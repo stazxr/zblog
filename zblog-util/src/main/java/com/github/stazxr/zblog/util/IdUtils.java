@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.util;
 import java.util.List;
 
 /**
- * ID生成工具类，只声明方法，不进行实现
+ * ID生成工具类，只声明方法，不进行实现，供给非必须依赖模块调用
  *
  * @author SunTao
  * @since 2021-12-12
