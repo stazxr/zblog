@@ -1,0 +1,12 @@
+spring:
+  web:
+    resources:
+      add-mappings: true
+  mvc:
+    throw-exception-if-no-handler-found: false
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource

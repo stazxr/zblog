@@ -1,0 +1,14 @@
+一、本地环境搭建=============
+
+注意事项：
+可以访问链接查看常见问题解决案例：https://www.suntaoblog.com/
+
+1、启动报错各种依赖找不到
+解决方法：
+File - Setting - Maven - Importing处，勾选Create module groups for multi-module Maven projects；
+在项目根目录执行 mvn clean install。
+
+二、上线部署=============
+1、run base.sql
+2、mvn clean package
+3、运行 zblog-service 模块的启动类

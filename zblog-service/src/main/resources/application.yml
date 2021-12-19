@@ -1,0 +1,17 @@
+server:
+  port: 31945
+spring:
+  profiles:
+    active: dev
+swagger:
+  enable: ${spring.web.resources.add-mappings}
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-value: true
+      logic-not-delete-value: false
+system:
+  deploy-type: single

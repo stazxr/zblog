@@ -1,0 +1,52 @@
+/*
+SQLyog Community v13.1.7 (64 bit)
+MySQL - 5.7.29-log : Database - zblog
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`zblog` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+
+USE `zblog`;
+
+/*Table structure for table `sys_dict` */
+
+DROP TABLE IF EXISTS `sys_dict`;
+
+CREATE TABLE `sys_dict` (
+  `ID` bigint(64) unsigned NOT NULL,
+  `NAME` varchar(50) NOT NULL COMMENT '字典名称',
+  `KEY` varchar(50) NOT NULL COMMENT '字典 key',
+  `VALUE` text DEFAULT NULL COMMENT '字典 value',
+  `PID` int(11) DEFAULT NULL COMMENT '父ID',
+  `TYPE` int(11) NOT NULL DEFAULT '1' COMMENT '类型，1：组；2：项',
+  `ORDER` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
+  `DESC` varchar(127) NOT NULL DEFAULT '' COMMENT '字典描述',
+  `LOCKED` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否允许编辑、删除',
+  `UNIQUE` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'key是否唯一',
+  `ENABLED` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  `DELETED` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否逻辑删除',
+  `VERSION` int(11) NOT NULL DEFAULT '1' COMMENT '乐观锁',
+  `CREATE_USER` varchar(20) NOT NULL,
+  `CREATE_TIME` varchar(20) NOT NULL,
+  `CREATE_DATE` varchar(20) NOT NULL,
+  `UPDATE_USER` varchar(20) NOT NULL DEFAULT '',
+  `UPDATE_TIME` varchar(20) NOT NULL DEFAULT '',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `UNIQUE_KEY_PID` (`KEY`,`PID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+/*Data for the table `sys_dict` */
+INSERT INTO zblog.sys_dict (ID, NAME, `KEY`, VALUE, PID, TYPE, `ORDER`, `DESC`, LOCKED, `UNIQUE`, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '系统参数', 'sys', null, null, 1, 1, '系统参数', 1, 1, 1, 0, 1, 'SYSTEM', '2021-12-17 00:09:21', '2021-12-17', '', '');
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

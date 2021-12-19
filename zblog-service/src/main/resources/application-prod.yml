@@ -1,0 +1,12 @@
+spring:
+  web:
+    resources:
+      add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://rm-2zesvm06o324og1k3bo.mysql.rds.aliyuncs.com:3306/blog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: blog_admin
+    password: Blog@2021#
+    type: com.alibaba.druid.pool.DruidDataSource
