@@ -1,10 +1,10 @@
-package com.github.stazxr.zblog.base.entity;
+package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.entity.BaseEntity;
+import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.Getter;
 import lombok.Setter;

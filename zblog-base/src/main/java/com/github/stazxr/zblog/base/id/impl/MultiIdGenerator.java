@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.base.id.impl;
 
 import com.github.stazxr.zblog.base.id.work.impl.DbWorkIdResolver;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +12,15 @@ import org.springframework.stereotype.Service;
  * @author SunTao
  * @since 2021-12-12
  */
+@Slf4j
 @Service("IdGeneratorService")
+@ConditionalOnBean(DbWorkIdResolver.class)
 @ConditionalOnProperty(name = "system.deploy-type", havingValue = "multi")
 public class MultiIdGenerator extends BaseWorkIdIdGeneratorImpl {
     private final DbWorkIdResolver dbWorkIdResolver;
 
     public MultiIdGenerator(DbWorkIdResolver dbWorkIdResolver) {
+        log.info("DeployType: multi");
         this.dbWorkIdResolver = dbWorkIdResolver;
     }
 

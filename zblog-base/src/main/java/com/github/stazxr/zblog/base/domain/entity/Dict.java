@@ -1,10 +1,10 @@
-package com.github.stazxr.zblog.base.entity;
+package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.entity.BaseEntity;
+import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +16,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("sys_dict")
+@TableName("dict")
 public class Dict extends BaseEntity {
     /**
      * serialId

@@ -18,9 +18,9 @@ USE `zblog`;
 
 /*Table structure for table `sys_dict` */
 
-DROP TABLE IF EXISTS `sys_dict`;
+DROP TABLE IF EXISTS `dict`;
 
-CREATE TABLE `sys_dict` (
+CREATE TABLE `dict` (
   `ID` bigint(64) unsigned NOT NULL,
   `NAME` varchar(50) NOT NULL COMMENT '字典名称',
   `KEY` varchar(50) NOT NULL COMMENT '字典 key',
@@ -44,7 +44,7 @@ CREATE TABLE `sys_dict` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 /*Data for the table `sys_dict` */
-INSERT INTO zblog.sys_dict (ID, NAME, `KEY`, VALUE, PID, TYPE, `ORDER`, `DESC`, LOCKED, `UNIQUE`, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '系统参数', 'sys', null, null, 1, 1, '系统参数', 1, 1, 1, 0, 1, 'SYSTEM', '2021-12-17 00:09:21', '2021-12-17', '', '');
+INSERT INTO zblog.dict (ID, NAME, `KEY`, VALUE, PID, TYPE, `ORDER`, `DESC`, LOCKED, `UNIQUE`, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '系统参数', 'sys', null, null, 1, 1, '系统参数', 1, 1, 1, 0, 1, 'SYSTEM', '2021-12-17 00:09:21', '2021-12-17', '', '');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

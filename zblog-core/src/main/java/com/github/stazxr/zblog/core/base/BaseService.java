@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.base.service;
+package com.github.stazxr.zblog.core.base;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 

@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.base.enums;
+package com.github.stazxr.zblog.base.domain.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
@@ -10,12 +10,12 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum PermissionType {
     /**
-     * 目录（一级菜单）
+     * 目录，可分配URL
      */
     DIR(1),
 
     /**
-     * 菜单（二级菜单）
+     * 菜单，无URL
      */
     MENU(2),
 

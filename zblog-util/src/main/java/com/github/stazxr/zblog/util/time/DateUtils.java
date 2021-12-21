@@ -183,4 +183,33 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         return day + "天" + hour + "小时" + min + "分钟" + sec + "秒";
     }
+
+    /**
+     * 格式化时间为字符串数组
+     *
+     * @param dateStr 时间字符串 yyyy-MM-dd HH:mm:ss or yyyy-MM-dd
+     * @return 时间字符数组
+     */
+    public static String[] parseDateStrToAry(String dateStr) {
+        String[] result = new String[6];
+        if (StringUtils.isBlank(dateStr)) {
+            return result;
+        }
+
+        int i = 0;
+        String[] tmp1 = dateStr.contains(" ") ? dateStr.split(" ") : new String[]{dateStr};
+        for (String tmp : tmp1) {
+            // get item
+            String[] tmp2 = tmp.contains("-") ? tmp.split("-") :
+                    tmp.contains(":") ? tmp.split(":") : new String[]{tmp};
+
+            // set item
+            for (String item : tmp2) {
+                result[i++] = item;
+            }
+        }
+
+        // result
+        return result;
+    }
 }

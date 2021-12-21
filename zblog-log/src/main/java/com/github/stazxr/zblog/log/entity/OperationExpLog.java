@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.log.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.entity.BaseEntity;
+import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

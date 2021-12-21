@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.base.entity;
+package com.github.stazxr.zblog.core.base;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 自定义公共Entity父类,将公共属性定义在这里
+ * BaseEntity
  *
  * @author SunTao
  * @since 2020-11-15

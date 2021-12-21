@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.base.enums;
+package com.github.stazxr.zblog.base.domain.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 

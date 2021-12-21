@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.core.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.github.stazxr.zblog.core.base.Const;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.AllArgsConstructor;
 import org.apache.ibatis.reflection.MetaObject;
@@ -70,7 +70,7 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
 
     public String getLoginUsername() {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            return Const.USER_SYSTEM;
+            return BaseConst.USER_SYSTEM;
         }
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }

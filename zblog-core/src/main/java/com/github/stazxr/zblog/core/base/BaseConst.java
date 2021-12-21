@@ -6,7 +6,7 @@ package com.github.stazxr.zblog.core.base;
  * @author SunTao
  * @since 2020-11-16
  */
-public class Const {
+public class BaseConst {
     /**
      * 系统根包路径
      */

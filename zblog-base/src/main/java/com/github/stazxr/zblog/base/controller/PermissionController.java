@@ -1,7 +1,7 @@
 //package com.github.stazxr.zblog.base.controller;
 //
-//import com.github.stazxr.zblog.base.entity.Permission;
-//import com.github.stazxr.zblog.base.enums.PermissionType;
+//import com.github.stazxr.zblog.base.model.entity.Permission;
+//import com.github.stazxr.zblog.base.model.enums.PermissionType;
 //import com.github.stazxr.zblog.base.service.PermissionService;
 //import com.github.stazxr.zblog.core.annotation.Log;
 //import com.github.stazxr.zblog.core.annotation.Route;

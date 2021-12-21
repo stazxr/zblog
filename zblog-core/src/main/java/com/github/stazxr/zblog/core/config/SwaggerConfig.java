@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.core.config;
 
-import com.github.stazxr.zblog.core.base.Const;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +33,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(Const.BASE_PACKAGE))
+                .apis(RequestHandlerSelectors.basePackage(BaseConst.BASE_PACKAGE))
                 .paths(PathSelectors.any())
                 .build();
     }

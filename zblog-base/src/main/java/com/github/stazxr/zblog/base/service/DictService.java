@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.stazxr.zblog.base.entity.Dict;
+import com.github.stazxr.zblog.base.domain.entity.Dict;
 
 /**
  * 字典服务层

@@ -1,14 +1,13 @@
-package com.github.stazxr.zblog.base.entity;
+package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.github.stazxr.zblog.base.enums.PermissionLevel;
-import com.github.stazxr.zblog.base.enums.PermissionType;
-import com.github.stazxr.zblog.core.base.entity.BaseEntity;
+import com.github.stazxr.zblog.base.domain.enums.PermissionLevel;
+import com.github.stazxr.zblog.base.domain.enums.PermissionType;
+import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -17,9 +16,9 @@ import java.util.Objects;
  * @author SunTao
  * @since 2020-11-15
  */
-@TableName("sys_permission")
 @Getter
 @Setter
+@TableName("sys_permission")
 public class Permission extends BaseEntity {
     /**
      * serialId
@@ -41,28 +40,27 @@ public class Permission extends BaseEntity {
     /**
      * 权限 URL
      */
-    private String url;
+    private String permUrl;
 
     /**
      * 权限标识
      */
-    private String perm;
+    private String permCode;
 
     /**
      * 父权限ID
      */
-    private Long parentId;
+    private Long pid;
 
     /**
      * 权限类型
      */
-    private PermissionType type;
+    private PermissionType permType;
 
     /**
      * 权限级别
      */
-    @TableField(value = "`LEVEL`")
-    private PermissionLevel level;
+    private PermissionLevel permLevel;
 
     /**
      * 权限图标
@@ -86,26 +84,19 @@ public class Permission extends BaseEntity {
     @TableLogic
     private Boolean deleted;
 
-    /**
-     * 子权限列表
-     */
-    @TableField(exist = false)
-    private List<Permission> childrenList;
-
     @Override
     public String toString() {
         return "Permission{" +
-                "id='" + getId() + '\'' +
+                "id=" + id +
                 ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", perm='" + perm + '\'' +
-                ", parentId=" + parentId +
-                ", type=" + type +
-                ", level=" + level +
+                ", permUrl='" + permUrl + '\'' +
+                ", permCode='" + permCode + '\'' +
+                ", pid=" + pid +
+                ", permType=" + permType +
+                ", permLevel=" + permLevel +
                 ", icon='" + icon + '\'' +
                 ", order=" + order +
                 ", active=" + active +
-                ", version=" + getVersion() +
                 '}';
     }
 

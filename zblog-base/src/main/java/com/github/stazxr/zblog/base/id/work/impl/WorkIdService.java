@@ -1,12 +1,12 @@
 package com.github.stazxr.zblog.base.id.work.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.stazxr.zblog.base.entity.Dict;
-import com.github.stazxr.zblog.base.enums.DictType;
+import com.github.stazxr.zblog.base.domain.entity.Dict;
+import com.github.stazxr.zblog.base.domain.enums.DictType;
 import com.github.stazxr.zblog.base.id.work.model.WorkIdCache;
 import com.github.stazxr.zblog.base.id.work.model.WorkResult;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.core.base.Const;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.net.LocalHostUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,7 @@ public class WorkIdService {
         WorkResult result = new WorkResult();
         result.setWorkIp(ipAddr);
 
-        Dict dict = dictService.getById(Const.DictId.WORK_ID);
+        Dict dict = dictService.getById(BaseConst.DictId.WORK_ID);
         if (dict == null) {
             // 不存在机器ID描述信息
             insertDictInfo(ipAddr);
@@ -91,10 +91,10 @@ public class WorkIdService {
         workIdCache.setLastWorkId(DEFAULT_LAST_WORK_ID);
 
         Dict newDict = new Dict();
-        newDict.setId(Const.DictId.WORK_ID);
+        newDict.setId(BaseConst.DictId.WORK_ID);
         newDict.setName("机器ID信息");
         newDict.setKey(DICT_KEY);
-        newDict.setPid(Const.DictId.SYS);
+        newDict.setPid(BaseConst.DictId.SYS);
         newDict.setType(DictType.ITEM.value());
         newDict.setLocked(true);
         newDict.setUnique(true);

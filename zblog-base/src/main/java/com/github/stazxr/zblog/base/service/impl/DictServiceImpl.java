@@ -2,11 +2,9 @@ package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.stazxr.zblog.base.entity.Dict;
-import com.github.stazxr.zblog.base.enums.DictType;
+import com.github.stazxr.zblog.base.domain.entity.Dict;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.util.Assert;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
