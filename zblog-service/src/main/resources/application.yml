@@ -15,3 +15,7 @@ mybatis-plus:
       logic-not-delete-value: false
 system:
   deploy-type: single
+jwt:
+  secret: zxrast
+  expiration: 3600000 # 1h
+  token: Authorization

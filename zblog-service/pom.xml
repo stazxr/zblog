@@ -24,11 +24,11 @@
             <version>${zblog.version}</version>
         </dependency>
         <!-- Zblog Log -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.stazxr</groupId>-->
-<!--            <artifactId>zblog-log</artifactId>-->
-<!--            <version>${zblog.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.stazxr</groupId>
+            <artifactId>zblog-log</artifactId>
+            <version>${zblog.version}</version>
+        </dependency>
         <!-- Springboot Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

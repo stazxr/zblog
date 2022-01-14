@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.github.stazxr.zblog.base.domain.enums.PermissionLevel;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -11,20 +10,15 @@ import lombok.Setter;
 import java.util.Objects;
 
 /**
- * 权限
+ * 系统权限
  *
  * @author SunTao
  * @since 2020-11-15
  */
 @Getter
 @Setter
-@TableName("sys_permission")
+@TableName("permission")
 public class Permission extends BaseEntity {
-    /**
-     * serialId
-     */
-    private static final long serialVersionUID = -1866426336122900009L;
-
     /**
      * 主键
      */
@@ -34,23 +28,26 @@ public class Permission extends BaseEntity {
     /**
      * 权限名称
      */
-    @TableField(value = "`NAME`")
-    private String name;
+    private String permName;
 
     /**
-     * 权限 URL
-     */
-    private String permUrl;
-
-    /**
-     * 权限标识
-     */
-    private String permCode;
-
-    /**
-     * 父权限ID
+     * 父权限ID, top perm is null
      */
     private Long pid;
+
+    /**
+     * 权限对应的路由信息
+     * if {@link PermissionType#BTN} not null see: {@link Router#getId()}, else be null.
+     */
+    private Long routerId;
+
+    /**
+     * 权限路径
+     * if {@link PermissionType#DIR} be empty string
+     * if {@link PermissionType#MENU} be menu path
+     * if {@link PermissionType#BTN} be router url, see {@link Router#getUrl()}
+     */
+    private String permPath;
 
     /**
      * 权限类型
@@ -58,9 +55,10 @@ public class Permission extends BaseEntity {
     private PermissionType permType;
 
     /**
-     * 权限级别
+     * 权限访问级别
+     * {@link com.github.stazxr.zblog.core.annotation.Router#level()}
      */
-    private PermissionLevel permLevel;
+    private Integer level;
 
     /**
      * 权限图标
@@ -70,39 +68,22 @@ public class Permission extends BaseEntity {
     /**
      * 排序字段
      */
-    @TableField(value = "`ORDER`")
-    private Long order;
+    private Integer sort;
 
     /**
-     * 权限状态（正常/禁用）
+     * 权限状态（启用/禁用）
      */
-    private Boolean active;
+    private Boolean enabled;
 
     /**
-     * 是否已删除（逻辑操作，保护数据）
+     * 是否有效
      */
     @TableLogic
     private Boolean deleted;
 
     @Override
-    public String toString() {
-        return "Permission{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", permUrl='" + permUrl + '\'' +
-                ", permCode='" + permCode + '\'' +
-                ", pid=" + pid +
-                ", permType=" + permType +
-                ", permLevel=" + permLevel +
-                ", icon='" + icon + '\'' +
-                ", order=" + order +
-                ", active=" + active +
-                '}';
-    }
-
-    @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getPermName());
     }
 
     @Override
@@ -115,6 +96,6 @@ public class Permission extends BaseEntity {
         }
 
         Permission other = (Permission) obj;
-        return !StringUtils.isEmpty(name) && name.equalsIgnoreCase(other.getName());
+        return !StringUtils.isEmpty(permName) && permName.equalsIgnoreCase(other.getPermName());
     }
 }

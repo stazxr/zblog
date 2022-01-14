@@ -10,17 +10,17 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum PermissionType {
     /**
-     * 目录，可分配URL
+     * 目录
      */
     DIR(1),
 
     /**
-     * 菜单，无URL
+     * 菜单
      */
     MENU(2),
 
     /**
-     * 按钮（页面的增加/删除等按钮）
+     * 按钮
      */
     BTN(3);
 

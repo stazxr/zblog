@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 字典
+ * 系统字典
  *
  * @author SunTao
  * @since 2021-02-20
@@ -18,11 +18,6 @@ import lombok.Setter;
 @Setter
 @TableName("dict")
 public class Dict extends BaseEntity {
-    /**
-     * serialId
-     */
-    private static final long serialVersionUID = -6696524713082616934L;
-
     /**
      * 主键
      */
@@ -68,8 +63,7 @@ public class Dict extends BaseEntity {
     /**
      * 排序
      */
-    @TableField(value = "`ORDER`")
-    private Integer order;
+    private Integer sort;
 
     /**
      * 是否允许编辑、删除
@@ -88,26 +82,8 @@ public class Dict extends BaseEntity {
     private Boolean enabled;
 
     /**
-     * 是否已删除（逻辑操作，保护数据）
+     * 是否有效
      */
     @TableLogic
     private Boolean deleted;
-
-    @Override
-    public String toString() {
-        return "Dict{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", pid=" + pid +
-                ", key='" + key + '\'' +
-                ", value='" + value + '\'' +
-                ", type=" + type +
-                ", desc='" + desc + '\'' +
-                ", order=" + order +
-                ", locked=" + locked +
-                ", unique=" + unique +
-                ", enabled=" + enabled +
-                ", deleted=" + deleted +
-                '}';
-    }
 }

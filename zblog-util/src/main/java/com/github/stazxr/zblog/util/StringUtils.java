@@ -1,5 +1,8 @@
 package com.github.stazxr.zblog.util;
 
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +13,9 @@ import java.util.regex.Pattern;
  * @since 2020-11-14
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
+
+    private static final String[] EMPTY_STRING_ARRAY = {};
+
     /**
      * 判断字符串是否为空
      *
@@ -90,5 +96,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
         matcher.appendTail(sb);
         return sb.toString();
+    }
+
+    public static String[] toStringArray(Collection<String> collection) {
+        return (!CollectionUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
     }
 }

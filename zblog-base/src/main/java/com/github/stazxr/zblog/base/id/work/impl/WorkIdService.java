@@ -27,7 +27,7 @@ public class WorkIdService {
     /**
      * key-value 存储主键
      */
-    private static final String DICT_KEY = "GUID_WORK_ID";
+    private static final String DICT_KEY = "guidWorkId";
 
     /**
      * 默认最近使用的workId是0

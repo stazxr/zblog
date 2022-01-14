@@ -8,7 +8,7 @@ package com.github.stazxr.zblog.util;
  */
 public abstract class Assert {
     /**
-     * Assert that an object is not
+     * Assert that an object is not null
      *
      * @param object the object to check
      * @throws IllegalArgumentException if the object is null
@@ -18,7 +18,7 @@ public abstract class Assert {
     }
 
     /**
-     * Assert that an object is not
+     * Assert that an object is not null
      *
      * @param object the object to check
      * @param message the exception message to use if the assertion fails
@@ -26,6 +26,19 @@ public abstract class Assert {
      */
     public static void notNull(Object object, String message) {
         if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    /**
+     * Assert that a string is not
+     *
+     * @param str the string to check
+     * @param message the exception message to use if the assertion fails
+     * @throws IllegalArgumentException if the string is blank
+     */
+    public static void notBlank(String str, String message) {
+        if (str == null || "".equals(str.trim())) {
             throw new IllegalArgumentException(message);
         }
     }

@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.core.exception.handler;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.util.ThrowableUtil;
+import com.github.stazxr.zblog.util.ThrowableUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public Result serviceExceptionHandler(ServiceException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return Result.failure(ResultCode.SERVER_EXP, e.getMessage());
     }
 
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NullPointerException.class)
     public Result nullExceptionHandler(NullPointerException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return Result.failure(ResultCode.NULL_POINT);
     }
 
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = IllegalArgumentException.class)
     public Result illegalArgumentExceptionHandler(IllegalArgumentException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return Result.failure(ResultCode.PARAM_INVALID);
     }
 

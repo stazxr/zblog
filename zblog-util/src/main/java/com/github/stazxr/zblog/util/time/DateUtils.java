@@ -16,19 +16,28 @@ import java.util.Date;
  */
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
-     * 默认时间格式
-     */
-    private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    /**
      * yyyy-MM-dd HH:mm:ss
      */
-    public static final String YMD_HMS_PATTERN = DEFAULT_PATTERN;
+    public static final String YMD_HMS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * yyyy-MM-dd
      */
     public static final String YMD_PATTERN = "yyyy-MM-dd";
+
+    /**
+     * 默认时间格式
+     */
+    private static final String DEFAULT_PATTERN = YMD_HMS_PATTERN;
+
+    /**
+     * 获取系统默认的时间格式样式
+     *
+     * @return DEFAULT_PATTERN
+     */
+    public static String defaultPattern() {
+        return DEFAULT_PATTERN;
+    }
 
     /**
      * 格式化现在
@@ -211,5 +220,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         // result
         return result;
+    }
+
+    /**
+     * 计算两个日期之间的天数
+     *
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return 天数
+     */
+    public static int calDayCount(Date startDate, Date endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("startDate or endDate must not be null");
+        }
+
+        return (int) ((endDate.getTime() - startDate.getTime()) / (24L * 3600L * 1000L)) + 1;
     }
 }

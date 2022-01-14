@@ -1,12 +1,10 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.model.Result;
 import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * ID生成管理器
@@ -25,6 +23,7 @@ public class IdController {
      */
     @GetMapping("/getId")
     @ApiOperation("生成唯一序列")
+    @Router(name = "生成唯一序列", code = "getId")
     public Result getId() {
         return Result.success().data(GenerateIdUtils.getId());
     }
@@ -35,11 +34,12 @@ public class IdController {
      * @return Result
      */
     @ApiOperation("生成序列列表")
-    @ApiImplicitParams(
-        @ApiImplicitParam(name = "count", value = "获取序列的个数", dataType = "int", paramType = "path")
-    )
-    @GetMapping("/getIds/{count}")
-    public Result getIds(@PathVariable("count") Integer count) {
+    @GetMapping("/getIds")
+    @Router(name = "生成序列列表", code = "getIds")
+    public Result getIds(@RequestParam("count") Integer count) {
+        if (count == null || count == 0) {
+            count = 1;
+        }
         return Result.success().data(GenerateIdUtils.getIdList(count));
     }
 }

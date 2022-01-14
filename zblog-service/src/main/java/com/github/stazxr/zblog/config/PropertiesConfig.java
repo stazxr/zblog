@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.config;
 
+import com.github.stazxr.zblog.config.properties.JwtProperties;
 import com.github.stazxr.zblog.config.properties.SwaggerProperties;
 import com.github.stazxr.zblog.config.properties.SystemProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
  * @since 2021-12-05
  */
 @Configuration
-@EnableConfigurationProperties({SystemProperties.class, SwaggerProperties.class})
+@EnableConfigurationProperties({
+    SystemProperties.class, SwaggerProperties.class, JwtProperties.class
+})
 public class PropertiesConfig {
 }

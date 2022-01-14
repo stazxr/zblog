@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
-import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 字典数据持久层
@@ -11,5 +12,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
  * @author SunTao
  * @since 2021-02-20
  */
-public interface DictMapper extends BaseMapper<Dict, DictDto, DictVo> {
+public interface DictMapper extends BaseMapper<Dict> {
+
+    List<Dict> selectItems(@Param("dictKey") String key);
 }
