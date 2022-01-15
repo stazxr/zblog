@@ -25,5 +25,11 @@
             <artifactId>commons-net</artifactId>
             <version>3.7</version>
         </dependency>
+        <!-- Springboot Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -10,4 +10,11 @@ import com.github.stazxr.zblog.core.base.BaseService;
  * @since 2020-11-15
  */
 public interface UserService extends BaseService<User> {
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return User
+     */
+    User queryUserByUsername(String username);
 }

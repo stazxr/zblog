@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.domain.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 /**
  * 字典类型
  *
@@ -17,6 +19,7 @@ public enum DictType {
      */
     ITEM(2);
 
+    @EnumValue
     private final Integer value;
 
     DictType(Integer value) {

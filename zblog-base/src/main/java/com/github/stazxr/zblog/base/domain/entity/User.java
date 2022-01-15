@@ -174,6 +174,11 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
+        if (admin) {
+            // admin not check this.
+            return true;
+        }
+
         try {
             String lastChangePwdTime = StringUtils.isNotBlank(changePwdTime) ? changePwdTime : super.getCreateTime();
             Date expiredDate = DateUtils.addDays(DateUtils.parse(lastChangePwdTime), PASSWORD_VALID_TIME);
@@ -209,12 +214,13 @@ public class User extends BaseEntity implements UserDetails {
             return authorities;
         }
 
-        for (Role role : roles) {
+        // 封装角色列表
+        roles.forEach(role -> {
             if (role.getEnabled()) {
                 // 校验角色状态，达成实时判断用户当前角色的功能
                 authorities.add(role);
             }
-        }
+        });
 
         // return
         return Collections.unmodifiableSet(sortAuthorities(authorities));

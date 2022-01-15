@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 角色业务实现层
@@ -20,4 +21,15 @@ import javax.annotation.Resource;
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
     @Resource
     private RoleMapper roleMapper;
+
+    /**
+     * 查询用户角色列表
+     *
+     * @param userId 用户序列
+     * @return Roles
+     */
+    @Override
+    public List<Role> queryRolesByUserId(Long userId) {
+        return roleMapper.queryRolesByUserId(userId);
+    }
 }

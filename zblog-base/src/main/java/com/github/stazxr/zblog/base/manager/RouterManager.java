@@ -126,7 +126,7 @@ public class RouterManager {
             if (routeInfo == null) {
                 router = new Router();
                 router.setName(method.getName());
-                router.setCode("undified");
+                router.setCode(null);
                 router.setLevel(BaseConst.PermLevel.PUBLIC); // 登录即可访问
                 router.setRemark("系统识别，接口未配置Router注解");
             } else {

@@ -13,9 +13,10 @@ mybatis-plus:
     db-config:
       logic-delete-value: true
       logic-not-delete-value: false
+  type-enums-package: com.github.stazxr.zblog.base.domain.enums
 system:
   deploy-type: single
 jwt:
   secret: zxrast
   expiration: 3600000 # 1h
-  token: Authorization
+  token-header: Authorization

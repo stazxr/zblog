@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
@@ -20,4 +22,19 @@ import javax.annotation.Resource;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     private UserMapper userMapper;
+
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return User
+     */
+    @Override
+    public User queryUserByUsername(String username) {
+        return userMapper.selectOne(queryBuild().eq(User::getUsername, username));
+    }
+
+    private LambdaQueryWrapper<User> queryBuild() {
+        return Wrappers.lambdaQuery();
+    }
 }
