@@ -16,7 +16,3 @@ mybatis-plus:
   type-enums-package: com.github.stazxr.zblog.base.domain.enums
 system:
   deploy-type: single
-jwt:
-  secret: zxrast
-  expiration: 3600000 # 1h
-  token-header: Authorization

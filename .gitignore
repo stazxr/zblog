@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### online data ###
+suntaoblogcom.jks
+application-online.yml

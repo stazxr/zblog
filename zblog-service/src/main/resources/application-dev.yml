@@ -10,3 +10,17 @@ spring:
     username: root
     password: root
     type: com.alibaba.druid.pool.DruidDataSource
+logging:
+  level:
+    com.github.spring.security.mapper: debug
+    org.springframework.security: debug
+jwt:
+  config:
+    enabled: true
+    key-location: zblog.jks
+    key-alias: zblog
+    key-pass: 123456
+    iss: zblog.space
+    sub: all
+    access-exp-days: 1
+    refresh-exp-days: 3
