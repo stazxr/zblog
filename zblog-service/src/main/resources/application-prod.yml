@@ -1,3 +1,5 @@
+server:
+  port: 9999
 spring:
   web:
     resources:
@@ -6,13 +8,14 @@ spring:
     throw-exception-if-no-handler-found: true
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: xxxxxx
-    username: xxxxxx
-    password: xxxxxx
+    url: jdbc:mysql://localhost:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
+  devtools:
+    add-properties: false
 jwt:
   config:
-    enabled: true
     key-location: zblog.jks
     key-alias: zblog
     key-pass: 123456
@@ -20,3 +23,4 @@ jwt:
     sub: all
     access-exp-days: 3
     refresh-exp-days: 7
+    cache-type: memory

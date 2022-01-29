@@ -8,11 +8,6 @@ package com.github.stazxr.zblog.core.base;
  */
 public class BaseConst {
     /**
-     * 系统根包路径
-     */
-    public static final String BASE_PACKAGE = "com.github.stazxr.zblog";
-
-    /**
      * system username
      */
     public static final String USER_SYSTEM = "SYSTEM";

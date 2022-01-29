@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.util;
 
 import com.github.stazxr.zblog.base.id.IdGenerator;
-import com.github.stazxr.zblog.core.util.SpringContextUtil;
+import com.github.stazxr.zblog.core.util.SpringContextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public abstract class GenerateIdUtils {
 
     private static IdGenerator getGenerateIdService() {
         if (GenerateIdUtils.idGenerator == null) {
-            GenerateIdUtils.idGenerator = SpringContextUtil.getBean("IdGeneratorService", IdGenerator.class);
+            GenerateIdUtils.idGenerator = SpringContextUtils.getBean("IdGeneratorService", IdGenerator.class);
         }
         return GenerateIdUtils.idGenerator;
     }

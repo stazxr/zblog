@@ -3,9 +3,11 @@ package com.github.stazxr.zblog.core.model;
 import com.alibaba.fastjson.JSONObject;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 自定义Response返回体
@@ -14,7 +16,6 @@ import java.io.Serializable;
  * @since 2020-11-16
  */
 @Getter
-@NoArgsConstructor
 public class Result implements Serializable {
     /**
      * serialVersionUID
@@ -22,52 +23,77 @@ public class Result implements Serializable {
     private static final long serialVersionUID = -7847907472897585204L;
 
     /**
-     * 响应码
+     * Http 响应码
      */
     private Integer code;
 
     /**
      * 响应信息
      */
-    private String message;
+    private final String message;
 
     /**
      * 响应数据
      */
     private Object data;
 
+    /**
+     * 业务响应码
+     */
+    private final Integer identifier;
+
+    /**
+     * 时间戳
+     */
+    private final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
     private Result(ResultCode resultCode) {
-        code = resultCode.code();
+        identifier = resultCode.code();
         message = resultCode.message();
     }
 
     private Result(ResultCode resultCode, String message) {
-        code = resultCode.code();
+        identifier = resultCode.code();
         this.message = message;
     }
 
     public static Result success() {
-        return new Result(ResultCode.SUCCESS);
+        return new Result(ResultCode.SUCCESS).code(HttpStatus.OK);
+    }
+
+    public static Result success(ResultCode resultCode) {
+        return new Result(resultCode).code(HttpStatus.OK);
     }
 
     public static Result success(String message) {
-        return new Result(ResultCode.SUCCESS, message);
+        return new Result(ResultCode.SUCCESS, message).code(HttpStatus.OK);
     }
 
     public static Result failure() {
-        return new Result(ResultCode.FAILED);
+        return new Result(ResultCode.FAILED).code(HttpStatus.OK);
     }
 
     public static Result failure(ResultCode resultCode) {
-        return new Result(resultCode);
+        return new Result(resultCode).code(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static Result failure(String message) {
-        return new Result(ResultCode.FAILED, message);
+        return new Result(ResultCode.FAILED, message).code(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static Result failure(ResultCode resultCode, String message) {
-        return new Result(resultCode, message);
+        return new Result(resultCode, message).code(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * 设置响应码
+     *
+     * @param status HttpStatus
+     * @return Result
+     */
+    public Result code(HttpStatus status) {
+        this.code = status.value();
+        return this;
     }
 
     /**

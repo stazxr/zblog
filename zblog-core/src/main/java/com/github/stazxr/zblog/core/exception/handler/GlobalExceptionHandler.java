@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
      * @param e 错误信息
      * @return Result
      */
-    @ExceptionHandler
+    @ExceptionHandler(value = NoHandlerFoundException.class)
     public Result resourceNotFoundExceptionHandler(NoHandlerFoundException e) {
         log.error(e.getMessage());
         return Result.failure(ResultCode.NOT_FOUND);

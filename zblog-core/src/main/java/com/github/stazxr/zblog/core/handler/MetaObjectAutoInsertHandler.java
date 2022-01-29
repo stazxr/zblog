@@ -3,7 +3,6 @@ package com.github.stazxr.zblog.core.handler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.time.DateUtils;
-import lombok.AllArgsConstructor;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
  * @since 2021-06-28
  */
 @Component
-@AllArgsConstructor
 public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     /**
      * 插入时自动填充创建用户

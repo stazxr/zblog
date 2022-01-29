@@ -1,0 +1,173 @@
+{
+  "groups": [
+    {
+      "name": "jwt.config",
+      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+    },
+    {
+      "name": "swagger",
+      "type": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties"
+    },
+    {
+      "name": "swagger.contact",
+      "type": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "sourceMethod": "getContact()"
+    },
+    {
+      "name": "deploy",
+      "type": "com.github.stazxr.zblog.base.config.properties.DeployProperties",
+      "sourceType": "com.github.stazxr.zblog.base.config.properties.DeployProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "jwt.config.key-location",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "jks file location.",
+      "defaultValue": "zblog.jks"
+    },
+    {
+      "name": "jwt.config.key-alias",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "jks alias.",
+      "defaultValue": "zblog"
+    },
+    {
+      "name": "jwt.config.key-pass",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "jks storepass."
+    },
+    {
+      "name": "jwt.config.iss",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "签发者.",
+      "defaultValue": "zblog.space"
+    },
+    {
+      "name": "jwt.config.sub",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "面向的用户.",
+      "defaultValue": "all"
+    },
+    {
+      "name": "jwt.config.cache-type",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "token 缓存类型.",
+      "defaultValue": "memory"
+    },
+    {
+      "name": "jwt.config.access-exp-days",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "令牌的有效天数.",
+      "defaultValue": 3
+    },
+    {
+      "name": "jwt.config.refresh-exp-days",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "description": "刷新令牌的有效天数.",
+      "defaultValue": 7
+    },
+    {
+      "name": "swagger.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "是否启用 Swagger.",
+      "defaultValue": false
+    },
+    {
+      "name": "swagger.title",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 文档标题.",
+      "defaultValue": "zblog API文档"
+    },
+    {
+      "name": "swagger.description",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 文档描述.",
+      "defaultValue": "一个前后端分离的个人博客框架，Git链接：https://github.com/stazxr/zblog"
+    },
+    {
+      "name": "swagger.version",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger API 版本.",
+      "defaultValue": "4.0.0"
+    },
+    {
+      "name": "swagger.basePackage",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 扫描路径.",
+      "defaultValue": "com.github.stazxr.zblog"
+    },
+    {
+      "name": "swagger.contact.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人姓名.",
+      "defaultValue": "孙涛"
+    },
+    {
+      "name": "swagger.contact.url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人网址.",
+      "defaultValue": "https://www.suntaoblog.com/"
+    },
+    {
+      "name": "swagger.contact.email",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人邮箱.",
+      "defaultValue": "stazxr@qq.com"
+    },
+    {
+      "name": "deploy.type",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.config.properties.DeployProperties",
+      "description": "部署类型：single - 单机部署；multi - 多节点部署.",
+      "defaultValue": "single"
+    }
+  ],
+  "hints": [
+    {
+      "name": "jwt.config.cache-type",
+      "values": [
+        {
+          "value": "memory",
+          "description": "运行内存."
+        },
+        {
+          "value": "redis",
+          "description": "Redis缓存."
+        }
+      ]
+    },
+    {
+      "name": "deploy.type",
+      "values": [
+        {
+        "value": "single",
+        "description": "单机部署."
+        },
+        {
+          "value": "multi",
+          "description": "多节点部署."
+        }
+      ]
+    }
+  ]
+}

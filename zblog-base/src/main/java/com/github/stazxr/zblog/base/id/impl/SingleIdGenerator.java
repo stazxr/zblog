@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service("IdGeneratorService")
-@ConditionalOnProperty(name = "system.deploy-type", havingValue = "single")
+@ConditionalOnProperty(name = "deploy.type", havingValue = "single")
 public class SingleIdGenerator extends BaseWorkIdIdGeneratorImpl {
     public SingleIdGenerator() {
       log.info("DeployType: single");

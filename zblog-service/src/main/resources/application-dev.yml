@@ -1,3 +1,5 @@
+server:
+  port: 8888
 spring:
   web:
     resources:
@@ -12,11 +14,10 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
 logging:
   level:
-    com.github.spring.security.mapper: debug
-    org.springframework.security: debug
+    com.github.spring.security.mapper: info
+    org.springframework.security: info
 jwt:
   config:
-    enabled: true
     key-location: zblog.jks
     key-alias: zblog
     key-pass: 123456
@@ -24,3 +25,4 @@ jwt:
     sub: all
     access-exp-days: 1
     refresh-exp-days: 3
+    cache-type: memory

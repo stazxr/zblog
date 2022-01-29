@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.base.id.work.impl;
 
+import com.github.stazxr.zblog.base.id.impl.MultiIdGenerator;
 import com.github.stazxr.zblog.base.id.work.api.WorkIdResolver;
 import com.github.stazxr.zblog.base.id.work.model.WorkResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +20,7 @@ import java.net.UnknownHostException;
  */
 @Slf4j
 @Component("dbWorkIdResolver")
-@ConditionalOnProperty(name = "system.deploy-type", havingValue = "multi")
+@ConditionalOnBean(MultiIdGenerator.class)
 public class DbWorkIdResolver implements WorkIdResolver {
     private volatile Long workId;
 

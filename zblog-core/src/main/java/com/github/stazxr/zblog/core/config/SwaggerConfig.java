@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.core.config;
 
-import com.github.stazxr.zblog.core.base.BaseConst;
+import com.alibaba.fastjson.JSON;
+import com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -23,17 +25,21 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Slf4j
 @Configuration
 @EnableSwagger2
-@ConditionalOnProperty(name = "swagger.enable", havingValue = "true")
+@EnableConfigurationProperties(SwaggerConfigProperties.class)
+@ConditionalOnProperty(name = "swagger.config.enable", havingValue = "true")
 public class SwaggerConfig {
-    private static final String API_VERSION = "4.0.0";
+    @Bean
+    public SwaggerConfigProperties swaggerConfigProperties() {
+        return new SwaggerConfigProperties();
+    }
 
     @Bean
     public Docket createRestApi() {
-        log.info("init swagger...");
+        log.info("init swagger: {}", JSON.toJSONString(swaggerConfigProperties()));
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(BaseConst.BASE_PACKAGE))
+                .apis(RequestHandlerSelectors.basePackage(swaggerConfigProperties().getBasePackage()))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -45,17 +51,18 @@ public class SwaggerConfig {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("zblog 接口文档")
-                .description("一个前后端分离的个人博客框架，Git链接：https://github.com/stazxr/zblog")
+                .title(swaggerConfigProperties().getTitle())
+                .description(swaggerConfigProperties().getDescription())
                 .contact(contact())
-                .version(API_VERSION)
+                .version(swaggerConfigProperties().getVersion())
                 .build();
     }
 
     private Contact contact() {
-        String name = "SunTao";
-        String url = "https://www.suntaoblog.com";
-        String email = "stazxr@qq.com";
+        SwaggerConfigProperties.Contact contact = swaggerConfigProperties().getContact();
+        String name = contact.getName();
+        String url = contact.getUrl();
+        String email = contact.getEmail();
         return new Contact(name, url, email);
     }
 }

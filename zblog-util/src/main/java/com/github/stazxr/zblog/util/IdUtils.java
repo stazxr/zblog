@@ -15,7 +15,7 @@ public class IdUtils {
      * @return Long id
      */
     public static Long getId() {
-        // ToDo: 由Service模块重写该类
+        // ToDo: 由依赖模块重写该类
         return null;
     }
 
@@ -26,7 +26,7 @@ public class IdUtils {
      * @return List<Long> id列表
      */
     public static List<Long> getIdList(Integer count) {
-        // ToDo: 由Service模块重写该类
+        // ToDo: 由依赖模块重写该类
         return null;
     }
 }

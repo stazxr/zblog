@@ -29,6 +29,7 @@ public class UserRoleCache {
     }
 
     public static void remove(String username) {
+        log.info("remove user role cache [user-{}]", username);
         userRoleCache.remove(username);
     }
 
@@ -37,6 +38,7 @@ public class UserRoleCache {
     }
 
     public static void clear() {
+        log.info("clear all user role cache");
         userRoleCache.clear();
     }
 }
