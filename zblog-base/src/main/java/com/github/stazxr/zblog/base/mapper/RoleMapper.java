@@ -14,10 +14,18 @@ import java.util.List;
  */
 public interface RoleMapper extends BaseMapper<Role> {
     /**
-     * 查询用户角色列表
+     * 查询用户角色列表（包含被禁用的角色）
      *
      * @param userId 用户序列
      * @return Roles
      */
     List<Role> queryRolesByUserId(@Param("userId") Long userId);
+
+    /**
+     * 查询资源角色列表（包含被禁用的角色）
+     *
+     * @param permissionId 权限序列
+     * @return Roles
+     */
+    List<Role> queryRolesByPermissionId(@Param("permissionId") Long permissionId);
 }

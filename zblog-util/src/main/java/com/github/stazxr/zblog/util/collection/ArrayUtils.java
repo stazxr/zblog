@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayUtils {
+    // the unit of split big array to batch save.
     private static final int GREAT_SPLIT_COUNT = 50;
 
     /**

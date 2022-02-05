@@ -23,7 +23,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private RoleMapper roleMapper;
 
     /**
-     * 查询用户角色列表
+     * 查询用户角色列表（包含被禁用的角色）
      *
      * @param userId 用户序列
      * @return Roles
@@ -31,5 +31,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public List<Role> queryRolesByUserId(Long userId) {
         return roleMapper.queryRolesByUserId(userId);
+    }
+
+    /**
+     * 查询资源角色列表（包含被禁用的角色）
+     *
+     * @param permissionId 权限序列
+     * @return Roles
+     */
+    @Override
+    public List<Role> queryRolesByPermissionId(Long permissionId) {
+        return roleMapper.queryRolesByPermissionId(permissionId);
     }
 }

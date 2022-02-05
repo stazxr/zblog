@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.base.cache.UserRoleCache;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -138,6 +139,11 @@ public class User extends BaseEntity implements UserDetails {
     @TableLogic
     private Boolean deleted;
 
+    public Boolean getAdmin() {
+        // 暂不已DB为准
+        return Constants.USER_ADMIN.equalsIgnoreCase(username);
+    }
+
     /**
      * 账户是否未过期，过期无法验证
      *
@@ -208,7 +214,6 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<Role> authorities = new ArrayList<>();
-
         List<Role> roles = UserRoleCache.get(username);
         if (roles == null) {
             return authorities;

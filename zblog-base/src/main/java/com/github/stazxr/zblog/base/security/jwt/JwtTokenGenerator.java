@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.security.jwt;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.github.stazxr.zblog.base.security.exception.PreJwtCheckAuthenticationException;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.jwt.Jwt;
@@ -110,9 +111,8 @@ public class JwtTokenGenerator {
         String claims = jwt.getClaims();
         JSONObject jsonObject = JSONUtil.parseObj(claims);
         String exp = jsonObject.getStr(JWT_EXP_KEY);
-
         if (isExpired(exp)) {
-            throw new IllegalStateException("jwt token is expired");
+            throw new PreJwtCheckAuthenticationException("认证失败：身份信息已过期，请刷新认证信息.");
         }
         return jsonObject;
     }

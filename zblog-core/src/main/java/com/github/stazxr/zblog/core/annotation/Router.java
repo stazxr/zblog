@@ -37,4 +37,11 @@ public @interface Router {
 	 * @return int
 	 */
 	int level() default BaseConst.PermLevel.PUBLIC;
+
+	/**
+	 * 路由备注
+	 *
+	 * @return String
+	 */
+	String remark() default "";
 }

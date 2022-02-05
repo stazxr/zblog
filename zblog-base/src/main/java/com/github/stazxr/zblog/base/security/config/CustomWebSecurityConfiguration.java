@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.security.config;
 
+import com.github.stazxr.zblog.base.security.CustomAccessDecisionManager;
+import com.github.stazxr.zblog.base.security.CustomSecurityMetadataSource;
 import com.github.stazxr.zblog.base.security.exception.CustomAccessDeniedHandler;
 import com.github.stazxr.zblog.base.security.CustomUserDetailsService;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
@@ -16,12 +18,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 /**
@@ -33,11 +37,11 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @Configuration
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class CustomSpringBootWebSecurityConfiguration {
+public class CustomWebSecurityConfiguration {
     /**
      * login url
      */
-    private static final String LOGIN_PROCESSING_URL = "/process";
+    public static final String LOGIN_PROCESSING_URL = "/process";
 
     /**
      * 使用 Security 推荐的 BCryptPasswordEncoder 进行加解密
@@ -102,6 +106,16 @@ public class CustomSpringBootWebSecurityConfiguration {
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
         /**
+         * 自定义元数据加载器
+         */
+        private final CustomSecurityMetadataSource securityMetadataSource;
+
+        /**
+         * 访问决策管理器
+         */
+        private final CustomAccessDecisionManager accessDecisionManager;
+
+        /**
          * authenticationProvider 配置DB的认证方式
          *
          * @return DaoAuthenticationProvider
@@ -124,8 +138,15 @@ public class CustomSpringBootWebSecurityConfiguration {
          */
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            // 所有资源都需要验证
-            http.authorizeRequests().anyRequest().authenticated();
+            // 自定义访问决策器、资源池查询
+            http.authorizeRequests().anyRequest().authenticated().withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                @Override
+                public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+                    o.setSecurityMetadataSource(securityMetadataSource);
+                    o.setAccessDecisionManager(accessDecisionManager);
+                    return o;
+                }
+            });
 
             // session 生成策略用无状态策略
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

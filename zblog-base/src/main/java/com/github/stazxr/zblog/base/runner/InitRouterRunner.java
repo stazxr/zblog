@@ -4,18 +4,20 @@ import com.github.stazxr.zblog.base.manager.RouterManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 刷新系统路由列表
+ * 初始化系统路由列表
  *
  * @author SunTao
  * @since 2020-11-18
  */
 @Slf4j
 @Component
+@Order(21)
 @RequiredArgsConstructor
-public class SetRouteRunner implements CommandLineRunner {
+public class InitRouterRunner implements CommandLineRunner {
     private final RouterManager routerManager;
 
     /**
@@ -26,7 +28,9 @@ public class SetRouteRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
+            log.info("start init router...");
             routerManager.initRouter();
+            log.info("init router finish...");
         } catch (Exception e) {
             log.error("init router catch eor", e);
             System.exit(1);

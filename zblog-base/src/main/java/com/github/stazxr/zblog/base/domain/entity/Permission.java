@@ -36,12 +36,6 @@ public class Permission extends BaseEntity {
     private Long pid;
 
     /**
-     * 权限对应的路由信息
-     * if {@link PermissionType#BTN} not null see: {@link Router#getId()}, else be null.
-     */
-    private Long routerId;
-
-    /**
      * 权限路径
      * if {@link PermissionType#DIR} be empty string
      * if {@link PermissionType#MENU} be menu path

@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.service.RouterService;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.collection.ArrayUtils;
@@ -35,21 +36,6 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RouterManager {
-    /**
-     * 路由未纳管
-     */
-    private static final String STATUS_NONE = "none";
-
-    /**
-     * 路由被禁用，只有管理员可以访问
-     */
-    private static final String STATUS_DISABLED = "disabled";
-
-    /**
-     * 路由状态正常
-     */
-    private static final String STATUS_OK = "ok";
-
     private final WebApplicationContext applicationContext;
 
     private final PermissionService permissionService;
@@ -61,7 +47,6 @@ public class RouterManager {
      */
     @Transactional(rollbackFor = Exception.class)
     public void initRouter() {
-        log.info("start init router...");
         List<Router> routeList = parseRouter();
         log.info("router list: {}", routeList);
 
@@ -72,7 +57,6 @@ public class RouterManager {
             List<List<Router>> routers = ArrayUtils.averageAssign(routeList);
             routers.forEach(routerService::saveBatch);
         }
-        log.info("init router finish...");
     }
 
     // 解析所有的路由信息
@@ -114,7 +98,7 @@ public class RouterManager {
             Method method = handlerMethod.getMethod();
             RequestMapping isReqMapper = method.getAnnotation(RequestMapping.class);
             if (isReqMapper != null) {
-                throw new IllegalStateException("系统禁止使用RequestMapping注解 > " + uri);
+                throw new IllegalStateException("禁止使用RequestMapping注解 > " + uri);
             }
 
             // 获取Router注解
@@ -126,9 +110,9 @@ public class RouterManager {
             if (routeInfo == null) {
                 router = new Router();
                 router.setName(method.getName());
-                router.setCode(null);
+                router.setCode(method.getName());
                 router.setLevel(BaseConst.PermLevel.PUBLIC); // 登录即可访问
-                router.setRemark("系统识别，接口未配置Router注解");
+                router.setRemark("系统自动识别");
             } else {
                 router = new Router(routeInfo);
             }
@@ -145,13 +129,12 @@ public class RouterManager {
             // 设置路由状态
             Permission permission = permissionService.selectPermByPath(router.getUrl());
             if (permission == null) {
-                router.setStatus(STATUS_NONE);
-            } else if (!permission.getEnabled()) {
-                router.setStatus(STATUS_DISABLED);
-                router.setLevel(permission.getLevel());
+                router.setStatus(Constants.RouterStatus.NONE);
             } else {
-                router.setStatus(STATUS_OK);
                 router.setLevel(permission.getLevel());
+                router.setStatus(
+                    permission.getEnabled() ? Constants.RouterStatus.OK : Constants.RouterStatus.DISABLED
+                );
             }
 
             router.setId(GenerateIdUtils.getId());

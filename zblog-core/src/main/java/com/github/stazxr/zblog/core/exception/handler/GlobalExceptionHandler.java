@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.util.ThrowableUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -63,6 +64,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NoHandlerFoundException.class)
     public Result resourceNotFoundExceptionHandler(NoHandlerFoundException e) {
         log.error(e.getMessage());
-        return Result.failure(ResultCode.NOT_FOUND);
+        return Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND);
     }
 }

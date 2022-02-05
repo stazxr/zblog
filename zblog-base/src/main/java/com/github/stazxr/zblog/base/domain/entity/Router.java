@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -35,7 +36,8 @@ public class Router extends BaseEntity {
     private String code;
 
     /**
-     * 权限级别
+     * 权限级别（依permission刷新）
+     * {@link com.github.stazxr.zblog.core.base.BaseConst.PermLevel}
      */
     private Integer level;
 
@@ -50,7 +52,8 @@ public class Router extends BaseEntity {
     private String method;
 
     /**
-     * 路由状态
+     * 路由状态（依permission刷新）
+     * {@link com.github.stazxr.zblog.base.util.Constants.RouterStatus}
      */
     private String status;
 
@@ -71,18 +74,11 @@ public class Router extends BaseEntity {
         name = router.name();
         code = router.code();
         level = router.level();
-        remark = "";
+        remark = router.remark();
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + " [" +
-                "RouterName=" + this.name + ", " +
-                "RouterCode=" + this.code + ", " +
-                "RouterLevel=" + this.level + ", " +
-                "RouterUrl=" + this.url + ", " +
-                "RouterMethod=" + this.method + ", " +
-                "RouterStatus=" + this.status + ", " +
-                "RouterRemark=" + this.remark + "]";
+        return JSON.toJSONString(this);
     }
 }

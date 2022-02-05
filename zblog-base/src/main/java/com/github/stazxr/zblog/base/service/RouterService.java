@@ -23,4 +23,20 @@ public interface RouterService extends IService<Router> {
      * @return whiteList
      */
     Map<String, String> getRouterWhiteList();
+
+    /**
+     * 获取路由黑名单
+     *
+     * @return blackList
+     */
+    Map<String, String> getRouterBlackList();
+
+    /**
+     * 根据请求URL和Method查询路由信息
+     *
+     * @param requestUrl 请求URL
+     * @param requestMethod 请求Method
+     * @return Router
+     */
+    Router selectByUrlAndMethod(String requestUrl, String requestMethod);
 }

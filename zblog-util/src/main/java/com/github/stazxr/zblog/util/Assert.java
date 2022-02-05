@@ -42,4 +42,17 @@ public abstract class Assert {
             throw new IllegalArgumentException(message);
         }
     }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param message the exception message to use if the flag is not true
+     * @throws IllegalArgumentException if the flag is not true
+     */
+    public static void isTrue(boolean flag, String message) {
+        if (!flag) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

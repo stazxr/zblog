@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: prod
+logging:
+  file:
+    path: /var/log/zblog/zblog.log
 swagger:
   config:
     enable: ${spring.web.resources.add-mappings}

@@ -69,7 +69,7 @@ public class BaseConst {
         }
 
         /**
-         * 公开权限，不需要认证授权即可访问
+         * 公开权限，直接访问
          */
         public static final int OPEN = 1;
 
@@ -79,7 +79,7 @@ public class BaseConst {
         public static final int PUBLIC = 2;
 
         /**
-         * 公共权限，认证即可访问
+         * 受控权限，授权即可访问
          */
         public static final int PERM = 3;
     }
