@@ -26,9 +26,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        System.out.println(":========================" + authException);
-        System.out.println(":========================" + request.getRequestURI());
-
         // 封装返回结果 Result
         Result result = Result.failure(ResultCode.AUTH_FAILED, errorMsg(authException)).code(HttpStatus.UNAUTHORIZED);
         ResponseUtils.responseJsonWriter(response, result);

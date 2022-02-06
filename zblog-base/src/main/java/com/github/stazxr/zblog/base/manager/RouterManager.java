@@ -91,7 +91,6 @@ public class RouterManager {
 
             // 白名单检查
             if (whiteList.containsValue(uri)) {
-                log.info("uri [{}] is config in white list", uri);
                 continue;
             }
 
