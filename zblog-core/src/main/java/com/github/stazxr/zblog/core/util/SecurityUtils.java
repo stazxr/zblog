@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.core.util;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public class SecurityUtils {
     /**
@@ -12,10 +12,10 @@ public class SecurityUtils {
      */
     public String getCurrentUsername() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return userDetails.getUsername();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            throw new IllegalStateException("No Login");
         }
-        return null;
+
+        return authentication.getName();
     }
 }
