@@ -14,6 +14,11 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
   devtools:
     add-properties: false
+  redis:
+    host: 127.0.0.1
+    port: 6480
+    client-type: lettuce
+    password: redis@Pwd
 jwt:
   config:
     key-location: zblog.jks
