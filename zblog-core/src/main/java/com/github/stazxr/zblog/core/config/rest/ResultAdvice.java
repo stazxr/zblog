@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.core.config.rest;
 
+import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.model.Result;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -16,10 +17,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @since 2022-02-05
  */
 @RestControllerAdvice
-public class RestBodyAdvice implements ResponseBodyAdvice<Object> {
+public class ResultAdvice implements ResponseBodyAdvice<Object> {
     @Override
-    public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
-        return true;
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> aClass) {
+        return !returnType.hasMethodAnnotation(IgnoreResult.class);
     }
 
     @Override
