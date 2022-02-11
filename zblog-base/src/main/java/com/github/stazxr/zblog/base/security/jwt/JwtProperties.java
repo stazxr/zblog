@@ -10,47 +10,56 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @since 2022-01-19
  */
 @Data
-@ConfigurationProperties(prefix= JwtProperties.JWT_PREFIX)
+@ConfigurationProperties(prefix= "jwt")
 public class JwtProperties {
-    static final String JWT_PREFIX= "jwt.config";
+    private CertInfo certInfo;
+
+    private Claims claims;
 
     /**
-     * jks 路径
+     * The cert info.
      */
-    private String keyLocation = "zblog.jks";
+    @Data
+    public static class CertInfo {
+        /**
+         * key alias
+         */
+        private String alias = "zblog";
+
+        /**
+         * key store pass
+         */
+        private String keyPassword;
+
+        /**
+         * 证书路径
+         */
+        private String certLocation = "zblog.jks";
+    }
 
     /**
-     * key alias
+     * The jwt claims.
      */
-    private String keyAlias = "zblog";
+    @Data
+    public static class Claims {
+        /**
+         * jwt签发者
+         */
+        private String issuer = "https://www.suntaoblog.com";
 
-    /**
-     * key store pass
-     */
-    private String keyPass;
+        /**
+         * jwt所面向的用户
+         */
+        private String subject = "all";
 
-    /**
-     * jwt签发者
-     */
-    private String iss = "zblog.space";
-
-    /**
-     * jwt所面向的用户
-     */
-    private String sub = "all";
+        /**
+         * jwt有效时间，单位秒数
+         */
+        private Integer duration;
+    }
 
     /**
      * 缓存类型
      */
     private String cacheType = "memory";
-
-    /**
-     * access token 有效天数
-     */
-    private int accessExpDays = 3;
-
-    /**
-     * refresh token 有效天数
-     */
-    private int refreshExpDays = 7;
 }

@@ -25,12 +25,12 @@ logging:
     com.github.spring.security.mapper: info
     org.springframework.security: info
 jwt:
-  config:
-    key-location: zblog.jks
-    key-alias: zblog
-    key-pass: 123456
-    iss: zblog.space
-    sub: all
-    access-exp-days: 1
-    refresh-exp-days: 3
-    cache-type: memory
+  cert-info:
+    alias: zblog
+    key-password: 123456
+    cert-location: zblog.jks
+  claims:
+    issuer: https://www.suntaoblog.com
+    subject: all
+    duration: 3600
+  cache-type: memory

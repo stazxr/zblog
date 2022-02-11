@@ -1,8 +1,18 @@
 {
   "groups": [
     {
-      "name": "jwt.config",
+      "name": "jwt",
       "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+    },
+    {
+      "name": "jwt.cert-info",
+      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+    },
+    {
+      "name": "jwt.claims",
+      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
       "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
     },
     {
@@ -24,59 +34,52 @@
   ],
   "properties": [
     {
-      "name": "jwt.config.key-location",
+      "name": "jwt.cert-info.cert-location",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
       "description": "jks file location.",
       "defaultValue": "zblog.jks"
     },
     {
-      "name": "jwt.config.key-alias",
+      "name": "jwt.cert-info.alias",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
       "description": "jks alias.",
       "defaultValue": "zblog"
     },
     {
-      "name": "jwt.config.key-pass",
+      "name": "jwt.cert-info.key-password",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
       "description": "jks storepass."
     },
     {
-      "name": "jwt.config.iss",
+      "name": "jwt.claims.issuer",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
       "description": "签发者.",
-      "defaultValue": "zblog.space"
+      "defaultValue": "https://www.suntaoblog.com"
     },
     {
-      "name": "jwt.config.sub",
+      "name": "jwt.claims.subject",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
       "description": "面向的用户.",
       "defaultValue": "all"
     },
     {
-      "name": "jwt.config.cache-type",
+      "name": "jwt.claims.duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
+      "description": "令牌的有效时间，单位秒.",
+      "defaultValue": 3600
+    },
+    {
+      "name": "jwt.cache-type",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
       "description": "token 缓存类型.",
       "defaultValue": "memory"
-    },
-    {
-      "name": "jwt.config.access-exp-days",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
-      "description": "令牌的有效天数.",
-      "defaultValue": 3
-    },
-    {
-      "name": "jwt.config.refresh-exp-days",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
-      "description": "刷新令牌的有效天数.",
-      "defaultValue": 7
     },
     {
       "name": "swagger.enable",
@@ -144,7 +147,7 @@
   ],
   "hints": [
     {
-      "name": "jwt.config.cache-type",
+      "name": "jwt.cache-type",
       "values": [
         {
           "value": "memory",

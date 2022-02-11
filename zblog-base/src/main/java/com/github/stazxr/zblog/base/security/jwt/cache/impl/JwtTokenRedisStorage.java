@@ -9,7 +9,7 @@ import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
  * @author SunTao
  * @since 2022-01-29
  */
-public class JwtTokenRedisStorage  implements JwtTokenStorage {
+public class JwtTokenRedisStorage implements JwtTokenStorage {
     /**
      * Put JwtTokenPair
      *

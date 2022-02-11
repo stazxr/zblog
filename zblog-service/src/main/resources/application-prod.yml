@@ -20,12 +20,12 @@ spring:
     client-type: lettuce
     password: redis@Pwd
 jwt:
-  config:
-    key-location: zblog.jks
-    key-alias: zblog
-    key-pass: 123456
-    iss: zblog.space
-    sub: all
-    access-exp-days: 3
-    refresh-exp-days: 7
-    cache-type: memory
+  cert-info:
+    alias: zblog
+    key-password: 123456
+    cert-location: zblog.jks
+  claims:
+    issuer: https://www.suntaoblog.com
+    subject: all
+    duration: 3600
+  cache-type: memory

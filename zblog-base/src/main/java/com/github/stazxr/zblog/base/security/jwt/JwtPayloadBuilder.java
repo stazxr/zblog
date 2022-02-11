@@ -99,7 +99,7 @@ public class JwtPayloadBuilder {
 
     public JwtPayloadBuilder expDays(int days) {
         Assert.isTrue(days > 0, "jwt expireDate must after now");
-        this.exp = this.iat.plusDays(days);
+        this.exp = this.iat.plusSeconds(days);
         return this;
     }
 

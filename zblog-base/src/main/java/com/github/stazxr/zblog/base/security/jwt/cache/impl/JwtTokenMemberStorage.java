@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component(value = "jwtTokenStorage")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "jwt.config.cache-type", havingValue = "memory")
+@ConditionalOnProperty(name = "jwt.cache-type", havingValue = "memory")
 public class JwtTokenMemberStorage implements JwtTokenStorage {
     private final Map<String, JwtTokenPair> tokenMap = new ConcurrentHashMap<>();
 
@@ -40,7 +40,7 @@ public class JwtTokenMemberStorage implements JwtTokenStorage {
     @Override
     public JwtTokenPair put(JwtTokenPair jwtTokenPair, String account) {
         tokenMap.put(account, jwtTokenPair);
-        expTimeMap1.put(account, LocalDateTime.now().plusDays(jwtProperties.getAccessExpDays()));
+        expTimeMap1.put(account, LocalDateTime.now().plusSeconds(jwtProperties.getClaims().getDuration()));
         // expTimeMap2.put(account, LocalDateTime.now().plusDays(jwtProperties.getRefreshExpDays()));
         return jwtTokenPair;
     }

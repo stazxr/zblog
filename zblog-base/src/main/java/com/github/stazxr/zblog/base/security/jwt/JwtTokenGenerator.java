@@ -49,7 +49,8 @@ public class JwtTokenGenerator {
         this.jwtProperties = jwtProperties;
 
         KeyPairFactory keyPairFactory = new KeyPairFactory();
-        this.keyPair = keyPairFactory.create(jwtProperties.getKeyLocation(), jwtProperties.getKeyAlias(), jwtProperties.getKeyPass());
+        JwtProperties.CertInfo certInfo = jwtProperties.getCertInfo();
+        this.keyPair = keyPairFactory.create(certInfo.getCertLocation(), certInfo.getAlias(), certInfo.getKeyPassword());
     }
 
     /**
@@ -61,8 +62,8 @@ public class JwtTokenGenerator {
      * @return the jwt token pair
      */
     public JwtTokenPair jwtTokenPair(String aud, Set<String> roles, Map<String, String> additional) {
-        String accessToken = jwtToken(aud, jwtProperties.getAccessExpDays(), roles, additional);
-        String refreshToken = jwtToken(aud, jwtProperties.getRefreshExpDays(), roles, additional);
+        String accessToken = jwtToken(aud, jwtProperties.getClaims().getDuration(), roles, additional);
+        String refreshToken = jwtToken(aud, jwtProperties.getClaims().getDuration(), roles, additional);
 
         JwtTokenPair jwtTokenPair = new JwtTokenPair();
         jwtTokenPair.setAccessToken(accessToken);
@@ -84,8 +85,8 @@ public class JwtTokenGenerator {
      */
     private String jwtToken(String aud, int exp, Set<String> roles, Map<String, String> additional) {
         String payload = jwtPayloadBuilder
-                .iss(jwtProperties.getIss())
-                .sub(jwtProperties.getSub())
+                .iss(jwtProperties.getClaims().getIssuer())
+                .sub(jwtProperties.getClaims().getSubject())
                 .aud(aud)
                 .additional(additional)
                 .roles(roles)
