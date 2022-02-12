@@ -33,4 +33,4 @@ jwt:
     issuer: https://www.suntaoblog.com
     subject: all
     duration: 3600
-  cache-type: memory
+  cache-type: ehcache

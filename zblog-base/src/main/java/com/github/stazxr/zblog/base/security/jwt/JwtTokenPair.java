@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @since 2022-01-19
  */
 @Data
+@Deprecated
 public class JwtTokenPair implements Serializable {
     /**
      * serial Id

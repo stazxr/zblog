@@ -1,15 +1,11 @@
 package com.github.stazxr.zblog.base.security.filter;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.security.config.CustomWebSecurityConfiguration;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.security.exception.PreJwtCheckAuthenticationException;
-import com.github.stazxr.zblog.base.security.jwt.JwtTokenGenerator;
-import com.github.stazxr.zblog.base.security.jwt.JwtTokenPair;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
@@ -25,6 +21,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * jwt认证拦截器，用于拦截请求，提取jwt认证
@@ -55,13 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
-    private final JwtTokenGenerator jwtTokenGenerator;
-
     private final JwtTokenStorage jwtTokenStorage;
 
     private final UserService userService;
 
     private final RouterService routerService;
+
+    private final JwtDecoder jwtDecoder;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -118,29 +119,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private void authenticationTokenHandle(String jwtToken, HttpServletRequest request) throws AuthenticationException {
         try {
-            // 根据我的实现 有效token才会被解析出来
-            JSONObject jsonObject = jwtTokenGenerator.decodeAndVerify(jwtToken);
-            if (Objects.isNull(jsonObject)) {
-                throw new BadCredentialsException("认证失败：身份信息有误.");
-            }
+            // decode jwt
+            Jwt jwt = jwtDecoder.decode(jwtToken);
 
             // 从缓存获取 token
-            String username = jsonObject.getStr("aud");
-            JwtTokenPair jwtTokenPair = jwtTokenStorage.get(username);
-            if (Objects.isNull(jwtTokenPair)) {
+            List<String> audiences = jwt.getAudience();
+            if (audiences == null || audiences.size() < 1) {
+                throw new CredentialsExpiredException("认证失败：Token信息不合法.");
+            }
+
+            String username = audiences.get(0);
+            OAuth2AccessTokenResponse tokenResponse = jwtTokenStorage.get(username);
+            if (Objects.isNull(tokenResponse)) {
                 // 缓存中不存在就算 失败了
                 throw new CredentialsExpiredException("认证失败：身份信息已过期，请重新登录认证.");
             }
 
-            String accessToken = jwtTokenPair.getAccessToken();
-            if (!jwtToken.equals(accessToken)) {
+            OAuth2AccessToken accessToken = tokenResponse.getAccessToken();
+            if (!jwtToken.equals(accessToken.getTokenValue())) {
                 throw new BadCredentialsException("认证失败：身份不匹配.");
             }
 
             // 解析权限集合这里
-            JSONArray jsonArray = jsonObject.getJSONArray("roles");
-            List<String> roles = jsonArray.toList(String.class);
-            String[] roleArr = roles.toArray(new String[0]);
+            Set<String> scopes = accessToken.getScopes();
+            String[] roleArr = scopes.toArray(new String[0]);
             List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleArr);
 
             // 构建用户认证token
@@ -156,6 +158,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (AuthenticationException e) {
             throw e;
         } catch (Exception e) {
+            log.warn("check token failed, [{}-{}]", jwtToken, e.getMessage());
             throw new PreJwtCheckAuthenticationException("认证失败：" + e.getMessage());
         }
     }

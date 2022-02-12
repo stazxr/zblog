@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.security.jwt;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * JwtProperties
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @since 2022-01-19
  */
 @Data
+@Component
 @ConfigurationProperties(prefix= "jwt")
 public class JwtProperties {
     private CertInfo certInfo;

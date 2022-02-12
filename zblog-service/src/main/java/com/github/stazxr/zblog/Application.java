@@ -2,6 +2,7 @@ package com.github.stazxr.zblog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * 前后端分离个人博客开源项目 - zblog.
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2020-11-14
  * @version 4.0.0
  */
+@EnableCaching
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {

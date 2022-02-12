@@ -79,7 +79,7 @@
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
       "description": "token 缓存类型.",
-      "defaultValue": "memory"
+      "defaultValue": "ehcache"
     },
     {
       "name": "swagger.enable",
@@ -150,12 +150,12 @@
       "name": "jwt.cache-type",
       "values": [
         {
-          "value": "memory",
-          "description": "运行内存."
+          "value": "ehcache",
+          "description": "use ehcache."
         },
         {
           "value": "redis",
-          "description": "Redis缓存."
+          "description": "use redis."
         }
       ]
     },

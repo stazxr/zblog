@@ -18,6 +18,7 @@ import java.util.Set;
  * @author SunTao
  * @since 2022-01-19
  */
+@Deprecated
 public class JwtPayloadBuilder {
     /**
      * jwt info

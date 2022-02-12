@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.security.jwt.cache;
 
-import com.github.stazxr.zblog.base.security.jwt.JwtTokenPair;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
 /**
  * JwtTokenStorage
@@ -10,26 +10,26 @@ import com.github.stazxr.zblog.base.security.jwt.JwtTokenPair;
  */
 public interface JwtTokenStorage {
     /**
-     * Put JwtTokenPair
+     * Put tokenResponse
      *
-     * @param jwtTokenPair jwtTokenPair
-     * @param account      username
+     * @param tokenResponse OAuth2AccessTokenResponse
+     * @param username      username
      * @return JwtTokenPair
      */
-    JwtTokenPair put(JwtTokenPair jwtTokenPair, String account);
+    OAuth2AccessTokenResponse put(OAuth2AccessTokenResponse tokenResponse, String username);
 
     /**
      * Expire.
      *
-     * @param account username
+     * @param username username
      */
-    void expire(String account);
+    void expire(String username);
 
     /**
-     * Get JwtTokenPair
+     * Get tokenResponse
      *
-     * @param account username
-     * @return JwtTokenPair
+     * @param username username
+     * @return OAuth2AccessTokenResponse
      */
-    JwtTokenPair get(String account);
+    OAuth2AccessTokenResponse get(String username);
 }

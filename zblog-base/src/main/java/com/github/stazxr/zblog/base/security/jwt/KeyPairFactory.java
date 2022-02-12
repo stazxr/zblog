@@ -15,6 +15,7 @@ import java.security.spec.RSAPublicKeySpec;
  * @author SunTao
  * @since 2022-01-19
  */
+@Deprecated
 class KeyPairFactory {
     private KeyStore store;
 

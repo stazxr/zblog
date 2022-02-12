@@ -68,7 +68,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         if (e instanceof NumCodeException) {
             return e.getMessage();
         } else if (e instanceof UsernameNotFoundException) {
-            return "用户不存在";
+            return "用户名或密码错误";
         } else if (e instanceof LockedException) {
             return "用户被锁定";
         }  else if (e instanceof DisabledException) {
@@ -76,9 +76,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         }  else if (e instanceof AccountExpiredException) {
             return "用户已过期";
         } else if (e instanceof BadCredentialsException) {
-            return "凭证错误";
+            return "用户名或密码错误";
         } else if (e instanceof CredentialsExpiredException) {
-            return "凭证已过期";
+            return "密码已过期";
         } else {
             return "认证失败";
         }

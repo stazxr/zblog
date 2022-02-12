@@ -2,6 +2,10 @@ package com.github.stazxr.zblog.base.security.jwt.cache.impl;
 
 import com.github.stazxr.zblog.base.security.jwt.JwtTokenPair;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.stereotype.Component;
 
 /**
  * JwtTokenCacheStorage
@@ -9,37 +13,40 @@ import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
  * @author SunTao
  * @since 2022-01-29
  */
+@Component(value = "jwtTokenStorage")
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "jwt.cache-type", havingValue = "redis")
 public class JwtTokenRedisStorage implements JwtTokenStorage {
     /**
-     * Put JwtTokenPair
+     * Put tokenResponse
      *
-     * @param jwtTokenPair jwtTokenPair
-     * @param account      username
+     * @param tokenResponse OAuth2AccessTokenResponse
+     * @param username      username
      * @return JwtTokenPair
      */
     @Override
-    public JwtTokenPair put(JwtTokenPair jwtTokenPair, String account) {
+    public OAuth2AccessTokenResponse put(OAuth2AccessTokenResponse tokenResponse, String username) {
         return null;
     }
 
     /**
      * Expire.
      *
-     * @param account username
+     * @param username username
      */
     @Override
-    public void expire(String account) {
+    public void expire(String username) {
 
     }
 
     /**
-     * Get JwtTokenPair
+     * Get tokenResponse
      *
-     * @param account username
-     * @return JwtTokenPair
+     * @param username username
+     * @return OAuth2AccessTokenResponse
      */
     @Override
-    public JwtTokenPair get(String account) {
+    public OAuth2AccessTokenResponse get(String username) {
         return null;
     }
 }

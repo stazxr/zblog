@@ -27,5 +27,5 @@ jwt:
   claims:
     issuer: https://www.suntaoblog.com
     subject: all
-    duration: 3600
-  cache-type: memory
+    duration: 60
+  cache-type: ehcache

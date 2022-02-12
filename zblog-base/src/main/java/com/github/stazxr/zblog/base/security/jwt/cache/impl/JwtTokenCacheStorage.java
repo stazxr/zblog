@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.base.security.jwt.cache.impl;
 
-import com.github.stazxr.zblog.base.security.jwt.JwtTokenPair;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.stereotype.Component;
 
 /**
  * JwtTokenCacheStorage
@@ -12,26 +15,48 @@ import org.springframework.cache.annotation.Cacheable;
  * @author SunTao
  * @since 2022-01-19
  */
+@Component(value = "jwtTokenStorage")
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "jwt.cache-type", havingValue = "ehcache")
 public class JwtTokenCacheStorage implements JwtTokenStorage {
     /**
-     * 查看缓存配置文件 ehcache.xml 定义 过期时间与 refresh token 过期一致.
+     * TIPS: 查看缓存配置文件 ehcache.xml 定义 过期时间与 token 过期一致.
      */
     private static final String TOKEN_CACHE = "usrTkn";
 
-    @CachePut(value = TOKEN_CACHE, key = "#userId")
+    /**
+     * Put tokenResponse
+     *
+     * @param tokenResponse OAuth2AccessTokenResponse
+     * @param username      username
+     * @return JwtTokenPair
+     */
+    @CachePut(value = TOKEN_CACHE, key = "#username")
     @Override
-    public JwtTokenPair put(JwtTokenPair jwtTokenPair, String userId) {
-        return jwtTokenPair;
+    public OAuth2AccessTokenResponse put(OAuth2AccessTokenResponse tokenResponse, String username) {
+        return tokenResponse;
     }
 
-    @CacheEvict(value = TOKEN_CACHE, key = "#userId")
+    /**
+     * Expire.
+     *
+     * @param username username
+     */
+    @CacheEvict(value = TOKEN_CACHE, key = "#username")
     @Override
-    public void expire(String userId) {
+    public void expire(String username) {
+
     }
 
-    @Cacheable(value = TOKEN_CACHE, key = "#userId")
+    /**
+     * Get tokenResponse
+     *
+     * @param username username
+     * @return OAuth2AccessTokenResponse
+     */
+    @Cacheable(value = TOKEN_CACHE, key = "#username")
     @Override
-    public JwtTokenPair get(String userId) {
+    public OAuth2AccessTokenResponse get(String username) {
         return null;
     }
 }
