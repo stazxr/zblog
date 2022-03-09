@@ -70,7 +70,7 @@ public class RedisUtils {
      * @param timeUnit   超时单位
      * @return boolean
      */
-    public boolean set(String key, String value, int expireTime,TimeUnit timeUnit) {
+    public boolean set(String key, String value, int expireTime, TimeUnit timeUnit) {
         boolean result = false;
         try {
             ValueOperations<String, String> operations = redisTemplate.opsForValue();
