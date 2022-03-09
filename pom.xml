@@ -60,6 +60,19 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <optional>true</optional>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Common Utils -->
         <dependency>
             <groupId>org.apache.commons</groupId>
