@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.security;
 
 import com.github.stazxr.zblog.base.domain.entity.User;
-import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
