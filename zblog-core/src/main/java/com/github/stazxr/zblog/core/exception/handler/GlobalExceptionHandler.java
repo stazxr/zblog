@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ServiceException.class)
     public Result serviceExceptionHandler(ServiceException e) {
         log.error(ThrowableUtils.getStackTrace(e));
-        return Result.failure(ResultCode.SERVER_EXP, e.getMessage());
+        return Result.failure(e.getIdentifier(), e.getMessage());
     }
 
     /**

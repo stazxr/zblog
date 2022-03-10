@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
  * @since 2020-11-16
  */
 @Getter
-public class Result implements Serializable {
+public final class Result implements Serializable {
     /**
      * serialVersionUID
      */
@@ -48,12 +48,15 @@ public class Result implements Serializable {
     private final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     private Result(ResultCode resultCode) {
-        identifier = resultCode.code();
-        message = resultCode.message();
+        this(resultCode.code(), resultCode.message());
     }
 
     private Result(ResultCode resultCode, String message) {
-        identifier = resultCode.code();
+        this(resultCode.code(), message);
+    }
+
+    private Result(Integer identifier, String message) {
+        this.identifier = identifier;
         this.message = message;
     }
 
@@ -83,6 +86,10 @@ public class Result implements Serializable {
 
     public static Result failure(ResultCode resultCode, String message) {
         return new Result(resultCode, message).code(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public static Result failure(Integer identifier, String message) {
+        return new Result(identifier, message).code(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
