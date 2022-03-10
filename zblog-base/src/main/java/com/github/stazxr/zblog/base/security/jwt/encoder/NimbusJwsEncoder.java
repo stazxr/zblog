@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
  *
  * @author Joe Grandja
  */
+@SuppressWarnings("ALL")
 @Slf4j
 public final class NimbusJwsEncoder implements JwtEncoder {
 

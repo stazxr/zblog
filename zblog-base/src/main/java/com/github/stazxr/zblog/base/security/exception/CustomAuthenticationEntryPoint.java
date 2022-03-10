@@ -9,7 +9,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,13 +24,14 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
         // 封装返回结果 Result
-        Result result = Result.failure(ResultCode.AUTH_FAILED, errorMsg(authException)).code(HttpStatus.UNAUTHORIZED);
+        Result result = Result.failure(ResultCode.VALID_TOKEN, errorMsg(authException)).code(HttpStatus.UNAUTHORIZED);
         ResponseUtils.responseJsonWriter(response, result);
     }
 
     private String errorMsg(AuthenticationException authException) {
+        log.error("check token failed", authException);
         return authException.getMessage();
     }
 }

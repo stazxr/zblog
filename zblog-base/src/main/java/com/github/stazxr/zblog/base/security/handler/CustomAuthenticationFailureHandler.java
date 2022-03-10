@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
      */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException exception) throws IOException, ServletException {
+            AuthenticationException exception) throws IOException {
         // 清除用的缓存信息
         String username = request.getParameter("username");
         UserRoleCache.remove(username);
@@ -46,7 +45,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         exceptionHandle(exception, request);
 
         // 封装返回结果 Result
-        Result result = Result.failure(ResultCode.AUTH_FAILED, errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED);
+        Result result = Result.failure(ResultCode.LOGIN_FAILED, errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED);
         ResponseUtils.responseJsonWriter(response, result);
     }
 
@@ -65,10 +64,11 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     }
 
     private String errorMsg(AuthenticationException e) {
+        log.error("login failed", e);
         if (e instanceof NumCodeException) {
             return e.getMessage();
         } else if (e instanceof UsernameNotFoundException) {
-            return "用户名或密码错误";
+            return "用户不存在";
         } else if (e instanceof LockedException) {
             return "用户被锁定";
         }  else if (e instanceof DisabledException) {
@@ -76,11 +76,11 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         }  else if (e instanceof AccountExpiredException) {
             return "用户已过期";
         } else if (e instanceof BadCredentialsException) {
-            return "用户名或密码错误";
+            return "密码错误";
         } else if (e instanceof CredentialsExpiredException) {
             return "密码已过期";
         } else {
-            return "认证失败";
+            return "登录失败";
         }
     }
 }

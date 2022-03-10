@@ -33,13 +33,13 @@ public class JwtTokenGenerator {
 
     private final JwtTokenStorage jwtTokenStorage;
 
-    public OAuth2AccessTokenResponse getTokenResponse(User user) {
+    public ZblogToken getTokenResponse(User user) {
         JoseHeader joseHeader = JoseHeader.withAlgorithm(SignatureAlgorithm.RS256).type("JWT").build();
         Instant issuedAt = Instant.now();
         Set<String> scopes = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 
         JwtProperties.Claims claims = jwtProperties.getClaims();
-        Integer duration = claims.getDuration();
+        int duration = claims.getDuration();
         String username = user.getUsername();
 
         JwtClaimsSet sharedClaims = JwtClaimsSet.builder()
@@ -61,6 +61,9 @@ public class JwtTokenGenerator {
                 .expiresIn(duration)
                 .scopes(scopes)
                 .refreshToken(refreshToken.getTokenValue()).build();
-        return jwtTokenStorage.put(tokenResponse, username);
+
+        // 将 OAuth2AccessTokenResponse 转为系统自定义的 ZblogToken
+        ZblogToken zblogToken = new ZblogToken().build(tokenResponse);
+        return jwtTokenStorage.put(zblogToken, username, duration);
     }
 }

@@ -75,13 +75,6 @@
       "defaultValue": 3600
     },
     {
-      "name": "jwt.cache-type",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
-      "description": "token 缓存类型.",
-      "defaultValue": "ehcache"
-    },
-    {
       "name": "swagger.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
@@ -146,19 +139,6 @@
     }
   ],
   "hints": [
-    {
-      "name": "jwt.cache-type",
-      "values": [
-        {
-          "value": "ehcache",
-          "description": "use ehcache."
-        },
-        {
-          "value": "redis",
-          "description": "use redis."
-        }
-      ]
-    },
     {
       "name": "deploy.type",
       "values": [

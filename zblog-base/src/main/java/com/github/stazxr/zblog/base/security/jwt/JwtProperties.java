@@ -57,11 +57,6 @@ public class JwtProperties {
         /**
          * jwt有效时间，单位秒数
          */
-        private Integer duration;
+        private int duration;
     }
-
-    /**
-     * 缓存类型
-     */
-    private String cacheType = "memory";
 }

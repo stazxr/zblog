@@ -31,6 +31,7 @@ import java.util.function.Consumer;
  * @author Anoop Garlapati
  * @author Joe Grandja
  */
+@SuppressWarnings("ALL")
 public final class JoseHeader {
     private final Map<String, Object> headers;
 
@@ -178,12 +179,12 @@ public final class JoseHeader {
 
         public JoseHeader build() {
             Assert.notEmpty(this.headers, "headers cannot be empty");
-            convertAsURL(JoseHeaderNames.JKU);
-            convertAsURL(JoseHeaderNames.X5U);
+            convertAsUrl(JoseHeaderNames.JKU);
+            convertAsUrl(JoseHeaderNames.X5U);
             return new JoseHeader(this.headers);
         }
 
-        private void convertAsURL(String header) {
+        private void convertAsUrl(String header) {
             Object value = this.headers.get(header);
             if (value != null) {
                 URL convertedValue = ClaimConversionService.getSharedInstance().convert(value, URL.class);

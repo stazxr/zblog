@@ -3,7 +3,7 @@ spring:
     active: prod
 logging:
   file:
-    path: /var/log/zblog/zblog.log
+    path: /home/zblog/logs/zblog.log
 swagger:
   config:
     enable: ${spring.web.resources.add-mappings}

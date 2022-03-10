@@ -1,5 +1,5 @@
 server:
-  port: 9999
+  port: 9990
 spring:
   web:
     resources:
@@ -12,13 +12,11 @@ spring:
     username: root
     password: root
     type: com.alibaba.druid.pool.DruidDataSource
-  devtools:
-    add-properties: false
   redis:
     host: 127.0.0.1
-    port: 6480
+    port: 6379
     client-type: lettuce
-    password: redis@Pwd
+    password: redisPwd
 jwt:
   cert-info:
     alias: zblog
@@ -27,5 +25,7 @@ jwt:
   claims:
     issuer: https://www.suntaoblog.com
     subject: all
-    duration: 60
-  cache-type: ehcache
+    duration: 3600
+cache:
+  default-duration: 300
+  type: redis

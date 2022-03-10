@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.base.security.config;
 import com.github.stazxr.zblog.base.security.CustomAccessDecisionManager;
 import com.github.stazxr.zblog.base.security.CustomSecurityMetadataSource;
 import com.github.stazxr.zblog.base.security.exception.CustomAccessDeniedHandler;
-import com.github.stazxr.zblog.base.security.CustomUserDetailsService;
+import com.github.stazxr.zblog.base.security.UserDetailsServiceImpl;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.security.filter.JwtAuthenticationFilter;
 import com.github.stazxr.zblog.base.security.handler.CustomAuthenticationFailureHandler;
@@ -61,9 +61,9 @@ public class CustomWebSecurityConfiguration {
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
     static class SecurityConfig extends WebSecurityConfigurerAdapter {
         /**
-         * 安全认证用户信息来源, {@link CustomUserDetailsService#loadUserByUsername}
+         * 安全认证用户信息来源, {@link UserDetailsServiceImpl#loadUserByUsername}
          */
-        private final CustomUserDetailsService userDetailsService;
+        private final UserDetailsServiceImpl userDetailsService;
 
         /**
          * 加密方式

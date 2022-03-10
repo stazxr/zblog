@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.security.jwt.cache;
 
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
 
 /**
  * JwtTokenStorage
@@ -12,11 +12,12 @@ public interface JwtTokenStorage {
     /**
      * Put tokenResponse
      *
-     * @param tokenResponse OAuth2AccessTokenResponse
-     * @param username      username
+     * @param token     ZblogToken
+     * @param username  username
+     * @param duration  valid time
      * @return JwtTokenPair
      */
-    OAuth2AccessTokenResponse put(OAuth2AccessTokenResponse tokenResponse, String username);
+    ZblogToken put(ZblogToken token, String username, int duration);
 
     /**
      * Expire.
@@ -31,5 +32,5 @@ public interface JwtTokenStorage {
      * @param username username
      * @return OAuth2AccessTokenResponse
      */
-    OAuth2AccessTokenResponse get(String username);
+    ZblogToken get(String username);
 }

@@ -1,12 +1,11 @@
 package com.github.stazxr.zblog.base.security.jwt.cache.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
+import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.util.Assert;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,24 +16,28 @@ import org.springframework.stereotype.Component;
  */
 @Component(value = "jwtTokenStorage")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "jwt.cache-type", havingValue = "ehcache")
 public class JwtTokenCacheStorage implements JwtTokenStorage {
     /**
      * TIPS: 查看缓存配置文件 ehcache.xml 定义 过期时间与 token 过期一致.
      */
-    private static final String TOKEN_CACHE = "usrTkn";
+    private static final String TOKEN_CACHE = "usrTkn-";
 
     /**
      * Put tokenResponse
      *
-     * @param tokenResponse OAuth2AccessTokenResponse
-     * @param username      username
+     * @param token    ZblogToken
+     * @param username username
+     * @param duration validTime
      * @return JwtTokenPair
      */
-    @CachePut(value = TOKEN_CACHE, key = "#username")
     @Override
-    public OAuth2AccessTokenResponse put(OAuth2AccessTokenResponse tokenResponse, String username) {
-        return tokenResponse;
+    public ZblogToken put(ZblogToken token, String username, int duration) {
+        Assert.notNull(username, "JwtTokenStorage cache username must not br null");
+        Assert.notNull(token, "JwtTokenStorage cache token must not br null");
+        String key = TOKEN_CACHE.concat(username);
+        String value = JSON.toJSONString(token);
+        CacheUtils.cache().put(key, value, duration);
+        return get(username);
     }
 
     /**
@@ -42,10 +45,10 @@ public class JwtTokenCacheStorage implements JwtTokenStorage {
      *
      * @param username username
      */
-    @CacheEvict(value = TOKEN_CACHE, key = "#username")
     @Override
     public void expire(String username) {
-
+        String key = TOKEN_CACHE.concat(username);
+        CacheUtils.cache().remove(key);
     }
 
     /**
@@ -54,9 +57,13 @@ public class JwtTokenCacheStorage implements JwtTokenStorage {
      * @param username username
      * @return OAuth2AccessTokenResponse
      */
-    @Cacheable(value = TOKEN_CACHE, key = "#username")
     @Override
-    public OAuth2AccessTokenResponse get(String username) {
+    public ZblogToken get(String username) {
+        String key = TOKEN_CACHE.concat(username);
+        String cacheValue = CacheUtils.cache().get(key);
+        if (cacheValue != null) {
+            return JSON.parseObject(cacheValue, ZblogToken.class);
+        }
         return null;
     }
 }

@@ -4,13 +4,12 @@ import com.github.stazxr.zblog.base.cache.UserRoleCache;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
 import com.github.stazxr.zblog.base.service.RoleService;
-import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -52,11 +51,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         // generate token
         Map<String, Object> data = new HashMap<>(2);
-        OAuth2AccessTokenResponse tokenResponse = jwtTokenGenerator.getTokenResponse(principal);
-        data.put("access_token", tokenResponse.getAccessToken());
-        data.put("refresh_token", tokenResponse.getRefreshToken());
+        ZblogToken token = jwtTokenGenerator.getTokenResponse(principal);
+        data.put("access_token", token.getAccessToken());
+        data.put("refresh_token", token.getRefreshToken());
+        data.put("additional", token.getAdditional());
 
         // return
-        ResponseUtils.responseJsonWriter(response, Result.success(ResultCode.LOGIN_SUCCESS).data(data));
+        ResponseUtils.responseJsonWriter(response, Result.success("登录成功").data(data));
     }
 }

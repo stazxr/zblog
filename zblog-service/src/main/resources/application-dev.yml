@@ -14,9 +14,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
   redis:
     host: 127.0.0.1
-    port: 6480
+    port: 6379
     client-type: lettuce
-    password: redis@Pwd
+    password: redisPwd
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -33,4 +33,6 @@ jwt:
     issuer: https://www.suntaoblog.com
     subject: all
     duration: 3600
-  cache-type: ehcache
+cache:
+  default-duration: 300
+  type: memory

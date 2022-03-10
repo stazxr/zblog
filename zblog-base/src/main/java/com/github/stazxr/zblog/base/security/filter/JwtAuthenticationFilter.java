@@ -6,6 +6,8 @@ import com.github.stazxr.zblog.base.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.security.config.CustomWebSecurityConfiguration;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.security.exception.PreJwtCheckAuthenticationException;
+import com.github.stazxr.zblog.base.security.jwt.TokenError;
+import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
@@ -14,15 +16,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -51,6 +50,8 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHENTICATION_PREFIX = "Bearer ";
 
+    private static final String URL_SPLIT_LABEL = "?";
+
     /**
      * 认证失败处理
      */
@@ -69,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         // 判断请求是否需要验证token
         String requestUrl = request.getRequestURI();
-        if (requestUrl.contains("?")) {
+        if (requestUrl.contains(URL_SPLIT_LABEL)) {
             requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
         }
 
@@ -97,16 +98,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticationTokenHandle(jwtToken, request);
                     chain.doFilter(request, response);
                 } catch (AuthenticationException e) {
-                    log.warn("authentication token failed [{}]", jwtToken);
+                    log.warn("authentication token failed: {} [{}]", e.getMessage(), jwtToken);
                     authenticationEntryPoint.commence(request, response, e);
                 }
             } else {
                 // 带安全头 没有带token
-                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException("token is not found."));
+                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.MISS_TOKEN.value()));
             }
         } else {
             // 没有带安全头
-            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException("valid request."));
+            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.VALID_REQUEST.value()));
         }
     }
 
@@ -125,19 +126,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 从缓存获取 token
             List<String> audiences = jwt.getAudience();
             if (audiences == null || audiences.size() < 1) {
-                throw new CredentialsExpiredException("认证失败：Token信息不合法.");
+                throw new PreJwtCheckAuthenticationException(TokenError.MISS_AUDIENCE.value());
             }
 
             String username = audiences.get(0);
-            OAuth2AccessTokenResponse tokenResponse = jwtTokenStorage.get(username);
-            if (Objects.isNull(tokenResponse)) {
-                // 缓存中不存在就算 失败了
-                throw new CredentialsExpiredException("认证失败：身份信息已过期，请重新登录认证.");
+            ZblogToken token = jwtTokenStorage.get(username);
+            if (Objects.isNull(token)) {
+                throw new PreJwtCheckAuthenticationException(TokenError.MISS_CACHE.value());
             }
 
-            OAuth2AccessToken accessToken = tokenResponse.getAccessToken();
+            ZblogToken.AccessToken accessToken = token.getAccessToken();
             if (!jwtToken.equals(accessToken.getTokenValue())) {
-                throw new BadCredentialsException("认证失败：身份不匹配.");
+                throw new PreJwtCheckAuthenticationException(TokenError.NOT_MATCH.value());
             }
 
             // 解析权限集合这里
@@ -152,14 +152,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 放入安全上下文中
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        } catch (PreJwtCheckAuthenticationException e) {
-            log.error("需要刷新令牌");
-            throw e;
         } catch (AuthenticationException e) {
             throw e;
+        } catch (BadJwtException e) {
+            String errorMsg = dealBadJwtException(e);
+            throw new PreJwtCheckAuthenticationException(errorMsg);
         } catch (Exception e) {
-            log.warn("check token failed, [{}-{}]", jwtToken, e.getMessage());
-            throw new PreJwtCheckAuthenticationException("认证失败：" + e.getMessage());
+            log.warn("check token catch eor: {} [{}]", e.getMessage(), jwtToken);
+            throw new PreJwtCheckAuthenticationException(TokenError.UNKNOWN_ERROR.value());
         }
+    }
+
+    private String dealBadJwtException(BadJwtException badJwtException) {
+        String errorMsg = badJwtException.getMessage();
+        return errorMsg.contains("Expired JWT") ? TokenError.EXPIRED.value() : TokenError.VALID.value();
     }
 }

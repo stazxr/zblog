@@ -32,6 +32,8 @@ import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 @Component
 @RequiredArgsConstructor
 public class CustomSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
+    private static final String URL_SPLIT_LABEL = "?";
+
     private final PermissionService permissionService;
 
     private final RoleService roleService;
@@ -50,7 +52,7 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         // 拦截用户请求的地址，返回访问该地址需要的所有权限
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
-        if (requestUrl.contains("?")) {
+        if (requestUrl.contains(URL_SPLIT_LABEL)) {
             requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
         }
 

@@ -4,7 +4,7 @@
          updateCheck = "false">
 
     <!-- 指定一个文件目录，当EHCache把数据写到硬盘上时，将把数据写到这个文件目录下 -->
-    <diskStore path = "/var/zblog/tmpdir/ehcache" />
+    <diskStore path = "/home/zblog/ehcache" />
 
     <!-- 默认的管理策略 -->
     <defaultCache
