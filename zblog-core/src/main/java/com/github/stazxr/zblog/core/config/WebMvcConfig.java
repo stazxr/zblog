@@ -21,7 +21,7 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.*;
  */
 @EnableWebMvc
 @Configuration
-public class CustomWebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * 配置使用 fastjson 进行 json 解析
      *

@@ -6,7 +6,7 @@ package com.github.stazxr.zblog.util.servlet;
  * @author SunTao
  * @since 2022-01-28
  */
-public class ResponseUtils {
+public final class ResponseUtils {
     private ResponseUtils() {
     }
 }

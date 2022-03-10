@@ -34,7 +34,8 @@ public class EncryptUtils {
      * @throws Exception encrypt failed
      */
     public static String desEncrypt(String source) throws Exception {
-        if (StringUtils.isBlank(source) || source.contains(" ")) {
+        String validSymbol = " ";
+        if (StringUtils.isBlank(source) || source.contains(validSymbol)) {
             throw new IllegalArgumentException("encrypt str must not be blank and not contains space");
         }
 

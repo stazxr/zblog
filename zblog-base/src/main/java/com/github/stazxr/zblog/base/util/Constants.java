@@ -25,7 +25,7 @@ public class Constants {
     /**
      * 路由状态
      */
-    public static class RouterStatus {
+    public static final class RouterStatus {
         private RouterStatus() {
             throw new IllegalStateException();
         }
@@ -49,7 +49,7 @@ public class Constants {
     /**
      * 内置安全系统的角色
      */
-    public static class SecurityRole {
+    public static final class SecurityRole {
         private SecurityRole() {
             throw new IllegalStateException();
         }
@@ -73,5 +73,18 @@ public class Constants {
          * 角色：ROLE_FORBIDDEN
          */
         public static final String FORBIDDEN = "ROLE_FORBIDDEN";
+    }
+
+    /**
+     * Session Key
+     *
+     * @author SunTao
+     * @since 2020-11-14
+     */
+    public static class SessionKey {
+        /**
+         * 绑定登录的用户
+         */
+        public static final String LOGIN_NUM_CODE = "loginNumCode";
     }
 }

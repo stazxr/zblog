@@ -69,7 +69,7 @@ public class WorkIdService {
         }
 
         if (workIdsMap == null) {
-            workIdsMap = new HashMap<>();
+            workIdsMap = new HashMap<>(16);
         }
 
         // 刷新机器保存信息

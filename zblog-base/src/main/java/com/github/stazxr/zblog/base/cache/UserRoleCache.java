@@ -19,26 +19,29 @@ public class UserRoleCache {
     /**
      * Cache user - role.
      */
-    private static final Map<String, List<Role>> userRoleCache = new ConcurrentHashMap<>();
+    private static final Map<String, List<Role>> USER_ROLE_CACHE = new ConcurrentHashMap<>();
 
     public static void put(String username, List<Role> roles) {
+        Assert.notNull(username, "username must not be null!");
         Assert.notNull(roles, "user roles must not be null!");
 
         log.info("cache user role [user-{}, roles-{}]", username, roles);
-        userRoleCache.put(username, roles);
+        USER_ROLE_CACHE.put(username, roles);
     }
 
     public static void remove(String username) {
-        log.info("remove user role cache [user-{}]", username);
-        userRoleCache.remove(username);
+        if (username != null) {
+            log.info("remove user role cache [user-{}]", username);
+            USER_ROLE_CACHE.remove(username);
+        }
     }
 
     public static List<Role> get(String username) {
-        return userRoleCache.get(username);
+        return USER_ROLE_CACHE.get(username);
     }
 
     public static void clear() {
         log.info("clear all user role cache");
-        userRoleCache.clear();
+        USER_ROLE_CACHE.clear();
     }
 }

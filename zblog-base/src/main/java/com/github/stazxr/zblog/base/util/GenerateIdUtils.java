@@ -12,10 +12,10 @@ import java.util.List;
  * @author SunTao
  * @since 2021-12-17
  */
-public abstract class GenerateIdUtils {
+public class GenerateIdUtils {
     private static IdGenerator idGenerator;
 
-    private static IdGenerator getGenerateIdService() {
+    private static IdGenerator instance() {
         if (GenerateIdUtils.idGenerator == null) {
             GenerateIdUtils.idGenerator = SpringContextUtils.getBean("IdGeneratorService", IdGenerator.class);
         }
@@ -28,7 +28,7 @@ public abstract class GenerateIdUtils {
      * @return Long id
      */
     public static Long getId() {
-        return getGenerateIdService().generateId();
+        return instance().generateId();
     }
 
     /**
@@ -40,7 +40,7 @@ public abstract class GenerateIdUtils {
     public static List<Long> getIdList(Integer count) {
         List<Long> ids = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            ids.add(getGenerateIdService().generateId());
+            ids.add(instance().generateId());
         }
         return ids;
     }

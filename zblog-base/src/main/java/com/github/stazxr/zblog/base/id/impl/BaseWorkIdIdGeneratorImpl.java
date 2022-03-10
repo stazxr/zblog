@@ -15,29 +15,42 @@ import java.util.concurrent.locks.ReentrantLock;
  *  第2-42位表示毫秒数，共41位，当前时间毫秒-START_TIME_MILLIS
  *  第43-52位表示workId，即机器id，共10位，能支持1024台机器
  *  第53-64位表示序列号，共12位
+ *
+ * @author https://blog.csdn.net/u010266988/article/details/87899533
+ * @since 2021-12-19
  */
 public abstract class BaseWorkIdIdGeneratorImpl extends BaseWorkIdIdGenerator {
-    // 开始时间
+    /**
+     * 开始时间
+     */
     public static final long START_TIME_MILLIS;
 
     private static final long SEQUENCE_BITS = 12L;
 
     private static final long WORKER_ID_BITS = 10L;
 
-    // 2^12 - 1 = 4095 ==> 111 111 111 111
+    /**
+     * 2^12 - 1 = 4095 ==> 111 111 111 111
+     */
     private static final long SEQUENCE_MASK = (1 << SEQUENCE_BITS) - 1;
 
-    // 2^10 - 1 = 1023 ===> 1 111 111 111
+    /**
+     * 2^10 - 1 = 1023 ===> 1 111 111 111
+     */
     private static final long WORK_ID_MASK = (1 << WORKER_ID_BITS) - 1;
 
     private static final long WORKER_ID_LEFT_SHIFT_BITS = SEQUENCE_BITS;
 
-    // 22
+    /**
+     * 22
+     */
     private static final long TIMESTAMP_LEFT_SHIFT_BITS = WORKER_ID_LEFT_SHIFT_BITS + WORKER_ID_BITS;
 
     private long sequence;
 
-    // default 0
+    /**
+     * default 0L
+     */
     private long lastTime;
 
     private final Lock lock = new ReentrantLock();

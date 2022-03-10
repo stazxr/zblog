@@ -4,6 +4,12 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * spring security utils
+ *
+ * @author SunTao
+ * @since 2021-01-29
+ */
 public class SecurityUtils {
     /**
      * 获取系统用户名称

@@ -7,7 +7,17 @@ package com.github.stazxr.zblog.base.id.work.api;
  * @since 2021-12-12
  */
 public interface WorkIdResolver {
+    /**
+     * 返回机器ID
+     *
+     * @return workId
+     */
     long resolveWorkId();
 
+    /**
+     * 返回机器IP
+     *
+     * @return workIp
+     */
     String resolveWorkIp();
 }

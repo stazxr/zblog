@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,11 @@ public class IdController {
     @ApiOperation("生成唯一序列")
     @Router(name = "生成唯一序列", code = "getId")
     public Result getId() {
-        return Result.success().data(GenerateIdUtils.getId());
+        try {
+            return Result.success().data(GenerateIdUtils.getId());
+        } catch (Exception e) {
+            throw new ServiceException(ResultCode.ID_EXCEPTION, e);
+        }
     }
 
     /**
@@ -37,9 +43,14 @@ public class IdController {
     @GetMapping("/getIds")
     @Router(name = "生成序列列表", code = "getIds")
     public Result getIds(@RequestParam("count") Integer count) {
-        if (count == null || count == 0) {
-            count = 1;
+        Integer tmpCount = count;
+        if (tmpCount == null || tmpCount == 0) {
+            tmpCount = 1;
         }
-        return Result.success().data(GenerateIdUtils.getIdList(count));
+        try {
+            return Result.success().data(GenerateIdUtils.getIdList(tmpCount));
+        } catch (Exception e) {
+            throw new ServiceException(ResultCode.ID_EXCEPTION, e);
+        }
     }
 }

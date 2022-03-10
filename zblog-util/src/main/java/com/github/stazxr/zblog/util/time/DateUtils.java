@@ -1,12 +1,16 @@
 package com.github.stazxr.zblog.util.time;
 
+import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 日期工具类
@@ -94,9 +98,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return String 格式化后的日期
      */
     public static String format(Date date, String pattern) {
-        if (null == date) {
-            date = new Date(0);
-        }
+        Assert.notNull(date, "待格式化日期不能为空");
         String pattern2 = StringUtils.isEmpty(pattern) ? DEFAULT_PATTERN : pattern;
         return new SimpleDateFormat(pattern2).format(date);
     }
@@ -144,8 +146,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 字符串转 LocalDateTime ，字符串格式 yyyy-MM-dd
      *
-     * @param localDateTime /
-     * @return /
+     * @param localDateTime yyyy-MM-dd
+     * @return LocalDateTime
      */
     public static LocalDateTime parseLocalDateTimeFormat(String localDateTime, String pattern) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
@@ -155,8 +157,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 字符串转 LocalDateTime ，字符串格式 yyyy-MM-dd
      *
-     * @param localDateTime /
-     * @return /
+     * @param localDateTime yyyy-MM-dd
+     * @return LocalDateTime
      */
     public static LocalDateTime parseLocalDateTimeFormat(String localDateTime, DateTimeFormatter dateTimeFormatter) {
         return LocalDateTime.from(dateTimeFormatter.parse(localDateTime));
@@ -223,6 +225,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
+     * 判断某天是否是周末（周六或周日）
+     *
+     * @param date 判断日期
+     * @return boolean
+     */
+    public static boolean isWeekend(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        int weekFlag = calendar.get(Calendar.DAY_OF_WEEK);
+        return weekFlag == Calendar.SATURDAY || weekFlag == Calendar.SUNDAY;
+    }
+
+    /**
      * 计算两个日期之间的天数
      *
      * @param startDate 开始日期
@@ -235,5 +251,108 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         }
 
         return (int) ((endDate.getTime() - startDate.getTime()) / (24L * 3600L * 1000L)) + 1;
+    }
+
+    /**
+     * 计算两个日期之间的工作日天数
+     *
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     * @param workDays  工作日列表，yyyy-MM-dd格式
+     * @param restDays  结束日期，yyyy-MM-dd格式
+     * @return 天数
+     */
+    public static int calWorkDayCount(Date startDate, Date endDate, Set<String> workDays, Set<String> restDays) throws ParseException {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("startDate or endDate must not be null");
+        }
+
+        // deal workDays and restDays
+        Set<String> workDaysTmp = workDays == null ? new HashSet<>() : workDays;
+        Set<String> restDaysTmp = restDays == null ? new HashSet<>() : restDays;
+
+        // 获取日期列表
+        Set<String> days = findDays(startDate, endDate);
+
+        // 规则计算，判断是否是周六或周天，如果是，则判断当天是否在 workDays 中配置，如果不是，则判断当天是否在 restDays 中配置
+        int workDayCount = 0;
+        for (String day : days) {
+            Date tmp = parseDate(day, YMD_PATTERN);
+            if (isWeekend(tmp)) {
+                if (workDaysTmp.contains(day)) {
+                    workDayCount++;
+                }
+            } else {
+                if (!restDaysTmp.contains(day)) {
+                    workDayCount++;
+                }
+            }
+        }
+
+        return workDayCount;
+    }
+
+    /**
+     * 计算两个日期之间所有的天数
+     *
+     * @param startTime 开始日期
+     * @param endTime 结束日期
+     * @return 日期的集合, 集合格式: [startTime, endTime]
+     */
+    public static Set<String> findDays(Date startTime, Date endTime) {
+        return findDays(startTime, endTime, true, "yyyy-MM-dd");
+    }
+
+    /**
+     * 计算两个日期之间所有的天数
+     *
+     * @param startTime 开始日期
+     * @param endTime   结束日期
+     * @param pattern   日期格式
+     * @return 日期的集合, 集合格式: [startTime, endTime]
+     */
+    public static Set<String> findDays(Date startTime, Date endTime, String pattern) {
+        return findDays(startTime, endTime, true, pattern);
+    }
+
+    /**
+     * 计算两个日期之间所有的天数
+     *
+     * @param startTime  开始日期
+     * @param endTime    结束日期
+     * @param containEnd 是否包含结束
+     * @return 日期的集合
+     */
+    public static Set<String> findDays(Date startTime, Date endTime, boolean containEnd) {
+        return findDays(startTime, endTime, containEnd, "yyyy-MM-dd");
+    }
+
+    /**
+     * 计算两个日期之间所有的天数
+     *
+     * @param startTime  开始日期
+     * @param endTime    结束日期
+     * @param containEnd 是否包含结束
+     * @param pattern    日期格式
+     * @return 日期的集合
+     */
+    public static Set<String> findDays(Date startTime, Date endTime, boolean containEnd, String pattern) {
+        Calendar startNode = Calendar.getInstance();
+        startNode.setTime(startTime);
+        Calendar endNode = Calendar.getInstance();
+        endNode.setTime(endTime);
+        if (containEnd) {
+            endNode.add(Calendar.DATE, 1);
+        }
+
+        // cal
+        Set<String> days = new HashSet<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        while (startNode.before(endNode)) {
+            days.add(simpleDateFormat.format(startNode.getTime()));
+            startNode.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        return days;
     }
 }

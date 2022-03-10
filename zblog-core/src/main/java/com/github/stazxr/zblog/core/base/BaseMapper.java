@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.core.base;
 
-
 /**
  * BaseMapper
  *

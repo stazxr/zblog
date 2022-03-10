@@ -25,7 +25,7 @@ public class BaseConst {
     /**
      * 系统初始化内置字典ID
      */
-    public static class DictId {
+    public static final class DictId {
         private DictId() {
             throw new IllegalStateException();
         }
@@ -44,7 +44,7 @@ public class BaseConst {
     /**
      * 系统初始化内置字典Key
      */
-    public static class DictKey {
+    public static final class DictKey {
         private DictKey() {
             throw new IllegalStateException();
         }
@@ -63,7 +63,7 @@ public class BaseConst {
     /**
      * 权限级别
      */
-    public static class PermLevel {
+    public static final class PermLevel {
         private PermLevel() {
             throw new IllegalStateException();
         }

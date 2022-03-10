@@ -16,7 +16,7 @@ import java.util.concurrent.*;
  * @author SunTao
  * @since 2021-12-13
  */
-public class LocalHostUtils {
+public final class LocalHostUtils {
     private LocalHostUtils() {
     }
 

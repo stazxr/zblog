@@ -36,6 +36,8 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RouterManager {
+    private static final int SPLIT_SIZE = 100;
+
     private final WebApplicationContext applicationContext;
 
     private final PermissionService permissionService;
@@ -50,16 +52,20 @@ public class RouterManager {
         List<Router> routeList = parseRouter();
         log.info("router list: {}", routeList);
 
-        routerService.clearRouter(); // 删除所有
-        if (routeList.size() < 100) {
-            routerService.saveBatch(routeList); // 批量插入
+        routerService.clearRouter();
+        if (routeList.size() < SPLIT_SIZE) {
+            routerService.saveBatch(routeList);
         } else {
             List<List<Router>> routers = ArrayUtils.averageAssign(routeList);
             routers.forEach(routerService::saveBatch);
         }
     }
 
-    // 解析所有的路由信息
+    /**
+     * 解析所有的路由信息
+     *
+     * @return 路由列表
+     */
     private List<Router> parseRouter() {
         List<Router> routes = new ArrayList<>();
 
@@ -107,10 +113,11 @@ public class RouterManager {
 
             Router router;
             if (routeInfo == null) {
+                // 该类别的路由登录即可访问
                 router = new Router();
                 router.setName(method.getName());
                 router.setCode(method.getName());
-                router.setLevel(BaseConst.PermLevel.PUBLIC); // 登录即可访问
+                router.setLevel(BaseConst.PermLevel.PUBLIC);
                 router.setRemark("系统自动识别");
             } else {
                 router = new Router(routeInfo);

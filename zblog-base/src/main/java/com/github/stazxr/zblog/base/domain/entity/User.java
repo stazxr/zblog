@@ -237,21 +237,6 @@ public class User extends BaseEntity implements UserDetails {
         return sortedAuthorities;
     }
 
-    private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
-        private static final long serialVersionUID = 4921529298932942546L;
-
-        @Override
-        public int compare(GrantedAuthority g1, GrantedAuthority g2) {
-            if (g2.getAuthority() == null) {
-                return -1;
-            }
-            if (g1.getAuthority() == null) {
-                return 1;
-            }
-            return g1.getAuthority().compareTo(g2.getAuthority());
-        }
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(getUsername());
@@ -268,5 +253,20 @@ public class User extends BaseEntity implements UserDetails {
 
         User other = (User) obj;
         return !StringUtils.isEmpty(username) && username.equalsIgnoreCase(other.getUsername());
+    }
+
+    private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
+        private static final long serialVersionUID = 4921529298932942546L;
+
+        @Override
+        public int compare(GrantedAuthority g1, GrantedAuthority g2) {
+            if (g2.getAuthority() == null) {
+                return -1;
+            }
+            if (g1.getAuthority() == null) {
+                return 1;
+            }
+            return g1.getAuthority().compareTo(g2.getAuthority());
+        }
     }
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author SunTao
  * @since 2020-12-12
  */
-public class ResponseUtils {
+public final class ResponseUtils {
     private ResponseUtils() {
     }
 

@@ -22,8 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @RequiredArgsConstructor
 public class MemoryCacheImpl extends BaseCache {
-    // sys cache
-    private static final CacheMap<String, String> cacheMap = CacheMap.getInstance();
+    /**
+     * sys cache
+     */
+    private static final CacheMap<String, String> CACHE_MAP = CacheMap.getInstance();
 
     private final CacheConfigProperties cacheConfigProperties;
 
@@ -50,7 +52,7 @@ public class MemoryCacheImpl extends BaseCache {
      */
     @Override
     public String put(String key, String value, int expireTime) {
-        cacheMap.cachePut(key, value, expireTime);
+        CACHE_MAP.cachePut(key, value, expireTime);
         return get(key);
     }
 
@@ -61,7 +63,7 @@ public class MemoryCacheImpl extends BaseCache {
      */
     @Override
     public void remove(String key) {
-        cacheMap.cacheRemove(key);
+        CACHE_MAP.cacheRemove(key);
     }
 
     /**
@@ -84,7 +86,7 @@ public class MemoryCacheImpl extends BaseCache {
      */
     @Override
     public String get(String key) {
-        return cacheMap.cacheGet(key);
+        return CACHE_MAP.cacheGet(key);
     }
 
     /**
@@ -93,7 +95,7 @@ public class MemoryCacheImpl extends BaseCache {
      * @param <K> key
      * @param <V> value
      */
-    private static class CacheMap<K, V> extends ConcurrentHashMap<K, V> {
+    private static final class CacheMap<K, V> extends ConcurrentHashMap<K, V> {
         private static CacheMap<String, String> instance;
 
         // cache the key expired time
@@ -150,13 +152,13 @@ public class MemoryCacheImpl extends BaseCache {
             return instance.get(key);
         }
 
+        @SuppressWarnings("AlibabaAvoidManuallyCreateThread")
         private static void startExpiredCheckThread() {
             expiredDateMap = new CacheMap<>();
 
             Thread thread = new Thread(() -> {
-                // 每10分种遍历一次 expiredDateMap
-
                 while (true) {
+                    // 每10分种遍历一次 expiredDateMap
                     checkExpiredMap();
                     ThreadUtils.sleepMinute(10);
                 }

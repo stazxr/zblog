@@ -25,7 +25,7 @@ public class ThreadUtils {
     }
 
     public static void sleepMillisecond(int milliseconds) {
-        Assert.isTrue(milliseconds > 0, "milliseconds must be greater than zero.");
+        Assert.isTrue(milliseconds <= 0, "milliseconds must be greater than zero.");
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {

@@ -6,7 +6,7 @@ package com.github.stazxr.zblog.util;
  * @author SunTao
  * @since 2021-11-30
  */
-public abstract class Assert {
+public final class Assert {
     /**
      * Assert that an object is not null
      *
@@ -51,7 +51,7 @@ public abstract class Assert {
      * @throws IllegalArgumentException if the flag is not true
      */
     public static void isTrue(boolean flag, String message) {
-        if (!flag) {
+        if (flag) {
             throw new IllegalArgumentException(message);
         }
     }

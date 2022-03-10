@@ -39,6 +39,7 @@ public class DbWorkIdResolver implements WorkIdResolver {
         return workId;
     }
 
+    @Override
     public String resolveWorkIp() {
         return workIp;
     }

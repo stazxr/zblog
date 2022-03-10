@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 @Slf4j
 @RestControllerAdvice
 public class ResultAdvice implements ResponseBodyAdvice<Object> {
+    private static final String ERROR_PATH = "/error";
+
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> aClass) {
         return !returnType.hasMethodAnnotation(IgnoreResult.class);
@@ -42,7 +44,7 @@ public class ResultAdvice implements ResponseBodyAdvice<Object> {
         }
 
         String uri = serverHttpRequest.getURI().getPath();
-        if ("/error".equals(uri)) {
+        if (ERROR_PATH.equals(uri)) {
             try {
                 LinkedHashMap<String, Object> val = (LinkedHashMap<String, Object>) o;
                 Integer code = (Integer) val.getOrDefault("status", "500");

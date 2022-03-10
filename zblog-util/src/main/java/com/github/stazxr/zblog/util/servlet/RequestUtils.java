@@ -8,7 +8,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author SunTao
  * @since 2022-01-28
  */
-public class RequestUtils {
+public final class RequestUtils {
+    private static final String APPLICATION_JSON = "application/json";
+
+    private static final String XML_HTTP_REQUEST = "XMLHttpRequest";
+
+    private static final String PATTERN_JSON = "json";
+
+    private static final String PATTERN_XML = "xml";
+
     private RequestUtils() {
     }
 
@@ -60,23 +68,23 @@ public class RequestUtils {
      */
     public static boolean isAjax(HttpServletRequest request) {
         String accept = request.getHeader("accept");
-        if (accept != null && accept.contains("application/json")) {
+        if (accept != null && accept.contains(APPLICATION_JSON)) {
             return true;
         }
 
         String xRequestedWith = request.getHeader("X-Requested-With");
-        if (xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest")) {
+        if (xRequestedWith != null && xRequestedWith.contains(XML_HTTP_REQUEST)) {
             return true;
         }
 
         String uri = request.getRequestURI();
-        if (uri.toLowerCase().contains("json") || uri.toLowerCase().contains("xml")) {
+        if (uri.toLowerCase().contains(PATTERN_JSON) || uri.toLowerCase().contains(PATTERN_XML)) {
             return true;
         }
 
         String ajax = request.getParameter("__ajax");
         if (null != ajax) {
-            return ajax.toLowerCase().contains("json") || ajax.toLowerCase().contains("xml");
+            return ajax.toLowerCase().contains(PATTERN_JSON) || ajax.toLowerCase().contains(PATTERN_XML);
         }
 
         return false;

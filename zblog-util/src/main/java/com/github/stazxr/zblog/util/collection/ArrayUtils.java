@@ -3,8 +3,16 @@ package com.github.stazxr.zblog.util.collection;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 数组工具类
+ *
+ * @author SunTao
+ * @since 2022-01-15
+ */
 public class ArrayUtils {
-    // the unit of split big array to batch save.
+    /**
+     * the unit of split big array to batch save.
+     */
     private static final int GREAT_SPLIT_COUNT = 50;
 
     /**
@@ -28,9 +36,15 @@ public class ArrayUtils {
      */
     public static <T> List<List<T>> averageAssign(List<T> source, int count) {
         List<List<T>> result = new ArrayList<>();
-        int remainder = source.size() % count;  //(先计算出余数)
-        int number = source.size() / count;  //然后是商
-        int offset = 0;//偏移量
+
+        // 余数
+        int remainder = source.size() % count;
+
+        // 商
+        int number = source.size() / count;
+
+        // 偏移量
+        int offset = 0;
         for (int i = 0; i < count; i++) {
             List<T> value;
             if (remainder > 0) {
