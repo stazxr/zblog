@@ -1,6 +1,11 @@
 package com.github.stazxr.zblog.util.servlet;
 
+import lombok.extern.slf4j.Slf4j;
+
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 /**
  * 请求相关工具类
@@ -8,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author SunTao
  * @since 2022-01-28
  */
+@Slf4j
 public final class RequestUtils {
     private static final String APPLICATION_JSON = "application/json";
 
@@ -88,5 +94,25 @@ public final class RequestUtils {
         }
 
         return false;
+    }
+
+    /**
+     * 获取 request body
+     *
+     * @param request req
+     * @return body
+     */
+    public static String obtainBody(ServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = request.getReader()) {
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            log.error("requestBody read error: [{}]", e.getMessage());
+            throw new IllegalStateException("obtainBody failed");
+        }
     }
 }

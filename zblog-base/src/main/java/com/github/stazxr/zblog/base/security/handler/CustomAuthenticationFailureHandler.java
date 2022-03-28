@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY;
+
 /**
  * CustomAuthenticationFailureHandler
  *
@@ -38,33 +40,41 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException {
         // 清除用的缓存信息
-        String username = request.getParameter("username");
+        String username = (String) request.getAttribute(SPRING_SECURITY_FORM_USERNAME_KEY);
         UserRoleCache.remove(username);
 
         // 处理异常
         exceptionHandle(exception, request);
 
         // 封装返回结果 Result
-        Result result = Result.failure(ResultCode.LOGIN_FAILED, errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED);
+        Result result = genResult(username, exception);
         ResponseUtils.responseJsonWriter(response, result);
     }
 
+    private Result genResult(String username, AuthenticationException exception) {
+        log.warn("user [{}] login failed: [{}]", username, exception.getMessage());
+        if (exception instanceof CredentialsExpiredException) {
+            return Result.failure(ResultCode.PASSWORD_EXPIRED, errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED);
+        }
+
+        return Result.failure(ResultCode.LOGIN_FAILED, errorMsg(exception)).code(HttpStatus.UNAUTHORIZED);
+    }
+
     private void exceptionHandle(AuthenticationException exception, HttpServletRequest request) {
+        String username = (String) request.getAttribute(SPRING_SECURITY_FORM_USERNAME_KEY);
         if (exception instanceof BadCredentialsException) {
             // 密码输入错误，记录用户密码输入错误次数，满足条件则锁定用户
-            String username = request.getParameter("username");
-            log.warn("user {} input wrong password", username);
+            log.warn("user [{}] input wrong password", username);
         }
 
         if (exception instanceof UsernameNotFoundException) {
             // 用户不存在，记录IP对网站的访问次数，满足条件则拉黑IP
             String ipAddr = RequestUtils.getIpAddr(request);
-            log.warn("ip {} input wrong username", ipAddr);
+            log.warn("ip [{}] input wrong username [{}]", ipAddr, username);
         }
     }
 
     private String errorMsg(AuthenticationException e) {
-        log.error("login failed", e);
         if (e instanceof NumCodeException) {
             return e.getMessage();
         } else if (e instanceof UsernameNotFoundException) {

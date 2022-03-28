@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.security.config;
 
-import com.github.stazxr.zblog.base.security.CustomAccessDecisionManager;
-import com.github.stazxr.zblog.base.security.CustomSecurityMetadataSource;
+import com.github.stazxr.zblog.base.security.*;
 import com.github.stazxr.zblog.base.security.exception.CustomAccessDeniedHandler;
-import com.github.stazxr.zblog.base.security.UserDetailsServiceImpl;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.security.filter.JwtAuthenticationFilter;
+import com.github.stazxr.zblog.base.security.filter.LoginAuthenticationFilter;
 import com.github.stazxr.zblog.base.security.handler.CustomAuthenticationFailureHandler;
 import com.github.stazxr.zblog.base.security.handler.CustomAuthenticationSuccessHandler;
 import com.github.stazxr.zblog.base.security.handler.CustomLogoutHandler;
@@ -17,6 +16,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,8 +24,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 /**
@@ -41,7 +44,7 @@ public class CustomWebSecurityConfiguration {
     /**
      * login url
      */
-    public static final String LOGIN_PROCESSING_URL = "/process";
+    public static final String LOGIN_PROCESSING_URL = "/api/process";
 
     /**
      * 使用 Security 推荐的 BCryptPasswordEncoder 进行加解密
@@ -130,6 +133,34 @@ public class CustomWebSecurityConfiguration {
         }
 
         /**
+         * 登录认证拦截器
+         *
+         * @return LoginAuthenticationFilter
+         * @throws Exception e
+         */
+        @Bean
+        public LoginAuthenticationFilter loginAuthenticationFilter() throws Exception {
+            LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
+            filter.setFilterProcessesUrl(LOGIN_PROCESSING_URL);
+            filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+            filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+            filter.setAuthenticationManager(authenticationManagerBean());
+            return filter;
+        }
+
+        /**
+         * AuthenticationManager
+         *
+         * @return AuthenticationManager
+         * @throws Exception e
+         */
+        @Bean
+        @Override
+        public AuthenticationManager authenticationManagerBean() throws Exception {
+            return super.authenticationManagerBean();
+        }
+
+        /**
          * HttpSecurity config
          *  用于构建一个安全过滤器链 SecurityFilterChain，SecurityFilterChain 最终被注入核心过滤器。
          *
@@ -150,11 +181,11 @@ public class CustomWebSecurityConfiguration {
 
             // session 生成策略用无状态策略
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-            // 表单登录配置
-            http.formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL)
-                    .successHandler(authenticationSuccessHandler)
-                    .failureHandler(authenticationFailureHandler);
+//
+//            // 表单登录配置
+//            http.formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL)
+//                    .successHandler(authenticationSuccessHandler)
+//                    .failureHandler(authenticationFailureHandler);
 
             // 登出配置
             http.logout().addLogoutHandler(logoutHandler).logoutSuccessHandler(logoutSuccessHandler);
@@ -165,6 +196,7 @@ public class CustomWebSecurityConfiguration {
 
             // 配置过滤器链
             http.addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
+            http.addFilterAt(loginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
             // 关闭CSRF保护, 开启跨域资源共享
             http.csrf().disable().cors();

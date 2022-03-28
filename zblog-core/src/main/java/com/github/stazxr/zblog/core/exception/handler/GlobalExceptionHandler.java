@@ -63,7 +63,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NoHandlerFoundException.class)
     public Result resourceNotFoundExceptionHandler(NoHandlerFoundException e) {
-        log.error(e.getMessage());
         return Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND);
     }
 }

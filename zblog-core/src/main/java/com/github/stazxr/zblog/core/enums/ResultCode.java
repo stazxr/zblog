@@ -60,7 +60,7 @@ public enum ResultCode {
     /**
      * 登录认证失败
      */
-    LOGIN_FAILED(10008, "登录认证失败"),
+    LOGIN_FAILED(10008, "登录失败"),
 
     /**
      * 令牌认证失败
@@ -105,7 +105,12 @@ public enum ResultCode {
     /**
      * 非法的参数
      */
-    PARAM_INVALID(10017, "非法的参数");
+    PARAM_INVALID(10017, "非法的参数"),
+
+    /**
+     * 密码已过期，请修改密码
+     */
+    PASSWORD_EXPIRED(10018, "密码已过期，请修改密码");
 
     private final Integer code;
 

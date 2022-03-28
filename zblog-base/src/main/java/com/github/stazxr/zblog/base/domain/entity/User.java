@@ -269,4 +269,11 @@ public class User extends BaseEntity implements UserDetails {
             return g1.getAuthority().compareTo(g2.getAuthority());
         }
     }
+
+    @Override
+    public String toString() {
+        // 密码脱敏
+        setPassword("[PROTECT]");
+        return super.toString();
+    }
 }

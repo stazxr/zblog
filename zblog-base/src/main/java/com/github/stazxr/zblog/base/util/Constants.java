@@ -76,15 +76,38 @@ public class Constants {
     }
 
     /**
-     * Session Key
+     * Cache Key
      *
      * @author SunTao
      * @since 2020-11-14
      */
-    public static class SessionKey {
+    public enum CacheKey {
         /**
-         * 绑定登录的用户
+         * 登录验证码
          */
-        public static final String LOGIN_NUM_CODE = "loginNumCode";
+        loginNumCode("loginNumCode", 300);
+
+        /**
+         * 缓存Key
+         */
+        private final String cacheKey;
+
+        /**
+         * 缓存有效时间，单位秒
+         */
+        private final int duration;
+
+        CacheKey(String cacheKey, int duration) {
+            this.cacheKey = cacheKey;
+            this.duration = duration;
+        }
+
+        public String cacheKey() {
+            return cacheKey;
+        }
+
+        public int duration() {
+            return duration;
+        }
     }
 }
