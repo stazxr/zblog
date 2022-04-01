@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.util.time;
 
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,7 @@ import java.util.Set;
  * @author SunTao
  * @since 2020-11-15
  */
+@Slf4j
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * yyyy-MM-dd HH:mm:ss
@@ -93,7 +95,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 格式化日期为字符串
      *
-     * @param date    日期，为空，则为初始日期
+     * @param date    日期
      * @param pattern 格式
      * @return String 格式化后的日期
      */
@@ -101,6 +103,24 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         Assert.notNull(date, "待格式化日期不能为空");
         String pattern2 = StringUtils.isEmpty(pattern) ? DEFAULT_PATTERN : pattern;
         return new SimpleDateFormat(pattern2).format(date);
+    }
+
+    /**
+     * 重新格式化字符串日期为新的格式字符串
+     *
+     * @param dateStr    字符串日期
+     * @param oldPattern 字符串原来的格式
+     * @param newPattern 字符串期望的格式
+     * @return String 格式化后的日期
+     */
+    public static String reFormat(String dateStr, String oldPattern, String newPattern) {
+        try {
+            return DateUtils.format(DateUtils.parseDate(dateStr, oldPattern), newPattern);
+        } catch (Exception e) {
+            // 格式化失败返回空
+            log.warn("reFormat data eor: [{} & {} & {}]", dateStr, oldPattern, newPattern);
+            return null;
+        }
     }
 
     /**
