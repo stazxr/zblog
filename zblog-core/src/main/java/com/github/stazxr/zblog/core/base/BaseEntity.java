@@ -22,31 +22,31 @@ public class BaseEntity extends Model<BaseEntity> {
 	/**
 	 * 创建用户
 	 */
-	@TableField(fill=FieldFill.INSERT)
+	@TableField(fill = FieldFill.INSERT)
 	private String createUser;
 
 	/**
 	 * 创建时间
 	 */
-	@TableField(fill=FieldFill.INSERT)
+	@TableField(fill = FieldFill.INSERT)
 	private String createTime;
 
 	/**
 	 * 创建日期
 	 */
-	@TableField(fill=FieldFill.INSERT)
+	@TableField(fill = FieldFill.INSERT)
 	private String createDate;
 
 	/**
 	 * 修改用户
 	 */
-	@TableField(fill=FieldFill.UPDATE)
+	@TableField(fill = FieldFill.UPDATE)
 	private String updateUser;
 
 	/**
 	 * 修改时间
 	 */
-	@TableField(fill=FieldFill.UPDATE)
+	@TableField(fill = FieldFill.UPDATE)
 	private String updateTime;
 
 	/**

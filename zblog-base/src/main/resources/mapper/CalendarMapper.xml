@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.CalendarMapper">
+    <select id="listCalendarSet" resultType="com.github.stazxr.zblog.base.domain.vo.CalendarVo">
+        SELECT
+            c.ID, c.DATE, c.FLAG type, c.REMARK, c.CREATE_USER, c.CREATE_TIME,
+            (SELECT d.NAME FROM dict d WHERE d.KEY = 'calendarType' AND d.VALUE = c.FLAG AND d.ENABLED = '1' AND d.DELETED = '0') typeName
+        FROM
+            calendar c
+        WHERE
+            c.DATE LIKE CONCAT(#{year}, '%')
+        ORDER BY c.DATE
+    </select>
+
+    <delete id="deleteDataConfig">
+        DELETE FROM calendar WHERE DATE = #{date}
+    </delete>
+</mapper>

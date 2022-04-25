@@ -21,7 +21,7 @@ public class IdController {
     /**
      * 生成唯一ID
      *
-     * @return Result
+     * @return 唯一ID
      */
     @GetMapping("/getId")
     @ApiOperation("生成唯一序列")
@@ -37,7 +37,7 @@ public class IdController {
     /**
      * 生成ID列表
      *
-     * @return Result
+     * @return 唯一ID列表
      */
     @ApiOperation("生成序列列表")
     @GetMapping("/getIds")

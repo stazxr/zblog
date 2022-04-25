@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = IllegalArgumentException.class)
     public Result illegalArgumentExceptionHandler(IllegalArgumentException e) {
         log.error(ThrowableUtils.getStackTrace(e));
-        return Result.failure(ResultCode.PARAM_INVALID);
+        return Result.failure(ResultCode.PARAM_VALID);
     }
 
     /**

@@ -66,7 +66,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 格式化现在
      *
-     * @return 当前时间的字符串 "yyyy-MM-dd HH:mm:ss"
+     * @return 当前时间的字符串 "yyyy-MM-dd"
      */
     public static String formatDate() {
         return format(new Date(), YMD_PATTERN);
