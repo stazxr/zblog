@@ -1,5 +1,5 @@
 server:
-  port: ${serverPort:31945}
+  port: 9993
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -8,15 +8,15 @@ spring:
     password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
     type: com.alibaba.druid.pool.DruidDataSource
   redis:
-    host: ENC(wEAkOysMms4sh54ilxS+TLLkIXxGGN7L)
-    port: 6480
+    host: 127.0.0.1
+    port: 6379
     client-type: lettuce
-    password: ENC(yLNmRC4j7X2ucajRvSutQTSbnrwi9eoM)
+    password: redisPwd
 jwt:
   cert-info:
-    alias: suntaoblogcom
-    key-password: ENC(kUfidmIYBnle2iOXS1MSqQvzU+VOhCXQ)
-    cert-location: suntaoblogcom.jks
+    alias: zblog
+    key-password: 123456
+    cert-location: zblog.jks
   claims:
     issuer: https://www.suntaoblog.com
     subject: all

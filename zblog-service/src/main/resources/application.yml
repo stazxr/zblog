@@ -1,6 +1,25 @@
 spring:
   profiles:
-    active: prod
+    active: dev
+  web:
+    resources:
+      add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-value: true
+      logic-not-delete-value: false
+  type-enums-package: com.github.stazxr.zblog.base.domain.enums
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
 logging:
   file:
     path: /home/zblog/logs/zblog.log
@@ -15,14 +34,5 @@ swagger:
       name: SunTao
       url: https://www.suntaoblog.com/
       email: stazxr@qq.com
-mybatis-plus:
-  mapper-locations: classpath*:mapper/**/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-  global-config:
-    db-config:
-      logic-delete-value: true
-      logic-not-delete-value: false
-  type-enums-package: com.github.stazxr.zblog.base.domain.enums
 deploy:
   type: single

@@ -14,7 +14,7 @@ import java.io.IOException;
  * @since 2022-01-28
  */
 @Slf4j
-public final class RequestUtils {
+public class RequestUtils {
     private static final String APPLICATION_JSON = "application/json";
 
     private static final String XML_HTTP_REQUEST = "XMLHttpRequest";
@@ -22,9 +22,6 @@ public final class RequestUtils {
     private static final String PATTERN_JSON = "json";
 
     private static final String PATTERN_XML = "xml";
-
-    private RequestUtils() {
-    }
 
     private static final String UNKNOWN = "unknown";
 

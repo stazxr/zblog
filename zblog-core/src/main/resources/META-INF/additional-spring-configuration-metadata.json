@@ -4,6 +4,22 @@
       "name": "cache",
       "type": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties"
+    },
+    {
+      "name": "swagger",
+      "type": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties"
+    },
+    {
+      "name": "swagger.contact",
+      "type": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "sourceMethod": "getContact()"
+    },
+    {
+      "name": "api.docs",
+      "type": "com.github.stazxr.zblog.core.config.properties.ApiDocsConfigProperties",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ApiDocsConfigProperties"
     }
   ],
   "properties": [
@@ -20,6 +36,62 @@
       "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
       "description": "默认有效时间, 单位秒, -1 代表永久有效.",
       "defaultValue": 300
+    },
+    {
+      "name": "swagger.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "是否启用 Swagger.",
+      "defaultValue": false
+    },
+    {
+      "name": "swagger.title",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 文档标题.",
+      "defaultValue": "zblog API文档"
+    },
+    {
+      "name": "swagger.description",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 文档描述.",
+      "defaultValue": "一个前后端分离的个人博客框架，Git链接：https://github.com/stazxr/zblog"
+    },
+    {
+      "name": "swagger.version",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger API 版本.",
+      "defaultValue": "4.0.0"
+    },
+    {
+      "name": "swagger.basePackage",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
+      "description": "Swagger 扫描路径.",
+      "defaultValue": "com.github.stazxr.zblog"
+    },
+    {
+      "name": "swagger.contact.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人姓名.",
+      "defaultValue": "孙涛"
+    },
+    {
+      "name": "swagger.contact.url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人网址.",
+      "defaultValue": "https://www.suntaoblog.com/"
+    },
+    {
+      "name": "swagger.contact.email",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
+      "description": "Swagger 联系人邮箱.",
+      "defaultValue": "stazxr@qq.com"
     }
   ],
   "hints": [

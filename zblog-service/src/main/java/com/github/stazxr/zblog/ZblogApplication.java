@@ -14,8 +14,8 @@ import org.springframework.cache.annotation.EnableCaching;
  */
 @EnableCaching
 @SpringBootApplication
-public class Application {
+public class ZblogApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(ZblogApplication.class, args);
     }
 }

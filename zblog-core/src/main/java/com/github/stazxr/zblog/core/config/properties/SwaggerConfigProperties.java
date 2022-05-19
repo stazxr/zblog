@@ -32,7 +32,7 @@ public class SwaggerConfigProperties {
     /**
      * api version
      */
-    private String version = "4.0.0";
+    private String version = "V_0.0.1";
 
     /**
      * 包扫描路径

@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author SunTao
  * @since 2020-12-12
  */
-public final class ResponseUtils {
+public final class ResponseUtils extends com.github.stazxr.zblog.util.servlet.ResponseUtils {
     private ResponseUtils() {
     }
 

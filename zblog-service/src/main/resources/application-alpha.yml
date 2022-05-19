@@ -1,5 +1,5 @@
 server:
-  port: 9991
+  port: 9992
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -23,11 +23,4 @@ jwt:
     duration: 3600
 cache:
   default-duration: 300
-  type: memory
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-logging:
-  level:
-    com.github.spring.security.mapper: debug
-    org.springframework.security: debug
+  type: redis

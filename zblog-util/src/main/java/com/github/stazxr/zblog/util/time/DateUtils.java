@@ -115,11 +115,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      */
     public static String reFormat(String dateStr, String oldPattern, String newPattern) {
         try {
-            return DateUtils.format(DateUtils.parseDate(dateStr, oldPattern), newPattern);
+            return format(parseDate(dateStr, oldPattern), newPattern);
         } catch (Exception e) {
             // 格式化失败返回空
-            log.warn("reFormat data eor: [{} & {} & {}]", dateStr, oldPattern, newPattern);
-            return null;
+            log.warn("reFormat data eor, return oldPattern: [{} & {} & {}]", dateStr, oldPattern, newPattern);
+            return oldPattern;
         }
     }
 
@@ -279,7 +279,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @param startDate 开始日期
      * @param endDate   结束日期
      * @param workDays  工作日列表，yyyy-MM-dd格式
-     * @param restDays  结束日期，yyyy-MM-dd格式
+     * @param restDays  节假日列表，yyyy-MM-dd格式
      * @return 天数
      */
     public static int calWorkDayCount(Date startDate, Date endDate, Set<String> workDays, Set<String> restDays) throws ParseException {
@@ -374,5 +374,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         }
 
         return days;
+    }
+
+    public static void main(String[] args) throws ParseException {
+        String area = "2022-05-16~至今";
+        String[] tmp = area.split("~");
+        Date sDate = parseDate(tmp[0], YMD_PATTERN);
+        Date eDate = "".equals(tmp[1]) ? new Date() : parseDate(tmp[1], YMD_PATTERN);
+        Set<String> days = findDays(sDate, eDate);
+        System.out.println(days);
     }
 }

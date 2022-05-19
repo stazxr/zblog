@@ -10,5 +10,5 @@ File - Setting - Maven - Importing处，勾选Create module groups for multi-mod
 
 二、上线部署=============
 1、run base.sql
-2、mvn clean package
+2、mvn clean package -Pdev
 3、运行 zblog-service 模块的启动类
