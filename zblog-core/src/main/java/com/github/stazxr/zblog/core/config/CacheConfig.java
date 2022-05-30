@@ -23,14 +23,14 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(CacheConfigProperties.class)
 public class CacheConfig {
-    @Bean
+    @Bean("sysCache")
     @ConditionalOnProperty(name = "cache.type", havingValue = "memory")
     public Cache memoryCache(CacheConfigProperties cacheConfigProperties) {
         log.info("cache type: {}", MemoryCacheImpl.class);
         return new MemoryCacheImpl(cacheConfigProperties);
     }
 
-    @Bean
+    @Bean("sysCache")
     @ConditionalOnProperty(name = "cache.type", havingValue = "redis")
     public Cache redisCache(CacheConfigProperties cacheConfigProperties, StringRedisTemplate redisTemplate) {
         log.info("cache type: {}", RedisCacheImpl.class);

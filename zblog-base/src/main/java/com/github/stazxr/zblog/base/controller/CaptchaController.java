@@ -19,11 +19,15 @@ import java.io.OutputStream;
 /**
  * 登录验证码管理
  *
+ *   TIPS:
+ *      于 2022-05-20 废弃，替换方案：/api/auth/loginCode
+ *
  * @author SunTao
  * @since 2020-11-14
  */
 @Slf4j
 @Controller
+@Deprecated
 @AllArgsConstructor
 public class CaptchaController {
     private final DefaultKaptcha defaultKaptcha;
@@ -40,7 +44,7 @@ public class CaptchaController {
         // cache numCode
         String correctNumCode = defaultKaptcha.createText();
         Constants.CacheKey loginNumCode = Constants.CacheKey.loginNumCode;
-        CacheUtils.cache().put(cacheKey, correctNumCode, loginNumCode.duration());
+        CacheUtils.put(cacheKey, correctNumCode, loginNumCode.duration());
 
         // response image
         BufferedImage image = defaultKaptcha.createImage(correctNumCode);
@@ -49,7 +53,7 @@ public class CaptchaController {
             ImageIO.write(image, "png", os);
         } catch (Exception e) {
             log.error("generate number error", e);
-            CacheUtils.cache().remove(cacheKey);
+            CacheUtils.remove(cacheKey);
         }
     }
 }

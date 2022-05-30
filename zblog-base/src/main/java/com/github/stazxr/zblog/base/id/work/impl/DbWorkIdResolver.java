@@ -5,7 +5,6 @@ import com.github.stazxr.zblog.base.id.work.api.WorkIdResolver;
 import com.github.stazxr.zblog.base.id.work.model.WorkResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

@@ -65,6 +65,18 @@ public class ServiceException extends ZblogException {
     }
 
     /**
+     * 通过 ResultCode 枚举来抛出已经归档记录的异常
+     *
+     * @param resultCode {@link ResultCode}
+     * @param errorMsg 错误信息
+     */
+    public ServiceException(ResultCode resultCode, String errorMsg) {
+        super(errorMsg);
+        this.identifier = resultCode.code();
+        this.message = errorMsg;
+    }
+
+    /**
      * 对异常 Throwable 进行包装，然后抛出
      *
      * @param cause 未知异常

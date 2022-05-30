@@ -375,13 +375,4 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         return days;
     }
-
-    public static void main(String[] args) throws ParseException {
-        String area = "2022-05-16~至今";
-        String[] tmp = area.split("~");
-        Date sDate = parseDate(tmp[0], YMD_PATTERN);
-        Date eDate = "".equals(tmp[1]) ? new Date() : parseDate(tmp[1], YMD_PATTERN);
-        Set<String> days = findDays(sDate, eDate);
-        System.out.println(days);
-    }
 }

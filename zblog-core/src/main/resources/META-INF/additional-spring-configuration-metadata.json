@@ -34,7 +34,7 @@
       "name": "cache.defaultDuration",
       "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
-      "description": "默认有效时间, 单位秒, -1 代表永久有效.",
+      "description": "默认有效时间, 单位秒, 0 代表永久有效.",
       "defaultValue": 300
     },
     {

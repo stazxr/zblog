@@ -15,6 +15,7 @@
 
     <properties>
         <kaptcha.version>2.3.2</kaptcha.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
     </properties>
 
     <dependencies>
@@ -35,6 +36,11 @@
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
             <version>${kaptcha.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+            <version>${easy-captcha.version}</version>
         </dependency>
         <!-- Springboot Configuration -->
         <dependency>

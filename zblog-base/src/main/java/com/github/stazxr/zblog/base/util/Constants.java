@@ -23,6 +23,11 @@ public class Constants {
     public static final String USER_ADMIN = "admin";
 
     /**
+     * 缓存不设置过期时间
+     */
+    public static final int FOREVER_CACHE = 0;
+
+    /**
      * 路由状态
      */
     public static final class RouterStatus {
@@ -85,7 +90,18 @@ public class Constants {
         /**
          * 登录验证码
          */
-        loginNumCode("loginNumCode", 300);
+        @Deprecated
+        loginNumCode("loginNumCode", 300),
+
+        /**
+         * 系统内置的验证码配置信息
+         */
+        captchaConfig("captchaConfig", FOREVER_CACHE),
+
+        /**
+         * 登录验证码缓存的Key值，有效时间已配置文件为准
+         */
+        loginCode("loginCode", -1);
 
         /**
          * 缓存Key

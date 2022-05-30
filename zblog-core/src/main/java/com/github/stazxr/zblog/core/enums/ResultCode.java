@@ -103,19 +103,24 @@ public enum ResultCode {
     OLD_PASSWORD_IS_ERROR(100016, "旧密码错误"),
 
     /**
-     * 请求参数错误，缺失必要的参数
+     * 参数错误，缺失必要的参数
      */
-    PARAM_EMPTY(10017, "请求参数错误，缺失必要的参数"),
+    PARAM_EMPTY(10017, "参数错误，缺失必要的参数"),
 
     /**
-     * 请求参数错误
+     * 参数错误
      */
-    PARAM_VALID(10018, "请求参数错误"),
+    PARAM_VALID(10018, "参数错误"),
 
     /**
      * 密码已过期，请修改密码
      */
-    PASSWORD_EXPIRED(10019, "密码已过期，请修改密码");
+    PASSWORD_EXPIRED(10019, "密码已过期，请修改密码"),
+
+    /**
+     * 错误的配置信息
+     */
+    BAD_CONFIGURATION(10020, "错误的配置信息");
 
     private final Integer code;
 

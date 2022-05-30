@@ -22,7 +22,7 @@ public class CacheConfigProperties {
     private String type = "memory";
 
     /**
-     * 默认有效时间, 单位秒, -1 代表永久有效.
+     * 默认有效时间, 单位秒, 0 代表永久有效.
      */
     private int defaultDuration = 300;
 

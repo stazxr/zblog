@@ -10,27 +10,27 @@ public enum TokenError {
     /**
      * 令牌已过期
      */
-    EXPIRED("TE001", "令牌已过期，请重新认证"),
+    EXPIRED("TE001", "登录已失效，请重新登录"),
 
     /**
      * 非法的令牌, decode(token) 失败
      */
-    VALID("TE002", "非法的令牌"),
+    VALID("TE002", "登录已失效，请重新登录"),
 
     /**
      * 非法的令牌, jwt 缺失 audiences
      */
-    MISS_AUDIENCE("TE003", "非法的令牌"),
+    MISS_AUDIENCE("TE003", "登录已失效，请重新登录"),
 
     /**
      * 令牌已过期, 缓存中的令牌已经失效
      */
-    MISS_CACHE("TE004", "令牌已过期，请重新认证"),
+    MISS_CACHE("TE004", "登录已失效，请重新登录"),
 
     /**
      * 非法的令牌, 与缓存中的令牌不一致
      */
-    NOT_MATCH("TE005", "非法的令牌"),
+    NOT_MATCH("TE005", "登录已失效，请重新登录"),
 
     /**
      * 令牌校验失败，发生了不可预料的错误
@@ -40,12 +40,12 @@ public enum TokenError {
     /**
      * 非法的请求，请求未携带 token
      */
-    MISS_TOKEN("TE007", "非法的请求"),
+    MISS_TOKEN("TE007", "登录已失效，请重新登录"),
 
     /**
      * 非法的请求
      */
-    VALID_REQUEST("TE008", "非法的请求");
+    VALID_REQUEST("TE008", "登录已失效，请重新登录");
 
     private final String code;
 
@@ -65,6 +65,6 @@ public enum TokenError {
     }
 
     public String value() {
-        return getMessage().concat("[").concat(getCode()).concat("]");
+        return "[".concat(getCode()).concat("]").concat(getMessage());
     }
 }

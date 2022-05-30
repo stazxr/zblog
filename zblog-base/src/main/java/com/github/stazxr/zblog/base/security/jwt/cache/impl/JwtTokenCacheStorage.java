@@ -36,7 +36,7 @@ public class JwtTokenCacheStorage implements JwtTokenStorage {
         Assert.notNull(token, "JwtTokenStorage cache token must not br null");
         String key = TOKEN_CACHE.concat(username);
         String value = JSON.toJSONString(token);
-        CacheUtils.cache().put(key, value, duration);
+        CacheUtils.put(key, value, duration);
         return get(username);
     }
 
@@ -48,7 +48,7 @@ public class JwtTokenCacheStorage implements JwtTokenStorage {
     @Override
     public void expire(String username) {
         String key = TOKEN_CACHE.concat(username);
-        CacheUtils.cache().remove(key);
+        CacheUtils.remove(key);
     }
 
     /**
@@ -60,7 +60,7 @@ public class JwtTokenCacheStorage implements JwtTokenStorage {
     @Override
     public ZblogToken get(String username) {
         String key = TOKEN_CACHE.concat(username);
-        String cacheValue = CacheUtils.cache().get(key);
+        String cacheValue = CacheUtils.get(key);
         if (cacheValue != null) {
             return JSON.parseObject(cacheValue, ZblogToken.class);
         }
