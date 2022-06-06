@@ -43,7 +43,7 @@
         <springboot.version>2.5.2</springboot.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <commons-io.version>2.3</commons-io.version>
-        <fastjson.version>1.2.72</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
         <mysql.version>5.1.47</mysql.version>
         <druid-starter.version>1.1.17</druid-starter.version>
