@@ -5,7 +5,7 @@ import com.github.stazxr.zblog.base.security.exception.NumCodeException;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
-import com.github.stazxr.zblog.util.servlet.RequestUtils;
+import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
@@ -69,7 +69,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
         if (exception instanceof UsernameNotFoundException) {
             // 用户不存在，记录IP对网站的访问次数，满足条件则拉黑IP
-            String ipAddr = RequestUtils.getIpAddr(request);
+            String ipAddr = IpUtils.getIpAddr(request);
             log.warn("ip [{}] input wrong username [{}]", ipAddr, username);
         }
     }

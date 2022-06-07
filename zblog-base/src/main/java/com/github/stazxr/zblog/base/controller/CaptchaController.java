@@ -27,7 +27,6 @@ import java.io.OutputStream;
  */
 @Slf4j
 @Controller
-@Deprecated
 @AllArgsConstructor
 public class CaptchaController {
     private final DefaultKaptcha defaultKaptcha;
@@ -38,6 +37,7 @@ public class CaptchaController {
      * @param cacheKey 缓存标识
      * @param response 响应信息
      */
+    @Deprecated
     @GetMapping(value = "/numCode")
     @Router(name = "登录验证码", code = "numCode", level = BaseConst.PermLevel.OPEN)
     public void numCodeForLogin(@RequestParam String cacheKey, HttpServletResponse response) {

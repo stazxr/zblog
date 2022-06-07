@@ -24,3 +24,6 @@ jwt:
 cache:
   default-duration: 300
   type: redis
+zblog:
+  deploy-type: single
+  is-local-ip-parsing: false

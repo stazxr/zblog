@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.id.impl;
 
+import com.github.stazxr.zblog.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service("IdGeneratorService")
-@ConditionalOnProperty(name = "deploy.type", havingValue = "single")
+@ConditionalOnProperty(name = "zblog.deploy-type", havingValue = "single")
 public class SingleIdGenerator extends BaseWorkIdIdGeneratorImpl {
     public SingleIdGenerator() {
       log.info("DeployType: single");
@@ -26,7 +27,7 @@ public class SingleIdGenerator extends BaseWorkIdIdGeneratorImpl {
      */
     @Override
     protected String parseWorkerIp(Long workId) {
-        return "127.0.0.1";
+        return Constants.LOCAL_HOST;
     }
 
     /**

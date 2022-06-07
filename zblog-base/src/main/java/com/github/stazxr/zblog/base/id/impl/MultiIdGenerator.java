@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service("IdGeneratorService")
 @ConditionalOnBean(DbWorkIdResolver.class)
-@ConditionalOnProperty(name = "deploy.type", havingValue = "multi")
+@ConditionalOnProperty(name = "zblog.deploy-type", havingValue = "multi")
 public class MultiIdGenerator extends BaseWorkIdIdGeneratorImpl {
     private final DbWorkIdResolver dbWorkIdResolver;
 

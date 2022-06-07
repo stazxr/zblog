@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
  */
 @Slf4j
 @SuppressWarnings("all")
-public class ImageBuilderUtil {
+public class ImageBuilderUtils {
     /**
      * 根据图片文字动态生成图片
      *

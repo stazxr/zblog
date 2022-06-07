@@ -27,7 +27,7 @@ public abstract class BaseWorkIdIdGeneratorImpl extends BaseWorkIdIdGenerator {
 
     private static final long SEQUENCE_BITS = 12L;
 
-    private static final long WORKER_ID_BITS = 10L;
+    public static final long WORKER_ID_BITS = 10L;
 
     /**
      * 2^12 - 1 = 4095 ==> 111 111 111 111

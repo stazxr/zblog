@@ -31,3 +31,6 @@ logging:
   level:
     com.github.spring.security.mapper: debug
     org.springframework.security: debug
+zblog:
+  deploy-type: single
+  is-local-ip-parsing: false

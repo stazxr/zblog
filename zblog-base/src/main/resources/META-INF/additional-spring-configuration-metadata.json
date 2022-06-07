@@ -14,11 +14,6 @@
       "name": "jwt.claims",
       "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
       "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
-    },
-    {
-      "name": "deploy",
-      "type": "com.github.stazxr.zblog.base.config.properties.DeployProperties",
-      "sourceType": "com.github.stazxr.zblog.base.config.properties.DeployProperties"
     }
   ],
   "properties": [
@@ -62,28 +57,7 @@
       "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
       "description": "令牌的有效时间，单位秒.",
       "defaultValue": 3600
-    },
-    {
-      "name": "deploy.type",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.config.properties.DeployProperties",
-      "description": "部署类型：single - 单机部署；multi - 多节点部署.",
-      "defaultValue": "single"
     }
   ],
-  "hints": [
-    {
-      "name": "deploy.type",
-      "values": [
-        {
-        "value": "single",
-        "description": "单机部署."
-        },
-        {
-          "value": "multi",
-          "description": "多节点部署."
-        }
-      ]
-    }
-  ]
+  "hints": []
 }

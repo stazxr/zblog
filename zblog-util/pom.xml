@@ -15,8 +15,11 @@
 
     <properties>
         <pinyin4j.version>2.5.1</pinyin4j.version>
-        <poi.version>3.14</poi.version>
+        <poi.version>3.17</poi.version>
         <easyexcel.version>3.0.5</easyexcel.version>
+        <xercesImpl.version>2.12.2</xercesImpl.version>
+        <ip2region.version>2.5.6</ip2region.version>
+        <useragent.version>5.23</useragent.version>
     </properties>
 
     <dependencies>
@@ -32,6 +35,18 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- ip2region -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-ip2region</artifactId>
+            <version>${ip2region.version}</version>
+        </dependency>
+        <!-- useragent 解析客户端操作系统、浏览器信息 -->
+        <dependency>
+            <groupId>nl.basjes.parse.useragent</groupId>
+            <artifactId>yauaa</artifactId>
+            <version>${useragent.version}</version>
         </dependency>
         <!-- pinyin4j -->
         <dependency>
@@ -59,6 +74,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml-schemas</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xercesImpl.version}</version>
         </dependency>
     </dependencies>
 </project>

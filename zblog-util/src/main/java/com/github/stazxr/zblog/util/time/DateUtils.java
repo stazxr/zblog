@@ -375,4 +375,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         return days;
     }
+
+    /**
+     * 获得当天是周几
+     *
+     * @return "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+     */
+    public static String getWeekDay() {
+        String[] weekDays = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        if (w < 0) {
+            w = 0;
+        }
+        return weekDays[w];
+    }
 }

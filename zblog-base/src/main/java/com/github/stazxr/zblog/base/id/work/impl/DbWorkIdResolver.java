@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
@@ -47,9 +48,10 @@ public class DbWorkIdResolver implements WorkIdResolver {
      * 初始化获取机器信息失败
      *
      * @throws UnknownHostException failed get hostIp
+     * @throws SocketException if an I/O error occurs
      */
     @PostConstruct
-    private void init() throws UnknownHostException {
+    private void init() throws UnknownHostException, SocketException {
         WorkResult workInfo = workIdService.generateWorkId();
         workId = workInfo.getWorkId();
         workIp = workInfo.getWorkIp();

@@ -3,7 +3,8 @@ package com.github.stazxr.zblog.util;
 import java.util.List;
 
 /**
- * ID生成工具类，只声明方法，不进行实现，供给非必须依赖模块调用
+ * ID生成工具类，只声明方法，不进行实现，service模块对该类进行了覆写，
+ *  供给非必须依赖Base模块的其他模块调用，保证其他模块可以正常使用ID生成器
  *
  * @author SunTao
  * @since 2021-12-12
@@ -15,7 +16,6 @@ public class IdUtils {
      * @return Long id
      */
     public static Long getId() {
-        // ToDo: 由依赖模块重写该类
         return null;
     }
 
@@ -26,7 +26,6 @@ public class IdUtils {
      * @return List<Long> id列表
      */
     public static List<Long> getIdList(Integer count) {
-        // ToDo: 由依赖模块重写该类
         return null;
     }
 }

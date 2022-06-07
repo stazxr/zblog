@@ -120,7 +120,12 @@ public enum ResultCode {
     /**
      * 错误的配置信息
      */
-    BAD_CONFIGURATION(10020, "错误的配置信息");
+    BAD_CONFIGURATION(10020, "错误的配置信息"),
+
+    /**
+     * 机器数超过了最大值
+     */
+    ID_OVER_MAX(10020, "机器数超过了最大值");
 
     private final Integer code;
 

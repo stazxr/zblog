@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
  * @since 2021-01-25
  */
 @Slf4j
-public class Md5Util {
+public class Md5Utils {
     /**
      * 对字节进行加密
      *

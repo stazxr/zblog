@@ -7,13 +7,18 @@ import com.github.stazxr.zblog.base.id.work.model.WorkIdCache;
 import com.github.stazxr.zblog.base.id.work.model.WorkResult;
 import com.github.stazxr.zblog.base.service.DictService;
 import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.net.LocalHostUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.github.stazxr.zblog.base.id.impl.BaseWorkIdIdGeneratorImpl.WORKER_ID_BITS;
 
 /**
  * workId generate
@@ -28,6 +33,8 @@ public class WorkIdService {
      * key-value 存储主键
      */
     private static final String DICT_KEY = "guidWorkId";
+
+    private static final long MAX_WORK_ID = (1 << WORKER_ID_BITS) - 1;
 
     /**
      * 默认最近使用的workId是0
@@ -45,8 +52,9 @@ public class WorkIdService {
      *
      * @return workId
      * @throws UnknownHostException failed get hostIp
+     * @throws SocketException if an I/O error occurs.
      */
-    public WorkResult generateWorkId() throws UnknownHostException {
+    public WorkResult generateWorkId() throws UnknownHostException, SocketException {
         String ipAddr = LocalHostUtils.getLocalIp();
         WorkResult result = new WorkResult();
         result.setWorkIp(ipAddr);
@@ -74,6 +82,9 @@ public class WorkIdService {
 
         // 刷新机器保存信息
         long newLastId = workIdCache.getLastWorkId() + 1;
+        if (newLastId > MAX_WORK_ID) {
+            throw new ServiceException(ResultCode.ID_OVER_MAX);
+        }
         workIdCache.setLastWorkId(newLastId);
         workIdsMap.put(ipAddr, newLastId);
         workIdCache.setWorkIdsCache(workIdsMap);

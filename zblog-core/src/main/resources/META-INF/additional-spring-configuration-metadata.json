@@ -17,9 +17,9 @@
       "sourceMethod": "getContact()"
     },
     {
-      "name": "api.docs",
-      "type": "com.github.stazxr.zblog.core.config.properties.ApiDocsConfigProperties",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ApiDocsConfigProperties"
+      "name": "zblog",
+      "type": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties"
     }
   ],
   "properties": [
@@ -92,6 +92,20 @@
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
       "description": "Swagger 联系人邮箱.",
       "defaultValue": "stazxr@qq.com"
+    },
+    {
+      "name": "zblog.deploy-type",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "部署类型：single - 单机部署；multi - 多节点部署.",
+      "defaultValue": "single"
+    },
+    {
+      "name": "zblog.is-local-ip-parsing",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "IP 解析类型：true - 本地解析；false - http解析.",
+      "defaultValue": true
     }
   ],
   "hints": [
@@ -105,6 +119,19 @@
         {
           "value": "redis",
           "description": "redis cache."
+        }
+      ]
+    },
+    {
+      "name": "zblog.deploy-type",
+      "values": [
+        {
+          "value": "single",
+          "description": "单机部署."
+        },
+        {
+          "value": "multi",
+          "description": "多节点部署."
         }
       ]
     }

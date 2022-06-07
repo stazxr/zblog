@@ -1,20 +1,23 @@
 spring:
   profiles:
-    active: dev
+    active: alpha
   web:
     resources:
       add-mappings: false
   mvc:
     throw-exception-if-no-handler-found: true
+  freemarker:
+    check-template-location: false
 mybatis-plus:
   mapper-locations: classpath*:mapper/**/*.xml
+  type-enums-package: com.github.stazxr.zblog.**.domain.enums
   configuration:
     map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
   global-config:
     db-config:
       logic-delete-value: true
       logic-not-delete-value: false
-  type-enums-package: com.github.stazxr.zblog.base.domain.enums
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
@@ -32,7 +35,5 @@ swagger:
     base-package: com.github.stazxr.zblog
     contact:
       name: SunTao
-      url: https://www.suntaoblog.com/
+      url: https://www.suntaoblog.com
       email: stazxr@qq.com
-deploy:
-  type: single
