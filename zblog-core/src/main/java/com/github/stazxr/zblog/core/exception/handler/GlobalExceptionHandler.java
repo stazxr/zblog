@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 异常处理器
  *
@@ -56,13 +58,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 资源未找到
+     * 请求路径不存在
      *
      * @param e 错误信息
      * @return Result
      */
     @ExceptionHandler(value = NoHandlerFoundException.class)
-    public Result resourceNotFoundExceptionHandler(NoHandlerFoundException e) {
-        return Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND).data(e.getMessage());
+    public Result resourceNotFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException e) {
+        log.error("请求路径不存在，{}", e.getMessage());
+        String eorMsg = String.format("请求资源[%s]不存在", request.getRequestURL());
+        return Result.failure(ResultCode.NOT_FOUND, eorMsg).code(HttpStatus.NOT_FOUND);
     }
 }

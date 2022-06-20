@@ -19,6 +19,9 @@ public class SpringContextUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if (SpringContextUtils.applicationContext != null) {
+            log.warn("SpringContextHolder中的ApplicationContext被覆盖, 原有ApplicationContext为:" + SpringContextUtils.applicationContext);
+        }
         SpringContextUtils.applicationContext = applicationContext;
     }
 

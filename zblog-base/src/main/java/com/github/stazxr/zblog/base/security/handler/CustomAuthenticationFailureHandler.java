@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.security.handler;
 
-import com.github.stazxr.zblog.base.cache.UserRoleCache;
 import com.github.stazxr.zblog.base.security.exception.NumCodeException;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
@@ -39,14 +38,11 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException {
-        // 清除用的缓存信息
-        String username = (String) request.getAttribute(SPRING_SECURITY_FORM_USERNAME_KEY);
-        UserRoleCache.remove(username);
-
         // 处理异常
         exceptionHandle(exception, request);
 
         // 封装返回结果 Result
+        String username = (String) request.getAttribute(SPRING_SECURITY_FORM_USERNAME_KEY);
         Result result = genResult(username, exception);
         ResponseUtils.responseJsonWriter(response, result);
     }
@@ -90,7 +86,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         } else if (e instanceof CredentialsExpiredException) {
             return "密码已过期";
         } else {
-            return "登录失败";
+            return "系统异常：".concat(e.getMessage());
         }
     }
 }

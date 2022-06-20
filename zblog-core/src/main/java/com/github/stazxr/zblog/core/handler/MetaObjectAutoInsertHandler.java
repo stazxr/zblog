@@ -1,12 +1,9 @@
 package com.github.stazxr.zblog.core.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,7 +42,7 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         if (getFieldValByName(CREATE_USER, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_USER, String.class, getLoginUsername());
+            this.strictInsertFill(metaObject, CREATE_USER, String.class, SecurityUtils.getLoginUsernameNoEor());
         }
 
         if (getFieldValByName(CREATE_TIME, metaObject) == null) {
@@ -60,20 +57,11 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         if (getFieldValByName(UPDATE_USER, metaObject) == null) {
-            this.strictUpdateFill(metaObject, UPDATE_USER, String.class, getLoginUsername());
+            this.strictUpdateFill(metaObject, UPDATE_USER, String.class, SecurityUtils.getLoginUsernameNoEor());
         }
 
         if (getFieldValByName(UPDATE_TIME, metaObject) == null) {
             this.strictUpdateFill(metaObject, UPDATE_TIME, String.class, DateUtils.formatNow());
         }
-    }
-
-    public String getLoginUsername() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return BaseConst.USER_SYSTEM;
-        }
-
-        return authentication.getName();
     }
 }

@@ -53,7 +53,6 @@ public class InitCaptchaConfigRunner implements CommandLineRunner {
             log.info("init captcha config runner finish...");
         } catch (IOException e) {
             log.error("parse conf/kaptchaConfig.json catch eor", e);
-            System.exit(1);
         }
     }
 }

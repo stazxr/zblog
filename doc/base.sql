@@ -16,6 +16,16 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`zblog` /*!40100 DEFAULT CHARACTER SET u
 
 USE `zblog`;
 
+/*Table structure for table `persistent_logins` */
+DROP TABLE IF EXISTS `persistent_logins`;
+CREATE TABLE `persistent_logins` (
+  `username` varchar(64) NOT NULL,
+  `series` varchar(64) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`series`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
 /*Table structure for table `user` */
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
@@ -54,7 +64,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户表';
 
 /*Data for the table `user` */
-INSERT INTO user (ID, NICKNAME, USERNAME, PASSWORD, EMAIL, TELEPHONE, QQ, GENDER, SIGNATURE, HEAD_IMG_URL, LOGIN_TIME, CHANGE_PWD_TIME, LOCKED, TEMP, EXPIRED_TIME, ADMIN, BUILD_IN, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '管理员', 'admin', '$2a$10$YycIf.XoN2Wl/vsoqVFZPOvyLnhv2rJNOpy2GZtPldZbqhvcNeb5a', 'stazxr@qq.com', '', '', '3', 'github开源网址：https://github.com/stazxr/zblog，创作不易，感觉还可以请star，比心', '', '', '', 0, 0, '', 1, 1, 1, 0, 1, 'system', '2021-05-17 01:48:00', '2021-05-17', '', '');
+INSERT INTO user (ID, NICKNAME, USERNAME, PASSWORD, EMAIL, TELEPHONE, QQ, GENDER, SIGNATURE, HEAD_IMG_URL, LOGIN_TIME, CHANGE_PWD_TIME, LOCKED, TEMP, EXPIRED_TIME, ADMIN, BUILD_IN, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '管理员', 'admin', '$2a$10$S9s8OySDf1B.0HerBauT1.QnrrOzsmAOU7rTXhVJL3UY2Z02Ul6FG', 'stazxr@qq.com', '', '', '3', 'github开源网址：https://github.com/stazxr/zblog，创作不易，感觉还可以请star，比心', '', '', '', 0, 0, '', 1, 1, 1, 0, 1, 'system', '2021-05-17 01:48:00', '2021-05-17', '', '');
 
 /*Table structure for table `role` */
 DROP TABLE IF EXISTS `role`;

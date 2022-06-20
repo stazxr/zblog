@@ -62,7 +62,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
             return;
         } else if (allowRoles.contains(PUBLIC) ) {
             if (authentication instanceof AnonymousAuthenticationToken) {
-                throw new BadCredentialsException("用户未登录");
+                throw new BadCredentialsException("未登录");
             } else {
                 return;
             }

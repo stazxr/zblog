@@ -38,7 +38,7 @@ public final class Result implements Serializable {
     private Object data;
 
     /**
-     * 业务响应码
+     * 业务响应码（在某些特殊场景，做更细致的业务划分）
      */
     private final Integer identifier;
 

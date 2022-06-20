@@ -3,8 +3,7 @@ package com.github.stazxr.zblog.base.security.config;
 import com.github.stazxr.zblog.base.security.*;
 import com.github.stazxr.zblog.base.security.exception.CustomAccessDeniedHandler;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
-import com.github.stazxr.zblog.base.security.filter.JwtAuthenticationFilter;
-import com.github.stazxr.zblog.base.security.filter.LoginAuthenticationFilter;
+import com.github.stazxr.zblog.base.security.filter.*;
 import com.github.stazxr.zblog.base.security.handler.CustomAuthenticationFailureHandler;
 import com.github.stazxr.zblog.base.security.handler.CustomAuthenticationSuccessHandler;
 import com.github.stazxr.zblog.base.security.handler.CustomLogoutHandler;
@@ -24,12 +23,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
+
+import javax.sql.DataSource;
 
 /**
  * 自定义安全配置
@@ -41,6 +45,8 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class CustomWebSecurityConfiguration {
+    private static final String REMEMBER_ME_UUID = "19960312&2014109078ST";
+
     /**
      * login url
      */
@@ -104,7 +110,7 @@ public class CustomWebSecurityConfiguration {
         private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
         /**
-         * jwt 认证过滤器
+         * 令牌认证过滤器
          */
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -117,6 +123,26 @@ public class CustomWebSecurityConfiguration {
          * 访问决策管理器
          */
         private final CustomAccessDecisionManager accessDecisionManager;
+
+        /**
+         * 跨域支持
+         */
+        private final CorsFilter corsFilter;
+
+        /**
+         * 数据源
+         */
+        private final DataSource dataSource;
+
+        /**
+         * 设置登录参数过滤器
+         */
+        private final ParseLoginParamFilter parseLoginParamFilter;
+
+        /**
+         * 登录验证码校验过滤器
+         */
+        private final ValidateLoginCodeFilter validateLoginCodeFilter;
 
         /**
          * authenticationProvider 配置DB的认证方式
@@ -139,13 +165,53 @@ public class CustomWebSecurityConfiguration {
          * @throws Exception e
          */
         @Bean
-        public LoginAuthenticationFilter loginAuthenticationFilter() throws Exception {
-            LoginAuthenticationFilter filter = new LoginAuthenticationFilter();
+        public CustomLoginAuthenticationFilter customLoginAuthenticationFilter() throws Exception {
+            CustomLoginAuthenticationFilter filter = new CustomLoginAuthenticationFilter();
             filter.setFilterProcessesUrl(LOGIN_PROCESSING_URL);
             filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
             filter.setAuthenticationFailureHandler(authenticationFailureHandler);
             filter.setAuthenticationManager(authenticationManagerBean());
+            filter.setRememberMeServices(rememberMeServices());
             return filter;
+        }
+
+        /**
+         * 登录认证拦截器
+         *
+         * @return LoginAuthenticationFilter
+         * @throws Exception e
+         */
+        @Bean
+        public CustomRememberMeFilter customRememberMeFilter() throws Exception {
+            CustomRememberMeFilter filter = new CustomRememberMeFilter(
+                    authenticationManagerBean(), rememberMeServices()
+            );
+
+            filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+            return filter;
+        }
+
+        /**
+         * 配置TokenRepository
+         *
+         * @return PersistentTokenRepository
+         */
+        @Bean
+        public PersistentTokenRepository persistentTokenRepository() {
+            JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+            jdbcTokenRepository.setCreateTableOnStartup(false);
+            jdbcTokenRepository.setDataSource(dataSource);
+            return jdbcTokenRepository;
+        }
+
+        /**
+         * 记住我
+         *
+         * @return RememberMeServices
+         */
+        @Bean
+        public RememberMeServices rememberMeServices() {
+            return new CustomRememberMeServices(REMEMBER_ME_UUID, userDetailsService, persistentTokenRepository());
         }
 
         /**
@@ -181,11 +247,11 @@ public class CustomWebSecurityConfiguration {
 
             // session 生成策略用无状态策略
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//            // 表单登录配置
-//            http.formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL)
-//                    .successHandler(authenticationSuccessHandler)
-//                    .failureHandler(authenticationFailureHandler);
+
+            // 表单登录配置
+            http.formLogin().loginProcessingUrl(LOGIN_PROCESSING_URL)
+                    .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler);
 
             // 登出配置
             http.logout().addLogoutHandler(logoutHandler).logoutSuccessHandler(logoutSuccessHandler);
@@ -194,9 +260,19 @@ public class CustomWebSecurityConfiguration {
             http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .accessDeniedHandler(accessDeniedHandler);
 
-            // 配置过滤器链
+            // 记住我
+            http.rememberMe().rememberMeServices(rememberMeServices());
+
+            // 配置过滤器链，see: FilterOrderRegistration
             http.addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
-            http.addFilterAt(loginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
+            http.addFilterBefore(parseLoginParamFilter, UsernamePasswordAuthenticationFilter.class);
+            http.addFilterAfter(validateLoginCodeFilter, ParseLoginParamFilter.class);
+            http.addFilterAt(customLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            http.addFilterAt(customRememberMeFilter(), RememberMeAuthenticationFilter.class);
+
+            // 防止iframe 造成跨域
+            http.headers().frameOptions().disable();
 
             // 关闭CSRF保护, 开启跨域资源共享
             http.csrf().disable().cors();

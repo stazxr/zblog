@@ -63,13 +63,12 @@ public class AuthController {
         }
 
         // 生成验证码
-        System.out.println("CaptchaCodeEnum.Arithmetic.name(): " + CaptchaCodeEnum.Arithmetic.name());
         CaptchaCodeProperties codeProperties = JSON.parseObject(captchaConfigStr, CaptchaCodeProperties.class);
         Captcha captcha = codeProperties.getCaptcha();
 
         // 缓存验证码
         Constants.CacheKey loginCode = Constants.CacheKey.loginCode;
-        String uuid = loginCode.cacheKey() + UuidUtils.generateShortUuid();
+        String uuid = loginCode.cacheKey().concat(":").concat(UuidUtils.generateShortUuid());
         // 当验证码类型为 arithmetic时且长度 >= 2 时，captcha.text()的结果有几率为浮点型
         String captchaValue = captcha.text();
         String point = ".";

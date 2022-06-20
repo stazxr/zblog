@@ -8,63 +8,52 @@ package com.github.stazxr.zblog.base.security.jwt;
  */
 public enum TokenError {
     /**
-     * 令牌已过期
+     * 令牌已过期 - 令牌过期，可续签
      */
-    EXPIRED("TE001", "登录已失效，请重新登录"),
+    TE001("TE001"),
 
     /**
-     * 非法的令牌, decode(token) 失败
+     * 非法的令牌, decode(token) 失败 - 视为未登录
      */
-    VALID("TE002", "登录已失效，请重新登录"),
+    TE002("TE002"),
 
     /**
-     * 非法的令牌, jwt 缺失 audiences
+     * 非法的令牌, jwt 缺失 audiences - 视为未登录
      */
-    MISS_AUDIENCE("TE003", "登录已失效，请重新登录"),
+    TE003("TE003"),
 
     /**
-     * 令牌已过期, 缓存中的令牌已经失效
+     * 令牌已过期, 缓存中的令牌已经失效 - 视为登录失效，不可续签
      */
-    MISS_CACHE("TE004", "登录已失效，请重新登录"),
+    TE004("TE004"),
 
     /**
-     * 非法的令牌, 与缓存中的令牌不一致
+     * 非法的令牌, 与缓存中的令牌不一致 - 视为未登录
      */
-    NOT_MATCH("TE005", "登录已失效，请重新登录"),
+    TE005("TE005"),
 
     /**
-     * 令牌校验失败，发生了不可预料的错误
+     * 令牌校验失败，发生了不可预料的错误 - 视为令牌认证系统错误
      */
-    UNKNOWN_ERROR("TE006", "令牌校验失败，请联系管理员"),
+    TE006("TE006"),
 
     /**
-     * 非法的请求，请求未携带 token
+     * 非法的请求，请求未携带 token - 视为未登录
      */
-    MISS_TOKEN("TE007", "登录已失效，请重新登录"),
+    TE007("TE007"),
 
     /**
-     * 非法的请求
+     * 非法的请求，请求未携带 Authorization - 视为未登录
      */
-    VALID_REQUEST("TE008", "登录已失效，请重新登录");
-
-    private final String code;
+    TE008("TE008");
 
     private final String message;
 
-    TokenError(String code, String message) {
-        this.code = code;
+    TokenError(String message) {
         this.message = message;
     }
 
-    private String getCode() {
-        return code;
-    }
-
-    private String getMessage() {
-        return message;
-    }
-
     public String value() {
-        return "[".concat(getCode()).concat("]").concat(getMessage());
+        return message;
     }
 }

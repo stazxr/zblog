@@ -33,7 +33,6 @@ public class InitRouterRunner implements CommandLineRunner {
             log.info("init router finish...");
         } catch (Exception e) {
             log.error("init router catch eor", e);
-            System.exit(1);
         }
     }
 }

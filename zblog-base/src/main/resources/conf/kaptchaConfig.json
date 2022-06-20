@@ -3,9 +3,11 @@
     "name": "loginCode",
     "properties": {
       "captchaType": "Arithmetic",
-      "duration": 180,
+      "duration": 60,
       "captchaCode": {
-
+        "length": 2,
+        "width": 111,
+        "height": 36
       }
     }
   },

@@ -33,5 +33,5 @@ public class CaptchaCode {
     /**
      * 字体大小
      */
-    private int fontSize;
+    private int fontSize = 25;
 }

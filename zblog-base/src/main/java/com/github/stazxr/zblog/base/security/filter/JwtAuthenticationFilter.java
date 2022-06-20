@@ -103,11 +103,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             } else {
                 // 带安全头 没有带token
-                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.MISS_TOKEN.value()));
+                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE007.value()));
             }
         } else {
             // 没有带安全头
-            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.VALID_REQUEST.value()));
+            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE008.value()));
         }
     }
 
@@ -126,18 +126,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 从缓存获取 token
             List<String> audiences = jwt.getAudience();
             if (audiences == null || audiences.size() < 1) {
-                throw new PreJwtCheckAuthenticationException(TokenError.MISS_AUDIENCE.value());
+                throw new PreJwtCheckAuthenticationException(TokenError.TE003.value());
             }
 
             String username = audiences.get(0);
             ZblogToken token = jwtTokenStorage.get(username);
             if (Objects.isNull(token)) {
-                throw new PreJwtCheckAuthenticationException(TokenError.MISS_CACHE.value());
+                throw new PreJwtCheckAuthenticationException(TokenError.TE004.value());
             }
 
             ZblogToken.AccessToken accessToken = token.getAccessToken();
             if (!jwtToken.equals(accessToken.getTokenValue())) {
-                throw new PreJwtCheckAuthenticationException(TokenError.NOT_MATCH.value());
+                throw new PreJwtCheckAuthenticationException(TokenError.TE005.value());
             }
 
             // 解析权限集合这里
@@ -145,26 +145,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String[] roleArr = scopes.toArray(new String[0]);
             List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleArr);
 
-            // 构建用户认证token
+            // 构建用户认证token, 放入上下文中
             User user = userService.queryUserByUsername(username.toUpperCase());
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // 放入安全上下文中
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         } catch (AuthenticationException e) {
-            throw e;
+            log.error("check token failed", e);
+            throw new PreJwtCheckAuthenticationException(e);
         } catch (BadJwtException e) {
             String errorMsg = dealBadJwtException(e);
             throw new PreJwtCheckAuthenticationException(errorMsg);
         } catch (Exception e) {
             log.warn("check token catch eor: {} [{}]", e.getMessage(), jwtToken);
-            throw new PreJwtCheckAuthenticationException(TokenError.UNKNOWN_ERROR.value());
+            throw new PreJwtCheckAuthenticationException(TokenError.TE006.value());
         }
     }
 
     private String dealBadJwtException(BadJwtException badJwtException) {
         String errorMsg = badJwtException.getMessage();
-        return errorMsg.contains("Expired JWT") ? TokenError.EXPIRED.value() : TokenError.VALID.value();
+        return errorMsg.contains("Expired JWT") ? TokenError.TE001.value() : TokenError.TE002.value();
     }
 }

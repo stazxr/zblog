@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.base.cache.UserRoleCache;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
-import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -33,6 +33,7 @@ public class User extends BaseEntity implements UserDetails {
     /**
      * 密码有效期, 单位天数
      */
+    @JsonIgnore
     private static final int PASSWORD_VALID_TIME = 180;
 
     /**
@@ -139,10 +140,11 @@ public class User extends BaseEntity implements UserDetails {
     @TableLogic
     private Boolean deleted;
 
-    public Boolean getAdmin() {
-        // 暂不已DB为准
-        return Constants.USER_ADMIN.equalsIgnoreCase(username);
-    }
+    /**
+     * 角色列表
+     */
+    @TableField(exist = false)
+    List<Role> authorities;
 
     /**
      * 账户是否未过期，过期无法验证
@@ -212,27 +214,26 @@ public class User extends BaseEntity implements UserDetails {
      * @return GrantedAuthorityList
      */
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<Role> authorities = new ArrayList<>();
-        List<Role> roles = UserRoleCache.get(username);
-        if (roles == null) {
-            return authorities;
+    public Collection<? extends Role> getAuthorities() {
+        List<Role> enabledAuthorities = new ArrayList<>();
+        if (authorities == null) {
+            return enabledAuthorities;
         }
 
         // 封装角色列表
-        roles.forEach(role -> {
+        authorities.forEach(role -> {
             if (role.getEnabled()) {
                 // 校验角色状态，达成实时判断用户当前角色的功能
-                authorities.add(role);
+                enabledAuthorities.add(role);
             }
         });
 
         // return
-        return Collections.unmodifiableSet(sortAuthorities(authorities));
+        return Collections.unmodifiableSet(sortAuthorities(enabledAuthorities));
     }
 
-    private SortedSet<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(new AuthorityComparator());
+    private SortedSet<Role> sortAuthorities(List<Role> authorities) {
+        SortedSet<Role> sortedAuthorities = new TreeSet<>(new AuthorityComparator());
         sortedAuthorities.addAll(authorities);
         return sortedAuthorities;
     }

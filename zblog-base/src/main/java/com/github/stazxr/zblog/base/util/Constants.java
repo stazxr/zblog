@@ -23,6 +23,11 @@ public class Constants {
     public static final String USER_ADMIN = "admin";
 
     /**
+     * 系统管理员序列
+     */
+    public static final Long USER_ADMIN_ID = 1L;
+
+    /**
      * 缓存不设置过期时间
      */
     public static final int FOREVER_CACHE = 0;
@@ -58,6 +63,11 @@ public class Constants {
         private SecurityRole() {
             throw new IllegalStateException();
         }
+
+        /**
+         * 角色：ROLE_ADMIN
+         */
+        public static final String ADMIN = "ROLE_ADMIN";
 
         /**
          * 角色：ROLE_OPEN

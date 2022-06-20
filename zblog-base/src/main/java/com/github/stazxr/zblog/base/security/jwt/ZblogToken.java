@@ -23,8 +23,14 @@ public class ZblogToken implements Serializable {
      */
     private static final long serialVersionUID = 8442431512167536320L;
 
+    /**
+     * ATK
+     */
     private AccessToken accessToken;
 
+    /**
+     * RTK
+     */
     private RefreshToken refreshToken;
 
     private Map<String, Object> additional;

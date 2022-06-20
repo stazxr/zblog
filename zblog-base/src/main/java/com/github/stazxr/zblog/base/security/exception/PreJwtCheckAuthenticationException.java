@@ -17,4 +17,8 @@ public class PreJwtCheckAuthenticationException extends AuthenticationException 
     public PreJwtCheckAuthenticationException(String msg) {
         super(msg);
     }
+
+    public PreJwtCheckAuthenticationException(AuthenticationException e) {
+        super(e.getMessage());
+    }
 }
