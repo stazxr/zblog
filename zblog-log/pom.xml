@@ -12,15 +12,20 @@
 
     <artifactId>zblog-log</artifactId>
     <packaging>jar</packaging>
-    <description>独立组件，如果需要开启日志，需要在service中添加依赖</description>
+    <description>日志组件</description>
 
     <dependencies>
         <!-- Zblog Core -->
         <dependency>
             <groupId>com.github.stazxr</groupId>
             <artifactId>zblog-core</artifactId>
-            <version>4.0.0</version>
+            <version>${zblog.version}</version>
             <optional>true</optional>
+        </dependency>
+        <!-- AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
     </dependencies>
 </project>

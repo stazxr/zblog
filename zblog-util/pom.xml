@@ -20,6 +20,7 @@
         <xercesImpl.version>2.12.2</xercesImpl.version>
         <ip2region.version>2.5.6</ip2region.version>
         <useragent.version>5.23</useragent.version>
+        <jackson.version>2.13.0</jackson.version>
     </properties>
 
     <dependencies>
@@ -27,7 +28,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.0</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!-- servlet api -->
         <dependency>

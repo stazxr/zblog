@@ -21,4 +21,21 @@ public class ThrowableUtils {
             return sw.toString();
         }
     }
+
+    /**
+     * 将异常转换为字符串
+     *
+     * @param throwable 异常信息
+     * @return String
+     */
+    public static String stackTraceToString(Throwable throwable) {
+        String expName = throwable.getClass().getName();
+        String message = throwable.getMessage();
+        StackTraceElement[] elements = throwable.getStackTrace();
+        StringBuilder buffer = new StringBuilder();
+        for (StackTraceElement stet : elements) {
+            buffer.append(stet).append("\n");
+        }
+        return expName + ":" + message + "\n\t" + buffer;
+    }
 }

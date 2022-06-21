@@ -17,12 +17,13 @@
     <version>4.0.0</version>
 
     <name>zblog-parent</name>
-    <description>zblog 前后端开源博客系统</description>
+    <url>https://github.com/stazxr/zblog</url>
+    <description>ZBLOG 前后端分离，开源，博客框架</description>
 
     <developers>
         <developer>
-            <name>SunTao</name>
-            <email>stazxr@qq.com</email>
+            <name>Sun Tao</name>
+            <email>1027353579@qq.com</email>
             <url>https://www.suntaoblog.com</url>
         </developer>
     </developers>
@@ -36,10 +37,14 @@
     </modules>
 
     <properties>
+        <!-- maven properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
+        <!-- zblog properties -->
+        <zblog.version>4.0.0</zblog.version>
+        <!-- third party properties -->
         <springboot.version>2.5.2</springboot.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
         <commons-io.version>2.3</commons-io.version>
@@ -51,6 +56,7 @@
         <swagger.version>2.4.0</swagger.version>
         <hutool.version>5.7.19</hutool.version>
         <security-jwt.version>1.0.11.RELEASE</security-jwt.version>
+        <jasypt.version>3.0.3</jasypt.version>
     </properties>
 
     <!-- 公共依赖管理 -->
@@ -147,6 +153,12 @@
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${springboot.version}</version>
             </dependency>
+            <!-- Springboot AOP -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
             <!-- Crypto JWT -->
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -170,6 +182,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid-starter.version}</version>
+            </dependency>
+            <!-- Jasypt -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

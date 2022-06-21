@@ -55,6 +55,6 @@ public class DbWorkIdResolver implements WorkIdResolver {
         WorkResult workInfo = workIdService.generateWorkId();
         workId = workInfo.getWorkId();
         workIp = workInfo.getWorkIp();
-        log.info("The work info {}-{}", workId, workIp);
+        log.info("The work info {} - {}", workId, workIp);
     }
 }

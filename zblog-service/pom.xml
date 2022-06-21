@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <zblog.version>4.0.0</zblog.version>
         <mainClass>com.github.stazxr.zblog.ZblogApplication</mainClass>
     </properties>
 
@@ -22,12 +21,6 @@
         <dependency>
             <groupId>com.github.stazxr</groupId>
             <artifactId>zblog-base</artifactId>
-            <version>${zblog.version}</version>
-        </dependency>
-        <!-- Zblog Log -->
-        <dependency>
-            <groupId>com.github.stazxr</groupId>
-            <artifactId>zblog-log</artifactId>
             <version>${zblog.version}</version>
         </dependency>
         <!-- Springboot Configuration -->
@@ -40,7 +33,6 @@
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>3.0.3</version>
         </dependency>
     </dependencies>
 

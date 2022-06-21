@@ -50,7 +50,7 @@ public class RedisCacheImpl extends BaseCache {
         Assert.isTrue(expireTime < 0, "cache expire time must not be negative.");
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         operations.set(key, value);
-        log.info("redis cache [{}, {}, {}]", key, value, expireTime);
+        log.debug("Redis cache [{}, {}, {}]", key, value, expireTime);
 
         // set cache
         if (expireTime != 0) {
@@ -69,7 +69,7 @@ public class RedisCacheImpl extends BaseCache {
     @Override
     public void remove(String key) {
         redisTemplate.delete(key);
-        log.info("redis cache remove [{}]", key);
+        log.debug("Redis cache remove [{}]", key);
     }
 
     /**

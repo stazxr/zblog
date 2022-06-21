@@ -26,14 +26,14 @@ public class CacheConfig {
     @Bean("sysCache")
     @ConditionalOnProperty(name = "cache.type", havingValue = "memory")
     public Cache memoryCache(CacheConfigProperties cacheConfigProperties) {
-        log.info("cache type: {}", MemoryCacheImpl.class);
+        log.info("Cache Type: {}", MemoryCacheImpl.class);
         return new MemoryCacheImpl(cacheConfigProperties);
     }
 
     @Bean("sysCache")
     @ConditionalOnProperty(name = "cache.type", havingValue = "redis")
     public Cache redisCache(CacheConfigProperties cacheConfigProperties, StringRedisTemplate redisTemplate) {
-        log.info("cache type: {}", RedisCacheImpl.class);
+        log.info("Cache Type: {}", RedisCacheImpl.class);
         return new RedisCacheImpl(cacheConfigProperties, redisTemplate);
     }
 }

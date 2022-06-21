@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(name = "zblog.deploy-type", havingValue = "single")
 public class SingleIdGenerator extends BaseWorkIdIdGeneratorImpl {
     public SingleIdGenerator() {
-      log.info("DeployType: single");
+      log.info("Deploy Type: single");
     }
 
     /**
@@ -27,7 +27,7 @@ public class SingleIdGenerator extends BaseWorkIdIdGeneratorImpl {
      */
     @Override
     protected String parseWorkerIp(Long workId) {
-        return Constants.LOCAL_HOST;
+        return Constants.LOCAL_HOST_V4;
     }
 
     /**

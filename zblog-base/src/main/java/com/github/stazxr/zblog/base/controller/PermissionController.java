@@ -4,7 +4,7 @@ import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
-import io.swagger.annotations.Api;
+import com.github.stazxr.zblog.log.annotation.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "系统：权限管理")
 @RequestMapping("/api/perms")
 public class PermissionController {
     private final PermissionService permissionService;
@@ -28,6 +27,7 @@ public class PermissionController {
      *
      * @return menuTree
      */
+    @Log
     @GetMapping(value = "/buildMenus")
     @Router(name = "构建菜单树", code = "buildMenus")
     public Result buildMenus() {

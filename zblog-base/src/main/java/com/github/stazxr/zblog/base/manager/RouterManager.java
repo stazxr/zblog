@@ -50,7 +50,7 @@ public class RouterManager {
     @Transactional(rollbackFor = Exception.class)
     public void initRouter() {
         List<Router> routeList = parseRouter();
-        log.info("router list: {}", routeList);
+        log.info("Router List: {}", routeList);
 
         routerService.clearRouter();
         if (routeList.size() < SPLIT_SIZE) {

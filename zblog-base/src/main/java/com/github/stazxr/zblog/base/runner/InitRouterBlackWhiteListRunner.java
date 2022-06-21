@@ -48,14 +48,14 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
 
     private void refreshRouterBlackWhiteList() {
         try {
-            log.info("start refresh router black and white list...");
+            log.info("Start refresh router black and white list...");
             Map<String, String> routerWhiteList = routerService.getRouterWhiteList();
             Set<String> whiteList = new LinkedHashSet<>();
             for (String url : routerWhiteList.keySet()) {
                 whiteList.add(routerWhiteList.get(url));
             }
             setWhiteList(whiteList);
-            log.info("router white list: {}", whiteList);
+            log.info("Router White List: {}", whiteList);
 
             Map<String, String> routerBlackList = routerService.getRouterBlackList();
             Set<String> blackList = new LinkedHashSet<>();
@@ -63,10 +63,10 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
                 blackList.add(routerBlackList.get(url));
             }
             setBlackList(blackList);
-            log.info("router black list: {}", blackList);
-            log.info("refresh router black and white list finish...");
+            log.info("Router Black List: {}", blackList);
+            log.info("Refresh router black and white list finish...");
         } catch (Exception e) {
-            log.error("refresh router black and white list catch eor", e);
+            log.error("Refresh router black and white list catch eor", e);
         }
     }
 }

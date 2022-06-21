@@ -65,7 +65,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
         if (exception instanceof UsernameNotFoundException) {
             // 用户不存在，记录IP对网站的访问次数，满足条件则拉黑IP
-            String ipAddr = IpUtils.getIpAddr(request);
+            String ipAddr = IpUtils.getIp(request);
             log.warn("ip [{}] input wrong username [{}]", ipAddr, username);
         }
     }

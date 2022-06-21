@@ -30,9 +30,10 @@ public class InitCaptchaConfigRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
+        log.info("Start init captcha config from conf/kaptchaConfig.json");
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("conf/kaptchaConfig.json")) {
             if (is == null) {
-                log.error("file conf/kaptchaConfig.json is not exist, please check code.");
+                log.error("File conf/kaptchaConfig.json is not exist, please check code.");
                 System.exit(1);
             }
 
@@ -45,14 +46,14 @@ public class InitCaptchaConfigRunner implements CommandLineRunner {
                 JSONObject jsonConfig = JSON.parseObject(JSON.toJSONString(config));
                 String name = jsonConfig.getString("name");
                 String properties = jsonConfig.getString("properties");
-                log.info("captcha config info: {} - {}", name, properties);
+                log.info("Captcha Config Info: {} - {}", name, properties);
                 String key = keyPrefix.concat(":").concat(name);
                 CacheUtils.put(key, properties, captchaConfig.duration());
             }
 
-            log.info("init captcha config runner finish...");
+            log.info("Init captcha config runner finish...");
         } catch (IOException e) {
-            log.error("parse conf/kaptchaConfig.json catch eor", e);
+            log.error("Parse conf/kaptchaConfig.json catch eor", e);
         }
     }
 }

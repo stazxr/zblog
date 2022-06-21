@@ -20,7 +20,7 @@ public class MultiIdGenerator extends BaseWorkIdIdGeneratorImpl {
     private final DbWorkIdResolver dbWorkIdResolver;
 
     public MultiIdGenerator(DbWorkIdResolver dbWorkIdResolver) {
-        log.info("DeployType: multi");
+        log.info("Deploy Type: multi");
         this.dbWorkIdResolver = dbWorkIdResolver;
     }
 

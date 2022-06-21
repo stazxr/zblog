@@ -11,7 +11,6 @@ import net.dreamlu.mica.ip2region.core.IpInfo;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.net.UnknownHostException;
 
@@ -25,31 +24,18 @@ import java.net.UnknownHostException;
 public class IpUtils {
     private static final String UNKNOWN = "unknown";
 
-    private static Ip2regionSearcher regionSearcher;
+    private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
 
-    private static UserAgentAnalyzer agentAnalyzer;
-
-    @PostConstruct
-    private void initObj() {
-        // init regionSearcher
-        regionSearcher = SpringContextHolder.getBean(Ip2regionSearcher.class);
-        if (regionSearcher == null) {
-            log.error("can't find class Ip2regionSearcher.");
-            System.exit(1);
-        }
-
-        // init agentAnalyzer
-        agentAnalyzer = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
-                .withField(UserAgent.AGENT_NAME_VERSION).build();
-    }
+    private static final UserAgentAnalyzer USER_AGENT_ANALYZER = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
+            .withField(UserAgent.AGENT_NAME_VERSION).build();
 
     /**
-     * 根据请求获取用户登录IP
+     * 根据请求获取IP地址
      *
      * @param request request
      * @return ip
      */
-    public static String getIpAddr(HttpServletRequest request) {
+    public static String getIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Real-IP");
         if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("x-forwarded-for");
@@ -79,7 +65,7 @@ public class IpUtils {
             }
         }
 
-        if (Constants.LOCAL_HOST.equals(ip)) {
+        if (Constants.LOCAL_HOST_V4.equals(ip) || Constants.LOCAL_HOST_V6.equals(ip)) {
             try {
                 // 获取本机真正的ip地址
                 ip = LocalHostUtils.getFirstLocalIp();
@@ -110,7 +96,10 @@ public class IpUtils {
      * @return 详细地址
      */
     public static String getLocalCityInfo(String ip) {
-        IpInfo ipInfo = regionSearcher.memorySearch(ip);
+        if (IP_SEARCHER == null) {
+            throw new IllegalStateException("bean Ip2regionSearcher not exist");
+        }
+        IpInfo ipInfo = IP_SEARCHER.memorySearch(ip);
         if (ipInfo != null) {
             return ipInfo.getAddress();
         }
@@ -124,7 +113,7 @@ public class IpUtils {
      * @return 浏览器信息
      */
     public static String getBrowser(HttpServletRequest request) {
-        UserAgent.ImmutableUserAgent userAgent = agentAnalyzer.parse(request.getHeader("User-Agent"));
+        UserAgent.ImmutableUserAgent userAgent = USER_AGENT_ANALYZER.parse(request.getHeader("User-Agent"));
         return userAgent.get(UserAgent.AGENT_NAME_VERSION).getValue();
     }
 }

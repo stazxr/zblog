@@ -43,9 +43,9 @@ public enum ResultCode {
     DATA_EXIST(10004, "数据已存在"),
 
     /**
-     * 空指针异常，或者业务所需的关键性数据不存在
+     * 空指针异常
      */
-    NULL_POINT(10005, "数据不存在"),
+    NULL_POINT(10005, "发生了空指针异常"),
 
     /**
      * 访问资源不存在
@@ -140,7 +140,12 @@ public enum ResultCode {
     /**
      * 机器数超过了最大值
      */
-    ID_OVER_MAX(10020, "机器数超过了最大值");
+    ID_OVER_MAX(10021, "机器数超过了最大值"),
+
+    /**
+     * 业务所需的关键性数据不存在
+     */
+    DATA_NOT_EXIST(10022, "数据不存在");
 
     private final Integer code;
 
