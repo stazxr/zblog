@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.util;
 
+import com.github.stazxr.zblog.util.exception.ValidParamException;
+
 /**
  * 验证工具类
  *
@@ -14,7 +16,7 @@ public final class Assert {
      * @throws IllegalArgumentException if the object is null
      */
     public static void notNull(Object object) {
-        notNull(object, "[Assertion failed] - the object argument is null");
+        notNull(object, "[Assertion failed] - param is null");
     }
 
     /**
@@ -26,7 +28,7 @@ public final class Assert {
      */
     public static void notNull(Object object, String message) {
         if (object == null) {
-            throw new IllegalArgumentException(message);
+            throw new ValidParamException(message);
         }
     }
 
@@ -39,7 +41,7 @@ public final class Assert {
      */
     public static void notBlank(String str, String message) {
         if (str == null || "".equals(str.trim())) {
-            throw new IllegalArgumentException(message);
+            throw new ValidParamException(message);
         }
     }
 
@@ -52,7 +54,7 @@ public final class Assert {
      */
     public static void isTrue(boolean flag, String message) {
         if (flag) {
-            throw new IllegalArgumentException(message);
+            throw new ValidParamException(message);
         }
     }
 }
