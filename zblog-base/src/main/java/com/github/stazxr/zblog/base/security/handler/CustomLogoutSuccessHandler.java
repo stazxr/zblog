@@ -29,7 +29,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         String username = user.getUsername();
         log.info("username: {} is offline success", username);
 
-        Result result = Result.success("登出成功");
+        Result result = Result.success(ResultCode.LOGOUT_SUCCESS);
         ResponseUtils.responseJsonWriter(response, result);
     }
 }

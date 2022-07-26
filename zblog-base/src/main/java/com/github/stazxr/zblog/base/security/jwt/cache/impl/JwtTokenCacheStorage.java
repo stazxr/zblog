@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.security.jwt.cache.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
 import com.github.stazxr.zblog.base.security.jwt.cache.JwtTokenStorage;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.util.Assert;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtTokenCacheStorage implements JwtTokenStorage {
     /**
-     * TIPS: 查看缓存配置文件 ehcache.xml 定义 过期时间与 token 过期一致.
+     * Cache Label
      */
-    private static final String TOKEN_CACHE = "usrTkn-";
+    public static final String TOKEN_CACHE = Constants.CacheKey.usrTkn.cacheKey().concat(":");
 
     /**
      * Put tokenResponse

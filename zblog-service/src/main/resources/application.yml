@@ -28,12 +28,14 @@ logging:
     path: /home/zblog/logs/zblog.log
 swagger:
   config:
-    enable: ${spring.web.resources.add-mappings}
+    enable: true
     title: zblog 官方文档
-    description: 一个前后端分离的个人博客框架，Git链接：https://github.com/stazxr/zblog
+    description: 一个前后端分离的个人博客框架，代码直通车 👉 https://github.com/stazxr/zblog
     version: 4.0.0
     base-package: com.github.stazxr.zblog
     contact:
       name: SunTao
       url: https://www.suntaoblog.com
-      email: stazxr@qq.com
+      email: 1027353579@qq.com
+zblog:
+  base-package: com.github.stazxr.zblog

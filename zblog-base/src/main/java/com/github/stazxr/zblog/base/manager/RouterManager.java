@@ -1,19 +1,17 @@
 package com.github.stazxr.zblog.base.manager;
 
-import com.github.stazxr.zblog.base.domain.entity.Permission;
-import com.github.stazxr.zblog.base.domain.entity.Router;
-import com.github.stazxr.zblog.base.service.PermissionService;
+import com.github.stazxr.zblog.base.domain.bo.RouterInterface;
+import com.github.stazxr.zblog.base.domain.entity.Interface;
+import com.github.stazxr.zblog.base.domain.enums.InterfaceType;
+import com.github.stazxr.zblog.base.service.InterfaceService;
 import com.github.stazxr.zblog.base.service.RouterService;
-import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.util.collection.ArrayUtils;
+import com.github.stazxr.zblog.base.domain.entity.Router;
+import com.github.stazxr.zblog.core.config.properties.ZblogProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
@@ -22,9 +20,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 路由管理，系统启动时加载一次
@@ -36,29 +32,31 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RouterManager {
-    private static final int SPLIT_SIZE = 100;
+    private static final String ALL_METHOD = "ANY";
 
     private final WebApplicationContext applicationContext;
 
-    private final PermissionService permissionService;
-
     private final RouterService routerService;
+
+    private final InterfaceService interfaceService;
+
+    private final ZblogProperties zblogProperties;
 
     /**
      * 系统启动时，初始化路由信息
      */
     @Transactional(rollbackFor = Exception.class)
     public void initRouter() {
-        List<Router> routeList = parseRouter();
-        log.info("Router List: {}", routeList);
+        RouterInterface routerInterface = parseRouter();
 
+        // save router
         routerService.clearRouter();
-        if (routeList.size() < SPLIT_SIZE) {
-            routerService.saveBatch(routeList);
-        } else {
-            List<List<Router>> routers = ArrayUtils.averageAssign(routeList);
-            routers.forEach(routerService::saveBatch);
-        }
+        routerService.saveBatch(routerInterface.getRouters());
+
+        // save interface
+        interfaceService.clearInterface();
+        routerInterface.getPermInterfaces().addAll(routerInterface.getNullInterfaces());
+        interfaceService.saveBatch(routerInterface.getPermInterfaces());
     }
 
     /**
@@ -66,86 +64,104 @@ public class RouterManager {
      *
      * @return 路由列表
      */
-    private List<Router> parseRouter() {
-        List<Router> routes = new ArrayList<>();
-
-        // 获取路由白名单
-        Map<String, String> whiteList = routerService.getRouterWhiteList();
-
-        // 获取url与类和方法的对应信息
+    private RouterInterface parseRouter() {
+        // 获取并遍历url与类和方法的对应信息
+        List<Router> routers = new ArrayList<>();
+        List<Interface> permInterfaces = new ArrayList<>();
+        List<Interface> nullInterfaces = new ArrayList<>();
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> m : map.entrySet()) {
             RequestMappingInfo info = m.getKey();
             HandlerMethod handlerMethod = m.getValue();
-            PatternsRequestCondition p = info.getPatternsCondition();
-            if (p == null) {
-                continue;
-            }
-
-            // 获取HTTP URI
-            String uri = "";
-            for (String pattern : p.getPatterns()) {
-                // 默认只有一个URL
-                uri = pattern;
-            }
-
-            // 禁止path风格的路由配置
-            if (uri.contains("{") && uri.contains("}")) {
-                throw new IllegalStateException("禁止使用PathVariable型URI > " + uri);
-            }
-
-            // 白名单检查
-            if (whiteList.containsValue(uri)) {
-                continue;
-            }
-
             Method method = handlerMethod.getMethod();
-            RequestMapping isReqMapper = method.getAnnotation(RequestMapping.class);
-            if (isReqMapper != null) {
-                throw new IllegalStateException("禁止使用RequestMapping注解 > " + uri);
+            String className = method.getDeclaringClass().getName();
+            if (!className.startsWith(zblogProperties.getBasePackage())) {
+                // 非系统本身接口，跳过
+                continue;
             }
 
-            // 获取Router注解
-            com.github.stazxr.zblog.core.annotation.Router routeInfo = method.getAnnotation(
-                com.github.stazxr.zblog.core.annotation.Router.class
-            );
+            // 获取请求地址
+            Set<String> requestUris;
+            PatternsRequestCondition prc = info.getPatternsCondition();
+            if (prc == null || prc.getPatterns().isEmpty()) {
+                log.warn("方法 {}.{}() URL Patterns 为空", className, method.getName());
+                continue;
+            } else {
+                requestUris = new HashSet<>(prc.getPatterns());
+            }
 
-            Router router;
+            // 获取请求方式
+            Set<String> requestMethods = new HashSet<>();
+            RequestMethodsRequestCondition mrc = info.getMethodsCondition();
+            if (mrc.getMethods().size() == 0) {
+                // ALL METHOD
+                requestMethods.add(ALL_METHOD.toUpperCase(Locale.ROOT));
+            } else {
+                mrc.getMethods().forEach(requestMethod -> requestMethods.add(requestMethod.toString().toUpperCase(Locale.ROOT)));
+            }
+
+            // 获取 Router 注解，如果接口未配置则跳过
+            com.github.stazxr.zblog.core.annotation.Router routeInfo = method.getAnnotation(com.github.stazxr.zblog.core.annotation.Router.class);
             if (routeInfo == null) {
-                // 该类别的路由登录即可访问
-                router = new Router();
-                router.setName(method.getName());
-                router.setCode(method.getName());
-                router.setLevel(BaseConst.PermLevel.PUBLIC);
-                router.setRemark("系统自动识别");
-            } else {
-                router = new Router(routeInfo);
+                log.warn("方法 {}.{}() 未声明 @Router 注解", className, method.getName());
+                pushNullInterface(nullInterfaces, requestUris, requestMethods);
+                continue;
             }
 
-            // HttpUrl and HttpMethod
-            router.setUrl(uri);
-            RequestMethodsRequestCondition methodsCondition = info.getMethodsCondition();
-            for (RequestMethod requestMethod : methodsCondition.getMethods()) {
-                // 默认一个方法只有一个HttpMethod
-                router.setMethod(requestMethod.toString());
-                break;
-            }
-
-            // 设置路由状态
-            Permission permission = permissionService.selectPermByPath(router.getUrl());
-            if (permission == null) {
-                router.setStatus(Constants.RouterStatus.NONE);
-            } else {
-                router.setLevel(permission.getLevel());
-                router.setStatus(
-                    permission.getEnabled() ? Constants.RouterStatus.OK : Constants.RouterStatus.DISABLED
-                );
-            }
-
+            // 封装 router
+            com.github.stazxr.zblog.base.domain.entity.Router router = new com.github.stazxr.zblog.base.domain.entity.Router(routeInfo);
             router.setId(GenerateIdUtils.getId());
-            routes.add(router);
+            routers.add(router);
+
+            // 封装 interface
+            for (String uri : requestUris) {
+                checkCustomRule(uri);
+                for (String requestMethod : requestMethods) {
+                    Interface anInterface = new Interface();
+                    anInterface.setId(GenerateIdUtils.getId());
+                    anInterface.setCode(routeInfo.code());
+                    anInterface.setUri(uri);
+                    anInterface.setMethod(requestMethod);
+                    anInterface.setType(InterfaceType.PERM);
+                    permInterfaces.add(anInterface);
+                }
+            }
         }
-        return routes;
+
+        // return
+        RouterInterface routerInterface = new RouterInterface();
+        routerInterface.setRouters(routers);
+        routerInterface.setPermInterfaces(permInterfaces);
+        routerInterface.setNullInterfaces(nullInterfaces);
+        return routerInterface;
+    }
+
+    /**
+     * zblog 对路由的自定义规范检查
+     *
+     * @param uri URI
+     */
+    private void checkCustomRule(String uri) {
+        // 禁止path风格的路由配置，后续想办法解决
+        String[] pathVariableLabel = {"{", "}"};
+        if (uri.contains(pathVariableLabel[0]) && uri.contains(pathVariableLabel[1])) {
+            throw new IllegalStateException("禁止使用PathVariable型URI > " + uri);
+        }
+    }
+
+    private void pushNullInterface(List<Interface> interfaces, Set<String> uris, Set<String> methods) {
+        for (String uri : uris) {
+            checkCustomRule(uri);
+            for (String method : methods) {
+                Interface anInterface = new Interface();
+                anInterface.setId(GenerateIdUtils.getId());
+                anInterface.setCode(null);
+                anInterface.setUri(uri);
+                anInterface.setMethod(method);
+                anInterface.setType(InterfaceType.NULL);
+                interfaces.add(anInterface);
+            }
+        }
     }
 }

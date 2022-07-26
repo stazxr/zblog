@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 从数据库获取用户信息
-        User user = userService.queryUserByUsername(username.toUpperCase());
+        User user = userService.queryUserByUsername(username);
 
         // 判断用户是否存在或允许登录
         if (user == null) {

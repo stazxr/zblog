@@ -4,18 +4,16 @@ import com.github.stazxr.zblog.base.manager.RouterManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 初始化系统路由列表
+ * 在项目启动时，持久化系统路由列表
  *
  * @author SunTao
  * @since 2020-11-18
  */
 @Slf4j
 @Component
-@Order(21)
 @RequiredArgsConstructor
 public class InitRouterRunner implements CommandLineRunner {
     private final RouterManager routerManager;

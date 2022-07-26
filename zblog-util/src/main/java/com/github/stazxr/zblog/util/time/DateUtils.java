@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.util.time;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -390,5 +391,33 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             w = 0;
         }
         return weekDays[w];
+    }
+
+    /**
+     * Java中获取近或过去XXX天的日期
+     *
+     * @param day 天数
+     * @param isFront 往后还是往前
+     * @param containToday 是否包含今天
+     * @return 日期列表，yyyy-MM-dd
+     */
+    public static String[] getDateAry(int day, boolean isFront, boolean containToday) {
+        String[] result = new String[day];
+        Calendar calendar = Calendar.getInstance();
+        for (int i = 0; i < day; i++) {
+            if (containToday) {
+                result[i] = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+                calendar.add(Calendar.DATE, isFront ? -1 : 1);
+            } else {
+                calendar.add(Calendar.DATE, isFront ? -1 : 1);
+                result[i] = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+            }
+        }
+
+        if (isFront && result.length > 1) {
+            ArrayUtils.reverse(result);
+        }
+
+        return result;
     }
 }

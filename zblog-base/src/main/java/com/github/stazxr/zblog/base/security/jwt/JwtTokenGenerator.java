@@ -9,13 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,36 +32,36 @@ public class JwtTokenGenerator {
     private final JwtTokenStorage jwtTokenStorage;
 
     public ZblogToken getTokenResponse(User user) {
-        JoseHeader joseHeader = JoseHeader.withAlgorithm(SignatureAlgorithm.RS256).type("JWT").build();
-        Instant issuedAt = Instant.now();
-        Set<String> scopes = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-
+        // jwt claims set
         JwtProperties.Claims claims = jwtProperties.getClaims();
-        int duration = claims.getDuration();
-        String username = user.getUsername();
-
+        // plusSeconds(TimeUnit.HOURS.toSeconds(8))
+        Instant issuedAt = Instant.now();
+        Instant expireAt = issuedAt.plusSeconds(claims.getDuration());
         JwtClaimsSet sharedClaims = JwtClaimsSet.builder()
                 .issuer(claims.getIssuer())
                 .subject(claims.getSubject())
-                .audience(Collections.singletonList(username))
-                .claim("scopes", scopes)
-                .expiresAt(issuedAt.plusSeconds(duration))
+                .audience(Collections.singletonList(user.getUsername()))
                 .issuedAt(issuedAt)
                 .build();
 
-        Jwt accessToken = jwtEncoder.encode(joseHeader, JwtClaimsSet.from(sharedClaims)
-                .expiresAt(issuedAt.plusSeconds(duration))
-                .build());
+        // jose header
+        JoseHeader joseHeader = JoseHeader.withAlgorithm(SignatureAlgorithm.RS256).type("JWT").build();
+
+        // atk, rtk
+        Jwt accessToken = jwtEncoder.encode(joseHeader, JwtClaimsSet.from(sharedClaims).expiresAt(expireAt).build());
         Jwt refreshToken = jwtEncoder.encode(joseHeader, sharedClaims);
 
-        OAuth2AccessTokenResponse tokenResponse = OAuth2AccessTokenResponse.withToken(accessToken.getTokenValue())
+        // build ZblogToken
+        ZblogToken zblogToken = new ZblogToken()
+                .withToken(accessToken.getTokenValue())
+                .refreshToken(refreshToken.getTokenValue())
+                .additionalParameters(Collections.emptyMap())
                 .tokenType(OAuth2AccessToken.TokenType.BEARER)
-                .expiresIn(duration)
-                .scopes(scopes)
-                .refreshToken(refreshToken.getTokenValue()).build();
+                .scopes(user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .issuedAt(issuedAt)
+                .expiresAt(expireAt);
 
-        // 将 OAuth2AccessTokenResponse 转为系统自定义的 ZblogToken
-        ZblogToken zblogToken = new ZblogToken().build(tokenResponse);
-        return jwtTokenStorage.put(zblogToken, username, duration);
+        // token在缓存中的有效期为半天
+        return jwtTokenStorage.put(zblogToken, user.getUsername(), 12 * 3600);
     }
 }

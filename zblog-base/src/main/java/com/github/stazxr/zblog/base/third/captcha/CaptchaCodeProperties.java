@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.third.captcha;
 
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.exception.BadConfigurationException;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.wf.captcha.*;
@@ -23,9 +24,9 @@ public class CaptchaCodeProperties {
     private String captchaType;
 
     /**
-     * 验证码有效期秒，默认180秒
+     * 验证码有效期秒
      */
-    private int duration = 180;
+    private int duration = Constants.CacheKey.loginCode.duration();
 
     /**
      * 验证码基本信息

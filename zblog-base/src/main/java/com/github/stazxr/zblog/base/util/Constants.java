@@ -10,12 +10,12 @@ public class Constants {
     /**
      * 权限树中顶层权限的ID
      */
-    public static final Long TOP_MENU_ID = 0L;
+    public static final Long TOP_PERM_ID = 0L;
 
     /**
      * 权限树中顶层权限名称
      */
-    public static final String TOP_MENU_NAME = "顶层菜单";
+    public static final String TOP_PERM_NAME = "ZBLOG";
 
     /**
      * 系统管理员
@@ -33,30 +33,6 @@ public class Constants {
     public static final int FOREVER_CACHE = 0;
 
     /**
-     * 路由状态
-     */
-    public static final class RouterStatus {
-        private RouterStatus() {
-            throw new IllegalStateException();
-        }
-
-        /**
-         * 路由未纳管
-         */
-        public static final String NONE = "none";
-
-        /**
-         * 路由被禁用，只有管理员可以访问
-         */
-        public static final String DISABLED = "disabled";
-
-        /**
-         * 路由状态正常
-         */
-        public static final String OK = "ok";
-    }
-
-    /**
      * 内置安全系统的角色
      */
     public static final class SecurityRole {
@@ -65,29 +41,29 @@ public class Constants {
         }
 
         /**
-         * 角色：ROLE_ADMIN
-         */
-        public static final String ADMIN = "ROLE_ADMIN";
-
-        /**
-         * 角色：ROLE_OPEN
+         * 角色：ROLE_OPEN（权限包含该角色，代表权限可以匿名访问）
          */
         public static final String OPEN = "ROLE_OPEN";
 
         /**
-         * 角色：ROLE_PUBLIC
+         * 角色：ROLE_PUBLIC（权限包含该角色，代表权限登录后就可以访问）
          */
         public static final String PUBLIC = "ROLE_PUBLIC";
 
         /**
-         * 角色：ROLE_NONE
+         * 角色：ROLE_FORBIDDEN（权限包含该角色，代表权限被禁止访问，只有内置管理员可以访问）
+         */
+        public static final String FORBIDDEN = "ROLE_FORBIDDEN";
+
+        /**
+         * 角色：ROLE_NONE（不存在角色可以访问该接口）
          */
         public static final String NONE = "ROLE_NONE";
 
         /**
-         * 角色：ROLE_FORBIDDEN
+         * 角色：ROLE_NULL（接口不存在，不允许访问）
          */
-        public static final String FORBIDDEN = "ROLE_FORBIDDEN";
+        public static final String NULL = "ROLE_NULL";
     }
 
     /**
@@ -109,9 +85,19 @@ public class Constants {
         captchaConfig("captchaConfig", FOREVER_CACHE),
 
         /**
-         * 登录验证码缓存的Key值，有效时间已配置文件为准
+         * 登录验证码缓存的Key值，有效时间已配置文件为准，配置文件未配置则已此处为准
          */
-        loginCode("loginCode", -1);
+        loginCode("loginCode", 60),
+
+        /**
+         * 缓存接口访问级别
+         */
+        interfaceLevel("interfaceLevel", 3600),
+
+        /**
+         * token
+         */
+        usrTkn("usrStk", 1800);
 
         /**
          * 缓存Key

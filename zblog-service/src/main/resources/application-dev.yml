@@ -1,5 +1,5 @@
 server:
-  port: 9991
+  port: 19991
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -20,7 +20,7 @@ jwt:
   claims:
     issuer: https://www.suntaoblog.com
     subject: all
-    duration: 3600
+    duration: 1800
 cache:
   default-duration: 300
   type: memory

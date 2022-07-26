@@ -1,9 +1,6 @@
 package com.github.stazxr.zblog.base.security.filter;
 
-import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.entity.User;
-import com.github.stazxr.zblog.base.security.RouterBlackWhiteListCache;
-import com.github.stazxr.zblog.base.security.config.CustomWebSecurityConfiguration;
 import com.github.stazxr.zblog.base.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.security.exception.PreJwtCheckAuthenticationException;
 import com.github.stazxr.zblog.base.security.jwt.TokenError;
@@ -50,8 +47,6 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHENTICATION_PREFIX = "Bearer ";
 
-    private static final String URL_SPLIT_LABEL = "?";
-
     /**
      * 认证失败处理
      */
@@ -66,25 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtDecoder jwtDecoder;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        // 判断请求是否需要验证token
-        String requestUrl = request.getRequestURI();
-        if (requestUrl.contains(URL_SPLIT_LABEL)) {
-            requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));
-        }
-
-        if (CustomWebSecurityConfiguration.LOGIN_PROCESSING_URL.equals(requestUrl)
-                || RouterBlackWhiteListCache.containsWhite(requestUrl)) {
-            // 登录请求放行，白名单放行
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // 获取路由信息
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String requestUri = request.getRequestURI();
         String requestMethod = request.getMethod();
-        Router router = routerService.selectByUrlAndMethod(requestUrl, requestMethod);
-        if (router == null || BaseConst.PermLevel.OPEN == router.getLevel()) {
+        int level = routerService.calculateInterfaceLevel(requestUri, requestMethod);
+        if (BaseConst.PermLevel.OPEN == level) {
+            // 可直接访问的接口忽略令牌校验
             chain.doFilter(request, response);
             return;
         }
@@ -98,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticationTokenHandle(jwtToken, request);
                     chain.doFilter(request, response);
                 } catch (AuthenticationException e) {
-                    log.warn("authentication token failed: {} [{}]", e.getMessage(), jwtToken);
+                    log.warn("authentication token failed: [{}] - {}", jwtToken, e.getMessage());
                     authenticationEntryPoint.commence(request, response, e);
                 }
             } else {
@@ -120,21 +102,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private void authenticationTokenHandle(String jwtToken, HttpServletRequest request) throws AuthenticationException {
         try {
-            // decode jwt
+            // decode jwt, if atk expired, throw code @{TE001}
             Jwt jwt = jwtDecoder.decode(jwtToken);
 
-            // 从缓存获取 token
+            // get username
             List<String> audiences = jwt.getAudience();
             if (audiences == null || audiences.size() < 1) {
                 throw new PreJwtCheckAuthenticationException(TokenError.TE003.value());
             }
 
+            // get zblog token from cache
             String username = audiences.get(0);
             ZblogToken token = jwtTokenStorage.get(username);
             if (Objects.isNull(token)) {
                 throw new PreJwtCheckAuthenticationException(TokenError.TE004.value());
             }
 
+            // 令牌不一致
             ZblogToken.AccessToken accessToken = token.getAccessToken();
             if (!jwtToken.equals(accessToken.getTokenValue())) {
                 throw new PreJwtCheckAuthenticationException(TokenError.TE005.value());
@@ -146,7 +130,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleArr);
 
             // 构建用户认证token, 放入上下文中
-            User user = userService.queryUserByUsername(username.toUpperCase());
+            User user = userService.queryUserByUsername(username);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
@@ -154,6 +138,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("check token failed", e);
             throw new PreJwtCheckAuthenticationException(e);
         } catch (BadJwtException e) {
+            log.warn("check token catch BadJwtException: {}", e.getMessage());
             String errorMsg = dealBadJwtException(e);
             throw new PreJwtCheckAuthenticationException(errorMsg);
         } catch (Exception e) {
@@ -164,6 +149,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String dealBadJwtException(BadJwtException badJwtException) {
         String errorMsg = badJwtException.getMessage();
-        return errorMsg.contains("Expired JWT") ? TokenError.TE001.value() : TokenError.TE002.value();
+        boolean enabledRenew = errorMsg.contains("Expired JWT") || errorMsg.contains("Jwt expired at");
+        return enabledRenew ? TokenError.TE001.value() : TokenError.TE002.value();
     }
 }

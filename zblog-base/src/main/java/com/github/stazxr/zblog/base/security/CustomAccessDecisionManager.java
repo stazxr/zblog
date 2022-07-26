@@ -46,8 +46,8 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
             throws AccessDeniedException, InsufficientAuthenticationException {
-        // 获取用户信息
         if (Constants.USER_ADMIN.equalsIgnoreCase(authentication.getName())) {
+            // 系统内置管理员不受权限管控
             return;
         }
 
@@ -56,7 +56,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         configAttributes.forEach(attribute -> allowRoles.add(attribute.getAttribute()));
 
         // 判断是否允许访问资源
-        if (allowRoles.contains(NONE) || allowRoles.contains(FORBIDDEN)) {
+        if (allowRoles.contains(NONE) || allowRoles.contains(NULL) || allowRoles.contains(FORBIDDEN)) {
             throw new AccessDeniedException("没有权限");
         } else if (allowRoles.contains(OPEN) ) {
             return;

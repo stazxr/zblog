@@ -23,7 +23,7 @@ public enum HolidayType {
         this.type = type;
     }
 
-    public String value() {
+    public String getType() {
         return type;
     }
 }

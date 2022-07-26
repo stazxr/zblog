@@ -10,6 +10,13 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
  */
 public class BadConfigurationException extends ServiceException {
     /**
+     * 生成一个默认配置信息错误异常
+     */
+    public BadConfigurationException() {
+        super(ResultCode.BAD_CONFIGURATION);
+    }
+
+    /**
      * 生成一个带有错误信息的的业务异常
      *
      * @param message 错误信息

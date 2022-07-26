@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
@@ -22,7 +23,7 @@ public class IdController {
      * @return 唯一ID
      */
     @GetMapping("/getId")
-    @Router(name = "生成唯一序列", code = "getId")
+    @Router(name = "生成唯一序列", code = "getId", level = BaseConst.PermLevel.PUBLIC)
     public Result getId() {
         try {
             return Result.success().data(GenerateIdUtils.getId());
@@ -37,7 +38,7 @@ public class IdController {
      * @return 唯一ID列表
      */
     @GetMapping("/getIds")
-    @Router(name = "生成序列列表", code = "getIds")
+    @Router(name = "生成序列列表", code = "getIds", level = BaseConst.PermLevel.PUBLIC)
     public Result getIds(@RequestParam("count") Integer count) {
         Integer tmpCount = count;
         if (tmpCount == null || tmpCount == 0) {

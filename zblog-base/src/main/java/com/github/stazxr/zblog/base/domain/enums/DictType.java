@@ -26,7 +26,7 @@ public enum DictType {
         this.value = value;
     }
 
-    public Integer value() {
+    public Integer getValue() {
         return value;
     }
 }

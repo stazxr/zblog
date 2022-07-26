@@ -36,7 +36,7 @@ public @interface Router {
 	 *
 	 * @return int
 	 */
-	int level() default BaseConst.PermLevel.PUBLIC;
+	int level() default BaseConst.PermLevel.PERM;
 
 	/**
 	 * 路由备注

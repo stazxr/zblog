@@ -31,7 +31,7 @@ public enum PermissionType {
         this.type = type;
     }
 
-    public Integer value() {
+    public Integer getType() {
         return type;
     }
 }

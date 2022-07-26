@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.security.handler;
 
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.vo.MenuVo;
 import com.github.stazxr.zblog.base.security.filter.CustomRememberMeFilter;
 import com.github.stazxr.zblog.base.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.security.jwt.ZblogToken;
@@ -27,7 +28,7 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-   private final JwtTokenGenerator jwtTokenGenerator;
+    private final JwtTokenGenerator jwtTokenGenerator;
 
     private final PermissionService permissionService;
 
@@ -39,8 +40,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
      * @param authentication the <tt>Authentication</tt> object which was created during
      */
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         // get user
         User principal = (User) authentication.getPrincipal();
 
@@ -49,17 +49,18 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         List<Permission> userPerms = permissionService.queryPermsByUserId(userId);
 
         // generate token
-        Map<String, Object> data = new HashMap<>(2);
         ZblogToken token = jwtTokenGenerator.getTokenResponse(principal);
         ZblogToken.AccessToken accessToken = token.getAccessToken();
-        data.put("access_token", accessToken.getTokenType().concat(" ").concat(accessToken.getTokenValue()));
-
         ZblogToken.RefreshToken refreshToken = token.getRefreshToken();
-        data.put("refresh_token", refreshToken.getTokenValue());
 
+        // additional
         Map<String, Object> additional = token.getAdditional();
         additional.put("user", principal);
         additional.put("userPerms", userPerms);
+
+        Map<String, Object> data = new HashMap<>(2);
+        data.put("access_token", accessToken.getTokenType().concat(" ").concat(accessToken.getTokenValue()));
+        data.put("refresh_token", refreshToken.getTokenValue());
         data.put("additional", additional);
 
         Boolean fromRememberMe = (Boolean) request.getAttribute(CustomRememberMeFilter.FROM_REMEMBER_ME);

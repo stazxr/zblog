@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog;
 
+import com.github.stazxr.zblog.base.runner.InitRouterBlackWhiteListRunner;
 import com.github.stazxr.zblog.log.annotation.EnableLog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,5 +21,8 @@ import org.springframework.cache.annotation.EnableCaching;
 public class ZblogApplication {
     public static void main(String[] args) {
         SpringApplication.run(ZblogApplication.class, args);
+
+        // 开启刷新黑白名单
+        InitRouterBlackWhiteListRunner.start();
     }
 }

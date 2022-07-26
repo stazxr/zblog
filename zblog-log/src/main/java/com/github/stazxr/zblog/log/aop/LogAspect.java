@@ -75,7 +75,6 @@ public class LogAspect {
             Log log = new Log(LogType.INFO, operateTime, System.currentTimeMillis() - currentTime.get());
             currentTime.remove();
             logService.saveLog(getHttpServletRequest(), joinPoint, log);
-            System.out.println("result: " + result);
             return result;
         } else {
             return joinPoint.proceed();

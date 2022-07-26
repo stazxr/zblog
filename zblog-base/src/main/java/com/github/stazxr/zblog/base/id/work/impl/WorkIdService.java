@@ -106,7 +106,7 @@ public class WorkIdService {
         newDict.setName("机器ID信息");
         newDict.setKey(DICT_KEY);
         newDict.setPid(BaseConst.DictId.SYS);
-        newDict.setType(DictType.ITEM.value());
+        newDict.setType(DictType.ITEM.getValue());
         newDict.setLocked(true);
         newDict.setUnique(true);
         newDict.setEnabled(true);

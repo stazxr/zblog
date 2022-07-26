@@ -13,6 +13,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "zblog")
 public class ZblogProperties {
     /**
+     * basePackage
+     */
+    private String basePackage = "com.github.stazxr.zblog";
+
+    /**
      * 部署类型：single - 单机部署；multi - 多节点部署. 默认单机部署
      */
     private String deployType = "single";

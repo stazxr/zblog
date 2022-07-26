@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.InterfaceMapper">
+    <delete id="clearInterface">
+        DELETE FROM interface WHERE ID > 0
+    </delete>
+
+    <select id="selectOneByRequest" resultType="com.github.stazxr.zblog.base.domain.entity.Interface">
+        SELECT
+            ID, CODE, URI, METHOD, CREATE_DATE
+        FROM
+            interface
+        WHERE
+            URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
+    </select>
+</mapper>

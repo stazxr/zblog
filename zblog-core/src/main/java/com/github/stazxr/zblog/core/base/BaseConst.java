@@ -61,7 +61,7 @@ public class BaseConst {
     }
 
     /**
-     * 权限级别
+     * 接口访问级别
      */
     public static final class PermLevel {
         private PermLevel() {
@@ -82,5 +82,29 @@ public class BaseConst {
          * 受控权限，授权即可访问
          */
         public static final int PERM = 3;
+    }
+
+    /**
+     * 扩展的接口访问级别,特殊用途
+     */
+    public static final class PermLevelExtend {
+        private PermLevelExtend() {
+            throw new IllegalStateException();
+        }
+
+        /**
+         * 禁止访问
+         */
+        public static final int FORBIDDEN = 99;
+
+        /**
+         * 未配置@Router注解,接口不对外,不允许访问
+         */
+        public static final int NULL = 98;
+
+        /**
+         *
+         */
+        public static final int NONE = 97;
     }
 }

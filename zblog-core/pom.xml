@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.stazxr</groupId>
+        <groupId>com.github.stazxr.zblog</groupId>
         <artifactId>zblog-parent</artifactId>
         <version>4.0.0</version>
     </parent>
@@ -16,7 +16,7 @@
     <dependencies>
         <!-- Zblog Util -->
         <dependency>
-            <groupId>com.github.stazxr</groupId>
+            <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-util</artifactId>
             <version>${zblog.version}</version>
         </dependency>

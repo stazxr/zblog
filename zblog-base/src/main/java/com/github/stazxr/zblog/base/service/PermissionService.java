@@ -14,14 +14,6 @@ import java.util.List;
  */
 public interface PermissionService extends IService<Permission> {
     /**
-     * 根据权限路径查找权限
-     *
-     * @param path 权限路径
-     * @return Permission
-     */
-    Permission selectPermByPath(String path);
-
-    /**
      * 查询用户权限列表
      *
      * @param userId 用户序列

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.core.config.rest;
 
 import com.github.stazxr.zblog.core.annotation.IgnoreResult;
+import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -48,10 +49,10 @@ public class ResultAdvice implements ResponseBodyAdvice<Object> {
             try {
                 LinkedHashMap<String, Object> val = (LinkedHashMap<String, Object>) o;
                 Integer code = (Integer) val.getOrDefault("status", "500");
-                return Result.failure("系统错误").data(o).code(HttpStatus.valueOf(code));
+                return Result.failure(ResultCode.SERVER_ERROR).data(o).code(HttpStatus.valueOf(code));
             } catch (Exception e) {
                 log.error("ResultAdvice.beforeBodyWrite catch eor", e);
-                return Result.failure("系统错误");
+                return Result.failure(ResultCode.SERVER_ERROR);
             }
         }
 

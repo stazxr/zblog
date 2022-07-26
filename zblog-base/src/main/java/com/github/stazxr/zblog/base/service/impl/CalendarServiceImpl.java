@@ -144,7 +144,7 @@ public class CalendarServiceImpl extends ServiceImpl<CalendarMapper, Calendar> i
                 }
 
                 String flag = ExcelUtils.getStringCellValue(flagCell);
-                if (!HolidayType.HOLIDAY.value().equals(flag) && !HolidayType.WORKDAY.value().equals(flag)) {
+                if (!HolidayType.HOLIDAY.getType().equals(flag) && !HolidayType.WORKDAY.getType().equals(flag)) {
                     throw new ServiceException(String.format("第%s行没有填写日期类型配置错误，有效范围['0', '1']", realRowNum));
                 }
 

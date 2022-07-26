@@ -106,6 +106,13 @@
       "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
       "description": "IP 解析类型：true - 本地解析；false - http解析.",
       "defaultValue": true
+    },
+    {
+      "name": "zblog.base-package",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "basePackage.",
+      "defaultValue": "com.github.stazxr.zblog"
     }
   ],
   "hints": [

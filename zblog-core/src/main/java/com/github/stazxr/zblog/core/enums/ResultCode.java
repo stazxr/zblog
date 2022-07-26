@@ -13,9 +13,14 @@ public enum ResultCode {
     FAILED(0, "操作失败"),
 
     /**
-     * 唯一的一个成功的编码
+     * 操作成功
      */
     SUCCESS(1, "操作成功"),
+
+    /**
+     * 注销成功
+     */
+    LOGOUT_SUCCESS(2, "注销成功"),
 
     /**
      * 系统发生了不可预料的未知的错误，空指针，参数解析错误，JSON解析错误等
@@ -65,7 +70,7 @@ public enum ResultCode {
     /**
      * 令牌认证失败：ATK 过期，可续签
      */
-    TOKEN_FAILED_001(900001, "登录已过期，请重新登录"),
+    TOKEN_FAILED_001(900001, "当前登录状态已过期，请重新登录"),
 
     /**
      * 令牌认证失败：RTK 过期，不可续签
@@ -145,7 +150,25 @@ public enum ResultCode {
     /**
      * 业务所需的关键性数据不存在
      */
-    DATA_NOT_EXIST(10022, "数据不存在");
+    DATA_NOT_EXIST(10022, "数据不存在"),
+
+    /**
+     * 接口必须使用@Router注解
+     *
+     * @Tips 取消强制要求
+     */
+    @Deprecated
+    INTERFACE_DEFINE_ERROR(10023, "接口必须使用@Router注解"),
+
+    /**
+     * 请求数据格式不正确，MissingServletRequestParameterException
+     */
+    BAD_REQUEST(10024, "请求数据格式不正确"),
+
+    /**
+     * 续签失败
+     */
+    RENEW_TOKEN_FAILED(10025, "续签失败");
 
     private final Integer code;
 

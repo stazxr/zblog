@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RouterMapper">
     <delete id="clearRouter">
-        DELETE FROM router WHERE `ID` > 0
+        DELETE FROM router WHERE ID > 0
     </delete>
+
+    <select id="selectRouterVoByCode" resultType="com.github.stazxr.zblog.base.domain.vo.RouterVo">
+        SELECT
+            r.NAME, r.CODE, r.DEFAULT_LEVEL, r.REMARK,
+            p.PERM_LEVEL, p.ID permId, p.ENABLED permEnabled
+        FROM
+            router r LEFT JOIN permission p ON p.DELETED = 0 AND r.CODE = p.PERM_CODE
+        WHERE
+            r.CODE = #{code}
+    </select>
 </mapper>

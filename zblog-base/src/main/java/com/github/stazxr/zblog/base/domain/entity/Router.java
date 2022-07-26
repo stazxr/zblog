@@ -4,9 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.base.BaseEntity;
+import com.github.stazxr.zblog.util.Assert;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 系统路由
@@ -36,26 +41,10 @@ public class Router extends BaseEntity {
     private String code;
 
     /**
-     * 权限级别（依permission刷新）
+     * 路由默认访问级别
      * {@link com.github.stazxr.zblog.core.base.BaseConst.PermLevel}
      */
-    private Integer level;
-
-    /**
-     * 路由链接
-     */
-    private String url;
-
-    /**
-     * 路由请求方式
-     */
-    private String method;
-
-    /**
-     * 路由状态（依permission刷新）
-     * {@link com.github.stazxr.zblog.base.util.Constants.RouterStatus}
-     */
-    private String status;
+    private Integer defaultLevel;
 
     /**
      * 路由备注
@@ -71,9 +60,13 @@ public class Router extends BaseEntity {
      * @param router 路由信息
      */
     public Router(com.github.stazxr.zblog.core.annotation.Router router) {
+        Assert.notNull(router, "router must not be null");
         name = router.name();
         code = router.code();
-        level = router.level();
+        defaultLevel = router.level();
+        Assert.isTrue(!Arrays.asList(new Integer[]{
+            BaseConst.PermLevel.OPEN, BaseConst.PermLevel.PUBLIC, BaseConst.PermLevel.PERM
+        }).contains(router.level()), "router level is out of range");
         remark = router.remark();
     }
 

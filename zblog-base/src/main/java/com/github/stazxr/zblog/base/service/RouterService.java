@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.base.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 
-import java.util.Map;
+import java.util.Set;
 
 /**
  * 路由业务层
@@ -13,30 +13,25 @@ import java.util.Map;
  */
 public interface RouterService extends IService<Router> {
     /**
-     * 清除路由信息
+     * 移除所有的路由信息
      */
     void clearRouter();
 
     /**
-     * 获取路由白名单
+     * 计算接口的访问级别
      *
-     * @return whiteList
+     * @param requestUri    请求地址
+     * @param requestMethod 请求方式
+     * @return 访问级别
      */
-    Map<String, String> getRouterWhiteList();
+    int calculateInterfaceLevel(String requestUri, String requestMethod);
 
     /**
-     * 获取路由黑名单
+     * 根据请求地址查询允许访问的角色列表
      *
-     * @return blackList
+     * @param requestUri    请求地址
+     * @param requestMethod 请求方式
+     * @return allowed roles
      */
-    Map<String, String> getRouterBlackList();
-
-    /**
-     * 根据请求URL和Method查询路由信息
-     *
-     * @param requestUrl 请求URL
-     * @param requestMethod 请求Method
-     * @return Router
-     */
-    Router selectByUrlAndMethod(String requestUrl, String requestMethod);
+    Set<String> findRoles(String requestUri, String requestMethod);
 }

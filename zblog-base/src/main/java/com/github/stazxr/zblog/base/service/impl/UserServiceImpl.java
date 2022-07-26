@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Locale;
 
 /**
  * 用户管理 - 业务实现层
@@ -31,7 +32,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User queryUserByUsername(String username) {
-        return userMapper.selectOne(queryBuild().eq(User::getUsername, username));
+        return userMapper.selectOne(queryBuild().eq(User::getUsername, username.toUpperCase(Locale.ROOT)));
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

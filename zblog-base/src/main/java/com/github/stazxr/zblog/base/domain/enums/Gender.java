@@ -31,7 +31,7 @@ public enum Gender {
         this.sex = sex;
     }
 
-    public Integer value() {
+    public Integer getSex() {
         return sex;
     }
 }

@@ -52,7 +52,7 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
             }
 
             // 获取后台绑定的验证码信息，并判断是否为空
-            String cacheCode = CacheUtils.get(uuid);
+            String cacheCode = CacheUtils.getThenRemove(uuid);
             if (cacheCode == null) {
                 authenticationFailureHandler.onAuthenticationFailure(request, response, new NumCodeException("验证码已过期"));
                 return;

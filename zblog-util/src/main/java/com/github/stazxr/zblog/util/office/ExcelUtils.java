@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
@@ -48,7 +49,7 @@ public class ExcelUtils {
      * @return boolean
      */
     public static boolean isCellBlank(Cell cell) {
-        return cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK;
+        return cell == null || cell.getCellTypeEnum() == CellType.BLANK;
     }
 
     /**
@@ -58,17 +59,17 @@ public class ExcelUtils {
      * @return String
      */
     public static String getStringCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case HSSFCell.CELL_TYPE_STRING:
+        switch (cell.getCellTypeEnum()) {
+            case STRING:
                 return cell.getStringCellValue();
-            case HSSFCell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 if (HSSFDateUtil.isCellDateFormatted(cell)) {
                     return DateUtils.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue()), "yyyy-MM-dd");
                 } else {
                     // Bug待处理，整数会带小数点
                     return String.valueOf(cell.getNumericCellValue());
                 }
-            case HSSFCell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
             default:
                 return "";
@@ -131,7 +132,8 @@ public class ExcelUtils {
                     } else {
                         Object o = jsonObject.get(tableNames[i - 1]);
                         if (o == null) {
-                            row1.createCell(i).setCellValue(Cell.CELL_TYPE_BLANK);
+                            // CellType.BLANK = 3
+                            row1.createCell(i).setCellValue(3);
                         } else {
                             String value = String.valueOf(o);
                             row1.createCell(i).setCellValue(value);

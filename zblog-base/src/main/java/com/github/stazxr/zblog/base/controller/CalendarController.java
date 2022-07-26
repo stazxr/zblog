@@ -60,7 +60,7 @@ public class CalendarController {
             return Result.failure(ResultCode.PARAM_EMPTY);
         }
 
-        if (!HolidayType.HOLIDAY.value().equals(type) && !HolidayType.WORKDAY.value().equals(type)) {
+        if (!HolidayType.HOLIDAY.getType().equals(type) && !HolidayType.WORKDAY.getType().equals(type)) {
             return Result.failure(ResultCode.PARAM_VALID, "日期类型错误，有效范围['0', '1']");
         }
 

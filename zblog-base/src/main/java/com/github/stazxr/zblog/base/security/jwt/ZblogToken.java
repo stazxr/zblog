@@ -33,6 +33,9 @@ public class ZblogToken implements Serializable {
      */
     private RefreshToken refreshToken;
 
+    /**
+     * Additional
+     */
     private Map<String, Object> additional;
 
     public ZblogToken() {
@@ -40,52 +43,59 @@ public class ZblogToken implements Serializable {
         refreshToken = new RefreshToken();
     }
 
-    /**
-     * 构建 ZblogToken
-     *
-     * @param tokenResponse OAuth2AccessTokenResponse
-     */
-    public ZblogToken build(OAuth2AccessTokenResponse tokenResponse) {
-        // accessToken
-        OAuth2AccessToken oAuth2AccessToken = tokenResponse.getAccessToken();
-        accessToken.issuedAt = oAuth2AccessToken.getIssuedAt();
-        accessToken.expiresAt = oAuth2AccessToken.getExpiresAt();
-        accessToken.tokenType = oAuth2AccessToken.getTokenType().getValue();
-        accessToken.tokenValue = oAuth2AccessToken.getTokenValue();
-        accessToken.scopes = oAuth2AccessToken.getScopes();
+    public ZblogToken withToken(String tokenValue) {
+        this.accessToken.tokenValue = tokenValue;
+        return this;
+    }
 
-        // refreshToken
-        OAuth2RefreshToken oAuth2RefreshToken = tokenResponse.getRefreshToken();
-        if (oAuth2RefreshToken == null) {
-            refreshToken = null;
-        } else {
-            refreshToken.issuedAt = oAuth2RefreshToken.getIssuedAt();
-            refreshToken.tokenValue = oAuth2RefreshToken.getTokenValue();
-        }
+    public ZblogToken refreshToken(String tokenValue) {
+        this.refreshToken.tokenValue = tokenValue;
+        return this;
+    }
 
-        // additional
-        additional = tokenResponse.getAdditionalParameters();
+    public ZblogToken tokenType(OAuth2AccessToken.TokenType tokenType) {
+        this.accessToken.tokenType = tokenType.getValue();
+        return this;
+    }
 
+    public ZblogToken scopes(Set<String> scopes) {
+        this.accessToken.scopes = scopes;
+        return this;
+    }
+
+    public ZblogToken issuedAt(Instant issuedAt) {
+        this.accessToken.issuedAt = issuedAt;
+        this.refreshToken.issuedAt = issuedAt;
+        return this;
+    }
+
+    public ZblogToken expiresAt(Instant expiresAt) {
+        this.accessToken.expiresAt = expiresAt;
+        return this;
+    }
+
+    public ZblogToken additionalParameters(Map<String, Object> additionalParameters) {
+        this.additional = additionalParameters;
         return this;
     }
 
     @Data
     public static class AccessToken {
-        private Instant issuedAt;
-
-        private Instant expiresAt;
-
         private String tokenType;
 
         private String tokenValue;
 
-        Set<String> scopes;
+        private Instant issuedAt;
+
+        private Instant expiresAt;
+
+        private Set<String> scopes;
     }
 
     @Data
     public static class RefreshToken {
-        private Instant issuedAt;
-
         private String tokenValue;
+
+        private Instant issuedAt;
     }
 }

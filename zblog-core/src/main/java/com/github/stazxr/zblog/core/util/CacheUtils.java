@@ -68,4 +68,16 @@ public class CacheUtils {
     public static String get(String key) {
         return instance().get(key);
     }
+
+    /**
+     * read cache then remove cache
+     *
+     * @param key cache key, not null
+     * @return cache content
+     */
+    public static String getThenRemove(String key) {
+        String result = instance().get(key);
+        instance().remove(key);
+        return result;
+    }
 }
