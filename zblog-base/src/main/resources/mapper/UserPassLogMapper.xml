@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.UserPassLogMapper">
+    <insert id="insertUserPassLog">
+        INSERT INTO user_pass_log(ID, USER_ID, PASSWORD, UPDATE_TIME) VALUES (#{id}, #{userId}, #{password}, #{updateTime})
+    </insert>
+    <select id="selectUserOldPass" resultType="java.lang.String">
+        SELECT PASSWORD FROM user_pass_log WHERE USER_ID = #{userId} ORDER BY UPDATE_TIME DESC LIMIT #{count}
+    </select>
+</mapper>

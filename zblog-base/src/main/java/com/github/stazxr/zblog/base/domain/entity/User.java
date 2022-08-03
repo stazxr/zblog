@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.stazxr.zblog.base.domain.enums.Gender;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -48,7 +47,7 @@ public class User extends BaseEntity implements UserDetails {
     private String nickname;
 
     /**
-     * 用户名（用于登录, 可支持修改一次）
+     * 用户名（用于登录）
      */
     private String username;
 
@@ -75,7 +74,7 @@ public class User extends BaseEntity implements UserDetails {
     /**
      * 性别
      */
-    private Gender gender;
+    private Integer gender;
 
     /**
      * 签名

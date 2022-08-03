@@ -26,4 +26,24 @@ public class ZblogProperties {
      * IP 是否采用本地解析. 默认是
      */
     private Boolean isLocalIpParsing = true;
+
+    /**
+     * 文件的访问地址
+     */
+    private String fileDomain;
+
+    /**
+     * 文件上传目录
+     */
+    private String fileUploadPath;
+
+    /**
+     * 文件访问域名
+     */
+    private String fileBaseUrl = "http://localhost:8080/file";
+
+    /**
+     * 文件上传类型（1，本地；2，阿里云存储；3，七牛云存储；4，ftp-未实现；5...）
+     */
+    private int fileUploadType = 1;
 }

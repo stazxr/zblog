@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
 
 /**
  * 性别
@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * @author SunTao
  * @since 2020-11-15
  */
+@Getter
 public enum Gender {
     /**
      * 男
@@ -24,14 +25,19 @@ public enum Gender {
      */
     HIDE(3);
 
-    @EnumValue
-    private final Integer sex;
+    private final Integer type;
 
-    Gender(Integer sex) {
-        this.sex = sex;
+    Gender(Integer type) {
+        this.type = type;
     }
 
-    public Integer getSex() {
-        return sex;
+    public static Gender of(Integer genderType) {
+        for (Gender gender : values()) {
+            if (gender.type.equals(genderType)) {
+                return gender;
+            }
+        }
+
+        return null;
     }
 }

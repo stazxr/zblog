@@ -24,10 +24,15 @@ public class IpImplUtils extends IpUtils {
      * @return 详细地址
      */
     public static String getCityInfo(String ip) {
-        if (PROPERTIES == null) {
-            throw new ServiceException(ResultCode.DATA_NOT_EXIST, "Bean ZblogProperties not exist.");
-        }
+        try {
+            if (PROPERTIES == null) {
+                throw new ServiceException(ResultCode.DATA_NOT_EXIST, "Bean ZblogProperties not exist.");
+            }
 
-        return PROPERTIES.getIsLocalIpParsing() ? getLocalCityInfo(ip) : getHttpCityInfo(ip);
+            return PROPERTIES.getIsLocalIpParsing() ? getLocalCityInfo(ip) : getHttpCityInfo(ip);
+        } catch (Exception e) {
+            log.error("getCityInfo catch eor", e);
+            return "";
+        }
     }
 }

@@ -12,10 +12,13 @@ import java.util.Properties;
 /**
  * 读取kaptcha.properties配置文件，生成DefaultKaptcha的配置信息
  *
+ *   20220727: 类弃用
+ *
  * @author SunTao
  * @since 2020-11-14
  */
 @Slf4j
+@Deprecated
 @Configuration
 public class CaptchaConfig {
     /**

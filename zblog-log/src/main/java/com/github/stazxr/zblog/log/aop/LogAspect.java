@@ -40,7 +40,7 @@ public class LogAspect {
         try {
             LogProperties logProperties = SpringContextUtils.getBean(LogProperties.class);
             enabledLog = logProperties.isEnabled();
-            log.info("Enabled Log: {}", enabledLog);
+            log.info("The global log open status: {}", enabledLog);
         } catch (Exception e) {
             log.warn("日志组件未开启，如果需要开启日志组件，请开启 @EnableLog");
             enabledLog = false;

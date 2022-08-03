@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.core.config;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.github.stazxr.zblog.core.config.rest.SingleParamHandlerMethodArgumentResolver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -29,6 +30,18 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 @EnableWebMvc
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+    /**
+     * 文件的访问地址
+     */
+    @Value("${zblog.file-domain:/file/**}")
+    private String fileDomain;
+
+    /**
+     * 文件上传目录
+     */
+    @Value("${zblog.fileUploadPath:/home/zblog/file/local/upload/}")
+    private String fileUploadPath;
+
     /**
      * 跨域支持
      *
@@ -96,6 +109,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler(fileDomain).addResourceLocations("file:" + fileUploadPath);
+
         registry.addResourceHandler("/swagger-ui.html")
                 .addResourceLocations("classpath:/META-INF/resources/", "/static", "/public");
 

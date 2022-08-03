@@ -93,7 +93,7 @@ public enum ResultCode {
     NO_PERMISSION(10010, "没有权限"),
 
     /**
-     * 新密码不能与前两次使用过的密码相同
+     * 新密码不能与前X次使用过的密码相同
      */
     PASSWORD_IS_OLD_SAME(10011, "新密码不能与前两次使用过的密码相同"),
 
@@ -168,7 +168,17 @@ public enum ResultCode {
     /**
      * 续签失败
      */
-    RENEW_TOKEN_FAILED(10025, "续签失败");
+    RENEW_TOKEN_FAILED(10025, "续签失败"),
+
+    /**
+     * 文件上传失败
+     */
+    FILE_UPLOAD_FAILED(10026, "文件上传失败"),
+
+    /**
+     * 文件上传失败，大小超过限制
+     */
+    FILE_SIZE_OVER_LIMIT(10027, "上传文件大小超出限制");
 
     private final Integer code;
 

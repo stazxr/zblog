@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.stazxr.zblog.base.security.config.CustomWebSecurityConfiguration;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.io.IoUtils;
+import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.secret.RsaUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +62,7 @@ public class ParseLoginParamFilter extends OncePerRequestFilter {
 
                     // 对密码进行解密
                     ClassPathResource classPathResource = new ClassPathResource("pri.key");
-                    String priKeyBase64 = IoUtils.readFile(classPathResource.getFile());
+                    String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
                     password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
                     request.setAttribute(SPRING_SECURITY_FORM_PASSWORD_KEY, password);
 

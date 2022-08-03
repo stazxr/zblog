@@ -7,10 +7,13 @@ import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
 import com.github.stazxr.zblog.util.exception.ValidParamException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +29,9 @@ import java.io.IOException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @Value("${spring.servlet.multipart.max-file-size:1MB}")
+    private DataSize maxFileSize;
+
     /**
      * 处理自定义的业务异常（返回200响应码）
      *
@@ -82,6 +88,20 @@ public class GlobalExceptionHandler {
         ErrorMeta errorMeta = new ErrorMeta(e);
         Result result = Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * 上传文件过大
+     *
+     * @param e 异常信息
+     */
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public void maxUploadSizeExceededExceptionHandler(HttpServletResponse response, MaxUploadSizeExceededException e) throws IOException {
+        log.error("全局捕获 -> 文件上传失败", e);
+        ErrorMeta errorMeta = new ErrorMeta(e);
+        String eorMsg = ResultCode.FILE_SIZE_OVER_LIMIT.message().concat(":").concat(maxFileSize.toString());
+        Result result = Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT, eorMsg).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        ResponseUtils.responseJsonWriter(response, result);
     }
 
     /**

@@ -86,7 +86,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             if (!permission.getIFrame()) {
                 if (permission.getPid() == null) {
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "Layout" : permission.getComponentPath());
-                } else if (permission.getPermType().getType() == 0) {
+                } else if (permission.getPermType() == 0) {
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "ParentView" : permission.getComponentPath());
                 } else if (StringUtils.isNoneBlank(permission.getComponentPath())) {
                     menuVo.setComponent(permission.getComponentPath());

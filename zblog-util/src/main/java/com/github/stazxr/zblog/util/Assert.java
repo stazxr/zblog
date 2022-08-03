@@ -33,6 +33,18 @@ public final class Assert {
     }
 
     /**
+     * Assert that an object is not null
+     *
+     * @param object the object to check
+     * @param callBack callback function
+     */
+    public static void notNull(Object object, CallBack callBack) {
+        if (object == null) {
+            callBack.execute();
+        }
+    }
+
+    /**
      * Assert that a string is not
      *
      * @param str the string to check
@@ -56,5 +68,24 @@ public final class Assert {
         if (flag) {
             throw new ValidParamException(message);
         }
+    }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param callBack callback function
+     */
+    public static void isTrue(boolean flag, CallBack callBack) {
+        if (flag) {
+            callBack.execute();
+        }
+    }
+
+    public interface CallBack {
+        /**
+         * 回调方法
+         */
+        void execute();
     }
 }

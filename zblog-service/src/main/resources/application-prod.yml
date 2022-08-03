@@ -20,13 +20,14 @@ jwt:
   claims:
     issuer: https://www.suntaoblog.com
     subject: all
-    duration: 1800
+    duration: 3600
 cache:
   default-duration: 300
   type: redis
 zblog:
   deploy-type: single
   is-local-ip-parsing: true
+  file-base-url: https://www.suntaoblog.com/file/
 swagger:
   config:
-    enable: false # 生产环境禁用 swagger
+    enable: false

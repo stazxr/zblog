@@ -73,7 +73,7 @@ public final class Result implements Serializable {
     }
 
     public static Result failure() {
-        return new Result(ResultCode.FAILED).code(HttpStatus.OK);
+        return new Result(ResultCode.FAILED).code(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static Result failure(ResultCode resultCode) {

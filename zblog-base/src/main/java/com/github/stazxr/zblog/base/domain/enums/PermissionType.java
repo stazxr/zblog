@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
 
 /**
  * 权限类型
@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * @author SunTao
  * @since 2020-11-15
  */
+@Getter
 public enum PermissionType {
     /**
      * 目录
@@ -24,14 +25,9 @@ public enum PermissionType {
      */
     BTN(3);
 
-    @EnumValue
     private final Integer type;
 
     PermissionType(Integer type) {
         this.type = type;
-    }
-
-    public Integer getType() {
-        return type;
     }
 }

@@ -101,6 +101,13 @@
       "defaultValue": "single"
     },
     {
+      "name": "zblog.base-package",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "basePackage.",
+      "defaultValue": "com.github.stazxr.zblog"
+    },
+    {
       "name": "zblog.is-local-ip-parsing",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
@@ -108,11 +115,30 @@
       "defaultValue": true
     },
     {
-      "name": "zblog.base-package",
+      "name": "zblog.file-domain",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "basePackage.",
-      "defaultValue": "com.github.stazxr.zblog"
+      "description": "文件的访问地址."
+    },
+    {
+      "name": "zblog.file-upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "文件上传目录."
+    },
+    {
+      "name": "zblog.file-base-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "file base url.",
+      "defaultValue": "http://localhost:8080/file"
+    },
+    {
+      "name": "zblog.file-upload-type",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
+      "description": "文件上传类型，默认本地上传.",
+      "defaultValue": 1
     }
   ],
   "hints": [

@@ -44,8 +44,9 @@ public class Permission extends BaseEntity {
 
     /**
      * 权限类型
+     * {@link com.github.stazxr.zblog.base.domain.enums.PermissionType}
      */
-    private PermissionType permType;
+    private Integer permType;
 
     /**
      * 权限编码（应与路由中的编码保持一致，否则找不到权限可以访问的接口列表）
