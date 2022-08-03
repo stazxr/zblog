@@ -2,59 +2,59 @@
   "groups": [
     {
       "name": "jwt",
-      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties"
     },
     {
       "name": "jwt.cert-info",
-      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties"
     },
     {
       "name": "jwt.claims",
-      "type": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties"
     }
   ],
   "properties": [
     {
       "name": "jwt.cert-info.cert-location",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
       "description": "jks file location.",
       "defaultValue": "zblog.jks"
     },
     {
       "name": "jwt.cert-info.alias",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
       "description": "jks alias.",
       "defaultValue": "zblog"
     },
     {
       "name": "jwt.cert-info.key-password",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
       "description": "jks storepass."
     },
     {
       "name": "jwt.claims.issuer",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
       "description": "签发者.",
       "defaultValue": "https://www.suntaoblog.com"
     },
     {
       "name": "jwt.claims.subject",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
       "description": "面向的用户.",
       "defaultValue": "all"
     },
     {
       "name": "jwt.claims.duration",
       "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.base.security.jwt.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
       "description": "令牌的有效时间，单位秒.",
       "defaultValue": 3600
     }

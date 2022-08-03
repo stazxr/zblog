@@ -2,7 +2,7 @@ package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.base.domain.entity.File;
-import com.github.stazxr.zblog.base.third.file.model.FileInfo;
+import com.github.stazxr.zblog.base.component.file.model.FileInfo;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.util;
 
-import com.github.stazxr.zblog.base.id.IdGenerator;
+import com.github.stazxr.zblog.base.component.id.IdGenerator;
 import com.github.stazxr.zblog.core.util.SpringContextUtils;
 
 import java.util.ArrayList;

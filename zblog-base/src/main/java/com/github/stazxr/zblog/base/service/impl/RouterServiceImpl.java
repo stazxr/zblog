@@ -9,7 +9,7 @@ import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.base.mapper.InterfaceMapper;
 import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RouterMapper;
-import com.github.stazxr.zblog.base.security.RouterBlackWhiteListCache;
+import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.util.CacheUtils;

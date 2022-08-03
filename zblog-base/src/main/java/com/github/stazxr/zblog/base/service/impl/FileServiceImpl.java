@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.service.FileService;
-import com.github.stazxr.zblog.base.third.file.model.FileInfo;
+import com.github.stazxr.zblog.base.component.file.model.FileInfo;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import org.springframework.stereotype.Service;

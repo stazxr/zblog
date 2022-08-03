@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.base.third.file.FileHandler;
-import com.github.stazxr.zblog.base.third.file.FileTypeHandler;
-import com.github.stazxr.zblog.base.third.file.model.FileInfo;
+import com.github.stazxr.zblog.base.component.file.FileHandler;
+import com.github.stazxr.zblog.base.component.file.FileTypeHandler;
+import com.github.stazxr.zblog.base.component.file.model.FileInfo;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
