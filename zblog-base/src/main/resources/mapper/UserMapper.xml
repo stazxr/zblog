@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.UserMapper">
-
+    <select id="selectEmailCountNotSelf" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM user WHERE EMAIL = #{email}
+        <if test="userId != null and userId != ''">
+            AND ID != #{userId}
+        </if>
+    </select>
 </mapper>

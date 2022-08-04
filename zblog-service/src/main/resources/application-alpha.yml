@@ -25,5 +25,5 @@ cache:
   default-duration: 300
   type: redis
 zblog:
-  deploy-type: multi
+  deploy-type: single
   is-local-ip-parsing: false

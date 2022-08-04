@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
@@ -13,8 +14,7 @@ import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.ServiceException;
+import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
@@ -124,43 +124,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String newPass = passDto.getNewPass();
         Assert.notNull(newPass, "新密码不能为空");
         String ensurePass = passDto.getConfirmPass();
-        Assert.isTrue(!newPass.equals(ensurePass), () -> {
-            throw new ServiceException(ResultCode.PASSWORD_IS_DIFFERENT);
-        });
+        Assert.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
 
         // 获取用户信息
         User user = queryUserByUsername(SecurityUtils.getLoginUsername());
         Assert.notNull(user, "修改失败，用户不存在");
 
         // 密码校验：旧密码是否正确 -> 新旧密码是否一致 ->
-        Assert.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), () -> {
-            throw new ServiceException(ResultCode.OLD_PASSWORD_IS_ERROR);
-        });
-        Assert.isTrue(passwordEncoder.matches(newPass, user.getPassword()), () -> {
-            throw new ServiceException(ResultCode.PASSWORD_IS_SAME);
-        });
+        Assert.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), "旧密码错误");
+        Assert.isTrue(passwordEncoder.matches(newPass, user.getPassword()), "新密码与旧密码不能相同");
 
         // 密码历史校验
         Long userId = user.getId();
         List<String> oldPassList = userPassLogMapper.selectUserOldPass(userId, OLD_PASS_COUNT);
-        oldPassList.forEach(pass -> {
-            if (passwordEncoder.matches(newPass, pass)) {
-                throw new ServiceException(ResultCode.PASSWORD_IS_OLD_SAME, "新密码不能与历史近三次使用过的密码相同");
-            }
-        });
+        oldPassList.forEach(pass -> Assert.isTrue(passwordEncoder.matches(newPass, pass), "新密码不能与历史近三次使用过的密码相同"));
 
         // 密码复杂度校验
-        Assert.isTrue(newPass.contains(user.getUsername()), () -> {
-            throw new ServiceException(ResultCode.PASSWORD_IS_VALID, "密码不能包含用户名");
-        });
-        Assert.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), () -> {
-            throw new ServiceException(ResultCode.PASSWORD_IS_SIMPLE);
-        });
+        Assert.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
+        Assert.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
 
         // 插入日志
         String updateTime = DateUtils.formatNow();
         UserPassLog passLog = UserPassLog.builder().id(GenerateIdUtils.getId()).userId(userId).password(newPass).updateTime(updateTime).build();
-        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "密码修改失败，日志入库失败");
+        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "修改失败，日志入库失败");
 
         // 数据入库
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
@@ -168,7 +154,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getChangePwd, false);
         wrapper.set(User::getChangePwdTime, updateTime);
         wrapper.eq(User::getId, userId);
-        Assert.isTrue(!wrapper.update(), "密码修改失败，更新用户密码信息失败");
+        Assert.isTrue(!wrapper.update(), "修改失败，更新用户密码信息失败");
+        return true;
+    }
+
+    /**
+     * 修改个人邮箱
+     *
+     * @param emailDto 用户邮箱信息
+     * @return boolean
+     */
+    @Override
+    public boolean updateUserEmail(UserUpdateEmailDto emailDto) {
+        // 非空校验
+        String password = emailDto.getPass();
+        Assert.notNull(password, "修改失败，用户密码不能为空");
+        String email = emailDto.getEmail();
+        Assert.notNull(email, "新邮箱不能为空");
+        String code = emailDto.getCode();
+        Assert.notNull(code, "邮箱验证码不能为空");
+
+        // 获取用户信息
+        User user = queryUserByUsername(SecurityUtils.getLoginUsername());
+        Assert.notNull(user, "修改失败，用户不存在");
+
+        // 校验用户密码
+        Assert.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码不正确");
+
+        // 校验验证码
+        String cacheCode = CacheUtils.get(emailDto.getUuid());
+        Assert.isTrue(!code.equalsIgnoreCase(cacheCode), "验证码不正确");
+
+        // 邮箱校验：相同校验 -> 格式校验 -> 存在性校验
+        Long userId = user.getId();
+        Assert.isTrue(email.equals(user.getEmail()), "新邮箱不能与旧邮箱相同");
+        Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
+        Assert.isTrue(userMapper.selectEmailCountNotSelf(userId, email) > 0, "邮箱已存在");
+
+        // 数据入库
+        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
+        wrapper.set(User::getEmail, email);
+        wrapper.eq(User::getId, userId);
+        Assert.isTrue(!wrapper.update(), "修改失败，更新用户邮箱信息失败");
         return true;
     }
 

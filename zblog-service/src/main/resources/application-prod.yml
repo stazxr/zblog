@@ -1,5 +1,5 @@
 server:
-  port: ${serverPort:31945}
+  port: ${SERVER_PORT:31945}
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -12,6 +12,8 @@ spring:
     port: 6480
     client-type: lettuce
     password: ENC(yLNmRC4j7X2ucajRvSutQTSbnrwi9eoM)
+    connect-timeout: 5000
+    database: ${REDIS_DB:0}
 jwt:
   cert-info:
     alias: suntaoblogcom
@@ -25,7 +27,7 @@ cache:
   default-duration: 300
   type: redis
 zblog:
-  deploy-type: single
+  deploy-type: multi
   is-local-ip-parsing: true
   file-base-url: https://www.suntaoblog.com/file/
 swagger:

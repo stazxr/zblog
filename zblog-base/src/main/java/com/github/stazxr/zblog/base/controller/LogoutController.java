@@ -15,7 +15,7 @@ import static com.github.stazxr.zblog.core.base.BaseConst.PermLevel.PUBLIC;
 @RestController
 public class LogoutController {
     /**
-     * 系统登出，这里只做路由注册，逻辑在 Handler 中
+     * 系统登出，这里只做路由注册，逻辑在处理器中
      */
     @PostMapping("/logout")
     @Router(name = "系统注销", code = "logout", level = PUBLIC)

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.annotation.Router;
@@ -61,5 +62,18 @@ public class UserController {
     @Router(name = "修改个人密码", code = "updateUserPass", level = BaseConst.PermLevel.PUBLIC)
     public Result updateUserPass(@RequestBody UserUpdatePassDto passDto) {
         return userService.updateUserPass(passDto) ? Result.success() : Result.failure();
+    }
+
+    /**
+     * 修改个人邮箱
+     *
+     * @param emailDto 用户邮箱信息
+     * @return Result
+     */
+    @Log
+    @PostMapping("updateUserEmail")
+    @Router(name = "修改个人邮箱", code = "updateUserEmail", level = BaseConst.PermLevel.PUBLIC)
+    public Result updateUserEmail(@RequestBody UserUpdateEmailDto emailDto) {
+        return userService.updateUserEmail(emailDto) ? Result.success() : Result.failure();
     }
 }

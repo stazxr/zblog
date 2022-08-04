@@ -8,6 +8,11 @@ package com.github.stazxr.zblog.base.util;
  */
 public class Constants {
     /**
+     * 系统名称
+     */
+    public static final String SYS_NAME = "ZBLOG后台管理系统";
+
+    /**
      * 权限树中顶层权限的ID
      */
     public static final Long TOP_PERM_ID = 0L;
@@ -87,7 +92,7 @@ public class Constants {
         /**
          * 登录验证码缓存的Key值，有效时间已配置文件为准，配置文件未配置则已此处为准
          */
-        loginCode("loginCode", 60),
+        loginCode("loginCode", 90),
 
         /**
          * 缓存接口访问级别
@@ -97,7 +102,12 @@ public class Constants {
         /**
          * token
          */
-        usrTkn("usrStk", 1800);
+        usrTkn("usrTkn", 1800),
+
+        /**
+         * email code
+         */
+        emailCode("emailCode", 300);
 
         /**
          * 缓存Key

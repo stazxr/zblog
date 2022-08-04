@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.core.base.BaseService;
@@ -43,4 +44,12 @@ public interface UserService extends BaseService<User> {
      * @return boolean
      */
     boolean updateUserPass(UserUpdatePassDto passDto);
+
+    /**
+     * 修改个人邮箱
+     *
+     * @param emailDto 用户邮箱信息
+     * @return boolean
+     */
+    boolean updateUserEmail(UserUpdateEmailDto emailDto);
 }

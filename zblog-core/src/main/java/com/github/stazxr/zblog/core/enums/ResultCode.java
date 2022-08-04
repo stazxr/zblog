@@ -95,16 +95,19 @@ public enum ResultCode {
     /**
      * 新密码不能与前X次使用过的密码相同
      */
+    @Deprecated
     PASSWORD_IS_OLD_SAME(10011, "新密码不能与前两次使用过的密码相同"),
 
     /**
      * 新旧密码不能一致
      */
+    @Deprecated
     PASSWORD_IS_SAME(10012, "新密码与旧密码不能相同"),
 
     /**
      * 两次新密码设置不相同
      */
+    @Deprecated
     PASSWORD_IS_DIFFERENT(10013, "两次新密码设置不相同"),
 
     /**
@@ -115,11 +118,13 @@ public enum ResultCode {
     /**
      * 密码不能包含用户名，姓名，昵称，手机号，邮箱等个人信息
      */
+    @Deprecated
     PASSWORD_IS_VALID(10015, "密码不能包含用户名，姓名，手机号，邮箱等个人信息"),
 
     /**
      * 旧密码错误
      */
+    @Deprecated
     OLD_PASSWORD_IS_ERROR(100016, "旧密码错误"),
 
     /**
