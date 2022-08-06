@@ -3,9 +3,13 @@ package com.github.stazxr.zblog.log.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
+import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
+import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 系统日志
@@ -26,7 +30,7 @@ public class Log extends BaseEntity {
     /**
      * 日志类型
      */
-    private LogType logType;
+    private Integer logType;
 
     /**
      * 操作用户
@@ -84,13 +88,36 @@ public class Log extends BaseEntity {
     private Long costTime;
 
     /**
+     * 执行结果
+     */
+    private boolean execResult;
+
+    /**
+     * 执行信息
+     */
+    private String execMessage;
+
+    /**
      * 异常信息
      */
     private byte[] exceptionDetail;
 
     public Log(LogType logType, String eventTime, Long costTime) {
-        this.logType = logType;
+        this.logType = logType.getValue();
         this.eventTime = eventTime;
         this.costTime = costTime;
+    }
+
+    /**
+     * 设置请求相关信息
+     *
+     * @param request 请求信息
+     */
+    public void setRequestInfo(HttpServletRequest request) {
+        this.requestIp = IpUtils.getIp(request);
+        this.requestUri = request.getRequestURI();
+        this.requestMethod = request.getMethod();
+        this.address = IpImplUtils.getCityInfo(this.requestIp);
+        this.browser = IpUtils.getBrowser(request);
     }
 }

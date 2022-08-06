@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.component.security.filter.CustomRememberMeFilter;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.service.PermissionService;
+import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtTokenGenerator jwtTokenGenerator;
 
     private final PermissionService permissionService;
+
+    private final UserService userService;
 
     /**
      * Called when a user has been successfully authenticated.
@@ -66,6 +69,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         if (fromRememberMe != null && fromRememberMe) {
             // TODO 记住我认证成功
         }
+
+        // set login time
+        userService.updateUserLoginInfo(request, userId);
 
         // return
         ResponseUtils.responseJsonWriter(response, Result.success("登录成功").data(data));

@@ -55,7 +55,7 @@ public class EmailController {
         ctx.setVariable("year", DateUtils.formatNow("yyyy"));
         String emailContext = templateEngine.process("sendMailCode", ctx);
         MailReceiveHandler handler = MailReceiveHandler.setReceive(email);
-        mailService.sendHtmlMail(handler, Constants.SYS_NAME, emailContext);
+        mailService.sendHtmlMail(handler, BaseConst.SYS_NAME, emailContext);
 
         // 缓存验证码
         Constants.CacheKey emailCode = Constants.CacheKey.emailCode;

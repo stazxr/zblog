@@ -6,6 +6,8 @@ import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.core.base.BaseService;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 用户服务层
  *
@@ -52,4 +54,12 @@ public interface UserService extends BaseService<User> {
      * @return boolean
      */
     boolean updateUserEmail(UserUpdateEmailDto emailDto);
+
+    /**
+     * 修改用户的登录信息
+     *
+     * @param request 请求信息
+     * @param userId 用户编号
+     */
+    void updateUserLoginInfo(HttpServletRequest request, Long userId);
 }

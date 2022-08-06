@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.log.mapper.LogMapper">
+    <select id="selectLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
+        SELECT
+            ID, OPERATE_USER, EVENT_TIME, DESCRIPTION, OPERATE_METHOD, OPERATE_PARAM,
+            REQUEST_IP, REQUEST_URI, REQUEST_METHOD, ADDRESS, BROWSER, COST_TIME,
+            EXEC_RESULT, EXEC_MESSAGE, EXCEPTION_DETAIL
+        FROM
+            log
+        <where>
+            <if test="username != null and username != null">
+                <bind name="username" value="'%' + username + '%'"/>
+                AND OPERATE_USER LIKE #{username}
+            </if>
+            <if test="logType != null">
+                AND LOG_TYPE = #{logType}
+            </if>
+        </where>
+        ORDER BY EVENT_TIME DESC
+    </select>
+</mapper>

@@ -1,7 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
+import com.github.stazxr.zblog.log.service.LogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,5 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/logs")
 public class LogController {
+    private final LogService logService;
 
+    /**
+     * 查询用户操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return 唯一ID
+     */
+    @GetMapping("/queryUserLog")
+    @Router(name = "查询用户操作日志列表", code = "queryUserLog", level = BaseConst.PermLevel.PUBLIC)
+    public Result queryUserLog(LogQueryDto queryDto) {
+        return Result.success().data(logService.queryUserLog(queryDto));
+    }
 }

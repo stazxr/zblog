@@ -6,15 +6,15 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * BaseRequest
+ * PageParam
  *
  * @author SunTao
  * @since 2021-12-21
  */
 @Getter
 @Setter
-public class BaseRequest implements Serializable {
-    private Integer pageNum;
+public class PageParam implements Serializable {
+    private Integer page;
 
     private Integer pageSize;
 }

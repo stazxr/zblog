@@ -8,6 +8,11 @@ package com.github.stazxr.zblog.core.base;
  */
 public class BaseConst {
     /**
+     * 系统名称
+     */
+    public static final String SYS_NAME = "ZBLOG后台管理系统";
+
+    /**
      * system username
      */
     public static final String USER_SYSTEM = "SYSTEM";

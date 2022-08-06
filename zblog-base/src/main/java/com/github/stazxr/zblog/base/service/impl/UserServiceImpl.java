@@ -16,6 +16,9 @@ import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
+import com.github.stazxr.zblog.log.domain.entity.Log;
+import com.github.stazxr.zblog.log.domain.enums.LogType;
+import com.github.stazxr.zblog.log.mapper.LogMapper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,6 +47,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private LogMapper logMapper;
 
     @Resource
     private UserPassLogMapper userPassLogMapper;
@@ -189,7 +196,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Long userId = user.getId();
         Assert.isTrue(email.equals(user.getEmail()), "新邮箱不能与旧邮箱相同");
         Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
-        Assert.isTrue(userMapper.selectEmailCountNotSelf(userId, email) > 0, "邮箱已存在");
+        Assert.isTrue(userMapper.exists(queryBuild().eq(User::getEmail, email).ne(User::getId, userId)), "邮箱已存在");
 
         // 数据入库
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
@@ -197,6 +204,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.eq(User::getId, userId);
         Assert.isTrue(!wrapper.update(), "修改失败，更新用户邮箱信息失败");
         return true;
+    }
+
+    /**
+     * 修改用户的登录信息
+     *
+     * @param request 请求信息
+     * @param userId  用户编号
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserLoginInfo(HttpServletRequest request, Long userId) {
+        // 获取登录用户信息
+        String username = SecurityUtils.getLoginUsername();
+        String dateTime = DateUtils.formatNow();
+
+        // 插入登录日志
+        Log loginLog = new Log(LogType.INFO, dateTime, null);
+        loginLog.setId(GenerateIdUtils.getId());
+        loginLog.setOperateUser(username);
+        loginLog.setDescription("用户登录");
+        loginLog.setOperateMethod("login");
+        loginLog.setExecResult(true);
+        loginLog.setRequestInfo(request);
+        Assert.isTrue(logMapper.insert(loginLog) != 1, "插入登录日志失败");
+
+        // 数据入库
+        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
+        wrapper.set(User::getLoginTime, dateTime);
+        wrapper.eq(User::getUsername, username);
+        Assert.isTrue(!wrapper.update(), "更新用户登录信息失败");
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

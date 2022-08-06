@@ -8,11 +8,6 @@ package com.github.stazxr.zblog.base.util;
  */
 public class Constants {
     /**
-     * 系统名称
-     */
-    public static final String SYS_NAME = "ZBLOG后台管理系统";
-
-    /**
      * 权限树中顶层权限的ID
      */
     public static final Long TOP_PERM_ID = 0L;

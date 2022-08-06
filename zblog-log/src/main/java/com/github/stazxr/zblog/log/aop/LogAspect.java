@@ -48,37 +48,47 @@ public class LogAspect {
     }
 
     /**
-     * 配置切入点，Log
+     * 配置 @Log 注解的切入点
      */
     @Pointcut("@annotation(com.github.stazxr.zblog.log.annotation.Log)")
     public void logPointCut() {
     }
 
     /**
-     * 配置切入点，Controller的所有接口
+     * 配置异常记录的切入点
      */
     @Pointcut("execution(public * com.github.stazxr.zblog..*.controller..*.*(..))")
     public void expLogPointCut() {
     }
 
     /**
-     * 配置环绕通知
+     * 配置 @Log 注解的环绕通知，记录操作日志
      *
      * @param joinPoint join point for advice
      */
     @Around("logPointCut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (enabledLog) {
-            String operateTime = DateUtils.formatNow();
-            currentTime.set(System.currentTimeMillis());
-            Object result = joinPoint.proceed();
-            Log log = new Log(LogType.INFO, operateTime, System.currentTimeMillis() - currentTime.get());
-            currentTime.remove();
-            logService.saveLog(getHttpServletRequest(), joinPoint, log);
-            return result;
-        } else {
+        if (!enabledLog) {
             return joinPoint.proceed();
         }
+
+        // exec
+        String operateTime = DateUtils.formatNow();
+        currentTime.set(System.currentTimeMillis());
+        Object result = joinPoint.proceed();
+        long costTime = System.currentTimeMillis() - currentTime.get();
+        currentTime.remove();
+
+        try {
+            // save log
+            Log log = new Log(LogType.INFO, operateTime, costTime);
+            logService.saveLog(getHttpServletRequest(), joinPoint, log, result);
+        } catch (Exception e) {
+            log.error("==================== LogAspect[logPointCut] catch eor", e);
+        }
+
+        // return
+        return result;
     }
 
     /**
@@ -87,25 +97,23 @@ public class LogAspect {
      * @param joinPoint join point for advice
      * @param e exception
      */
-    @AfterThrowing(pointcut = "logPointCut()", throwing = "e")
+    @AfterThrowing(pointcut = "expLogPointCut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        if (enabledLog) {
-            String occurTime = DateUtils.formatNow();
-            Log log = new Log(LogType.ERROR, occurTime,System.currentTimeMillis() - currentTime.get());
-            currentTime.remove();
-            log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
-            logService.saveLog(getHttpServletRequest(), (ProceedingJoinPoint) joinPoint, log);
+        if (!enabledLog) {
+            return;
         }
-    }
 
-    /**
-     * 配置返回通知
-     *
-     * @param joinPoint 切入点
-     * @param keys      返回结果
-     */
-    @AfterReturning(value = "logPointCut()", returning = "keys")
-    public void saveOperateLog(JoinPoint joinPoint, Object keys) {
+        String occurTime = DateUtils.formatNow();
+        Long costTime = currentTime.get() == null ? null : System.currentTimeMillis() - currentTime.get();
+        currentTime.remove();
+
+        try {
+            Log log = new Log(LogType.ERROR, occurTime, costTime);
+            log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+            logService.saveLog(getHttpServletRequest(), (ProceedingJoinPoint) joinPoint, log, null);
+        } catch (Exception ex) {
+            log.error("==================== LogAspect[expLogPointCut] catch eor", e);
+        }
     }
 
     private HttpServletRequest getHttpServletRequest() {

@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.log.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
 
 /**
  * 日志类型
@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * @author SunTao
  * @since 2022-06-20
  */
+@Getter
 public enum LogType {
     /**
      * 操作日志
@@ -19,14 +20,9 @@ public enum LogType {
      */
     ERROR(2);
 
-    @EnumValue
     private final Integer value;
 
     LogType(Integer value) {
         this.value = value;
-    }
-
-    public Integer value() {
-        return value;
     }
 }
