@@ -18,45 +18,85 @@
   ],
   "properties": [
     {
-      "name": "jwt.cert-info.cert-location",
+      "name": "jwt.access-token-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "ACCESS_TOKEN 有效时间，单位秒数，默认 2H.",
+      "defaultValue": 7200
+    },
+    {
+      "name": "jwt.refresh-token-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "REFRESH_TOKEN 有效时间，单位秒数，要求大于 accessTokenDuration，一般配置为 accessTokenDuration 的两倍.",
+      "defaultValue": 14400
+    },
+    {
+      "name": "jwt.allowed-renew-token",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "是否允许续签，默认关闭.",
+      "defaultValue": false
+    },
+    {
+      "name": "jwt.refresh-min-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "在 ACCESS_TOKEN 即将过期前多长时间进行刷新，要求小于 accessTokenDuration.",
+      "defaultValue": 1800
+    },
+    {
+      "name": "jwt.max-version",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "ACCESS_TOKEN 最大的版本（最多允许续签几次，默认五次，不续签可填写0）.",
+      "defaultValue": 5
+    },
+    {
+      "name": "jwt.algorithm",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
-      "description": "jks file location.",
-      "defaultValue": "zblog.jks"
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
+      "description": "签名类型，com.nimbusds.jose.JWSAlgorithm，默认 RS256.",
+      "defaultValue": "RS256"
     },
     {
       "name": "jwt.cert-info.alias",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
-      "description": "jks alias.",
+      "description": "证书名称.",
       "defaultValue": "zblog"
     },
     {
       "name": "jwt.cert-info.key-password",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
-      "description": "jks storepass."
+      "description": "证书密钥.",
+      "defaultValue": "123456"
+    },
+    {
+      "name": "jwt.cert-info.cert-location",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$CertInfo",
+      "description": "证书路径.",
+      "defaultValue": "zblog.jks"
     },
     {
       "name": "jwt.claims.issuer",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
-      "description": "签发者.",
-      "defaultValue": "https://www.suntaoblog.com"
+      "description": "发布者的url地址."
+    },
+    {
+      "name": "jwt.claims.audience",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
+      "description": "接受者的url地址，多个逗号分割."
     },
     {
       "name": "jwt.claims.subject",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
-      "description": "面向的用户.",
-      "defaultValue": "all"
-    },
-    {
-      "name": "jwt.claims.duration",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties$Claims",
-      "description": "令牌的有效时间，单位秒.",
-      "defaultValue": 3600
+      "description": "jwt所面向的用户."
     }
   ],
   "hints": []

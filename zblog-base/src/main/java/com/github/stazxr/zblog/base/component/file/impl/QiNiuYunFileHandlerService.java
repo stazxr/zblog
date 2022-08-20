@@ -13,7 +13,7 @@ import java.util.List;
  * @since 2022-07-27
  */
 @Component("QiNiuYunFileHandlerService")
-public class QiNiuYunFileHandlerService extends DefaultFileService {
+public class QiNiuYunFileHandlerService extends BaseFileService {
     /**
      * 文件上传
      *

@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Component("LocalFileHandlerService")
 @RequiredArgsConstructor
-public class LocalFileHandlerService extends DefaultFileService {
+public class LocalFileHandlerService extends BaseFileService {
     private final ZblogProperties zblogProperties;
 
     protected String baseUrl;

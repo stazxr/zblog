@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.core.base.BaseService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,4 +63,20 @@ public interface UserService extends BaseService<User> {
      * @param userId 用户编号
      */
     void updateUserLoginInfo(HttpServletRequest request, Long userId);
+
+    /**
+     * 记录用户令牌信息
+     *
+     * @param tokenStorage token
+     * @param flag 1: 登录；2：续签
+     */
+    void storageUserToken(UserTokenStorage tokenStorage, int flag);
+
+    /**
+     * 查询用户持久化的令牌信息
+     *
+     * @param userId 用户序列
+     * @return UserTokenStorage
+     */
+    UserTokenStorage queryUserStorageToken(Long userId);
 }

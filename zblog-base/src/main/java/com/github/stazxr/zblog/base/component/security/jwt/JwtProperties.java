@@ -14,24 +14,57 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix= "jwt")
 public class JwtProperties {
-    private CertInfo certInfo;
-
-    private Claims claims;
+    /**
+     * ACCESS_TOKEN 有效时间，单位秒数
+     */
+    private int accessTokenDuration = 7200;
 
     /**
-     * The cert info.
+     * REFRESH_TOKEN 有效时间，单位秒数，要求大于 accessTokenDuration，一般配置为 accessTokenDuration 的两倍
      */
+    private int refreshTokenDuration = accessTokenDuration * 2;
+
+    /**
+     * 是否允许续签，默认关闭
+     */
+    private boolean allowedRenewToken = false;
+
+    /**
+     * 在 ACCESS_TOKEN 即将过期前多长时间进行刷新，要求小于 accessTokenDuration
+     */
+    private int refreshMinDuration = accessTokenDuration / 4;
+
+    /**
+     * ACCESS_TOKEN 最大的版本（最多允许续签几次，默认五次）
+     */
+    private int maxVersion = 5;
+
+    /**
+     * 签名类型，com.nimbusds.jose.JWSAlgorithm，默认 RS256
+     */
+    private String algorithm = "RS256";
+
+    /**
+     * 证书信息
+     */
+    private CertInfo certInfo;
+
+    /**
+     * 共有属性
+     */
+    private Claims claims;
+
     @Data
     public static class CertInfo {
         /**
-         * key alias
+         * 证书名称
          */
         private String alias = "zblog";
 
         /**
-         * key store pass
+         * 证书密钥
          */
-        private String keyPassword;
+        private String keyPassword = "123456";
 
         /**
          * 证书路径
@@ -45,18 +78,49 @@ public class JwtProperties {
     @Data
     public static class Claims {
         /**
-         * jwt签发者
+         * 发布者的url地址
          */
-        private String issuer = "https://www.suntaoblog.com";
+        private String issuer;
 
         /**
          * jwt所面向的用户
          */
-        private String subject = "all";
+        private String subject;
+    }
 
-        /**
-         * jwt有效时间，单位秒数
-         */
-        private int duration;
+    public void setMaxVersion(int maxVersion) {
+        if (maxVersion < 0) {
+            throw new IllegalArgumentException("jwt.max-version must not be negative.");
+        }
+        this.maxVersion = maxVersion;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public void setAccessTokenDuration(int accessTokenDuration) {
+        if (accessTokenDuration < 0) {
+            throw new IllegalArgumentException("jwt.access-token-duration must not be negative.");
+        }
+        this.accessTokenDuration = accessTokenDuration;
+    }
+
+    public void setRefreshTokenDuration(int refreshTokenDuration) {
+        if (refreshTokenDuration < 0) {
+            throw new IllegalArgumentException("jwt.refresh-token-duration must not be negative.");
+        }
+        this.refreshTokenDuration = refreshTokenDuration;
+    }
+
+    public void setRefreshMinDuration(int refreshMinDuration) {
+        if (refreshMinDuration < 0) {
+            throw new IllegalArgumentException("jwt.refresh-token-duration must not be negative.");
+        }
+
+        if (refreshMinDuration >= accessTokenDuration) {
+            throw new IllegalArgumentException("jwt.refresh-token-duration must be less then jwt.refresh-token-duration.");
+        }
+        this.refreshMinDuration = refreshMinDuration;
     }
 }

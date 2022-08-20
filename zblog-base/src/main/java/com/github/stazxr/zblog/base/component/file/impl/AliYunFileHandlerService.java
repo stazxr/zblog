@@ -13,7 +13,7 @@ import java.util.List;
  * @since 2022-07-27
  */
 @Component("AliYunFileHandlerService")
-public class AliYunFileHandlerService extends DefaultFileService {
+public class AliYunFileHandlerService extends BaseFileService {
     /**
      * 文件上传
      *

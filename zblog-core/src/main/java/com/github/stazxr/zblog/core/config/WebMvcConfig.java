@@ -55,6 +55,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("*");
+        config.addExposedHeader("new-token");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

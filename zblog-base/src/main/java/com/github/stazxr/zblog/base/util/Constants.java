@@ -33,6 +33,11 @@ public class Constants {
     public static final int FOREVER_CACHE = 0;
 
     /**
+     * AUTHENTICATION_PREFIX
+     */
+    public static final String AUTHENTICATION_PREFIX = "Bearer ";
+
+    /**
      * 内置安全系统的角色
      */
     public static final class SecurityRole {

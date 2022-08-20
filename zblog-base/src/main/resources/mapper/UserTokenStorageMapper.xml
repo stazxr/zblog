@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper">
+    <insert id="insertUserTokenStorage" parameterType="com.github.stazxr.zblog.base.domain.entity.UserTokenStorage">
+        INSERT INTO user_token_storage (
+            USER_ID, LASTED_TOKEN, VERSION, REMARK, CREATE_TIME
+        ) VALUES (
+            #{userId}, #{lastedToken}, #{version}, #{remark}, #{createTime}
+        )
+    </insert>
+
+    <update id="updateUserTokenStorage">
+        UPDATE user_token_storage SET
+            LASTED_TOKEN = #{lastedToken}, VERSION = #{version}, REMARK = #{remark}, UPDATE_TIME = #{updateTime}
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <delete id="deleteUserTokenStorage">
+        DELETE FROM user_token_storage WHERE USER_ID = #{userId}
+    </delete>
+
+    <select id="selectUserTokenStorageByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.UserTokenStorage">
+        SELECT USER_ID, LASTED_TOKEN, VERSION, REMARK, CREATE_TIME, UPDATE_TIME FROM user_token_storage WHERE USER_ID = #{userId}
+    </select>
+</mapper>

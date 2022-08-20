@@ -1,5 +1,0 @@
-<dependency>
-    <groupId>org.springframework.security.experimental</groupId>
-    <artifactId>spring-security-oauth2-authorization-server</artifactId>
-    <version>0.1.2</version>
-</dependency>

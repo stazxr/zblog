@@ -26,8 +26,8 @@ public class IpUtils {
 
     private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
 
-    private static final UserAgentAnalyzer USER_AGENT_ANALYZER = UserAgentAnalyzer.newBuilder().hideMatcherLoadStats().withCache(10000)
-            .withField(UserAgent.AGENT_NAME_VERSION).build();
+    private static final UserAgentAnalyzer USER_AGENT_ANALYZER = UserAgentAnalyzer.newBuilder()
+            .hideMatcherLoadStats().withCache(10000).withField(UserAgent.AGENT_NAME_VERSION).build();
 
     /**
      * 根据请求获取IP地址
@@ -56,21 +56,21 @@ public class IpUtils {
             ip = request.getRemoteAddr();
         }
 
-        // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
-        final int ipSingleLength = 15;
-        final char ipSplitSymbol = ',';
-        if (ip != null && ip.length() > ipSingleLength) {
-            if (ip.indexOf(ipSplitSymbol) > 0) {
-                ip = ip.substring(0, ip.indexOf(ipSplitSymbol));
-            }
-        }
-
         if (Constants.LOCAL_HOST_V4.equals(ip) || Constants.LOCAL_HOST_V6.equals(ip)) {
             try {
                 // 获取本机真正的ip地址
                 ip = LocalHostUtils.getFirstLocalIp();
             } catch (UnknownHostException e) {
                 log.error("获取本机真正的ip地址发生异常", e);
+            }
+        }
+
+        // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+        final int ipSingleLength = 15;
+        final char ipSplitSymbol = ',';
+        if (ip != null && ip.length() > ipSingleLength) {
+            if (ip.indexOf(ipSplitSymbol) > -1) {
+                ip = ip.substring(0, ip.indexOf(ipSplitSymbol));
             }
         }
 

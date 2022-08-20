@@ -1,29 +1,35 @@
 package com.github.stazxr.zblog.base.component.security.filter;
 
+import com.github.stazxr.zblog.base.component.security.jwt.JwtException;
+import com.github.stazxr.zblog.base.component.security.jwt.JwtProperties;
+import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.base.component.security.jwt.decoder.JwtDecoder;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.component.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.component.security.exception.PreJwtCheckAuthenticationException;
 import com.github.stazxr.zblog.base.component.security.jwt.TokenError;
-import com.github.stazxr.zblog.base.component.security.jwt.ZblogToken;
-import com.github.stazxr.zblog.base.component.security.jwt.cache.JwtTokenStorage;
+import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
+import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.net.IpUtils;
+import com.github.stazxr.zblog.util.time.ThreadUtils;
+import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.BadJwtException;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -31,9 +37,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * jwt认证拦截器，用于拦截请求，提取jwt认证
@@ -45,23 +53,43 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String AUTHENTICATION_PREFIX = "Bearer ";
+    public static final Map<Long, Boolean> RENEW_LOCK_MAP = new ConcurrentHashMap<>();
+
+    private static final String AUTHENTICATION_PREFIX = Constants.AUTHENTICATION_PREFIX;
+
+    /**
+     * 最大等待续签时间 / 令牌被弃用后的一个最大存活期，单位秒
+     */
+    private static final int MAX_RENEW_WAIT_SECONDS = 30;
+
+    /**
+     * 等待续签的循环刷新间隔，单位毫秒
+     */
+    private static final int RENEW_WAIT_INTERVAL_MILL_SECONDS = 500;
+
+    private static final String PREVIOUS_TOKEN_KEY_TEMPLATE = "previousTkn:%s";
+
+    private static final String AUTH_ERROR_MESSAGE_TEMPLATE = "An error occurred while authentication token: %s";
 
     /**
      * 认证失败处理
      */
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
-    private final JwtTokenStorage jwtTokenStorage;
-
     private final UserService userService;
 
     private final RouterService routerService;
 
+    private final JwtTokenStorage jwtTokenStorage;
+
+    private final JwtTokenGenerator jwtTokenGenerator;
+
     private final JwtDecoder jwtDecoder;
 
+    private final JwtProperties jwtProperties;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain) throws IOException, ServletException {
         String requestUri = request.getRequestURI();
         String requestMethod = request.getMethod();
         int level = routerService.calculateInterfaceLevel(requestUri, requestMethod);
@@ -73,23 +101,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 获取 header 解析出 jwt 并进行认证 无token 直接进入下一个过滤器，因为 SecurityContext 的缘故，如果无权限并不会放行
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(header) && header.startsWith(AUTHENTICATION_PREFIX)) {
+        if (StringUtils.isNotBlank(header) && header.startsWith(AUTHENTICATION_PREFIX)) {
             String jwtToken = header.replace(AUTHENTICATION_PREFIX, "");
-            if (StringUtils.hasText(jwtToken)) {
+            if (StringUtils.isNotBlank(jwtToken)) {
                 try {
-                    authenticationTokenHandle(jwtToken, request);
+                    // 验证 Token 并将用户信息写入上下文
+                    authenticationTokenHandle(jwtToken, request, response);
                     chain.doFilter(request, response);
-                } catch (AuthenticationException e) {
-                    log.warn("authentication token failed: [{}] - {}", jwtToken, e.getMessage());
-                    authenticationEntryPoint.commence(request, response, e);
+                } catch (AuthenticationException ex) {
+                    log.error("authentication token handle exec failed: {} - [{}]", ex.getMessage(), jwtToken);
+                    authenticationEntryPoint.commence(request, response, ex);
                 }
             } else {
                 // 带安全头 没有带token
-                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE007.value()));
+                authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE002.value()));
             }
         } else {
             // 没有带安全头
-            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE008.value()));
+            authenticationEntryPoint.commence(request, response, new AuthenticationCredentialsNotFoundException(TokenError.TE001.value()));
         }
     }
 
@@ -100,56 +129,212 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @param jwtToken jwt token
      * @param request  request
      */
-    private void authenticationTokenHandle(String jwtToken, HttpServletRequest request) throws AuthenticationException {
+    private void authenticationTokenHandle(String jwtToken, HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            // decode jwt, if atk expired, throw code @{TE001}
-            Jwt jwt = jwtDecoder.decode(jwtToken);
+            Date requestTime = new Date();
+            JWTClaimsSet claimsSet = jwtDecoder.decode(jwtToken);
 
-            // get username
-            List<String> audiences = jwt.getAudience();
-            if (audiences == null || audiences.size() < 1) {
-                throw new PreJwtCheckAuthenticationException(TokenError.TE003.value());
+            // get user
+            User user = findTokenUser(claimsSet);
+
+            // check loginIp
+            String username = user.getUsername();
+            checkTokenLoginIp(request, claimsSet, username);
+
+            // check is user previous token
+            Long userId = user.getId();
+            String previousToken = CacheUtils.get(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            boolean isPrevious = previousToken != null && previousToken.equals(jwtToken);
+            if (isPrevious) {
+                // 这里Token已经续签完成，不做后续校验
+                log.warn("user {} token has been renew finish, but continue use the previous token, request '{}'", username, request.getRequestURL());
+                setContextAuthentication(request, user);
+                return;
+            } else {
+                // check token consistency
+                checkTokenIsMatch(jwtToken, userId, username);
             }
 
-            // get zblog token from cache
-            String username = audiences.get(0);
-            ZblogToken token = jwtTokenStorage.get(username);
-            if (Objects.isNull(token)) {
-                throw new PreJwtCheckAuthenticationException(TokenError.TE004.value());
+            // check token is expired
+            boolean expired = checkTokenIsExpired(claimsSet, requestTime);
+            boolean allowedRenewToken = claimsSet.getBooleanClaim("renewToken");
+            if (expired && !allowedRenewToken) {
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} token expired without renew"));
+                throw new PreJwtCheckAuthenticationException(TokenError.TE008.value());
             }
 
-            // 令牌不一致
-            ZblogToken.AccessToken accessToken = token.getAccessToken();
-            if (!jwtToken.equals(accessToken.getTokenValue())) {
-                throw new PreJwtCheckAuthenticationException(TokenError.TE005.value());
+            // check is need to renew token
+            boolean needRenewToken = checkTokenIsNeededRenew(claimsSet, requestTime);
+            if (needRenewToken) {
+                // check is allowed renew token
+                String refreshToken = jwtTokenStorage.getRefreshToken(userId);
+                checkTokenIsAllowedRenew(claimsSet, expired, refreshToken, username);
+
+                // renewToken
+                Assert.isTrue(checkRequestDoOrWait(userId, username), () -> renewToken(request, response, jwtToken, user, claimsSet), () -> {
+                    if (expired) {
+                        int count = 0;
+                        int maxWaitCount = MAX_RENEW_WAIT_SECONDS * 1000 / RENEW_WAIT_INTERVAL_MILL_SECONDS;
+                        do {
+                            ThreadUtils.sleepMillisecond(RENEW_WAIT_INTERVAL_MILL_SECONDS);
+                            if (count++ > maxWaitCount) {
+                                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token failed, overtime"), username);
+                                throw new PreJwtCheckAuthenticationException(TokenError.TE012.value());
+                            }
+                        } while (RENEW_LOCK_MAP.containsKey(userId));
+
+                        // 续签请求已经执行结束
+                        if (StringUtils.isBlank(jwtTokenStorage.getAccessToken(userId))) {
+                            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token failed"), username);
+                            throw new PreJwtCheckAuthenticationException(TokenError.TE011.value());
+                        }
+                    }
+                });
             }
 
-            // 解析权限集合这里
-            Set<String> scopes = accessToken.getScopes();
-            String[] roleArr = scopes.toArray(new String[0]);
-            List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleArr);
-
-            // 构建用户认证token, 放入上下文中
-            User user = userService.queryUserByUsername(username);
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
-            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        } catch (AuthenticationException e) {
-            log.error("check token failed", e);
-            throw new PreJwtCheckAuthenticationException(e);
-        } catch (BadJwtException e) {
-            log.warn("check token catch BadJwtException: {}", e.getMessage());
-            String errorMsg = dealBadJwtException(e);
-            throw new PreJwtCheckAuthenticationException(errorMsg);
-        } catch (Exception e) {
-            log.warn("check token catch eor: {} [{}]", e.getMessage(), jwtToken);
-            throw new PreJwtCheckAuthenticationException(TokenError.TE006.value());
+            // set UsernamePasswordAuthenticationToken
+            setContextAuthentication(request, user);
+        } catch (PreJwtCheckAuthenticationException ex) {
+            throw ex;
+        } catch (JwtException ex) {
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "decode token error"), ex);
+            throw new PreJwtCheckAuthenticationException(TokenError.TE003.value(), ex);
+        } catch (Exception ex) {
+            // unexpected eor, may parse chaim item error
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "catch unexpected error"), ex);
+            throw new PreJwtCheckAuthenticationException(TokenError.TE004.value(), ex);
         }
     }
 
-    private String dealBadJwtException(BadJwtException badJwtException) {
-        String errorMsg = badJwtException.getMessage();
-        boolean enabledRenew = errorMsg.contains("Expired JWT") || errorMsg.contains("Jwt expired at");
-        return enabledRenew ? TokenError.TE001.value() : TokenError.TE002.value();
+    private void setContextAuthentication(HttpServletRequest request, User user) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    }
+
+    private void renewToken(HttpServletRequest request, HttpServletResponse response, String jwtToken, User user, JWTClaimsSet claimsSet) {
+        Long userId = user.getId();
+        String username = user.getUsername();
+        try {
+            // generate new token
+            log.info("user {} start to renew token", username);
+            int version = claimsSet.getIntegerClaim("version");
+            String loginIp = claimsSet.getStringClaim("loginIp");
+            int newVersion = version + 1;
+            String newToken = jwtTokenGenerator.generateToken(request, user, newVersion, loginIp);
+
+            // cache previous token
+            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, MAX_RENEW_WAIT_SECONDS);
+
+            // set token
+            response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newToken));
+            String remark = "续签: ".concat(String.valueOf(newVersion));
+            UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userId).lastedToken(newToken).version(newVersion).remark(remark).build();
+            userService.storageUserToken(tokenStorage, 1);
+            log.info("user {} renew token success: version[{}]", username, newVersion);
+        } catch (Exception ex) {
+            jwtTokenStorage.expire(userId);
+            CacheUtils.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token catch error"), username, ex);
+            throw new PreJwtCheckAuthenticationException(TokenError.TE011.value(), ex);
+        } finally {
+            RENEW_LOCK_MAP.remove(userId);
+        }
+    }
+
+    private synchronized boolean checkRequestDoOrWait(Long userId, String username) {
+        if (RENEW_LOCK_MAP.containsKey(userId)) {
+            return false;
+        } else {
+            log.info("lock user {} renew token operation", username);
+            RENEW_LOCK_MAP.put(userId, true);
+            return true;
+        }
+    }
+
+    private void checkTokenIsAllowedRenew(JWTClaimsSet claimsSet, boolean expired, String refreshToken, String username) throws ParseException {
+        if (expired) {
+            // accessToken已过期，校验refreshToken是否过期
+            if (StringUtils.isBlank(refreshToken)) {
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} refresh token expired"), username);
+                throw new PreJwtCheckAuthenticationException(TokenError.TE009.value());
+            }
+        } else {
+            // accessToken未过期，校验version是否已经达到了阙值
+            int version = claimsSet.getIntegerClaim("version");
+            int maxVersion = jwtProperties.getMaxVersion();
+            if (version >= maxVersion) {
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token over max count[{}]"), username, maxVersion);
+                throw new PreJwtCheckAuthenticationException(TokenError.TE010.value());
+            }
+        }
+    }
+
+    private boolean checkTokenIsNeededRenew(JWTClaimsSet claimsSet, Date requestTime) {
+        int maxSafeTime = jwtProperties.getAccessTokenDuration() - jwtProperties.getRefreshMinDuration();
+        Date minNeedRenewTime = new Date(claimsSet.getIssueTime().getTime() + (maxSafeTime * 1000L));
+        return requestTime.after(minNeedRenewTime);
+    }
+
+    private boolean checkTokenIsExpired(JWTClaimsSet claimsSet, Date requestTime) {
+        Date expirationTime = claimsSet.getExpirationTime();
+        return requestTime.after(expirationTime);
+    }
+
+    private void checkTokenIsMatch(String jwtToken, Long userId, String username) {
+        String accessToken = jwtTokenStorage.getAccessToken(userId);
+        if (accessToken == null) {
+            // 令牌已经过期，对比持久化的Token
+            UserTokenStorage tokenStorage = userService.queryUserStorageToken(userId);
+            if (tokenStorage != null && jwtToken.equals(tokenStorage.getLastedToken())) {
+                return;
+            }
+
+            log.warn(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token consistency failed, token may different or expired forever"), username);
+        } else {
+            // 令牌未过期
+            if (jwtToken.equals(accessToken)) {
+                return;
+            }
+        }
+
+        throw new PreJwtCheckAuthenticationException(TokenError.TE007.value());
+    }
+
+    private void checkTokenLoginIp(HttpServletRequest request, JWTClaimsSet claimsSet, String username) {
+        try {
+            String loginIp = claimsSet.getStringClaim("loginIp");
+            String requestIp = IpUtils.getIp(request);
+            if (loginIp.equals(requestIp)) {
+                return;
+            }
+
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip failed, requestIp: {}, loginId: {}"), username, requestIp, loginIp);
+        } catch (Exception ex) {
+            // loginIp not exist or parse eor
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip catch eor"), username, ex);
+        }
+
+        throw new PreJwtCheckAuthenticationException(TokenError.TE006.value());
+    }
+
+    protected User findTokenUser(JWTClaimsSet claimsSet) {
+        try {
+            List<String> audiences = claimsSet.getAudience();
+            if (audiences != null && !audiences.isEmpty()) {
+                Long userId = Long.parseLong(audiences.get(0));
+                User user = userService.getById(userId);
+                if (user != null) {
+                    return user;
+                }
+
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "aud {} is not inner user"), userId);
+            }
+        } catch (Exception ex) {
+            // parse aud catch eor
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "check aud catch eor"), ex);
+        }
+
+        throw new PreJwtCheckAuthenticationException(TokenError.TE005.value());
     }
 }

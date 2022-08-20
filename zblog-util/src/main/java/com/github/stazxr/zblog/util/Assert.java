@@ -82,6 +82,21 @@ public final class Assert {
         }
     }
 
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param trueBack true callback function
+     * @param falseBack false callback function
+     */
+    public static void isTrue(boolean flag, CallBack trueBack, CallBack falseBack) {
+        if (flag) {
+            trueBack.execute();
+        } else {
+            falseBack.execute();
+        }
+    }
+
     public interface CallBack {
         /**
          * 回调方法

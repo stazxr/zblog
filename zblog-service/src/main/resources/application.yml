@@ -56,6 +56,20 @@ swagger:
       name: SunTao
       url: https://www.suntaoblog.com
       email: 1027353579@qq.com
+jwt:
+  access-token-duration: 1800
+  refresh-token-duration: 43200
+  allowed-renew-token: true
+  refresh-min-duration: 600
+  max-version: 5
+  algorithm: RS256
+  cert-info:
+    alias: zblog
+    key-password: 123456
+    cert-location: zblog.jks
+  claims:
+    issuer: http://localhost:${server.port}
+    subject: Login
 zblog:
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/

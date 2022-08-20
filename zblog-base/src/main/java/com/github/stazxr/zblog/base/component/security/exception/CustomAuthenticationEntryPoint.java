@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.component.security.exception;
 
+import com.github.stazxr.zblog.base.component.security.jwt.TokenError;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
@@ -22,38 +23,26 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    /**
-     * ATK 过期，可续签
-     */
-    private static final String TOKEN_LABEL_1 = "TE001";
-
-    /**
-     * RTK 过期，不可续签
-     */
-    private static final String TOKEN_LABEL_4 = "TE004";
-
-    /**
-     * 令牌校验失败
-     */
-    private static final String TOKEN_LABEL_6 = "TE006";
-
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         // 封装返回结果 Result
         String errorMsg = errorMsg(authException);
         ResultCode resultCode;
-        if (errorMsg.contains(TOKEN_LABEL_1)) {
-            resultCode = ResultCode.TOKEN_FAILED_001;
-        } else if (errorMsg.contains(TOKEN_LABEL_4)) {
+        if (errorMsg.contains(TokenError.Const.EXCEPTION)) {
+            log.error("authentication catch an error", authException);
             resultCode = ResultCode.TOKEN_FAILED_004;
-        } else if (errorMsg.contains(TOKEN_LABEL_6)) {
-            resultCode = ResultCode.TOKEN_FAILED_006;
+        } else if (errorMsg.contains(TokenError.Const.BUSY)) {
+            resultCode = ResultCode.TOKEN_FAILED_003;
+        } else if (errorMsg.contains(TokenError.Const.EXPIRED)) {
+            resultCode = ResultCode.TOKEN_FAILED_002;
+        } else if (errorMsg.contains(TokenError.Const.NO_LOGIN)) {
+            resultCode = ResultCode.TOKEN_FAILED_001;
         } else {
-            // no login
-            resultCode = ResultCode.TOKEN_FAILED_XXX;
+            log.error("authentication catch an exception", authException);
+            resultCode = ResultCode.TOKEN_FAILED_001;
         }
-        Result result = Result.failure(resultCode).code(HttpStatus.UNAUTHORIZED);
+
+        Result result = Result.failure(resultCode).data(errorMsg).code(HttpStatus.UNAUTHORIZED);
         ResponseUtils.responseJsonWriter(response, result);
     }
 

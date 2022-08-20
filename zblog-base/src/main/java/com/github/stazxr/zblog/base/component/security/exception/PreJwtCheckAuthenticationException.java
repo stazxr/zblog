@@ -18,6 +18,10 @@ public class PreJwtCheckAuthenticationException extends AuthenticationException 
         super(msg);
     }
 
+    public PreJwtCheckAuthenticationException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
     public PreJwtCheckAuthenticationException(AuthenticationException e) {
         super(e.getMessage());
     }

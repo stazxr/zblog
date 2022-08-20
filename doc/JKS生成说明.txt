@@ -1,0 +1,2 @@
+# d:/keystores/zblog.jks为密钥生成位置，可以根据自己的笔记本修改
+keytool -genkey -alias zblog -keyalg RSA -storetype PKCS12 -keysize 1024 -validity 365 -keystore d:/keystores/zblog.jks -storepass 123456 -dname "CN=(SunTao), OU=(zblog), O=(zblog), L=(xa), ST=(sx), C=(cn)"

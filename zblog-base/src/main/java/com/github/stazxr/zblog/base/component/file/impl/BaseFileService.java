@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author SunTao
  * @since 2022-07-27
  */
-public abstract class DefaultFileService implements FileHandler {
+public abstract class BaseFileService implements FileHandler {
     /**
      * 获取文件信息
      *

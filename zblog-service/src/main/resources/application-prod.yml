@@ -15,14 +15,19 @@ spring:
     connect-timeout: 5000
     database: ${REDIS_DB:0}
 jwt:
+  access-token-duration: 7200
+  refresh-token-duration: 86400
+  allowed-renew-token: true
+  refresh-min-duration: 1800
+  max-version: 10
+  algorithm: RS256
   cert-info:
     alias: suntaoblogcom
     key-password: ENC(kUfidmIYBnle2iOXS1MSqQvzU+VOhCXQ)
     cert-location: suntaoblogcom.jks
   claims:
     issuer: https://www.suntaoblog.com
-    subject: all
-    duration: 3600
+    subject: Login
 cache:
   default-duration: 300
   type: redis

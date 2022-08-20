@@ -1,45 +1,23 @@
-/*
- * Copyright 2020-2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.github.stazxr.zblog.base.component.security.jwt.encoder;
 
-import org.springframework.security.oauth2.jwt.Jwt;
+import com.github.stazxr.zblog.base.component.security.jwt.JwtException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 /**
- * Implementations of this interface are responsible for encoding
- * a JSON Web Token (JWT) to it's compact claims representation format.
+ * Encoding a JSON Web Token (JWT) TO JWS
  *
- * <p>
- * JWTs may be represented using the JWS Compact Serialization format for a
- * JSON Web Signature (JWS) structure or JWE Compact Serialization format for a
- * JSON Web Encryption (JWE) structure. Therefore, implementors are responsible
- * for signing a JWS and/or encrypting a JWE.
- *
- * @author Anoop Garlapati
- * @author Joe Grandja
- * @since 0.0.1
+ * @author SunTao
+ * @since 2022-08-17
  */
-@FunctionalInterface
 public interface JwtEncoder {
 	/**
-	 * Encode the JWT to it's compact claims representation format.
+	 * Encode the JWT to JWS.
 	 *
-	 * @param headers the JOSE header
+	 * @param algorithm the algorithm
 	 * @param claims the JWT Claims Set
-	 * @return a {@link Jwt}
-	 * @throws JwtEncodingException if an error occurs while attempting to encode the JWT
+	 * @return jws
+	 * @throws JwtException if an error occurs while attempting to encode the JWT
 	 */
-	Jwt encode(JoseHeader headers, JwtClaimsSet claims) throws JwtEncodingException;
+	String encode(JWSAlgorithm algorithm, JWTClaimsSet claims) throws JwtException;
 }

@@ -122,7 +122,6 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
         param.put("operateUser", queryDto.getUsername());
-        param.put("logType", LogType.INFO.getValue());
         List<LogVo> dataList = logMapper.selectLogList(param);
         return new PageInfo<>(dataList);
     }

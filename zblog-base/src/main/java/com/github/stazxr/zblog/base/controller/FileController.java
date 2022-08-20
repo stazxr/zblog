@@ -58,16 +58,12 @@ public class FileController {
             files = new MultipartFile[] {file};
         }
 
-        // 获取上传接口
-        List<FileInfo> fileList = new ArrayList<>();
-        FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
-
         try {
             // 上传文件
-            fileList = fileHandler.uploadFile(files);
+            FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
+            List<FileInfo> fileList = fileHandler.uploadFile(files);
             return Result.success("上传成功").data(fileService.insertFile(fileList, fileUploadType));
         } catch (Exception e) {
-            // fileHandler.deleteFile(fileList);
             throw new ServiceException(ResultCode.FILE_UPLOAD_FAILED, e);
         }
     }

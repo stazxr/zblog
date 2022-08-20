@@ -58,9 +58,9 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         // 判断是否允许访问资源
         if (allowRoles.contains(NONE) || allowRoles.contains(NULL) || allowRoles.contains(FORBIDDEN)) {
             throw new AccessDeniedException("没有权限");
-        } else if (allowRoles.contains(OPEN) ) {
+        } else if (allowRoles.contains(OPEN)) {
             return;
-        } else if (allowRoles.contains(PUBLIC) ) {
+        } else if (allowRoles.contains(PUBLIC)) {
             if (authentication instanceof AnonymousAuthenticationToken) {
                 throw new BadCredentialsException("未登录");
             } else {

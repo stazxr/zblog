@@ -1,0 +1,19 @@
+token续签方案修改：2022-08-15
+
+原方案：基于spring-boot-starter-oauth2-client、spring-security-jwt
+双Token方案，在登录成功后，生成 access_token，refresh_token，返回给客户端
+access_token过期时，有以下两种情况
+a、refresh_token过期，不可续签：返回给前端登录过期的标识，提醒前端重新登录
+b、refresh_token未过期，可续签：返回给客户端可续签的标识，续签成功，返回新的token对，续签失败，提醒前端重新登录
+
+注意事项：前端需要有一个缓存队列，在token过期刷新期间，将请求放到缓存队列中，在续签成功时，重试请求
+缺点：
+a、需要前端代码配合，有大量适配；重试的只是请求，但是请求成功后的处理（promise => then 中 then里面的内容 ）丢失了，
+如请求获取表格数据列表的接口在重新尝试后，只是接口成功执行了，但是表个列表未刷新等情况
+b、续签成功后，需要重试请求
+
+新方案：基于
+续签操作由后端处理，核心逻辑 👉 com.github.stazxr.zblog.base.component.security.filter.JwtAuthenticationFilter
+优点：
+a、前端只需要检查响应头，是否需要刷新token，不需要额外适配
+b、不需要重试请求

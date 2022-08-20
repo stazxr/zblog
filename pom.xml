@@ -219,6 +219,12 @@
                 <artifactId>jasypt-spring-boot-starter</artifactId>
                 <version>${jasypt.version}</version>
             </dependency>
+            <!-- Nimbus Jose Jwt -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

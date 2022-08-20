@@ -9,10 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 日期工具类
@@ -36,6 +33,26 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * 默认时间格式
      */
     private static final String DEFAULT_PATTERN = YMD_HMS_PATTERN;
+
+    /**
+     * 第一季度月份列表
+     */
+    private static final String[] FIRST_QUARTER = new String[]{"01", "02", "03"};
+
+    /**
+     * 第二季度月份列表
+     */
+    private static final String[] SECOND_QUARTER = new String[]{"04", "05", "06"};
+
+    /**
+     * 第三季度月份列表
+     */
+    private static final String[] THIRD_QUARTER = new String[]{"07", "08", "09"};
+
+    /**
+     * 第四季度月份列表
+     */
+    private static final String[] FOURTH_QUARTER = new String[]{"10", "11", "12"};
 
     /**
      * 获取系统默认的时间格式样式
@@ -394,7 +411,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * Java中获取近或过去XXX天的日期
+     * Java中获取未来或过去XXX天的日期
      *
      * @param day 天数
      * @param isFront 往后还是往前
@@ -419,5 +436,96 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         }
 
         return result;
+    }
+
+    /**
+     * 获取当前季度
+     *
+     * @return 1、2、3、4
+     */
+    public static int getCurQuarterNum() {
+        return getQuarterNum(new Date());
+    }
+
+    /**
+     * 获取指定日期所属的季度
+     *
+     * @param date 日期
+     * @return 1、2、3、4
+     */
+    public static int getQuarterNum(Date date) {
+        String month = format(date, "MM");
+        if (Arrays.asList(FIRST_QUARTER).contains(month)) {
+            return 1;
+        } else if (Arrays.asList(SECOND_QUARTER).contains(month)) {
+            return 2;
+        } else if (Arrays.asList(THIRD_QUARTER).contains(month)) {
+            return 3;
+        } else if (Arrays.asList(FOURTH_QUARTER).contains(month)) {
+            return 4;
+        } else {
+            throw new RuntimeException("get cur quarter failed: " + month);
+        }
+    }
+
+    /**
+     * 获取当前季度名称
+     *
+     * @return yyyy年x季度
+     */
+    public static String getCurQuarterName() {
+        return getQuarterName(new Date());
+    }
+
+    /**
+     * 获取指定日期所属的季度名称
+     *
+     * @param date 日期
+     * @return yyyy年x季度
+     */
+    public static String getQuarterName(Date date) {
+        return getQuarterName("%s年%s季度", date);
+    }
+
+    /**
+     * 获取指定日期所属的季度名称
+     *
+     * @param template 模板
+     * @param date 日期
+     * @return yyyy年x季度
+     */
+    public static String getQuarterName(String template, Date date) {
+        String year = format(date, "yyyy");
+        int quarter = getQuarterNum(date);
+        return String.format(template, year, quarter);
+    }
+
+    /**
+     * 获取当前日期所属的季度的起止时间范围
+     *
+     * @return QuarterRange
+     */
+    public static QuarterRange getCurQuarterRange() {
+        return getQuarterRange(new Date());
+    }
+
+    /**
+     * 获取指定日期所属的季度的起止时间范围
+     *
+     * @param date 日期
+     * @return QuarterRange
+     */
+    public static QuarterRange getQuarterRange(Date date) {
+        return getQuarterRange(date, YMD_PATTERN);
+    }
+
+    /**
+     * 获取指定日期所属的季度的起止时间范围
+     *
+     * @param date 日期
+     * @return QuarterRange
+     */
+    public static QuarterRange getQuarterRange(Date date, String pattern) {
+        return new QuarterRange();
     }
 }

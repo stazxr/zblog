@@ -9,9 +9,11 @@ import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
+import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
+import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.util.CacheUtils;
@@ -53,6 +55,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserPassLogMapper userPassLogMapper;
+
+    @Resource
+    private UserTokenStorageMapper userTokenStorageMapper;
 
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
@@ -234,6 +239,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getLoginTime, dateTime);
         wrapper.eq(User::getUsername, username);
         Assert.isTrue(!wrapper.update(), "更新用户登录信息失败");
+    }
+
+    /**
+     * 记录用户令牌信息
+     *
+     * @param tokenStorage token
+     * @param flag 1: 登录；2：续签
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void storageUserToken(UserTokenStorage tokenStorage, int flag) {
+        int rowNum;
+        if (1 == flag) {
+            tokenStorage.setCreateTime(DateUtils.formatNow());
+            userTokenStorageMapper.deleteUserTokenStorage(tokenStorage.getUserId());
+            rowNum = userTokenStorageMapper.insertUserTokenStorage(tokenStorage);
+        } else {
+            tokenStorage.setUpdateTime(DateUtils.formatNow());
+            rowNum = userTokenStorageMapper.updateUserTokenStorage(tokenStorage);
+        }
+
+        Assert.isTrue(rowNum != 1, "持久化用户令牌信息失败");
+    }
+
+    /**
+     * 查询用户持久化的令牌信息
+     *
+     * @param userId 用户序列
+     * @return UserTokenStorage
+     */
+    @Override
+    public UserTokenStorage queryUserStorageToken(Long userId) {
+        return userTokenStorageMapper.selectUserTokenStorageByUserId(userId);
     }
 
     private LambdaQueryWrapper<User> queryBuild() {
