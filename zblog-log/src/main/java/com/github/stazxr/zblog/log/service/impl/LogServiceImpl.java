@@ -87,13 +87,14 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
 
         // 设置响应结果
         if (result != null && RESULT_CLASS.equals(method.getReturnType().getSimpleName())) {
+            // 标准返回
             String resultStr = JSON.toJSONString(result);
             JSONObject resultObj = JSON.parseObject(resultStr, JSONObject.class);
             log.setExecResult(HttpStatus.OK.value() == resultObj.getInteger("code"));
             log.setExecMessage(resultObj.getString("message"));
         } else {
             // 返回不是Result，默认返回的是数据，默认成功
-            log.setExecResult(LogType.ERROR.getValue().equals(log.getLogType()));
+            log.setExecResult(log.getLogType() != LogType.ERROR.getValue());
         }
 
         // 方法路径

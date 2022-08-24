@@ -20,9 +20,9 @@ public enum LogType {
      */
     ERROR(2);
 
-    private final Integer value;
+    private final int value;
 
-    LogType(Integer value) {
+    LogType(int value) {
         this.value = value;
     }
 }

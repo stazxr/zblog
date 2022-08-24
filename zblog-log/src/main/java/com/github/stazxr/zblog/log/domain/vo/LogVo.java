@@ -16,6 +16,11 @@ public class LogVo {
     private Long id;
 
     /**
+     * 日志类型：1-操作日志；2-异常日志
+     */
+    private Integer logType;
+
+    /**
      * 操作用户
      */
     private String operateUser;
@@ -79,9 +84,4 @@ public class LogVo {
      * 执行信息
      */
     private String execMessage;
-
-    /**
-     * 异常信息
-     */
-    private byte[] exceptionDetail;
 }

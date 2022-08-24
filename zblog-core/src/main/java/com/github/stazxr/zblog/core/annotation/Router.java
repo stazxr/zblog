@@ -30,9 +30,9 @@ public @interface Router {
 
 	/**
 	 * 权限级别
-	 * {@link BaseConst.PermLevel#OPEN} 公开权限，不需要认证授权才可访问
-	 * {@link BaseConst.PermLevel#PUBLIC} 公共权限，认证才可访问
-	 * {@link BaseConst.PermLevel#PERM} 受控权限，需要认证授权才可访问
+	 * {@link BaseConst.PermLevel#OPEN} 公开权限，不需要认证授权即可访问
+	 * {@link BaseConst.PermLevel#PUBLIC} 公共权限，认证即可访问
+	 * {@link BaseConst.PermLevel#PERM} 受控权限，授权即可访问
 	 *
 	 * @return int
 	 */

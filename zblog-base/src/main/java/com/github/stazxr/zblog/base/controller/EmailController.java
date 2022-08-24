@@ -8,7 +8,6 @@ import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.CacheUtils;
-import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
@@ -41,7 +40,6 @@ public class EmailController {
      * @param email 对方邮箱
      * @return 验证码缓存key
      */
-    @Log
     @PostMapping("sendCode")
     @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.PUBLIC)
     public Result sendCode(@RequestPostSingleParam String email) {

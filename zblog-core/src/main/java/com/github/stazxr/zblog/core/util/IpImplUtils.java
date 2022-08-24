@@ -31,7 +31,7 @@ public class IpImplUtils extends IpUtils {
 
             return PROPERTIES.getIsLocalIpParsing() ? getLocalCityInfo(ip) : getHttpCityInfo(ip);
         } catch (Exception e) {
-            log.error("getCityInfo catch eor", e);
+            log.error("getCityInfo catch eor: {}", e.getMessage());
             return "";
         }
     }

@@ -28,14 +28,9 @@ public class Permission extends BaseEntity {
     private Long id;
 
     /**
-     * 父权限ID, top perm is null
+     * top's pid is null
      */
     private Long pid;
-
-    /**
-     * 子节点数目
-     */
-    private Integer subCount;
 
     /**
      * 目录名称/菜单名称/权限名称
@@ -45,16 +40,25 @@ public class Permission extends BaseEntity {
     /**
      * 权限类型
      * {@link com.github.stazxr.zblog.base.domain.enums.PermissionType}
+     * DIR TOP IS DIR, SUB IS DIR OR MENU
+     * MENU TOP IS DIR, SUB IS BTN
+     * BTN TOP IS MENU
+     * * DIR IS FRAME, FORBIDDEN SUB
+     * * MENU IS FRAME, FORBIDDEN SUB
+     * *** 这里做成类似于目录，文件，文本的关系 ***
      */
     private Integer permType;
 
     /**
      * 权限编码（应与路由中的编码保持一致，否则找不到权限可以访问的接口列表）
+     * if {@link PermissionType#DIR}, permCode is null
+     * if {@link PermissionType#MENU}, permCode is null（isFrame） or route code
+     * if {@link PermissionType#BTN}, permCode is null（isFrame） or route code
      */
     private String permCode;
 
     /**
-     * 权限访问级别
+     * 权限访问级别（可在服务运行后动态修改权限的访问级别）
      * {@link com.github.stazxr.zblog.core.annotation.Router#level()}
      */
     private Integer permLevel;
@@ -68,7 +72,7 @@ public class Permission extends BaseEntity {
     private String componentName;
 
     /**
-     * 组件路径(前端一般对应位view下的路径, eg: account/user/index)
+     * 组件路径
      * if {@link PermissionType#DIR} be null
      * if {@link PermissionType#MENU} be vue component path
      * if {@link PermissionType#BTN} be null
@@ -76,9 +80,9 @@ public class Permission extends BaseEntity {
     private String componentPath;
 
     /**
-     * 前端路由地址
-     * if {@link PermissionType#DIR} be null
-     * if {@link PermissionType#MENU} be vue menu path or http url (if iframe)
+     * 前端路由地址 xxx or xxx:${val} (非斜杠开头)
+     * if {@link PermissionType#DIR} be parent path or http(s) url (if iframe)
+     * if {@link PermissionType#MENU} be children path or http(s) url (if iframe)
      * if {@link PermissionType#BTN} be null
      */
     private String routerPath;
@@ -90,7 +94,7 @@ public class Permission extends BaseEntity {
     private String icon;
 
     /**
-     * 排序字段
+     * 排序字段，默认99999
      */
     private Integer sort;
 
@@ -124,7 +128,7 @@ public class Permission extends BaseEntity {
     private Boolean deleted;
 
     /**
-     * 子菜单
+     * 子集列表
      */
     @JsonIgnore
     @TableField(exist = false)

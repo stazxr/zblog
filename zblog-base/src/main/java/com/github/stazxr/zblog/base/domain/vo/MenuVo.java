@@ -39,7 +39,9 @@ public class MenuVo implements Serializable {
 
     /**
      * 组件路径
-     * use: return (resolve) => require([`@/views/${component}`], resolve)
+     *  Layout
+     *  ParentView
+     *  return (resolve) => require([`@/views/${component}`], resolve)
      */
     private String component;
 

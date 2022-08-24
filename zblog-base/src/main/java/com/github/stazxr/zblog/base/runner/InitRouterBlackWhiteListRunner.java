@@ -29,9 +29,7 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
      */
     private static boolean start = false;
 
-    private static final int CACHE_REFRESH_INTERVAL_1 = 5;
-
-    private static final int CACHE_REFRESH_INTERVAL_2 = 10;
+    private static final int CACHE_REFRESH_INTERVAL = 5;
 
     private final DictService dictService;
 
@@ -48,24 +46,22 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
             while (true) {
                 if (start) {
                     refreshRouterBlackWhiteList();
-                    ThreadUtils.sleepMinute(CACHE_REFRESH_INTERVAL_1);
-                } else {
-                    ThreadUtils.sleepSecond(CACHE_REFRESH_INTERVAL_2);
                 }
+
+                ThreadUtils.sleepMinute(CACHE_REFRESH_INTERVAL);
             }
         });
     }
 
     private void refreshRouterBlackWhiteList() {
         try {
-            log.info("Start refresh router black and white list...");
+            long begin = System.currentTimeMillis();
             Map<String, String> routerWhiteList = dictService.selectItems(BaseConst.DictKey.ROUTER_WHITE_LIST);
             Set<String> whiteList = new LinkedHashSet<>();
             for (String url : routerWhiteList.keySet()) {
                 whiteList.add(routerWhiteList.get(url));
             }
             setWhiteList(whiteList);
-            log.info("Router White List: {}", whiteList);
 
             Map<String, String> routerBlackList = dictService.selectItems(BaseConst.DictKey.ROUTER_BLACK_LIST);
             Set<String> blackList = new LinkedHashSet<>();
@@ -73,10 +69,9 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
                 blackList.add(routerBlackList.get(url));
             }
             setBlackList(blackList);
-            log.info("Router Black List: {}", blackList);
-            log.info("Refresh router black and white list finish...");
-        } catch (Exception e) {
-            log.error("Refresh router black and white list catch eor", e);
+            long end = System.currentTimeMillis();
+        } catch (Exception ex) {
+            log.error("refreshRouterBlackWhiteList catch error", ex);
         }
     }
 

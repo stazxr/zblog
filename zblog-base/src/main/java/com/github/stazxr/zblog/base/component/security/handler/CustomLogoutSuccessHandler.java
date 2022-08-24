@@ -23,11 +23,10 @@ import java.io.IOException;
 @Component
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         User user = (User) authentication.getPrincipal();
         String username = user.getUsername();
-        log.info("username: {} is offline success", username);
+        log.info("用户 {} 注销成功", username);
 
         Result result = Result.success(ResultCode.LOGOUT_SUCCESS);
         ResponseUtils.responseJsonWriter(response, result);

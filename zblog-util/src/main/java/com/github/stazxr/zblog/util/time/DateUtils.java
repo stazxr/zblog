@@ -30,6 +30,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static final String YMD_PATTERN = "yyyy-MM-dd";
 
     /**
+     * 一秒
+     */
+    public static final long ONE_SECOND_OF_MILL = 1000L;
+
+    /**
      * 默认时间格式
      */
     private static final String DEFAULT_PATTERN = YMD_HMS_PATTERN;
@@ -231,6 +236,22 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         long sec = diff % nd % nh % nm / ns;
 
         return day + "天" + hour + "小时" + min + "分钟" + sec + "秒";
+    }
+
+    /**
+     * 获取耗时描述
+     *
+     * @param cost long time
+     * @return ** 秒 ** 毫秒
+     */
+    public static String printCostTime(long cost) {
+        if (cost >= ONE_SECOND_OF_MILL) {
+            long s = cost / ONE_SECOND_OF_MILL;
+            long ms = cost % ONE_SECOND_OF_MILL;
+            return s + "秒" + ms + "毫秒";
+        } else {
+            return cost + "毫秒";
+        }
     }
 
     /**

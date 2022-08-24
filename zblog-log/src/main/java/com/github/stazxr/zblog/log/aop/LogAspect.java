@@ -48,14 +48,14 @@ public class LogAspect {
     }
 
     /**
-     * 配置 @Log 注解的切入点
+     * 配置 @Log 注解的切入点，如果要
      */
     @Pointcut("@annotation(com.github.stazxr.zblog.log.annotation.Log)")
     public void logPointCut() {
     }
 
     /**
-     * 配置异常记录的切入点
+     * 配置异常记录的切入点，扫描所有controller包下的异常信息
      */
     @Pointcut("execution(public * com.github.stazxr.zblog..*.controller..*.*(..))")
     public void expLogPointCut() {
@@ -110,6 +110,7 @@ public class LogAspect {
         try {
             Log log = new Log(LogType.ERROR, occurTime, costTime);
             log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+            log.setExecMessage(e.getMessage());
             logService.saveLog(getHttpServletRequest(), (ProceedingJoinPoint) joinPoint, log, null);
         } catch (Exception ex) {
             log.error("==================== LogAspect[expLogPointCut] catch eor", e);

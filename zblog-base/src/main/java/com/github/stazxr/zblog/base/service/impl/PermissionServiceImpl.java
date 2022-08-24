@@ -81,14 +81,17 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         permTreeList.forEach(permission -> {
             MenuVo menuVo = new MenuVo();
             menuVo.setName(StringUtils.isNotEmpty(permission.getComponentName()) ? permission.getComponentName() : permission.getPermName());
-            menuVo.setPath(permission.getPid() == null ? "/" + permission.getRouterPath() : permission.getRouterPath());
+            boolean isTopAndNotFrame = permission.getPid() == null && !permission.getIFrame();
+            menuVo.setPath(isTopAndNotFrame ? "/" + permission.getRouterPath() : permission.getRouterPath());
             menuVo.setHidden(permission.getHidden());
             if (!permission.getIFrame()) {
                 if (permission.getPid() == null) {
+                    // 一级菜单默认组件为Layout
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "Layout" : permission.getComponentPath());
                 } else if (permission.getPermType() == 0) {
+                    // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单，默认组件为ParentView
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "ParentView" : permission.getComponentPath());
-                } else if (StringUtils.isNoneBlank(permission.getComponentPath())) {
+                } else if (StringUtils.isNotBlank(permission.getComponentPath())) {
                     menuVo.setComponent(permission.getComponentPath());
                 }
             }
@@ -100,6 +103,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 menuVo.setRedirect("noredirect");
                 menuVo.setChildren(parsePermToMenu(childrenList));
             } else if (permission.getPid() == null) {
+                // 一级菜单并且没有子菜单
                 MenuVo menuVo1 = new MenuVo();
                 menuVo1.setMeta(menuVo.getMeta());
                 if (!permission.getIFrame()) {

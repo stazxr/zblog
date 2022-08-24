@@ -30,7 +30,7 @@ public class CustomLogoutHandler implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         String username = user.getUsername();
-        log.info("username: {}  is offline now", username);
+        log.info("用户 {} 正在注销...", username);
 
         // 注销token
         jwtTokenStorage.expire(user.getId());

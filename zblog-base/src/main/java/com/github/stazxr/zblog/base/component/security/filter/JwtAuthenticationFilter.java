@@ -217,7 +217,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = user.getUsername();
         try {
             // generate new token
-            log.info("user {} start to renew token", username);
+            log.info("续签 - 用户 {}: 开始续签", username);
             int version = claimsSet.getIntegerClaim("version");
             String loginIp = claimsSet.getStringClaim("loginIp");
             int newVersion = version + 1;
@@ -231,13 +231,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String remark = "续签: ".concat(String.valueOf(newVersion));
             UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userId).lastedToken(newToken).version(newVersion).remark(remark).build();
             userService.storageUserToken(tokenStorage, 1);
-            log.info("user {} renew token success: version[{}]", username, newVersion);
+            log.info("续签 - 用户 {}: 续签成功，版本【{}】", username, newVersion);
         } catch (Exception ex) {
             jwtTokenStorage.expire(userId);
             CacheUtils.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            log.error("续签 - 用户 {}: 续签失败", username);
             log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token catch error"), username, ex);
             throw new PreJwtCheckAuthenticationException(TokenError.TE011.value(), ex);
         } finally {
+            log.info("续签 - 用户 {}: 释放锁", username);
             RENEW_LOCK_MAP.remove(userId);
         }
     }
@@ -246,7 +248,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (RENEW_LOCK_MAP.containsKey(userId)) {
             return false;
         } else {
-            log.info("lock user {} renew token operation", username);
+            log.info("续签 - 用户 {}: 上锁", username);
             RENEW_LOCK_MAP.put(userId, true);
             return true;
         }
