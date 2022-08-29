@@ -1,8 +1,12 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.entity.Role;
+import com.github.stazxr.zblog.base.domain.vo.RoleVo;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 import java.util.List;
 
@@ -22,10 +26,10 @@ public interface RoleService extends IService<Role> {
     List<Role> queryRolesByUserId(Long userId);
 
     /**
-     * 查询资源角色列表（包含被禁用的角色）
+     * 查询权限对应的角色详情
      *
-     * @param permissionId 权限序列
-     * @return Roles
+     * @param queryDto 查询参数
+     * @return roleList
      */
-    List<Role> queryRolesByPermissionId(Long permissionId);
+    PageInfo<RoleVo> queryPermRole(RoleQueryDto queryDto);
 }

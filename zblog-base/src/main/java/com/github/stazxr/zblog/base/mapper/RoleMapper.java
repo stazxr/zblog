@@ -1,7 +1,9 @@
 package com.github.stazxr.zblog.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.stazxr.zblog.base.domain.dto.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
+import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,4 +30,12 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return Roles
      */
     List<Role> queryRolesByPermissionId(@Param("permissionId") Long permissionId);
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    List<RoleVo> selectRoleList(RoleQueryDto queryDto);
 }

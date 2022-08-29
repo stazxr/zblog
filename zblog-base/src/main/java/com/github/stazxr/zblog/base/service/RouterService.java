@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.base.domain.entity.Router;
+import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 
 import java.util.Set;
 
@@ -34,4 +35,12 @@ public interface RouterService extends IService<Router> {
      * @return allowed roles
      */
     Set<String> findRoles(String requestUri, String requestMethod);
+
+    /**
+     * 根据权限编码查询路由信息
+     *
+     * @param code 权限编码
+     * @return routerVo
+     */
+    RouterVo queryRouterByCode(String code);
 }

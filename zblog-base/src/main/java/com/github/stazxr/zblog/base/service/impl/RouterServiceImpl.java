@@ -13,6 +13,7 @@ import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.Constants;
 import com.github.stazxr.zblog.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
             if (anInterface == null) {
                 // 不存在的接口可以直接访问,后续流程会报404
                 level = BaseConst.PermLevel.OPEN;
-            } else if (InterfaceType.NULL == anInterface.getType() || StringUtils.isBlank(anInterface.getCode())) {
+            } else if (InterfaceType.NULL.getType().equals(anInterface.getType()) || StringUtils.isBlank(anInterface.getCode())) {
                 // 未配置@Router注解,接口不对外,不允许访问
                 level = BaseConst.PermLevelExtend.NULL;
             } else {
@@ -142,7 +143,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
             Interface anInterface = interfaceMapper.selectOneByRequest(requestUri, requestMethod.toUpperCase(Locale.ROOT));
             if (anInterface == null) {
                 return ROLE_OPEN_SET;
-            } else if (InterfaceType.NULL == anInterface.getType() || StringUtils.isBlank(anInterface.getCode())) {
+            } else if (InterfaceType.NULL.getType().equals(anInterface.getType()) || StringUtils.isBlank(anInterface.getCode())) {
                 // 未配置@Router注解,接口不对外,不允许访问
                 return ROLE_NULL_SET;
             } else {
@@ -185,5 +186,17 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
                 }
             }
         }
+    }
+
+    /**
+     * 根据权限编码查询路由信息
+     *
+     * @param code 权限编码
+     * @return routerVo
+     */
+    @Override
+    public RouterVo queryRouterByCode(String code) {
+        Assert.notNull(code, "权限编码不能为空");
+        return routerMapper.selectRouterVoByCode(code);
     }
 }

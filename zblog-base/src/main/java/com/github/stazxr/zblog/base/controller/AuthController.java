@@ -36,13 +36,13 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
     /**
-     * 获取当前登录用户的用户名
+     * 获取当前登录用户信息
      *
      * @return login username
      */
     @GetMapping("/loginId")
-    @Router(name = "获取当前登录用户的用户名", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
-    public Result currentUserName(@AuthenticationPrincipal User user) {
+    @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
+    public Result currentUserDetail(@AuthenticationPrincipal User user) {
         if (user == null) {
             return Result.failure(ResultCode.TOKEN_FAILED_001);
         }

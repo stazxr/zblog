@@ -123,7 +123,7 @@ public class RouterManager {
                     anInterface.setCode(routeInfo.code());
                     anInterface.setUri(uri);
                     anInterface.setMethod(requestMethod);
-                    anInterface.setType(InterfaceType.PERM);
+                    anInterface.setType(InterfaceType.PERM.getType());
                     permInterfaces.add(anInterface);
                 }
             }
@@ -159,7 +159,7 @@ public class RouterManager {
                 anInterface.setCode(null);
                 anInterface.setUri(uri);
                 anInterface.setMethod(method);
-                anInterface.setType(InterfaceType.NULL);
+                anInterface.setType(InterfaceType.NULL.getType());
                 interfaces.add(anInterface);
             }
         }

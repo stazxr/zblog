@@ -1,9 +1,7 @@
 package com.github.stazxr.zblog.base.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
 /**
- * 节假日类型
+ * 接口类型
  *
  * @author SunTao
  * @since 2022-07-12
@@ -19,7 +17,6 @@ public enum InterfaceType {
      */
     NULL(2);
 
-    @EnumValue
     private final Integer type;
 
     InterfaceType(Integer type) {

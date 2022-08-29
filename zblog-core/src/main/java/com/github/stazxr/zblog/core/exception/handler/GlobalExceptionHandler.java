@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.core.exception.handler;
 
 import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.core.exception.EntityValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.ErrorMeta;
 import com.github.stazxr.zblog.core.model.Result;
@@ -31,6 +32,21 @@ import java.io.IOException;
 public class GlobalExceptionHandler {
     @Value("${spring.servlet.multipart.max-file-size:1MB}")
     private DataSize maxFileSize;
+
+    /**
+     * 实体校验异常（返回200响应码）
+     *
+     * @param e 异常信息
+     */
+    @ExceptionHandler(value = EntityValidatedException.class)
+    public void entityValidExceptionHandler(HttpServletRequest request, HttpServletResponse response, EntityValidatedException e) throws IOException {
+        log.error("全局捕获 -> 实体校验失败: {}", e.getMessage());
+        ErrorMeta errorMeta = new ErrorMeta(e, "请求信息：" + request.getRequestURI());
+
+        // 业务异常返回200
+        Result result = Result.failure(e.getIdentifier(), e.getMessage()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        ResponseUtils.responseJsonWriter(response, result);
+    }
 
     /**
      * 处理自定义的业务异常（返回200响应码）

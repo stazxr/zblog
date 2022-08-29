@@ -9,12 +9,19 @@
         FROM
             log
         <where>
-            <if test="username != null and username != null">
-                <bind name="username" value="'%' + username + '%'"/>
-                AND OPERATE_USER LIKE #{username}
+            <if test="username != null and username != ''">
+                <bind name="usernameBind" value="'%' + username + '%'"/>
+                AND OPERATE_USER LIKE #{usernameBind}
             </if>
-            <if test="logType != null">
+            <if test="logType != null and logType != ''">
                 AND LOG_TYPE = #{logType}
+            </if>
+            <if test="permId != null and permId != ''">
+                CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (
+                    SELECT CONCAT(URI, '_', METHOD) FROM interface WHERE CODE = (
+                        SELECT PERM_CODE FROM permission WHERE ID = #{permId}
+                    )
+                )
             </if>
         </where>
         ORDER BY EVENT_TIME DESC

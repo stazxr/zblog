@@ -8,7 +8,7 @@ import com.github.stazxr.zblog.util.exception.ValidParamException;
  * @author SunTao
  * @since 2021-11-30
  */
-public final class Assert {
+public class Assert {
     /**
      * Assert that an object is not null
      *

@@ -183,7 +183,22 @@ public enum ResultCode {
     /**
      * 令牌认证失败：系统错误
      */
-    TOKEN_FAILED_004(900004, "权限校验异常，请联系网站管理员");
+    TOKEN_FAILED_004(900004, "权限校验异常，请联系网站管理员"),
+
+    /**
+     * 新增失败
+     */
+    ADD_FAILED(10028, "新增失败"),
+
+    /**
+     * 编辑失败
+     */
+    EDIT_FAILED(10029, "编辑失败"),
+
+    /**
+     * 删除失败
+     */
+    DELETE_FAILED(10030, "删除失败");
 
     private final Integer code;
 

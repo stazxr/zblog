@@ -106,10 +106,5 @@ public class BaseConst {
          * 未配置@Router注解,接口不对外,不允许访问
          */
         public static final int NULL = 98;
-
-        /**
-         *
-         */
-        public static final int NONE = 97;
     }
 }

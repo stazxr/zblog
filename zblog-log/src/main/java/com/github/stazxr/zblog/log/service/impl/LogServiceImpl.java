@@ -112,7 +112,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      * 查询用户日志列表
      *
      * @param queryDto 查询参数
-     * @return LogList
+     * @return userLog
      */
     @Override
     public PageInfo<LogVo> queryUserLog(LogQueryDto queryDto) {
@@ -123,6 +123,25 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
         param.put("operateUser", queryDto.getUsername());
+        List<LogVo> dataList = logMapper.selectLogList(param);
+        return new PageInfo<>(dataList);
+    }
+
+    /**
+     * 查询权限的操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return permLog
+     */
+    @Override
+    public PageInfo<LogVo> queryPermLog(LogQueryDto queryDto) {
+        Assert.notNull(queryDto.getPage(), "参数page不能为空");
+        Assert.notNull(queryDto.getPageSize(), "参数pageSize不能为空");
+        Assert.notNull(queryDto.getPermId(), "权限ID不能为空");
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
+        param.put("permId", queryDto.getPermId());
         List<LogVo> dataList = logMapper.selectLogList(param);
         return new PageInfo<>(dataList);
     }

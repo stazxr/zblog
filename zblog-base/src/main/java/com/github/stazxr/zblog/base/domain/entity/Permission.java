@@ -40,9 +40,9 @@ public class Permission extends BaseEntity {
     /**
      * 权限类型
      * {@link com.github.stazxr.zblog.base.domain.enums.PermissionType}
-     * DIR TOP IS DIR, SUB IS DIR OR MENU
+     * DIR TOP IS DIR OR NULL, SUB IS DIR OR MENU
      * MENU TOP IS DIR, SUB IS BTN
-     * BTN TOP IS MENU
+     * BTN TOP IS MENU, NO SUB
      * * DIR IS FRAME, FORBIDDEN SUB
      * * MENU IS FRAME, FORBIDDEN SUB
      * *** 这里做成类似于目录，文件，文本的关系 ***
@@ -102,6 +102,7 @@ public class Permission extends BaseEntity {
      * 是否缓存
      * only for {@link PermissionType#MENU}
      */
+    @TableField(value = "`CACHE`")
     private Boolean cache;
 
     /**

@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.log.domain.dto;
+package com.github.stazxr.zblog.base.domain.dto;
 
 import com.github.stazxr.zblog.core.base.PageParam;
 import lombok.Getter;
@@ -6,20 +6,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 日志列表查询参数
+ * 角色查询
  *
  * @author SunTao
- * @since 2022-08-05
+ * @since 2022-08-29
  */
 @Getter
 @Setter
 @ToString
-public class LogQueryDto extends PageParam {
-    /**
-     * 操作人
-     */
-    private String username;
-
+public class RoleQueryDto extends PageParam {
     /**
      * 权限ID
      */

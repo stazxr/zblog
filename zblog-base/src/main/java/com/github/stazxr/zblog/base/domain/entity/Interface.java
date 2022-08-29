@@ -41,5 +41,5 @@ public class Interface extends BaseEntity {
     /**
      * 接口类型
      */
-    private InterfaceType type;
+    private Integer type;
 }

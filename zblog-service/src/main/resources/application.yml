@@ -61,7 +61,7 @@ jwt:
   refresh-token-duration: 43200
   allowed-renew-token: true
   refresh-min-duration: 600
-  max-version: 5
+  max-version: 10
   algorithm: RS256
   cert-info:
     alias: zblog

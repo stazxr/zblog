@@ -24,9 +24,11 @@ import java.io.IOException;
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        User user = (User) authentication.getPrincipal();
-        String username = user.getUsername();
-        log.info("用户 {} 注销成功", username);
+        if (authentication != null && authentication.getPrincipal() != null) {
+            User user = (User) authentication.getPrincipal();
+            String username = user.getUsername();
+            log.info("用户 {} 注销成功", username);
+        }
 
         Result result = Result.success(ResultCode.LOGOUT_SUCCESS);
         ResponseUtils.responseJsonWriter(response, result);

@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.PermissionMapper">
+    <select id="queryPermList" resultType="com.github.stazxr.zblog.base.domain.vo.PermissionVo">
+        SELECT
+            ID, PID, PERM_NAME, ICON, SORT, PERM_CODE, ROUTER_PATH, COMPONENT_NAME, COMPONENT_PATH,
+            PERM_TYPE, PERM_LEVEL, ENABLED, I_FRAME, CACHE, HIDDEN, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        FROM permission
+        WHERE DELETED = 0
+        <if test="blurry != null and blurry != ''">
+            <bind name="blurryBind" value="'%' + blurry + '%'"/>
+            AND (
+                PERM_NAME LIKE #{blurryBind} OR PERM_CODE LIKE #{blurryBind} OR
+                COMPONENT_NAME LIKE #{blurryBind} OR COMPONENT_PATH LIKE #{blurryBind}
+            )
+        </if>
+        <if test="enabled != null">
+            AND ENABLED = #{enabled}
+        </if>
+        <if test="iFrame != null">
+            AND I_FRAME = #{iFrame}
+        </if>
+        <if test="onlyShowMenu != null and onlyShowMenu == true">
+            AND PERM_TYPE != 3
+        </if>
+        ORDER BY SORT, PERM_NAME
+    </select>
+    <select id="queryPermDetail" resultType="com.github.stazxr.zblog.base.domain.vo.PermissionVo">
+        SELECT
+            ID, PID, PERM_NAME, ICON, SORT, PERM_CODE, ROUTER_PATH, COMPONENT_NAME, COMPONENT_PATH,
+            PERM_TYPE, PERM_LEVEL, ENABLED, I_FRAME, CACHE, HIDDEN, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        FROM permission
+        WHERE DELETED = 0 AND ID = #{permId}
+    </select>
     <select id="selectMenu" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE DELETED = 0 AND PERM_TYPE != 3 ORDER BY SORT, PERM_NAME
     </select>
-
     <select id="selectMenuByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE DELETED = 0 AND PERM_TYPE != 3 AND (
             PERM_LEVEL IN (1, 2) OR (
@@ -15,5 +45,18 @@
                 )
             )
         ) ORDER BY SORT, PERM_NAME
+    </select>
+    <select id="queryPermCodes" resultType="com.github.stazxr.zblog.base.domain.vo.PermCodeVo">
+        SELECT
+            r.NAME, r.CODE value, r.DEFAULT_LEVEL permLevel,
+            (SELECT IF(COUNT(1) > 0, true, false) FROM permission WHERE PERM_CODE = r.CODE) DISABLED
+        FROM router r
+        ORDER BY r.NAME
+    </select>
+    <select id="findByPermName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
+        SELECT * FROM permission WHERE PERM_NAME = #{permName} AND DELETED = 0
+    </select>
+    <select id="findByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
+        SELECT * FROM permission WHERE COMPONENT_NAME = #{componentName} AND DELETED = 0
     </select>
 </mapper>

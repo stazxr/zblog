@@ -6,10 +6,20 @@
             SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
         )
     </select>
-
     <select id="queryRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
             SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permissionId}
         )
+    </select>
+    <select id="selectRoleList" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
+        SELECT
+            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME
+        FROM role
+        WHERE DELETED = '0'
+        <if test="permId != null and permId != ''">
+            AND ID IN (
+                SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
+            )
+        </if>
     </select>
 </mapper>

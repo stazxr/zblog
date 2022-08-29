@@ -1,8 +1,12 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.github.stazxr.zblog.base.domain.dto.InterfaceQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Interface;
+import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 接口数据持久层
@@ -23,4 +27,12 @@ public interface InterfaceMapper extends BaseMapper<Interface> {
      * @return Interface
      */
     Interface selectOneByRequest(@Param("uri") String requestUri, @Param("method") String requestMethod);
+
+    /**
+     * 查询权限对应的接口列表
+     *
+     * @param queryDto 查询参数
+     * @return interfaceList
+     */
+    List<InterfaceVo> selectInterfaceList(InterfaceQueryDto queryDto);
 }

@@ -13,4 +13,16 @@
         WHERE
             URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
     </select>
+    <select id="selectInterfaceList" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT
+            CODE, URI, METHOD, TYPE, CREATE_TIME
+        FROM interface
+        <where>
+            <if test="permId != null and permId != ''">
+                AND CODE IN (
+                    SELECT PERM_CODE FROM permission WHERE ID = #{permId}
+                )
+            </if>
+        </where>
+    </select>
 </mapper>
