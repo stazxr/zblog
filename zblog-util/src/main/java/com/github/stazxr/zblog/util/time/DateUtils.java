@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -28,6 +29,16 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * yyyy-MM-dd
      */
     public static final String YMD_PATTERN = "yyyy-MM-dd";
+
+    /**
+     * yyyy-MM
+     */
+    public static final String YM_PATTERN = "yyyy-MM";
+
+    /**
+     * yyyy
+     */
+    public static final String Y_PATTERN = "yyyy";
 
     /**
      * 一秒
@@ -516,37 +527,157 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return yyyy年x季度
      */
     public static String getQuarterName(String template, Date date) {
-        String year = format(date, "yyyy");
+        String year = format(date, Y_PATTERN);
         int quarter = getQuarterNum(date);
         return String.format(template, year, quarter);
     }
 
     /**
-     * 获取当前日期所属的季度的起止时间范围
+     * 计算季度的偏移量
      *
-     * @return QuarterRange
+     * @param offset 偏移量
+     * @return [年份, 季度]
      */
-    public static QuarterRange getCurQuarterRange() {
-        return getQuarterRange(new Date());
+    public static String[] getQuarterOffset(int offset) {
+        return getQuarterOffset(new Date(), offset);
     }
 
     /**
-     * 获取指定日期所属的季度的起止时间范围
+     * 计算季度的偏移量
      *
-     * @param date 日期
-     * @return QuarterRange
+     * @param date 基准日期
+     * @param offset 偏移量
+     * @return [年份, 季度]
      */
-    public static QuarterRange getQuarterRange(Date date) {
-        return getQuarterRange(date, YMD_PATTERN);
+    public static String[] getQuarterOffset(Date date, int offset) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, 3 * offset);
+        Date offsetDate = calendar.getTime();
+        return new String[] {format(offsetDate, Y_PATTERN), String.valueOf(getQuarterNum(offsetDate))};
     }
 
     /**
-     * 获取指定日期所属的季度的起止时间范围
+     * 获取某年的第一天和最后一天
      *
-     * @param date 日期
-     * @return QuarterRange
+     * @param year 年份
+     * @return { 开始时间 - ${yyyy-MM-dd 00:00:00}, 结束时间 - ${yyyy-MM-dd 23:59:59} }
      */
-    public static QuarterRange getQuarterRange(Date date, String pattern) {
-        return new QuarterRange();
+    public static String[] getYearRange(String year) {
+        return getYearRange(year, YMD_HMS_PATTERN);
+    }
+
+    /**
+     * 获取某年的第一天和最后一天
+     *
+     * @param year 年份
+     * @param formatter 返回格式
+     * @return { 开始时间 - ${yyyy-MM-dd 00:00:00}, 结束时间 - ${yyyy-MM-dd 23:59:59} }
+     */
+    public static String[] getYearRange(String year, String formatter) {
+        // 开始日期
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.YEAR, Integer.parseInt(year));
+        start.set(Calendar.DAY_OF_YEAR, start.getActualMinimum(Calendar.DAY_OF_YEAR));
+        setActualMinimumDay(start);
+
+        // 结束日期
+        Calendar end = Calendar.getInstance();
+        end.set(Calendar.YEAR, Integer.parseInt(year));
+        end.set(Calendar.DAY_OF_YEAR, end.getActualMaximum(Calendar.DAY_OF_YEAR));
+        setActualMaximumDay(end);
+
+        // return
+        return new String[] {format(start.getTime(), formatter), format(end.getTime(), formatter)};
+    }
+
+    /**
+     * 获取某季度的第一天和最后一天
+     *
+     * @param year 年份
+     * @param quarter 季度，1、2、3、4
+     * @return { 开始时间 - ${yyyy-MM-dd 00:00:00}, 结束时间 - ${yyyy-MM-dd 23:59:59} }
+     */
+    public static String[] getQuarterRange(String year, int quarter) {
+        return getQuarterRange(year, quarter, YMD_HMS_PATTERN);
+    }
+
+    /**
+     * 获取某季度的第一天和最后一天
+     *
+     * @param year 年份
+     * @param quarter 季度，1、2、3、4
+     * @param formatter 格式
+     * @return { 开始时间, 结束时间 }
+     */
+    public static String[] getQuarterRange(String year, int quarter, String formatter) {
+        Assert.isTrue(quarter <= 0 || quarter >= 5, "季度的有效范围为: [1, 2, 3, 4]");
+
+        // 开始日期
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.YEAR, Integer.parseInt(year));
+        start.set(Calendar.MONTH, (quarter - 1) * 3);
+        start.set(Calendar.DATE, start.getActualMinimum(Calendar.DATE));
+        start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
+        setActualMinimumDay(start);
+
+        // 结束日期
+        Calendar end = Calendar.getInstance();
+        end.set(Calendar.YEAR, Integer.parseInt(year));
+        end.set(Calendar.MONTH, ((quarter - 1) * 3) + 2);
+        end.set(Calendar.DATE, end.getActualMaximum(Calendar.DATE));
+        end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DATE));
+        setActualMaximumDay(end);
+
+        // return
+        return new String[] {format(start.getTime(), formatter), format(end.getTime(), formatter)};
+    }
+
+    /**
+     * 计算对比当前前进或后退 ${偏移量} ${单位} 的日期
+     *
+     * @param offset 偏移量
+     * @param unit   单位，eg: Calendar.SECOND，default Calendar.DAY_OF_MONTH
+     * @return Date
+     */
+    public static Date findDate(int offset, Integer unit) {
+        if (unit == null) {
+            unit = Calendar.DAY_OF_MONTH;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(unit, offset);
+        return calendar.getTime();
+    }
+
+    /**
+     * 计算某天的同比，环比日期
+     *
+     * @param date 对比日期，格式要求：2022-08-31
+     * @return 0: 原日期; 1: 环比日期; 2: 同比日期
+     */
+    public static List<String> getCompareDate(String date) {
+        // eg: 2022-08-31 => return [2022-08-31, 2022-08-30, 2021-08-31]
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(YMD_PATTERN);
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        List<String> result = new ArrayList<>();
+        result.add(localDate.format(formatter));
+        result.add(localDate.minusDays(1).format(formatter));
+        result.add(localDate.minusYears(1).format(formatter));
+        return result;
+    }
+
+    private static void setActualMaximumDay(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, calendar.getActualMaximum(Calendar.SECOND));
+        calendar.set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND));
+    }
+
+    private static void setActualMinimumDay(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.getActualMinimum(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND));
+        calendar.set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND));
     }
 }
