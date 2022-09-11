@@ -4,6 +4,9 @@
     <delete id="deleteByPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId}
     </delete>
+    <delete id="deleteByRoleId">
+        DELETE FROM role_permission_relation WHERE ROLE_ID = #{roleId}
+    </delete>
     <delete id="deleteByRoleIdAndPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId} AND ROLE_ID = #{roleId}
     </delete>

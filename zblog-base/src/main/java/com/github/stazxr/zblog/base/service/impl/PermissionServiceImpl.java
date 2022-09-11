@@ -4,14 +4,16 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.bo.MenuMeta;
 import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
-import com.github.stazxr.zblog.base.domain.vo.MenuVo;
-import com.github.stazxr.zblog.base.domain.vo.PermCodeVo;
-import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
+import com.github.stazxr.zblog.base.domain.vo.*;
+import com.github.stazxr.zblog.base.mapper.InterfaceMapper;
 import com.github.stazxr.zblog.base.mapper.PermissionMapper;
+import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
@@ -19,8 +21,11 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.EntityValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.EntityValidated;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
+import com.github.stazxr.zblog.log.mapper.LogMapper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,21 +41,26 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = Exception.class)
 public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permission> implements PermissionService {
     private final PermissionMapper permissionMapper;
+
+    private final InterfaceMapper interfaceMapper;
+
+    private final RoleMapper roleMapper;
+
+    private final LogMapper logMapper;
 
     private final RolePermMapper rolePermMapper;
 
     /**
-     * 查询权限列表
+     * 查询权限列表（树）
      *
      * @param queryDto 查询参数
      * @return permsList
      */
     @Override
-    public List<PermissionVo> queryPermList(PermissionQueryDto queryDto) {
-        List<PermissionVo> permissionVos = permissionMapper.queryPermList(queryDto);
+    public List<PermissionVo> queryPermTreeList(PermissionQueryDto queryDto) {
+        List<PermissionVo> permissionVos = permissionMapper.selectPermList(queryDto);
         Map<Long, List<PermissionVo>> permPidGroupMap = permissionVos.stream().collect(
                 Collectors.groupingBy(v -> v.getPid() == null ? Constants.TOP_PERM_ID : v.getPid())
         );
@@ -63,34 +73,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             fetchPermVoChildren(permList, permPidGroupMap);
             result.addAll(permList);
         }
-        return result;
-    }
 
-    /**
-     * 构造前端菜单模型
-     *
-     * @param userId 用户序列
-     * @return menuTree
-     */
-    @Override
-    public List<MenuVo> buildMenus(Long userId) {
-        Assert.notNull(userId, "用户ID不能为空");
-
-        // 查询用户对应的菜单权限列表，并构建菜单树
-        boolean isAdmin = Constants.USER_ADMIN_ID.equals(userId);
-        List<Permission> permList = isAdmin ? permissionMapper.selectMenu() : permissionMapper.selectMenuByUserId(userId);
-        List<Permission> permTreeList = buildPermTree(permList);
-        return parsePermToMenu(permTreeList);
-    }
-
-    /**
-     * 查找所有注册的权限编码
-     *
-     * @return permCodes
-     */
-    @Override
-    public List<PermCodeVo> queryPermCodes() {
-        return permissionMapper.queryPermCodes();
+        return queryDto.getNeedTop() != null && queryDto.getNeedTop() ? putTopMenu(result) : result;
     }
 
     /**
@@ -101,10 +85,71 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PermissionVo queryPermDetail(Long permId) {
-        Assert.notNull(permId, "权限ID不能为空");
-        PermissionVo permission = permissionMapper.queryPermDetail(permId);
-        Assert.notNull(permission, "数据不存在，权限ID为：" + permId);
+        Assert.notNull(permId, "权限序列不能为空");
+        PermissionVo permission = permissionMapper.selectPermDetail(permId);
+        Assert.notNull(permission, "数据不存在，权限序列为：" + permId);
         return permission;
+    }
+
+    /**
+     * 查询权限可访问的接口列表
+     *
+     * @param queryDto 查询参数
+     * @return interfaceList
+     */
+    @Override
+    public PageInfo<InterfaceVo> queryPermInterfaces(PermissionQueryDto queryDto) {
+        queryDto.checkPage();
+        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        List<InterfaceVo> dataList = interfaceMapper.selectPermInterfaces(queryDto.getPermId());
+        return new PageInfo<>(dataList);
+    }
+
+    /**
+     * 查询可以访问权限的角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    @Override
+    public PageInfo<RoleVo> queryPermRoles(PermissionQueryDto queryDto) {
+        queryDto.checkPage();
+        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        List<RoleVo> dataList = roleMapper.selectPermRoles(queryDto.getPermId());
+        return new PageInfo<>(dataList);
+    }
+
+    /**
+     * 查询权限的操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return logList
+     */
+    @Override
+    public PageInfo<LogVo> queryPermLogs(PermissionQueryDto queryDto) {
+        queryDto.checkPage();
+        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
+        param.put("permId", queryDto.getPermId());
+        List<LogVo> dataList = logMapper.selectLogList(param);
+        return new PageInfo<>(dataList);
+    }
+
+    /**
+     * 查询所有的权限编码
+     *
+     * @param searchKey 查询条件
+     * @return PermCodeVo
+     */
+    @Override
+    public List<PermCodeVo> queryPermCodes(String searchKey) {
+        return permissionMapper.selectPermCodes(searchKey);
     }
 
     /**
@@ -127,6 +172,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      * @param permission 权限
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void editPermission(Permission permission) {
         checkPermission(permission);
         if (!updateById(permission)) {
@@ -137,12 +183,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     /**
      * 删除权限
      *
-     * @param permId 权限ID
+     * @param permId 权限序列
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Long permId) {
         Permission permission = permissionMapper.selectById(permId);
-        Assert.notNull(permission, "待删除权限不存在，权限ID为：" + permId);
+        Assert.notNull(permission, "待删除权限不存在，权限序列为：" + permId);
 
         Permission param = new Permission();
         param.setPid(permId);
@@ -158,6 +205,43 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
 
         throw new ServiceException(ResultCode.DELETE_FAILED);
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * 查询用户菜单列表
+     *
+     * @param userId 用户序列
+     * @return menuTree
+     */
+    @Override
+    public List<MenuVo> queryUserMenus(Long userId) {
+        Assert.notNull(userId, "用户序列不能为空");
+
+        // 查询用户对应的菜单权限列表，并构建菜单树，管理员可以查看所有的菜单
+        boolean isAdmin = Constants.USER_ADMIN_ID.equals(userId);
+        List<Permission> permList = isAdmin ? permissionMapper.selectAllMenu() : permissionMapper.selectMenuByUserId(userId);
+        List<Permission> permTreeList = buildPermTree(permList);
+        return parsePermToMenu(permTreeList);
+    }
+
+    private List<PermissionVo> putTopMenu(List<PermissionVo> permissionVos) {
+        PermissionVo top = new PermissionVo();
+        top.setId(Constants.TOP_PERM_ID);
+        top.setPermName(Constants.TOP_PERM_NAME);
+        top.setPermType(PermissionType.DIR.getType());
+        top.setChildren(permissionVos == null ? Collections.emptyList() : permissionVos);
+
+        List<PermissionVo> result = new ArrayList<>();
+        result.add(top);
+        return result;
     }
 
     private void checkPermission(Permission permission) {

@@ -36,7 +36,7 @@ public class HomeServiceImpl implements HomeService {
      */
     @Override
     public SingleLineChartDataVo getHomePanelDetailDataByType(String type) {
-        // TODO
+        // TODO 待实现
         String[] xAxisData = DateUtils.getDateAry(7, true, false);
 
         int[] legendDataAry = new int[xAxisData.length];

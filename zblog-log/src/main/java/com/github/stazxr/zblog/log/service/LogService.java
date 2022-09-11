@@ -33,12 +33,4 @@ public interface LogService extends IService<Log> {
      * @return userLog
      */
     PageInfo<LogVo> queryUserLog(LogQueryDto queryDto);
-
-    /**
-     * 查询权限的操作日志列表
-     *
-     * @param queryDto 查询参数
-     * @return permLog
-     */
-    PageInfo<LogVo> queryPermLog(LogQueryDto queryDto);
 }

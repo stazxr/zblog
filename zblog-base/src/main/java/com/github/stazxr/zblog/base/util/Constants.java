@@ -15,7 +15,7 @@ public class Constants {
     /**
      * 权限树中顶层权限名称
      */
-    public static final String TOP_PERM_NAME = "ZBLOG";
+    public static final String TOP_PERM_NAME = "Z-BLOG";
 
     /**
      * 系统管理员

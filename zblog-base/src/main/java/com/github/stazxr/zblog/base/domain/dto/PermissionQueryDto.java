@@ -16,9 +16,14 @@ import lombok.ToString;
 @ToString
 public class PermissionQueryDto extends PageParam {
     /**
-     * 权限ID
+     * 权限序列
      */
     private Long permId;
+
+    /**
+     * 角色序列
+     */
+    private Long roleId;
 
     /**
      * 模糊查询（标题、权限标识、组件名称、组件路径）
@@ -39,4 +44,9 @@ public class PermissionQueryDto extends PageParam {
      * 是否只显示菜单
      */
     private Boolean onlyShowMenu;
+
+    /**
+     * 是否补充顶级菜单
+     */
+    private Boolean needTop;
 }

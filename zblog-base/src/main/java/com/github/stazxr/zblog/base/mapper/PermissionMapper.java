@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 权限数据持久层
@@ -17,34 +18,43 @@ import java.util.List;
  */
 public interface PermissionMapper extends BaseMapper<Permission> {
     /**
-     * 查询所有的菜单
-     *
-     * @return 所有的菜单列表
-     */
-    List<Permission> selectMenu();
-
-    /**
-     * 查询用户对应的菜单
-     *
-     * @param userId 用户ID
-     * @return 菜单列表
-     */
-    List<Permission> selectMenuByUserId(@Param("userId") Long userId);
-
-    /**
      * 查询权限列表
      *
      * @param queryDto 查询参数
      * @return permsList
      */
-    List<PermissionVo> queryPermList(PermissionQueryDto queryDto);
+    List<PermissionVo> selectPermList(PermissionQueryDto queryDto);
 
     /**
-     * 查找所有注册的权限编码
+     * 查询权限详情
      *
-     * @return permCodes
+     * @param permId 权限ID
+     * @return PermissionVo
      */
-    List<PermCodeVo> queryPermCodes();
+    PermissionVo selectPermDetail(@Param("permId") Long permId);
+
+    /**
+     * 查询所有的菜单
+     *
+     * @return 所有的菜单列表
+     */
+    List<Permission> selectAllMenu();
+
+    /**
+     * 查询用户对应的菜单
+     *
+     * @param userId 用户序列
+     * @return 启用的菜单列表
+     */
+    List<Permission> selectMenuByUserId(@Param("userId") Long userId);
+
+    /**
+     * 查询所有的权限编码
+     *
+     * @param searchKey 查询条件
+     * @return PermCodeVo
+     */
+    List<PermCodeVo> selectPermCodes(@Param("searchKey") String searchKey);
 
     /**
      * 根据权限名称查询权限信息
@@ -61,12 +71,4 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @return Permission
      */
     Permission findByComponentName(@Param("componentName") String componentName);
-
-    /**
-     * 查询权限详情
-     *
-     * @param permId 权限ID
-     * @return PermissionVo
-     */
-    PermissionVo queryPermDetail(@Param("permId") Long permId);
 }

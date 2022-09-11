@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
-import com.github.stazxr.zblog.base.domain.vo.MenuVo;
-import com.github.stazxr.zblog.base.domain.vo.PermCodeVo;
-import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
+import com.github.stazxr.zblog.base.domain.vo.*;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 import java.util.List;
 
@@ -17,27 +17,52 @@ import java.util.List;
  */
 public interface PermissionService extends IService<Permission> {
     /**
-     * 查询权限列表
+     * 查询权限列表（树）
      *
      * @param queryDto 查询参数
      * @return permsList
      */
-    List<PermissionVo> queryPermList(PermissionQueryDto queryDto);
+    List<PermissionVo> queryPermTreeList(PermissionQueryDto queryDto);
 
     /**
-     * 构造前端菜单模型
+     * 查询权限详情
      *
-     * @param userId 用户序列
-     * @return menuTree
+     * @param permId 权限ID
+     * @return PermissionVo
      */
-    List<MenuVo> buildMenus(Long userId);
+    PermissionVo queryPermDetail(Long permId);
 
     /**
-     * 查找所有注册的权限编码
+     * 查询权限可访问的接口列表
      *
-     * @return permCodes
+     * @param queryDto 查询参数
+     * @return interfaceList
      */
-    List<PermCodeVo> queryPermCodes();
+    PageInfo<InterfaceVo> queryPermInterfaces(PermissionQueryDto queryDto);
+
+    /**
+     * 查询可以访问权限的角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    PageInfo<RoleVo> queryPermRoles(PermissionQueryDto queryDto);
+
+    /**
+     * 查询权限的操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return logList
+     */
+    PageInfo<LogVo> queryPermLogs(PermissionQueryDto queryDto);
+
+    /**
+     * 查询权限编码列表
+     *
+     * @param searchKey 查询条件
+     * @return PermCodeVo
+     */
+    List<PermCodeVo> queryPermCodes(String searchKey);
 
     /**
      * 新增权限
@@ -56,15 +81,15 @@ public interface PermissionService extends IService<Permission> {
     /**
      * 删除权限
      *
-     * @param permId 权限ID
+     * @param permId 权限序列
      */
     void deletePermission(Long permId);
 
     /**
-     * 查询权限详情
+     * 查询用户菜单列表
      *
-     * @param permId 权限ID
-     * @return PermissionVo
+     * @param userId 用户序列
+     * @return menuTree
      */
-    PermissionVo queryPermDetail(Long permId);
+    List<MenuVo> queryUserMenus(Long userId);
 }

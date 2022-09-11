@@ -9,5 +9,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-07-03
  */
 public interface BaseService<T> extends IService<T> {
-    // ToDo
+    // ToDo 自定义 Service 接口
 }

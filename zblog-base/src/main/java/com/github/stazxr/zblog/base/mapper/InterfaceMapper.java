@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.InterfaceQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Interface;
 import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
@@ -31,8 +30,8 @@ public interface InterfaceMapper extends BaseMapper<Interface> {
     /**
      * 查询权限对应的接口列表
      *
-     * @param queryDto 查询参数
+     * @param permId 权限序列
      * @return interfaceList
      */
-    List<InterfaceVo> selectInterfaceList(InterfaceQueryDto queryDto);
+    List<InterfaceVo> selectPermInterfaces(@Param("permId") Long permId);
 }
