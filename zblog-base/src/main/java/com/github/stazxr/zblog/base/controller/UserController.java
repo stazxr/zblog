@@ -1,8 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -75,5 +73,17 @@ public class UserController {
     @Router(name = "修改个人邮箱", code = "updateUserEmail", level = BaseConst.PermLevel.PUBLIC)
     public Result updateUserEmail(@RequestBody UserUpdateEmailDto emailDto) {
         return userService.updateUserEmail(emailDto) ? Result.success() : Result.failure();
+    }
+
+    /**
+     * 查询用户列表（公共接口）
+     *
+     * @param queryDto 查询参数
+     * @return userList
+     */
+    @GetMapping(value = "/pageListOfCommon")
+    @Router(name = "查询用户列表（公共接口）", code = "pageUserListOfCommon", level = BaseConst.PermLevel.PUBLIC)
+    public Result pageUserListOfCommon(UserQueryDto queryDto) {
+        return Result.success().data(userService.queryUserListByPage(queryDto));
     }
 }

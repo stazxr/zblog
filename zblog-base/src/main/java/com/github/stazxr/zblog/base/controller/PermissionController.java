@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
@@ -39,13 +40,13 @@ public class PermissionController {
     }
 
     /**
-     * 查询权限详细信息
+     * 查询权限详情
      *
      * @param permId 权限ID
      * @return PermissionVo
      */
     @GetMapping(value = "/queryPermDetail")
-    @Router(name = "查询权限详细信息", code = "queryPermDetail")
+    @Router(name = "查询权限详情", code = "queryPermDetail")
     public Result queryPermDetail(Long permId) {
         return Result.success().data(permissionService.queryPermDetail(permId));
     }
@@ -186,5 +187,23 @@ public class PermissionController {
     @Router(name = "查询用户菜单列表", code = "queryUserMenus", level = BaseConst.PermLevel.PUBLIC)
     public Result buildUserMenus() {
         return Result.success().data(permissionService.queryUserMenus(SecurityUtils.getLoginId()));
+    }
+
+    /**
+     * 批量删除角色权限
+     *
+     * @param rolePermDto 角色 - 权限对应信息
+     * @return Result
+     */
+    @Log
+    @PostMapping(value = "/batchDeleteRolePerm")
+    @Router(name = "批量删除角色权限", code = "batchDeleteRolePerm")
+    public Result batchDeleteRolePerm(@RequestBody RolePermDto rolePermDto) {
+        if (rolePermDto.getPermId() == null) {
+            return Result.failure("参数错误，缺失permId");
+        }
+
+        permissionService.batchDeleteRolePerm(rolePermDto);
+        return Result.success();
     }
 }

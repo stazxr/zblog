@@ -66,11 +66,11 @@
         ) ORDER BY SORT, PERM_NAME
     </select>
 
-    <select id="findByPermName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
+    <select id="selectByPermName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE PERM_NAME = #{permName} AND DELETED = 0
     </select>
 
-    <select id="findByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
+    <select id="selectByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE COMPONENT_NAME = #{componentName} AND DELETED = 0
     </select>
 </mapper>

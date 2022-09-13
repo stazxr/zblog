@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
@@ -11,6 +14,7 @@ import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
+import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
 import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
@@ -272,6 +276,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public UserTokenStorage queryUserStorageToken(Long userId) {
         return userTokenStorageMapper.selectUserTokenStorageByUserId(userId);
+    }
+
+    /**
+     * 查询用户列表
+     *
+     * @param queryDto 查询参数
+     * @return userList
+     */
+    @Override
+    public PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto) {
+        queryDto.checkPage();
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        return new PageInfo<>(userMapper.selectUserList(queryDto));
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

@@ -44,4 +44,14 @@ public class RoleVo {
      * 创建时间
      */
     private String createTime;
+
+    /**
+     * 修改用户
+     */
+    private String updateUser;
+
+    /**
+     * 修改时间
+     */
+    private String updateTime;
 }

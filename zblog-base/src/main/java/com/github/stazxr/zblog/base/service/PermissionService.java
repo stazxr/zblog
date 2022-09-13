@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
@@ -92,4 +93,11 @@ public interface PermissionService extends IService<Permission> {
      * @return menuTree
      */
     List<MenuVo> queryUserMenus(Long userId);
+
+    /**
+     * 批量删除角色权限
+     *
+     * @param rolePermDto 角色 - 权限对应信息
+     */
+    void batchDeleteRolePerm(RolePermDto rolePermDto);
 }

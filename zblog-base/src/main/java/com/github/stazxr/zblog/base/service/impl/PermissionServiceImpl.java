@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.bo.MenuMeta;
 import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
 import com.github.stazxr.zblog.base.domain.vo.*;
@@ -119,7 +120,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
 
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        List<RoleVo> dataList = roleMapper.selectPermRoles(queryDto.getPermId());
+        List<RoleVo> dataList = roleMapper.selectPermRoles(queryDto.getPermId(), queryDto.getBlurry());
         return new PageInfo<>(dataList);
     }
 
@@ -200,20 +201,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
 
         if (removeById(permId)) {
+            // 删除角色 - 权限的中间数据
             rolePermMapper.deleteByPermId(permId);
             return;
         }
 
         throw new ServiceException(ResultCode.DELETE_FAILED);
     }
-
-
-
-
-
-
-
-
 
     /**
      * 查询用户菜单列表
@@ -230,6 +224,23 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         List<Permission> permList = isAdmin ? permissionMapper.selectAllMenu() : permissionMapper.selectMenuByUserId(userId);
         List<Permission> permTreeList = buildPermTree(permList);
         return parsePermToMenu(permTreeList);
+    }
+
+    /**
+     * 批量删除角色权限
+     *
+     * @param rolePermDto 角色 - 权限对应信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteRolePerm(RolePermDto rolePermDto) {
+        Assert.notNull(rolePermDto.getPermId(), "参数roleId不能为空");
+        Set<Long> roleIds = rolePermDto.getRoleIds();
+        if (roleIds == null || roleIds.size() == 0) {
+            return;
+        }
+
+        rolePermMapper.batchDeleteRolePerm(rolePermDto);
     }
 
     private List<PermissionVo> putTopMenu(List<PermissionVo> permissionVos) {
@@ -249,7 +260,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         emptyCheck(permission);
 
         // 检查权限名称是否存在
-        Permission dbPerm = permissionMapper.findByPermName(permission.getPermName());
+        Permission dbPerm = permissionMapper.selectByPermName(permission.getPermName());
         if (dbPerm != null && !dbPerm.getId().equals(permission.getId())) {
             throw new EntityValidatedException("权限名称已存在");
         }
@@ -301,7 +312,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             } else {
                 EntityValidated.notNull(permission.getComponentPath(), "组件路径不能为空");
                 EntityValidated.notNull(permission.getComponentName(), "组件名称不能为空");
-                dbPerm = permissionMapper.findByComponentName(permission.getComponentName());
+                dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
                 if (dbPerm != null && !dbPerm.getId().equals(permission.getId())) {
                     throw new EntityValidatedException("组件名称已存在");
                 }

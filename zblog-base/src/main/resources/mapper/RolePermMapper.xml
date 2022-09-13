@@ -4,10 +4,30 @@
     <delete id="deleteByPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId}
     </delete>
+
     <delete id="deleteByRoleId">
         DELETE FROM role_permission_relation WHERE ROLE_ID = #{roleId}
     </delete>
+
     <delete id="deleteByRoleIdAndPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId} AND ROLE_ID = #{roleId}
     </delete>
+
+    <delete id="batchDeleteRolePerm">
+        DELETE FROM role_permission_relation WHERE PERM_ID = #{permId} AND ROLE_ID IN
+        <choose>
+            <when test="roleIds != null and roleIds.size() > 0">
+                <foreach collection="roleIds" item="roleId" index="index" open="(" separator="," close=")">
+                    #{roleId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no delete')
+            </otherwise>
+        </choose>
+    </delete>
+
+    <select id="selectPermIdsByRoleId" resultType="java.lang.Long">
+        SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID = #{roleId}
+    </select>
 </mapper>

@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.UserMapper">
+    <resultMap id="userVoMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
+        <result property="id" column="ID" />
+        <result property="username" column="USERNAME" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="email" column="EMAIL" />
+        <result property="loginTime" column="LOGIN_TIME" />
+        <result property="email" column="EMAIL" />
+        <result property="enabled" column="ENABLED" />
+        <result property="locked" column="LOCKED" />
+        <result property="temp" column="TEMP" />
+        <collection property="roleIds" ofType="Long">
+            <result column="ROLE_ID" />
+        </collection>
+    </resultMap>
 
+    <select id="selectUserList" resultMap="userVoMap">
+        SELECT
+            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.LOGIN_TIME, u.ENABLED, u.LOCKED, u.TEMP, r.ROLE_ID
+        FROM user u
+        LEFT JOIN (
+            SELECT USER_ID, ROLE_ID FROM user_role_relation
+        ) r ON r.USER_ID = u.ID
+        WHERE u.DELETED = '0'
+        <if test="username != null and username != ''">
+            <bind name="usernameBind" value="'%' + username + '%'"/>
+            AND u.USERNAME LIKE #{usernameBind}
+        </if>
+        <if test="nickname != null and nickname != ''">
+            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
+            AND u.NICKNAME LIKE #{nicknameBind}
+        </if>
+        <if test="enabled != null">
+            AND u.ENABLED = #{enabled}
+        </if>
+        ORDER BY u.USERNAME, u.NICKNAME
+    </select>
 </mapper>

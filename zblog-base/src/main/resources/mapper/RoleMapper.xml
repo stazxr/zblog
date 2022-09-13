@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RoleMapper">
-    <select id="queryRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
-        )
-    </select>
-    <select id="queryRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permissionId}
-        )
-    </select>
     <select id="selectRoleList" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
             ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME
@@ -21,5 +11,84 @@
                 SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
             )
         </if>
+        <if test="roleName != null and roleName != ''">
+            <bind name="roleNameBind" value="'%' + roleName + '%'"/>
+            AND ROLE_NAME LIKE #{roleNameBind}
+        </if>
+        <if test="roleCode != null and roleCode != ''">
+            <bind name="roleCodeBind" value="'%' + roleCode + '%'"/>
+            AND ROLE_CODE LIKE #{roleCodeBind}
+        </if>
+        <if test="enabled != null">
+            AND ENABLED = #{enabled}
+        </if>
+    </select>
+
+    <select id="queryRoleDetail" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
+        SELECT
+            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        FROM role
+        WHERE DELETED = '0' AND ID = #{roleId}
+    </select>
+
+    <select id="findByRoleName" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+        SELECT * FROM role WHERE DELETED = 0 AND ROLE_NAME = #{roleName}
+    </select>
+
+    <select id="findByRoleCode" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+        SELECT * FROM role WHERE DELETED = 0 AND ROLE_CODE = #{roleCode}
+    </select>
+
+    <select id="selectPermRoles" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
+        SELECT
+            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME
+        FROM role
+        WHERE DELETED = '0' AND ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
+        )
+        <if test="blurry != null and blurry != ''">
+            <bind name="blurryBind" value="'%' + blurry + '%'"/>
+            AND (
+                ROLE_NAME LIKE #{blurryBind} OR ROLE_CODE LIKE #{blurryBind}
+            )
+        </if>
+    </select>
+
+    <select id="selectUsersByRoleId" resultType="com.github.stazxr.zblog.base.domain.vo.UserVo">
+        SELECT
+            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.LOGIN_TIME, urr.CREATE_TIME authTime, u.ENABLED, u.LOCKED, u.TEMP
+        FROM user u
+        INNER JOIN user_role_relation urr ON urr.USER_ID = u.ID
+        WHERE u.DELETED = '0' AND urr.ROLE_ID = #{businessId}
+        <if test="username != null and username != ''">
+            <bind name="usernameBind" value="'%' + username + '%'"/>
+            AND u.USERNAME LIKE #{usernameBind}
+        </if>
+        <if test="nickname != null and nickname != ''">
+            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
+            AND u.NICKNAME LIKE #{nicknameBind}
+        </if>
+        <if test="enabled != null">
+            AND u.ENABLED = #{enabled}
+        </if>
+        <if test="loginStartTime != null and loginStartTime != ''">
+            AND u.LOGIN_TIME &gt;= #{loginStartTime}
+        </if>
+        <if test="loginEndTime != null and loginEndTime != ''">
+            AND u.LOGIN_TIME &lt;= #{loginEndTime}
+        </if>
+        ORDER BY u.USERNAME, u.NICKNAME
+    </select>
+
+    <select id="queryRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
+            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+        )
+    </select>
+
+    <select id="queryRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permissionId}
+        )
     </select>
 </mapper>

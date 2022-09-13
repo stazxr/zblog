@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
+import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.core.base.BaseService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,4 +82,12 @@ public interface UserService extends BaseService<User> {
      * @return UserTokenStorage
      */
     UserTokenStorage queryUserStorageToken(Long userId);
+
+    /**
+     * 查询用户列表
+     *
+     * @param queryDto 查询参数
+     * @return userList
+     */
+    PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto);
 }

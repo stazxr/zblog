@@ -62,7 +62,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @param permName 权限名称
      * @return Permission
      */
-    Permission findByPermName(@Param("permName") String permName);
+    Permission selectByPermName(@Param("permName") String permName);
 
     /**
      * 根据组件名称查询权限信息
@@ -70,5 +70,5 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @param componentName 组件名称
      * @return Permission
      */
-    Permission findByComponentName(@Param("componentName") String componentName);
+    Permission selectByComponentName(@Param("componentName") String componentName);
 }
