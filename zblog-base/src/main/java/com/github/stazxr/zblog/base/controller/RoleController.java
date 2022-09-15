@@ -34,8 +34,20 @@ public class RoleController {
      * @param queryDto 查询参数
      * @return roleList
      */
+    @GetMapping(value = "/list")
+    @Router(name = "查询角色列表", code = "queryRoleList", level = BaseConst.PermLevel.PUBLIC)
+    public Result queryRoleList(RoleQueryDto queryDto) {
+        return Result.success().data(roleService.queryRoleList(queryDto));
+    }
+
+    /**
+     * 分页查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
     @GetMapping(value = "/pageList")
-    @Router(name = "查询角色列表", code = "queryRoleListByPage")
+    @Router(name = "分页查询角色列表", code = "queryRoleListByPage")
     public Result pageList(RoleQueryDto queryDto) {
         return Result.success().data(roleService.queryRoleListByPage(queryDto));
     }

@@ -51,6 +51,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @return roleList
      */
     @Override
+    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
+        return roleMapper.selectRoleList(queryDto);
+    }
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    @Override
     public PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto) {
         queryDto.checkPage();
 
@@ -178,7 +189,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public List<Role> queryRolesByUserId(Long userId) {
         Assert.notNull(userId, "参数userId不能为空");
-        return roleMapper.queryRolesByUserId(userId);
+        return roleMapper.selectRolesByUserId(userId);
     }
 
     /**
@@ -210,6 +221,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * @param userRoleDto 角色 - 用户对应信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
         Assert.notNull(userRoleDto.getRoleId(), "参数roleId不能为空");
         Set<Long> userIds = userRoleDto.getUserIds();
@@ -226,13 +238,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         EntityValidated.notNull(role.getEnabled(), "角色状态不能为空");
 
         // 检查角色名称是否存在
-        Role dbRole = roleMapper.findByRoleName(role.getRoleName());
+        Role dbRole = roleMapper.selectByRoleName(role.getRoleName());
         if (dbRole != null && !dbRole.getId().equals(role.getId())) {
             throw new EntityValidatedException("角色名称已存在");
         }
 
         // 检查角色编码是否存在
-        dbRole = roleMapper.findByRoleCode(role.getRoleCode());
+        dbRole = roleMapper.selectByRoleCode(role.getRoleCode());
         if (dbRole != null && !dbRole.getId().equals(role.getId())) {
             throw new EntityValidatedException("角色编码已存在");
         }

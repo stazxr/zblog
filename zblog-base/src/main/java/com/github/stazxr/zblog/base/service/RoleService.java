@@ -20,8 +20,17 @@ import java.util.Set;
  * @since 2020-11-16
  */
 public interface RoleService extends IService<Role> {
+
     /**
      * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    List<RoleVo> queryRoleList(RoleQueryDto queryDto);
+
+    /**
+     * 分页查询角色列表
      *
      * @param queryDto 查询参数
      * @return roleList

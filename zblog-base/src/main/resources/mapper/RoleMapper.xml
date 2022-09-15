@@ -31,11 +31,11 @@
         WHERE DELETED = '0' AND ID = #{roleId}
     </select>
 
-    <select id="findByRoleName" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+    <select id="selectByRoleName" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ROLE_NAME = #{roleName}
     </select>
 
-    <select id="findByRoleCode" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+    <select id="selectByRoleCode" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ROLE_CODE = #{roleCode}
     </select>
 
@@ -72,21 +72,21 @@
             AND u.ENABLED = #{enabled}
         </if>
         <if test="loginStartTime != null and loginStartTime != ''">
-            AND u.LOGIN_TIME &gt;= #{loginStartTime}
+            AND u.LOGIN_TIME &gt;= CONCAT(#{loginStartTime}, ' 00:00:00')
         </if>
         <if test="loginEndTime != null and loginEndTime != ''">
-            AND u.LOGIN_TIME &lt;= #{loginEndTime}
+            AND u.LOGIN_TIME &lt;= CONCAT(#{loginStartTime}, ' 23:59:59')
         </if>
         ORDER BY u.USERNAME, u.NICKNAME
     </select>
 
-    <select id="queryRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+    <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
             SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
         )
     </select>
 
-    <select id="queryRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+    <select id="selectRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
             SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permissionId}
         )

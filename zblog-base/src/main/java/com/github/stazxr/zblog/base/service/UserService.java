@@ -2,7 +2,7 @@ package com.github.stazxr.zblog.base.service;
 
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
+import com.github.stazxr.zblog.base.domain.dto.UserDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
@@ -33,7 +33,7 @@ public interface UserService extends BaseService<User> {
      * @param updateDto 用户信息
      * @return boolean
      */
-    boolean updateUserHeadImg(UserUpdateDto updateDto);
+    boolean updateUserHeadImg(UserDto updateDto);
 
     /**
      * 修改个人基础信息
@@ -41,7 +41,7 @@ public interface UserService extends BaseService<User> {
      * @param updateDto 用户信息
      * @return boolean
      */
-    boolean updateUserBaseInfo(UserUpdateDto updateDto);
+    boolean updateUserBaseInfo(UserDto updateDto);
 
     /**
      * 修改个人密码
@@ -90,4 +90,40 @@ public interface UserService extends BaseService<User> {
      * @return userList
      */
     PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto);
+
+    /**
+     * 查询用户详情
+     *
+     * @param userId 用户序列
+     * @return UserVo
+     */
+    UserVo queryUserDetail(Long userId);
+
+    /**
+     * 新增用户
+     *
+     * @param user 用户信息
+     */
+    void addUser(UserDto user);
+
+    /**
+     * 编辑用户
+     *
+     * @param user 用户信息
+     */
+    void editUser(UserDto user);
+
+    /**
+     * 删除用户
+     *
+     * @param userId 用户序列
+     */
+    void deleteUser(Long userId);
+
+    /**
+     * 更新用户状态
+     *
+     * @param user 用户信息
+     */
+    void updateUserStatus(UserDto user);
 }

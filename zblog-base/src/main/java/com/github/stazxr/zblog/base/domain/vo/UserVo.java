@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -28,9 +30,24 @@ public class UserVo {
     private String nickname;
 
     /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 头像地址
+     */
+    private String headImgUrl;
+
+    /**
      * 邮箱
      */
     private String email;
+
+    /**
+     * 签名
+     */
+    private String signature;
 
     /**
      * 登录时间
@@ -38,9 +55,24 @@ public class UserVo {
     private String loginTime;
 
     /**
-     * 授权时间
+     * 创建用户
      */
-    private String authTime;
+    private String createUser;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
+     * 修改用户
+     */
+    private String updateUser;
+
+    /**
+     * 修改时间
+     */
+    private String updateTime;
 
     /**
      * 用户是否启用
@@ -58,7 +90,22 @@ public class UserVo {
     private Boolean temp;
 
     /**
+     * 授权时间
+     */
+    private String authTime;
+
+    /**
+     * 账号过期时间
+     */
+    private String expiredTime;
+
+    /**
      * 用户对应的角色序号列表
      */
     private List<Long> roleIds;
+
+    /**
+     * 用户对应的角色列表
+     */
+    private List<String> roleNames;
 }

@@ -20,6 +20,13 @@ public interface UserRoleMapper extends BaseMapper<UserRoleRelation> {
     void deleteByRoleId(@Param("roleId") Long roleId);
 
     /**
+     * 根据用户序列删除中间数据
+     *
+     * @param userId 用户序列
+     */
+    void deleteByUserId(@Param("userId") Long userId);
+
+    /**
      * 批量删除用户角色信息
      *
      * @param userRoleDto 角色 - 用户对应信息

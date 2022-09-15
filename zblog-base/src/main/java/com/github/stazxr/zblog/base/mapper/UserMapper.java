@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,28 @@ public interface UserMapper extends BaseMapper<User> {
      * @return userList
      */
     List<UserVo> selectUserList(UserQueryDto queryDto);
+
+    /**
+     * 查询用户详情
+     *
+     * @param userId 用户序列
+     * @return UserVo
+     */
+    UserVo selectUserDetail(@Param("userId") Long userId);
+
+    /**
+     * 根据用户名查询用户信息
+     *
+     * @param username 用户名
+     * @return User
+     */
+    User selectByUsername(@Param("username") String username);
+
+    /**
+     * 根据昵称查询用户信息
+     *
+     * @param nickname 昵称
+     * @return User
+     */
+    User selectByNickname(@Param("nickname") String nickname);
 }

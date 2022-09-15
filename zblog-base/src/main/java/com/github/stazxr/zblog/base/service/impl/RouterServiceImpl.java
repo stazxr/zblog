@@ -174,7 +174,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
                         return ROLE_PUBLIC_SET;
                     } else {
                         // 获取可以访问该权限的角色列表
-                        List<Role> roles = roleMapper.queryRolesByPermissionId(routerVo.getPermId());
+                        List<Role> roles = roleMapper.selectRolesByPermissionId(routerVo.getPermId());
                         roles = roles.stream().filter(Role::getEnabled).collect(Collectors.toList());
                         if (roles.isEmpty()) {
                             return ROLE_NONE_SET;

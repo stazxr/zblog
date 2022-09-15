@@ -5,6 +5,10 @@
         DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId}
     </delete>
 
+    <delete id="deleteByUserId">
+        DELETE FROM user_role_relation WHERE USER_ID = #{userId}
+    </delete>
+
     <delete id="batchDeleteUserRole">
         DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId} AND USER_ID IN
         <choose>

@@ -6,21 +6,31 @@ import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWra
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
+import com.github.stazxr.zblog.base.component.email.MailService;
+import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateDto;
+import com.github.stazxr.zblog.base.domain.dto.UserDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
+import com.github.stazxr.zblog.base.domain.entity.UserRoleRelation;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
+import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.core.exception.EntityValidatedException;
+import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.core.util.EntityValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
@@ -28,15 +38,17 @@ import com.github.stazxr.zblog.log.mapper.LogMapper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 用户管理 - 业务实现层
@@ -45,26 +57,30 @@ import java.util.Locale;
  * @since 2020-11-15
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     /**
      * 新密码不能与前几次的密码相同
      */
     private static final int OLD_PASS_COUNT = 3;
 
-    @Resource
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Resource
-    private LogMapper logMapper;
+    private final UserConverter userConverter;
 
-    @Resource
-    private UserPassLogMapper userPassLogMapper;
+    private final UserRoleMapper userRoleMapper;
 
-    @Resource
-    private UserTokenStorageMapper userTokenStorageMapper;
+    private final LogMapper logMapper;
 
-    @Resource
-    private BCryptPasswordEncoder passwordEncoder;
+    private final UserPassLogMapper userPassLogMapper;
+
+    private final UserTokenStorageMapper userTokenStorageMapper;
+
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    private final MailService mailService;
+
+    private final TemplateEngine templateEngine;
 
     /**
      * 根据用户名查询用户信息
@@ -75,7 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User queryUserByUsername(String username) {
         Assert.notNull(username, "用户名不能为空");
-        return userMapper.selectOne(queryBuild().eq(User::getUsername, username.toUpperCase(Locale.ROOT)));
+        return userMapper.selectOne(queryBuild().eq(User::getUsername, username));
     }
 
     /**
@@ -86,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateUserHeadImg(UserUpdateDto updateDto) {
+    public boolean updateUserHeadImg(UserDto updateDto) {
         String username = updateDto.getUsername();
         Assert.notNull(username, "用户名不能为空");
 
@@ -104,7 +120,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateUserBaseInfo(UserUpdateDto updateDto) {
+    public boolean updateUserBaseInfo(UserDto updateDto) {
         Long userId = updateDto.getId();
         Assert.notNull(userId, "用户编码不能为空");
 
@@ -114,6 +130,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String telephone = updateDto.getTelephone();
         if (StringUtils.isNotBlank(telephone) && !RegexUtils.match(telephone, RegexUtils.Const.PHONE_REGEX)) {
             throw new IllegalArgumentException("手机号格式不正确");
+        }
+
+        // 检查昵称是否存在
+        User dbUser = userMapper.selectByNickname(updateDto.getNickname());
+        if (dbUser != null && !dbUser.getId().equals(userId)) {
+            throw new EntityValidatedException("昵称已存在");
         }
 
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
@@ -290,6 +312,171 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(userMapper.selectUserList(queryDto));
+    }
+
+    /**
+     * 查询用户详情
+     *
+     * @param userId 用户序列
+     * @return UserVo
+     */
+    @Override
+    public UserVo queryUserDetail(Long userId) {
+        return userMapper.selectUserDetail(userId);
+    }
+
+    /**
+     * 新增用户
+     *
+     * @param userDto 用户信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addUser(UserDto userDto) {
+        User user = userConverter.dtoToEntity(userDto);
+        checkUser(user);
+
+        // 设置默认值
+        Long userId = GenerateIdUtils.getId();
+        user.setId(userId);
+        user.setAdmin(false);
+        user.setBuildIn(false);
+        user.setLocked(false);
+        user.setChangePwd(true);
+        user.setGender(Gender.HIDE.getType());
+        user.setNickname(user.getUsername());
+        String password = UuidUtils.generateShortUuid();
+        user.setPassword(passwordEncoder.encode(password));
+
+        // 保存用户 - 角色信息
+        if (save(user)) {
+            insertUserRoleData(userId, userDto.getRoleIds());
+
+            // 邮件通知（邮件发送失败也回滚，因为没有人知道新用户密码是多少）
+            sendAddUserNoticeEmail(user.getEmail(), user.getUsername(), password);
+            return;
+        }
+
+        throw new ServiceException(ResultCode.ADD_FAILED);
+    }
+
+    /**
+     * 编辑用户
+     *
+     * @param userDto 用户信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editUser(UserDto userDto) {
+        Assert.notNull(userDto.getId(), "UserId不能为空");
+        User user = userConverter.dtoToEntity(userDto);
+        checkUser(user);
+
+        // 保存用户 - 角色信息
+        user.setUsername(null);
+        if (updateById(user)) {
+            insertUserRoleData(user.getId(), userDto.getRoleIds());
+            return;
+        }
+
+        throw new ServiceException(ResultCode.EDIT_FAILED);
+    }
+
+    /**
+     * 删除用户
+     *
+     * @param userId 用户序列
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUser(Long userId) {
+        Assert.notNull(userId, "UserId不能为空");
+
+        // 不允许删除自己
+        Long loginId = SecurityUtils.getLoginId();
+        Assert.isTrue(userId.equals(loginId), "自己无法删除自己");
+
+        User user = userMapper.selectById(userId);
+        Assert.notNull(user, "预删除用户不存在，用户序列为：" + userId);
+        Assert.notNull(user.getBuildIn(), "用户【" + user.getUsername() + "】为内置用户，不允许删除");
+        if (removeById(userId)) {
+            // 删除对应的角色信息
+            userRoleMapper.deleteByUserId(userId);
+            return;
+        }
+
+        throw new ServiceException(ResultCode.DELETE_FAILED);
+    }
+
+    /**
+     * 更新用户状态
+     *
+     * @param user 用户信息
+     */
+    @Override
+    public void updateUserStatus(UserDto user) {
+        Assert.notNull(user.getId(), "UserId不能为空");
+        Assert.notNull(user.getEnabled(), "状态不能为空");
+        boolean update = lambdaUpdate().set(User::isEnabled, user.getEnabled()).eq(User::getId, user.getId()).update();
+        if (!update) {
+            throw new ServiceException(ResultCode.EDIT_FAILED);
+        }
+    }
+
+    private void insertUserRoleData(Long userId, List<Long> roleIds) {
+        userRoleMapper.deleteByUserId(userId);
+        if (roleIds != null && roleIds.size() > 0) {
+            for (Long roleId : roleIds) {
+                UserRoleRelation userRole = new UserRoleRelation();
+                userRole.setId(GenerateIdUtils.getId());
+                userRole.setUserId(userId);
+                userRole.setRoleId(roleId);
+                userRoleMapper.insert(userRole);
+            }
+        }
+    }
+
+    private void sendAddUserNoticeEmail(String email, String username, String password) {
+        try {
+            Context ctx = new Context();
+            ctx.setVariable("username", username);
+            ctx.setVariable("password", password);
+            ctx.setVariable("year", DateUtils.formatNow("yyyy"));
+            String emailContext = templateEngine.process("addUserNotice", ctx);
+            MailReceiveHandler handler = MailReceiveHandler.setReceive(email);
+            mailService.sendHtmlMail(handler, BaseConst.SYS_NAME, emailContext);
+        } catch (Exception e) {
+            throw new ServiceException(500, "邮件推送失败", e);
+        }
+    }
+
+    private void checkUser(User user) {
+        EntityValidated.notNull(user.getUsername(), "用户名不能为空");
+        EntityValidated.notNull(user.getEmail(), "用户邮箱不能为空");
+        EntityValidated.notNull(user.isEnabled(), "用户状态不能为空");
+        EntityValidated.notNull(user.getTemp(), "用户类型不能为空");
+
+        // 邮箱格式检查
+        String email = user.getEmail();
+        EntityValidated.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
+
+        // 检查邮箱是否存在
+        LambdaQueryWrapper<User> wrapper = queryBuild().eq(User::getEmail, email);
+        if (user.getId() != null) {
+            wrapper.ne(User::getId, user.getId());
+        }
+        EntityValidated.isTrue(userMapper.exists(wrapper), "邮箱已存在");
+
+        // 检查用户名是否存在（包含删除的，用户名全局不允许重复）
+        User dbUser = userMapper.selectByUsername(user.getUsername());
+        if (dbUser != null && !dbUser.getId().equals(user.getId())) {
+            throw new EntityValidatedException("用户名已存在");
+        }
+
+        // 正式用户需要置空账号过期时间
+        if (!user.getTemp()) {
+            user.setExpiredTime(null);
+        }
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

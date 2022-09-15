@@ -25,8 +25,6 @@ import java.util.*;
  * @since 2020-11-15
  */
 @Slf4j
-@Getter
-@Setter
 @TableName("user")
 public class User extends BaseEntity implements UserDetails {
     /**
@@ -39,109 +37,149 @@ public class User extends BaseEntity implements UserDetails {
      * 主键
      */
     @TableId
+    @Getter
+    @Setter
     private Long id;
 
     /**
      * 昵称
      */
+    @Getter
+    @Setter
     private String nickname;
 
     /**
      * 用户名（用于登录）
      */
+    @Getter
+    @Setter
     private String username;
 
     /**
      * 密码
      */
+    @Getter
+    @Setter
     private String password;
 
     /**
      * 邮箱
      */
+    @Getter
+    @Setter
     private String email;
 
     /**
      * 手机号
      */
+    @Getter
+    @Setter
     private String telephone;
 
     /**
      * 企鹅号
      */
+    @Getter
+    @Setter
     private String qq;
 
     /**
      * 性别
      */
+    @Getter
+    @Setter
     private Integer gender;
 
     /**
      * 签名
      */
+    @Getter
+    @Setter
     private String signature;
 
     /**
      * 头像地址
      */
+    @Getter
+    @Setter
     private String headImgUrl;
 
     /**
      * 登录时间
      */
+    @Getter
+    @Setter
     private String loginTime;
 
     /**
      * 修改密码时间
      */
+    @Getter
+    @Setter
     private String changePwdTime;
 
     /**
      * 是否需要登陆修改密码
      * 后台创建的用户第一次登录需要修改密码
      */
+    @Getter
+    @Setter
     private Boolean changePwd;
 
     /**
      * 账户是否登录锁定, 登录次数失败太多则锁定
      */
+    @Getter
+    @Setter
     private Boolean locked;
 
     /**
      * 是否是临时账户
      */
+    @Getter
+    @Setter
     private Boolean temp;
 
     /**
      * 如果是临时账户，需要注明过期时间
      * 格式：{@link DateUtils#defaultPattern}
      */
+    @Getter
+    @Setter
     private String expiredTime;
 
     /**
      * 是否是系统管理员
      */
+    @Getter
+    @Setter
     private Boolean admin;
 
     /**
      * 是否是内置用户, 默认否, 内置用户无法删除
      */
+    @Getter
+    @Setter
     private Boolean buildIn;
 
     /**
      * 用户是否启用
      */
+    @Setter
     private Boolean enabled;
 
     /**
      * 是否有效
      */
+    @Getter
+    @Setter
     @TableLogic
     private Boolean deleted;
 
     /**
      * 角色列表
      */
+    @Setter
     @TableField(exist = false)
     List<Role> authorities;
 

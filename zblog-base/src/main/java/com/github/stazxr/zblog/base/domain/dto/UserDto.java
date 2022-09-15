@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.base.domain.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 用户更新字段信息
  *
@@ -9,7 +11,7 @@ import lombok.Data;
  * @since 2022-07-31
  */
 @Data
-public class UserUpdateDto {
+public class UserDto {
     /**
      * 用户ID
      */
@@ -44,4 +46,29 @@ public class UserUpdateDto {
      * 性别
      */
     private Integer gender;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 是否启用
+     */
+    private Boolean enabled;
+
+    /**
+     * 是否临时用户
+     */
+    private Boolean temp;
+
+    /**
+     * 临时用户有效时间
+     */
+    private String expiredTime;
+
+    /**
+     * 角色序列列表
+     */
+    private List<Long> roleIds;
 }

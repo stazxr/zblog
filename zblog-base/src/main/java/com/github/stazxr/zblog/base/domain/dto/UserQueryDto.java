@@ -31,6 +31,16 @@ public class UserQueryDto extends PageParam {
     private String nickname;
 
     /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 手机号
+     */
+    private String telephone;
+
+    /**
      * 启用状态
      */
     private Boolean enabled;

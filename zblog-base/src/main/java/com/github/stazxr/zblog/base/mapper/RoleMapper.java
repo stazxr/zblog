@@ -39,7 +39,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param roleName 角色名称
      * @return Role
      */
-    Role findByRoleName(@Param("roleName") String roleName);
+    Role selectByRoleName(@Param("roleName") String roleName);
 
     /**
      * 根据角色编码查询角色信息
@@ -47,7 +47,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param roleCode 角色编码
      * @return Role
      */
-    Role findByRoleCode(@Param("roleCode") String roleCode);
+    Role selectByRoleCode(@Param("roleCode") String roleCode);
 
     /**
      * 查询可以访问权限的角色列表
@@ -72,7 +72,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param userId 用户序列
      * @return Roles
      */
-    List<Role> queryRolesByUserId(@Param("userId") Long userId);
+    List<Role> selectRolesByUserId(@Param("userId") Long userId);
 
     /**
      * 查询资源角色列表（包含被禁用的角色）
@@ -80,5 +80,5 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param permissionId 权限序列
      * @return Roles
      */
-    List<Role> queryRolesByPermissionId(@Param("permissionId") Long permissionId);
+    List<Role> selectRolesByPermissionId(@Param("permissionId") Long permissionId);
 }
