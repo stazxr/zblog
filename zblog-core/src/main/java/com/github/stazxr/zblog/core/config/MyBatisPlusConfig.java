@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.core.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.github.stazxr.zblog.util.IdUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
  * @author SunTao
  * @since 2020-12-09
  */
+@Slf4j
 @Configuration(proxyBeanMethods = false)
 @MapperScan(value = {"com.github.stazxr.zblog.*.mapper"})
 public class MyBatisPlusConfig {
@@ -41,5 +45,10 @@ public class MyBatisPlusConfig {
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
 
         return interceptor;
+    }
+
+    @Bean
+    public IdentifierGenerator identifierGenerator() {
+        return entity -> IdUtils.getId();
     }
 }
