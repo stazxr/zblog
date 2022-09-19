@@ -75,10 +75,11 @@ public interface RoleMapper extends BaseMapper<Role> {
     List<Role> selectRolesByUserId(@Param("userId") Long userId);
 
     /**
-     * 查询资源角色列表（包含被禁用的角色）
+     * 查询允许访问资源的角色列表
      *
-     * @param permissionId 权限序列
+     * @param uri 请求地址
+     * @param method 请求方式
      * @return Roles
      */
-    List<Role> selectRolesByPermissionId(@Param("permissionId") Long permissionId);
+    List<Role> selectRolesByUriAndMethod(@Param("uri") String uri, @Param("method") String method);
 }

@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 
@@ -43,4 +45,12 @@ public interface RouterService extends IService<Router> {
      * @return routerVo
      */
     RouterVo queryRouterByCode(String code);
+
+    /**
+     * 分页查询路由列表
+     *
+     * @param queryDto 查询参数
+     * @return routerList
+     */
+    PageInfo<RouterVo> queryRouterListByPage(RouterQueryDto queryDto);
 }

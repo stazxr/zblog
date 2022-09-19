@@ -6,12 +6,52 @@
     </delete>
 
     <select id="selectRouterVoByCode" resultType="com.github.stazxr.zblog.base.domain.vo.RouterVo">
-        SELECT
-            r.NAME, r.CODE, r.DEFAULT_LEVEL, r.REMARK,
-            p.PERM_LEVEL, p.ID permId, p.ENABLED permEnabled
-        FROM
-            router r LEFT JOIN permission p ON p.DELETED = 0 AND r.CODE = p.PERM_CODE
-        WHERE
-            r.CODE = #{code}
+        SELECT * FROM (
+            SELECT
+                R.NAME, R.CODE, p.ID permId, p.ENABLED PERM_ENABLED,
+                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL
+            FROM router R
+            LEFT JOIN permission P ON P.DELETED = 0 AND P.PERM_CODE = R.CODE
+        ) temp WHERE CODE = #{code}
+    </select>
+
+    <select id="selectRouterList" resultType="com.github.stazxr.zblog.base.domain.vo.RouterVo">
+        SELECT * FROM (
+            SELECT
+                R.NAME, I.CODE, I.URI, I.METHOD, p.ID permId, p.ENABLED PERM_ENABLED,
+                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL
+            FROM interface I
+            LEFT JOIN router R ON R.CODE = I.CODE
+            LEFT JOIN permission P ON P.DELETED = 0 AND P.PERM_CODE = I.CODE
+        ) temp
+        <where>
+            <if test="code != null and code != ''">
+                <bind name="codeBind" value="'%' + code + '%'"/>
+                AND temp.CODE LIKE #{codeBind}
+            </if>
+            <if test="name != null and name != ''">
+                <bind name="nameBind" value="'%' + name + '%'"/>
+                AND temp.NAME LIKE #{nameBind}
+            </if>
+            <if test="uri != null and uri != ''">
+                <bind name="uriBind" value="'%' + uri + '%'"/>
+                AND temp.URI LIKE #{uriBind}
+            </if>
+            <if test="level != null and level != ''">
+                AND temp.PERM_LEVEL = #{level}
+            </if>
+            <choose>
+                <when test='status == "1"'>
+                    AND temp.PERM_ENABLED IS NULL
+                </when>
+                <when test='status == "2"'>
+                    AND temp.PERM_ENABLED = 1
+                </when>
+                <when test='status == "3"'>
+                    AND temp.PERM_ENABLED = 0
+                </when>
+            </choose>
+        </where>
+        ORDER BY temp.CODE
     </select>
 </mapper>

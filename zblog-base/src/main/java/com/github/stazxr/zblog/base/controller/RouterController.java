@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.base.domain.dto.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.core.annotation.Router;
@@ -24,6 +25,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/router")
 public class RouterController {
     private final RouterService routerService;
+
+    /**
+     * 分页查询路由列表
+     *
+     * @param queryDto 查询参数
+     * @return routerList
+     */
+    @GetMapping("pageList")
+    @Router(name = "分页查询路由列表", code = "queryRouterListByPage")
+    public Result pageList(RouterQueryDto queryDto) {
+        return Result.success().data(routerService.queryRouterListByPage(queryDto));
+    }
 
     /**
      * 根据权限编码查询路由信息

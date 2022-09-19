@@ -8,12 +8,12 @@ package com.github.stazxr.zblog.base.domain.enums;
  */
 public enum InterfaceType {
     /**
-     * 受权限管控的接口
+     * Router注解标注的接口
      */
     PERM(1),
 
     /**
-     * 不可以访问的接口
+     * 未被Router注解标注的接口，不允许访问
      */
     NULL(2);
 

@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.ToString;
 
@@ -16,7 +15,6 @@ public class RouterVo {
     /**
      * 路由名称
      */
-    @TableField(value = "`NAME`")
     private String name;
 
     /**
@@ -25,20 +23,14 @@ public class RouterVo {
     private String code;
 
     /**
-     * 路由默认访问级别
-     * {@link com.github.stazxr.zblog.core.base.BaseConst.PermLevel}
+     * 请求地址
      */
-    private Integer defaultLevel;
+    private String uri;
 
     /**
-     * 路由备注
+     * 请求方式
      */
-    private String remark;
-
-    /**
-     * 权限访问级别
-     */
-    private Integer permLevel;
+    private String method;
 
     /**
      * 权限编码
@@ -49,4 +41,9 @@ public class RouterVo {
      * 权限是否启用
      */
     private Boolean permEnabled;
+
+    /**
+     * 权限访问级别
+     */
+    private Integer permLevel;
 }

@@ -86,9 +86,13 @@
         )
     </select>
 
-    <select id="selectRolesByPermissionId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+    <select id="selectRolesByUriAndMethod" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permissionId}
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID IN (
+                SELECT ID FROM permission WHERE PERM_CODE = (
+                    SELECT CODE FROM interface WHERE URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
+                )
+            )
         )
     </select>
 </mapper>
