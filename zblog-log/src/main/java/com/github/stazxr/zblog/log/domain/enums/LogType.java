@@ -13,12 +13,12 @@ public enum LogType {
     /**
      * 操作日志
      */
-    INFO(1),
+    OPERATE(1),
 
     /**
-     * 异常日志
+     * 接口日志
      */
-    ERROR(2);
+    API(2);
 
     private final int value;
 

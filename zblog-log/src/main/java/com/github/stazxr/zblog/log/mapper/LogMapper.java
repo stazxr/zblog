@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.log.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
@@ -20,5 +21,5 @@ public interface LogMapper extends BaseMapper<Log> {
      * @param param 查询参数
      * @return LogVoList
      */
-    List<LogVo> selectLogList(Map<String, Object> param);
+    List<LogVo> selectLogList(LogQueryDto param);
 }

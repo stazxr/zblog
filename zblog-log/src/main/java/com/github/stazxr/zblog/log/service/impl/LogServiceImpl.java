@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
@@ -17,7 +18,7 @@ import com.github.stazxr.zblog.log.service.LogService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.IdUtils;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.collection.CollectionUtils;
+import com.github.stazxr.zblog.util.ThrowableUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -54,36 +54,31 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
     /**
      * 保存日志信息
      *
-     * @param request   请求信息
      * @param joinPoint 切点信息
      * @param log       日志信息
      * @param result    执行结果
+     * @param e         异常信息
      */
     @Override
-    public void saveLog(HttpServletRequest request, ProceedingJoinPoint joinPoint, Log log, Object result) {
-        Assert.notNull(log, "日志信息不能为空");
-
-        // 从切面织入点处通过反射机制获取织入点处的方法
+    public void saveLog(ProceedingJoinPoint joinPoint, Log log, Object result, Throwable e) {
+        // 获取路由信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-
-        // 获取注解信息
-        com.github.stazxr.zblog.log.annotation.Log aopLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
-        String desc;
-        if (aopLog == null || StringUtils.isBlank(aopLog.value())) {
-            // 这里依赖了业务的 Router 注解，如果不需要，可以去除这里的逻辑
-            Router aopRouter = method.getAnnotation(Router.class);
-            if (aopRouter != null) {
-                desc = aopRouter.name();
-            } else {
-                // default: methodName
-                desc = method.getName();
-            }
-        } else {
-            desc = aopLog.value();
+        Router aopRouter = method.getAnnotation(Router.class);
+        if (aopRouter == null) {
+            return;
         }
-        Assert.isTrue(desc.length() > 50, "操作描述长度不能大于50个字符");
-        log.setDescription(desc);
+
+        com.github.stazxr.zblog.log.annotation.Log aopLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
+        if (aopLog != null) {
+            // 操作日志
+            log.setLogType(LogType.OPERATE.getValue());
+            log.setDescription(StringUtils.isBlank(aopLog.value()) ? aopRouter.name() : aopLog.value());
+        } else {
+            // 接口日志
+            log.setLogType(LogType.API.getValue());
+            log.setDescription(aopRouter.name());
+        }
 
         // 设置响应结果
         if (result != null && RESULT_CLASS.equals(method.getReturnType().getSimpleName())) {
@@ -94,17 +89,27 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
             log.setExecMessage(resultObj.getString("message"));
         } else {
             // 返回不是Result，默认返回的是数据，默认成功
-            log.setExecResult(log.getLogType() != LogType.ERROR.getValue());
+            log.setExecResult(true);
+            log.setExecMessage(result == null ? null : JSON.toJSONString(result));
         }
 
-        // 方法路径
-        String methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
-        log.setOperateMethod(methodName);
+        // 异常信息
+        if (e != null) {
+            log.setExecResult(false);
+            if (e instanceof ServiceException) {
+                // 业务异常
+                log.setExecMessage(e.getMessage());
+            } else {
+                // 系统异常
+                log.setExecMessage("系统发生未知错误!");
+                log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+            }
+        }
 
+        // 设置其他信息
         log.setId(IdUtils.getId());
+        log.setRequestParam(getParameter(method, joinPoint.getArgs()));
         log.setOperateUser(SecurityUtils.getLoginUsernameNoEor());
-        log.setOperateParam(getParameter(method, joinPoint.getArgs()));
-        log.setRequestInfo(request);
         save(log);
     }
 
@@ -121,9 +126,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         Assert.notNull(queryDto.getUsername(), "用户名不能为空");
 
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
-        param.put("operateUser", queryDto.getUsername());
-        List<LogVo> dataList = logMapper.selectLogList(param);
+        List<LogVo> dataList = logMapper.selectLogList(queryDto);
         return new PageInfo<>(dataList);
     }
 

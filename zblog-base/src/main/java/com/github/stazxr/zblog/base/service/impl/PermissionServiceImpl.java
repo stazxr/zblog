@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.bo.MenuMeta;
-import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
@@ -22,11 +22,11 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.EntityValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.EntityValidated;
+import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.log.mapper.LogMapper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,9 +136,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
 
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(1));
-        param.put("permId", queryDto.getPermId());
-        List<LogVo> dataList = logMapper.selectLogList(param);
+        LogQueryDto logQueryDto = new LogQueryDto();
+        logQueryDto.setPermId(queryDto.getPermId());
+        List<LogVo> dataList = logMapper.selectLogList(logQueryDto);
         return new PageInfo<>(dataList);
     }
 
@@ -175,6 +175,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void editPermission(Permission permission) {
+        // 查询菜单信息，赋值菜单类型和是否外联，这两项不允许编辑
+        Permission dbPerm = permissionMapper.selectById(permission.getId());
+        EntityValidated.isTrue(!dbPerm.getPermType().equals(permission.getPermType()), "权限类型不允许编辑");
+        permission.setIFrame(dbPerm.getIFrame());
         checkPermission(permission);
         if (!updateById(permission)) {
             throw new ServiceException(ResultCode.EDIT_FAILED);
@@ -292,7 +296,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 }
             } else {
                 if (parentIsFrame || !PermissionType.DIR.getType().equals(parentType)) {
-                    throw new EntityValidatedException("目录的上级只能是目录，且上级目录不允许为外链菜单");
+                    throw new EntityValidatedException("目录的上级只能是目录，且上级目录不允许为外链目录");
                 }
             }
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
@@ -319,7 +323,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             }
 
             if (parentIsFrame || !PermissionType.DIR.getType().equals(parentType)) {
-                throw new EntityValidatedException("菜单的上级只能是目录，且上级目录不允许为外链菜单");
+                throw new EntityValidatedException("菜单的上级只能是目录，且上级目录不允许为外链目录");
             }
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
             permission.setIcon(null);
@@ -329,6 +333,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentName(null);
             permission.setComponentPath(null);
             permission.setRouterPath(null);
+            EntityValidated.notNull(permission.getPermCode(), "权限编码不能为空");
             if (parentIsFrame || !PermissionType.MENU.getType().equals(parentType)) {
                 throw new EntityValidatedException("按钮的上级只能是菜单，且上级菜单不允许为外链菜单");
             }

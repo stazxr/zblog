@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.RouterQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;

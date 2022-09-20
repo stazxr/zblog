@@ -21,6 +21,11 @@ public class LogQueryDto extends PageParam {
     private String username;
 
     /**
+     * 日志类型
+     */
+    private Integer logType;
+
+    /**
      * 权限ID
      */
     private Long permId;

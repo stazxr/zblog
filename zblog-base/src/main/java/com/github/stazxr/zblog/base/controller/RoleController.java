@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
-import com.github.stazxr.zblog.base.domain.dto.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.service.RoleService;

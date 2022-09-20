@@ -3,9 +3,7 @@ package com.github.stazxr.zblog.log.aop;
 import com.github.stazxr.zblog.core.util.SpringContextUtils;
 import com.github.stazxr.zblog.log.annotation.properties.LogProperties;
 import com.github.stazxr.zblog.log.domain.entity.Log;
-import com.github.stazxr.zblog.log.domain.enums.LogType;
 import com.github.stazxr.zblog.log.service.LogService;
-import com.github.stazxr.zblog.util.ThrowableUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -48,17 +46,10 @@ public class LogAspect {
     }
 
     /**
-     * 配置 @Log 注解的切入点，如果要
-     */
-    @Pointcut("@annotation(com.github.stazxr.zblog.log.annotation.Log)")
-    public void logPointCut() {
-    }
-
-    /**
-     * 配置异常记录的切入点，扫描所有controller包下的异常信息
+     * 配置接口的切入点，扫描所有controller包下的异常信息
      */
     @Pointcut("execution(public * com.github.stazxr.zblog..*.controller..*.*(..))")
-    public void expLogPointCut() {
+    public void ctlLogPointCut() {
     }
 
     /**
@@ -66,7 +57,7 @@ public class LogAspect {
      *
      * @param joinPoint join point for advice
      */
-    @Around("logPointCut()")
+    @Around("ctlLogPointCut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!enabledLog) {
             return joinPoint.proceed();
@@ -81,8 +72,11 @@ public class LogAspect {
 
         try {
             // save log
-            Log log = new Log(LogType.INFO, operateTime, costTime);
-            logService.saveLog(getHttpServletRequest(), joinPoint, log, result);
+            Log log = new Log();
+            log.setCostTime(costTime);
+            log.setEventTime(operateTime);
+            log.setRequestInfo(getHttpServletRequest());
+            logService.saveLog(joinPoint, log, result, null);
         } catch (Exception e) {
             log.error("==================== LogAspect[logPointCut] catch eor", e);
         }
@@ -97,21 +91,23 @@ public class LogAspect {
      * @param joinPoint join point for advice
      * @param e exception
      */
-    @AfterThrowing(pointcut = "expLogPointCut()", throwing = "e")
+    @AfterThrowing(pointcut = "ctlLogPointCut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        if (!enabledLog) {
-            return;
-        }
-
-        String occurTime = DateUtils.formatNow();
-        Long costTime = currentTime.get() == null ? null : System.currentTimeMillis() - currentTime.get();
-        currentTime.remove();
-
         try {
-            Log log = new Log(LogType.ERROR, occurTime, costTime);
-            log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
-            log.setExecMessage(e.getMessage());
-            logService.saveLog(getHttpServletRequest(), (ProceedingJoinPoint) joinPoint, log, null);
+            if (!enabledLog) {
+                return;
+            }
+
+            // costTime
+            Long costTime = currentTime.get() == null ? null : System.currentTimeMillis() - currentTime.get();
+            currentTime.remove();
+
+            // save log
+            Log log = new Log();
+            log.setCostTime(costTime);
+            log.setEventTime(DateUtils.formatNow());
+            log.setRequestInfo(getHttpServletRequest());
+            logService.saveLog((ProceedingJoinPoint) joinPoint, log, null, e);
         } catch (Exception ex) {
             log.error("==================== LogAspect[expLogPointCut] catch eor", e);
         }

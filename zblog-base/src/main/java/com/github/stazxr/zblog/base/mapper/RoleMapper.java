@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.stazxr.zblog.base.domain.dto.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;

@@ -25,13 +25,37 @@ public class LogController {
     private final LogService logService;
 
     /**
-     * 查询用户操作日志列表
+     * 分页查询操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return logList
+     */
+    @GetMapping(value = "/queryOperateLogsByPage")
+    @Router(name = "分页查询操作日志列表", code = "queryOperateLogsByPage")
+    public Result queryOperateLogsByPage(LogQueryDto queryDto) {
+        return Result.success().data(queryDto);
+    }
+
+    /**
+     * 分页查询接口日志列表
+     *
+     * @param queryDto 查询参数
+     * @return logList
+     */
+    @GetMapping(value = "/queryApiLogsByPage")
+    @Router(name = "分页查询接口日志列表", code = "queryApiLogsByPage")
+    public Result queryApiLogsByPage(LogQueryDto queryDto) {
+        return Result.success().data(queryDto);
+    }
+
+    /**
+     * 查询用户日志列表
      *
      * @param queryDto 查询参数
      * @return userLog
      */
     @GetMapping("/queryUserLog")
-    @Router(name = "查询用户操作日志列表", code = "queryUserLog", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询用户日志列表", code = "queryUserLog", level = BaseConst.PermLevel.PUBLIC)
     public Result queryUserLog(LogQueryDto queryDto) {
         return Result.success().data(logService.queryUserLog(queryDto));
     }

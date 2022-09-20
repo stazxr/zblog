@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;

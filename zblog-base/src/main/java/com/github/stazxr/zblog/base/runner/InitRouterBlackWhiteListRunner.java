@@ -55,7 +55,6 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
 
     private void refreshRouterBlackWhiteList() {
         try {
-            long begin = System.currentTimeMillis();
             Map<String, String> routerWhiteList = dictService.selectItems(BaseConst.DictKey.ROUTER_WHITE_LIST);
             Set<String> whiteList = new LinkedHashSet<>();
             for (String url : routerWhiteList.keySet()) {
@@ -69,7 +68,6 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
                 blackList.add(routerBlackList.get(url));
             }
             setBlackList(blackList);
-            long end = System.currentTimeMillis();
         } catch (Exception ex) {
             log.error("refreshRouterBlackWhiteList catch error", ex);
         }

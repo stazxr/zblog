@@ -9,7 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
 import com.github.stazxr.zblog.base.component.email.MailService;
 import com.github.stazxr.zblog.base.converter.UserConverter;
-import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
@@ -251,13 +251,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String dateTime = DateUtils.formatNow();
 
         // 插入登录日志
-        Log loginLog = new Log(LogType.INFO, dateTime, null);
+        Log loginLog = new Log();
         loginLog.setId(GenerateIdUtils.getId());
-        loginLog.setOperateUser(username);
+        loginLog.setLogType(LogType.OPERATE.getValue());
         loginLog.setDescription("用户登录");
-        loginLog.setOperateMethod("login");
-        loginLog.setExecResult(true);
+        loginLog.setCostTime(null);
+        loginLog.setOperateUser(username);
+        loginLog.setEventTime(DateUtils.formatNow());
         loginLog.setRequestInfo(request);
+        loginLog.setExecResult(true);
+        loginLog.setExecMessage("登录成功");
         Assert.isTrue(logMapper.insert(loginLog) != 1, "插入登录日志失败");
 
         // 数据入库

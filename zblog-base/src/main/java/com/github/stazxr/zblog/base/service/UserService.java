@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.base.domain.dto.UserQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;

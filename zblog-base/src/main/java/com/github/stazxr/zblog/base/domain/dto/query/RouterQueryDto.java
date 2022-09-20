@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.base.domain.dto;
+package com.github.stazxr.zblog.base.domain.dto.query;
 
 import com.github.stazxr.zblog.core.base.PageParam;
 import lombok.Getter;

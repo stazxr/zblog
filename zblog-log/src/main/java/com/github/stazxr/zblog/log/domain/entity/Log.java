@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
-import com.github.stazxr.zblog.log.domain.enums.LogType;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +27,7 @@ public class Log extends BaseEntity {
     private Long id;
 
     /**
-     * 日志类型
+     * 日志类型（操作日志、接口日志）
      */
     private Integer logType;
 
@@ -48,14 +47,9 @@ public class Log extends BaseEntity {
     private String description;
 
     /**
-     * 操作方法
-     */
-    private String operateMethod;
-
-    /**
      * 操作参数
      */
-    private String operateParam;
+    private String requestParam;
 
     /**
      * 请求IP
@@ -101,12 +95,6 @@ public class Log extends BaseEntity {
      * 异常信息
      */
     private byte[] exceptionDetail;
-
-    public Log(LogType logType, String eventTime, Long costTime) {
-        this.logType = logType.getValue();
-        this.eventTime = eventTime;
-        this.costTime = costTime;
-    }
 
     /**
      * 设置请求相关信息

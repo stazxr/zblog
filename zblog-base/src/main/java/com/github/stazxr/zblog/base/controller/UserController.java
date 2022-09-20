@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.domain.dto.*;
+import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;

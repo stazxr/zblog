@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.vo.PermCodeVo;
 import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
@@ -8,7 +8,6 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 权限数据持久层
