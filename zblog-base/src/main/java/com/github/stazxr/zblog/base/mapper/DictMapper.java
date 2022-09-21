@@ -20,4 +20,13 @@ public interface DictMapper extends BaseMapper<Dict> {
      * @return 字典项列表
      */
     List<Dict> selectItems(@Param("dictKey") String key);
+
+    /**
+     * 修改字典状态
+     *
+     * @param dictId  字典ID
+     * @param enabled 字典状态
+     * @return 影响行数
+     */
+    int updateDictStatus(@Param("dictId") Long dictId, @Param("enabled") Boolean enabled);
 }

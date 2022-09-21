@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.runner;
 
-import com.github.stazxr.zblog.base.manager.RouterManager;
+import com.github.stazxr.zblog.base.component.router.RouterManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

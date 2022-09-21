@@ -20,4 +20,4 @@ cache:
   type: redis
 zblog:
   deploy-type: single
-  is-local-ip-parsing: false
+  is-local-ip-parsing: true

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.DictMapper">
+    <update id="updateDictStatus">
+        UPDATE dict SET ENABLED = #{enabled} WHERE ID = #{dictId}
+    </update>
+
     <select id="selectItems" resultType="com.github.stazxr.zblog.base.domain.entity.Dict">
         SELECT `NAME`, `VALUE` FROM dict WHERE DELETED = 0 AND TYPE = 2 AND `KEY` = #{dictKey} ORDER BY SORT
     </select>

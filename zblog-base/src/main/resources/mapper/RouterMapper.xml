@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RouterMapper">
+    <insert id="insertLogShowFlag">
+        INSERT INTO log_show_flag (SHOWED, URI, METHOD, CREATE_USER, CREATE_TIME) VALUES (
+            #{param3}, #{param1}, #{param2}, #{param4}, #{param5}
+        )
+    </insert>
+
+    <update id="updateLogShowFlag">
+        UPDATE log_show_flag SET SHOWED = #{param3}, UPDATE_USER = #{param4}, UPDATE_TIME = #{param5} WHERE URI = #{param1} AND METHOD = #{param2}
+    </update>
+
     <delete id="clearRouter">
         DELETE FROM router WHERE ID > 0
     </delete>
@@ -19,9 +29,11 @@
         SELECT * FROM (
             SELECT
                 R.NAME, I.CODE, I.URI, I.METHOD, p.ID permId, p.ENABLED PERM_ENABLED,
-                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL
+                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL,
+                IF(LSF.SHOWED IS NULL, false, LSF.SHOWED) AS LOG_SHOWED
             FROM interface I
             LEFT JOIN router R ON R.CODE = I.CODE
+            LEFT JOIN log_show_flag LSF ON LSF.URI = I.URI AND LSF.METHOD = I.METHOD
             LEFT JOIN permission P ON P.DELETED = 0 AND P.PERM_CODE = I.CODE
         ) temp
         <where>
@@ -40,6 +52,9 @@
             <if test="level != null and level != ''">
                 AND temp.PERM_LEVEL = #{level}
             </if>
+            <if test="logShowed != null">
+                AND temp.LOG_SHOWED = #{logShowed}
+            </if>
             <choose>
                 <when test='status == "1"'>
                     AND temp.PERM_ENABLED IS NULL
@@ -53,5 +68,21 @@
             </choose>
         </where>
         ORDER BY temp.CODE
+    </select>
+
+    <select id="selectBlackOrWhiteList" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
+        SELECT
+            ID, NAME, `KEY`, `VALUE`, `DESC`, SORT, ENABLED, LOCKED
+        FROM dict
+        WHERE `KEY` = #{dictKey} AND DELETED = '0'
+        <if test="uri != null and uri != ''">
+            <bind name="uriBind" value="'%' + uri + '%'"/>
+            AND `VALUE` LIKE #{uriBind}
+        </if>
+        ORDER BY SORT
+    </select>
+
+    <select id="selectLogShowFlag" resultType="java.lang.Boolean">
+        SELECT SHOWED FROM log_show_flag WHERE URI = #{uri} AND METHOD = #{method}
     </select>
 </mapper>

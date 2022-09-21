@@ -18,16 +18,6 @@ public class BaseConst {
     public static final String USER_SYSTEM = "SYSTEM";
 
     /**
-     * admin username
-     */
-    public static final String USER_ADMIN = "ADMIN";
-
-    /**
-     * 匿名用户
-     */
-    public static final String ANONYMITY_USERNAME = "匿名用户";
-
-    /**
      * 系统初始化内置字典ID
      */
     public static final class DictId {

@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.base.manager;
+package com.github.stazxr.zblog.base.component.router;
 
 import com.github.stazxr.zblog.base.domain.bo.RouterInterface;
 import com.github.stazxr.zblog.base.domain.entity.Interface;

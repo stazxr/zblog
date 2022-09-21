@@ -2,8 +2,11 @@ package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.DictDto;
+import com.github.stazxr.zblog.base.domain.dto.RouterDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Router;
+import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 
 import java.util.Set;
@@ -53,4 +56,47 @@ public interface RouterService extends IService<Router> {
      * @return routerList
      */
     PageInfo<RouterVo> queryRouterListByPage(RouterQueryDto queryDto);
+
+    /**
+     * 分页查询黑白名单列表
+     *
+     * @param queryDto 查询参数
+     * @return blackOrWhiteList
+     */
+    PageInfo<DictVo> pageBlackOrWhiteList(RouterQueryDto queryDto);
+
+    /**
+     * 更新接口的日志展示状态
+     *
+     * @param routerDto 路由信息
+     */
+    void updateLogShowStatus(RouterDto routerDto);
+
+    /**
+     * 新增黑白名单
+     *
+     * @param dictDto 字典信息
+     */
+    void addBlackOrWhiteRouter(DictDto dictDto);
+
+    /**
+     * 编辑黑白名单
+     *
+     * @param dictDto 字典信息
+     */
+    void editBlackOrWhiteRouter(DictDto dictDto);
+
+    /**
+     * 修改黑白名单状态
+     *
+     * @param dictDto 字典信息
+     */
+    void changeBlackOrWhiteRouterStatus(DictDto dictDto);
+
+    /**
+     * 删除黑白名单
+     *
+     * @param dictId 字典序列
+     */
+    void deleteBlackOrWhiteRouter(Long dictId);
 }

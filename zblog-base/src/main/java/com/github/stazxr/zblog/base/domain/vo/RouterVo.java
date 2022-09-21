@@ -46,4 +46,9 @@ public class RouterVo {
      * 权限访问级别
      */
     private Integer permLevel;
+
+    /**
+     * 日志是否展示
+     */
+    private Boolean logShowed;
 }

@@ -39,4 +39,14 @@ public class RouterQueryDto extends PageParam {
      * 接口状态
      */
     private String status;
+
+    /**
+     * 日志状态
+     */
+    private Boolean logShowed;
+
+    /**
+     * 字典KEY
+     */
+    private String dictKey;
 }
