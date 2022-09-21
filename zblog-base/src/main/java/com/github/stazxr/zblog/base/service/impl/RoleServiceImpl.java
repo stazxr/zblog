@@ -26,8 +26,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 
 /**
  * 角色业务实现层
@@ -38,6 +41,11 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
+    /**
+     * 内置角色列表
+     */
+    private static final String[] INNER_ROLES = { OPEN, PUBLIC, FORBIDDEN, NONE, NULL };
+
     private final RoleMapper roleMapper;
 
     private final UserRoleMapper userRoleMapper;
@@ -236,6 +244,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         EntityValidated.notNull(role.getRoleName(), "角色名称不能为空");
         EntityValidated.notNull(role.getRoleCode(), "角色编码不能为空");
         EntityValidated.notNull(role.getEnabled(), "角色状态不能为空");
+
+        // 检查角色编码是否允许使用
+        if (Arrays.asList(INNER_ROLES).contains(role.getRoleCode())) {
+            throw new EntityValidatedException("该角色编码被禁止使用，请换一个");
+        }
 
         // 检查角色名称是否存在
         Role dbRole = roleMapper.selectByRoleName(role.getRoleName());
