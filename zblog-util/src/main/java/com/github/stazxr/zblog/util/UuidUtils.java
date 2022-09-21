@@ -9,7 +9,9 @@ import java.util.UUID;
  * @since 2021-05-16
  */
 public class UuidUtils {
-    private static final int SHORT_UUID_LENGTH = 16;
+    private static final int SHORT_UUID_LENGTH = 8;
+
+    private static final int MIDDLE_UUID_LENGTH = 16;
 
     private static final String[] CHARS = {"a", "b", "c", "d", "e", "f",
         "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
@@ -26,14 +28,19 @@ public class UuidUtils {
 
     public static String generateShortUuid() {
         StringBuilder shortBuffer = new StringBuilder();
-
-        // uuid的长度为32
         String uuid = UUID.randomUUID().toString().replace("-", "");
         for (int i = 0; i < SHORT_UUID_LENGTH; i++) {
-            // uuid.length / 16 = 2
-            String str = uuid.substring(i * 2, i * 2 + 2);
+            String str = uuid.substring(i * 4, i * 4 + 4);
+            shortBuffer.append(CHARS[Integer.parseInt(str, 16) % 0x3E]);
+        }
+        return shortBuffer.toString();
+    }
 
-            // 0x3E为CHARS的长度
+    public static String generateMiddleUuid() {
+        StringBuilder shortBuffer = new StringBuilder();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        for (int i = 0; i < MIDDLE_UUID_LENGTH; i++) {
+            String str = uuid.substring(i * 2, i * 2 + 2);
             shortBuffer.append(CHARS[Integer.parseInt(str, 16) % 0x3E]);
         }
         return shortBuffer.toString();
