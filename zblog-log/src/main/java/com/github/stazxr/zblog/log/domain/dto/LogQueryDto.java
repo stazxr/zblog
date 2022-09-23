@@ -21,6 +21,11 @@ public class LogQueryDto extends PageParam {
     private String username;
 
     /**
+     * 操作描述
+     */
+    private String description;
+
+    /**
      * 日志类型
      */
     private Integer logType;
@@ -29,4 +34,24 @@ public class LogQueryDto extends PageParam {
      * 权限ID
      */
     private Long permId;
+
+    /**
+     * 操作结果
+     */
+    private Integer execResult;
+
+    /**
+     * 请求耗时
+     */
+    private Double costTime;
+
+    /**
+     * 操作开始时间
+     */
+    private String eventStartTime;
+
+    /**
+     * 操作结束时间
+     */
+    private String eventEndTime;
 }

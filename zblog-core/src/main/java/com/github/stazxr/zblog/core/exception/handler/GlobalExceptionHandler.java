@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -117,6 +118,19 @@ public class GlobalExceptionHandler {
         ErrorMeta errorMeta = new ErrorMeta(e);
         String eorMsg = ResultCode.FILE_SIZE_OVER_LIMIT.message().concat(":").concat(maxFileSize.toString());
         Result result = Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT, eorMsg).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        ResponseUtils.responseJsonWriter(response, result);
+    }
+
+    /**
+     * 处理 HttpRequestMethodNotSupportedException 异常
+     *
+     * @param e 异常信息
+     */
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public void methodNotSupportedExceptionHandler(HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
+        log.error("全局捕获 -> 请求方式不正确", e);
+        ErrorMeta errorMeta = new ErrorMeta(e);
+        Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT, "请求方式不正确：".concat(e.getMessage())).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result);
     }
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +23,19 @@ public interface LogMapper extends BaseMapper<Log> {
      * @return LogVoList
      */
     List<LogVo> selectLogList(LogQueryDto param);
+
+    /**
+     * 删除日志列表
+     *
+     * @param logType 日志类型
+     */
+    void deleteLog(@Param("logType") Integer logType);
+
+    /**
+     * 查询日志堆栈详情
+     *
+     * @param logId 日志序号
+     * @return exceptionDetail
+     */
+    String selectLogErrorDetail(@Param("logId") Long logId);
 }

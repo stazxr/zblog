@@ -16,7 +16,7 @@ public class LogVo {
     private Long id;
 
     /**
-     * 日志类型：1-操作日志；2-异常日志
+     * 日志类型：1-操作日志；2-接口日志
      */
     private Integer logType;
 
@@ -36,14 +36,9 @@ public class LogVo {
     private String description;
 
     /**
-     * 操作方法
+     * 请求参数
      */
-    private String operateMethod;
-
-    /**
-     * 操作参数
-     */
-    private String operateParam;
+    private String requestParam;
 
     /**
      * 请求IP

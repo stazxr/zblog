@@ -1,11 +1,15 @@
 package com.github.stazxr.zblog.util.servlet;
 
+import com.alibaba.fastjson.JSON;
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 请求相关工具类
@@ -54,7 +58,7 @@ public class RequestUtils {
     }
 
     /**
-     * 获取 request body
+     * 获取请求体
      *
      * @param request req
      * @return body
@@ -71,5 +75,20 @@ public class RequestUtils {
             log.error("requestBody read error: [{}]", e.getMessage());
             throw new IllegalStateException("obtainBody failed");
         }
+    }
+
+    /**
+     * 获取请求参数
+     *
+     * @param request req
+     * @return body
+     */
+    public static String obtainParam(ServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, String> rtnMap = new HashMap<>(CollectionUtils.mapSize(parameterMap.size()));
+        for (String key : parameterMap.keySet()) {
+            rtnMap.put(key, parameterMap.get(key)[0]);
+        }
+        return JSON.toJSONString(rtnMap);
     }
 }

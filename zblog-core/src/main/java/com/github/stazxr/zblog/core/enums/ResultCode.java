@@ -198,7 +198,12 @@ public enum ResultCode {
     /**
      * 删除失败
      */
-    DELETE_FAILED(10030, "删除失败");
+    DELETE_FAILED(10030, "删除失败"),
+
+    /**
+     * 请求方式不正确
+     */
+    REQUEST_METHOD_NOT_SUPPORT(10033, "请求方式不正确");
 
     private final Integer code;
 

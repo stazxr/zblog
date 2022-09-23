@@ -7,6 +7,8 @@ import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import org.aspectj.lang.ProceedingJoinPoint;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 日志业务层
  *
@@ -31,4 +33,35 @@ public interface LogService extends IService<Log> {
      * @return userLog
      */
     PageInfo<LogVo> queryUserLog(LogQueryDto queryDto);
+
+    /**
+     * 分页查询日志列表
+     *
+     * @param queryDto 查询参数
+     * @return LogList
+     */
+    PageInfo<LogVo> queryLogListByPage(LogQueryDto queryDto);
+
+    /**
+     * 导出日志列表
+     *
+     * @param queryDto 查询参数
+     * @param response response
+     */
+    void exportLogList(LogQueryDto queryDto, HttpServletResponse response);
+
+    /**
+     * 删除日志列表
+     *
+     * @param logType 日志类型
+     */
+    void deleteLog(Integer logType);
+
+    /**
+     * 查询日志堆栈详情
+     *
+     * @param logId 日志序号
+     * @return exceptionDetail
+     */
+    String queryLogErrorDetail(Long logId);
 }
