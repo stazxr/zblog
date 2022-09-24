@@ -52,6 +52,11 @@
             <artifactId>easy-captcha</artifactId>
             <version>${easy-captcha.version}</version>
         </dependency>
+        <!-- OS -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+        </dependency>
         <!-- Springboot Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -10,6 +10,7 @@ import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.EntityValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
+import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
@@ -64,6 +65,11 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         // 获取路由信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
+        IgnoredLog ignoredLog = method.getAnnotation(IgnoredLog.class);
+        if (ignoredLog != null) {
+            return;
+        }
+
         Router aopRouter = method.getAnnotation(Router.class);
         if (aopRouter == null) {
             return;

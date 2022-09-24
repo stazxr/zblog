@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.log.annotation;
 import java.lang.annotation.*;
 
 /**
- * 标注日志，记录操作日志记录
+ * 标注日志，忽略记录接口日志信息
  *
  * @author SunTao
  * @since 2021-05-16
@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Log {
+public @interface IgnoredLog {
     String value() default "";
 }
