@@ -30,7 +30,7 @@ public class JwtProperties {
     private boolean allowedRenewToken = false;
 
     /**
-     * 在 ACCESS_TOKEN 即将过期前多长时间进行刷新，要求小于 accessTokenDuration
+     * token 续期检查时间范围（默认30分钟，单位秒），要求小于 accessTokenDuration
      */
     private int refreshMinDuration = accessTokenDuration / 4;
 

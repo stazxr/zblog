@@ -42,7 +42,7 @@
       "name": "jwt.refresh-min-duration",
       "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.base.component.security.jwt.JwtProperties",
-      "description": "在 ACCESS_TOKEN 即将过期前多长时间进行刷新，要求小于 accessTokenDuration.",
+      "description": "token 续期检查时间范围（默认30分钟，单位秒），要求小于 accessTokenDuration.",
       "defaultValue": 1800
     },
     {

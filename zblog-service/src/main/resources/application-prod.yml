@@ -2,11 +2,10 @@ server:
   port: ${SERVER_PORT:31945}
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-2zesvm06o324og1k3bo.mysql.rds.aliyuncs.com:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: ENC(hisvsQ4rjMY755ISBof8XuElj9jw2dmG)
-    password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
-    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:mysql://rm-2zesvm06o324og1k3bo.mysql.rds.aliyuncs.com:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      username: ENC(hisvsQ4rjMY755ISBof8XuElj9jw2dmG)
+      password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
   redis:
     host: ENC(wEAkOysMms4sh54ilxS+TLLkIXxGGN7L)
     port: 6480
