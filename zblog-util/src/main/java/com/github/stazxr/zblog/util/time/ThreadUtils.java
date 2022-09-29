@@ -32,4 +32,24 @@ public class ThreadUtils {
             log.error("thread sleep catch eor", e);
         }
     }
+
+    /**
+     * 运行一个线程
+     *
+     * @param task 执行内容
+     * @return Thread
+     */
+    @SuppressWarnings("all")
+    public static Thread runThread(Task task) {
+        Thread thread = new Thread(() -> task.execute());
+        thread.start();
+        return thread;
+    }
+
+    public interface Task {
+        /**
+         * 调用方法
+         */
+        void execute();
+    }
 }

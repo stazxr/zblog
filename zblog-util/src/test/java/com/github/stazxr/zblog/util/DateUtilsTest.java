@@ -141,4 +141,13 @@ public class DateUtilsTest {
 
         System.out.println(Arrays.toString(DateUtils.getYearRange("2021")));
     }
+
+    @Test
+    @Ignore
+    public void test9() {
+        String hour = "";
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, - Integer.parseInt(StringUtils.isBlank(hour) ? "0" : hour));
+        System.out.println(DateUtils.format(calendar.getTime(), DateUtils.YMD_HMS_PATTERN));
+    }
 }
