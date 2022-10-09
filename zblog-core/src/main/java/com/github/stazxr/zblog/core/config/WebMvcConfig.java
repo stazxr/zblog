@@ -123,12 +123,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("fileDomain: {}, fileUploadPath: {}", fileDomain, fileUploadPath);
         registry.addResourceHandler(fileDomain).addResourceLocations("file:" + fileUploadPath);
-
-        registry.addResourceHandler("/swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/", "/static", "/public");
-
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     @Override

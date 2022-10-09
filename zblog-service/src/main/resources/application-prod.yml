@@ -34,6 +34,3 @@ zblog:
   deploy-type: multi
   is-local-ip-parsing: true
   file-base-url: https://www.suntaoblog.com/file/
-swagger:
-  config:
-    enable: false

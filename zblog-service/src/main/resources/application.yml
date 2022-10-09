@@ -94,17 +94,6 @@ jasypt:
 logging:
   file:
     path: /home/${spring.application.name}/logs/services
-swagger:
-  config:
-    enable: true
-    title: zblog 官方文档
-    description: 一个前后端分离的个人博客框架，代码直通车 👉 https://github.com/stazxr/zblog
-    version: 4.0.0
-    base-package: com.github.stazxr.zblog
-    contact:
-      name: SunTao
-      url: https://www.suntaoblog.com
-      email: 1027353579@qq.com
 jwt:
   access-token-duration: 1800
   refresh-token-duration: 43200
