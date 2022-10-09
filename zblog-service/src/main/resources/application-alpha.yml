@@ -6,9 +6,6 @@ spring:
     port: 6379
     client-type: lettuce
     password: redisPwd
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 cache:
   default-duration: 300
   type: redis

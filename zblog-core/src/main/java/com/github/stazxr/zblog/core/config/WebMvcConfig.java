@@ -5,6 +5,7 @@ import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.github.stazxr.zblog.core.config.rest.SingleParamHandlerMethodArgumentResolver;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,19 +30,20 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.*;
  * @author SunTao
  * @since 2020-11-14
  */
+@Slf4j
 @EnableWebMvc
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * 文件的访问地址
      */
-    @Value("${zblog.file-domain:/file/**}")
+    @Value("${zblog.file-domain}")
     private String fileDomain;
 
     /**
      * 文件上传目录
      */
-    @Value("${zblog.fileUploadPath:/home/zblog/file/local/upload/}")
+    @Value("${zblog.file-upload-path}")
     private String fileUploadPath;
 
     /**
@@ -119,6 +121,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("fileDomain: {}, fileUploadPath: {}", fileDomain, fileUploadPath);
         registry.addResourceHandler(fileDomain).addResourceLocations("file:" + fileUploadPath);
 
         registry.addResourceHandler("/swagger-ui.html")

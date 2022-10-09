@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: zblog
   profiles:
     active: alpha
   datasource:
@@ -34,8 +36,9 @@ spring:
         enabled: true
         url-pattern: /druid/*
         reset-enable: false
-        login-username: admin
-        login-password: druid@123
+        # 密码登录
+        # login-username: admin
+        # login-password: druid@123
       filter:
         stat:
           enabled: true
@@ -90,7 +93,7 @@ jasypt:
     salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
 logging:
   file:
-    path: /home/zblog/logs/services
+    path: /home/${spring.application.name}/logs/services
 swagger:
   config:
     enable: true
@@ -119,6 +122,6 @@ jwt:
 zblog:
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
-  file-upload-path: /home/zblog/file/local/upload/
+  file-upload-path: /home/${spring.application.name}/file/upload/local/
   file-domain: /file/**
   file-upload-type: 1

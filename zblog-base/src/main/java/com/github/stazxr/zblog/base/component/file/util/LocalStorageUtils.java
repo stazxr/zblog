@@ -32,7 +32,7 @@ public class LocalStorageUtils {
         if (StringUtils.isNotBlank(suffix)) {
             fileName = fileName + "." + suffix;
         }
-        String datePath = DateUtils.formatNow("yyyy/MM/dd/");
+        String datePath = DateUtils.formatNow("yyyy-MM/dd/");
         uploadPathPrefix = uploadPathPrefix.endsWith("/") ? uploadPathPrefix : uploadPathPrefix.concat("/");
         String relativePath = datePath.concat(FileUtils.getFileEnType(suffix)).concat("/").concat(fileName);
         String filePath = uploadPathPrefix + relativePath;

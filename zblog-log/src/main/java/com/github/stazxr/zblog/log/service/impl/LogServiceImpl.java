@@ -212,7 +212,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             String paramTypeName = parameter.getType().getSimpleName();
-            if ("HttpServletResponse".equals(paramTypeName) || "HttpServletRequest".equals(paramTypeName)) {
+            if (Arrays.asList(new String[] {"HttpServletResponse", "HttpServletRequest", "MultipartFile"}).contains(paramTypeName)) {
                 // 不记录HttpServletResponse、HttpServletRequest参数信息
                 continue;
             }
