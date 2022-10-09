@@ -24,7 +24,7 @@
         </if>
     </select>
 
-    <select id="queryRoleDetail" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
+    <select id="selectRoleDetail" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
             ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
         FROM role

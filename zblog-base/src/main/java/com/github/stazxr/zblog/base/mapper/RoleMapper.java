@@ -31,7 +31,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param roleId 角色序列
      * @return RoleVo
      */
-    RoleVo queryRoleDetail(@Param("roleId") Long roleId);
+    RoleVo selectRoleDetail(@Param("roleId") Long roleId);
 
     /**
      * 根据角色名称查询角色信息

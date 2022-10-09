@@ -66,15 +66,9 @@ public class Dict extends BaseEntity {
     private Integer sort;
 
     /**
-     * 是否允许编辑、删除
+     * 是否锁定
      */
     private Boolean locked;
-
-    /**
-     * Key是否允许重复
-     */
-    @TableField(value = "`UNIQUE`")
-    private Boolean unique;
 
     /**
      * 是否启用

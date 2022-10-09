@@ -11,14 +11,19 @@ import lombok.Data;
 @Data
 public class DictDto {
     /**
+     * 字典序列（黑白名单用）
+     */
+    private Long dictId;
+
+    /**
      * 字典序列
      */
     private Long id;
 
     /**
-     * 字典序列
+     * 父序列
      */
-    private Long dictId;
+    private Long pid;
 
     /**
      * 字典名称
@@ -26,12 +31,17 @@ public class DictDto {
     private String name;
 
     /**
-     * 字典键
+     * 字典类型
+     */
+    private Integer type;
+
+    /**
+     * 字典KEY
      */
     private String key;
 
     /**
-     * 字典值
+     * 字典VALUE
      */
     private String value;
 

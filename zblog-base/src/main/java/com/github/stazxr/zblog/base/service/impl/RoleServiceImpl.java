@@ -86,7 +86,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
         Assert.notNull(roleId, "RoleId不能为空");
-        return roleMapper.queryRoleDetail(roleId);
+        RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
+        Assert.notNull(roleVo, "查询角色信息失败，角色【" + roleId + "】不存在");
+        return roleVo;
     }
 
     /**

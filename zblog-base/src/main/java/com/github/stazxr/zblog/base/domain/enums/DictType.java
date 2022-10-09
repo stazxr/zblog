@@ -29,4 +29,14 @@ public enum DictType {
     public Integer getValue() {
         return value;
     }
+
+    public static DictType of(Integer type) {
+        for (DictType dictType : values()) {
+            if (dictType.value.equals(type)) {
+                return dictType;
+            }
+        }
+
+        return null;
+    }
 }

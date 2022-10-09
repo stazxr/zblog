@@ -102,15 +102,14 @@ public class WorkIdService {
 
         Dict newDict = new Dict();
         newDict.setId(BaseConst.DictId.WORK_ID);
-        newDict.setName("机器ID信息");
-        newDict.setKey(DICT_KEY);
         newDict.setPid(BaseConst.DictId.SYS);
         newDict.setType(DictType.ITEM.getValue());
-        newDict.setLocked(true);
-        newDict.setUnique(true);
-        newDict.setEnabled(true);
+        newDict.setName("机器ID信息");
+        newDict.setKey(DICT_KEY);
         newDict.setValue(JSON.toJSONString(workIdCache));
         newDict.setDesc("系统参数：存储机器ID信息");
+        newDict.setLocked(true);
+        newDict.setEnabled(true);
         dictService.save(newDict);
     }
 }

@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.DictMapper">
+    <sql id="BaseVoColumn">
+        ID, NAME, `KEY`, VALUE, PID, TYPE, SORT, `DESC`, `LOCKED`, ENABLED, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+    </sql>
+
     <update id="updateDictStatus">
         UPDATE dict SET ENABLED = #{enabled} WHERE ID = #{dictId}
     </update>
 
+    <delete id="deleteDict">
+        DELETE FROM dict WHERE ID = #{dictId}
+        <if test='type != null and type == "1"'>
+            OR PID = #{dictId}
+        </if>
+    </delete>
+
     <select id="selectItems" resultType="com.github.stazxr.zblog.base.domain.entity.Dict">
         SELECT `NAME`, `VALUE` FROM dict WHERE DELETED = 0 AND TYPE = 2 AND `KEY` = #{dictKey} ORDER BY SORT
+    </select>
+
+    <select id="selectDictList" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
+        SELECT
+            <include refid="BaseVoColumn" />, (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount
+        FROM dict d WHERE DELETED = 0 AND TYPE = 1
+        <if test="dictName != null and dictName != ''">
+            <bind name="dictNameBind" value="'%' + dictName + '%'"/>
+            AND d.NAME LIKE #{dictNameBind}
+        </if>
+        <if test="dictKey != null and dictKey != ''">
+            <bind name="dictKeyBind" value="'%' + dictKey + '%'"/>
+            AND d.`KEY` LIKE #{dictKeyBind}
+        </if>
+        <if test="enabled != null">
+            AND d.ENABLED = #{enabled}
+        </if>
+    </select>
+
+    <select id="selectChildList" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
+        SELECT <include refid="BaseVoColumn" /> FROM dict d WHERE DELETED = 0 AND TYPE = 2 AND PID = #{pid}
+    </select>
+
+    <select id="selectDictDetail" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
+        SELECT
+            <include refid="BaseVoColumn" />, (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount
+        FROM dict d WHERE DELETED = 0 AND ID = #{dictId}
     </select>
 </mapper>

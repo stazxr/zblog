@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
+import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,4 +31,36 @@ public interface DictMapper extends BaseMapper<Dict> {
      * @return 影响行数
      */
     int updateDictStatus(@Param("dictId") Long dictId, @Param("enabled") Boolean enabled);
+
+    /**
+     * 分页查询字典列表
+     *
+     * @param queryDto 查询参数
+     * @return dictList
+     */
+    List<DictVo> selectDictList(DictQueryDto queryDto);
+
+    /**
+     * 查询字典子列表
+     *
+     * @param pid PID
+     * @return dictList
+     */
+    List<DictVo> selectChildList(@Param("pid") Long pid);
+
+    /**
+     * 查询字典信息
+     *
+     * @param dictId 字典序列
+     * @return DictVo
+     */
+    DictVo selectDictDetail(@Param("dictId") Long dictId);
+
+    /**
+     * 删除字典
+     *
+     * @param dictId 字典序列
+     * @param type   字典类型
+     */
+    void deleteDict(@Param("dictId") Long dictId, @Param("type") Integer type);
 }

@@ -15,4 +15,18 @@ import lombok.ToString;
 @Setter
 @ToString
 public class DictQueryDto extends PageParam {
+    /**
+     * 字典名称
+     */
+    private String dictName;
+
+    /**
+     * 字典Key
+     */
+    private String dictKey;
+
+    /**
+     * 字典状态
+     */
+    private Boolean enabled;
 }

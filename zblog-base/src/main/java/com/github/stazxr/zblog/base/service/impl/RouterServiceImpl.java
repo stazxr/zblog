@@ -108,7 +108,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
 
         Interface anInterface = interfaceMapper.selectOneByRequest(requestUri, requestMethod.toUpperCase(Locale.ROOT));
         if (anInterface == null) {
-            // 访问的接口在系统中不存在，返回匿名，后续校验会自动抛出404
+            // 放行
             return BaseConst.PermLevel.OPEN;
         }
 
@@ -252,8 +252,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         dict.setPid(BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) ? 2L : 3L);
         dict.setType(DictType.ITEM.getValue());
         dict.setEnabled(true);
-        dict.setLocked(false);
-        dict.setUnique(false);
+        dict.setLocked(true);
         Assert.isTrue(dictMapper.insert(dict) != 1, () -> { throw new ServiceException(ResultCode.ADD_FAILED); });
     }
 

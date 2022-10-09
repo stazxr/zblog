@@ -1,14 +1,23 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.converter.DictConverter;
+import com.github.stazxr.zblog.base.domain.dto.DictDto;
+import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
+import com.github.stazxr.zblog.base.domain.enums.DictType;
+import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
+import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.Assert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -18,10 +27,12 @@ import java.util.*;
  * @since 2021-02-20
  */
 @Service
+@RequiredArgsConstructor
 @Transactional(rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
-    @Resource
-    private DictMapper dictMapper;
+    private final DictMapper dictMapper;
+
+    private final DictConverter dictConverter;
 
     /**
      * 根据key查找字典项列表
@@ -40,5 +51,116 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dicts.forEach(dict -> options.put(dict.getName(), dict.getValue()));
         }
         return options;
+    }
+
+    /**
+     * 分页查询字典列表
+     *
+     * @param queryDto 查询参数
+     * @return dictList
+     */
+    @Override
+    public PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto) {
+        queryDto.checkPage();
+
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        return new PageInfo<>(dictMapper.selectDictList(queryDto));
+    }
+
+    /**
+     * 查询字典子列表
+     *
+     * @param pid PID
+     * @return dictList
+     */
+    @Override
+    public List<DictVo> queryChildList(Long pid) {
+        return dictMapper.selectChildList(pid);
+    }
+
+    /**
+     * 查询字典信息
+     *
+     * @param dictId 字典序列
+     * @return DictVo
+     */
+    @Override
+    public DictVo queryDictDetail(Long dictId) {
+        Assert.notNull(dictId, "参数【dictId】不能为空");
+        DictVo dictVo = dictMapper.selectDictDetail(dictId);
+        Assert.notNull(dictVo, "查询字典信息失败，字典【" + dictId + "】不存在");
+        return dictVo;
+    }
+
+    /**
+     * 新增字典
+     *
+     * @param dictDto 字典
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addDict(DictDto dictDto) {
+        Dict dict = dictConverter.dtoToEntity(dictDto);
+        checkDict(dict);
+        Assert.isTrue(dictMapper.insert(dict) != 1, () -> { throw new ServiceException(ResultCode.ADD_FAILED); });
+    }
+
+    /**
+     * 编辑字典
+     *
+     * @param dictDto 字典
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editDict(DictDto dictDto) {
+        Dict dict = dictConverter.dtoToEntity(dictDto);
+        checkDict(dict);
+        Assert.isTrue(dictMapper.updateById(dict) != 1, () -> { throw new ServiceException(ResultCode.EDIT_FAILED); });
+    }
+
+    /**
+     * 删除字典
+     *
+     * @param dictId 字典序列
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDict(Long dictId) {
+        DictVo dictVo = queryDictDetail(dictId);
+        if (dictVo.getLocked()) {
+            throw new ServiceException("该字典被锁定，不允许删除");
+        }
+
+        if (dictVo.getHasChildren()) {
+            throw new ServiceException("存在子节点，无法被删除");
+        }
+
+        int i = dictMapper.deleteById(dictId);
+        Assert.isTrue(i != 1, () -> { throw new ServiceException(ResultCode.DELETE_FAILED); });
+    }
+
+    private void checkDict(Dict dict) {
+        dict.setLocked(Boolean.FALSE);
+        Assert.notNull(dict.getName(), "字典名称不能为空");
+        Assert.notNull(dict.getSort(), "字典排序不能为空");
+        Assert.notNull(dict.getType(), "字典类型不能为空");
+        Assert.notNull(DictType.of(dict.getType()), "字典类型不正确，取值范围[1, 2]");
+        if (DictType.GROUP.getValue().equals(dict.getType())) {
+            dict.setPid(null);
+            dict.setKey(null);
+            dict.setValue(null);
+            dict.setEnabled(true);
+        } else {
+            Assert.notNull(dict.getPid(), "父字典不能为空");
+            Assert.notNull(dict.getKey(), "字典KEY不能为空");
+            Assert.notNull(dict.getEnabled(), "字典状态不能为空");
+        }
+
+        if (dict.getId() != null) {
+            Dict dbDict = dictMapper.selectById(dict.getId());
+            if (dbDict.getLocked()) {
+                throw new ServiceException("该字典被锁定，不允许编辑");
+            }
+        }
     }
 }
