@@ -74,11 +74,6 @@ public class RoleController {
     @PostMapping(value = "/addRole")
     @Router(name = "新增角色", code = "addRole")
     public Result addRole(@RequestBody Role role) {
-        if (role.getId() != null) {
-            log.warn("A new role cannot already have an ID: {}", role.getId());
-            return Result.failure("参数错误");
-        }
-
         roleService.addRole(role);
         return Result.success();
     }
@@ -93,10 +88,6 @@ public class RoleController {
     @PostMapping(value = "/editRole")
     @Router(name = "编辑角色", code = "editRole")
     public Result editRole(@RequestBody Role role) {
-        if (role.getId() == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         roleService.editRole(role);
         return Result.success();
     }

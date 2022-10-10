@@ -26,11 +26,9 @@ import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.EntityValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
-import com.github.stazxr.zblog.core.util.EntityValidated;
+import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
@@ -128,15 +126,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Assert.notNull(Gender.of(gender), "用户性别参数错误");
 
         String telephone = updateDto.getTelephone();
-        if (StringUtils.isNotBlank(telephone) && !RegexUtils.match(telephone, RegexUtils.Const.PHONE_REGEX)) {
-            throw new IllegalArgumentException("手机号格式不正确");
-        }
+        DataValidated.isTrue(StringUtils.isNotBlank(telephone) && !RegexUtils.match(telephone, RegexUtils.Const.PHONE_REGEX), "手机号格式不正确");
 
         // 检查昵称是否存在
         User dbUser = userMapper.selectByNickname(updateDto.getNickname());
-        if (dbUser != null && !dbUser.getId().equals(userId)) {
-            throw new EntityValidatedException("昵称已存在");
-        }
+        DataValidated.isTrue(dbUser != null && !dbUser.getId().equals(userId), "昵称已存在");
 
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
         wrapper.set(User::getGender, gender);
@@ -162,29 +156,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String newPass = passDto.getNewPass();
         Assert.notNull(newPass, "新密码不能为空");
         String ensurePass = passDto.getConfirmPass();
-        Assert.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
+        DataValidated.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
 
         // 获取用户信息
         User user = queryUserByUsername(SecurityUtils.getLoginUsername());
         Assert.notNull(user, "修改失败，用户不存在");
 
         // 密码校验：旧密码是否正确 -> 新旧密码是否一致 ->
-        Assert.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), "旧密码错误");
-        Assert.isTrue(passwordEncoder.matches(newPass, user.getPassword()), "新密码与旧密码不能相同");
+        DataValidated.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), "旧密码错误");
+        DataValidated.isTrue(passwordEncoder.matches(newPass, user.getPassword()), "新密码与旧密码不能相同");
 
         // 密码历史校验
         Long userId = user.getId();
         List<String> oldPassList = userPassLogMapper.selectUserOldPass(userId, OLD_PASS_COUNT);
-        oldPassList.forEach(pass -> Assert.isTrue(passwordEncoder.matches(newPass, pass), "新密码不能与历史近三次使用过的密码相同"));
+        oldPassList.forEach(pass -> DataValidated.isTrue(passwordEncoder.matches(newPass, pass), "新密码不能与历史近三次使用过的密码相同"));
 
         // 密码复杂度校验
-        Assert.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
-        Assert.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
+        DataValidated.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
+        DataValidated.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
 
         // 插入日志
         String updateTime = DateUtils.formatNow();
         UserPassLog passLog = UserPassLog.builder().id(GenerateIdUtils.getId()).userId(userId).password(newPass).updateTime(updateTime).build();
-        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "修改失败，日志入库失败");
+        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "修改失败");
 
         // 数据入库
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
@@ -192,7 +186,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getChangePwd, false);
         wrapper.set(User::getChangePwdTime, updateTime);
         wrapper.eq(User::getId, userId);
-        Assert.isTrue(!wrapper.update(), "修改失败，更新用户密码信息失败");
+        Assert.isTrue(!wrapper.update(), "修改失败");
         return true;
     }
 
@@ -217,23 +211,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Assert.notNull(user, "修改失败，用户不存在");
 
         // 校验用户密码
-        Assert.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码不正确");
+        DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码不正确");
 
         // 校验验证码
         String cacheCode = CacheUtils.get(emailDto.getUuid());
-        Assert.isTrue(!code.equalsIgnoreCase(cacheCode), "验证码不正确");
+        DataValidated.isTrue(!code.equalsIgnoreCase(cacheCode), "验证码不正确");
 
         // 邮箱校验：相同校验 -> 格式校验 -> 存在性校验
         Long userId = user.getId();
-        Assert.isTrue(email.equals(user.getEmail()), "新邮箱不能与旧邮箱相同");
-        Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
-        Assert.isTrue(userMapper.exists(queryBuild().eq(User::getEmail, email).ne(User::getId, userId)), "邮箱已存在");
+        DataValidated.isTrue(email.equals(user.getEmail()), "新邮箱不能与旧邮箱相同");
+        DataValidated.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
+        DataValidated.isTrue(userMapper.exists(queryBuild().eq(User::getEmail, email).ne(User::getId, userId)), "邮箱已存在");
 
         // 数据入库
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
         wrapper.set(User::getEmail, email);
         wrapper.eq(User::getId, userId);
-        Assert.isTrue(!wrapper.update(), "修改失败，更新用户邮箱信息失败");
+        Assert.isTrue(!wrapper.update(), "修改失败");
         return true;
     }
 
@@ -312,7 +306,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto) {
         queryDto.checkPage();
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(userMapper.selectUserList(queryDto));
     }
@@ -325,6 +318,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public UserVo queryUserDetail(Long userId) {
+        Assert.notNull(userId, "参数【userId】不能为空");
         return userMapper.selectUserDetail(userId);
     }
 
@@ -336,6 +330,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserDto userDto) {
+        userDto.setId(null);
         User user = userConverter.dtoToEntity(userDto);
         checkUser(user);
 
@@ -352,15 +347,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(passwordEncoder.encode(password));
 
         // 保存用户 - 角色信息
-        if (save(user)) {
-            insertUserRoleData(userId, userDto.getRoleIds());
+        Assert.isTrue(userMapper.insert(user) != 1, "新增失败");
+        insertUserRoleData(userId, userDto.getRoleIds());
 
-            // 邮件通知（邮件发送失败也回滚，因为没有人知道新用户密码是多少）
-            sendAddUserNoticeEmail(user.getEmail(), user.getUsername(), password);
-            return;
-        }
-
-        throw new ServiceException(ResultCode.ADD_FAILED);
+        // 邮件通知（邮件发送失败也回滚，因为没有人知道新用户密码是多少）
+        sendAddUserNoticeEmail(user.getEmail(), user.getUsername(), password);
     }
 
     /**
@@ -371,18 +362,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void editUser(UserDto userDto) {
-        Assert.notNull(userDto.getId(), "UserId不能为空");
+        Assert.notNull(userDto.getId(), "参数【id】不能为空");
         User user = userConverter.dtoToEntity(userDto);
         checkUser(user);
 
         // 保存用户 - 角色信息
         user.setUsername(null);
-        if (updateById(user)) {
-            insertUserRoleData(user.getId(), userDto.getRoleIds());
-            return;
-        }
-
-        throw new ServiceException(ResultCode.EDIT_FAILED);
+        Assert.isTrue(userMapper.updateById(user) != 1, "修改失败");
+        insertUserRoleData(user.getId(), userDto.getRoleIds());
     }
 
     /**
@@ -393,22 +380,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long userId) {
-        Assert.notNull(userId, "UserId不能为空");
-
         // 不允许删除自己
+        Assert.notNull(userId, "参数【userId】不能为空");
         Long loginId = SecurityUtils.getLoginId();
-        Assert.isTrue(userId.equals(loginId), "自己无法删除自己");
+        DataValidated.isTrue(userId.equals(loginId), "自己无法删除自己");
 
         User user = userMapper.selectById(userId);
-        Assert.notNull(user, "预删除用户不存在，用户序列为：" + userId);
-        Assert.notNull(user.getBuildIn(), "用户【" + user.getUsername() + "】为内置用户，不允许删除");
-        if (removeById(userId)) {
-            // 删除对应的角色信息
-            userRoleMapper.deleteByUserId(userId);
-            return;
-        }
-
-        throw new ServiceException(ResultCode.DELETE_FAILED);
+        Assert.notNull(user, "查询用户信息失败，用户【" + userId + "】不存在");
+        DataValidated.notNull(user.getBuildIn(), "用户【" + user.getUsername() + "】为内置用户，不允许删除");
+        Assert.isTrue(userMapper.deleteById(userId) != 1, "删除失败");
+        userRoleMapper.deleteByUserId(userId);
     }
 
     /**
@@ -417,13 +398,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @param user 用户信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateUserStatus(UserDto user) {
-        Assert.notNull(user.getId(), "UserId不能为空");
-        Assert.notNull(user.getEnabled(), "状态不能为空");
+        Assert.notNull(user.getId(), "参数【id】不能为空");
+        Assert.notNull(user.getEnabled(), "参数【enabled】不能为空");
         boolean update = lambdaUpdate().set(User::isEnabled, user.getEnabled()).eq(User::getId, user.getId()).update();
-        if (!update) {
-            throw new ServiceException(ResultCode.EDIT_FAILED);
-        }
+        Assert.isTrue(!update, "修改失败");
     }
 
     private void insertUserRoleData(Long userId, List<Long> roleIds) {
@@ -454,27 +434,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private void checkUser(User user) {
-        EntityValidated.notNull(user.getUsername(), "用户名不能为空");
-        EntityValidated.notNull(user.getEmail(), "用户邮箱不能为空");
-        EntityValidated.notNull(user.isEnabled(), "用户状态不能为空");
-        EntityValidated.notNull(user.getTemp(), "用户类型不能为空");
+        DataValidated.notNull(user.getUsername(), "用户名不能为空");
+        DataValidated.notNull(user.getEmail(), "用户邮箱不能为空");
+        DataValidated.notNull(user.isEnabled(), "用户状态不能为空");
+        DataValidated.notNull(user.getTemp(), "用户类型不能为空");
 
         // 邮箱格式检查
         String email = user.getEmail();
-        EntityValidated.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
+        DataValidated.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
 
         // 检查邮箱是否存在
         LambdaQueryWrapper<User> wrapper = queryBuild().eq(User::getEmail, email);
         if (user.getId() != null) {
             wrapper.ne(User::getId, user.getId());
         }
-        EntityValidated.isTrue(userMapper.exists(wrapper), "邮箱已存在");
+        DataValidated.isTrue(userMapper.exists(wrapper), "邮箱已存在");
 
         // 检查用户名是否存在（包含删除的，用户名全局不允许重复）
+        user.setUsername(user.getUsername().trim());
         User dbUser = userMapper.selectByUsername(user.getUsername());
-        if (dbUser != null && !dbUser.getId().equals(user.getId())) {
-            throw new EntityValidatedException("用户名已存在");
-        }
+        DataValidated.isTrue(dbUser != null && !dbUser.getId().equals(user.getId()), "用户名已存在");
 
         // 正式用户需要置空账号过期时间
         if (!user.getTemp()) {

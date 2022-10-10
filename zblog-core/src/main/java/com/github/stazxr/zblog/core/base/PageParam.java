@@ -20,7 +20,7 @@ public class PageParam implements Serializable {
     private Integer pageSize;
 
     public void checkPage() {
-        Assert.notNull(page, "参数page不能为空");
-        Assert.notNull(pageSize, "参数pageSize不能为空");
+        Assert.notNull(page, "参数【page】不能为空");
+        Assert.notNull(pageSize, "参数【pageSize】不能为空");
     }
 }

@@ -8,7 +8,6 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.util.EntityValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
@@ -47,6 +46,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogService {
+    private static final String[] IGNORED_PARAM = {"HttpServletResponse", "HttpServletRequest", "MultipartFile"};
+
     private static final String RESULT_CLASS = "Result";
 
     private final LogMapper logMapper;
@@ -66,7 +67,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         IgnoredLog ignoredLog = method.getAnnotation(IgnoredLog.class);
-        if (ignoredLog != null) {
+        if (ignoredLog != null && e == null) {
+            // 过滤非异常日志
             return;
         }
 
@@ -108,7 +110,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
             } else {
                 // 系统异常
                 log.setLogType(LogType.ERROR.getValue());
-                log.setExecMessage("系统发生未知错误!");
+                log.setExecMessage("系统发生未知错误：".concat(e.getMessage()));
                 log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
             }
         }
@@ -127,10 +129,9 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      * @return userLog
      */
     @Override
-    public PageInfo<LogVo> queryUserLog(LogQueryDto queryDto) {
-        Assert.notNull(queryDto.getPage(), "参数page不能为空");
-        Assert.notNull(queryDto.getPageSize(), "参数pageSize不能为空");
-        Assert.notNull(queryDto.getUsername(), "用户名不能为空");
+    public PageInfo<LogVo> queryUserLogListByPage(LogQueryDto queryDto) {
+        queryDto.checkPage();
+        Assert.notNull(queryDto.getUsername(), "参数【username】不能为空");
 
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         List<LogVo> dataList = logMapper.selectLogList(queryDto);
@@ -190,7 +191,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteLog(Integer logType) {
-        EntityValidated.notNull(logType, "参数['logType']不能为空");
+        Assert.notNull(logType, "参数【logType】不能为空");
         logMapper.deleteLog(logType);
     }
 
@@ -202,7 +203,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      */
     @Override
     public String queryLogErrorDetail(Long logId) {
-        EntityValidated.notNull(logId, "参数['logId']不能为空");
+        Assert.notNull(logId, "参数【logId】不能为空");
         return logMapper.selectLogErrorDetail(logId);
     }
 
@@ -212,7 +213,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             String paramTypeName = parameter.getType().getSimpleName();
-            if (Arrays.asList(new String[] {"HttpServletResponse", "HttpServletRequest", "MultipartFile"}).contains(paramTypeName)) {
+            if (Arrays.asList(IGNORED_PARAM).contains(paramTypeName)) {
                 // 不记录HttpServletResponse、HttpServletRequest参数信息
                 continue;
             }

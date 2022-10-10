@@ -4,9 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.base.domain.entity.Interface;
 import com.github.stazxr.zblog.base.mapper.InterfaceMapper;
 import com.github.stazxr.zblog.base.service.InterfaceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * 接口业务实现层
@@ -15,9 +14,9 @@ import javax.annotation.Resource;
  * @since 2021-06-23
  */
 @Service
+@RequiredArgsConstructor
 public class InterfaceServiceImpl extends ServiceImpl<InterfaceMapper, Interface> implements InterfaceService {
-    @Resource
-    private InterfaceMapper interfaceMapper;
+    private final InterfaceMapper interfaceMapper;
 
     /**
      * 移除所有的接口信息

@@ -17,10 +17,7 @@ import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.EntityValidatedException;
-import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.util.EntityValidated;
+import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.util.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -72,7 +69,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto) {
         queryDto.checkPage();
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(roleMapper.selectRoleList(queryDto));
     }
@@ -85,7 +81,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
-        Assert.notNull(roleId, "RoleId不能为空");
+        Assert.notNull(roleId, "参数【roleId】不能为空");
         RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
         Assert.notNull(roleVo, "查询角色信息失败，角色【" + roleId + "】不存在");
         return roleVo;
@@ -99,10 +95,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRole(Role role) {
+        role.setId(null);
         checkRole(role);
-        if (!save(role)) {
-            throw new ServiceException(ResultCode.ADD_FAILED);
-        }
+        Assert.isTrue(roleMapper.insert(role) != 1, "新增失败");
     }
 
     /**
@@ -113,10 +108,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void editRole(Role role) {
+        Assert.notNull(role.getId(), "参数【id】不能为空");
         checkRole(role);
-        if (!updateById(role)) {
-            throw new ServiceException(ResultCode.EDIT_FAILED);
-        }
+        Assert.isTrue(roleMapper.updateById(role) != 1, "修改失败");
     }
 
     /**
@@ -127,22 +121,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long roleId) {
-        Assert.notNull(roleId, "RoleId不能为空");
+        Assert.notNull(roleId, "参数【roleId】不能为空");
         UserQueryDto queryDto = new UserQueryDto();
         queryDto.setBusinessId(roleId);
         List<UserVo> userList = roleMapper.selectUsersByRoleId(queryDto);
-        if (!userList.isEmpty()) {
-            throw new ServiceException("所选角色存在用户关联，请解除关联再试！");
-        }
-
-        if (removeById(roleId)) {
-            // 删除对应的用户、权限信息
-            userRoleMapper.deleteByRoleId(roleId);
-            rolePermMapper.deleteByRoleId(roleId);
-            return;
-        }
-
-        throw new ServiceException(ResultCode.DELETE_FAILED);
+        DataValidated.isTrue(!userList.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
+        Assert.isTrue(roleMapper.deleteById(roleId) != 1, "删除失败");
+        userRoleMapper.deleteByRoleId(roleId);
+        rolePermMapper.deleteByRoleId(roleId);
     }
 
     /**
@@ -171,7 +157,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public Set<Long> queryPermIdsByRoleId(Long roleId) {
-        Assert.notNull(roleId, "角色序列不能为空");
+        Assert.notNull(roleId, "参数【roleId】不能为空");
         return rolePermMapper.selectPermIdsByRoleId(roleId);
     }
 
@@ -183,9 +169,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
+        Assert.notNull(queryDto.getBusinessId(), "参数【businessId】不能为空");
         queryDto.checkPage();
-        Assert.notNull(queryDto.getBusinessId(), "参数businessId不能为空");
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(roleMapper.selectUsersByRoleId(queryDto));
     }
@@ -198,7 +183,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public List<Role> queryRolesByUserId(Long userId) {
-        Assert.notNull(userId, "参数userId不能为空");
+        Assert.notNull(userId, "参数【userId】不能为空");
         return roleMapper.selectRolesByUserId(userId);
     }
 
@@ -210,7 +195,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchAddUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), "参数roleId不能为空");
+        Assert.notNull(userRoleDto.getRoleId(), "参数【roleId】不能为空");
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -233,7 +218,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), "参数roleId不能为空");
+        Assert.notNull(userRoleDto.getRoleId(), "参数【roleId】不能为空");
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -243,25 +228,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     private void checkRole(Role role) {
-        EntityValidated.notNull(role.getRoleName(), "角色名称不能为空");
-        EntityValidated.notNull(role.getRoleCode(), "角色编码不能为空");
-        EntityValidated.notNull(role.getEnabled(), "角色状态不能为空");
+        Assert.notNull(role.getRoleName(), "角色名称不能为空");
+        Assert.notNull(role.getRoleCode(), "角色编码不能为空");
+        Assert.notNull(role.getEnabled(), "角色状态不能为空");
 
         // 检查角色编码是否允许使用
-        if (Arrays.asList(INNER_ROLES).contains(role.getRoleCode())) {
-            throw new EntityValidatedException("该角色编码被禁止使用，请换一个");
-        }
+        role.setRoleCode(role.getRoleCode().trim());
+        DataValidated.isTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), "该角色编码被禁止使用，请换一个");
 
         // 检查角色名称是否存在
         Role dbRole = roleMapper.selectByRoleName(role.getRoleName());
-        if (dbRole != null && !dbRole.getId().equals(role.getId())) {
-            throw new EntityValidatedException("角色名称已存在");
-        }
+        DataValidated.isTrue(dbRole != null && !dbRole.getId().equals(role.getId()), "角色名称已存在");
 
         // 检查角色编码是否存在
         dbRole = roleMapper.selectByRoleCode(role.getRoleCode());
-        if (dbRole != null && !dbRole.getId().equals(role.getId())) {
-            throw new EntityValidatedException("角色编码已存在");
-        }
+        DataValidated.isTrue(dbRole != null && !dbRole.getId().equals(role.getId()), "角色编码已存在");
     }
 }

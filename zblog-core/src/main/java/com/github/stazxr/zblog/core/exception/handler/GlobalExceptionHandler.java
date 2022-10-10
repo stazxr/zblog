@@ -1,12 +1,12 @@
 package com.github.stazxr.zblog.core.exception.handler;
 
 import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.EntityValidatedException;
+import com.github.stazxr.zblog.core.exception.DataValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.ErrorMeta;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
-import com.github.stazxr.zblog.util.exception.ValidParamException;
+import com.github.stazxr.zblog.util.exception.AssertionViolatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,12 @@ import java.io.IOException;
 
 /**
  * 异常处理器
+ *  业务异常：DataValidatedException => ServiceException
+ *  规则校验失败：AssertionViolatedException
+ *  上传文件过大：MaxUploadSizeExceededException
+ *  请求错误异常：HttpRequestMethodNotSupportedException => ServletRequestBindingException(500)
+ *  资源不存在：NoHandlerFoundException(404)
+ *  其他异常：Throwable(500)
  *
  * @author SunTao
  * @since 2021-05-19
@@ -35,56 +41,80 @@ public class GlobalExceptionHandler {
     private DataSize maxFileSize;
 
     /**
-     * 实体校验异常（返回200响应码）
+     * 实体校验异常
      *
      * @param e 异常信息
+     * @throws IOException write json failed
      */
-    @ExceptionHandler(value = EntityValidatedException.class)
-    public void entityValidExceptionHandler(HttpServletRequest request, HttpServletResponse response, EntityValidatedException e) throws IOException {
-        log.error("全局捕获 -> 实体校验失败: {}", e.getMessage());
-        ErrorMeta errorMeta = new ErrorMeta(e, "请求信息：" + request.getRequestURI());
-
-        // 业务异常返回200
-        Result result = Result.failure(e.getIdentifier(), e.getMessage()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
-        ResponseUtils.responseJsonWriter(response, result);
+    @ExceptionHandler(value = DataValidatedException.class)
+    public void dataValidatedExceptionHandler(HttpServletResponse response, DataValidatedException e) throws IOException {
+        log.warn("全局捕获 -> 数据校验失败: {}", e.getMessage());
+        ResponseUtils.responseJsonWriter(response, Result.failure(e.getIdentifier(), e.getMessage()));
     }
 
     /**
-     * 处理自定义的业务异常（返回200响应码）
+     * 业务异常
      *
      * @param e 异常信息
+     * @throws IOException write json failed
      */
     @ExceptionHandler(value = ServiceException.class)
     public void serviceExceptionHandler(HttpServletResponse response, ServiceException e) throws IOException {
         log.error("全局捕获 -> 系统发生业务异常", e);
         ErrorMeta errorMeta = new ErrorMeta(e);
         if (e.getThrowable() != null) {
+            // return sys exception info
             Throwable throwable = e.getThrowable();
             errorMeta.setRemark("系统异常为: ".concat(throwable.getClass().getName().concat(" - ").concat(throwable.getMessage())));
         }
 
-        // 业务异常返回200
-        Result result = Result.failure(e.getIdentifier(), e.getMessage()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
-        ResponseUtils.responseJsonWriter(response, result);
+        ResponseUtils.responseJsonWriter(response, Result.failure(e.getIdentifier(), e.getMessage()).data(errorMeta));
     }
 
     /**
-     * 处理参数校验错误的异常
+     * 规则校验不通过异常
      *
      * @param e 异常信息
+     * @throws IOException write json failed
      */
-    @ExceptionHandler(value = ValidParamException.class)
-    public void validParamExceptionHandler(HttpServletResponse response, ValidParamException e) throws IOException {
-        log.error("全局捕获 -> 参数校验错误", e);
+    @ExceptionHandler(value = AssertionViolatedException.class)
+    public void assertionViolatedExceptionHandler(HttpServletResponse response, AssertionViolatedException e) throws IOException {
+        log.error("全局捕获 -> 规则校验失败", e);
+        ResponseUtils.responseJsonWriter(response, Result.failure(e.getMessage()));
+    }
+
+    /**
+     * 上传文件过大
+     *
+     * @param e 异常信息
+     * @throws IOException write json failed
+     */
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public void maxUploadSizeExceededExceptionHandler(HttpServletResponse response, MaxUploadSizeExceededException e) throws IOException {
+        log.error("全局捕获 -> 文件上传失败", e);
+        String eorMsg = ResultCode.FILE_SIZE_OVER_LIMIT.message().concat(":").concat(maxFileSize.toString());
+        ResponseUtils.responseJsonWriter(response, Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT, eorMsg));
+    }
+
+    /**
+     * 请求方式错误
+     *
+     * @param e 异常信息
+     * @throws IOException write json failed
+     */
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public void methodNotSupportedExceptionHandler(HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
+        log.error("全局捕获 -> 请求方式错误", e);
         ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.PARAM_VALID, e.getMessage()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT, "请求方式不正确：".concat(e.getMessage())).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result);
     }
 
     /**
-     * 请求数据格式不正确（返回400响应码，参数不匹配，请求头不匹配...）
+     * 请求数据格式不正确
      *
      * @param e 异常信息
+     * @throws IOException write json failed
      */
     @ExceptionHandler(value = ServletRequestBindingException.class)
     public void badRequestExceptionHandler(HttpServletResponse response, ServletRequestBindingException e) throws IOException {
@@ -95,9 +125,10 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 请求资源不存在（返回404响应码）
+     * 请求资源不存在
      *
      * @param e 异常信息
+     * @throws IOException write json failed
      */
     @ExceptionHandler(value = NoHandlerFoundException.class)
     public void resourceNotFoundExceptionHandler(HttpServletRequest request, HttpServletResponse response, NoHandlerFoundException e) throws IOException {
@@ -105,33 +136,6 @@ public class GlobalExceptionHandler {
         ErrorMeta errorMeta = new ErrorMeta(e);
         Result result = Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * 上传文件过大
-     *
-     * @param e 异常信息
-     */
-    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
-    public void maxUploadSizeExceededExceptionHandler(HttpServletResponse response, MaxUploadSizeExceededException e) throws IOException {
-        log.error("全局捕获 -> 文件上传失败", e);
-        ErrorMeta errorMeta = new ErrorMeta(e);
-        String eorMsg = ResultCode.FILE_SIZE_OVER_LIMIT.message().concat(":").concat(maxFileSize.toString());
-        Result result = Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT, eorMsg).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
-        ResponseUtils.responseJsonWriter(response, result);
-    }
-
-    /**
-     * 处理 HttpRequestMethodNotSupportedException 异常
-     *
-     * @param e 异常信息
-     */
-    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public void methodNotSupportedExceptionHandler(HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
-        log.error("全局捕获 -> 请求方式不正确", e);
-        ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT, "请求方式不正确：".concat(e.getMessage())).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
-        ResponseUtils.responseJsonWriter(response, result);
     }
 
     /**

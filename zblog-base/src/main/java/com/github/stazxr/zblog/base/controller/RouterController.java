@@ -60,7 +60,7 @@ public class RouterController {
      */
     @GetMapping(value = "/queryRouterByCode")
     @Router(name = "根据权限编码查询路由信息", code = "queryRouterByCode", level = BaseConst.PermLevel.PUBLIC)
-    public Result queryRouterByCode(String code) {
+    public Result queryRouterByCode(@RequestParam String code) {
         RouterVo routerVo = routerService.queryRouterByCode(code);
         Assert.notNull(routerVo, "根据权限编码查询路由信息失败，数据不存在");
         return Result.success().data(routerVo);

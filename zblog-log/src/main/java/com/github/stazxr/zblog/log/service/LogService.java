@@ -32,7 +32,7 @@ public interface LogService extends IService<Log> {
      * @param queryDto 查询参数
      * @return userLog
      */
-    PageInfo<LogVo> queryUserLog(LogQueryDto queryDto);
+    PageInfo<LogVo> queryUserLogListByPage(LogQueryDto queryDto);
 
     /**
      * 分页查询日志列表

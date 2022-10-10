@@ -113,8 +113,9 @@ public enum ResultCode {
     OLD_PASSWORD_IS_ERROR(100016, "旧密码错误"),
 
     /**
-     * 参数错误，缺失必要的参数
+     * 参数错误，缺失必要的参数，use 10018
      */
+    @Deprecated
     PARAM_EMPTY(10017, "参数错误，缺失必要的参数"),
 
     /**

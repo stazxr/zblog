@@ -1,0 +1,9 @@
+1、业务错误，如角色编码已存在，数据不允许删除...
+使用：com.github.stazxr.zblog.core.util.DataValidated
+特点：抛出 DataValidatedException 异常，不会打印异常堆栈信息，日志模块不会标记为异常日志，标记执行结果为失败
+注意：业务异常返回的提示要人性化，如返回”角色编码已存在“，”存在子节点，不允许删除“等
+
+2、非业务错误，如代码错误，系统错误，数据查询不存在，接口（增删改）入参缺失...
+使用：com.github.stazxr.zblog.util.Assert
+特点：抛出 AssertionViolatedException 异常，会打印异常堆栈信息，日志模块会标记为异常日志
+注意：非业务异常一般是代码原因，未知异常导致，可以返回较具体提示信息，方便根据提示快速定位原因，如”参数【name】缺失“，”数据【id】不存在“等

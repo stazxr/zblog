@@ -11,6 +11,7 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.wf.captcha.base.Captcha;
@@ -40,6 +41,7 @@ public class AuthController {
      *
      * @return login username
      */
+    @IgnoredLog
     @GetMapping("/loginId")
     @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
     public Result currentUserDetail(@AuthenticationPrincipal User user) {

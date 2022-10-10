@@ -1,7 +1,0 @@
-1、业务错误
-使用：
-特点：
-
-2、非业务错误，如代码错误，系统错误，接口（增删改）入参缺失...
-使用：com.github.stazxr.zblog.util.Assert
-特点：抛出 {com.github.stazxr.zblog.util.exception.ValidParamException} 异常，会打印异常堆栈信息，日志模块会标记为异常日志

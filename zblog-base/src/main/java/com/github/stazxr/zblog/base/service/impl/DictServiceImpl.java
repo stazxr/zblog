@@ -11,7 +11,6 @@ import com.github.stazxr.zblog.base.domain.enums.DictType;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.Assert;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = Exception.class)
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
     private final DictMapper dictMapper;
 
@@ -42,7 +40,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public Map<String, String> selectItems(String key) {
-        Assert.notBlank(key, "查询参数不能为空");
+        Assert.notNull(key, "参数【key】不能为空");
         List<Dict> dicts = dictMapper.selectItems(key);
 
         // return map
@@ -75,6 +73,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public List<DictVo> queryChildList(Long pid) {
+        Assert.notNull(pid, "参数【pid】不能为空");
         return dictMapper.selectChildList(pid);
     }
 
@@ -100,9 +99,10 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addDict(DictDto dictDto) {
+        dictDto.setId(null);
         Dict dict = dictConverter.dtoToEntity(dictDto);
         checkDict(dict);
-        Assert.isTrue(dictMapper.insert(dict) != 1, () -> { throw new ServiceException(ResultCode.ADD_FAILED); });
+        Assert.isTrue(dictMapper.insert(dict) != 1, "新增失败");
     }
 
     /**
@@ -113,9 +113,10 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void editDict(DictDto dictDto) {
+        Assert.notNull(dictDto.getId(), "参数【id】不能为空");
         Dict dict = dictConverter.dtoToEntity(dictDto);
         checkDict(dict);
-        Assert.isTrue(dictMapper.updateById(dict) != 1, () -> { throw new ServiceException(ResultCode.EDIT_FAILED); });
+        Assert.isTrue(dictMapper.updateById(dict) != 1, "修改失败");
     }
 
     /**
@@ -135,8 +136,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             throw new ServiceException("存在子节点，无法被删除");
         }
 
-        int i = dictMapper.deleteById(dictId);
-        Assert.isTrue(i != 1, () -> { throw new ServiceException(ResultCode.DELETE_FAILED); });
+        Assert.isTrue(dictMapper.deleteById(dictId) != 1, "删除失败");
     }
 
     private void checkDict(Dict dict) {

@@ -36,14 +36,7 @@
             AND EVENT_TIME &lt;= #{eventEndTime}
         </if>
         <if test="execResult != null">
-            <choose>
-                <when test='execResult == "2"'>
-                    AND LOG_TYPE = 3
-                </when>
-                <otherwise>
-                    AND EXEC_RESULT = #{execResult}
-                </otherwise>
-            </choose>
+            AND EXEC_RESULT = #{execResult}
         </if>
         <if test="permId != null and permId != ''">
             AND CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (

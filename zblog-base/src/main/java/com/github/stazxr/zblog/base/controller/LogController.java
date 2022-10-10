@@ -64,7 +64,7 @@ public class LogController {
     @GetMapping("/queryUserLog")
     @Router(name = "查询用户日志列表", code = "queryUserLog", level = BaseConst.PermLevel.PUBLIC)
     public Result queryUserLog(LogQueryDto queryDto) {
-        return Result.success().data(logService.queryUserLog(queryDto));
+        return Result.success().data(logService.queryUserLogListByPage(queryDto));
     }
 
     /**
@@ -112,6 +112,7 @@ public class LogController {
      * @param logId 日志序列
      * @return LogErrorDetail
      */
+    @Log
     @GetMapping("/queryLogErrorDetail")
     @Router(name = "查询日志堆栈详情", code = "queryLogErrorDetail")
     public Result queryUserLog(Long logId) {

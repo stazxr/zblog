@@ -23,10 +23,7 @@ import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
-import com.github.stazxr.zblog.core.util.EntityValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.Constants;
@@ -177,7 +174,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      */
     @Override
     public RouterVo queryRouterByCode(String code) {
-        Assert.notNull(code, "权限编码不能为空");
+        Assert.notNull(code, "参数【code】不能为空");
         return routerMapper.selectRouterVoByCode(code);
     }
 
@@ -203,9 +200,8 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      */
     @Override
     public PageInfo<DictVo> pageBlackOrWhiteList(RouterQueryDto queryDto) {
+        Assert.notNull(queryDto.getDictKey(), "参数【dictKey】不能为空");
         queryDto.checkPage();
-        Assert.notNull(queryDto.getDictKey(), "参数['dictKey']不能为空");
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(routerMapper.selectBlackOrWhiteList(queryDto));
     }
@@ -218,9 +214,9 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateLogShowStatus(RouterDto routerDto) {
-        Assert.notNull(routerDto.getUri(), "参数['uri']不能为空");
-        Assert.notNull(routerDto.getMethod(), "参数['method']不能为空");
-        Assert.notNull(routerDto.getLogShowed(), "参数['logShowed']不能为空");
+        Assert.notNull(routerDto.getUri(), "参数【uri】不能为空");
+        Assert.notNull(routerDto.getMethod(), "参数【method】不能为空");
+        Assert.notNull(routerDto.getLogShowed(), "参数【logShowed】不能为空");
 
         String uri = routerDto.getUri();
         String method = routerDto.getMethod();
@@ -253,7 +249,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         dict.setType(DictType.ITEM.getValue());
         dict.setEnabled(true);
         dict.setLocked(true);
-        Assert.isTrue(dictMapper.insert(dict) != 1, () -> { throw new ServiceException(ResultCode.ADD_FAILED); });
+        Assert.isTrue(dictMapper.insert(dict) != 1, "新增失败");
     }
 
     /**
@@ -266,7 +262,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     public void editBlackOrWhiteRouter(DictDto dictDto) {
         Dict dict = dictConverter.dtoToEntity(dictDto);
         checkDict(dict);
-        Assert.isTrue(dictMapper.updateById(dict) != 1, () -> { throw new ServiceException(ResultCode.EDIT_FAILED); });
+        Assert.isTrue(dictMapper.updateById(dict) != 1, "编辑失败");
     }
 
     /**
@@ -277,10 +273,10 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void changeBlackOrWhiteRouterStatus(DictDto dictDto) {
-        Assert.notNull(dictDto.getDictId(), "参数['dictId']不能为空");
-        Assert.notNull(dictDto.getEnabled(), "参数['enabled']不能为空");
+        Assert.notNull(dictDto.getDictId(), "参数【dictId】不能为空");
+        Assert.notNull(dictDto.getEnabled(), "参数【enabled】不能为空");
         int i = dictMapper.updateDictStatus(dictDto.getDictId(), dictDto.getEnabled());
-        Assert.isTrue(i != 1, () -> { throw new ServiceException(ResultCode.DELETE_FAILED); });
+        Assert.isTrue(i != 1, "修改失败");
     }
 
     /**
@@ -292,16 +288,16 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Transactional(rollbackFor = Exception.class)
     public void deleteBlackOrWhiteRouter(Long dictId) {
         int i = dictMapper.deleteById(dictId);
-        Assert.isTrue(i != 1, () -> { throw new ServiceException(ResultCode.DELETE_FAILED); });
+        Assert.isTrue(i != 1, "删除失败");
     }
 
     private void checkDict(Dict dict) {
-        EntityValidated.notNull(dict.getName(), "接口名称不能为空");
-        EntityValidated.notNull(dict.getKey(), "接口类型不能为空");
-        EntityValidated.notNull(dict.getValue(), "接口地址不能为空");
-        EntityValidated.notNull(dict.getSort(), "接口排序不能为空");
+        Assert.notNull(dict.getName(), "接口名称不能为空");
+        Assert.notNull(dict.getKey(), "接口类型不能为空");
+        Assert.notNull(dict.getValue(), "接口地址不能为空");
+        Assert.notNull(dict.getSort(), "接口排序不能为空");
 
         boolean typeFlag = !BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) && !BaseConst.DictKey.ROUTER_BLACK_LIST.equals(dict.getKey());
-        EntityValidated.isTrue(typeFlag, "接口类型不正确：" + dict.getKey());
+        Assert.isTrue(typeFlag, "接口类型不正确：" + dict.getKey());
     }
 }

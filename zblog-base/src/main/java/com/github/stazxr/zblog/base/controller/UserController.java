@@ -109,7 +109,7 @@ public class UserController {
      */
     @GetMapping(value = "/queryUserDetail")
     @Router(name = "查询用户详情", code = "queryUserDetail")
-    public Result queryUserDetail(Long userId) {
+    public Result queryUserDetail(@RequestParam Long userId) {
         return Result.success().data(userService.queryUserDetail(userId));
     }
 
@@ -123,11 +123,6 @@ public class UserController {
     @PostMapping(value = "/addUser")
     @Router(name = "新增用户", code = "addUser")
     public Result addUser(@RequestBody UserDto user) {
-        if (user.getId() != null) {
-            log.warn("A new user cannot already have an ID: {}", user.getId());
-            return Result.failure("参数错误");
-        }
-
         userService.addUser(user);
         return Result.success();
     }
@@ -142,10 +137,6 @@ public class UserController {
     @PostMapping(value = "/editUser")
     @Router(name = "编辑用户", code = "editUser")
     public Result editUser(@RequestBody UserDto user) {
-        if (user.getId() == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         userService.editUser(user);
         return Result.success();
     }

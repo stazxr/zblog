@@ -55,6 +55,7 @@ public class DictController {
      * @param dictId 字典序列
      * @return DictVo
      */
+    @Log
     @GetMapping(value = "/queryDictDetail")
     @Router(name = "查询字典详情", code = "queryDictDetail")
     public Result queryDictDetail(@RequestParam Long dictId) {
@@ -83,11 +84,6 @@ public class DictController {
     @PostMapping(value = "/addDict")
     @Router(name = "新增字典", code = "addDict")
     public Result addDict(@RequestBody DictDto dictDto) {
-        if (dictDto.getId() != null) {
-            log.warn("A new dict cannot already have an ID: {}", dictDto.getId());
-            return Result.failure("参数错误");
-        }
-
         dictService.addDict(dictDto);
         return Result.success();
     }
@@ -102,10 +98,6 @@ public class DictController {
     @PostMapping(value = "/editDict")
     @Router(name = "编辑字典", code = "editDict")
     public Result editDict(@RequestBody DictDto dictDto) {
-        if (dictDto.getId() == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         dictService.editDict(dictDto);
         return Result.success();
     }
@@ -120,10 +112,6 @@ public class DictController {
     @PostMapping(value = "/deleteDict")
     @Router(name = "删除字典", code = "deleteDict")
     public Result deleteDict(@RequestPostSingleParam Long dictId) {
-        if (dictId == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         dictService.deleteDict(dictId);
         return Result.success();
     }

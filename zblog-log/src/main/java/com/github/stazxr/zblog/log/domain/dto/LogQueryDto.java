@@ -36,9 +36,9 @@ public class LogQueryDto extends PageParam {
     private Long permId;
 
     /**
-     * 操作结果
+     * 操作结果：
      */
-    private Integer execResult;
+    private Boolean execResult;
 
     /**
      * 请求耗时

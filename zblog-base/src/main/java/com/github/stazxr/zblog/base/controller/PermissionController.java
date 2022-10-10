@@ -45,6 +45,7 @@ public class PermissionController {
      * @param permId 权限ID
      * @return PermissionVo
      */
+    @Log
     @GetMapping(value = "/queryPermDetail")
     @Router(name = "查询权限详情", code = "queryPermDetail")
     public Result queryPermDetail(Long permId) {
@@ -133,11 +134,6 @@ public class PermissionController {
     @PostMapping(value = "/addPerm")
     @Router(name = "新增权限", code = "addPerm")
     public Result addPerm(@RequestBody Permission permission) {
-        if (permission.getId() != null) {
-            log.warn("A new permission cannot already have an ID: {}", permission.getId());
-            return Result.failure("参数错误");
-        }
-
         permissionService.addPermission(permission);
         return Result.success();
     }
@@ -152,10 +148,6 @@ public class PermissionController {
     @PostMapping(value = "/editPerm")
     @Router(name = "编辑权限", code = "editPerm")
     public Result editPerm(@RequestBody Permission permission) {
-        if (permission.getId() == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         permissionService.editPermission(permission);
         return Result.success();
     }
@@ -170,10 +162,6 @@ public class PermissionController {
     @PostMapping(value = "/deletePerm")
     @Router(name = "删除权限", code = "deletePerm")
     public Result deletePerm(@RequestPostSingleParam Long permId) {
-        if (permId == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         permissionService.deletePermission(permId);
         return Result.success();
     }
@@ -199,10 +187,6 @@ public class PermissionController {
     @PostMapping(value = "/batchDeleteRolePerm")
     @Router(name = "批量删除角色权限", code = "batchDeleteRolePerm")
     public Result batchDeleteRolePerm(@RequestBody RolePermDto rolePermDto) {
-        if (rolePermDto.getPermId() == null) {
-            return Result.failure("参数错误，缺失permId");
-        }
-
         permissionService.batchDeleteRolePerm(rolePermDto);
         return Result.success();
     }

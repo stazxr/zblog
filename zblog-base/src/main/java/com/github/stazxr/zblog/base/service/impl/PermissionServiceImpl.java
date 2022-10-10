@@ -18,10 +18,8 @@ import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.enums.ResultCode;
-import com.github.stazxr.zblog.core.exception.EntityValidatedException;
-import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.util.EntityValidated;
+import com.github.stazxr.zblog.core.exception.DataValidatedException;
+import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.log.mapper.LogMapper;
@@ -86,10 +84,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PermissionVo queryPermDetail(Long permId) {
-        Assert.notNull(permId, "权限序列不能为空");
-        PermissionVo permission = permissionMapper.selectPermDetail(permId);
-        Assert.notNull(permission, "数据不存在，权限序列为：" + permId);
-        return permission;
+        Assert.notNull(permId, "参数【permId】不能为空");
+        PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
+        Assert.notNull(permissionVo, "查询权限信息失败，权限【" + permId + "】不存在");
+        return permissionVo;
     }
 
     /**
@@ -100,9 +98,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PageInfo<InterfaceVo> queryPermInterfaces(PermissionQueryDto queryDto) {
+        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         List<InterfaceVo> dataList = interfaceMapper.selectPermInterfaces(queryDto.getPermId());
         return new PageInfo<>(dataList);
@@ -116,9 +113,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PageInfo<RoleVo> queryPermRoles(PermissionQueryDto queryDto) {
+        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         List<RoleVo> dataList = roleMapper.selectPermRoles(queryDto.getPermId(), queryDto.getBlurry());
         return new PageInfo<>(dataList);
@@ -132,9 +128,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PageInfo<LogVo> queryPermLogs(PermissionQueryDto queryDto) {
+        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "权限序列不能为空");
-
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         LogQueryDto logQueryDto = new LogQueryDto();
         logQueryDto.setPermId(queryDto.getPermId());
@@ -161,10 +156,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addPermission(Permission permission) {
+        permission.setId(null);
         checkPermission(permission);
-        if (!save(permission)) {
-            throw new ServiceException(ResultCode.ADD_FAILED);
-        }
+        Assert.isTrue(permissionMapper.insert(permission) != 1, "新增失败");
     }
 
     /**
@@ -176,13 +170,12 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Transactional(rollbackFor = Exception.class)
     public void editPermission(Permission permission) {
         // 查询菜单信息，赋值菜单类型和是否外联，这两项不允许编辑
+        Assert.notNull(permission.getId(), "参数【id】不能为空");
         Permission dbPerm = permissionMapper.selectById(permission.getId());
-        EntityValidated.isTrue(!dbPerm.getPermType().equals(permission.getPermType()), "权限类型不允许编辑");
+        DataValidated.isTrue(!dbPerm.getPermType().equals(permission.getPermType()), "权限类型不允许编辑");
         permission.setIFrame(dbPerm.getIFrame());
         checkPermission(permission);
-        if (!updateById(permission)) {
-            throw new ServiceException(ResultCode.EDIT_FAILED);
-        }
+        Assert.isTrue(permissionMapper.updateById(permission) != 1, "编辑失败");
     }
 
     /**
@@ -193,24 +186,16 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Long permId) {
+        Assert.notNull(permId, "参数【permId】不能为空");
         Permission permission = permissionMapper.selectById(permId);
         Assert.notNull(permission, "待删除权限不存在，权限序列为：" + permId);
 
         Permission param = new Permission();
         param.setPid(permId);
-
         Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
-        if (childCount > 0) {
-            throw new ServiceException("存在子节点，无法删除，请先删除子节点");
-        }
-
-        if (removeById(permId)) {
-            // 删除角色 - 权限的中间数据
-            rolePermMapper.deleteByPermId(permId);
-            return;
-        }
-
-        throw new ServiceException(ResultCode.DELETE_FAILED);
+        DataValidated.isTrue(childCount > 0, "存在子节点，无法删除，请先删除子节点");
+        Assert.isTrue(permissionMapper.deleteById(permId) != 1, "删除失败");
+        rolePermMapper.deleteByPermId(permId);
     }
 
     /**
@@ -221,9 +206,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public List<MenuVo> queryUserMenus(Long userId) {
-        Assert.notNull(userId, "用户序列不能为空");
-
         // 查询用户对应的菜单权限列表，并构建菜单树，管理员可以查看所有的菜单
+        Assert.notNull(userId, "参数【userId】不能为空");
         boolean isAdmin = Constants.USER_ADMIN_ID.equals(userId);
         List<Permission> permList = isAdmin ? permissionMapper.selectAllMenu() : permissionMapper.selectMenuByUserId(userId);
         List<Permission> permTreeList = buildPermTree(permList);
@@ -238,7 +222,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteRolePerm(RolePermDto rolePermDto) {
-        Assert.notNull(rolePermDto.getPermId(), "参数roleId不能为空");
+        Assert.notNull(rolePermDto.getPermId(), "参数【permId】不能为空");
         Set<Long> roleIds = rolePermDto.getRoleIds();
         if (roleIds == null || roleIds.size() == 0) {
             return;
@@ -265,9 +249,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
         // 检查权限名称是否存在
         Permission dbPerm = permissionMapper.selectByPermName(permission.getPermName());
-        if (dbPerm != null && !dbPerm.getId().equals(permission.getId())) {
-            throw new EntityValidatedException("权限名称已存在");
-        }
+        boolean isExist = dbPerm != null && !dbPerm.getId().equals(permission.getId());
+        DataValidated.isTrue(isExist, "权限名称已存在");
 
         // PID校验
         boolean parentIsFrame = false;
@@ -276,55 +259,47 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setPid(null);
         } else {
             Permission parent = permissionMapper.selectById(permission.getPid());
-            EntityValidated.notNull(parent, "上级类目不存在");
+            Assert.notNull(parent, "上级类目不存在");
             parentType = parent.getPermType();
             parentIsFrame = parent.getIFrame();
         }
 
         // 赋默认值
         if (PermissionType.DIR.getType().equals(permission.getPermType())) {
-            EntityValidated.notNull(permission.getIFrame(), "请选择是否外链");
-            EntityValidated.notNull(permission.getHidden(), "请选择是否可见");
-            EntityValidated.notNull(permission.getRouterPath(), "路由地址不能为空");
+            Assert.notNull(permission.getIFrame(), "请选择是否外链");
+            Assert.notNull(permission.getHidden(), "请选择是否可见");
+            Assert.notNull(permission.getRouterPath(), "路由地址不能为空");
             permission.setPermCode(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
             permission.setCache(null);
             if (permission.getIFrame()) {
-                if (permission.getPid() != null) {
-                    throw new EntityValidatedException("目录如果是外链，上级只能是顶级类目");
-                }
+                DataValidated.isTrue(permission.getPid() != null, "目录如果是外链，上级只能是顶级类目");
             } else {
-                if (parentIsFrame || !PermissionType.DIR.getType().equals(parentType)) {
-                    throw new EntityValidatedException("目录的上级只能是目录，且上级目录不允许为外链目录");
-                }
+                boolean isValid = parentIsFrame || !PermissionType.DIR.getType().equals(parentType);
+                DataValidated.isTrue(isValid, "目录的上级只能是目录，且上级目录不允许为外链目录");
             }
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
-            EntityValidated.notNull(permission.getIFrame(), "请选择是否外链");
-            EntityValidated.notNull(permission.getHidden(), "请选择是否可见");
-            EntityValidated.notNull(permission.getCache(), "请选择是否缓存");
-            EntityValidated.notNull(permission.getRouterPath(), "路由地址不能为空");
+            Assert.notNull(permission.getIFrame(), "请选择是否外链");
+            Assert.notNull(permission.getHidden(), "请选择是否可见");
+            Assert.notNull(permission.getCache(), "请选择是否缓存");
+            Assert.notNull(permission.getRouterPath(), "路由地址不能为空");
             if (permission.getIFrame()) {
                 permission.setPermCode(null);
                 permission.setComponentName(null);
                 permission.setComponentPath(null);
                 String http = "http://", https = "https://";
                 String routerPath = permission.getRouterPath().toLowerCase(Locale.ROOT);
-                if (!routerPath.startsWith(http) && !routerPath.startsWith(https)) {
-                    throw new EntityValidatedException("外链必须以http://或者https://开头");
-                }
+                boolean isNulHttp = !routerPath.startsWith(http) && !routerPath.startsWith(https);
+                DataValidated.isTrue(isNulHttp, "外链必须以http://或者https://开头");
             } else {
-                EntityValidated.notNull(permission.getComponentPath(), "组件路径不能为空");
-                EntityValidated.notNull(permission.getComponentName(), "组件名称不能为空");
+                Assert.notNull(permission.getComponentPath(), "组件路径不能为空");
+                Assert.notNull(permission.getComponentName(), "组件名称不能为空");
                 dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
-                if (dbPerm != null && !dbPerm.getId().equals(permission.getId())) {
-                    throw new EntityValidatedException("组件名称已存在");
-                }
+                DataValidated.isTrue(dbPerm != null && !dbPerm.getId().equals(permission.getId()), "组件名称已存在");
             }
 
-            if (parentIsFrame || !PermissionType.DIR.getType().equals(parentType)) {
-                throw new EntityValidatedException("菜单的上级只能是目录，且上级目录不允许为外链目录");
-            }
+            DataValidated.isTrue(parentIsFrame || !PermissionType.DIR.getType().equals(parentType), "菜单的上级只能是目录，且上级目录不允许为外链目录");
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
             permission.setIcon(null);
             permission.setIFrame(null);
@@ -333,21 +308,19 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentName(null);
             permission.setComponentPath(null);
             permission.setRouterPath(null);
-            EntityValidated.notNull(permission.getPermCode(), "权限编码不能为空");
-            if (parentIsFrame || !PermissionType.MENU.getType().equals(parentType)) {
-                throw new EntityValidatedException("按钮的上级只能是菜单，且上级菜单不允许为外链菜单");
-            }
+            DataValidated.notNull(permission.getPermCode(), "权限编码不能为空");
+            DataValidated.isTrue(parentIsFrame || !PermissionType.MENU.getType().equals(parentType), "按钮的上级只能是菜单，且上级菜单不允许为外链菜单");
         } else {
-            throw new EntityValidatedException("非法的权限类型：" + permission.getPermType());
+            throw new DataValidatedException("非法的权限类型：" + permission.getPermType());
         }
     }
 
     private void emptyCheck(Permission permission) {
-        EntityValidated.notNull(permission.getPermName(), "权限名称不能为空");
-        EntityValidated.notNull(permission.getPermLevel(), "访问级别不能为空");
-        EntityValidated.notNull(permission.getEnabled(), "权限状态不能为空");
-        EntityValidated.notNull(permission.getSort(), "权限排序不能为空");
-        EntityValidated.notNull(permission.getPermType(), "权限类型不能为空");
+        Assert.notNull(permission.getPermName(), "权限名称不能为空");
+        Assert.notNull(permission.getPermLevel(), "访问级别不能为空");
+        Assert.notNull(permission.getEnabled(), "权限状态不能为空");
+        Assert.notNull(permission.getSort(), "权限排序不能为空");
+        Assert.notNull(permission.getPermType(), "权限类型不能为空");
     }
 
     private List<Permission> buildPermTree(List<Permission> permList) {
