@@ -27,6 +27,10 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
     /**
      * 自定义规则
      *
+     *   这里可以对
+     *      Set<String> roles = routerService.findRoles(requestUrl, requestMethod);
+     *   做缓存处理
+     *
      * @param object FilterInvocation
      * @return 可以访问该权限的角色列表
      * @throws IllegalArgumentException passed object eor

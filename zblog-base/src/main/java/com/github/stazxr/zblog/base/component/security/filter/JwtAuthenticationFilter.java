@@ -1,15 +1,18 @@
 package com.github.stazxr.zblog.base.component.security.filter;
 
+import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtException;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtProperties;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.component.security.jwt.decoder.JwtDecoder;
+import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.component.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.component.security.exception.PreJwtCheckAuthenticationException;
 import com.github.stazxr.zblog.base.component.security.jwt.TokenError;
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
+import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
@@ -57,6 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHENTICATION_PREFIX = Constants.AUTHENTICATION_PREFIX;
 
+    private static final String PASSWORD = "******";
+
     /**
      * 最大等待续签时间 / 令牌被弃用后的一个最大存活期，单位秒
      */
@@ -78,7 +83,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserService userService;
 
+    private final RoleService roleService;
+
     private final RouterService routerService;
+
+    private final UserCacheHandler userCacheHandler;
 
     private final JwtTokenStorage jwtTokenStorage;
 
@@ -90,9 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain) throws IOException, ServletException {
-        String requestUri = request.getRequestURI();
-        String requestMethod = request.getMethod();
-        int level = routerService.calculateInterfaceLevel(requestUri, requestMethod);
+        int level = routerService.calculateInterfaceLevel(request.getRequestURI(), request.getMethod());
         if (BaseConst.PermLevel.OPEN == level) {
             // 可直接访问的接口忽略令牌校验
             chain.doFilter(request, response);
@@ -135,7 +142,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             JWTClaimsSet claimsSet = jwtDecoder.decode(jwtToken);
 
             // get user
-            User user = findTokenUser(claimsSet);
+            User user = getUserFromClaimSet(claimsSet);
 
             // check loginIp
             String username = user.getUsername();
@@ -183,7 +190,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             }
                         } while (RENEW_LOCK_MAP.containsKey(userId));
 
-                        // 续签请求已经执行结束
+                        // renew token finish, check result is success
                         if (StringUtils.isBlank(jwtTokenStorage.getAccessToken(userId))) {
                             log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token failed"), username);
                             throw new PreJwtCheckAuthenticationException(TokenError.TE011.value());
@@ -207,9 +214,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void setContextAuthentication(HttpServletRequest request, User user) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, PASSWORD, user.getAuthorities());
+        token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(token);
     }
 
     private void renewToken(HttpServletRequest request, HttpServletResponse response, String jwtToken, User user, JWTClaimsSet claimsSet) {
@@ -320,14 +327,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throw new PreJwtCheckAuthenticationException(TokenError.TE006.value());
     }
 
-    protected User findTokenUser(JWTClaimsSet claimsSet) {
+    protected User getUserFromClaimSet(JWTClaimsSet claimsSet) {
         try {
             List<String> audiences = claimsSet.getAudience();
             if (audiences != null && !audiences.isEmpty()) {
                 Long userId = Long.parseLong(audiences.get(0));
-                User user = userService.getById(userId);
-                if (user != null) {
-                    return user;
+                User cacheUser = userCacheHandler.getUserFromCache(userId);
+                if (cacheUser == null) {
+                    // from db
+                    User dbUser = findUserBySearchDb(userId);
+                    if (dbUser != null) {
+                        userCacheHandler.putUserInCache(userId, dbUser);
+                        return dbUser;
+                    }
+                } else {
+                    // from cache
+                    return cacheUser;
                 }
 
                 log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "aud {} is not inner user"), userId);
@@ -338,5 +353,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         throw new PreJwtCheckAuthenticationException(TokenError.TE005.value());
+    }
+
+    private User findUserBySearchDb(Long userId) {
+        User user = userService.getById(userId);
+        if (user != null) {
+            List<Role> userRoles = roleService.queryRolesByUserId(user.getId());
+            user.setAuthorities(userRoles);
+        }
+
+        return user;
     }
 }

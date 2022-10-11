@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
 import com.github.stazxr.zblog.base.component.email.MailService;
+import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserDto;
@@ -79,6 +80,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final MailService mailService;
 
     private final TemplateEngine templateEngine;
+
+    private final UserCacheHandler userCacheHandler;
 
     /**
      * 根据用户名查询用户信息
@@ -370,6 +373,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUsername(null);
         Assert.isTrue(userMapper.updateById(user) != 1, "修改失败");
         insertUserRoleData(user.getId(), userDto.getRoleIds());
+        userCacheHandler.removeUserFromCache(user.getId());
     }
 
     /**
@@ -390,6 +394,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         DataValidated.notNull(user.getBuildIn(), "用户【" + user.getUsername() + "】为内置用户，不允许删除");
         Assert.isTrue(userMapper.deleteById(userId) != 1, "删除失败");
         userRoleMapper.deleteByUserId(userId);
+        userCacheHandler.removeUserFromCache(userId);
     }
 
     /**

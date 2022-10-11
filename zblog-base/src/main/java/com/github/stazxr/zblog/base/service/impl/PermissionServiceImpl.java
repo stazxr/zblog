@@ -12,13 +12,11 @@ import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
 import com.github.stazxr.zblog.base.domain.vo.*;
-import com.github.stazxr.zblog.base.mapper.InterfaceMapper;
-import com.github.stazxr.zblog.base.mapper.PermissionMapper;
-import com.github.stazxr.zblog.base.mapper.RoleMapper;
-import com.github.stazxr.zblog.base.mapper.RolePermMapper;
+import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.exception.DataValidatedException;
+import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
@@ -31,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.github.stazxr.zblog.base.util.Constants.CacheKey.interfaceLevel;
 
 /**
  * 权限业务实现层
@@ -48,6 +48,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private final RoleMapper roleMapper;
 
     private final LogMapper logMapper;
+
+    private final RouterMapper routerMapper;
 
     private final RolePermMapper rolePermMapper;
 
@@ -159,6 +161,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         permission.setId(null);
         checkPermission(permission);
         Assert.isTrue(permissionMapper.insert(permission) != 1, "新增失败");
+        removeCache(permission);
     }
 
     /**
@@ -176,6 +179,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         permission.setIFrame(dbPerm.getIFrame());
         checkPermission(permission);
         Assert.isTrue(permissionMapper.updateById(permission) != 1, "编辑失败");
+        removeCache(permission);
     }
 
     /**
@@ -196,6 +200,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         DataValidated.isTrue(childCount > 0, "存在子节点，无法删除，请先删除子节点");
         Assert.isTrue(permissionMapper.deleteById(permId) != 1, "删除失败");
         rolePermMapper.deleteByPermId(permId);
+        removeCache(permission);
     }
 
     /**
@@ -433,6 +438,16 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             result.add(pid);
         }
         return result;
+    }
+
+    private void removeCache(Permission permission) {
+        if (StringUtils.isNotBlank(permission.getPermCode())) {
+            RouterVo routerVo = routerMapper.selectRouterVoByCode(permission.getPermCode());
+            if (routerVo != null) {
+                String key = interfaceLevel.cacheKey().concat(":").concat(routerVo.getUri()).concat("_").concat(routerVo.getMethod());
+                CacheUtils.remove(key);
+            }
+        }
     }
 
     private LambdaQueryWrapper<Permission> queryBuild() {

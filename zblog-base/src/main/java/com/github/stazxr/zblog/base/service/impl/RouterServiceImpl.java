@@ -250,6 +250,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         dict.setEnabled(true);
         dict.setLocked(true);
         Assert.isTrue(dictMapper.insert(dict) != 1, "新增失败");
+        removeCache(dictDto.getValue());
     }
 
     /**
@@ -263,6 +264,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         Dict dict = dictConverter.dtoToEntity(dictDto);
         checkDict(dict);
         Assert.isTrue(dictMapper.updateById(dict) != 1, "编辑失败");
+        removeCache(dictDto.getValue());
     }
 
     /**
@@ -277,6 +279,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         Assert.notNull(dictDto.getEnabled(), "参数【enabled】不能为空");
         int i = dictMapper.updateDictStatus(dictDto.getDictId(), dictDto.getEnabled());
         Assert.isTrue(i != 1, "修改失败");
+        removeCache(dictDto.getValue());
     }
 
     /**
@@ -287,8 +290,10 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteBlackOrWhiteRouter(Long dictId) {
+        Dict dbDict = dictMapper.selectById(dictId);
         int i = dictMapper.deleteById(dictId);
         Assert.isTrue(i != 1, "删除失败");
+        removeCache(dbDict.getValue());
     }
 
     private void checkDict(Dict dict) {
@@ -299,5 +304,13 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
 
         boolean typeFlag = !BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) && !BaseConst.DictKey.ROUTER_BLACK_LIST.equals(dict.getKey());
         Assert.isTrue(typeFlag, "接口类型不正确：" + dict.getKey());
+    }
+
+    private void removeCache(String url) {
+        String getKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_GET");
+        String postKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_POST");
+        String putKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_PUT");
+        String deleteKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_DELETE");
+        CacheUtils.remove(getKey, postKey, putKey, deleteKey);
     }
 }

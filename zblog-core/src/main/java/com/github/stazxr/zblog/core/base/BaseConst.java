@@ -15,7 +15,7 @@ public class BaseConst {
     /**
      * system username
      */
-    public static final String USER_SYSTEM = "SYSTEM";
+    public static final String USER_SYSTEM = "system";
 
     /**
      * 系统初始化内置字典ID

@@ -311,7 +311,7 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public String toString() {
         // 密码脱敏
-        setPassword("[PROTECT]");
+        // setPassword("[PROTECT]");
         return super.toString();
     }
 }

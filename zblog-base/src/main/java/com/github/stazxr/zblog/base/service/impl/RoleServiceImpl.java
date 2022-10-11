@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
@@ -48,6 +49,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private final UserRoleMapper userRoleMapper;
 
     private final RolePermMapper rolePermMapper;
+
+    private final UserCacheHandler userCacheHandler;
 
     /**
      * 查询角色列表
@@ -129,6 +132,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.isTrue(roleMapper.deleteById(roleId) != 1, "删除失败");
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
+        userCacheHandler.clean();
     }
 
     /**
@@ -207,6 +211,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             userRole.setUserId(userId);
             userRole.setRoleId(userRoleDto.getRoleId());
             userRoleMapper.insert(userRole);
+            userCacheHandler.removeUserFromCache(userId);
         }
     }
 
@@ -225,6 +230,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
 
         userRoleMapper.batchDeleteUserRole(userRoleDto);
+        userIds.forEach(userCacheHandler::removeUserFromCache);
     }
 
     private void checkRole(Role role) {

@@ -27,9 +27,8 @@ public class InitRouterRunner implements CommandLineRunner {
     public void run(String... args) {
         try {
             routerManager.initRouter();
-            log.info("InitRouter finish");
         } catch (Exception ex) {
-            log.error("initRouter catch error", ex);
+            log.error("Init Router Failed", ex);
         }
     }
 }
