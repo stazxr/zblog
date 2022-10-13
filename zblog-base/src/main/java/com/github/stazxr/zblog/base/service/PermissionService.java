@@ -9,6 +9,7 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 权限服务层
@@ -100,4 +101,12 @@ public interface PermissionService extends IService<Permission> {
      * @param rolePermDto 角色 - 权限对应信息
      */
     void batchDeleteRolePerm(RolePermDto rolePermDto);
+
+    /**
+     * 查询用户的权限列表（权限编码）
+     *
+     * @param userId 用户序列
+     * @return permCodes
+     */
+    Set<String> queryUserPerms(Long userId);
 }

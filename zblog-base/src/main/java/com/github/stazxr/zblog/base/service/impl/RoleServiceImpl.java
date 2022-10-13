@@ -114,6 +114,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.notNull(role.getId(), "参数【id】不能为空");
         checkRole(role);
         Assert.isTrue(roleMapper.updateById(role) != 1, "修改失败");
+        userCacheHandler.clean();
     }
 
     /**
@@ -151,6 +152,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             rolePerm.setPermId(permId);
             rolePermMapper.insert(rolePerm);
         }
+
+        userCacheHandler.clean();
     }
 
     /**

@@ -12,6 +12,7 @@ import com.github.stazxr.zblog.base.component.security.exception.PreJwtCheckAuth
 import com.github.stazxr.zblog.base.component.security.jwt.TokenError;
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
+import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
@@ -44,6 +45,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -84,6 +86,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     private final RoleService roleService;
+
+    private final PermissionService permissionService;
 
     private final RouterService routerService;
 
@@ -360,6 +364,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (user != null) {
             List<Role> userRoles = roleService.queryRolesByUserId(user.getId());
             user.setAuthorities(userRoles);
+
+            Set<String> userPerms = permissionService.queryUserPerms(user.getId());
+            user.setPerms(userPerms);
         }
 
         return user;

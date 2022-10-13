@@ -85,4 +85,8 @@
     <select id="selectLogShowFlag" resultType="java.lang.Boolean">
         SELECT SHOWED FROM log_show_flag WHERE URI = #{uri} AND METHOD = #{method}
     </select>
+
+    <select id="selectCode" resultType="java.lang.String">
+        SELECT DISTINCT CODE FROM router
+    </select>
 </mapper>

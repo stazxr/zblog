@@ -5,7 +5,6 @@ import com.github.stazxr.zblog.core.base.BaseConst;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * spring security utils
@@ -20,8 +19,12 @@ public class SecurityUtils {
      * @return UserDetails
      */
     public static UserDetails getLoginUser() {
-        UserDetailsService userDetailsService = SpringContextUtils.getBean(UserDetailsService.class);
-        return userDetailsService.loadUserByUsername(getLoginUsername());
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            return (UserDetails) authentication.getPrincipal();
+        }
+
+        throw new IllegalStateException("请登录");
     }
 
     /**
@@ -48,7 +51,7 @@ public class SecurityUtils {
             return userDetails.getUsername();
         }
 
-        throw new IllegalStateException("未登录");
+        throw new IllegalStateException("请登录");
     }
 
     /**

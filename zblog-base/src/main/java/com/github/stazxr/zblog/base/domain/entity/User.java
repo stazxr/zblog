@@ -184,6 +184,14 @@ public class User extends BaseEntity implements UserDetails {
     List<Role> authorities;
 
     /**
+     * 权限列表
+     */
+    @Getter
+    @Setter
+    @TableField(exist = false)
+    Set<String> perms;
+
+    /**
      * 账户是否未过期，过期无法验证
      *
      * @return true: 没有过期

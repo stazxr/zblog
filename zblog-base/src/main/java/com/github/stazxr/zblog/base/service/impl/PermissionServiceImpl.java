@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.domain.bo.MenuMeta;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
@@ -52,6 +53,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private final RouterMapper routerMapper;
 
     private final RolePermMapper rolePermMapper;
+
+    private final UserCacheHandler userCacheHandler;
 
     /**
      * 查询权限列表（树）
@@ -236,6 +239,25 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         rolePermMapper.batchDeleteRolePerm(rolePermDto);
     }
 
+    /**
+     * 查询用户的权限列表（权限编码）
+     *
+     * @param userId 用户序列
+     * @return permCodes
+     */
+    @Override
+    public Set<String> queryUserPerms(Long userId) {
+        if (userId == null) {
+            return new HashSet<>();
+        }
+
+        if (Constants.USER_ADMIN_ID.equals(userId)) {
+            return routerMapper.selectCode();
+        } else {
+            return permissionMapper.selectUserPerms(userId);
+        }
+    }
+
     private List<PermissionVo> putTopMenu(List<PermissionVo> permissionVos) {
         PermissionVo top = new PermissionVo();
         top.setId(Constants.TOP_PERM_ID);
@@ -298,6 +320,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 boolean isNulHttp = !routerPath.startsWith(http) && !routerPath.startsWith(https);
                 DataValidated.isTrue(isNulHttp, "外链必须以http://或者https://开头");
             } else {
+                permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
                 Assert.notNull(permission.getComponentPath(), "组件路径不能为空");
                 Assert.notNull(permission.getComponentName(), "组件名称不能为空");
                 dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
@@ -441,6 +464,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     private void removeCache(Permission permission) {
+        userCacheHandler.clean();
         if (StringUtils.isNotBlank(permission.getPermCode())) {
             RouterVo routerVo = routerMapper.selectRouterVoByCode(permission.getPermCode());
             if (routerVo != null) {

@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 权限数据持久层
@@ -70,4 +71,12 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @return Permission
      */
     Permission selectByComponentName(@Param("componentName") String componentName);
+
+    /**
+     * 查询用户的权限列表（权限编码）
+     *
+     * @param userId 用户序列
+     * @return permCodes
+     */
+    Set<String> selectUserPerms(@Param("userId") Long userId);
 }

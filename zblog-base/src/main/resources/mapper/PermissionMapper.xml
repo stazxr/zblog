@@ -73,4 +73,18 @@
     <select id="selectByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE COMPONENT_NAME = #{componentName} AND DELETED = 0
     </select>
+
+    <select id="selectUserPerms" resultType="java.lang.String">
+        SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND ENABLED = 1 AND PERM_CODE IS NOT NULL AND (
+            PERM_LEVEL != 3 OR ID IN (
+                SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
+                    SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                )
+            )
+        )
+        UNION ALL
+        SELECT CODE FROM router WHERE DEFAULT_LEVEL != 3 AND CODE NOT IN (
+            SELECT PERM_CODE FROM permission WHERE DELETED = 0
+        )
+    </select>
 </mapper>

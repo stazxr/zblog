@@ -104,12 +104,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUserHeadImg(UserDto updateDto) {
-        String username = updateDto.getUsername();
-        Assert.notNull(username, "用户名不能为空");
+        Long userId = updateDto.getId();
+        Assert.notNull(userId, "参数【id】不能为空");
 
         LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
         wrapper.set(User::getHeadImgUrl, updateDto.getHeadImg());
-        wrapper.eq(User::getUsername, username);
+        wrapper.eq(User::getId, userId);
+        userCacheHandler.removeUserFromCache(userId);
         return wrapper.update();
     }
 
@@ -141,6 +142,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getSignature, updateDto.getSignature());
         wrapper.set(User::getTelephone, telephone);
         wrapper.eq(User::getId, userId);
+        userCacheHandler.removeUserFromCache(userId);
         return wrapper.update();
     }
 
@@ -190,6 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getChangePwdTime, updateTime);
         wrapper.eq(User::getId, userId);
         Assert.isTrue(!wrapper.update(), "修改失败");
+        userCacheHandler.removeUserFromCache(userId);
         return true;
     }
 
@@ -231,6 +234,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getEmail, email);
         wrapper.eq(User::getId, userId);
         Assert.isTrue(!wrapper.update(), "修改失败");
+        userCacheHandler.removeUserFromCache(userId);
         return true;
     }
 
@@ -265,6 +269,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getLoginTime, dateTime);
         wrapper.eq(User::getUsername, username);
         Assert.isTrue(!wrapper.update(), "更新用户登录信息失败");
+        userCacheHandler.removeUserFromCache(userId);
     }
 
     /**
@@ -409,6 +414,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Assert.notNull(user.getEnabled(), "参数【enabled】不能为空");
         boolean update = lambdaUpdate().set(User::isEnabled, user.getEnabled()).eq(User::getId, user.getId()).update();
         Assert.isTrue(!update, "修改失败");
+        userCacheHandler.removeUserFromCache(user.getId());
     }
 
     private void insertUserRoleData(Long userId, List<Long> roleIds) {

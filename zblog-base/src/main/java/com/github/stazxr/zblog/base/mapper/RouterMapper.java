@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 路由数据持久层
@@ -77,4 +78,11 @@ public interface RouterMapper extends BaseMapper<Router> {
      * @return 影响行数
      */
     int updateLogShowFlag(String uri, String method, boolean logShowed, String updateUser, String updateTime);
+
+    /**
+     * 查询所有的权限编码
+     *
+     * @return codes
+     */
+    Set<String> selectCode();
 }

@@ -1,24 +1,21 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeEnum;
 import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeProperties;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.wf.captcha.base.Captcha;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -31,7 +28,6 @@ import java.util.Map;
  * @since 2022-01-15
  */
 @Slf4j
-@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -44,11 +40,8 @@ public class AuthController {
     @IgnoredLog
     @GetMapping("/loginId")
     @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
-    public Result currentUserDetail(@AuthenticationPrincipal User user) {
-        if (user == null) {
-            return Result.failure(ResultCode.TOKEN_FAILED_001);
-        }
-        return Result.success().data(user);
+    public Result currentUserDetail() {
+        return Result.success().data(SecurityUtils.getLoginUser());
     }
 
     /**
