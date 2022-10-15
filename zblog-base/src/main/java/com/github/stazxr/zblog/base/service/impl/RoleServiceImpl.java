@@ -144,6 +144,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void authRole(RoleAuthDto authDto) {
+        Assert.notNull(authDto.getRoleId(), "参数【roleId】不能为空");
         rolePermMapper.deleteByRoleId(authDto.getRoleId());
         for (Long permId : authDto.getPermIds()) {
             RolePermissionRelation rolePerm = new RolePermissionRelation();

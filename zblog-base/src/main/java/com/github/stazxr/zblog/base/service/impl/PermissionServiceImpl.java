@@ -465,11 +465,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
     private void removeCache(Permission permission) {
         userCacheHandler.clean();
-        if (StringUtils.isNotBlank(permission.getPermCode())) {
-            RouterVo routerVo = routerMapper.selectRouterVoByCode(permission.getPermCode());
-            if (routerVo != null) {
-                String key = interfaceLevel.cacheKey().concat(":").concat(routerVo.getUri()).concat("_").concat(routerVo.getMethod());
-                CacheUtils.remove(key);
+        if (permission != null && StringUtils.isNotBlank(permission.getPermCode())) {
+            List<InterfaceVo> interfaces = interfaceMapper.selectInterfacesByCode(permission.getPermCode());
+            if (!interfaces.isEmpty()) {
+                interfaces.forEach(interfaceVo -> {
+                    String key = interfaceLevel.cacheKey().concat(":").concat(interfaceVo.getUri()).concat("_").concat(interfaceVo.getMethod());
+                    CacheUtils.remove(key);
+                });
             }
         }
     }

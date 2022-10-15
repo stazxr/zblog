@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.VersionMapper">
+    <select id="selectVersionList" resultType="com.github.stazxr.zblog.base.domain.entity.Version">
+        SELECT * FROM version WHERE DELETED = 0
+        <if test="versionName != null and versionName != ''">
+            <bind name="versionNameBind" value="'%' + versionName + '%'"/>
+            AND VERSION_NAME LIKE #{versionNameBind}
+        </if>
+        <if test="updateContent != null and updateContent != ''">
+            <bind name="updateContentBind" value="'%' + updateContent + '%'"/>
+            AND UPDATE_CONTENT LIKE #{updateContentBind}
+        </if>
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectByVersionName" resultType="com.github.stazxr.zblog.base.domain.entity.Version">
+        SELECT * FROM version WHERE DELETED = 0 AND VERSION_NAME = #{versionName}
+    </select>
+</mapper>

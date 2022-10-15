@@ -24,4 +24,8 @@
             </if>
         </where>
     </select>
+
+    <select id="selectInterfacesByCode" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT CODE, URI, METHOD, TYPE, CREATE_TIME FROM interface WHERE CODE = #{code}
+    </select>
 </mapper>

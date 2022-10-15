@@ -34,4 +34,12 @@ public interface InterfaceMapper extends BaseMapper<Interface> {
      * @return interfaceList
      */
     List<InterfaceVo> selectPermInterfaces(@Param("permId") Long permId);
+
+    /**
+     * 查询权限编码对应的接口列表
+     *
+     * @param code 权限编码
+     * @return interfaceList
+     */
+    List<InterfaceVo> selectInterfacesByCode(@Param("code") String code);
 }

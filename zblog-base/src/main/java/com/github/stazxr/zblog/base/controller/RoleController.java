@@ -60,7 +60,7 @@ public class RoleController {
      */
     @GetMapping(value = "/queryRoleDetail")
     @Router(name = "查询角色详情", code = "queryRoleDetail", level = BaseConst.PermLevel.PUBLIC)
-    public Result queryRoleDetail(Long roleId) {
+    public Result queryRoleDetail(@RequestParam Long roleId) {
         return Result.success().data(roleService.queryRoleDetail(roleId));
     }
 
@@ -102,10 +102,6 @@ public class RoleController {
     @PostMapping(value = "/deleteRole")
     @Router(name = "删除角色", code = "deleteRole")
     public Result deleteRole(@RequestPostSingleParam Long roleId) {
-        if (roleId == null) {
-            return Result.failure("参数错误，缺失ID");
-        }
-
         roleService.deleteRole(roleId);
         return Result.success();
     }
@@ -120,10 +116,6 @@ public class RoleController {
     @PostMapping(value = "/authRole")
     @Router(name = "角色授权", code = "authRole")
     public Result authRole(@RequestBody RoleAuthDto authDto) {
-        if (authDto.getRoleId() == null) {
-            return Result.failure("参数错误，缺失roleID");
-        }
-
         roleService.authRole(authDto);
         return Result.success();
     }
@@ -162,10 +154,6 @@ public class RoleController {
     @PostMapping(value = "/batchAddUserRole")
     @Router(name = "批量新增角色用户", code = "batchAddUserRole")
     public Result batchAddUserRole(@RequestBody UserRoleDto userRoleDto) {
-        if (userRoleDto.getRoleId() == null) {
-            return Result.failure("参数错误，缺失roleID");
-        }
-
         roleService.batchAddUserRole(userRoleDto);
         return Result.success();
     }
@@ -180,10 +168,6 @@ public class RoleController {
     @PostMapping(value = "/batchDeleteUserRole")
     @Router(name = "批量删除角色用户", code = "batchDeleteUserRole")
     public Result batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
-        if (userRoleDto.getRoleId() == null) {
-            return Result.failure("参数错误，缺失roleID");
-        }
-
         roleService.batchDeleteUserRole(userRoleDto);
         return Result.success();
     }
