@@ -44,7 +44,7 @@ public class DictController {
      * @return dictList
      */
     @GetMapping(value = "/queryChildList")
-    @Router(name = "查询字典子列表", code = "queryChildList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询字典子列表", code = "queryDictChildList", level = BaseConst.PermLevel.PUBLIC)
     public Result queryChildList(@RequestParam Long pid) {
         return Result.success().data(dictService.queryChildList(pid));
     }

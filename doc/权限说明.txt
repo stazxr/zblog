@@ -1,6 +1,5 @@
 1、涉及的表
-user, role, permission, router, interface
-中间表：
+user, role, permission, router, interface...
 
 2、关联关系
 用户（user） - 角色（role）：多对多的关系，一个用户可以对应多个角色，多个角色同时生效（不存在默认/激活角色）

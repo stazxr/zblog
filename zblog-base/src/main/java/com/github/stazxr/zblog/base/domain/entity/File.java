@@ -61,7 +61,12 @@ public class File extends BaseEntity {
     /**
      * 存储类型
      */
-    private String storageType;
+    private Integer storageType;
+
+    /**
+     * 上传类型
+     */
+    private String uploadType;
 
     /**
      * 是否有效

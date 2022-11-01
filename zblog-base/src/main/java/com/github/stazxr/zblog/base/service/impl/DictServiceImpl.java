@@ -139,6 +139,18 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         Assert.isTrue(dictMapper.deleteById(dictId) != 1, "删除失败");
     }
 
+    /**
+     * 根据KEY查询VALUE
+     *
+     * @param key 字典KEY
+     * @return VALUE
+     */
+    @Override
+    public String querySingleValue(String key) {
+        Assert.notNull(key, "参数【key】不能为空");
+        return dictMapper.selectSingleValue(key);
+    }
+
     private void checkDict(Dict dict) {
         dict.setLocked(Boolean.FALSE);
         Assert.notNull(dict.getName(), "字典名称不能为空");

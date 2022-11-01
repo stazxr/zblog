@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.core.cache.impl;
 import com.github.stazxr.zblog.core.config.properties.CacheConfigProperties;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.time.DateUtils;
-import com.github.stazxr.zblog.util.time.ThreadUtils;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

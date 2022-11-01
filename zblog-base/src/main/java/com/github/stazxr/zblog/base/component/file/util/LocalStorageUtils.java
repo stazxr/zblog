@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.component.file.util;
 
+import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +28,7 @@ public class LocalStorageUtils {
         // 获取文件路径
         String originalFilename = file.getOriginalFilename();
         String suffix = FileUtils.getExtensionName(originalFilename);
-        String fileName = UuidUtils.uuid();
+        String fileName = String.valueOf(GenerateIdUtils.getId());
         if (StringUtils.isNotBlank(suffix)) {
             fileName = fileName + "." + suffix;
         }

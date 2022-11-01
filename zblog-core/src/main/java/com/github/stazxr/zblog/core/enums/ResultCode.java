@@ -204,7 +204,17 @@ public enum ResultCode {
     /**
      * 请求方式不正确
      */
-    REQUEST_METHOD_NOT_SUPPORT(10033, "请求方式不正确");
+    REQUEST_METHOD_NOT_SUPPORT(10033, "请求方式不正确"),
+
+    /**
+     * 文件下载失败
+     */
+    FILE_DOWNLOAD_FAILED(10034, "文件下载失败"),
+
+    /**
+     * 文件删除失败
+     */
+    FILE_DELETE_FAILED(10035, "文件删除失败");
 
     private final Integer code;
 

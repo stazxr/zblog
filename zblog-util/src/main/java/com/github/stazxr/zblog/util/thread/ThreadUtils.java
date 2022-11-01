@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.util.time;
+package com.github.stazxr.zblog.util.thread;
 
 import com.github.stazxr.zblog.util.Assert;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class ThreadUtils {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            log.error("thread sleep catch eor", e);
+            log.error("thread sleep catch interrupted eor", e);
         }
     }
 

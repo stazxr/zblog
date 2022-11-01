@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.util;
 
-import com.github.stazxr.zblog.util.time.ThreadUtils;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 

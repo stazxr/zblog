@@ -22,7 +22,7 @@ import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
-import com.github.stazxr.zblog.util.time.ThreadUtils;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

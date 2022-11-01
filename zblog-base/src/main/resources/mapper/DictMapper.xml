@@ -9,6 +9,10 @@
         UPDATE dict SET ENABLED = #{enabled} WHERE ID = #{dictId}
     </update>
 
+    <update id="updateSingleValue">
+        UPDATE dict SET VALUE = #{dictValue} WHERE `KEY` = #{dictKey} AND DELETED = 0
+    </update>
+
     <delete id="deleteDict">
         DELETE FROM dict WHERE ID = #{dictId}
         <if test='type != null and type == "1"'>
@@ -35,15 +39,20 @@
         <if test="enabled != null">
             AND d.ENABLED = #{enabled}
         </if>
+        ORDER BY SORT
     </select>
 
     <select id="selectChildList" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
-        SELECT <include refid="BaseVoColumn" /> FROM dict d WHERE DELETED = 0 AND TYPE = 2 AND PID = #{pid}
+        SELECT <include refid="BaseVoColumn" /> FROM dict d WHERE DELETED = 0 AND TYPE = 2 AND PID = #{pid} ORDER BY SORT
     </select>
 
     <select id="selectDictDetail" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
         SELECT
             <include refid="BaseVoColumn" />, (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount
         FROM dict d WHERE DELETED = 0 AND ID = #{dictId}
+    </select>
+
+    <select id="selectSingleValue" resultType="java.lang.String">
+        SELECT VALUE FROM dict WHERE DELETED = 0 AND `KEY` = #{key}
     </select>
 </mapper>

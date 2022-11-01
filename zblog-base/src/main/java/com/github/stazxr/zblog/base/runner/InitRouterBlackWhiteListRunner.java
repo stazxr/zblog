@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.base.runner;
 import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.service.DictService;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.util.time.ThreadUtils;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

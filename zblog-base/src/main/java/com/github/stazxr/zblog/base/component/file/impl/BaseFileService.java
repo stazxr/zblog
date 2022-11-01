@@ -14,6 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class BaseFileService implements FileHandler {
     /**
+     * 桶名称与上传路径的分隔符
+     */
+    protected static final String BUCKET_PATH_SPLIT_LABEL = ":";
+
+    /**
      * 获取文件信息
      *
      * @param file MultipartFile

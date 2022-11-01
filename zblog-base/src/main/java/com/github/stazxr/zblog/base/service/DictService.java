@@ -69,4 +69,12 @@ public interface DictService extends IService<Dict> {
      * @param dictId 字典序列
      */
     void deleteDict(Long dictId);
+
+    /**
+     * 根据KEY查询VALUE
+     *
+     * @param key 字典KEY
+     * @return VALUE
+     */
+    String querySingleValue(String key);
 }

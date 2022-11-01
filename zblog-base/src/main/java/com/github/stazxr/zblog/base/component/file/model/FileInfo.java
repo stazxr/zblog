@@ -44,4 +44,9 @@ public class FileInfo {
      * MD5
      */
     private String md5;
+
+    /**
+     * 上传类型
+     */
+    private Integer uploadType;
 }

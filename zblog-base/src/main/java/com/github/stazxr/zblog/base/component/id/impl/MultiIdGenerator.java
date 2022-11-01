@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * 单机部署全局唯一ID生成器
+ * 多节点机部署全局唯一ID生成器
  *
  * @author SunTao
  * @since 2021-12-12

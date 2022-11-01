@@ -63,4 +63,20 @@ public interface DictMapper extends BaseMapper<Dict> {
      * @param type   字典类型
      */
     void deleteDict(@Param("dictId") Long dictId, @Param("type") Integer type);
+
+    /**
+     * 根据KEY查询VALUE
+     *
+     * @param key 字典KEY
+     * @return VALUE
+     */
+    String selectSingleValue(@Param("key") String key);
+
+    /**
+     * 根据 KEY 修改字典值
+     *
+     * @param dictKey   KEY
+     * @param dictValue VALUE
+     */
+    void updateSingleValue(@Param("dictKey") String dictKey, @Param("dictValue") String dictValue);
 }

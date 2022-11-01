@@ -1,24 +1,31 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.stazxr.zblog.base.component.file.FileHandler;
 import com.github.stazxr.zblog.base.component.file.FileTypeHandler;
 import com.github.stazxr.zblog.base.component.file.model.FileInfo;
+import com.github.stazxr.zblog.base.component.file.model.FileUploadType;
+import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.service.FileService;
+import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.util.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * 附件上传管理
+ * 存储管理
  *
  * @author SunTao
  * @since 2022-07-27
@@ -31,10 +38,16 @@ public class FileController {
     private final FileService fileService;
 
     /**
-     * 文件上传类型
+     * 分页查询文件列表
+     *
+     * @param queryDto 查询参数
+     * @return fileList
      */
-    @Value("${zblog.file-upload-type:1}")
-    private int fileUploadType;
+    @GetMapping(value = "/queryFileListByPage")
+    @Router(name = "分页查询文件列表", code = "queryFileListByPage")
+    public Result queryFileListByPage(FileQueryDto queryDto) {
+        return Result.success().data(fileService.queryFileListByPage(queryDto));
+    }
 
     /**
      * 文件上传，支持单文件，多文件上传
@@ -43,27 +56,138 @@ public class FileController {
      * @param file 单文件上传
      * @return FileUploadVo List
      */
+    @Log
     @PostMapping("/uploadFile")
     @Router(name = "文件上传", code = "uploadFile", level = BaseConst.PermLevel.PUBLIC)
     public Result uploadFile(@RequestPart(value = "files", required = false) MultipartFile[] files,
             @RequestPart(value = "file", required = false) MultipartFile file) {
-        boolean isMulFileEmpty = files == null || files.length < 1;
-        if (isMulFileEmpty && file == null) {
-            throw new ServiceException(ResultCode.FILE_UPLOAD_FAILED, "文件上传失败，参数【files, file】为空");
-        }
-
-        // 设置上传文件列表
+        Assert.isTrue((files == null || files.length < 1) && file == null, "上传失败，待上传文件列表为空");
         if (files == null || files.length < 1) {
             files = new MultipartFile[] {file};
         }
 
         try {
             // 上传文件
+            int fileUploadType = fileService.getFileUploadType();
             FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
             List<FileInfo> fileList = fileHandler.uploadFile(files);
-            return Result.success("上传成功").data(fileService.insertFile(fileList, fileUploadType));
+            return Result.success("上传成功").data(fileService.insertFile(FileUploadType.NORMAL.getType(), fileList));
         } catch (Exception e) {
             throw new ServiceException(ResultCode.FILE_UPLOAD_FAILED, e);
         }
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param fileId   文件序号
+     * @param isDown   是否强制下载
+     * @param response 响应对象
+     * @return Result
+     */
+    @GetMapping("/downloadFile")
+    @Router(name = "下载文件", code = "downloadFile", level = BaseConst.PermLevel.OPEN)
+    public Result downloadFile(Long fileId, Boolean isDown, HttpServletResponse response) {
+        fileService.downloadFile(fileId, isDown, response);
+        return Result.success();
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param fileId 文件序号
+     * @param businessId 业务序号
+     * @return Result
+     */
+    @PostMapping("/deleteFile")
+    @Router(name = "删除文件", code = "deleteFile", level = BaseConst.PermLevel.PUBLIC)
+    public Result deleteFile(Long fileId, Long businessId) {
+        fileService.deleteFile(fileId, businessId);
+        return Result.success();
+    }
+
+    /**
+     * 测试文件上传
+     *
+     * @param file  单文件上传
+     * @param type  上传类型
+     * @return FileUploadVo List
+     */
+    @PostMapping("/testUploadFile")
+    @Router(name = "测试文件上传", code = "testUploadFile")
+    public Result testUploadFile(@RequestPart(value = "file") MultipartFile file, @RequestParam Integer type) {
+        Assert.notNull(type, "参数【type】不能为空".toLowerCase(Locale.ROOT));
+        Assert.isTrue(file == null, "上传失败，待上传文件列表为空");
+
+        try {
+            // 上传文件
+            FileHandler fileHandler = FileTypeHandler.of(type);
+            List<FileInfo> fileList = fileHandler.uploadFile(new MultipartFile[] {file});
+            return Result.success("上传成功").data(fileService.insertFile(FileUploadType.TEST.getType(), fileList));
+        } catch (Exception e) {
+            throw new ServiceException(ResultCode.FILE_UPLOAD_FAILED, e);
+        }
+    }
+
+    /**
+     * 测试文件删除
+     *
+     * @param fileIds 文件序号列表
+     * @return Result
+     */
+    @PostMapping("/testDeleteFile")
+    @Router(name = "测试文件删除", code = "testDeleteFile")
+    public Result testDeleteFile(@RequestBody List<Long> fileIds) {
+        fileService.testDeleteFile(fileIds);
+        return Result.success();
+    }
+
+    /**
+     * 获取配置信息
+     *
+     * @param storageType 存储类型
+     * @return Result
+     */
+    @GetMapping("/getConfigInfo")
+    @Router(name = "获取配置信息", code = "getStorageConfigInfo")
+    public Result getConfigInfo(@RequestParam Integer storageType) {
+        return Result.success().data(fileService.getConfigInfo(storageType));
+    }
+
+    /**
+     * 保存配置信息
+     *
+     * @param param 配置信息
+     * @return Result
+     */
+    @PostMapping("/setConfigInfo")
+    @Router(name = "保存配置信息", code = "setStorageConfigInfo")
+    public Result setConfigInfo(@RequestBody JSONObject param) {
+        fileService.setConfigInfo(param);
+        return Result.success();
+    }
+
+    /**
+     * 获取激活的存储类型
+     *
+     * @return StorageType
+     */
+    @GetMapping("/getConfigStorageType")
+    @Router(name = "获取激活的存储类型", code = "getConfigStorageType")
+    public Result getConfigStorageType() {
+        return Result.success().data(fileService.getConfigStorageType());
+    }
+
+    /**
+     * 激活存储配置
+     *
+     * @param storageType 存储类型
+     * @return Result
+     */
+    @PostMapping("/activeStorageConfig")
+    @Router(name = "激活存储配置", code = "activeStorageConfig")
+    public Result activeStorageConfig(@RequestPostSingleParam Integer storageType) {
+        fileService.activeStorageConfig(storageType);
+        return Result.success();
     }
 }

@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileMapper">
+    <update id="deleteFileByBusinessId">
+        UPDATE file SET DELETED = 1, UPDATE_USER = #{deleteUser}, UPDATE_TIME = SYSDATE() WHERE ID IN (
+            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId}
+        )
+    </update>
 
+    <update id="deleteFileByFileId">
+        UPDATE file SET DELETED = 1, UPDATE_USER = #{deleteUser}, UPDATE_TIME = SYSDATE() WHERE ID = #{fileId}
+    </update>
+
+    <select id="selectFileList" resultType="com.github.stazxr.zblog.base.domain.entity.File">
+        SELECT * FROM file WHERE DELETED = 0
+        <if test="filename != null and filename != ''">
+            <bind name="filenameBind" value="'%' + filename + '%'"/>
+            AND ORIGINAL_FILENAME LIKE #{filenameBind}
+        </if>
+        <if test='storageType != null and storageType != ""'>
+            AND STORAGE_TYPE = #{storageType}
+        </if>
+        <if test="createStartTime != null and createStartTime != ''">
+            AND CREATE_TIME &gt;= #{createStartTime}
+        </if>
+        <if test="createEndTime != null and createEndTime != ''">
+            AND CREATE_TIME &lt;= #{createEndTime}
+        </if>
+    </select>
+
+    <select id="selectFilePathListByFileId" resultType="java.lang.String">
+        SELECT FILE_PATH FROM file WHERE DELETED = 0 AND ID = #{fileId}
+    </select>
+
+    <select id="selectFilePathListByBusinessId" resultType="java.lang.String">
+        SELECT FILE_PATH FROM file WHERE DELETED = 0 AND ID IN (
+            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId}
+        )
+    </select>
+
+    <select id="selectByFilepath" resultType="com.github.stazxr.zblog.base.domain.entity.File">
+        SELECT * FROM file WHERE FILE_PATH = #{filepath}
+    </select>
 </mapper>

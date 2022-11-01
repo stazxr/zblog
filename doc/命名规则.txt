@@ -1,4 +1,4 @@
-Controller:
+控制层:
 查询：queryXXX
     查询一个：queryOneByXXX
     查询列表：queryListByXXX
@@ -7,15 +7,16 @@ Controller:
 修改：editXXX
 删除：deleteXXX
 
-Service:
+业务层:
 查询：queryXXX
 新增：addXXX
 修改：editXXX
 删除：deleteXXX
 
-Mapper:
+数据层:
 查询：selectXXX
 新增：insertXXX
 修改：updateXXX
 删除：deleteXXX
 
+其他：类命，方法名、常量名，变量名等其他命令严格按照阿里Java开发规范进行。

@@ -53,6 +53,26 @@ public class BaseConst {
          * 路由黑名单
          */
         public static final String ROUTER_BLACK_LIST = "routerBlackList";
+
+        /**
+         * 文件存储类型
+         */
+        public static final String ACTIVE_UPLOAD_TYPE = "ACTIVE_UPLOAD_TYPE";
+
+        /**
+         * 云存储配置-本地
+         */
+        public static final String CLOUD_STORAGE_LOCAL_CONFIG = "CLOUD_STORAGE_LOCAL_CONFIG";
+
+        /**
+         * 云存储配置-阿里云
+         */
+        public static final String CLOUD_STORAGE_A_LI_CONFIG = "CLOUD_STORAGE_A_LI_CONFIG";
+
+        /**
+         * 云存储配置-七牛云
+         */
+        public static final String CLOUD_STORAGE_QI_NIU_CONFIG = "CLOUD_STORAGE_QI_NIU_CONFIG";
     }
 
     /**

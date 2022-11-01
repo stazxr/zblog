@@ -15,6 +15,7 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+.fleet
 *.iws
 *.iml
 *.ipr
@@ -33,4 +34,4 @@ build/
 .vscode/
 
 ### online data ###
-
+/doc/prod.sql
