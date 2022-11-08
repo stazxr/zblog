@@ -12,6 +12,9 @@
     <artifactId>zblog-service</artifactId>
     <packaging>jar</packaging>
 
+    <name>zblog-service</name>
+    <description>ZBLOG 框架的业务组件</description>
+
     <properties>
         <mainClass>com.github.stazxr.zblog.ZblogApplication</mainClass>
     </properties>

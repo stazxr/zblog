@@ -13,6 +13,9 @@
     <artifactId>zblog-util</artifactId>
     <packaging>jar</packaging>
 
+    <name>zblog-util</name>
+    <description>ZBLOG 框架的公共工具类组件，实现字符串、日期、加解密、IO、Assert、OSS、JSCH 等工具的的封装</description>
+
     <properties>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <poi.version>4.0.0</poi.version>
@@ -94,13 +97,13 @@
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
         </dependency>
-        <!-- aliyun OSS -->
+        <!-- aliYun OSS -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>${aliyun.oss.version}</version>
         </dependency>
-        <!-- qiniu SDK -->
+        <!-- qiNiu SDK -->
         <dependency>
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>

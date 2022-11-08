@@ -11,4 +11,7 @@
 
     <artifactId>zblog-xxljob</artifactId>
     <packaging>jar</packaging>
+
+    <name>zblog-xxljob</name>
+    <description>基于 XXLJOB 的定时任务组件（待实现）</description>
 </project>

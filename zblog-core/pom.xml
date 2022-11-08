@@ -13,6 +13,11 @@
     <artifactId>zblog-core</artifactId>
     <packaging>jar</packaging>
 
+    <name>zblog-core</name>
+    <description>
+        ZBLOG 框架的核心组件，提供接口统一响应、统一异常处理、系统缓存、默认配置（MybatisPlus、Thread、Cache、WebMvc等）、基础类、基础注解等
+    </description>
+
     <dependencies>
         <!-- Zblog Util -->
         <dependency>
