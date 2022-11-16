@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.ServerNodeMapper">
+    <select id="selectNodeList" resultType="com.github.stazxr.zblog.base.domain.vo.NodeVo">
+        SELECT
+            ID, `NAME`, IP, PORT, SSH_USER, `DESC`, CREATE_USER, CREATE_TIME
+        FROM server_node
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="nameBind" value="'%' + name + '%'"/>
+                AND `NAME` LIKE #{nameBind}
+            </if>
+            <if test="ip != null and ip != ''">
+                <bind name="ipBind" value="'%' + ip + '%'"/>
+                AND IP LIKE #{ipBind}
+            </if>
+        </where>
+        ORDER BY UPDATE_TIME DESC
+    </select>
+
+    <select id="selectNodeDetail" resultType="com.github.stazxr.zblog.base.domain.vo.NodeVo">
+        SELECT
+            ID, `NAME`, IP, PORT, SSH_USER, SSH_PWD, `DESC`,
+            CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        FROM server_node
+        WHERE ID = #{nodeId}
+    </select>
+
+    <select id="selectByHostAndUser" resultType="com.github.stazxr.zblog.base.domain.entity.ServerNode">
+        SELECT
+            ID, `NAME`, IP, PORT, SSH_USER, SSH_PWD, `DESC`,
+            CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        FROM server_node
+        WHERE IP = #{ip} AND SSH_USER = #{sshUser}
+    </select>
+</mapper>

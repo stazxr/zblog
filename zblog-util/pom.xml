@@ -109,5 +109,11 @@
             <artifactId>qiniu-java-sdk</artifactId>
             <version>${qiniu.version}</version>
         </dependency>
+        <!-- Jsch -->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>

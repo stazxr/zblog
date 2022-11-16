@@ -7,6 +7,7 @@ import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,7 +35,7 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
     private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 拦截登录请求，进行验证码验证
         if (CustomWebSecurityConfiguration.LOGIN_PROCESSING_URL.equals(request.getRequestURI())
                 && HttpMethod.POST.toString().equalsIgnoreCase(request.getMethod())) {

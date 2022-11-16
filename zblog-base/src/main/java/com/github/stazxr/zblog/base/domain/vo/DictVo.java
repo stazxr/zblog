@@ -81,5 +81,4 @@ public class DictVo extends BaseVo {
 
         return subCount > 0;
     }
-
 }

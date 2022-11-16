@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.secret.RsaUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class ParseLoginParamFilter extends OncePerRequestFilter {
     private static final String REMEMBER_ME_PARAMETER = "rememberMe";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (CustomWebSecurityConfiguration.LOGIN_PROCESSING_URL.equals(request.getRequestURI())
                 && HttpMethod.POST.toString().equalsIgnoreCase(request.getMethod())) {
             // 如果是登录请求，将参数存储到请求中

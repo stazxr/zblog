@@ -30,7 +30,7 @@
 
     <modules>
         <!-- 定时任务 -->
-        <module>zblog-xxljob</module>
+        <!-- <module>zblog-xxljob</module> -->
         <!-- 工具组件 -->
         <module>zblog-util</module>
         <!-- 核心组件 -->
@@ -38,7 +38,7 @@
         <!-- 切面日志 -->
         <module>zblog-log</module>
         <!-- 消息中心 -->
-        <module>zblog-notify</module>
+        <!-- <module>zblog-notify</module> -->
         <!-- 基础功能 -->
         <module>zblog-base</module>
         <!-- 业务模块 -->
