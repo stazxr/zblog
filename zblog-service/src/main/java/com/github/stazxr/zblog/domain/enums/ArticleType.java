@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.IEnum;
+import lombok.Getter;
 
 /**
  * 文章类型
@@ -8,48 +8,31 @@ import com.baomidou.mybatisplus.annotation.IEnum;
  * @author SunTao
  * @since 2021-07-31
  */
-public enum ArticleType implements IEnum<Integer> {
+@Getter
+public enum ArticleType {
     /**
      * 原创
      */
-    ORIGINAL(1, "原创"),
+    ORIGINAL(1),
 
     /**
      * 转载
      */
-    REPRINT(2, "转载");
+    REPRINT(2);
 
-    private final int value;
+    private final Integer type;
 
-    private final String name;
-
-    ArticleType(int value, String name) {
-        this.value = value;
-        this.name = name;
+    ArticleType(Integer type) {
+        this.type = type;
     }
 
-    /**
-     * 枚举数据库存储值
-     */
-    @Override
-    public Integer getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return this.name;
-    }
-
-    public static ArticleType getInstance(int value) {
-        ArticleType[] values = ArticleType.values();
-        for (ArticleType articleType : values) {
-            if (articleType.value == value) {
-                return articleType;
+    public static ArticleType of(Integer articleType) {
+        for (ArticleType item : values()) {
+            if (item.type.equals(articleType)) {
+                return item;
             }
         }
 
-        // 找不到就抛出异常
-        throw new IllegalStateException("非法的参数[" + value + "]");
+        return null;
     }
 }

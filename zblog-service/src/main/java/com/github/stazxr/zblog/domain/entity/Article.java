@@ -4,9 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
-import com.github.stazxr.zblog.domain.enums.ArticlePerm;
-import com.github.stazxr.zblog.domain.enums.ArticleStatus;
-import com.github.stazxr.zblog.domain.enums.ArticleType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,6 +54,31 @@ public class Article extends BaseEntity {
     private String coverImage;
 
     /**
+     * 转载情况下原文的地址
+     */
+    private String reprintLink;
+
+    /**
+     * 转载说明
+     */
+    private String reprintDesc;
+
+    /**
+     * 文章类型
+     */
+    private Integer articleType;
+
+    /**
+     * 文章状态
+     */
+    private Integer articleStatus;
+
+    /**
+     * 文章权限
+     */
+    private Integer articlePerm;
+
+    /**
      * 文章分类
      */
     private Long categoryId;
@@ -67,34 +89,9 @@ public class Article extends BaseEntity {
     private Long authorId;
 
     /**
-     * 文章类型
-     */
-    private ArticleType articleType;
-
-    /**
-     * 文章状态
-     */
-    private ArticleStatus articleStatus;
-
-    /**
-     * 文章权限
-     */
-    private ArticlePerm articlePerm;
-
-    /**
      * 是否允许评论
      */
-    private Boolean commentAble;
-
-    /**
-     * 转载情况下原文的地址
-     */
-    private String reprintLink;
-
-    /**
-     * 转载说明
-     */
-    private String reprintDesc;
+    private Boolean commentFlag;
 
     /**
      * 是否已删除（使用逻辑操作，保护数据）

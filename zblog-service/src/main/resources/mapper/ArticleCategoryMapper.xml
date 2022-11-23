@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.ArticleCategoryMapper">
+    <select id="selectCategoryList" resultType="com.github.stazxr.zblog.domain.vo.ArticleCategoryVo">
+        SELECT
+            c.ID, c.PID, c.NAME, c.IMAGE_URL, c.`DESC`, c.SORT, c.ENABLED,
+            IF(c.PID IS NULL, (
+                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID IN (
+                    SELECT c1.ID FROM article_category c1 WHERE c1.ID = c.PID
+                )
+            ), (
+                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = c.PID
+            )) AS ARTICLE_COUNT
+        FROM article_category c
+        WHERE c.DELETED = 0
+        <if test="name != null and name != ''">
+            <bind name="nameBind" value="'%' + name + '%'"/>
+            AND c.NAME LIKE #{nameBind}
+        </if>
+        <if test="enabled != null">
+            AND c.ENABLED = #{enabled}
+        </if>
+        <if test="firstLevel != null">
+            AND c.PID IS NULL
+        </if>
+        ORDER BY SORT, NAME
+    </select>
+
+    <select id="selectCategoryDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleCategoryVo">
+        SELECT
+            ID, PID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED,
+            CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_category
+        WHERE DELETED = 0 AND ID = #{categoryId}
+    </select>
+
+    <select id="selectArticleCountByCategory" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM article WHERE DELETED = 0 AND CATEGORY_ID = #{categoryId}
+    </select>
+
+    <select id="selectByCategoryName" resultType="com.github.stazxr.zblog.domain.entity.ArticleCategory">
+        SELECT
+            ID, PID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED,
+            CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_category
+        WHERE DELETED = 0 AND NAME = #{name}
+    </select>
+</mapper>

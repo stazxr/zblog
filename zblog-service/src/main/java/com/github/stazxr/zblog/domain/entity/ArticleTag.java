@@ -9,15 +9,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 文章分类
+ * 文章标签
  *
  * @author SunTao
- * @since 2021-01-17
+ * @since 2020-12-20
  */
 @Getter
 @Setter
-@TableName("category")
-public class Category extends BaseEntity {
+@TableName("article_tag")
+public class ArticleTag extends BaseEntity {
     /**
      * 主键
      */
@@ -25,32 +25,10 @@ public class Category extends BaseEntity {
     private Long id;
 
     /**
-     * 上级分类
-     */
-    @TableField(value = "`PID`")
-    private Long pid;
-
-    /**
-     * 分类名称
+     * 标签名称
      */
     @TableField(value = "`NAME`")
     private String name;
-
-    /**
-     * 分类预览图
-     */
-    private String imageUrl;
-
-    /**
-     * 分类描述
-     */
-    @TableField(value = "`DESC`")
-    private String desc;
-
-    /**
-     * 排序
-     */
-    private Integer sort;
 
     /**
      * 首页推荐

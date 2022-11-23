@@ -12,5 +12,5 @@ public class YwConstants {
     /**
      * 前台只允许展示已发布状态的文章
      */
-    public static final int APG = ArticleStatus.PUBLISHED.getValue();
+    public static final int APG = ArticleStatus.PUBLISHED.getType();
 }

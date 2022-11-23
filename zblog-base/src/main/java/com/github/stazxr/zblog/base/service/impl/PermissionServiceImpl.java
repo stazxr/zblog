@@ -24,6 +24,7 @@ import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.log.mapper.LogMapper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
         List<PermissionVo> result = new ArrayList<>();
         Map<Long, Set<Long>> pidIdsMap = parsePermPidGroupMap(permPidGroupMap);
-        Set<Long> firstPid = calculateFirstFirstPid(pidIdsMap);
+        Set<Long> firstPid = MathUtils.calculateFirstPid(pidIdsMap);
         for (Long pid : firstPid) {
             List<PermissionVo> permList = permPidGroupMap.get(pid);
             fetchPermVoChildren(permList, permPidGroupMap);
@@ -440,25 +441,6 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 ids.add(permissionVo.getId());
             }
             result.put(pid, ids);
-        }
-        return result;
-    }
-
-    /**
-     * 计算一级PID列表
-     *
-     * @param pidIdsMap pid id 的对应关系
-     * @return 需要一级展示的PID列表
-     */
-    private Set<Long> calculateFirstFirstPid(Map<Long, Set<Long>> pidIdsMap) {
-        Set<Long> result = new HashSet<>();
-        Loop: for (Long pid : pidIdsMap.keySet()) {
-            for (Set<Long> ids: pidIdsMap.values()) {
-                if (ids.contains(pid)) {
-                    continue Loop;
-                }
-            }
-            result.add(pid);
         }
         return result;
     }

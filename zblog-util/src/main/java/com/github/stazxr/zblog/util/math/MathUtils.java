@@ -5,6 +5,9 @@ import com.github.stazxr.zblog.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 算术工具类
@@ -89,5 +92,24 @@ public class MathUtils {
         BigDecimal subtract = nowNum.subtract(preNum);
         BigDecimal divide = subtract.divide(preNum, 4, RoundingMode.HALF_UP);
         return parsePercent(divide.doubleValue(), scale);
+    }
+
+    /**
+     * 计算一级PID列表
+     *
+     * @param pidIdsMap pid id 的对应关系
+     * @return 需要一级展示的PID列表
+     */
+    public static Set<Long> calculateFirstPid(Map<Long, Set<Long>> pidIdsMap) {
+        Set<Long> result = new HashSet<>();
+        Loop: for (Long pid : pidIdsMap.keySet()) {
+            for (Set<Long> ids: pidIdsMap.values()) {
+                if (ids.contains(pid)) {
+                    continue Loop;
+                }
+            }
+            result.add(pid);
+        }
+        return result;
     }
 }

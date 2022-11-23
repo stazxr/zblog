@@ -55,11 +55,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements FileService {
-    /**
-     * 0代表使用系统默认的文件存储方式
-     */
-    private static final String DEFAULT_TYPE = "0";
-
     private final DictMapper dictMapper;
 
     private final FileMapper fileMapper;
@@ -80,7 +75,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
     @Override
     public int getFileUploadType() {
         String dictType = dictMapper.selectSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE);
-        if (StringUtils.isNotBlank(dictType)) {
+        if (StringUtils.isNotBlank(dictType) && !String.valueOf(FileTypeHandler.DEFAULT.getType()).equals(dictType)) {
             return Integer.parseInt(dictType);
         }
 
@@ -318,9 +313,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
 
         // 激活的存储方式
         String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE);
-        if (StringUtils.isBlank(configValue) || DEFAULT_TYPE.equals(configValue)) {
-            typeVo.setActiveType(Integer.parseInt(DEFAULT_TYPE));
-            typeVo.setActiveTypeName("默认");
+        if (StringUtils.isBlank(configValue) || String.valueOf(FileTypeHandler.DEFAULT.getType()).equals(configValue)) {
+            typeVo.setActiveType(FileTypeHandler.DEFAULT.getType());
+            typeVo.setActiveTypeName(FileTypeHandler.ofName(FileTypeHandler.DEFAULT.getType()));
         } else {
             typeVo.setActiveType(Integer.valueOf(configValue));
             typeVo.setActiveTypeName(FileTypeHandler.ofName(Integer.parseInt(configValue)));

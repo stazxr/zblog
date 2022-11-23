@@ -9,15 +9,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 文章标签
+ * 文章栏目
  *
  * @author SunTao
- * @since 2020-12-20
+ * @since 2022-05-31
  */
 @Getter
 @Setter
-@TableName("tag")
-public class Tag extends BaseEntity {
+@TableName("article_column")
+public class ArticleColumn extends BaseEntity {
     /**
      * 主键
      */
@@ -25,15 +25,26 @@ public class Tag extends BaseEntity {
     private Long id;
 
     /**
-     * 标签名称
+     * 栏目名称
      */
     @TableField(value = "`NAME`")
     private String name;
 
     /**
-     * 首页推荐
+     * 栏目预览图
      */
-    private Boolean good;
+    private String imageUrl;
+
+    /**
+     * 栏目描述
+     */
+    @TableField(value = "`DESC`")
+    private String desc;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 
     /**
      * 是否启用

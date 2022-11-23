@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.domain.enums;
 
-import com.baomidou.mybatisplus.annotation.IEnum;
+import lombok.Getter;
 
 /**
  * 文章权限
@@ -8,53 +8,36 @@ import com.baomidou.mybatisplus.annotation.IEnum;
  * @author SunTao
  * @since 2022-06-07
  */
-public enum ArticlePerm implements IEnum<Integer> {
+@Getter
+public enum ArticlePerm {
     /**
      * 公开
      */
-    OPEN_SHOW(1, "公开"),
+    OPEN_SHOW(1),
 
     /**
      * 登录可见
      */
-    LOGIN_SHOW(2, "登录可见"),
+    LOGIN_SHOW(2),
 
     /**
-     * 仅自己可见
+     * 仅自己可见，无需审核
      */
-    SELF_SHOW(3, "仅自己可见");
+    SELF_SHOW(3);
 
-    private final int value;
+    private final Integer type;
 
-    private final String name;
-
-    ArticlePerm(int value, String name) {
-        this.value = value;
-        this.name = name;
+    ArticlePerm(int type) {
+        this.type = type;
     }
 
-    /**
-     * 枚举数据库存储值
-     */
-    @Override
-    public Integer getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return this.name;
-    }
-
-    public static ArticlePerm getInstance(int value) {
-        ArticlePerm[] values = ArticlePerm.values();
-        for (ArticlePerm articlePerm : values) {
-            if (articlePerm.value == value) {
-                return articlePerm;
+    public static ArticlePerm of(Integer articlePerm) {
+        for (ArticlePerm item : values()) {
+            if (item.type.equals(articlePerm)) {
+                return item;
             }
         }
 
-        // 找不到就抛出异常
-        throw new IllegalStateException("非法的参数[" + value + "]");
+        return null;
     }
 }

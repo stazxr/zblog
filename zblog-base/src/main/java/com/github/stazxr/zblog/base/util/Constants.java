@@ -8,6 +8,11 @@ package com.github.stazxr.zblog.base.util;
  */
 public class Constants {
     /**
+     * 树结构的顶部序列
+     */
+    public static final Long TOP_ID = 0L;
+
+    /**
      * 权限树中顶层权限的ID
      */
     public static final Long TOP_PERM_ID = 0L;

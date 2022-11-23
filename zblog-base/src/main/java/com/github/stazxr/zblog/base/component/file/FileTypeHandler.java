@@ -12,6 +12,11 @@ import lombok.Getter;
  */
 public enum FileTypeHandler {
     /**
+     * 默认，已配置文件为主
+     */
+    DEFAULT(0, "默认", ""),
+
+    /**
      * 本地存储
      */
     LOCAL(1, "本地", "LocalFileHandlerService"),
