@@ -31,9 +31,9 @@ public class ArticleTag extends BaseEntity {
     private String name;
 
     /**
-     * 首页推荐
+     * 标签类型: see {@link com.github.stazxr.zblog.domain.enums.ArticleTagType}
      */
-    private Boolean good;
+    private Integer type;
 
     /**
      * 是否启用
@@ -41,7 +41,7 @@ public class ArticleTag extends BaseEntity {
     private Boolean enabled;
 
     /**
-     * 是否已删除（逻辑操作，保护数据）
+     * 是否已删除
      */
     @TableLogic
     private Boolean deleted;

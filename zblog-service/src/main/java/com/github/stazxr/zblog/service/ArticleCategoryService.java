@@ -14,7 +14,7 @@ import java.util.List;
  * @author SunTao
  * @since 2021-01-17
  */
-public interface CategoryService extends IService<ArticleCategory> {
+public interface ArticleCategoryService extends IService<ArticleCategory> {
     /**
      * 查询类别列表（树）
      *

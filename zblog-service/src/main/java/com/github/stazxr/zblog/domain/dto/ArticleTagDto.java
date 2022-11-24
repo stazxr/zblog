@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 类别信息
+ * 标签信息
  *
  * @author SunTao
  * @since 2022-11-24
@@ -13,36 +13,21 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ArticleCategoryDto {
+public class ArticleTagDto {
     /**
      * 主键
      */
     private Long id;
 
     /**
-     * 上级分类
-     */
-    private Long pid;
-
-    /**
-     * 分类名称
+     * 标签名称
      */
     private String name;
 
     /**
-     * 分类预览图
+     * 标签类型
      */
-    private String imageUrl;
-
-    /**
-     * 分类描述
-     */
-    private String desc;
-
-    /**
-     * 排序
-     */
-    private Integer sort;
+    private Integer type;
 
     /**
      * 是否启用

@@ -6,27 +6,27 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 类别查询
+ * 标签查询
  *
  * @author SunTao
- * @since 2022-09-20
+ * @since 2022-11-24
  */
 @Getter
 @Setter
 @ToString
-public class ArticleCategoryQueryDto extends PageParam {
+public class ArticleTagQueryDto extends PageParam {
     /**
-     * 类别名称
+     * 标签名称
      */
     private String name;
 
     /**
-     * 类别状态
+     * 标签状态
      */
     private Boolean enabled;
 
     /**
-     * 是否只查询一级的类别列表
+     * 创建用户
      */
-    private Boolean firstLevel;
+    private String createUser;
 }

@@ -12,7 +12,7 @@ import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleCategory;
 import com.github.stazxr.zblog.domain.vo.ArticleCategoryVo;
 import com.github.stazxr.zblog.mapper.ArticleCategoryMapper;
-import com.github.stazxr.zblog.service.CategoryService;
+import com.github.stazxr.zblog.service.ArticleCategoryService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMapper, ArticleCategory> implements CategoryService {
+public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMapper, ArticleCategory> implements ArticleCategoryService {
     private final ArticleCategoryConverter articleCategoryConverter;
 
     /**
@@ -139,7 +139,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     private void checkArticleCategory(ArticleCategory articleCategory) {
         Assert.notNull(articleCategory.getName(), "分类名称不能为空");
         Assert.notNull(articleCategory.getSort(), "分类排序不能为空");
-        Assert.notNull(articleCategory.getEnabled(), "分类排序不能为空");
+        Assert.notNull(articleCategory.getEnabled(), "分类状态不能为空");
 
         ArticleCategory dbCategory = baseMapper.selectByCategoryName(articleCategory.getName());
         boolean isExist = dbCategory != null && !dbCategory.getId().equals(articleCategory.getId());

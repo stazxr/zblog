@@ -16,6 +16,12 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`zblog` /*!40100 DEFAULT CHARACTER SET u
 
 USE `zblog`;
 
+/*
+  COLLATE=utf8_bin; COLLATE=utf8_general_ci
+  utf8_general_ci -- 不区分大小写，默认
+  utf8_bin -- 区分大小写
+*/
+
 /*Table structure for table `persistent_logins` */
 DROP TABLE IF EXISTS `persistent_logins`;
 CREATE TABLE `persistent_logins` (

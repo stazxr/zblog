@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleTagMapper">
+    <select id="selectTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+        SELECT * FROM (
+            SELECT
+                ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+            FROM article_tag WHERE DELETED = 0 AND TYPE = 1
+            UNION ALL
+            SELECT
+                ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+            FROM article_tag WHERE DELETED = 0 AND TYPE = 2 AND CREATE_USER = #{createUser}
+        ) temp
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="nameBind" value="'%' + name + '%'"/>
+                temp.NAME LIKE #{nameBind}
+            </if>
+            <if test="enabled != null">
+                temp.ENABLED = #{enabled}
+            </if>
+        </where>
+        ORDER BY temp.NAME
+    </select>
 
+    <select id="selectTagDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+        SELECT
+            ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_tag WHERE DELETED = 0 AND ID = #{tagId}
+    </select>
+
+    <select id="selectByTagName" resultType="com.github.stazxr.zblog.domain.entity.ArticleTag">
+        SELECT
+            ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_tag WHERE DELETED = 0 AND NAME = #{name}
+    </select>
 </mapper>
