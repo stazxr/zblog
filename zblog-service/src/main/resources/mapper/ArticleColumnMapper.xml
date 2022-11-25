@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnMapper">
+    <select id="selectColumnList" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnVo">
+        SELECT
+            ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_column
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="nameBind" value="'%' + name + '%'"/>
+                NAME LIKE #{nameBind}
+            </if>
+            <if test="enabled != null">
+                ENABLED = #{enabled}
+            </if>
+        </where>
+        ORDER BY SORT, NAME
+    </select>
 
+    <select id="selectColumnDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnVo">
+        SELECT
+            ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_column
+        WHERE ID = #{columnId}
+    </select>
+
+    <select id="selectByColumnName" resultType="com.github.stazxr.zblog.domain.entity.ArticleCategory">
+        SELECT
+            ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM article_column
+        WHERE NAME = #{name}
+    </select>
 </mapper>

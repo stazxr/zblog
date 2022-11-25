@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnMapper">
+<mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnRelationMapper">
+    <delete id="deleteByColumnId">
+        DELETE FROM article_column_relation WHERE COLUMN_ID = #{columnId}
+    </delete>
 
+    <delete id="deleteByArticleId">
+        DELETE FROM article_column_relation WHERE ARTICLE_ID = #{articleId}
+    </delete>
 </mapper>

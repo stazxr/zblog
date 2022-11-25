@@ -1,32 +1,27 @@
-package com.github.stazxr.zblog.domain.entity;
+package com.github.stazxr.zblog.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
- * 文章栏目
+ * 栏目信息
  *
  * @author SunTao
- * @since 2022-05-31
+ * @since 2022-11-24
  */
 @Getter
 @Setter
-@TableName("article_column")
-public class ArticleColumn extends BaseEntity {
+@ToString
+public class ArticleColumnDto {
     /**
      * 主键
      */
-    @TableId
     private Long id;
 
     /**
      * 栏目名称
      */
-    @TableField(value = "`NAME`")
     private String name;
 
     /**
@@ -37,7 +32,6 @@ public class ArticleColumn extends BaseEntity {
     /**
      * 栏目描述
      */
-    @TableField(value = "`DESC`")
     private String desc;
 
     /**
