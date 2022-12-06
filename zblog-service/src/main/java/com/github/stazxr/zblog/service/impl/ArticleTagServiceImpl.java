@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 文章标签业务实现层
  *
@@ -33,7 +35,7 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     private final ArticleTagConverter articleTagConverter;
 
     /**
-     * 查询标签列表
+     * 分页查询标签列表
      *
      * @param queryDto 查询参数
      * @return TagVoList
@@ -47,6 +49,20 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
         queryDto.checkPage();
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(baseMapper.selectTagList(queryDto));
+    }
+
+    /**
+     * 查询标签列表
+     *
+     * @param queryDto 查询参数
+     * @return TagVoList
+     */
+    @Override
+    public List<ArticleTagVo> queryTagList(ArticleTagQueryDto queryDto) {
+        // 查询当前用户信息
+        String loginUsername = SecurityUtils.getLoginUsername();
+        queryDto.setCreateUser(loginUsername);
+        return baseMapper.selectTagList(queryDto);
     }
 
     /**

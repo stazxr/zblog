@@ -16,7 +16,7 @@ public class FileUtils {
     /**
      * 系统临时目录
      *   windows : C:\Users/xxx\AppData\Local\Temp\
-     *   linux: /temp
+     *   linux: /tmp
      */
     public static final String SYS_TEM_DIR = System.getProperty("java.io.tmpdir") + File.separator;
 

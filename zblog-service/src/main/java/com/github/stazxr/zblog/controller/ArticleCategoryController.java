@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.controller;
 
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.ArticleCategoryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
@@ -43,7 +44,7 @@ public class ArticleCategoryController {
      * @return CategoryVoList
      */
     @GetMapping(value = "/queryFirstCategoryList")
-    @Router(name = "查询一级类别列表", code = "queryFirstCategoryList")
+    @Router(name = "查询一级类别列表", code = "queryFirstCategoryList", level = BaseConst.PermLevel.PUBLIC)
     public Result queryFirstCategoryList(ArticleCategoryQueryDto queryDto) {
         return Result.success().data(articleCategoryService.queryFirstCategoryList(queryDto));
     }

@@ -86,6 +86,16 @@ public class ServiceException extends ZblogException {
     }
 
     /**
+     * 生成一个带有错误信息的的业务异常 {@link ResultCode#SERVER_EXP}
+     *
+     * @param message 业务提示信息
+     * @param cause   异常信息
+     */
+    public ServiceException(String message, Throwable cause) {
+        this(ResultCode.SERVER_EXP.code(), message, cause);
+    }
+
+    /**
      * 通过 ResultCode 枚举来抛出已经归档记录的异常
      *
      * @param resultCode {@link ResultCode}

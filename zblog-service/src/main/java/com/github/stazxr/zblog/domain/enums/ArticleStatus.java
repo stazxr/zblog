@@ -51,9 +51,9 @@ public enum ArticleStatus {
     RECYCLE(8),
 
     /**
-     * 已删除
+     * 待发布（定时）
      */
-    DELETED(9);
+    TIME_PUBLISH(9);
 
     private final Integer type;
 

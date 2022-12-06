@@ -7,6 +7,8 @@ import com.github.stazxr.zblog.domain.dto.query.ArticleTagQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleTag;
 import com.github.stazxr.zblog.domain.vo.ArticleTagVo;
 
+import java.util.List;
+
 /**
  * 文章标签服务层
  *
@@ -15,12 +17,20 @@ import com.github.stazxr.zblog.domain.vo.ArticleTagVo;
  */
 public interface ArticleTagService extends IService<ArticleTag> {
     /**
-     * 查询标签列表
+     * 分页查询标签列表
      *
      * @param queryDto 查询参数
      * @return TagVoList
      */
     PageInfo<ArticleTagVo> queryTagListByPage(ArticleTagQueryDto queryDto);
+
+    /**
+     * 查询标签列表
+     *
+     * @param queryDto 查询参数
+     * @return TagVoList
+     */
+    List<ArticleTagVo> queryTagList(ArticleTagQueryDto queryDto);
 
     /**
      * 查询标签详情

@@ -26,6 +26,7 @@
         <if test="createEndTime != null and createEndTime != ''">
             AND CREATE_TIME &lt;= #{createEndTime}
         </if>
+        ORDER BY CREATE_TIME DESC
     </select>
 
     <select id="selectFilePathListByFileId" resultType="java.lang.String">

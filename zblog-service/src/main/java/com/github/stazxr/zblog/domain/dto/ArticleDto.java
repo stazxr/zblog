@@ -1,26 +1,25 @@
-package com.github.stazxr.zblog.domain.entity;
+package com.github.stazxr.zblog.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.impl.BaseEntityWithExtend;
+import com.github.stazxr.zblog.base.domain.entity.File;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.List;
 
 /**
- * 文章
+ * 文章信息
  *
  * @author SunTao
- * @since 2021-01-18
+ * @since 2022-12-03
  */
 @Getter
 @Setter
-@TableName("article")
-public class Article extends BaseEntityWithExtend {
+@ToString
+public class ArticleDto {
     /**
      * 主键
      */
-    @TableId
     private Long id;
 
     /**
@@ -39,11 +38,6 @@ public class Article extends BaseEntityWithExtend {
     private String content;
 
     /**
-     * 文章内容（预留字段）
-     */
-    private String contentMd;
-
-    /**
      * 文章关键字
      */
     private String keywords;
@@ -52,11 +46,6 @@ public class Article extends BaseEntityWithExtend {
      * 原文链接（转载或翻译需要填写该字段）
      */
     private String reprintLink;
-
-    /**
-     * 转载说明
-     */
-    private String reprintDesc;
 
     /**
      * 封面类型: see {@link com.github.stazxr.zblog.domain.enums.ArticleImgType}
@@ -69,14 +58,14 @@ public class Article extends BaseEntityWithExtend {
     private Integer articleType;
 
     /**
-     * 文章状态: see {@link com.github.stazxr.zblog.domain.enums.ArticleStatus}
-     */
-    private Integer articleStatus;
-
-    /**
      * 文章权限: see {@link com.github.stazxr.zblog.domain.enums.ArticlePerm}
      */
     private Integer articlePerm;
+
+    /**
+     * 文章状态: see {@link com.github.stazxr.zblog.domain.enums.ArticleStatus}
+     */
+    private Integer articleStatus;
 
     /**
      * 文章分类
@@ -94,8 +83,12 @@ public class Article extends BaseEntityWithExtend {
     private Boolean commentFlag;
 
     /**
-     * 是否已删除（使用逻辑操作，保护数据）
+     * 文章标签
      */
-    @TableLogic
-    private Boolean deleted;
+    private List<String> articleTag;
+
+    /**
+     * 文章封面
+     */
+    private List<File> articleImg;
 }

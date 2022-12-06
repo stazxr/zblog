@@ -43,15 +43,8 @@ public class SecurityUtils {
      * @return 当前登录用户名称
      */
     public static String getLoginUsername() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // return username
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return userDetails.getUsername();
-        }
-
-        throw new IllegalStateException("请登录");
+        UserDetails userDetails = getLoginUser();
+        return userDetails.getUsername();
     }
 
     /**

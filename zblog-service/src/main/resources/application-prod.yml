@@ -8,7 +8,7 @@ spring:
       password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
   redis:
     host: ENC(wEAkOysMms4sh54ilxS+TLLkIXxGGN7L)
-    port: 6480
+    port: 6481
     client-type: lettuce
     password: ENC(yLNmRC4j7X2ucajRvSutQTSbnrwi9eoM)
     connect-timeout: 5000

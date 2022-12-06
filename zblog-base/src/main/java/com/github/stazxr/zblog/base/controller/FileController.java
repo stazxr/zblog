@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.base.component.file.FileHandler;
 import com.github.stazxr.zblog.base.component.file.FileTypeHandler;
 import com.github.stazxr.zblog.base.component.file.model.FileInfo;
 import com.github.stazxr.zblog.base.component.file.model.FileUploadType;
+import com.github.stazxr.zblog.base.domain.dto.FileDeleteDto;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
@@ -21,8 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * 存储管理
@@ -66,13 +69,26 @@ public class FileController {
             files = new MultipartFile[] {file};
         }
 
+        // 获取文件存储类型
+        List<FileInfo> fileList = new ArrayList<>();
+        int fileUploadType = fileService.getFileUploadType();
+        FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
+
+        // 白名单检查
+        whiteListPreCheck(files);
+
         try {
             // 上传文件
-            int fileUploadType = fileService.getFileUploadType();
-            FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
-            List<FileInfo> fileList = fileHandler.uploadFile(files);
+            fileList = fileHandler.uploadFile(files);
             return Result.success("上传成功").data(fileService.insertFile(FileUploadType.NORMAL.getType(), fileList));
         } catch (Exception e) {
+            try {
+                // 上传失败，可能是数据入库失败，删除已上传的文件
+                List<String> filePaths = fileList.stream().map(FileInfo::getFilePath).collect(Collectors.toList());
+                fileHandler.deleteFiles(filePaths);
+            } catch (Exception ignored) {
+            }
+
             throw new ServiceException(ResultCode.FILE_UPLOAD_FAILED, e);
         }
     }
@@ -89,21 +105,20 @@ public class FileController {
     @Router(name = "下载文件", code = "downloadFile", level = BaseConst.PermLevel.OPEN)
     public Result downloadFile(Long fileId, Boolean isDown, HttpServletResponse response) {
         fileService.downloadFile(fileId, isDown, response);
-        return Result.success();
+        return Result.success("下载成功");
     }
 
     /**
      * 删除文件
      *
-     * @param fileId 文件序号
-     * @param businessId 业务序号
+     * @param paramDto 参数信息
      * @return Result
      */
     @PostMapping("/deleteFile")
     @Router(name = "删除文件", code = "deleteFile", level = BaseConst.PermLevel.PUBLIC)
-    public Result deleteFile(Long fileId, Long businessId) {
-        fileService.deleteFile(fileId, businessId);
-        return Result.success();
+    public Result deleteFile(@RequestBody FileDeleteDto paramDto) {
+        fileService.deleteFile(paramDto.getFileId(), paramDto.getBusinessId());
+        return Result.success("删除成功");
     }
 
     /**
@@ -189,5 +204,9 @@ public class FileController {
     public Result activeStorageConfig(@RequestPostSingleParam Integer storageType) {
         fileService.activeStorageConfig(storageType);
         return Result.success();
+    }
+
+    private void whiteListPreCheck(MultipartFile[] files) {
+
     }
 }

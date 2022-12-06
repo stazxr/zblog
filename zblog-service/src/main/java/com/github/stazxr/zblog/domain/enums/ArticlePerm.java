@@ -11,17 +11,17 @@ import lombok.Getter;
 @Getter
 public enum ArticlePerm {
     /**
-     * 公开
+     * 全部可见：所有用户将均可访问和阅读
      */
     OPEN_SHOW(1),
 
     /**
-     * 登录可见
+     * 登录可见：仅系统用户可访问和阅读
      */
     LOGIN_SHOW(2),
 
     /**
-     * 仅自己可见，无需审核
+     * 仅我可见：仅您自己可访问和阅读
      */
     SELF_SHOW(3);
 

@@ -26,13 +26,13 @@ public class ArticleTagController {
     private final ArticleTagService articleTagService;
 
     /**
-     * 查询标签列表
+     * 分页查询标签列表
      *
      * @param queryDto 查询参数
      * @return TagVoList
      */
     @GetMapping(value = "/pageList")
-    @Router(name = "查询标签列表", code = "queryTagListByPage")
+    @Router(name = "分页查询标签列表", code = "queryTagListByPage")
     public Result queryTagListByPage(ArticleTagQueryDto queryDto) {
         return Result.success().data(articleTagService.queryTagListByPage(queryDto));
     }

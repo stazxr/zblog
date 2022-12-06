@@ -112,4 +112,18 @@ public class MathUtils {
         }
         return result;
     }
+
+    /**
+     * 判断字符串是否是正整数
+     *
+     * @param numStr 待判定字符串
+     * @return boolean
+     */
+    public static boolean isInteger(String numStr) {
+        try {
+            return Long.parseLong(numStr) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

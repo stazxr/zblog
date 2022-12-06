@@ -1,5 +1,5 @@
 server:
-  port: 19993
+  port: 19992
 spring:
   datasource:
     druid:
@@ -11,9 +11,23 @@ spring:
     port: 6379
     client-type: lettuce
     password: redisPwd
+jwt:
+  access-token-duration: 7200
+  refresh-token-duration: 86400
+  allowed-renew-token: true
+  refresh-min-duration: 1800
+  max-version: 10
+  algorithm: RS256
+  cert-info:
+    alias: suntaoblogcom
+    key-password: ENC(kUfidmIYBnle2iOXS1MSqQvzU+VOhCXQ)
+    cert-location: suntaoblogcom.jks
+  claims:
+    issuer: https://www.suntaoblog.com
+    subject: Login
 cache:
   default-duration: 300
   type: redis
 zblog:
-  deploy-type: single
-  is-local-ip-parsing: false
+  deploy-type: multi
+  is-local-ip-parsing: true

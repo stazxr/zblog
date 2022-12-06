@@ -95,7 +95,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
         List<File> result = new ArrayList<>();
         for (FileInfo fileInfo : fileList) {
             File file = new File();
-            file.setId(GenerateIdUtils.getId());
+            Long fileId = GenerateIdUtils.getId();
+            file.setId(fileId);
             file.setFilename(fileInfo.getFileName());
             file.setOriginalFilename(fileInfo.getOriginalFileName());
             file.setFilePath(fileInfo.getFilePath());
@@ -105,8 +106,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
             file.setFileType(FileUtils.getFileType(fileInfo.getSuffix()));
             file.setStorageType(fileInfo.getUploadType());
             file.setUploadType(uploadType);
-            fileMapper.insert(file);
-            result.add(file);
+            Assert.isTrue(fileMapper.insert(file) != 1, "文件信息入库失败");
+            result.add(fileMapper.selectById(fileId));
         }
 
         return result;

@@ -18,7 +18,12 @@ public enum ArticleType {
     /**
      * 转载
      */
-    REPRINT(2);
+    REPRINT(2),
+
+    /**
+     * 翻译
+     */
+    TRANSLATE(3);
 
     private final Integer type;
 

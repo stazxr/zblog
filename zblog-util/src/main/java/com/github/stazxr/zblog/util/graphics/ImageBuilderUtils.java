@@ -43,9 +43,9 @@ public class ImageBuilderUtils {
             int ascent = fontMetrics.getAscent();
             int leading = fontMetrics.getLeading();
 
-            // 计算图片大小，设置图片信息，比例为4:3   height = width * (3 / 4)
+            // 计算图片大小，设置图片信息，比例为16:9   height = width * (9 / 16)
             int imageWidth = width + 100;
-            int imageHeight = imageWidth * 3 / 4;
+            int imageHeight = imageWidth * 9 / 16;
             BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 
             // 获取画笔
@@ -57,7 +57,7 @@ public class ImageBuilderUtils {
             graphics.setBackground(Color.BLACK);
 
             // 填充红色的正方形
-            graphics.setColor(Color.RED);
+            graphics.setColor(Color.BLACK);
             int rectX = (imageWidth - width) / 2;
             int rectY = (imageHeight - height) / 3;
             graphics.fillRect(rectX, rectY, width, height);
