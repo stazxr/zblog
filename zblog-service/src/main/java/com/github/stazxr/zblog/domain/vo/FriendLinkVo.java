@@ -5,36 +5,41 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * ArticleTagVo
+ * 友链信息
  *
  * @author SunTao
- * @since 2022-11-24
+ * @since 2022-12-07
  */
 @Getter
 @Setter
-public class ArticleTagVo extends BaseVo {
+public class FriendLinkVo extends BaseVo {
     /**
      * 主键
      */
     private Long id;
 
     /**
-     * 标签名称
+     * 链接名称
      */
     private String name;
 
     /**
-     * 标签类型
+     * 头像地址
      */
-    private Integer type;
+    private String headUrl;
 
     /**
-     * 是否启用
+     * 链接地址
      */
-    private Boolean enabled;
+    private String linkUrl;
 
     /**
-     * 文章数
+     * 链接介绍
      */
-    private Integer articleCount;
+    private String linkRemark;
+
+    /**
+     * 是否有效
+     */
+    private Boolean valid;
 }

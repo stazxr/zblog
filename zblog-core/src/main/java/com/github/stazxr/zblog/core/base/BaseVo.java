@@ -24,6 +24,11 @@ public class BaseVo implements Serializable {
     private String createUser;
 
     /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
      * 创建日期
      */
     private String createDate;

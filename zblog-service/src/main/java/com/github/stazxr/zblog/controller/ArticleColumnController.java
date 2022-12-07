@@ -42,7 +42,6 @@ public class ArticleColumnController {
      * @param columnId 标签ID
      * @return TagVo
      */
-    @Log
     @GetMapping(value = "/queryColumnDetail")
     @Router(name = "查询栏目详情", code = "queryColumnDetail")
     public Result queryColumnDetail(Long columnId) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.FriendLinkMapper">
+    <select id="selectFriendLinkList" resultType="com.github.stazxr.zblog.domain.vo.FriendLinkVo">
+        SELECT
+            ID, NAME, HEAD_URL, LINK_URL, LINK_REMARK, VALID, CREATE_TIME
+        FROM friend_link WHERE DELETED = 0
+        <if test="name != null and name != ''">
+            <bind name="nameBind" value="'%' + name + '%'"/>
+            AND NAME LIKE #{nameBind}
+        </if>
+        <if test="valid != null">
+            AND VALID = #{valid}
+        </if>
+        ORDER BY CREATE_TIME
+    </select>
+
+    <select id="selectFriendLinkDetail" resultType="com.github.stazxr.zblog.domain.vo.FriendLinkVo">
+        SELECT
+            ID, NAME, HEAD_URL, LINK_URL, LINK_REMARK, VALID, CREATE_TIME
+        FROM friend_link WHERE DELETED = 0 AND ID = #{friendLinkId}
+    </select>
+
+    <select id="selectByLinkUrl" resultType="com.github.stazxr.zblog.domain.entity.FriendLink">
+        SELECT
+            ID, NAME, HEAD_URL, LINK_URL, LINK_REMARK, VALID, CREATE_TIME
+        FROM friend_link WHERE DELETED = 0 AND LINK_URL = #{linkUrl}
+    </select>
+</mapper>

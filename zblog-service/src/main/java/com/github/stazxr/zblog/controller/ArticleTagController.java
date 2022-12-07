@@ -43,7 +43,6 @@ public class ArticleTagController {
      * @param tagId 标签ID
      * @return TagVo
      */
-    @Log
     @GetMapping(value = "/queryTagDetail")
     @Router(name = "查询标签详情", code = "queryTagDetail")
     public Result queryTagDetail(Long tagId) {

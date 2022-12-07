@@ -59,7 +59,6 @@ public class FileController {
      * @param file 单文件上传
      * @return FileUploadVo List
      */
-    @Log
     @PostMapping("/uploadFile")
     @Router(name = "文件上传", code = "uploadFile", level = BaseConst.PermLevel.PUBLIC)
     public Result uploadFile(@RequestPart(value = "files", required = false) MultipartFile[] files,
@@ -128,6 +127,7 @@ public class FileController {
      * @param type  上传类型
      * @return FileUploadVo List
      */
+    @Log
     @PostMapping("/testUploadFile")
     @Router(name = "测试文件上传", code = "testUploadFile")
     public Result testUploadFile(@RequestPart(value = "file") MultipartFile file, @RequestParam Integer type) {
@@ -150,6 +150,7 @@ public class FileController {
      * @param fileIds 文件序号列表
      * @return Result
      */
+    @Log
     @PostMapping("/testDeleteFile")
     @Router(name = "测试文件删除", code = "testDeleteFile")
     public Result testDeleteFile(@RequestBody List<Long> fileIds) {
@@ -175,6 +176,7 @@ public class FileController {
      * @param param 配置信息
      * @return Result
      */
+    @Log
     @PostMapping("/setConfigInfo")
     @Router(name = "保存配置信息", code = "setStorageConfigInfo")
     public Result setConfigInfo(@RequestBody JSONObject param) {
@@ -199,6 +201,7 @@ public class FileController {
      * @param storageType 存储类型
      * @return Result
      */
+    @Log
     @PostMapping("/activeStorageConfig")
     @Router(name = "激活存储配置", code = "activeStorageConfig")
     public Result activeStorageConfig(@RequestPostSingleParam Integer storageType) {
@@ -207,6 +210,10 @@ public class FileController {
     }
 
     private void whiteListPreCheck(MultipartFile[] files) {
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
 
+            }
+        }
     }
 }

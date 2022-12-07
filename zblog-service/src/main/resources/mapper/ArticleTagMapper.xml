@@ -2,25 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleTagMapper">
     <select id="selectTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
-        SELECT * FROM (
-            SELECT
-                ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
-            FROM article_tag WHERE DELETED = 0 AND TYPE = 1
-            UNION ALL
-            SELECT
-                ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
-            FROM article_tag WHERE DELETED = 0 AND TYPE = 2 AND CREATE_USER = #{createUser}
-        ) temp
-        <where>
-            <if test="name != null and name != ''">
-                <bind name="nameBind" value="'%' + name + '%'"/>
-                temp.NAME LIKE #{nameBind}
-            </if>
-            <if test="enabled != null">
-                temp.ENABLED = #{enabled}
-            </if>
-        </where>
-        ORDER BY temp.NAME
+        SELECT
+            at.ID, at.`NAME`, at.TYPE, at.ENABLED, at.CREATE_USER, at.CREATE_TIME,
+        (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+            SELECT atr.ARTICLE_ID FROM article_tag_relation atr WHERE atr.TAG_ID = at.ID
+        )) ARTICLE_COUNT
+        FROM article_tag at
+        WHERE DELETED = 0
+        <if test="name != null and name != ''">
+            <bind name="nameBind" value="'%' + name + '%'"/>
+            AND at.`NAME` LIKE #{nameBind}
+        </if>
+        <if test="createUser != null and createUser != ''">
+            <bind name="createUserBind" value="'%' + createUser + '%'"/>
+            AND at.CREATE_USER LIKE #{createUserBind}
+        </if>
+        <if test="enabled != null">
+            AND at.ENABLED = #{enabled}
+        </if>
+        <if test="type != null">
+            AND at.TYPE = #{type}
+        </if>
+        ORDER BY at.`NAME`, at.CREATE_TIME DESC
     </select>
 
     <select id="selectTagDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
@@ -33,5 +36,11 @@
         SELECT
             ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
         FROM article_tag WHERE DELETED = 0 AND NAME = #{name}
+    </select>
+
+    <select id="selectArticleCountByTag" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ID IN (
+            SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID = #{tagId}
+        )
     </select>
 </mapper>

@@ -55,7 +55,6 @@ public class ArticleCategoryController {
      * @param categoryId 类别ID
      * @return CategoryVo
      */
-    @Log
     @GetMapping(value = "/queryCategoryDetail")
     @Router(name = "查询类别详情", code = "queryCategoryDetail")
     public Result queryCategoryDetail(Long categoryId) {

@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.converter.ArticleTagConverter;
 import com.github.stazxr.zblog.core.util.DataValidated;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.domain.dto.ArticleTagDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleTagQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleTag;
@@ -42,10 +41,6 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
      */
     @Override
     public PageInfo<ArticleTagVo> queryTagListByPage(ArticleTagQueryDto queryDto) {
-        // 查询当前用户信息
-        String loginUsername = SecurityUtils.getLoginUsername();
-        queryDto.setCreateUser(loginUsername);
-
         queryDto.checkPage();
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(baseMapper.selectTagList(queryDto));
@@ -60,8 +55,6 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     @Override
     public List<ArticleTagVo> queryTagList(ArticleTagQueryDto queryDto) {
         // 查询当前用户信息
-        String loginUsername = SecurityUtils.getLoginUsername();
-        queryDto.setCreateUser(loginUsername);
         return baseMapper.selectTagList(queryDto);
     }
 
@@ -116,6 +109,10 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     @Transactional(rollbackFor = Exception.class)
     public void deleteTag(Long tagId) {
         Assert.notNull(tagId, "参数【tagId】不能为空");
+
+        // 校验文章数
+        Long articleCount = baseMapper.selectArticleCountByTag(tagId);
+        DataValidated.isTrue(articleCount > 0, "该标签下存在文章，无法删除");
         Assert.isTrue(baseMapper.deleteById(tagId) != 1, "删除失败");
 
         // 删除中间表的数据
@@ -133,6 +130,6 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
 
         ArticleTag dbTag = baseMapper.selectByTagName(articleTag.getName());
         boolean isExist = dbTag != null && !dbTag.getId().equals(articleTag.getId());
-        DataValidated.isTrue(isExist, "分类名称[" + articleTag.getName() + "]已存在");
+        DataValidated.isTrue(isExist, "标签名称[" + articleTag.getName() + "]已存在");
     }
 }

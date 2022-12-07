@@ -21,12 +21,17 @@ public class ArticleTagQueryDto extends PageParam {
     private String name;
 
     /**
-     * 标签状态
-     */
-    private Boolean enabled;
-
-    /**
      * 创建用户
      */
     private String createUser;
+
+    /**
+     * 标签类型
+     */
+    private Integer type;
+
+    /**
+     * 标签状态
+     */
+    private Boolean enabled;
 }

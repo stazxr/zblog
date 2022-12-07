@@ -38,4 +38,12 @@ public interface ArticleTagMapper extends BaseMapper<ArticleTag> {
      * @return ArticleTag
      */
     ArticleTag selectByTagName(@Param("name") String name);
+
+    /**
+     * 查询标签对应的文章数
+     *
+     * @param tagId 标签序号
+     * @return 文章数
+     */
+    Long selectArticleCountByTag(@Param("tagId") Long tagId);
 }
