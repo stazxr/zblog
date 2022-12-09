@@ -1,14 +1,5 @@
 server:
   port: 19990
-spring:
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    client-type: lettuce
-    password: redisPwd
-cache:
-  default-duration: 300
-  type: memory
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -16,6 +7,3 @@ logging:
   level:
     com.github.spring.security.mapper: debug
     org.springframework.security: debug
-zblog:
-  deploy-type: single
-  is-local-ip-parsing: false

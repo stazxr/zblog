@@ -51,7 +51,6 @@ public class ArticleController {
      * @param articleId 文章ID
      * @return ArticleVo
      */
-    @Log
     @GetMapping(value = "/queryArticleDetail")
     @Router(name = "查询文章详情", code = "queryArticleDetail")
     public Result queryArticleDetail(Long articleId) {

@@ -6,11 +6,6 @@ spring:
       url: jdbc:mysql://rm-2zesvm06o324og1k3bo.mysql.rds.aliyuncs.com:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       username: ENC(hisvsQ4rjMY755ISBof8XuElj9jw2dmG)
       password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    client-type: lettuce
-    password: redisPwd
 jwt:
   access-token-duration: 7200
   refresh-token-duration: 86400
@@ -26,8 +21,4 @@ jwt:
     issuer: https://www.suntaoblog.com
     subject: Login
 cache:
-  default-duration: 300
   type: redis
-zblog:
-  deploy-type: multi
-  is-local-ip-parsing: true

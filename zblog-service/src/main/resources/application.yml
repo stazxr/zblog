@@ -50,6 +50,11 @@ spring:
           config:
             drop-table-allow: false
             multi-statement-allow: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    client-type: lettuce
+    password: redisPwd
   web:
     resources:
       add-mappings: false
@@ -108,7 +113,12 @@ jwt:
   claims:
     issuer: http://localhost:${server.port}
     subject: Login
+cache:
+  default-duration: 300
+  type: memory
 zblog:
+  deploy-type: single
+  is-local-ip-parsing: false
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
