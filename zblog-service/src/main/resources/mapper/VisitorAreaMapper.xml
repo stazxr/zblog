@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.VisitorAreaMapper">
+    <insert id="insertAreaCount">
+        INSERT INTO visitor_area (AREA, AREA_COUNT, CREATE_TIME) VALUES (#{area}, 1, #{createTime})
+    </insert>
+
+    <update id="updateAreaCount">
+        UPDATE visitor_area SET AREA_COUNT = AREA_COUNT + 1, UPDATE_TIME = #{updateTime} WHERE area = #{area}
+    </update>
+
+    <select id="judgeAreaExist" resultType="java.lang.Boolean">
+        SELECT COUNT(1) FROM visitor_area WHERE AREA = #{area}
+    </select>
+</mapper>

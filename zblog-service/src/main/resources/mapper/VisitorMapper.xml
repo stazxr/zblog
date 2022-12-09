@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.VisitorMapper">
+    <update id="addWebVisitorCount">
+        UPDATE visitor_count SET WEB_COUNT = WEB_COUNT + 1 WHERE ID = 1
+    </update>
+</mapper>

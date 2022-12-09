@@ -90,6 +90,28 @@ public class IpUtils {
     }
 
     /**
+     * 根据ip获取详细地址(http)
+     *
+     * @param ip 请求地址
+     * @return {
+     * 	"ip": "113.247.47.171",
+     * 	"pro": "湖南省",
+     * 	"proCode": "430000",
+     * 	"city": "长沙市",
+     * 	"cityCode": "430100",
+     * 	"region": "",
+     * 	"regionCode": "0",
+     * 	"addr": "湖南省长沙市 电信",
+     * 	"regionNames": "",
+     * 	"err": ""
+     * }
+     */
+    public static JSONObject getHttpCityDetailInfo(String ip) {
+        String api = String.format(Constants.Url.IP_URL, ip);
+        return JSONUtil.parseObj(HttpUtil.get(api));
+    }
+
+    /**
      * 根据ip获取详细地址(本地)
      *
      * @param ip IP 地址
