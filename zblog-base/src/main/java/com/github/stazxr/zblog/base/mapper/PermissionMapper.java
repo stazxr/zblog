@@ -79,4 +79,12 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @return permCodes
      */
     Set<String> selectUserPerms(@Param("userId") Long userId);
+
+    /**
+     * 更新 Permission 信息
+     *
+     * @param permission 权限信息
+     * @return rows
+     */
+    int updatePermission(Permission permission);
 }

@@ -7,6 +7,14 @@
         CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
     </sql>
 
+    <update id="updatePermission">
+        UPDATE permission SET
+            PID = #{pid}, PERM_NAME = #{permName}, PERM_CODE = #{permCode}, PERM_LEVEL = #{permLevel},
+            COMPONENT_NAME = #{componentName}, COMPONENT_PATH = #{componentPath}, ROUTER_PATH = #{routerPath},
+            ICON = #{icon}, SORT = #{sort}, `CACHE` = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
+        WHERE ID = #{id}
+    </update>
+
     <select id="selectPermList" resultType="com.github.stazxr.zblog.base.domain.vo.PermissionVo">
         SELECT <include refid="BaseVoColumn" />
         FROM permission

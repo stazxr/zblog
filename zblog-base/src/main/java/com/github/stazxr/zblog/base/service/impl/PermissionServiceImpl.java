@@ -182,7 +182,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         DataValidated.isTrue(!dbPerm.getPermType().equals(permission.getPermType()), "权限类型不允许编辑");
         permission.setIFrame(dbPerm.getIFrame());
         checkPermission(permission);
-        Assert.isTrue(permissionMapper.updateById(permission) != 1, "编辑失败");
+        Assert.isTrue(permissionMapper.updatePermission(permission) != 1, "编辑失败");
         removeCache(permission);
     }
 
@@ -393,11 +393,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 if (permission.getPid() == null) {
                     // 一级菜单默认组件为Layout
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "Layout" : permission.getComponentPath());
-                } else if (permission.getPermType() == 0) {
+                } else if (PermissionType.DIR.getType().equals(permission.getPermType())) {
                     // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单，默认组件为ParentView
                     menuVo.setComponent(StringUtils.isEmpty(permission.getComponentPath()) ? "ParentView" : permission.getComponentPath());
-                } else if (StringUtils.isNotBlank(permission.getComponentPath())) {
-                    menuVo.setComponent(permission.getComponentPath());
+                } else {
+                    menuVo.setComponent(StringUtils.isBlank(permission.getComponentPath()) ? null : permission.getComponentPath());
                 }
             }
             boolean noCache = permission.getCache() == null || !permission.getCache();

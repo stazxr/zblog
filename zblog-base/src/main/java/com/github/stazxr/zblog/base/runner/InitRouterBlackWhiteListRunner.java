@@ -74,6 +74,7 @@ public class InitRouterBlackWhiteListRunner extends RouterBlackWhiteListCache im
     }
 
     public static void start() {
+        log.info("===> 路由黑白名单刷新状态开启");
         InitRouterBlackWhiteListRunner.start = true;
     }
 }
