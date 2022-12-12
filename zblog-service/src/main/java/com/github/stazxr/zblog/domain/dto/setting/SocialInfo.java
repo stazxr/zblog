@@ -11,17 +11,22 @@ import lombok.Data;
 @Data
 public class SocialInfo {
     /**
-     * QQ
+     * QQ 号
+     */
+    private String qqNum = "";
+
+    /**
+     * QQ 链接
      */
     private String qq = "";
 
     /**
-     * Github
+     * Github 链接
      */
     private String github = "";
 
     /**
-     * Gitee
+     * Gitee 链接
      */
     private String gitee = "";
 }

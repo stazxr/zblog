@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.service.PortalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,17 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/portal")
 public class PortalController {
     private final PortalService portalService;
+
+    /**
+     * 查询博客前台信息
+     *
+     * @return BlogWebVo
+     */
+    @GetMapping("/queryBlogInfo")
+    @Router(name = "查询博客前台信息", code = "queryBlogWebInfo", level = BaseConst.PermLevel.OPEN)
+    public Result queryBlogWebInfo() {
+        return Result.success().data(portalService.queryBlogWebInfo());
+    }
 
     /**
      * 记录访客信息

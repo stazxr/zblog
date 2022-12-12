@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 路由管理，系统启动时加载一次
@@ -50,6 +51,7 @@ public class RouterManager {
         RouterInterface routerInterface = parseRouter();
 
         // save router
+        checkRouterCodeUnique(routerInterface.getRouters());
         routerService.clearRouter();
         routerService.saveBatch(routerInterface.getRouters());
 
@@ -57,6 +59,19 @@ public class RouterManager {
         interfaceService.clearInterface();
         routerInterface.getPermInterfaces().addAll(routerInterface.getNullInterfaces());
         interfaceService.saveBatch(routerInterface.getPermInterfaces());
+    }
+
+    /**
+     * 检查路由编码的唯一性
+     *
+     * @param routers 路由列表
+     */
+    private void checkRouterCodeUnique(List<Router> routers) {
+        routers.stream().collect(Collectors.groupingBy(Router::getCode, Collectors.counting())).forEach((code, count) -> {
+            if (count > 1) {
+                log.error("权限编码重复：{}", code);
+            }
+        });
     }
 
     /**

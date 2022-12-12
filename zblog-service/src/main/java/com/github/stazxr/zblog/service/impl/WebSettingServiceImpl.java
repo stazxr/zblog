@@ -10,9 +10,13 @@ import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
 import com.github.stazxr.zblog.mapper.WebSettingMapper;
 import com.github.stazxr.zblog.service.WebSettingService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.Constants;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
 
 /**
  * 网站设置业务实现层
@@ -72,6 +76,11 @@ public class WebSettingServiceImpl extends ServiceImpl<WebSettingMapper, Website
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSocialInfo(SocialInfo socialInfo) {
+        // 设置 QQ 链接
+        if (StringUtils.isNotBlank(socialInfo.getQqNum())) {
+            socialInfo.setQq(String.format(Locale.ROOT, Constants.Url.QQ_URL, socialInfo.getQqNum()));
+        }
+
         Integer dbKey = WebsiteConfigType.SOCIAL_INFO.value();
         WebsiteConfig websiteConfig = baseMapper.selectById(dbKey);
         Assert.notNull(websiteConfig, "网站社交信息不存在，KEY 为: " + dbKey);

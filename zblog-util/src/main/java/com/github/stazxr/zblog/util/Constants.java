@@ -26,7 +26,14 @@ public class Constants {
      * 常用链接
      */
     public static class Url {
-        // IP归属地查询
+        /**
+         * IP 归属地查询
+         */
         public static final String IP_URL = "http://whois.pconline.com.cn/ipJson.jsp?ip=%s&json=true";
+
+        /**
+         * QQ 跳转链接
+         */
+        public static final String QQ_URL = "http://wpa.qq.com/msgrd?v=3&uin=%s&site=qq&menu=yes";
     }
 }

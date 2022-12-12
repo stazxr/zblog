@@ -1,11 +1,20 @@
 package com.github.stazxr.zblog.service.impl;
 
 import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
+import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
+import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
+import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
 import com.github.stazxr.zblog.domain.entity.Visitor;
+import com.github.stazxr.zblog.domain.entity.WebsiteConfig;
+import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
+import com.github.stazxr.zblog.domain.vo.BlogWebVo;
+import com.github.stazxr.zblog.mapper.PortalMapper;
 import com.github.stazxr.zblog.mapper.VisitorAreaMapper;
 import com.github.stazxr.zblog.mapper.VisitorMapper;
+import com.github.stazxr.zblog.mapper.WebSettingMapper;
 import com.github.stazxr.zblog.service.PortalService;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -32,9 +41,37 @@ public class PortalServiceImpl implements PortalService {
 
     private static final String LOCAL_AREA_NET = "局域网";
 
+    private final PortalMapper portalMapper;
+
     private final VisitorMapper visitorMapper;
 
     private final VisitorAreaMapper visitorAreaMapper;
+
+    private final WebSettingMapper webSettingMapper;
+
+    /**
+     * 查询博客前台信息
+     *
+     * @return BlogWebVo
+     */
+    @Override
+    public BlogWebVo queryBlogWebInfo() {
+        BlogWebVo webVo = portalMapper.selectBlogWebInfo();
+
+        // WebInfo
+        WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.WEB_INFO.value());
+        webVo.setWebInfo(websiteConfig == null ? new WebInfo() : JSON.parseObject(websiteConfig.getConfig(), WebInfo.class));
+
+        // SocialInfo
+        websiteConfig = webSettingMapper.selectById(WebsiteConfigType.SOCIAL_INFO.value());
+        webVo.setSocialInfo(websiteConfig == null ? new SocialInfo() : JSON.parseObject(websiteConfig.getConfig(), SocialInfo.class));
+
+        // OtherInfo
+        websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
+        webVo.setOtherInfo(websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class));
+
+        return webVo;
+    }
 
     /**
      * 记录访客信息

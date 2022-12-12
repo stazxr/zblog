@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.service;
 
+import com.github.stazxr.zblog.domain.vo.BlogWebVo;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -9,6 +11,13 @@ import javax.servlet.http.HttpServletRequest;
  * @since 2022-11-25
  */
 public interface PortalService {
+    /**
+     * 查询博客前台信息
+     *
+     * @return BlogWebVo
+     */
+    BlogWebVo queryBlogWebInfo();
+
     /**
      * 记录访客信息
      *
