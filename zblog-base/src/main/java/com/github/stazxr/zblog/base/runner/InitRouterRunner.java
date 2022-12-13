@@ -33,6 +33,6 @@ public class InitRouterRunner implements CommandLineRunner {
             System.exit(1);
         }
 
-        log.info("Init Router End ===>");
+        log.info("Init Router End <===");
     }
 }

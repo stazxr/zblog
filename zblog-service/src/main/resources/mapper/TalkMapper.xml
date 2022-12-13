@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.TalkMapper">
+    <update id="updateTopStatus">
+        UPDATE talk SET IS_TOP = 0 WHERE DELETED = 0 AND ID != #{talkId}
+    </update>
+
+    <select id="selectTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+        SELECT
+            t.ID, t.CONTENT, t.IMAGES, t.STATUS, t.IS_TOP, t.CREATE_USER, t.CREATE_TIME, t.UPDATE_TIME,
+            u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar
+        FROM (
+            SELECT
+                ID, CONTENT, IMAGES, STATUS, IS_TOP, CREATE_USER, CREATE_TIME, UPDATE_TIME
+            FROM talk WHERE DELETED = 0 AND STATUS = 1
+            <if test="loginUser != null and loginUser != ''">
+                UNION ALL
+                SELECT
+                    ID, CONTENT, IMAGES, STATUS, IS_TOP, CREATE_USER, CREATE_TIME, UPDATE_TIME
+                FROM talk WHERE DELETED = 0 AND STATUS = 2 AND CREATE_USER = #{loginUser}
+            </if>
+        ) t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
+        <where>
+            <if test="status != null">
+                t.STATUS = #{status}
+            </if>
+        </where>
+        ORDER BY t.IS_TOP DESC, t.CREATE_TIME DESC
+    </select>
+
+    <select id="selectTalkDetail" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+        SELECT
+            ID, CONTENT, IMAGES, STATUS, IS_TOP, CREATE_USER, CREATE_TIME, UPDATE_TIME
+        FROM talk WHERE DELETED = 0 AND ID = #{talkId}
+    </select>
+</mapper>

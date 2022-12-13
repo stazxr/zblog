@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileRelationMapper">
+    <delete id="deleteByBusinessId">
+        DELETE FROM file_relation WHERE BUSINESS_ID = #{businessId}
+    </delete>
 
+    <select id="selectByBusinessId" resultType="com.github.stazxr.zblog.base.domain.entity.File">
+        SELECT
+            ID, FILENAME, ORIGINAL_FILENAME, SIZE, FILE_PATH, DOWNLOAD_URL, MD5,
+            FILE_TYPE, STORAGE_TYPE, UPLOAD_TYPE, DELETED, VERSION, CREATE_USER,
+            CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+        FROM file WHERE DELETED = 0 AND ID IN (
+            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId}
+        )
+    </select>
 </mapper>

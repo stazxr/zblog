@@ -61,11 +61,24 @@ public class Assert {
      * Assert flag is true
      *
      * @param flag flag
-     * @param message the exception message to use if the flag is not true
-     * @throws AssertionViolatedException if the flag is not true
+     * @param message the exception message to use if the flag is true
+     * @throws AssertionViolatedException if the flag is true
      */
     public static void isTrue(boolean flag, String message) {
         if (flag) {
+            throw new AssertionViolatedException(message);
+        }
+    }
+
+    /**
+     * Assert flag is not true
+     *
+     * @param flag flag
+     * @param message the exception message to use if the flag is not true
+     * @throws AssertionViolatedException if the flag is not true
+     */
+    public static void nonTrue(boolean flag, String message) {
+        if (!flag) {
             throw new AssertionViolatedException(message);
         }
     }

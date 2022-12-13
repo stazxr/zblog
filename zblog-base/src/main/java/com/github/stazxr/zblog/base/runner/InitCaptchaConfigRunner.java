@@ -54,6 +54,6 @@ public class InitCaptchaConfigRunner implements CommandLineRunner {
             log.error("Parse 'conf/kaptchaConfig.json' Failed", e);
         }
 
-        log.info("Init Captcha End ===>");
+        log.info("Init Captcha End <===");
     }
 }
