@@ -174,7 +174,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      */
     @Override
     public RouterVo queryRouterByCode(String code) {
-        Assert.notNull(code, "参数【code】不能为空");
+        Assert.isTrue(StringUtils.isBlank(code), "参数【code】不能为空");
         return routerMapper.selectRouterVoByCode(code);
     }
 

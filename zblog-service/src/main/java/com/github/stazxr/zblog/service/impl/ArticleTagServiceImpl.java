@@ -14,6 +14,7 @@ import com.github.stazxr.zblog.mapper.ArticleTagMapper;
 import com.github.stazxr.zblog.mapper.ArticleTagRelationMapper;
 import com.github.stazxr.zblog.service.ArticleTagService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,7 +121,7 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     }
 
     private void checkArticleTag(ArticleTag articleTag) {
-        Assert.notNull(articleTag.getName(), "标签名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleTag.getName()), "标签名称不能为空");
         Assert.notNull(articleTag.getEnabled(), "标签状态不能为空");
 
         // 新增检查标签类型

@@ -14,6 +14,7 @@ import com.github.stazxr.zblog.mapper.ArticleColumnMapper;
 import com.github.stazxr.zblog.mapper.ArticleColumnRelationMapper;
 import com.github.stazxr.zblog.service.ArticleColumnService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +103,7 @@ public class ArticleColumnServiceImpl extends ServiceImpl<ArticleColumnMapper, A
     }
 
     private void checkArticleColumn(ArticleColumn articleColumn) {
-        Assert.notNull(articleColumn.getName(), "栏目名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleColumn.getName()), "栏目名称不能为空");
         Assert.notNull(articleColumn.getSort(), "栏目排序不能为空");
         Assert.notNull(articleColumn.getEnabled(), "栏目状态不能为空");
 

@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.core.cache.impl;
 
 import com.github.stazxr.zblog.core.config.properties.CacheConfigProperties;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +120,7 @@ public class MemoryCacheImpl extends BaseCache {
         }
 
         public void cachePut(String key, String value, int expireTime) {
-            Assert.notNull(key, "cache key must not be null.");
+            Assert.isTrue(StringUtils.isBlank(key), "cache key must not be empty.");
             Assert.notNull(value, "cache value must not be null.");
             Assert.isTrue(expireTime < 0, "cache expire time must not be negative.");
 

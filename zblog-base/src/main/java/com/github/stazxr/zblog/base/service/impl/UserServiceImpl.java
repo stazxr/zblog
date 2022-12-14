@@ -91,7 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User queryUserByUsername(String username) {
-        Assert.notNull(username, "用户名不能为空");
+        Assert.isTrue(StringUtils.isBlank(username), "用户名不能为空");
         return userMapper.selectOne(queryBuild().eq(User::getUsername, username));
     }
 
@@ -157,9 +157,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean updateUserPass(UserUpdatePassDto passDto) {
         // 非空校验
         String oldPass = passDto.getOldPass();
-        Assert.notNull(oldPass, "修改失败，旧密码不能为空");
+        Assert.isTrue(StringUtils.isBlank(oldPass), "修改失败，旧密码不能为空");
         String newPass = passDto.getNewPass();
-        Assert.notNull(newPass, "新密码不能为空");
+        Assert.isTrue(StringUtils.isBlank(newPass), "新密码不能为空");
         String ensurePass = passDto.getConfirmPass();
         DataValidated.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
 
@@ -206,11 +206,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean updateUserEmail(UserUpdateEmailDto emailDto) {
         // 非空校验
         String password = emailDto.getPass();
-        Assert.notNull(password, "修改失败，用户密码不能为空");
+        Assert.isTrue(StringUtils.isBlank(password), "修改失败，用户密码不能为空");
         String email = emailDto.getEmail();
-        Assert.notNull(email, "新邮箱不能为空");
+        Assert.isTrue(StringUtils.isBlank(email), "新邮箱不能为空");
         String code = emailDto.getCode();
-        Assert.notNull(code, "邮箱验证码不能为空");
+        Assert.isTrue(StringUtils.isBlank(code), "邮箱验证码不能为空");
 
         // 获取用户信息
         User user = queryUserByUsername(SecurityUtils.getLoginUsername());

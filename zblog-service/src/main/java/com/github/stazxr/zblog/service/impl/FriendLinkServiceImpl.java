@@ -12,6 +12,7 @@ import com.github.stazxr.zblog.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.mapper.FriendLinkMapper;
 import com.github.stazxr.zblog.service.FriendLinkService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,8 +96,8 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
     }
 
     private void checkFriendLink(FriendLink friendLink) {
-        Assert.notNull(friendLink.getName(), "友链名称不能为空");
-        Assert.notNull(friendLink.getHeadUrl(), "友链地址不能为空");
+        Assert.isTrue(StringUtils.isBlank(friendLink.getName()), "友链名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(friendLink.getHeadUrl()), "友链地址不能为空");
         Assert.notNull(friendLink.getValid(), "友链状态不能为空");
 
         FriendLink dbLink = baseMapper.selectByLinkUrl(friendLink.getLinkUrl());

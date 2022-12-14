@@ -10,6 +10,7 @@ import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.math.RandomUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -43,7 +44,7 @@ public class EmailController {
     @PostMapping("sendCode")
     @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.PUBLIC)
     public Result sendCode(@RequestPostSingleParam String email) {
-        Assert.notNull(email, "邮箱不能为空");
+        Assert.isTrue(StringUtils.isBlank(email), "邮箱不能为空");
         Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
 
         // 获取邮件内容

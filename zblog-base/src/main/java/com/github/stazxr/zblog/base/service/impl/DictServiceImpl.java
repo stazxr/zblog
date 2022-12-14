@@ -13,6 +13,7 @@ import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public Map<String, String> selectItems(String key) {
-        Assert.notNull(key, "参数【key】不能为空");
+        Assert.isTrue(StringUtils.isBlank(key), "参数【key】不能为空");
         List<Dict> dicts = dictMapper.selectItems(key);
 
         // return map
@@ -147,13 +148,13 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public String querySingleValue(String key) {
-        Assert.notNull(key, "参数【key】不能为空");
+        Assert.isTrue(StringUtils.isBlank(key), "参数【key】不能为空");
         return dictMapper.selectSingleValue(key);
     }
 
     private void checkDict(Dict dict) {
         dict.setLocked(Boolean.FALSE);
-        Assert.notNull(dict.getName(), "字典名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(dict.getName()), "字典名称不能为空");
         Assert.notNull(dict.getSort(), "字典排序不能为空");
         Assert.notNull(dict.getType(), "字典类型不能为空");
         Assert.notNull(DictType.of(dict.getType()), "字典类型不正确，取值范围[1, 2]");
@@ -164,7 +165,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dict.setEnabled(true);
         } else {
             Assert.notNull(dict.getPid(), "父字典不能为空");
-            Assert.notNull(dict.getKey(), "字典KEY不能为空");
+            Assert.isTrue(StringUtils.isBlank(dict.getKey()), "字典KEY不能为空");
             Assert.notNull(dict.getEnabled(), "字典状态不能为空");
         }
 

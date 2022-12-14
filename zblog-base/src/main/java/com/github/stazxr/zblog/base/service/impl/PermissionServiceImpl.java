@@ -296,7 +296,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         if (PermissionType.DIR.getType().equals(permission.getPermType())) {
             Assert.notNull(permission.getIFrame(), "请选择是否外链");
             Assert.notNull(permission.getHidden(), "请选择是否可见");
-            Assert.notNull(permission.getRouterPath(), "路由地址不能为空");
+            Assert.isTrue(StringUtils.isBlank(permission.getRouterPath()), "路由地址不能为空");
             permission.setPermCode(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
@@ -311,7 +311,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             Assert.notNull(permission.getIFrame(), "请选择是否外链");
             Assert.notNull(permission.getHidden(), "请选择是否可见");
             Assert.notNull(permission.getCache(), "请选择是否缓存");
-            Assert.notNull(permission.getRouterPath(), "路由地址不能为空");
+            Assert.isTrue(StringUtils.isBlank(permission.getRouterPath()), "路由地址不能为空");
             if (permission.getIFrame()) {
                 permission.setPermCode(null);
                 permission.setComponentName(null);
@@ -322,8 +322,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 DataValidated.isTrue(isNulHttp, "外链必须以http://或者https://开头");
             } else {
                 permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
-                Assert.notNull(permission.getComponentPath(), "组件路径不能为空");
-                Assert.notNull(permission.getComponentName(), "组件名称不能为空");
+                Assert.isTrue(StringUtils.isBlank(permission.getComponentPath()), "组件路径不能为空");
+                Assert.isTrue(StringUtils.isBlank(permission.getComponentName()), "组件名称不能为空");
                 dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
                 DataValidated.isTrue(dbPerm != null && !dbPerm.getId().equals(permission.getId()), "组件名称已存在");
             }
@@ -345,7 +345,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     private void emptyCheck(Permission permission) {
-        Assert.notNull(permission.getPermName(), "权限名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(permission.getPermName()), "权限名称不能为空");
         Assert.notNull(permission.getPermLevel(), "访问级别不能为空");
         Assert.notNull(permission.getEnabled(), "权限状态不能为空");
         Assert.notNull(permission.getSort(), "权限排序不能为空");

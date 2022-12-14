@@ -14,6 +14,7 @@ import com.github.stazxr.zblog.domain.vo.ArticleCategoryVo;
 import com.github.stazxr.zblog.mapper.ArticleCategoryMapper;
 import com.github.stazxr.zblog.service.ArticleCategoryService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -137,7 +138,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     }
 
     private void checkArticleCategory(ArticleCategory articleCategory) {
-        Assert.notNull(articleCategory.getName(), "分类名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleCategory.getName()), "分类名称不能为空");
         Assert.notNull(articleCategory.getSort(), "分类排序不能为空");
         Assert.notNull(articleCategory.getEnabled(), "分类状态不能为空");
 

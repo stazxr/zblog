@@ -14,6 +14,7 @@ import com.github.stazxr.zblog.base.mapper.ServerNodeMapper;
 import com.github.stazxr.zblog.base.service.ServerNodeService;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.jsch.JschUtils;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -124,11 +125,11 @@ public class ServerNodeServiceImpl extends ServiceImpl<ServerNodeMapper, ServerN
     }
 
     private void checkNode(ServerNode node) {
-        Assert.notNull(node.getName(), "节点名称不能为空");
-        Assert.notNull(node.getIp(), "IP地址不能为空");
+        Assert.isTrue(StringUtils.isBlank(node.getName()), "节点名称不能为空");
+        Assert.isTrue(StringUtils.isBlank(node.getIp()), "IP地址不能为空");
         Assert.notNull(node.getPort(), "端口不能为空");
-        Assert.notNull(node.getSshUser(), "登录用户不能为空");
-        Assert.notNull(node.getSshPwd(), "登录密码不能为空");
+        Assert.isTrue(StringUtils.isBlank(node.getSshUser()), "登录用户不能为空");
+        Assert.isTrue(StringUtils.isBlank(node.getSshPwd()), "登录密码不能为空");
 
         // 检查节点信息是否存在
         ServerNode dbNode = serverNodeMapper.selectByHostAndUser(node.getIp(), node.getSshUser());

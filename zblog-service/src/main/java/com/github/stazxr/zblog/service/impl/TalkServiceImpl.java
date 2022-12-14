@@ -81,7 +81,7 @@ public class TalkServiceImpl extends ServiceImpl<TalkMapper, Talk> implements Ta
     @Transactional(rollbackFor = Exception.class)
     public void addOrEditTalk(TalkDto talkDto) {
         Talk talk = talkConverter.dtoToEntity(talkDto);
-        checkArticleTag(talk);
+        checkTalk(talk);
         Assert.nonTrue(saveOrUpdate(talk), "操作失败");
 
         // 保存置顶信息
@@ -118,7 +118,7 @@ public class TalkServiceImpl extends ServiceImpl<TalkMapper, Talk> implements Ta
         Assert.isTrue(baseMapper.deleteById(talkId) != 1, "删除失败");
     }
 
-    private void checkArticleTag(Talk talk) {
+    private void checkTalk(Talk talk) {
         // 只有创建人有修改权限
         String loginUsername = SecurityUtils.getLoginUsername();
         if (talk.getId() != null) {

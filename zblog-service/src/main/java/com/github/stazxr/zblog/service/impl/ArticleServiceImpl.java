@@ -28,6 +28,7 @@ import com.github.stazxr.zblog.mapper.ArticleTagMapper;
 import com.github.stazxr.zblog.mapper.ArticleTagRelationMapper;
 import com.github.stazxr.zblog.service.ArticleService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
@@ -141,9 +142,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     private void checkArticle(ArticleDto articleDto) {
         // 非空校验
-        Assert.notNull(articleDto.getTitle(), "文章标题不能为空");
-        Assert.notNull(articleDto.getContent(), "文章内容不能为空");
-        Assert.notNull(articleDto.getRemark(), "文章摘要不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleDto.getTitle()), "文章标题不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleDto.getContent()), "文章内容不能为空");
+        Assert.isTrue(StringUtils.isBlank(articleDto.getRemark()), "文章摘要不能为空");
         Assert.notNull(articleDto.getCategoryId(), "文章分类不能为空");
         Assert.notNull(articleDto.getArticlePerm(), "发布范围不能为空");
         Assert.notNull(articleDto.getCommentFlag(), "评论设置不能为空");
@@ -152,7 +153,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Integer articleType = articleDto.getArticleType();
         Assert.notNull(articleType, "文章类型不能为空");
         if (!ArticleType.ORIGINAL.getType().equals(articleType)) {
-            Assert.notNull(articleDto.getReprintLink(), "原文链接不能为空");
+            Assert.isTrue(StringUtils.isBlank(articleDto.getReprintLink()), "原文链接不能为空");
         }
 
         Long loginId = SecurityUtils.getLoginId();
