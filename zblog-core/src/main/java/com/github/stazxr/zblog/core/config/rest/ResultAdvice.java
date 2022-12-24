@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.model.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,15 +28,15 @@ public class ResultAdvice implements ResponseBodyAdvice<Object> {
     private static final String ERROR_PATH = "/error";
 
     @Override
-    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> aClass) {
+    public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> aClass) {
         return !returnType.hasMethodAnnotation(IgnoreResult.class);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType,
-            Class<? extends HttpMessageConverter<?>> aClass, ServerHttpRequest serverHttpRequest,
-            ServerHttpResponse serverHttpResponse) {
+    public Object beforeBodyWrite(Object o, @NotNull MethodParameter methodParameter, @NotNull MediaType mediaType,
+            @NotNull Class<? extends HttpMessageConverter<?>> aClass, @NotNull ServerHttpRequest serverHttpRequest,
+            @NotNull ServerHttpResponse serverHttpResponse) {
         if (o == null) {
             return Result.success();
         }

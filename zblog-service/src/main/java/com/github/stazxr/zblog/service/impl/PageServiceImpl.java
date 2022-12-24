@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.converter.PageConverter;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.domain.dto.PageDto;
@@ -77,6 +78,10 @@ public class PageServiceImpl extends ServiceImpl<PageMapper, Page> implements Pa
     }
 
     private void checkPage(Page page) {
+        if (page.getId() == null) {
+            page.setId(GenerateIdUtils.getId());
+        }
+
         Assert.isTrue(StringUtils.isBlank(page.getPageName()), "页面名称不能为空");
         Assert.isTrue(StringUtils.isBlank(page.getPageLabel()), "页面标签不能为空");
         Assert.isTrue(StringUtils.isBlank(page.getPageCover()), "页面封面不能为空");

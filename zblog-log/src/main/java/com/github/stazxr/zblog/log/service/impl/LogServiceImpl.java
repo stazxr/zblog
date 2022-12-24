@@ -46,7 +46,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogService {
-    private static final String[] IGNORED_PARAM = {"HttpServletResponse", "HttpServletRequest", "MultipartFile"};
+    private static final String[] IGNORED_PARAM = {"HttpServletResponse", "HttpServletRequest", "MultipartFile", "MultipartFile[]"};
 
     private static final String RESULT_CLASS = "Result";
 

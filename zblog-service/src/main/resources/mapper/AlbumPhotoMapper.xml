@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.AlbumPhotoMapper">
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO album_photo (ID, ALBUM_ID, FILE_ID, PHOTO_NAME, PHOTO_LINK, IS_DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE) VALUES
+        <foreach collection="photos" item="photo" index="index" separator=",">
+            (#{photo.id}, #{photo.albumId}, #{photo.fileId}, #{photo.photoName}, #{photo.photoLink}, #{photo.isDeleted}, 1, #{photo.createUser}, #{photo.createTime}, #{photo.createDate})
+        </foreach>
+    </insert>
+
+    <select id="selectAlbumPhotoList" resultType="com.github.stazxr.zblog.domain.vo.AlbumPhotoVo">
+        SELECT
+            ID, ALBUM_ID, PHOTO_NAME, PHOTO_DESC, PHOTO_LINK, IS_DELETED, CREATE_TIME
+        FROM album_photo WHERE IS_DELETED = 0
+        <if test="albumId != null">
+            AND ALBUM_ID = #{albumId}
+        </if>
+        ORDER BY CREATE_TIME DESC
+    </select>
+</mapper>

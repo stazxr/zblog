@@ -11,7 +11,10 @@
         UPDATE permission SET
             PID = #{pid}, PERM_NAME = #{permName}, PERM_CODE = #{permCode}, PERM_LEVEL = #{permLevel},
             COMPONENT_NAME = #{componentName}, COMPONENT_PATH = #{componentPath}, ROUTER_PATH = #{routerPath},
-            ICON = #{icon}, SORT = #{sort}, `CACHE` = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
+            <if test="icon != null and icon != ''">
+                ICON = #{icon},
+            </if>
+            SORT = #{sort}, `CACHE` = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
         WHERE ID = #{id}
     </update>
 
