@@ -39,4 +39,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param status    文章状态
      */
     void updateArticleStatus(@Param("articleId") Long articleId, @Param("status") ArticleStatus status);
+
+    /**
+     * 查询前台文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    List<ArticleVo> selectWebArticleList(ArticleQueryDto queryDto);
 }

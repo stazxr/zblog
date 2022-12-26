@@ -3,18 +3,20 @@ package com.github.stazxr.zblog.service.impl;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.PageHelper;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
+import com.github.stazxr.zblog.domain.bo.PageInfo;
+import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
 import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
 import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
 import com.github.stazxr.zblog.domain.entity.Visitor;
 import com.github.stazxr.zblog.domain.entity.WebsiteConfig;
 import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
+import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.domain.vo.BlogWebVo;
-import com.github.stazxr.zblog.mapper.PortalMapper;
-import com.github.stazxr.zblog.mapper.VisitorAreaMapper;
-import com.github.stazxr.zblog.mapper.VisitorMapper;
-import com.github.stazxr.zblog.mapper.WebSettingMapper;
+import com.github.stazxr.zblog.domain.vo.TalkVo;
+import com.github.stazxr.zblog.mapper.*;
 import com.github.stazxr.zblog.service.PortalService;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 前台服务实现层
@@ -49,6 +52,12 @@ public class PortalServiceImpl implements PortalService {
 
     private final WebSettingMapper webSettingMapper;
 
+    private final PageMapper pageMapper;
+
+    private final TalkMapper talkMapper;
+
+    private final ArticleMapper articleMapper;
+
     /**
      * 查询博客前台信息
      *
@@ -69,6 +78,10 @@ public class PortalServiceImpl implements PortalService {
         // OtherInfo
         websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
         webVo.setOtherInfo(websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class));
+
+        // PageInfo
+        List<PageInfo> pageList = pageMapper.selectWebPageList();
+        webVo.setPageList(pageList);
 
         return webVo;
     }
@@ -113,6 +126,29 @@ public class PortalServiceImpl implements PortalService {
 
         // 网站访问量自增
         visitorMapper.addWebVisitorCount();
+    }
+
+    /**
+     * 查询首页轮播的说说列表
+     *
+     * @return TalkList
+     */
+    @Override
+    public List<TalkVo> queryTalkList() {
+        return talkMapper.selectWebTalkList();
+    }
+
+    /**
+     * 分页查询前台文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    @Override
+    public com.github.pagehelper.PageInfo<ArticleVo> queryArticleList(ArticleQueryDto queryDto) {
+        queryDto.checkPage();
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        return new com.github.pagehelper.PageInfo<>(articleMapper.selectWebArticleList(queryDto));
     }
 
     private synchronized void updateVisitorAreaCount(String area) {

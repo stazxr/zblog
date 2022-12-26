@@ -37,4 +37,11 @@ public interface TalkMapper extends BaseMapper<Talk> {
      * @param talkId 说说ID
      */
     void updateTopStatus(@Param("talkId") Long talkId);
+
+    /**
+     * 查询首页轮播的说说列表
+     *
+     * @return TalkList
+     */
+    List<TalkVo> selectWebTalkList();
 }

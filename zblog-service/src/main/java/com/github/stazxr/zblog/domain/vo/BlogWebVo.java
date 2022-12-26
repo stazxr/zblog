@@ -1,11 +1,14 @@
 package com.github.stazxr.zblog.domain.vo;
 
+import com.github.stazxr.zblog.domain.bo.PageInfo;
 import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
 import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
 import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
 
 /**
  * 博客前台信息
@@ -51,4 +54,9 @@ public class BlogWebVo {
      * 其他信息
      */
     private OtherInfo otherInfo;
+
+    /**
+     * 前端页面信息
+     */
+    private List<PageInfo> pageList;
 }

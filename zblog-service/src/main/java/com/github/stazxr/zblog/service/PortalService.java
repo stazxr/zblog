@@ -1,8 +1,13 @@
 package com.github.stazxr.zblog.service;
 
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.domain.vo.BlogWebVo;
+import com.github.stazxr.zblog.domain.vo.TalkVo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 前台服务层
@@ -24,4 +29,19 @@ public interface PortalService {
      * @param request 请求信息
      */
     void recordVisitor(HttpServletRequest request);
+
+    /**
+     * 查询首页轮播的说说列表
+     *
+     * @return TalkList
+     */
+    List<TalkVo> queryTalkList();
+
+    /**
+     * 分页查询前台文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    PageInfo<ArticleVo> queryArticleList(ArticleQueryDto queryDto);
 }

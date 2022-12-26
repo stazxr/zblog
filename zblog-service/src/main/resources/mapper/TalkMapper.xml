@@ -34,4 +34,12 @@
             ID, CONTENT, IMAGES, STATUS, IS_TOP, CREATE_USER, CREATE_TIME, UPDATE_TIME
         FROM talk WHERE DELETED = 0 AND ID = #{talkId}
     </select>
+
+    <select id="selectWebTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+        SELECT
+            CONTENT, IS_TOP, CREATE_TIME
+        FROM talk
+        WHERE DELETED = 0 AND STATUS = 1
+        ORDER BY IS_TOP DESC, CREATE_TIME DESC LIMIT 5
+    </select>
 </mapper>

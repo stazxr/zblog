@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.mapper;
 
 import com.github.stazxr.zblog.core.base.BaseMapper;
+import com.github.stazxr.zblog.domain.bo.PageInfo;
 import com.github.stazxr.zblog.domain.entity.Page;
 import com.github.stazxr.zblog.domain.vo.PageVo;
 import org.apache.ibatis.annotations.Param;
@@ -36,4 +37,11 @@ public interface PageMapper extends BaseMapper<Page> {
      * @return Page
      */
     Page selectByPageLabel(@Param("pageLabel") String pageLabel);
+
+    /**
+     * 查询前台页面列表
+     *
+     * @return PageList
+     */
+    List<PageInfo> selectWebPageList();
 }
