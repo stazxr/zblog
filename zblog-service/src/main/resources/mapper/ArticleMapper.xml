@@ -5,107 +5,422 @@
         <result property="id" column="ID" />
         <result property="title" column="TITLE" />
         <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="categoryId" column="CATEGORY_ID" />
         <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="commentFlag" column="COMMENT_FLAG" />
+        <result property="articlePerm" column="ARTICLE_PERM" />
         <result property="articleStatus" column="ARTICLE_STATUS" />
-        <result property="viewCount" column="VIEW_COUNT" />
-        <result property="likeCount" column="LIKE_COUNT" />
-        <result property="authorId" column="LIKE_COUNT" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="reprintLink" column="REPRINT_LINK" />
+        <result property="reprintDesc" column="REPRINT_DESC" />
+        <result property="authorId" column="AUTHOR_ID" />
         <result property="authorNickname" column="AUTHOR_NICKNAME" />
         <result property="createTime" column="CREATE_TIME" />
         <result property="updateTime" column="UPDATE_TIME" />
-        <result property="articlePerm" column="ARTICLE_PERM" />
+        <result property="desc" column="DESC" />
+        <result property="wordCount" column="WORD_COUNT" />
+        <result property="viewCount" column="VIEW_COUNT" />
+        <result property="likeCount" column="LIKE_COUNT" />
+        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo" select="selectArticleTagList" column="ID">
+            <result property="id" column="TAG_ID" />
+            <result property="name" column="TAG_NAME" />
+            <result property="type" column="TAG_TYPE" />
+        </collection>
+        <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID">
+            <result property="id" column="FILE_ID" />
+            <result property="originalFilename" column="ORIGINAL_FILENAME" />
+            <result property="downloadUrl" column="DOWNLOAD_URL" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="remark" column="REMARK" />
+        <result property="content" column="CONTENT" />
+        <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="categoryId" column="CATEGORY_ID" />
+        <result property="categoryName" column="CATEGORY_NAME" />
         <result property="commentFlag" column="COMMENT_FLAG" />
+        <result property="articlePerm" column="ARTICLE_PERM" />
+        <result property="articleStatus" column="ARTICLE_STATUS" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="reprintLink" column="REPRINT_LINK" />
+        <result property="reprintDesc" column="REPRINT_DESC" />
+        <result property="authorId" column="AUTHOR_ID" />
+        <result property="authorNickname" column="AUTHOR_NICKNAME" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="viewCount" column="VIEW_COUNT" />
+        <result property="likeCount" column="LIKE_COUNT" />
         <collection property="tagList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
             <result property="id" column="TAG_ID" />
             <result property="name" column="TAG_NAME" />
             <result property="type" column="TAG_TYPE" />
         </collection>
+        <collection property="articleImg" ofType="com.github.stazxr.zblog.base.domain.entity.File">
+            <result property="id" column="FILE_ID" />
+            <result property="originalFilename" column="ORIGINAL_FILENAME" />
+            <result property="downloadUrl" column="DOWNLOAD_URL" />
+        </collection>
     </resultMap>
+
+    <resultMap id="articleVoWebListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="remark" column="REMARK" />
+        <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="categoryId" column="CATEGORY_ID" />
+        <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="authorNickname" column="AUTHOR_NICKNAME" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="viewCount" column="VIEW_COUNT" />
+        <result property="likeCount" column="LIKE_COUNT" />
+        <collection property="tagList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+            <result property="id" column="TAG_ID" />
+            <result property="name" column="TAG_NAME" />
+            <result property="type" column="TAG_TYPE" />
+        </collection>
+        <collection property="articleImg" ofType="com.github.stazxr.zblog.base.domain.entity.File">
+            <result property="id" column="FILE_ID" />
+            <result property="originalFilename" column="ORIGINAL_FILENAME" />
+            <result property="downloadUrl" column="DOWNLOAD_URL" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertArticleTmpContent">
+        INSERT INTO article_content_draft_record (
+            ID, ARTICLE_ID, CONTENT, REMARK, `COUNT`, SAVE_TIME
+        ) VALUES (
+            #{id}, #{articleId}, #{content}, #{remark}, #{count}, #{saveTime}
+        )
+    </insert>
+
+    <insert id="insertArticlePublishTiming">
+        INSERT INTO article_auto_publish_timing (
+            ID, ARTICLE_ID, PUBLISH_TIME, PRODUCER_TIME
+        ) VALUES (
+            #{id}, #{articleId}, #{publishTime}, #{producerTime}
+        )
+    </insert>
 
     <update id="updateArticleStatus">
         UPDATE article SET ARTICLE_STATUS = #{status} WHERE ID = #{articleId}
     </update>
 
-    <select id="selectArticleList" resultMap="articleVoListMap">
+    <update id="batchUpdateArticleStatus">
+        UPDATE article SET ARTICLE_STATUS = #{status}, `DESC` = #{desc} WHERE ID IN
+        <choose>
+            <when test="articleIds != null and articleIds.size() > 0">
+                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">
+                    #{articleId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no delete')
+            </otherwise>
+        </choose>
+    </update>
+
+    <update id="clearArticleRecycleBin">
+        UPDATE article SET DELETED = 1 WHERE DELETED = 0 AND ARTICLE_STATUS = 8 AND AUTHOR_ID = #{authorId}
+    </update>
+
+    <update id="invalidateArticlePublishTiming">
+        UPDATE article_auto_publish_timing SET VALID = 0, `DESC` = #{desc} WHERE VALID = 1 AND ARTICLE_ID = #{articleId}
+    </update>
+
+    <update id="batchInvalidateArticlePublishTiming">
+        UPDATE article_auto_publish_timing SET VALID = 0, `DESC` = #{desc} WHERE VALID = 1 AND ARTICLE_ID IN
+        <choose>
+            <when test="articleIds != null and articleIds.size() > 0">
+                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">
+                    #{articleId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no delete')
+            </otherwise>
+        </choose>
+    </update>
+
+    <update id="deleteArticleByAuthor">
+        UPDATE article SET ARTICLE_STATUS = 10 WHERE ARTICLE_STATUS = 8 AND AUTHOR_ID = #{authorId}
+    </update>
+
+    <update id="updateArticleDesc">
+        UPDATE article SET `DESC` = #{desc} WHERE ID = #{articleId}
+    </update>
+
+    <delete id="deleteArticleTmpContent">
+        DELETE FROM article_content_draft_record WHERE ARTICLE_ID = #{articleId}
+    </delete>
+
+    <delete id="deleteArticlePublishTiming">
+        DELETE FROM article_auto_publish_timing WHERE ARTICLE_ID = #{articleId}
+    </delete>
+
+    <select id="selectArticleTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
         SELECT
-            temp.ID, temp.TITLE, temp.ARTICLE_TYPE, temp.ARTICLE_STATUS, temp.ARTICLE_PERM, temp.COMMENT_FLAG,
-            temp.CREATE_TIME, temp.UPDATE_TIME, c.NAME CATEGORY_NAME, u.NICKNAME AUTHOR_NICKNAME,
-            tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE,
-            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = temp.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = temp.ID) LIKE_COUNT
-        FROM (
-            SELECT
-                ID, TITLE, REMARK, CONTENT, KEYWORDS, REPRINT_LINK, REPRINT_DESC,
-                COVER_IMAGE_TYPE, ARTICLE_TYPE, ARTICLE_STATUS, ARTICLE_PERM, CATEGORY_ID, AUTHOR_ID, COMMENT_FLAG,
-                CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
-            FROM
-                article
-            WHERE DELETED = 0 AND ARTICLE_PERM IN (1, 2)
-            UNION ALL
-            SELECT
-                ID, TITLE, REMARK, CONTENT, KEYWORDS, REPRINT_LINK, REPRINT_DESC,
-                COVER_IMAGE_TYPE, ARTICLE_TYPE, ARTICLE_STATUS, ARTICLE_PERM, CATEGORY_ID, AUTHOR_ID, COMMENT_FLAG,
-                CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
-            FROM
-                article
-            WHERE DELETED = 0 AND ARTICLE_PERM = 3 AND AUTHOR_ID IN (
-                SELECT ID FROM user WHERE USERNAME = #{loginUser}
-            )
-        ) temp
-        LEFT JOIN article_category c ON c.ID = temp.CATEGORY_ID
-        LEFT JOIN (
-            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
-        ) tag ON tag.ARTICLE_ID = temp.ID
-        LEFT JOIN user u ON u.ID = temp.AUTHOR_ID
-        <where>
-            <if test="title != null and title != ''">
-                <bind name="titleBind" value="'%' + title + '%'"/>
-                AND temp.TITLE LIKE #{titleBind}
-            </if>
-            <if test="articleStatus != null">
-                AND temp.ARTICLE_STATUS = #{articleStatus}
-            </if>
-            <if test="author != null and author != ''">
-                <bind name="authorBind" value="'%' + author + '%'"/>
-                AND temp.AUTHOR_ID IN (
-                    SELECT ID FROM user WHERE USERNAME LIKE #{authorBind} OR NICKNAME LIKE #{authorBind}
-                )
-            </if>
-        </where>
+            ata.ID, ata.NAME, ata.TYPE
+        FROM article_tag_relation atr
+        LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
+        WHERE ata.DELETED = 0 AND atr.ARTICLE_ID = #{ID}
     </select>
 
-    <select id="selectArticleDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+    <select id="selectArticleImgList" resultType="com.github.stazxr.zblog.base.domain.entity.File">
         SELECT
-            a.ID, a.TITLE, a.REMARK, a.CONTENT, a.KEYWORDS, a.REPRINT_LINK, a.REPRINT_DESC,
-            a.COVER_IMAGE_TYPE, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.ARTICLE_PERM, a.CATEGORY_ID, a.AUTHOR_ID, a.COMMENT_FLAG,
-            a.CREATE_USER, a.CREATE_TIME, a.UPDATE_USER, a.UPDATE_TIME
+            f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+        FROM article_img_relation air
+        LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        WHERE air.ARTICLE_ID = #{ID}
+    </select>
+
+    <select id="selectUserArticleList" resultMap="articleVoListMap">
+        SELECT
+            a.ID, a.TITLE, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.COMMENT_FLAG,
+            a.ARTICLE_PERM, a.`DESC`, a.EXTEND2 WORD_COUNT, a.ARTICLE_STATUS, a.COVER_IMAGE_TYPE,
+            a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
+            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
+            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+        FROM article a
+        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
+        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        WHERE a.DELETED = 0 AND a.AUTHOR_ID = #{loginUser}
+        <if test="title != null and title != ''">
+            <bind name="titleBind" value="'%' + title + '%'"/>
+            AND a.TITLE LIKE #{titleBind}
+        </if>
+        <if test="keywords != null and keywords != ''">
+            AND (
+                a.KEYWORDS = #{keywords} OR a.KEYWORDS LIKE CONCAT('%', ',', #{keywords}, '%') OR a.KEYWORDS LIKE CONCAT('%', 'java', ',', '%')
+            )
+        </if>
+        <if test="categoryId != null">
+            AND a.CATEGORY_ID = #{categoryId}
+        </if>
+        <if test="articleType != null">
+            AND a.ARTICLE_TYPE = #{articleType}
+        </if>
+        <if test="commentFlag != null">
+            AND a.COMMENT_FLAG = #{commentFlag}
+        </if>
+        <if test="tagStatus != null">
+            <choose>
+                <when test="tagStatus == 1">
+                    AND a.ARTICLE_STATUS != 8
+                </when>
+                <when test="tagStatus == 2">
+                    AND a.ARTICLE_STATUS != 8 AND a.ARTICLE_PERM = 1
+                </when>
+                <when test="tagStatus == 3">
+                    AND a.ARTICLE_STATUS != 8 AND a.ARTICLE_PERM = 3
+                </when>
+                <when test="tagStatus == 4">
+                    AND a.ARTICLE_STATUS IN (2, 3)
+                </when>
+                <when test="tagStatus == 5">
+                    AND a.ARTICLE_STATUS = 9
+                </when>
+                <when test="tagStatus == 6">
+                    AND a.ARTICLE_STATUS IN (4, 6, 7)
+                </when>
+                <when test="tagStatus == 7">
+                    AND a.ARTICLE_STATUS = 1
+                </when>
+                <when test="tagStatus == 8">
+                    AND a.ARTICLE_STATUS = 8
+                </when>
+                <otherwise>
+                    AND a.ARTICLE_STATUS = 99999
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY IF(a.UPDATE_TIME = '', a.CREATE_TIME, a.UPDATE_TIME) DESC
+    </select>
+
+    <select id="selectUserArticleCountData" resultType="com.github.stazxr.zblog.domain.bo.ArticleCountData">
+        SELECT
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS != 8) AS allCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS != 8 AND ARTICLE_PERM = 1) AS publicCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS != 8 AND ARTICLE_PERM = 3) AS privateCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS IN (2, 3)) AS auditCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS = 9) AS publishCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS IN (4, 6, 7)) AS dealCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS = 1) AS draftCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND AUTHOR_ID = #{userId} AND ARTICLE_STATUS = 8) AS deleteCount
+        FROM DUAL
+    </select>
+
+    <select id="selectPublicArticleList" resultMap="articleVoListMap">
+        SELECT
+            a.ID, a.TITLE, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.COMMENT_FLAG,
+            a.ARTICLE_PERM, a.`DESC`, a.EXTEND2 WORD_COUNT, a.ARTICLE_STATUS, a.COVER_IMAGE_TYPE,
+            a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
+            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
+            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+        FROM article a
+        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
+        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_STATUS != 8 AND a.ARTICLE_PERM = 1
+        <if test="title != null and title != ''">
+            <bind name="titleBind" value="'%' + title + '%'"/>
+            AND a.TITLE LIKE #{titleBind}
+        </if>
+        <if test="keywords != null and keywords != ''">
+            AND (
+                a.KEYWORDS = #{keywords} OR a.KEYWORDS LIKE CONCAT('%', ',', #{keywords}, '%') OR a.KEYWORDS LIKE CONCAT('%', 'java', ',', '%')
+            )
+        </if>
+        <if test="author != null and author != ''">
+            <bind name="authorBind" value="'%' + author + '%'"/>
+            AND a.AUTHOR_ID IN (
+                SELECT ID FROM user WHERE USERNAME LIKE #{authorBind} OR NICKNAME LIKE #{authorBind}
+            )
+        </if>
+        <if test="categoryId != null">
+            AND a.CATEGORY_ID = #{categoryId}
+        </if>
+        <if test="articleType != null">
+            AND a.ARTICLE_TYPE = #{articleType}
+        </if>
+        <if test="tagStatus != null">
+            <choose>
+                <when test="tagStatus == 1">
+                    AND a.ARTICLE_STATUS != 8
+                </when>
+                <when test="tagStatus == 2">
+                    AND a.ARTICLE_STATUS = 5
+                </when>
+                <when test="tagStatus == 3">
+                    AND a.ARTICLE_STATUS IN (2, 3)
+                </when>
+                <when test="tagStatus == 4">
+                    AND a.ARTICLE_STATUS IN (4, 6, 7)
+                </when>
+                <when test="tagStatus == 5">
+                    AND a.ARTICLE_STATUS = 9
+                </when>
+                <otherwise>
+                    AND a.ARTICLE_STATUS = 99999
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY IF(a.UPDATE_TIME = '', a.CREATE_TIME, a.UPDATE_TIME) DESC
+    </select>
+
+    <select id="selectPublicArticleCountData" resultType="com.github.stazxr.zblog.domain.bo.ArticleCountData">
+        SELECT
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS != 8 AND ARTICLE_PERM = 1) AS allCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1) AS publishedCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS IN (2, 3) AND ARTICLE_PERM = 1) AS auditCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS IN (4, 6, 7) AND ARTICLE_PERM = 1) AS dealCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 9 AND ARTICLE_PERM = 1) AS publishCount
+        FROM DUAL
+    </select>
+
+    <select id="selectArticleDetail" resultMap="articleVoDetailMap">
+        SELECT
+            a.ID, a.TITLE, a.REMARK, a.CONTENT, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.ARTICLE_TYPE, a.ARTICLE_STATUS,
+            a.ARTICLE_PERM, a.COVER_IMAGE_TYPE, a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, a.COMMENT_FLAG, u.NICKNAME AUTHOR_NICKNAME,
+            a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,
+            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
+            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
         FROM
             article a
+        LEFT JOIN (
+            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID, ata.DELETED FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
+        ) tag ON tag.ARTICLE_ID = a.ID AND tag.DELETED = 0
+        LEFT JOIN (
+            SELECT
+                air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         WHERE a.DELETED = 0 AND a.ID = #{articleId}
     </select>
 
-    <select id="selectWebArticleList" resultMap="articleVoListMap">
+    <select id="selectWebArticleList" resultMap="articleVoWebListMap">
         SELECT
-            temp.ID, temp.TITLE, temp.ARTICLE_TYPE, temp.ARTICLE_STATUS, temp.ARTICLE_PERM, temp.COMMENT_FLAG,
-            temp.CREATE_TIME, temp.UPDATE_TIME, c.NAME CATEGORY_NAME, u.NICKNAME AUTHOR_NICKNAME,
-            tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE,
-            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = temp.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = temp.ID) LIKE_COUNT
-        FROM (
-            SELECT
-                ID, TITLE, REMARK, CONTENT, KEYWORDS, REPRINT_LINK, REPRINT_DESC,
-                COVER_IMAGE_TYPE, ARTICLE_TYPE, ARTICLE_STATUS, ARTICLE_PERM, CATEGORY_ID, AUTHOR_ID, COMMENT_FLAG,
-                CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
-            FROM
-                article
-            WHERE DELETED = 0 AND ARTICLE_PERM = 1 AND ARTICLE_STATUS = 5
-        ) temp
-        LEFT JOIN article_category c ON c.ID = temp.CATEGORY_ID
+            a.ID, a.TITLE, a.REMARK, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME,
+            a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,
+            (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
+            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+        FROM article a
+        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
+        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
         LEFT JOIN (
-            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
-        ) tag ON tag.ARTICLE_ID = temp.ID
-        LEFT JOIN user u ON u.ID = temp.AUTHOR_ID
-        ORDER BY temp.CREATE_TIME DESC
+            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID, ata.DELETED FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
+        ) tag ON tag.ARTICLE_ID = a.ID AND tag.DELETED = 0
+        LEFT JOIN (
+            SELECT
+                air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
+        ORDER BY a.CREATE_TIME DESC
+    </select>
+
+    <select id="selectLastArticleDraft" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT
+            ID, TITLE
+        FROM article
+        WHERE DELETED = 0 AND ARTICLE_STATUS = 1 AND AUTHOR_ID = #{authorId}
+        ORDER BY IF(UPDATE_TIME = '', CREATE_TIME, UPDATE_TIME) DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectOneWithDeleted" resultType="com.github.stazxr.zblog.domain.entity.Article">
+        SELECT ID, ARTICLE_STATUS, AUTHOR_ID, DELETED FROM article WHERE ID = #{articleId}
+    </select>
+
+    <select id="selectAutoSaveArticleContentList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo">
+        SELECT ID, ARTICLE_ID, `COUNT`, SAVE_TIME FROM article_content_draft_record WHERE ARTICLE_ID = #{articleId} ORDER BY SAVE_TIME DESC
+    </select>
+
+    <select id="selectAutoSaveArticleContentById" resultType="com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo">
+        SELECT ID, ARTICLE_ID, REMARK, `COUNT`, CONTENT, SAVE_TIME FROM article_content_draft_record WHERE ID = #{recordId}
+    </select>
+
+    <select id="selectArticleByPublishId" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT
+            a.ID, a.TITLE, a.ARTICLE_STATUS
+        FROM
+            article_auto_publish_timing timing
+        LEFT JOIN article a ON a.ID = timing.ARTICLE_ID
+        WHERE timing.VALID = 1 AND timing.CONSUMED = 0 AND timing.ID = #{publishId}
+    </select>
+
+    <select id="checkNoAuditCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS NOT IN (2, 3) AND ID IN
+        <choose>
+            <when test="articleIds != null and articleIds.size() > 0">
+                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">
+                    #{articleId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no choose')
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="splitAuditArticleIds" resultType="java.lang.Long">
+        SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = #{status} AND ID IN
+        <choose>
+            <when test="articleIds != null and articleIds.size() > 0">
+                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">
+                    #{articleId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no choose')
+            </otherwise>
+        </choose>
     </select>
 </mapper>

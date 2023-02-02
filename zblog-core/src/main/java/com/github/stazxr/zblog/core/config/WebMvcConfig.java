@@ -121,7 +121,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        log.info("fileDomain: {}, fileUploadPath: {}", fileDomain, fileUploadPath);
+        log.info("Local File Config ===> fileDomain: {}, fileUploadPath: {}", fileDomain, fileUploadPath);
         registry.addResourceHandler(fileDomain).addResourceLocations("file:" + fileUploadPath);
     }
 

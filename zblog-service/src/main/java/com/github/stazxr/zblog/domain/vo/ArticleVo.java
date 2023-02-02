@@ -1,10 +1,12 @@
 package com.github.stazxr.zblog.domain.vo;
 
+import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +30,21 @@ public class ArticleVo extends BaseVo {
     private String title;
 
     /**
+     * 文章内容
+     */
+    private String content;
+
+    /**
+     * 文章关键字
+     */
+    private String keywords;
+
+    /**
+     * 文章摘要
+     */
+    private String remark;
+
+    /**
      * 文章类型: see {@link com.github.stazxr.zblog.domain.enums.ArticleType}
      */
     private Integer articleType;
@@ -35,27 +52,42 @@ public class ArticleVo extends BaseVo {
     /**
      * 文章分类
      */
+    private String categoryId;
+
+    /**
+     * 文章分类名称
+     */
     private String categoryName;
 
     /**
-     * 标签列表
+     * 是否允许评论
      */
-    private List<ArticleTagVo> tagList;
+    private Boolean commentFlag;
 
     /**
-     * 浏览量
+     * 文章权限: see {@link com.github.stazxr.zblog.domain.enums.ArticlePerm}
      */
-    private int viewCount;
-
-    /**
-     * 点赞量
-     */
-    private int likeCount;
+    private Integer articlePerm;
 
     /**
      * 文章状态: see {@link com.github.stazxr.zblog.domain.enums.ArticleStatus}
      */
     private Integer articleStatus;
+
+    /**
+     * 封面类型: see {@link com.github.stazxr.zblog.domain.enums.ArticleImgType}
+     */
+    private Integer coverImageType;
+
+    /**
+     * 原文链接（转载或翻译需要填写该字段）
+     */
+    private String reprintLink;
+
+    /**
+     * 转载说明
+     */
+    private String reprintDesc;
 
     /**
      * 作者
@@ -78,17 +110,67 @@ public class ArticleVo extends BaseVo {
     private String updateTime;
 
     /**
-     * 文章权限: see {@link com.github.stazxr.zblog.domain.enums.ArticlePerm}
+     * 备注
      */
-    private Integer articlePerm;
+    private String desc;
 
     /**
-     * 是否允许评论
+     * 字数
      */
-    private Boolean commentFlag;
+    private String wordCount;
+
+    /**
+     * 浏览量
+     */
+    private int viewCount;
+
+    /**
+     * 点赞量
+     */
+    private int likeCount;
 
     /**
      * 评论数
      */
     private int commentCount;
+
+    /**
+     * 标签明细列表
+     */
+    private List<ArticleTagVo> tagList;
+
+    /**
+     * 封面列表
+     */
+    private List<File> articleImg;
+
+    /**
+     * 标签序号列表
+     */
+    private List<Long> articleTag;
+
+    /**
+     * 封面链接列表
+     */
+    private List<String> articleImgLinkList;
+
+    public List<String> getArticleImgLinkList() {
+        List<String> tmp = new ArrayList<>();
+        if (this.articleImg != null) {
+            for (File file : articleImg) {
+                tmp.add(file.getDownloadUrl());
+            }
+        }
+        return tmp;
+    }
+
+    public List<Long> getArticleTag() {
+        List<Long> tmp = new ArrayList<>();
+        if (this.tagList != null) {
+            for (ArticleTagVo tagVo : tagList) {
+                tmp.add(tagVo.getId());
+            }
+        }
+        return tmp;
+    }
 }

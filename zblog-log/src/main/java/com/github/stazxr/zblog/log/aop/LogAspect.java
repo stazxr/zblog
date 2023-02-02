@@ -48,7 +48,7 @@ public class LogAspect {
     /**
      * 配置接口的切入点，扫描所有controller包下的异常信息
      */
-    @Pointcut("execution(public * com.github.stazxr.zblog..*.controller..*.*(..))")
+    @Pointcut("execution(public * com.github.stazxr.zblog*.controller..*.*(..))")
     public void ctlLogPointCut() {
     }
 

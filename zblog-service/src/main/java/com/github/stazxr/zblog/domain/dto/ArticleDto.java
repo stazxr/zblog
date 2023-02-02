@@ -18,6 +18,11 @@ import java.util.List;
 @ToString
 public class ArticleDto {
     /**
+     * 操作类型：add/edit
+     */
+    private String action;
+
+    /**
      * 主键
      */
     private Long id;
@@ -91,4 +96,19 @@ public class ArticleDto {
      * 文章封面
      */
     private List<File> articleImg;
+
+    /**
+     * 编辑器类型
+     */
+    private String extend1;
+
+    /**
+     * 文章字数
+     */
+    private String extend2;
+
+    /**
+     * 自动发布时间
+     */
+    private String autoPublishTime;
 }

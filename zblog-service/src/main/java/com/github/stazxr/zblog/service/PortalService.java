@@ -44,4 +44,12 @@ public interface PortalService {
      * @return ArticleList
      */
     PageInfo<ArticleVo> queryArticleList(ArticleQueryDto queryDto);
+
+    /**
+     * 分页查询前台文章详情
+     *
+     * @param articleId 文章ID
+     * @return ArticleVo
+     */
+    ArticleVo queryArticleDetail(Long articleId);
 }

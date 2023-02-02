@@ -97,6 +97,7 @@ INSERT INTO article_tag (ID, NAME, TYPE, ENABLED, DELETED, VERSION, CREATE_USER,
 INSERT INTO article_tag (ID, NAME, TYPE, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3538598210605940773, '随笔', 1, 1, 0, 1, 'admin', '2021-03-01 00:58:53', '2021-03-01', '', '');
 INSERT INTO article_tag (ID, NAME, TYPE, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3538598210605940774, '散文', 1, 1, 0, 1, 'admin', '2021-03-01 00:58:53', '2021-03-01', '', '');
 INSERT INTO article_tag (ID, NAME, TYPE, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3538598210605940775, '笔记', 1, 1, 0, 1, 'admin', '2021-03-01 00:58:53', '2021-03-01', '', '');
+INSERT INTO article_tag (ID, NAME, TYPE, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3538598210605940776, '生活', 1, 1, 0, 1, 'admin', '2021-03-01 00:58:53', '2021-03-01', '', '');
 
 /*Table structure for table `article_tag_relation` */
 DROP TABLE IF EXISTS `article_tag_relation`;
@@ -196,18 +197,19 @@ CREATE TABLE `article` (
   `ID` BIGINT(64) UNSIGNED NOT NULL,
   `TITLE` VARCHAR(100) NOT NULL COMMENT '文章标题',
   `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
-  `CONTENT` TEXT NOT NULL COMMENT '文章内容',
+  `CONTENT` TEXT NOT NULL COMMENT '文章内容: 65535 / 16,777,215',
   `CONTENT_MD` TEXT COMMENT '文章内容_Markdown',
   `KEYWORDS` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '文章关键字',
   `REPRINT_LINK` VARCHAR(1000) DEFAULT NULL COMMENT '原文地址',
   `REPRINT_DESC` VARCHAR(1000) NOT NULL DEFAULT '' COMMENT '转载说明',
   `COVER_IMAGE_TYPE` INT(2) NOT NULL COMMENT '封面类型',
   `ARTICLE_TYPE` INT(2) NOT NULL COMMENT '文章类型',
-  `ARTICLE_STATUS` INT(2) NOT NULL COMMENT '文章状态',
-  `ARTICLE_PERM` INT(2) NOT NULL COMMENT '文章权限',
-  `CATEGORY_ID` BIGINT(64) NOT NULL COMMENT '文章分类',
+  `ARTICLE_STATUS` INT(2) DEFAULT NULL COMMENT '文章状态',
+  `ARTICLE_PERM` INT(2) DEFAULT NULL COMMENT '文章权限',
+  `CATEGORY_ID` BIGINT(64) DEFAULT NULL COMMENT '文章分类',
   `AUTHOR_ID` BIGINT(64) NOT NULL COMMENT '文章作者',
   `COMMENT_FLAG` TINYINT(1) DEFAULT 1 COMMENT '是否允许评论',
+  `DESC` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '其他信息',
   `DELETED` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
   `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
   `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
@@ -215,8 +217,8 @@ CREATE TABLE `article` (
   `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
   `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
   `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
-  `EXTEND1` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段一',
-  `EXTEND2` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段二',
+  `EXTEND1` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段一：编辑器类型：1-WangEditor; 2-Markdown',
+  `EXTEND2` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段二：文章字数',
   `EXTEND3` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段三',
   `EXTEND4` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段四',
   `EXTEND5` VARCHAR(200) DEFAULT NULL COMMENT '扩展字段五',
@@ -228,6 +230,34 @@ CREATE TABLE `article` (
   KEY `INDEX_KEY_ARTICLE_PERM` (`ARTICLE_PERM`),
   KEY `INDEX_KEY_AUTHOR_ID` (`AUTHOR_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章表';
+
+/*Table structure for table `article_content_draft_record` */
+DROP TABLE IF EXISTS `article_content_draft_record`;
+CREATE TABLE `article_content_draft_record` (
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+  `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
+  `COUNT` VARCHAR(200) DEFAULT NULL COMMENT '文章字数',
+  `CONTENT` TEXT NOT NULL COMMENT '文章内容: 65535 / 16,777,215',
+  `SAVE_TIME` VARCHAR(50) NOT NULL COMMENT '自动保存时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
+
+/*Table structure for table `article_auto_publish_timing` */
+DROP TABLE IF EXISTS `article_auto_publish_timing`;
+CREATE TABLE `article_auto_publish_timing` (
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+  `PUBLISH_TIME` VARCHAR(50) NOT NULL COMMENT '消息发布时间: yyyy-MM-dd HH:mm',
+  `PRODUCER_TIME` VARCHAR(20) NOT NULL COMMENT '消息生产时间: yyyy-MM-dd HH:mm:ss',
+  `CONSUMER_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '消息消费时间: yyyy-MM-dd HH:mm:ss',
+  `CONSUMED` TINYINT(1) DEFAULT 0 COMMENT '消息是否被消费',
+  `VALID` TINYINT(1) DEFAULT 1 COMMENT '消息是否有效',
+  `DESC` VARCHAR(100) DEFAULT NULL DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`ID`) USING BTREE,
+  KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章自动发布状态记录表';
 
 /*Table structure for table `friend_link` */
 DROP TABLE IF EXISTS `friend_link`;
@@ -265,9 +295,9 @@ CREATE TABLE `website_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='网站配置信息表';
 
 /*Data for the table `website_config` */
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '', 1, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '', 1, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '', 1, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
+INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAuthor":"長安、某","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550267120476487680.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629","websiteRecordNo":"陕ICP备2021003044号-1"}', 2, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
+INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '{"gitee":"https://gitee.com/stazxr/zblog","github":"https://github.com/stazxr/zblog","qq":"http://wpa.qq.com/msgrd?v=3&uin=1027353579&site=qq&menu=yes","qqNum":"1027353579"}', 3, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
+INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273434476871680.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272378833469440.jpg","isCommentReview":1,"isEmailNotice":1,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272186411384832.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550271987156779008.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273418534322176.jpg"}', 2, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 
 /*Table structure for table `visitor` */
 DROP TABLE IF EXISTS `visitor`;
@@ -329,6 +359,9 @@ CREATE TABLE `talk` (
   KEY `INDEX_KEY_IS_TOP` (`IS_TOP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='说说';
 
+/*Data for the table `talk` */
+INSERT INTO talk (ID, CONTENT, IMAGES, STATUS, IS_TOP, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550278505713369088, '声明：博客框架为SpringBoot2.5 + Vue2，大家有Bug和优化提议欢迎提Issue，也可以加入QQ群（760210629）进行交流。项目前端借鉴了《风、宇个人博客》和《ELADMIN》两个开源项目的内容，感谢两个项目的作者！<img src="https://suntaoblog.oss-cn-beijing.aliyuncs.com/emoji/dacall.jpg" width="24" height="24" alt="[打call]" style="margin: 0 1px; vertical-align: text-bottom">', '', 1, 1, 0, 1, 'admin', '2023-01-06 21:39:16', '2023-01-06', 'admin', '2023-01-06 22:11:01');
+
 /*Table structure for table `page` */
 DROP TABLE IF EXISTS `page`;
 CREATE TABLE `page` (
@@ -346,6 +379,20 @@ CREATE TABLE `page` (
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE KEY `KEY_PAGE_LABEL` (`PAGE_LABEL`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='页面配置';
+
+/*Data for the table `page` */
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550262842852638720, '首页', 'home', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550262833667112960.jpg', 1, 1, 'admin', '2023-01-06 20:37:02', '2023-01-06', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550263063359782912, '分类', 'category', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550263046892945408.jpg', 3, 1, 'admin', '2023-01-06 20:37:55', '2023-01-06', 'admin', '2023-01-06 23:46:52');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550263198819024896, '标签', 'tag', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550263180460556288.jpg', 4, 1, 'admin', '2023-01-06 20:38:27', '2023-01-06', 'admin', '2023-01-06 23:46:59');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550263325503782912, '栏目', 'column', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550263314208522240.jpg', 5, 1, 'admin', '2023-01-06 20:38:57', '2023-01-06', 'admin', '2023-01-06 23:47:20');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550302122887086080, '文章', 'article', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550302354764988416.jpg', 6, 1, 'admin', '2023-01-06 23:13:07', '2023-01-06', 'admin', '2023-01-06 23:47:35');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550302704641245184, '文章列表', 'articles', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550302692230299648.jpg', 7, 1, 'admin', '2023-01-06 23:15:26', '2023-01-06', 'admin', '2023-01-06 23:47:42');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550303326471979008, '归档', 'archive', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550303310193885184.jpg', 2, 1, 'admin', '2023-01-06 23:17:54', '2023-01-06', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550312241301553152, '相册', 'album', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550312232287993856.jpg', 8, 1, 'admin', '2023-01-06 23:53:19', '2023-01-06', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550312375179542528, '说说', 'talk', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550312364781862912.jpg', 9, 1, 'admin', '2023-01-06 23:53:51', '2023-01-06', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320281232867328, '友链', 'link', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320270478671872.jpg', 10, 1, 'admin', '2023-01-07 00:25:16', '2023-01-07', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320511156224000, '关于我', 'about', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320496522297344.jpg', 11, 1, 'admin', '2023-01-07 00:26:11', '2023-01-07', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320794401767424, '留言', 'message', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320781672054784.jpg', 12, 1, 'admin', '2023-01-07 00:27:19', '2023-01-07', '', '');
 
 /*Table structure for table `album` */
 DROP TABLE IF EXISTS `album`;

@@ -16,22 +16,47 @@ import lombok.ToString;
 @ToString
 public class ArticleQueryDto extends PageParam {
     /**
+     * 登录用户序号
+     */
+    private Long loginUser;
+
+    /**
+     * 文章序列
+     */
+    private Long articleId;
+
+    /**
      * 文章标题
      */
     private String title;
 
     /**
-     * 文章状态
+     * 文章关键字
      */
-    private Integer articleStatus;
+    private String keywords;
+
+    /**
+     * 文章分类
+     */
+    private Long categoryId;
+
+    /**
+     * 文章类型
+     */
+    private Integer articleType;
+
+    /**
+     * 评论状态
+     */
+    private Boolean commentFlag;
+
+    /**
+     * 状态查询
+     */
+    private Integer tagStatus;
 
     /**
      * 作者用户名、昵称
      */
     private String author;
-
-    /**
-     * 登录用户
-     */
-    private String loginUser;
 }

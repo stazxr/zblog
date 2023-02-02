@@ -73,4 +73,16 @@ public class PortalController {
     public Result queryArticleList(ArticleQueryDto queryDto) {
         return Result.success().data(portalService.queryArticleList(queryDto));
     }
+
+    /**
+     * 分页查询前台文章详情
+     *
+     * @param articleId 文章ID
+     * @return ArticleVo
+     */
+    @GetMapping("/queryArticleDetail")
+    @Router(name = "分页查询前台文章详情", code = "queryWebArticleDetail", level = BaseConst.PermLevel.OPEN)
+    public Result queryArticleDetail(Long articleId) {
+        return Result.success().data(portalService.queryArticleDetail(articleId));
+    }
 }

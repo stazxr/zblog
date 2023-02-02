@@ -2,10 +2,9 @@ package com.github.stazxr.zblog.controller;
 
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.PageDto;
-import com.github.stazxr.zblog.domain.dto.TalkDto;
-import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.service.PageService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class WebPageController {
      * @return PageVo
      */
     @GetMapping(value = "/queryPageDetail")
-    @Router(name = "查询页面详情", code = "queryPageDetail")
+    @Router(name = "查询页面详情", code = "queryPageDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryPageDetail(Long pageId) {
         return Result.success().data(pageService.queryPageDetail(pageId));
     }

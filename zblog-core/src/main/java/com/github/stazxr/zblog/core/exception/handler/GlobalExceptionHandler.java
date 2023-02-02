@@ -9,6 +9,7 @@ import com.github.stazxr.zblog.core.util.ResponseUtils;
 import com.github.stazxr.zblog.util.exception.AssertionViolatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -145,9 +146,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Throwable.class)
     public void exceptionHandler(HttpServletResponse response, Throwable e) throws IOException {
-        log.error("全局捕获 -> 系统发生未知错误", e);
         ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.SERVER_ERROR).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        ResultCode resultCode = ResultCode.SERVER_ERROR;
+        if (e instanceof DuplicateKeyException) {
+            resultCode = ResultCode.DATA_EXIST;
+            log.error("全局捕获 -> 系统发生未知错误[数据已存在]", e);
+        } else {
+            log.error("全局捕获 -> 系统发生未知错误", e);
+        }
+
+        Result result = Result.failure(resultCode).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

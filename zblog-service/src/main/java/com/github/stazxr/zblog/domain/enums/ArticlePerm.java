@@ -18,6 +18,7 @@ public enum ArticlePerm {
     /**
      * 登录可见：仅系统用户可访问和阅读
      */
+    @Deprecated
     LOGIN_SHOW(2),
 
     /**

@@ -4,12 +4,12 @@
     <select id="selectBlogWebInfo" resultType="com.github.stazxr.zblog.domain.vo.BlogWebVo">
         SELECT
             (
-                <!-- 查询已发布的公开的文章数量 -->
                 SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
             ) ARTICLE_COUNT,
             (
-                <!-- 查询启用的二级类别数量 -->
-                SELECT COUNT(1) FROM article_category WHERE DELETED = 0 AND ENABLED = 1 AND PID IS NULL
+                SELECT COUNT(1) FROM article_category WHERE DELETED = 0 AND ENABLED = 1 AND PID IS NOT NULL AND ID IN (
+                    SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+                )
             ) CATEGORY_COUNT,
             (
                 SELECT COUNT(1) FROM article_tag WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (

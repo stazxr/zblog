@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -92,6 +93,12 @@ public class Article extends BaseEntityWithExtend {
      * 是否允许评论
      */
     private Boolean commentFlag;
+
+    /**
+     * 其他信息
+     */
+    @TableField(value = "`DESC`")
+    private String desc;
 
     /**
      * 是否已删除（使用逻辑操作，保护数据）

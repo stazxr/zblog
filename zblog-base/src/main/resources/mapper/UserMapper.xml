@@ -11,12 +11,6 @@
         <result property="gender" column="GENDER" />
         <result property="email" column="EMAIL" />
         <result property="enabled" column="ENABLED" />
-        <result property="locked" column="LOCKED" />
-        <result property="temp" column="TEMP" />
-        <result property="createTime" column="CREATE_TIME" />
-        <collection property="roleIds" ofType="Long">
-            <result column="ROLE_ID" />
-        </collection>
     </resultMap>
 
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
@@ -46,12 +40,8 @@
 
     <select id="selectUserList" resultMap="userVoMap">
         SELECT
-            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER,
-            u.ENABLED, u.LOCKED, u.TEMP, u.LOGIN_TIME, u.CREATE_TIME, r.ROLE_ID
+            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER, u.ENABLED, u.LOGIN_TIME
         FROM user u
-        LEFT JOIN (
-            SELECT USER_ID, ROLE_ID FROM user_role_relation
-        ) r ON r.USER_ID = u.ID
         WHERE u.DELETED = '0'
         <if test="username != null and username != ''">
             <bind name="usernameBind" value="'%' + username + '%'"/>
@@ -64,7 +54,7 @@
         <if test="enabled != null">
             AND u.ENABLED = #{enabled}
         </if>
-        ORDER BY u.USERNAME, u.NICKNAME
+        ORDER BY u.LOGIN_TIME DESC
     </select>
 
     <select id="selectUserDetail" resultMap="userVoDetailMap">

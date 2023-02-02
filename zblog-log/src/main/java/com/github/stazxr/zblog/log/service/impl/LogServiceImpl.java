@@ -50,6 +50,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
 
     private static final String RESULT_CLASS = "Result";
 
+    private static final int MAX_PARAM_LENGTH = 65535;
+
     private final LogMapper logMapper;
 
     /**
@@ -117,7 +119,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
 
         // 设置其他信息
         log.setId(IdUtils.getId());
-        log.setRequestParam(getParameter(method, joinPoint.getArgs()));
+        String parameter = getParameter(method, joinPoint.getArgs());
+        log.setRequestParam(parameter.length() > MAX_PARAM_LENGTH ? "参数内容过长" : parameter);
         log.setOperateUser(SecurityUtils.getLoginUsernameNoEor());
         save(log);
     }

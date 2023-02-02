@@ -16,17 +16,17 @@ public enum ArticleStatus {
     DRAFT(1),
 
     /**
-     * 审核中
+     * 待审核（下一个状态为 -> 已发布）
      */
     REVIEW(2),
 
     /**
-     * 修改审核中（已发布的文章如果被修改，需要重新审核）
+     * 待审核（自动发布的待审核，下一个状态为 -> 待发布）
      */
-    UPDATE_REVIEW(3),
+    PUBLISH_REVIEW(3),
 
     /**
-     * 审核拒绝
+     * 审核不通过
      */
     FAILED_REVIEW(4),
 

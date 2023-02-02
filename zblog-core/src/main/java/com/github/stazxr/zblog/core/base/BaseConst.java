@@ -117,4 +117,28 @@ public class BaseConst {
          */
         public static final int NULL = 98;
     }
+
+    /**
+     * 操作类型
+     */
+    public static final class Action {
+        private Action() {
+            throw new IllegalStateException();
+        }
+
+        /**
+         * 新增
+         */
+        public static final String ADD = "add";
+
+        /**
+         * 编辑
+         */
+        public static final String EDIT = "edit";
+
+        /**
+         * 删除
+         */
+        public static final String DELETE = "delete";
+    }
 }

@@ -151,6 +151,22 @@ public class PortalServiceImpl implements PortalService {
         return new com.github.pagehelper.PageInfo<>(articleMapper.selectWebArticleList(queryDto));
     }
 
+    /**
+     * 分页查询前台文章详情
+     *
+     * @param articleId 文章ID
+     * @return ArticleVo
+     */
+    @Override
+    public ArticleVo queryArticleDetail(Long articleId) {
+        if (articleId == null) {
+            // 返回空，前台处理
+            return null;
+        }
+
+        return articleMapper.selectArticleDetail(articleId);
+    }
+
     private synchronized void updateVisitorAreaCount(String area) {
         String currentTime = DateUtils.formatNow();
         if (visitorAreaMapper.judgeAreaExist(area)) {

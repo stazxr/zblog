@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.controller;
 
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.TalkDto;
 import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
@@ -43,7 +44,7 @@ public class TalkController {
      * @return TalkVo
      */
     @GetMapping(value = "/queryTalkDetail")
-    @Router(name = "查询说说详情", code = "queryTalkDetail")
+    @Router(name = "查询说说详情", code = "queryTalkDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryTalkDetail(Long talkId) {
         return Result.success().data(talkService.queryTalkDetail(talkId));
     }
