@@ -26,6 +26,7 @@
         <jackson.version>2.13.0</jackson.version>
         <aliyun.oss.version>3.8.0</aliyun.oss.version>
         <qiniu.version>7.9.5</qiniu.version>
+        <sensitive-word.version>0.2.0</sensitive-word.version>
     </properties>
 
     <dependencies>
@@ -114,6 +115,12 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!-- Sensitive-word -->
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>sensitive-word</artifactId>
+            <version>${sensitive-word.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.MessageMapper">
+    <update id="auditMessage">
+        UPDATE message SET IS_REVIEW = 1 WHERE IS_REVIEW = 0 AND ID IN
+        <choose>
+            <when test="messageIds != null and messageIds.size() > 0">
+                <foreach collection="messageIds" item="messageId" index="index" open="(" separator="," close=")">
+                    #{messageId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no choose')
+            </otherwise>
+        </choose>
+    </update>
+
+    <select id="selectMessageList" resultType="com.github.stazxr.zblog.domain.vo.MessageVo">
+        SELECT
+            ID, IP_ADDRESS, IP_SOURCE, NICKNAME, AVATAR, MESSAGE_CONTENT, IS_REVIEW, CREATE_TIME
+        FROM message
+        <where>
+            <if test="content != null and content != ''">
+                <bind name="contentBind" value="'%' + content + '%'"/>
+                AND MESSAGE_CONTENT LIKE #{contentBind}
+            </if>
+            <if test="status != null">
+                <choose>
+                    <when test="status == 1">
+                        AND IS_REVIEW IS TRUE
+                    </when>
+                    <when test="status == 2">
+                        AND IS_REVIEW IS FALSE
+                    </when>
+                    <otherwise>
+                        AND IS_REVIEW IS NULL
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectWebMessageList" resultType="com.github.stazxr.zblog.domain.vo.MessageVo">
+        SELECT NICKNAME, AVATAR, MESSAGE_CONTENT, TIME FROM message WHERE IS_REVIEW IS TRUE ORDER BY CREATE_TIME DESC
+    </select>
+</mapper>

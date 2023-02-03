@@ -4,21 +4,27 @@ import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
+import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.converter.MessageConverter;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.domain.bo.PageInfo;
+import com.github.stazxr.zblog.domain.dto.MessageDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
 import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
 import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
+import com.github.stazxr.zblog.domain.entity.Message;
 import com.github.stazxr.zblog.domain.entity.Visitor;
 import com.github.stazxr.zblog.domain.entity.WebsiteConfig;
 import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
 import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.domain.vo.BlogWebVo;
+import com.github.stazxr.zblog.domain.vo.MessageVo;
 import com.github.stazxr.zblog.domain.vo.TalkVo;
 import com.github.stazxr.zblog.mapper.*;
 import com.github.stazxr.zblog.service.PortalService;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.http.HtmlContentUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import eu.bitwalker.useragentutils.OperatingSystem;
@@ -57,6 +63,10 @@ public class PortalServiceImpl implements PortalService {
     private final TalkMapper talkMapper;
 
     private final ArticleMapper articleMapper;
+
+    private final MessageConverter messageConverter;
+
+    private final MessageMapper messageMapper;
 
     /**
      * 查询博客前台信息
@@ -165,6 +175,41 @@ public class PortalServiceImpl implements PortalService {
         }
 
         return articleMapper.selectArticleDetail(articleId);
+    }
+
+    /**
+     * 留言板留言
+     *
+     * @param request    请求信息
+     * @param messageDto 留言信息
+     */
+    @Override
+    public void saveMessage(HttpServletRequest request, MessageDto messageDto) {
+        Message message = messageConverter.dtoToEntity(messageDto);
+
+        // 留言审核开启状态
+        WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
+        OtherInfo otherInfo = websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class);
+        Integer isReview = otherInfo.getIsMessageReview();
+
+        // 设置请求信息
+        String ip = IpUtils.getIp(request);
+        message.setIpAddress(ip);
+        message.setMessageContent(HtmlContentUtils.filter(message.getMessageContent()));
+        message.setIpSource(IpImplUtils.getCityInfo(ip));
+        message.setId(GenerateIdUtils.getId());
+        message.setIsReview(1 == isReview);
+        messageMapper.insert(message);
+    }
+
+    /**
+     * 查询前台弹幕列表
+     *
+     * @return MessageVo
+     */
+    @Override
+    public List<MessageVo> queryMessageList() {
+        return messageMapper.selectWebMessageList();
     }
 
     private synchronized void updateVisitorAreaCount(String area) {

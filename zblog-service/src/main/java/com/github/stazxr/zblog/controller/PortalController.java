@@ -3,14 +3,12 @@ package com.github.stazxr.zblog.controller;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.domain.dto.MessageDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.service.PortalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,5 +82,30 @@ public class PortalController {
     @Router(name = "分页查询前台文章详情", code = "queryWebArticleDetail", level = BaseConst.PermLevel.OPEN)
     public Result queryArticleDetail(Long articleId) {
         return Result.success().data(portalService.queryArticleDetail(articleId));
+    }
+
+    /**
+     * 查询前台弹幕列表
+     *
+     * @return MessageVo
+     */
+    @GetMapping("/queryMessageList")
+    @Router(name = "查询前台弹幕列表", code = "queryWebMessageList", level = BaseConst.PermLevel.OPEN)
+    public Result queryMessageList() {
+        return Result.success().data(portalService.queryMessageList());
+    }
+
+    /**
+     * 留言板留言
+     *
+     * @param request    请求信息
+     * @param messageDto 留言信息
+     * @return Result
+     */
+    @PostMapping(value = "/saveMessage")
+    @Router(name = "留言板留言", code = "saveMessage", level = BaseConst.PermLevel.OPEN)
+    public Result recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
+        portalService.saveMessage(request, messageDto);
+        return Result.success();
     }
 }

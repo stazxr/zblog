@@ -13,32 +13,32 @@ public class OtherInfo {
     /**
      * 游客头像
      */
-    private String touristAvatar;
+    private String touristAvatar = "";
 
     /**
      * 用户头像
      */
-    private String userAvatar;
+    private String userAvatar = "";
 
     /**
      * 是否评论审核
      */
-    private Integer isCommentReview;
+    private Integer isCommentReview = 1;
 
     /**
      * 是否留言审核
      */
-    private Integer isMessageReview;
+    private Integer isMessageReview = 1;
 
     /**
      * 是否邮箱通知
      */
-    private Integer isEmailNotice;
+    private Integer isEmailNotice = 0;
 
     /**
      * 是否打赏
      */
-    private Integer isReward;
+    private Integer isReward = 0;
 
     /**
      * 微信二维码
@@ -53,10 +53,10 @@ public class OtherInfo {
     /**
      * 文章封面
      */
-    private String articleCover;
+    private String articleCover = "";
 
     /**
      * 是否开启音乐
      */
-    private Integer isMusicPlayer;
+    private Integer isMusicPlayer = 0;
 }

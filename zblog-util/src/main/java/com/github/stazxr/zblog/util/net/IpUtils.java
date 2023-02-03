@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.util.net;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.github.stazxr.zblog.util.Constants;
 import com.github.stazxr.zblog.util.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,12 @@ import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * IP工具类

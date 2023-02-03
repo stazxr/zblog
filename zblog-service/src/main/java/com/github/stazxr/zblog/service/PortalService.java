@@ -1,9 +1,11 @@
 package com.github.stazxr.zblog.service;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.domain.dto.MessageDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.domain.vo.BlogWebVo;
+import com.github.stazxr.zblog.domain.vo.MessageVo;
 import com.github.stazxr.zblog.domain.vo.TalkVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,4 +54,19 @@ public interface PortalService {
      * @return ArticleVo
      */
     ArticleVo queryArticleDetail(Long articleId);
+
+    /**
+     * 留言板留言
+     *
+     * @param request    请求信息
+     * @param messageDto 留言信息
+     */
+    void saveMessage(HttpServletRequest request, MessageDto messageDto);
+
+    /**
+     * 查询前台弹幕列表
+     *
+     * @return MessageVo
+     */
+    List<MessageVo> queryMessageList();
 }
