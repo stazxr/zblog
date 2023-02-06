@@ -124,7 +124,7 @@ cache:
   type: memory
 zblog:
   deploy-type: single
-  is-local-ip-parsing: false
+  is-local-ip-parsing: true
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/

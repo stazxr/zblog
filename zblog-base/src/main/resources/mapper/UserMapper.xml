@@ -21,6 +21,7 @@
         <result property="headImgUrl" column="HEAD_IMG_URL" />
         <result property="gender" column="GENDER" />
         <result property="signature" column="SIGNATURE" />
+        <result property="website" column="WEBSITE" />
         <result property="enabled" column="ENABLED" />
         <result property="locked" column="LOCKED" />
         <result property="temp" column="TEMP" />
@@ -60,7 +61,7 @@
     <select id="selectUserDetail" resultMap="userVoDetailMap">
         SELECT
             u.ID, u.USERNAME, u.NICKNAME, u.GENDER, u.EMAIL, ur.ROLE_ID, r.ROLE_NAME,
-            u.ENABLED, u.LOCKED, u.TEMP, u.HEAD_IMG_URL, u.SIGNATURE,
+            u.ENABLED, u.LOCKED, u.TEMP, u.HEAD_IMG_URL, u.SIGNATURE, u.WEBSITE,
             u.EXPIRED_TIME, u.LOGIN_TIME, u.CREATE_TIME, u.CREATE_USER, u.UPDATE_TIME, u.UPDATE_USER
         FROM user u
         LEFT JOIN (
@@ -74,7 +75,24 @@
         SELECT * FROM user WHERE USERNAME = #{username}
     </select>
 
+    <select id="selectByEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE EMAIL = #{email} AND DELETED = 0
+    </select>
+
     <select id="selectByNickname" resultType="com.github.stazxr.zblog.base.domain.entity.User">
         SELECT * FROM user WHERE NICKNAME = #{nickname} AND DELETED = 0
+    </select>
+
+    <select id="selectLoginUserByUsernameOrEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT
+            ID, NICKNAME, HEAD_IMG_URL, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`, ENABLED, `LOCKED`
+        FROM user
+        WHERE DELETED = 0
+        <if test="isEmail == true">
+            AND EMAIL = #{username}
+        </if>
+        <if test="isEmail == false">
+            AND USERNAME = #{username}
+        </if>
     </select>
 </mapper>

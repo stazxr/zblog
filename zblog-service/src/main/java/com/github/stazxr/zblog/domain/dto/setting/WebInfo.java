@@ -39,6 +39,16 @@ public class WebInfo {
     private String websiteIntro = "";
 
     /**
+     * 网站链接（前台）
+     */
+    private String websiteLink = "";
+
+    /**
+     * 网站链接（后台）
+     */
+    private String websiteAdminLink = "";
+
+    /**
      * 网站公告
      */
     private String websiteNotice = "";

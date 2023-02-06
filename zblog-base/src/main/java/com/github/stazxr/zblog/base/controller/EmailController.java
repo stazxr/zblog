@@ -42,7 +42,7 @@ public class EmailController {
      * @return 验证码缓存key
      */
     @PostMapping("sendCode")
-    @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.OPEN)
     public Result sendCode(@RequestPostSingleParam String email) {
         Assert.isTrue(StringUtils.isBlank(email), "邮箱不能为空");
         Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");

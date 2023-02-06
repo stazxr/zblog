@@ -38,4 +38,11 @@ public interface FriendLinkMapper extends BaseMapper<FriendLink> {
      * @return FriendLink
      */
     FriendLink selectByLinkUrl(@Param("linkUrl") String linkUrl);
+
+    /**
+     * 查询友链列表
+     *
+     * @return FriendLinkVoList
+     */
+    List<FriendLinkVo> selectWebFriendLinkList();
 }

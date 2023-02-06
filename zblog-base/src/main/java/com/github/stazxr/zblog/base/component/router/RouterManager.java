@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.core.config.properties.ZblogProperties;
+import com.github.stazxr.zblog.util.collection.ArrayUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,12 +54,14 @@ public class RouterManager {
         // save router
         checkRouterCodeUnique(routerInterface.getRouters());
         routerService.clearRouter();
-        routerService.saveBatch(routerInterface.getRouters());
+        List<List<Router>> routers = ArrayUtils.averageAssign(routerInterface.getRouters());
+        routers.forEach(routerService::saveBatch);
 
         // save interface
         interfaceService.clearInterface();
         routerInterface.getPermInterfaces().addAll(routerInterface.getNullInterfaces());
-        interfaceService.saveBatch(routerInterface.getPermInterfaces());
+        List<List<Interface>> interfaces = ArrayUtils.averageAssign(routerInterface.getPermInterfaces());
+        interfaces.forEach(interfaceService::saveBatch);
     }
 
     /**

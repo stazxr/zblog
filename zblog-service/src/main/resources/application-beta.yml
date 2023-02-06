@@ -22,6 +22,3 @@ jwt:
     subject: Login
 cache:
   type: redis
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

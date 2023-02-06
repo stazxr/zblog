@@ -108,7 +108,7 @@ public class UserController {
      * @return UserVo
      */
     @GetMapping(value = "/queryUserDetail")
-    @Router(name = "查询用户详情", code = "queryUserDetail")
+    @Router(name = "查询用户详情", code = "queryUserDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryUserDetail(@RequestParam Long userId) {
         return Result.success().data(userService.queryUserDetail(userId));
     }
@@ -170,6 +170,32 @@ public class UserController {
     @Router(name = "更新用户状态", code = "updateUserStatus")
     public Result updateUserStatus(@RequestBody UserDto user) {
         userService.updateUserStatus(user);
+        return Result.success();
+    }
+
+    /**
+     * 用户注册
+     *
+     * @param registerDto 注册信息
+     * @return Result
+     */
+    @PostMapping(value = "/register")
+    @Router(name = "用户注册", code = "userRegister", level = BaseConst.PermLevel.OPEN)
+    public Result userRegister(@RequestBody UserRegisterDto registerDto) {
+        userService.userRegister(registerDto);
+        return Result.success();
+    }
+
+    /**
+     * 通过邮箱修改密码
+     *
+     * @param forgetPwdDto 密码信息
+     * @return Result
+     */
+    @PostMapping(value = "/updateUserPwdByEmail")
+    @Router(name = "通过邮箱修改密码", code = "updateUserPwdByEmail", level = BaseConst.PermLevel.OPEN)
+    public Result updateUserPwdByEmail(@RequestBody ForgetPwdDto forgetPwdDto) {
+        userService.updateUserPwdByEmail(forgetPwdDto);
         return Result.success();
     }
 }

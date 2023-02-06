@@ -43,6 +43,11 @@ public class UserDto {
     private String signature;
 
     /**
+     * 个人网站
+     */
+    private String website;
+
+    /**
      * 性别
      */
     private Integer gender;

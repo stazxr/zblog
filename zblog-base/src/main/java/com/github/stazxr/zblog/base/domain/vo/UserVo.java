@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * UserVo
@@ -48,6 +49,11 @@ public class UserVo {
      * 签名
      */
     private String signature;
+
+    /**
+     * 个人网站
+     */
+    private String website;
 
     /**
      * 登录时间
@@ -108,4 +114,9 @@ public class UserVo {
      * 用户对应的角色列表
      */
     private List<String> roleNames;
+
+    /**
+     * 评论点赞列表
+     */
+    private Set<Long> commentLikeSet;
 }

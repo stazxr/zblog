@@ -277,9 +277,9 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     public void changeBlackOrWhiteRouterStatus(DictDto dictDto) {
         Assert.notNull(dictDto.getDictId(), "参数【dictId】不能为空");
         Assert.notNull(dictDto.getEnabled(), "参数【enabled】不能为空");
-        int i = dictMapper.updateDictStatus(dictDto.getDictId(), dictDto.getEnabled());
-        Assert.isTrue(i != 1, "修改失败");
-        removeCache(dictDto.getValue());
+        Assert.isTrue(dictMapper.updateDictStatus(dictDto.getDictId(), dictDto.getEnabled()) != 1, "修改失败");
+        Dict dict = dictMapper.selectById(dictDto.getDictId());
+        removeCache(dict.getValue());
     }
 
     /**

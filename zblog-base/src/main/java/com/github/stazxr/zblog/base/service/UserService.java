@@ -1,10 +1,8 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
@@ -126,4 +124,18 @@ public interface UserService extends BaseService<User> {
      * @param user 用户信息
      */
     void updateUserStatus(UserDto user);
+
+    /**
+     * 用户注册
+     *
+     * @param registerDto 注册信息
+     */
+    void userRegister(UserRegisterDto registerDto);
+
+    /**
+     * 通过邮箱修改密码
+     *
+     * @param forgetPwdDto 密码信息
+     */
+    void updateUserPwdByEmail(ForgetPwdDto forgetPwdDto);
 }

@@ -40,6 +40,11 @@ public class RegexUtils {
         /**
          * 邮箱正则表达式
          */
+        public static final String USERNAME_REGEX = "^[0-9A-Za-z]{4,20}$";
+
+        /**
+         * 邮箱正则表达式
+         */
         public static final String EMAIL_REGEX = "^[0-9A-Za-z][\\.-_0-9A-Za-z]*@[0-9A-Za-z]+(\\.[0-9A-Za-z]+)+$";
 
         /**

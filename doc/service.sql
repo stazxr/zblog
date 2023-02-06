@@ -295,7 +295,7 @@ CREATE TABLE `website_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='网站配置信息表';
 
 /*Data for the table `website_config` */
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAuthor":"長安、某","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550267120476487680.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629","websiteRecordNo":"陕ICP备2021003044号-1"}', 2, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
+INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAdminLink":"https://admin.suntaoblog.com","websiteAuthor":"恋、長安","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550267120476487680.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊","websiteLink":"https://www.suntaoblog.com","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629","websiteRecordNo":"陕ICP备2021003044号-1"}', 5, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '{"gitee":"https://gitee.com/stazxr/zblog","github":"https://github.com/stazxr/zblog","qq":"http://wpa.qq.com/msgrd?v=3&uin=1027353579&site=qq&menu=yes","qqNum":"1027353579"}', 3, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273434476871680.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272378833469440.jpg","isCommentReview":1,"isEmailNotice":1,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272186411384832.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550271987156779008.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273418534322176.jpg"}', 2, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 
@@ -390,9 +390,10 @@ INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CRE
 INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550303326471979008, '归档', 'archive', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550303310193885184.jpg', 2, 1, 'admin', '2023-01-06 23:17:54', '2023-01-06', '', '');
 INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550312241301553152, '相册', 'album', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550312232287993856.jpg', 8, 1, 'admin', '2023-01-06 23:53:19', '2023-01-06', '', '');
 INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550312375179542528, '说说', 'talk', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550312364781862912.jpg', 9, 1, 'admin', '2023-01-06 23:53:51', '2023-01-06', '', '');
-INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320281232867328, '友链', 'link', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320270478671872.jpg', 10, 1, 'admin', '2023-01-07 00:25:16', '2023-01-07', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320281232867328, '友链', 'link', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/03/3560430307511369728.png', 10, 1, 'admin', '2023-01-07 00:25:16', '2023-01-07', 'admin', '2023-02-03 21:58:57');
 INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320511156224000, '关于我', 'about', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320496522297344.jpg', 11, 1, 'admin', '2023-01-07 00:26:11', '2023-01-07', '', '');
-INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320794401767424, '留言', 'message', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/07/3550320781672054784.jpg', 12, 1, 'admin', '2023-01-07 00:27:19', '2023-01-07', '', '');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3550320794401767424, '留言', 'message', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/03/3560449645610008576.png', 12, 1, 'admin', '2023-01-07 00:27:19', '2023-01-07', 'admin', '2023-02-03 23:15:47');
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3560832866961063936, '个人中心', 'user', 'https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/05/3560832853027586048.png', 13, 1, 'admin', '2023-02-05 00:38:32', '2023-02-05', '', '');
 
 /*Table structure for table `album` */
 DROP TABLE IF EXISTS `album`;
@@ -452,3 +453,45 @@ CREATE TABLE `message` (
   `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='留言';
+
+/*Table structure for table `comment` */
+DROP TABLE IF EXISTS `comment`;
+CREATE TABLE `comment` (
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `USER_ID` BIGINT(64) NOT NULL COMMENT '评论用户',
+  `REPLY_USER_ID` BIGINT(64) NULL DEFAULT NULL COMMENT '回复用户',
+  `REPLY_COMMENT_ID` BIGINT(64) NULL DEFAULT NULL COMMENT '回复那条评论',
+  `PARENT_ID` BIGINT(64) NULL DEFAULT NULL COMMENT '上级节点',
+  `OBJECT_ID` BIGINT(64) NULL DEFAULT NULL COMMENT '评论对象',
+  `CONTENT` TEXT NOT NULL COMMENT '评论内容',
+  `TYPE` TINYINT(1) NOT NULL COMMENT '评论类型',
+  `IP_ADDRESS` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '评论用户IP',
+  `IP_SOURCE` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '评论用户来源',
+  `IS_REVIEW` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否审核',
+  `DELETED` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
+  `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='评论';
+
+/*Table structure for table `comment_like` */
+DROP TABLE IF EXISTS `comment_like`;
+CREATE TABLE `comment_like` (
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `USER_ID` BIGINT(64) NOT NULL COMMENT '点赞用户',
+  `COMMENT_ID` BIGINT(64) NULL DEFAULT NULL COMMENT '点赞评论',
+  `IP_ADDRESS` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '点赞用户IP',
+  `IP_SOURCE` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '点赞用户来源',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
+  `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `KEY_USER_ID_COMMENT_ID` (`USER_ID`, `COMMENT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='评论点赞信息';

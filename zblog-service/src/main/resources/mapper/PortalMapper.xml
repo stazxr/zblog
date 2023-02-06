@@ -23,4 +23,8 @@
             ) VIEWS_COUNT
         FROM DUAL
     </select>
+
+    <select id="selectCommentListSet" resultType="java.lang.Long">
+        SELECT DISTINCT COMMENT_ID FROM comment_like WHERE USER_ID = #{userId}
+    </select>
 </mapper>

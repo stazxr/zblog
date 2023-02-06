@@ -43,6 +43,21 @@ public class Constants {
     public static final String AUTHENTICATION_PREFIX = "Bearer ";
 
     /**
+     * 系统默认用户
+     */
+    public static final long DEFAULT_ROLE_ID = 3561010960472735744L;
+
+    /**
+     * 否
+     */
+    public static final Integer FALSE = 0;
+
+    /**
+     * 是
+     */
+    public static final Integer TRUE = 1;
+
+    /**
      * 内置安全系统的角色
      */
     public static final class SecurityRole {

@@ -10,10 +10,8 @@ import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
 import com.github.stazxr.zblog.base.component.email.MailService;
 import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.converter.UserConverter;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.UserDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
 import com.github.stazxr.zblog.base.domain.entity.UserRoleRelation;
@@ -25,6 +23,7 @@ import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.exception.ServiceException;
@@ -38,8 +37,11 @@ import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
+import com.github.stazxr.zblog.util.io.FileUtils;
+import com.github.stazxr.zblog.util.secret.RsaUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -140,6 +143,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.set(User::getGender, gender);
         wrapper.set(User::getNickname, updateDto.getNickname());
         wrapper.set(User::getSignature, updateDto.getSignature());
+        wrapper.set(User::getWebsite, updateDto.getWebsite());
         wrapper.set(User::getTelephone, telephone);
         wrapper.eq(User::getId, userId);
         userCacheHandler.removeUserFromCache(userId);
@@ -180,19 +184,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         DataValidated.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
         DataValidated.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
 
-        // 插入日志
-        String updateTime = DateUtils.formatNow();
-        UserPassLog passLog = UserPassLog.builder().id(GenerateIdUtils.getId()).userId(userId).password(newPass).updateTime(updateTime).build();
-        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "修改失败");
-
-        // 数据入库
-        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
-        wrapper.set(User::getPassword, passwordEncoder.encode(newPass));
-        wrapper.set(User::getChangePwd, false);
-        wrapper.set(User::getChangePwdTime, updateTime);
-        wrapper.eq(User::getId, userId);
-        Assert.isTrue(!wrapper.update(), "修改失败");
-        userCacheHandler.removeUserFromCache(userId);
+        // 修改密码
+        doUpdateUserPass(user.getId(), newPass);
         return true;
     }
 
@@ -203,6 +196,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return boolean
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserEmail(UserUpdateEmailDto emailDto) {
         // 非空校验
         String password = emailDto.getPass();
@@ -350,7 +344,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setLocked(false);
         user.setChangePwd(true);
         user.setGender(Gender.HIDE.getType());
-        user.setNickname(user.getUsername());
+        user.setNickname("用户" + userId);
         String password = UuidUtils.generateShortUuid();
         user.setPassword(passwordEncoder.encode(password));
 
@@ -417,6 +411,114 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userCacheHandler.removeUserFromCache(user.getId());
     }
 
+    /**
+     * 用户注册
+     *
+     * @param registerDto 注册信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void userRegister(UserRegisterDto registerDto) {
+        // 验空
+        Assert.isTrue(StringUtils.isBlank(registerDto.getUsername()), "用户名不能为空");
+        Assert.isTrue(StringUtils.isBlank(registerDto.getEmail()), "邮箱不能为空");
+        Assert.isTrue(StringUtils.isBlank(registerDto.getCode()), "邮箱验证码不能为空");
+
+        // 邮箱验证码校验
+        String uuid = registerDto.getUuid();
+        Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
+        String cacheCode = CacheUtils.get(uuid);
+        DataValidated.isTrue(!registerDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
+
+        // 密码复杂度校验
+        String password = registerDto.getPassword().trim();
+        Assert.isTrue(StringUtils.isBlank(password), "密码不能为空");
+        DataValidated.isTrue(password.contains(registerDto.getUsername()), "密码不能包含用户名");
+        DataValidated.isTrue(!RegexUtils.match(password, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
+
+        // 设置用户信息，新增用户
+        User user = new User();
+        Long userId = GenerateIdUtils.getId();
+        user.setId(userId);
+        user.setUsername(registerDto.getUsername().trim());
+        user.setNickname("用户" + userId);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(registerDto.getEmail().trim());
+        user.setGender(Gender.HIDE.getType());
+        user.setEnabled(true);
+        user.setTemp(false);
+        user.setAdmin(false);
+        user.setBuildIn(false);
+        user.setLocked(false);
+        user.setChangePwd(false);
+        checkUser(user);
+        Assert.isTrue(userMapper.insert(user) != 1, "新增失败");
+
+        // 保存用户 - 角色信息
+        List<Long> roleIds = new ArrayList<>();
+        roleIds.add(Constants.DEFAULT_ROLE_ID);
+        insertUserRoleData(userId, roleIds);
+    }
+
+    /**
+     * 通过邮箱修改密码
+     *
+     * @param forgetPwdDto 密码信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserPwdByEmail(ForgetPwdDto forgetPwdDto) {
+        // 验空
+        Assert.isTrue(StringUtils.isBlank(forgetPwdDto.getEmail()), "邮箱不能为空");
+        Assert.isTrue(StringUtils.isBlank(forgetPwdDto.getCode()), "邮箱验证码不能为空");
+
+        // 通过邮箱查询用户信息
+        User user = userMapper.selectByEmail(forgetPwdDto.getEmail());
+        DataValidated.notNull(user, "邮箱未注册");
+
+        // 邮箱验证码校验
+        String uuid = forgetPwdDto.getUuid();
+        Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
+        String cacheCode = CacheUtils.get(uuid);
+        DataValidated.isTrue(!forgetPwdDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
+
+        // 密码校验
+        String password = forgetPwdDto.getPassword().trim();
+
+        try {
+            // 对密码进行解密
+            ClassPathResource classPathResource = new ClassPathResource("pri.key");
+            String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+            password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
+        } catch (Exception e) {
+            throw new ServiceException("密码解析失败，请联系管理员", e);
+        }
+
+        // 密码复杂度校验
+        Assert.isTrue(StringUtils.isBlank(password), "密码不能为空");
+        DataValidated.isTrue(password.contains(user.getUsername()), "密码不能包含用户名");
+        DataValidated.isTrue(!RegexUtils.match(password, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
+
+        // 修改密码
+        doUpdateUserPass(user.getId(), password);
+    }
+
+    private void doUpdateUserPass(Long userId, String password) {
+        // 修改用户密码
+        String updateTime = DateUtils.formatNow();
+        UserPassLog passLog = UserPassLog.builder().id(GenerateIdUtils.getId()).userId(userId).password(password).updateTime(updateTime).build();
+        Assert.isTrue(userPassLogMapper.insertUserPassLog(passLog) != 1, "修改失败");
+
+        // 数据入库
+        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
+        wrapper.eq(User::getId, userId);
+        wrapper.set(User::getPassword, passwordEncoder.encode(password));
+        wrapper.set(User::getChangePwdTime, updateTime);
+        wrapper.set(User::getChangePwd, false);
+        Assert.isTrue(!wrapper.update(), "修改失败");
+        userCacheHandler.removeUserFromCache(userId);
+    }
+
     private void insertUserRoleData(Long userId, List<Long> roleIds) {
         userRoleMapper.deleteByUserId(userId);
         if (roleIds != null && roleIds.size() > 0) {
@@ -449,6 +551,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         DataValidated.notNull(user.getEmail(), "用户邮箱不能为空");
         DataValidated.notNull(user.isEnabled(), "用户状态不能为空");
         DataValidated.notNull(user.getTemp(), "用户类型不能为空");
+
+        // 用户名格式检查
+        String username = user.getUsername();
+        DataValidated.isTrue(!RegexUtils.match(username, RegexUtils.Const.USERNAME_REGEX), "用户名只允许包含数字和字母, 且长度范围要求为[4, 20]");
 
         // 邮箱格式检查
         String email = user.getEmail();

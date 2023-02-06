@@ -40,10 +40,27 @@ public interface UserMapper extends BaseMapper<User> {
     User selectByUsername(@Param("username") String username);
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return User
+     */
+    User selectByEmail(@Param("email") String email);
+
+    /**
      * 根据昵称查询用户信息
      *
      * @param nickname 昵称
      * @return User
      */
     User selectByNickname(@Param("nickname") String nickname);
+
+    /**
+     * 根据用户名或邮箱查询登录用户信息
+     *
+     * @param username 用户名或邮箱
+     * @param isEmail  是否是邮箱查询
+     * @return User
+     */
+    User selectLoginUserByUsernameOrEmail(@Param("username") String username, @Param("isEmail") boolean isEmail);
 }

@@ -28,10 +28,10 @@ import java.util.*;
 @TableName("user")
 public class User extends BaseEntity implements UserDetails {
     /**
-     * 密码有效期, 单位天数
+     * 密码有效期, 单位天数，默认一年
      */
     @JsonIgnore
-    private static final int PASSWORD_VALID_TIME = 180;
+    private static final int PASSWORD_VALID_TIME = 365;
 
     /**
      * 主键
@@ -96,6 +96,13 @@ public class User extends BaseEntity implements UserDetails {
     @Getter
     @Setter
     private String signature;
+
+    /**
+     * 个人网站
+     */
+    @Getter
+    @Setter
+    private String website;
 
     /**
      * 头像地址

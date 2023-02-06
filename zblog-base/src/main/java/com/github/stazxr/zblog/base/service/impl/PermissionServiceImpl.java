@@ -323,6 +323,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             } else {
                 permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
                 Assert.isTrue(StringUtils.isBlank(permission.getComponentPath()), "组件路径不能为空");
+                Assert.isTrue(permission.getComponentPath().startsWith("/"), "组件路径不能以斜杠开头");
                 Assert.isTrue(StringUtils.isBlank(permission.getComponentName()), "组件名称不能为空");
                 dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
                 DataValidated.isTrue(dbPerm != null && !dbPerm.getId().equals(permission.getId()), "组件名称已存在");

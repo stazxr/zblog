@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.CommentMapper">
+    <resultMap id="webCommentVoListMap" type="com.github.stazxr.zblog.domain.vo.CommentVo">
+        <result property="id" column="ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="avatar" column="HEAD_IMG_URL" />
+        <result property="website" column="WEBSITE" />
+        <result property="ipSource" column="IP_SOURCE" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="content" column="CONTENT" />
+        <result property="likeCount" column="LIKE_COUNT" />
+        <result property="replyCount" column="REPLY_COUNT" />
+        <collection property="replyList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.CommentReplyVo" select="selectCommentReplyList" column="ID" />
+    </resultMap>
+
+    <resultMap id="webCommentVoReplyListMap" type="com.github.stazxr.zblog.domain.vo.CommentReplyVo">
+        <result property="id" column="ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="avatar" column="HEAD_IMG_URL" />
+        <result property="website" column="WEBSITE" />
+        <result property="ipSource" column="IP_SOURCE" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="content" column="CONTENT" />
+        <result property="likeCount" column="LIKE_COUNT" />
+        <result property="replyCount" column="REPLY_COUNT" />
+        <result property="replyUserId" column="REPLY_USER_ID" />
+        <result property="replyNickname" column="REPLY_NICKNAME" />
+        <result property="replyWebsite" column="REPLY_WEBSITE" />
+        <result property="replyCommentId" column="REPLY_COMMENT_ID" />
+    </resultMap>
+
+    <update id="auditComment">
+        UPDATE comment SET IS_REVIEW = 1 WHERE IS_REVIEW = 0 AND ID IN
+        <choose>
+            <when test="commentIds != null and commentIds.size() > 0">
+                <foreach collection="commentIds" item="commentId" index="index" open="(" separator="," close=")">
+                    #{commentId}
+                </foreach>
+            </when>
+            <otherwise>
+                ('no choose')
+            </otherwise>
+        </choose>
+    </update>
+
+    <select id="selectCommentReplyList" resultType="com.github.stazxr.zblog.domain.vo.CommentReplyVo">
+        SELECT
+            c.ID, c.USER_ID, u.NICKNAME, u.HEAD_IMG_URL AVATAR, u.WEBSITE, c.IP_SOURCE, c.CREATE_TIME, c.CONTENT,
+            c.REPLY_COMMENT_ID, c.TYPE, c.REPLY_USER_ID, ru.NICKNAME REPLY_NICKNAME, ru.WEBSITE REPLY_WEBSITE,
+            (SELECT COUNT(1) FROM comment_like WHERE COMMENT_ID = c.ID) LIKE_COUNT,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND PARENT_ID = c.ID) REPLY_COUNT
+        FROM comment c
+        LEFT JOIN user u on c.USER_ID = u.ID
+        LEFT JOIN user ru on c.REPLY_USER_ID = ru.ID
+        WHERE c.DELETED = 0 AND c.IS_REVIEW = 1 AND c.PARENT_ID = #{ID}
+    </select>
+
+    <select id="selectCommentList" resultType="com.github.stazxr.zblog.domain.vo.CommentVo">
+        SELECT
+            c.ID, u.NICKNAME, u.HEAD_IMG_URL AVATAR, ru.NICKNAME REPLY_NICKNAME,
+            c.TYPE, c.CONTENT, c.IP_SOURCE, c.IS_REVIEW, c.CREATE_TIME,
+            (SELECT COUNT(1) FROM comment_like WHERE COMMENT_ID = c.ID) LIKE_COUNT,
+            IF(c.TYPE = 1, a.TITLE, IF(c.TYPE = 3, t.CONTENT, '')) AS OBJECT_TITLE
+        FROM comment c
+        LEFT JOIN user u on c.USER_ID = u.ID
+        LEFT JOIN user ru on c.REPLY_USER_ID = ru.ID
+        LEFT JOIN article a on c.OBJECT_ID = a.ID
+        LEFT JOIN talk t on c.OBJECT_ID = t.ID
+        WHERE c.DELETED = 0
+        <if test="status != null">
+            <choose>
+                <when test="status == 1">
+                    AND c.IS_REVIEW IS TRUE
+                </when>
+                <when test="status == 2">
+                    AND c.IS_REVIEW IS FALSE
+                </when>
+            </choose>
+        </if>
+        <if test="type != null">
+            AND c.TYPE = #{type}
+        </if>
+        <if test="type != null and type == 1 and articleTitle != null and articleTitle != ''">
+            <bind name="articleTitleBind" value="'%' + articleTitle + '%'"/>
+            AND a.TITLE LIKE #{articleTitleBind}
+        </if>
+        <if test="type != null and type == 3 and talkTitle != null and talkTitle != ''">
+            <bind name="talkTitleBind" value="'%' + talkTitle + '%'"/>
+            AND t.CONTENT LIKE #{talkTitleBind}
+        </if>
+        <if test="nickname != null and nickname != ''">
+            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
+            AND u.NICKNAME LIKE #{nicknameBind}
+        </if>
+        ORDER BY c.CREATE_TIME DESC
+    </select>
+
+    <select id="selectWebCommentList" resultMap="webCommentVoListMap">
+        SELECT
+            c.ID, c.USER_ID, u.NICKNAME, u.HEAD_IMG_URL, u.WEBSITE, c.IP_SOURCE, c.CREATE_TIME, c.CONTENT,
+            (SELECT COUNT(1) FROM comment_like WHERE COMMENT_ID = c.ID) LIKE_COUNT,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND PARENT_ID = c.ID) REPLY_COUNT
+        FROM comment c
+        LEFT JOIN user u on c.USER_ID = u.ID
+        WHERE c.DELETED = 0 AND c.IS_REVIEW = 1 AND c.REPLY_USER_ID IS NULL
+        <if test="type != null">
+            AND c.TYPE = #{type}
+        </if>
+        <if test="objectId != null">
+            AND c.OBJECT_ID = #{objectId}
+        </if>
+        ORDER BY c.CREATE_TIME
+    </select>
+
+    <select id="selectWebCommentReplyList" resultMap="webCommentVoReplyListMap">
+        SELECT
+            c.ID, c.USER_ID, u.NICKNAME, u.HEAD_IMG_URL, u.WEBSITE, c.IP_SOURCE, c.CREATE_TIME, c.CONTENT,
+            c.REPLY_COMMENT_ID, c.REPLY_USER_ID, ru.NICKNAME REPLY_NICKNAME, ru.WEBSITE REPLY_WEBSITE,
+            (SELECT COUNT(1) FROM comment_like WHERE COMMENT_ID = c.ID) LIKE_COUNT,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND PARENT_ID = c.ID) REPLY_COUNT
+        FROM comment c
+        LEFT JOIN user u on c.USER_ID = u.ID
+        LEFT JOIN user ru on c.REPLY_USER_ID = ru.ID
+        WHERE c.DELETED = 0 AND c.IS_REVIEW = 1 AND c.PARENT_ID = #{parentId}
+        ORDER BY c.CREATE_TIME
+    </select>
+</mapper>

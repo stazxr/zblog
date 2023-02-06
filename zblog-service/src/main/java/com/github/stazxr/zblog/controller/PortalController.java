@@ -3,8 +3,13 @@ package com.github.stazxr.zblog.controller;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.domain.CommentLikeDto;
+import com.github.stazxr.zblog.domain.dto.CommentDeleteDto;
+import com.github.stazxr.zblog.domain.dto.CommentDto;
 import com.github.stazxr.zblog.domain.dto.MessageDto;
+import com.github.stazxr.zblog.domain.dto.UserLoginDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
 import com.github.stazxr.zblog.service.PortalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +111,109 @@ public class PortalController {
     @Router(name = "留言板留言", code = "saveMessage", level = BaseConst.PermLevel.OPEN)
     public Result recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
         portalService.saveMessage(request, messageDto);
+        return Result.success();
+    }
+
+    /**
+     * 查询前台友链列表
+     *
+     * @return FriendLinkVo
+     */
+    @GetMapping("/queryFriendLinkList")
+    @Router(name = "查询前台友链列表", code = "queryWebFriendLinkList", level = BaseConst.PermLevel.OPEN)
+    public Result queryFriendLinkList() {
+        return Result.success().data(portalService.queryFriendLinkList());
+    }
+
+    /**
+     * 前台登录
+     *
+     * @param request    请求信息
+     * @param loginDto   登录信息
+     * @return User
+     */
+    @PostMapping(value = "/webLogin")
+    @Router(name = "前台登录", code = "webLogin", level = BaseConst.PermLevel.OPEN)
+    public Result webLogin(HttpServletRequest request, @RequestBody UserLoginDto loginDto) {
+        return Result.success().data(portalService.webLogin(request, loginDto));
+    }
+
+    /**
+     * 查询前台评论列表
+     *
+     * @param queryDto 查询参数
+     * @return CommentVo
+     */
+    @GetMapping("/queryCommentList")
+    @Router(name = "查询前台评论列表", code = "queryWebCommentList", level = BaseConst.PermLevel.OPEN)
+    public Result queryCommentList(CommentQueryDto queryDto) {
+        return Result.success().data(portalService.queryCommentList(queryDto));
+    }
+
+    /**
+     * 获取评论回复列表
+     *
+     * @param queryDto 查询参数
+     * @return CommentVo
+     */
+    @GetMapping("/queryCommentReplyList")
+    @Router(name = "获取评论回复列表", code = "queryCommentReplyList", level = BaseConst.PermLevel.OPEN)
+    public Result queryCommentReplyList(CommentQueryDto queryDto) {
+        return Result.success().data(portalService.queryCommentReplyList(queryDto));
+    }
+
+    /**
+     * 新增评论
+     *
+     * @param request    请求信息
+     * @param commentDto 评论信息
+     * @return Result
+     */
+    @PostMapping(value = "/saveComment")
+    @Router(name = "新增评论", code = "saveComment", level = BaseConst.PermLevel.OPEN)
+    public Result saveComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
+        portalService.saveComment(request, commentDto);
+        return Result.success();
+    }
+
+    /**
+     * 点赞评论
+     *
+     * @param request    请求信息
+     * @param commentDto 评论信息
+     * @return Result
+     */
+    @PostMapping(value = "/likeComment")
+    @Router(name = "点赞评论", code = "likeComment", level = BaseConst.PermLevel.OPEN)
+    public Result saveComment(HttpServletRequest request, @RequestBody CommentLikeDto commentDto) {
+        portalService.likeComment(request, commentDto);
+        return Result.success();
+    }
+
+    /**
+     * 回复评论
+     *
+     * @param request    请求信息
+     * @param commentDto 评论信息
+     * @return Result
+     */
+    @PostMapping(value = "/replyComment")
+    @Router(name = "回复评论", code = "replyComment", level = BaseConst.PermLevel.OPEN)
+    public Result replyComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
+        portalService.saveComment(request, commentDto);
+        return Result.success();
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param commentDto 评论信息
+     * @return Result
+     */
+    @PostMapping(value = "/deleteComment")
+    @Router(name = "删除评论", code = "deleteWebComment", level = BaseConst.PermLevel.OPEN)
+    public Result deleteComment(@RequestBody CommentDeleteDto commentDto) {
+        portalService.deleteComment(commentDto);
         return Result.success();
     }
 }

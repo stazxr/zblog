@@ -26,4 +26,8 @@
             ID, NAME, HEAD_URL, LINK_URL, LINK_REMARK, VALID, CREATE_TIME
         FROM friend_link WHERE DELETED = 0 AND LINK_URL = #{linkUrl}
     </select>
+
+    <select id="selectWebFriendLinkList" resultType="com.github.stazxr.zblog.domain.vo.FriendLinkVo">
+        SELECT NAME, HEAD_URL, LINK_URL, LINK_REMARK FROM friend_link WHERE DELETED = 0 AND VALID = 1 ORDER BY CREATE_TIME
+    </select>
 </mapper>
