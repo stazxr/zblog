@@ -43,5 +43,21 @@ public interface TalkMapper extends BaseMapper<Talk> {
      *
      * @return TalkList
      */
-    List<TalkVo> selectWebTalkList();
+    List<TalkVo> queryBoardTalkList();
+
+    /**
+     * 查询前台说说列表
+     *
+     * @param queryDto 查询参数
+     * @return TalkList
+     */
+    List<TalkVo> selectWebTalkList(TalkQueryDto queryDto);
+
+    /**
+     * 查询前台说说详情
+     *
+     * @param talkId 查询详情
+     * @return TalkVo
+     */
+    TalkVo selectWebTalkDetail(@Param("talkId") Long talkId);
 }

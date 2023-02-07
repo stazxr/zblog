@@ -25,5 +25,21 @@ public interface PortalMapper {
      * @param userId 用户ID
      * @return likes
      */
-    Set<Long> selectCommentListSet(@Param("userId") Long userId);
+    Set<Long> selectCommentLikeSet(@Param("userId") Long userId);
+
+    /**
+     * 查询说说点赞列表
+     *
+     * @param userId 用户ID
+     * @return likes
+     */
+    Set<Long> selectTalkLikeSet(@Param("userId") Long userId);
+
+    /**
+     * 查询文章点赞列表
+     *
+     * @param userId 用户ID
+     * @return likes
+     */
+    Set<Long> selectArticleLikeSet(@Param("userId") Long userId);
 }

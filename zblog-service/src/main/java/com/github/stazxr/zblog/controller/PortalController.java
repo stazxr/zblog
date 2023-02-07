@@ -3,13 +3,10 @@ package com.github.stazxr.zblog.controller;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.domain.CommentLikeDto;
-import com.github.stazxr.zblog.domain.dto.CommentDeleteDto;
-import com.github.stazxr.zblog.domain.dto.CommentDto;
-import com.github.stazxr.zblog.domain.dto.MessageDto;
-import com.github.stazxr.zblog.domain.dto.UserLoginDto;
+import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
+import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
 import com.github.stazxr.zblog.service.PortalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,17 +49,6 @@ public class PortalController {
     public Result recordVisitor(HttpServletRequest request) {
         portalService.recordVisitor(request);
         return Result.success();
-    }
-
-    /**
-     * 查询首页轮播的说说列表
-     *
-     * @return TalkList
-     */
-    @GetMapping("/queryTalkList")
-    @Router(name = "查询首页轮播的说说列表", code = "queryWebTalkList", level = BaseConst.PermLevel.OPEN)
-    public Result queryTalkList() {
-        return Result.success().data(portalService.queryTalkList());
     }
 
     /**
@@ -214,6 +200,69 @@ public class PortalController {
     @Router(name = "删除评论", code = "deleteWebComment", level = BaseConst.PermLevel.OPEN)
     public Result deleteComment(@RequestBody CommentDeleteDto commentDto) {
         portalService.deleteComment(commentDto);
+        return Result.success();
+    }
+
+    /**
+     * 查询首页轮播的说说列表
+     *
+     * @return TalkList
+     */
+    @GetMapping("/queryBoardTalkList")
+    @Router(name = "查询首页轮播的说说列表", code = "queryWebBoardTalkList", level = BaseConst.PermLevel.OPEN)
+    public Result queryBoardTalkList() {
+        return Result.success().data(portalService.queryBoardTalkList());
+    }
+
+    /**
+     * 查询前台说说列表
+     *
+     * @param queryDto 查询参数
+     * @return TalkList
+     */
+    @GetMapping("/queryTalkList")
+    @Router(name = "查询前台说说列表", code = "queryWebTalkList", level = BaseConst.PermLevel.OPEN)
+    public Result queryTalkList(TalkQueryDto queryDto) {
+        return Result.success().data(portalService.queryTalkList(queryDto));
+    }
+
+    /**
+     * 查询前台说说详情
+     *
+     * @param talkId 查询详情
+     * @return TalkVo
+     */
+    @GetMapping("/queryTalkById")
+    @Router(name = "查询前台说说详情", code = "queryWebTalkById", level = BaseConst.PermLevel.OPEN)
+    public Result queryTalkById(Long talkId) {
+        return Result.success().data(portalService.queryTalkById(talkId));
+    }
+
+    /**
+     * 点赞说说
+     *
+     * @param request 请求信息
+     * @param talkDto 说说信息
+     * @return Result
+     */
+    @PostMapping(value = "/likeTalk")
+    @Router(name = "点赞说说", code = "likeTalk", level = BaseConst.PermLevel.OPEN)
+    public Result likeTalk(HttpServletRequest request, @RequestBody TalkLikeDto talkDto) {
+        portalService.likeTalk(request, talkDto);
+        return Result.success();
+    }
+
+    /**
+     * 点赞文章
+     *
+     * @param request    请求信息
+     * @param articleDto 文章信息
+     * @return Result
+     */
+    @PostMapping(value = "/likeArticle")
+    @Router(name = "点赞文章", code = "likeArticle", level = BaseConst.PermLevel.OPEN)
+    public Result likeArticle(HttpServletRequest request, @RequestBody ArticleLikeDto articleDto) {
+        portalService.likeArticle(request, articleDto);
         return Result.success();
     }
 }

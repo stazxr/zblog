@@ -29,13 +29,34 @@
         ORDER BY t.IS_TOP DESC, t.CREATE_TIME DESC
     </select>
 
+    <select id="selectWebTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+        SELECT
+            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
+            (SELECT COUNT(1) FROM talk_like WHERE TALK_ID = t.ID) likeCount,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND OBJECT_ID = t.ID) commentCount
+        FROM talk t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
+        WHERE t.DELETED = 0 AND t.STATUS = 1
+        ORDER BY t.IS_TOP DESC, t.CREATE_TIME DESC
+    </select>
+
+    <select id="selectWebTalkDetail" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+        SELECT
+            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
+            (SELECT COUNT(1) FROM talk_like WHERE TALK_ID = t.ID) likeCount,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND OBJECT_ID = t.ID) commentCount
+        FROM talk t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
+        WHERE t.DELETED = 0 AND t.STATUS = 1 AND t.ID = #{talkId}
+    </select>
+
     <select id="selectTalkDetail" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
         SELECT
             ID, CONTENT, IMAGES, STATUS, IS_TOP, CREATE_USER, CREATE_TIME, UPDATE_TIME
         FROM talk WHERE DELETED = 0 AND ID = #{talkId}
     </select>
 
-    <select id="selectWebTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
+    <select id="queryBoardTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
         SELECT
             CONTENT, IS_TOP, CREATE_TIME
         FROM talk

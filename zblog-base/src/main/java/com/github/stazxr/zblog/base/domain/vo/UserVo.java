@@ -119,4 +119,14 @@ public class UserVo {
      * 评论点赞列表
      */
     private Set<Long> commentLikeSet;
+
+    /**
+     * 说说点赞列表
+     */
+    private Set<Long> talkLikeSet;
+
+    /**
+     * 文章点赞列表
+     */
+    private Set<Long> articleLikeSet;
 }

@@ -21,6 +21,8 @@ public class PageParam implements Serializable {
 
     private Integer defaultPage = 1;
 
+    public static Integer defaultPage1 = 1;
+
     private Integer defaultPageSize = 10;
 
     public void checkPage() {

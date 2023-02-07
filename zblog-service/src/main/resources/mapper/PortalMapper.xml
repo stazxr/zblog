@@ -24,7 +24,15 @@
         FROM DUAL
     </select>
 
-    <select id="selectCommentListSet" resultType="java.lang.Long">
+    <select id="selectCommentLikeSet" resultType="java.lang.Long">
         SELECT DISTINCT COMMENT_ID FROM comment_like WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="selectTalkLikeSet" resultType="java.lang.Long">
+        SELECT DISTINCT TALK_ID FROM talk_like WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="selectArticleLikeSet" resultType="java.lang.Long">
+        SELECT DISTINCT ARTICLE_ID FROM article_like WHERE USER_ID = #{userId}
     </select>
 </mapper>

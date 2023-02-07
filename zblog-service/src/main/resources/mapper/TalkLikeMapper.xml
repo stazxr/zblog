@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.TalkLikeMapper">
+    <delete id="deleteLike">
+        DELETE FROM talk_like WHERE USER_ID = #{userId} AND TALK_ID = #{talkId}
+    </delete>
+
+    <select id="isLiked" resultType="java.lang.Boolean">
+        SELECT COUNT(1) FROM talk_like WHERE USER_ID = #{userId} AND TALK_ID = #{talkId}
+    </select>
+</mapper>

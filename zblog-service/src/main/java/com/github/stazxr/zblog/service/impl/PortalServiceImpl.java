@@ -15,14 +15,11 @@ import com.github.stazxr.zblog.converter.MessageConverter;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
-import com.github.stazxr.zblog.domain.CommentLikeDto;
+import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.bo.PageInfo;
-import com.github.stazxr.zblog.domain.dto.CommentDeleteDto;
-import com.github.stazxr.zblog.domain.dto.CommentDto;
-import com.github.stazxr.zblog.domain.dto.MessageDto;
-import com.github.stazxr.zblog.domain.dto.UserLoginDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
+import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
 import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
 import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
 import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
@@ -60,7 +57,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
-    private static final String UNKNOWN_AREA = "外星人";
+    private static final String UNKNOWN_AREA = "未知地域";
 
     private static final String LOCAL_AREA_NET = "局域网";
 
@@ -95,6 +92,10 @@ public class PortalServiceImpl implements PortalService {
     private final UserConverter userConverter;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final TalkLikeMapper talkLikeMapper;
+
+    private final ArticleLikeMapper articleLikeMapper;
 
     /**
      * 查询博客前台信息
@@ -172,8 +173,8 @@ public class PortalServiceImpl implements PortalService {
      * @return TalkList
      */
     @Override
-    public List<TalkVo> queryTalkList() {
-        return talkMapper.selectWebTalkList();
+    public List<TalkVo> queryBoardTalkList() {
+        return talkMapper.queryBoardTalkList();
     }
 
     /**
@@ -285,7 +286,9 @@ public class PortalServiceImpl implements PortalService {
         UserVo userVo = userConverter.entityToVo(user);
 
         // 查询用户点赞列表
-        userVo.setCommentLikeSet(portalMapper.selectCommentListSet(userVo.getId()));
+        userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
+        userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
+        userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
 
         return userVo;
     }
@@ -388,6 +391,84 @@ public class PortalServiceImpl implements PortalService {
                 commentMapper.deleteById(commentDto.getCommentId());
             }
         }
+    }
+
+    /**
+     * 查询前台说说列表
+     *
+     * @param queryDto 查询参数
+     * @return TalkList
+     */
+    @Override
+    public com.github.pagehelper.PageInfo<TalkVo> queryTalkList(TalkQueryDto queryDto) {
+        queryDto.checkPage();
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        List<TalkVo> talkVos = talkMapper.selectWebTalkList(queryDto);
+        return new com.github.pagehelper.PageInfo<>(talkVos);
+    }
+
+    /**
+     * 点赞说说
+     *
+     * @param request 请求信息
+     * @param talkDto 说说信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void likeTalk(HttpServletRequest request, TalkLikeDto talkDto) {
+        if (talkLikeMapper.isLiked(talkDto.getUserId(), talkDto.getTalkId())) {
+            // 取消点赞
+            talkLikeMapper.deleteLike(talkDto.getUserId(), talkDto.getTalkId());
+        } else {
+            // 点赞
+            TalkLike talkLike = new TalkLike();
+            talkLike.setId(GenerateIdUtils.getId());
+            talkLike.setUserId(talkDto.getUserId());
+            talkLike.setTalkId(talkDto.getTalkId());
+            String ip = IpUtils.getIp(request);
+            talkLike.setIpAddress(ip);
+            talkLike.setIpSource(IpImplUtils.getCityInfo(ip));
+            talkLikeMapper.insert(talkLike);
+        }
+    }
+
+    /**
+     * 点赞文章
+     *
+     * @param request    请求信息
+     * @param articleDto 文章信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void likeArticle(HttpServletRequest request, ArticleLikeDto articleDto) {
+        if (articleLikeMapper.isLiked(articleDto.getUserId(), articleDto.getArticleId())) {
+            // 取消点赞
+            articleLikeMapper.deleteLike(articleDto.getUserId(), articleDto.getArticleId());
+        } else {
+            // 点赞
+            ArticleLike articleLike = new ArticleLike();
+            articleLike.setId(GenerateIdUtils.getId());
+            articleLike.setUserId(articleDto.getUserId());
+            articleLike.setArticleId(articleDto.getArticleId());
+            String ip = IpUtils.getIp(request);
+            articleLike.setIpAddress(ip);
+            articleLike.setIpSource(IpImplUtils.getCityInfo(ip));
+            articleLikeMapper.insert(articleLike);
+        }
+    }
+
+    /**
+     * 查询前台说说详情
+     *
+     * @param talkId 查询详情
+     * @return TalkVo
+     */
+    @Override
+    public TalkVo queryTalkById(Long talkId) {
+        Assert.notNull(talkId, "参数错误");
+        TalkVo talkVo = talkMapper.selectWebTalkDetail(talkId);
+        Assert.notNull(talkVo, "说说信息不存在");
+        return talkVo;
     }
 
     private void notice(Comment comment) {

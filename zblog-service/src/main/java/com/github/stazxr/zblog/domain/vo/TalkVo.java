@@ -69,6 +69,16 @@ public class TalkVo extends BaseVo {
      */
     private List<String> imagesList;
 
+    /**
+     * 点赞数
+     */
+    private Long likeCount;
+
+    /**
+     * 评论数
+     */
+    private Long commentCount;
+
     public List<String> getImagesList() {
         imagesList = new ArrayList<>();
 

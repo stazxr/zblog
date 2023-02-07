@@ -2,13 +2,10 @@ package com.github.stazxr.zblog.service;
 
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
-import com.github.stazxr.zblog.domain.CommentLikeDto;
-import com.github.stazxr.zblog.domain.dto.CommentDeleteDto;
-import com.github.stazxr.zblog.domain.dto.CommentDto;
-import com.github.stazxr.zblog.domain.dto.MessageDto;
-import com.github.stazxr.zblog.domain.dto.UserLoginDto;
+import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
+import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
 import com.github.stazxr.zblog.domain.vo.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +37,7 @@ public interface PortalService {
      *
      * @return TalkList
      */
-    List<TalkVo> queryTalkList();
+    List<TalkVo> queryBoardTalkList();
 
     /**
      * 分页查询前台文章列表
@@ -127,4 +124,36 @@ public interface PortalService {
      * @param commentDto 评论信息
      */
     void deleteComment(CommentDeleteDto commentDto);
+
+    /**
+     * 查询前台说说列表
+     *
+     * @param queryDto 查询参数
+     * @return TalkList
+     */
+    PageInfo<TalkVo> queryTalkList(TalkQueryDto queryDto);
+
+    /**
+     * 点赞说说
+     *
+     * @param request 请求信息
+     * @param talkDto 说说信息
+     */
+    void likeTalk(HttpServletRequest request, TalkLikeDto talkDto);
+
+    /**
+     * 点赞文章
+     *
+     * @param request    请求信息
+     * @param articleDto 文章信息
+     */
+    void likeArticle(HttpServletRequest request, ArticleLikeDto articleDto);
+
+    /**
+     * 查询前台说说详情
+     *
+     * @param talkId 查询详情
+     * @return TalkVo
+     */
+    TalkVo queryTalkById(Long talkId);
 }
