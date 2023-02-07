@@ -45,4 +45,12 @@
         FROM article_category
         WHERE DELETED = 0 AND NAME = #{name}
     </select>
+
+    <select id="selectWebCategoryList" resultType="com.github.stazxr.zblog.domain.vo.ArticleCategoryVo">
+        SELECT
+            ac.ID, ac.NAME, (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND CATEGORY_ID = ac.ID) AS ARTICLE_COUNT
+        FROM article_category ac WHERE ac.DELETED = 0 AND ac.ENABLED = 1 AND ac.PID IS NOT NULL AND ac.ID IN (
+            SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+        )
+    </select>
 </mapper>

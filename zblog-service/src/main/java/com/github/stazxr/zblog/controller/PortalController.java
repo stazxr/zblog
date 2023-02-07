@@ -64,13 +64,13 @@ public class PortalController {
     }
 
     /**
-     * 分页查询前台文章详情
+     * 查询前台文章详情
      *
      * @param articleId 文章ID
      * @return ArticleVo
      */
     @GetMapping("/queryArticleDetail")
-    @Router(name = "分页查询前台文章详情", code = "queryWebArticleDetail", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台文章详情", code = "queryWebArticleDetail", level = BaseConst.PermLevel.OPEN)
     public Result queryArticleDetail(Long articleId) {
         return Result.success().data(portalService.queryArticleDetail(articleId));
     }
@@ -264,5 +264,63 @@ public class PortalController {
     public Result likeArticle(HttpServletRequest request, @RequestBody ArticleLikeDto articleDto) {
         portalService.likeArticle(request, articleDto);
         return Result.success();
+    }
+
+    /**
+     * 查询前台标签列表
+     *
+     * @return TagList
+     */
+    @GetMapping("/queryTagList")
+    @Router(name = "查询前台标签列表", code = "queryWebTagList", level = BaseConst.PermLevel.OPEN)
+    public Result queryTagList() {
+        return Result.success().data(portalService.queryTagList());
+    }
+
+    /**
+     * 查询前台分类列表
+     *
+     * @return CategoryList
+     */
+    @GetMapping("/queryCategoryList")
+    @Router(name = "查询前台分类列表", code = "queryWebCategoryList", level = BaseConst.PermLevel.OPEN)
+    public Result queryCategoryList() {
+        return Result.success().data(portalService.queryCategoryList());
+    }
+
+    /**
+     * 查询前台归档列表
+     *
+     * @param current 页码
+     * @return ArticleList
+     */
+    @GetMapping("/queryArchiveList")
+    @Router(name = "查询前台归档列表", code = "queryArchiveList", level = BaseConst.PermLevel.OPEN)
+    public Result queryArchiveList(@RequestParam Integer current) {
+        return Result.success().data(portalService.queryArchiveList(current));
+    }
+
+    /**
+     * 查询前台分类详情
+     *
+     * @param categoryId 查询详情
+     * @return CategoryVo
+     */
+    @GetMapping("/queryCategoryById")
+    @Router(name = "查询前台分类详情", code = "queryWebCategoryById", level = BaseConst.PermLevel.OPEN)
+    public Result queryCategoryById(@RequestParam Long categoryId) {
+        return Result.success().data(portalService.queryCategoryById(categoryId));
+    }
+
+    /**
+     * 查询前台标签详情
+     *
+     * @param tagId 查询详情
+     * @return TagVo
+     */
+    @GetMapping("/queryTagById")
+    @Router(name = "查询前台标签详情", code = "queryWebTagById", level = BaseConst.PermLevel.OPEN)
+    public Result queryTagById(@RequestParam Long tagId) {
+        return Result.success().data(portalService.queryTagById(tagId));
     }
 }

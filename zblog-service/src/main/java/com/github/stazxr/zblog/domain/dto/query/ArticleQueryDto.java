@@ -41,6 +41,11 @@ public class ArticleQueryDto extends PageParam {
     private Long categoryId;
 
     /**
+     * 文章标签
+     */
+    private Long tagId;
+
+    /**
      * 文章类型
      */
     private Integer articleType;

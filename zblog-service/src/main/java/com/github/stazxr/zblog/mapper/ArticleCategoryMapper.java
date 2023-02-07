@@ -46,4 +46,11 @@ public interface ArticleCategoryMapper extends BaseMapper<ArticleCategory> {
      * @return Category
      */
     ArticleCategory selectByCategoryName(@Param("name") String name);
+
+    /**
+     * 查询前台分类列表
+     *
+     * @return CategoryList
+     */
+    List<ArticleCategoryVo> selectWebCategoryList();
 }

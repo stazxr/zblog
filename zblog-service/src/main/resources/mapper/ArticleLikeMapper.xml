@@ -6,6 +6,6 @@
     </delete>
 
     <select id="isLiked" resultType="java.lang.Boolean">
-        SELECT COUNT(1) FROM talk_like WHERE USER_ID = #{userId} AND ARTICLE_ID = #{articleId}
+        SELECT COUNT(1) FROM article_like WHERE USER_ID = #{userId} AND ARTICLE_ID = #{articleId}
     </select>
 </mapper>

@@ -156,4 +156,42 @@ public interface PortalService {
      * @return TalkVo
      */
     TalkVo queryTalkById(Long talkId);
+
+    /**
+     * 查询前台标签列表
+     *
+     * @return TagList
+     */
+    List<ArticleTagVo> queryTagList();
+
+    /**
+     * 查询前台分类列表
+     *
+     * @return CategoryList
+     */
+    List<ArticleCategoryVo> queryCategoryList();
+
+    /**
+     * 查询前台归档列表
+     *
+     * @param current 页码
+     * @return ArticleList
+     */
+    PageInfo<ArticleVo> queryArchiveList(Integer current);
+
+    /**
+     * 查询前台分类详情
+     *
+     * @param categoryId 查询详情
+     * @return CategoryVo
+     */
+    ArticleCategoryVo queryCategoryById(Long categoryId);
+
+    /**
+     * 查询前台标签详情
+     *
+     * @param tagId 查询详情
+     * @return TagVo
+     */
+    ArticleTagVo queryTagById(Long tagId);
 }

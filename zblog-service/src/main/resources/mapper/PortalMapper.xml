@@ -8,7 +8,7 @@
             ) ARTICLE_COUNT,
             (
                 SELECT COUNT(1) FROM article_category WHERE DELETED = 0 AND ENABLED = 1 AND PID IS NOT NULL AND ID IN (
-                    SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+                    SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
                 )
             ) CATEGORY_COUNT,
             (

@@ -154,6 +154,26 @@ public class ArticleVo extends BaseVo {
      */
     private List<String> articleImgLinkList;
 
+    /**
+     * 上一篇文章
+     */
+    private ArticleVo lastArticle;
+
+    /**
+     * 下一篇文章
+     */
+    private ArticleVo nextArticle;
+
+    /**
+     * 推荐列表
+     */
+    private List<ArticleVo> recommendList;
+
+    /**
+     * 最新列表
+     */
+    private List<ArticleVo> newestList;
+
     public List<String> getArticleImgLinkList() {
         List<String> tmp = new ArrayList<>();
         if (this.articleImg != null) {

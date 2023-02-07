@@ -75,6 +75,10 @@ public class PortalServiceImpl implements PortalService {
 
     private final ArticleMapper articleMapper;
 
+    private final ArticleTagMapper articleTagMapper;
+
+    private final ArticleCategoryMapper articleCategoryMapper;
+
     private final MessageConverter messageConverter;
 
     private final MessageMapper messageMapper;
@@ -203,7 +207,22 @@ public class PortalServiceImpl implements PortalService {
             return null;
         }
 
-        return articleMapper.selectArticleDetail(articleId);
+        // 查询文章信息
+        ArticleVo articleVo = articleMapper.selectArticleDetail(articleId);
+
+        // 查找上一篇文章
+        articleVo.setLastArticle(articleMapper.selectLastArticle(articleId));
+
+        // 查找下一篇文章
+        articleVo.setNextArticle(articleMapper.selectNextArticle(articleId));
+
+        // 查找推荐文章（按照标签、类别查询）
+        articleVo.setRecommendList(articleMapper.selectRecommendList(articleId));
+
+        // 查找最新文章
+        articleVo.setNewestList(articleMapper.selectNewestList());
+
+        return articleVo;
     }
 
     /**
@@ -469,6 +488,67 @@ public class PortalServiceImpl implements PortalService {
         TalkVo talkVo = talkMapper.selectWebTalkDetail(talkId);
         Assert.notNull(talkVo, "说说信息不存在");
         return talkVo;
+    }
+
+    /**
+     * 查询前台标签列表
+     *
+     * @return TagList
+     */
+    @Override
+    public List<ArticleTagVo> queryTagList() {
+        return articleTagMapper.selectWebTagList();
+    }
+
+    /**
+     * 查询前台分类列表
+     *
+     * @return CategoryList
+     */
+    @Override
+    public List<ArticleCategoryVo> queryCategoryList() {
+        return articleCategoryMapper.selectWebCategoryList();
+    }
+
+    /**
+     * 查询前台归档列表
+     *
+     * @param current 页码
+     * @return ArticleList
+     */
+    @Override
+    public com.github.pagehelper.PageInfo<ArticleVo> queryArchiveList(Integer current) {
+        PageHelper.startPage(current, 10);
+        List<ArticleVo> articleVos = articleMapper.selectArchiveList();
+        return new com.github.pagehelper.PageInfo<>(articleVos);
+    }
+
+    /**
+     * 查询前台分类详情
+     *
+     * @param categoryId 查询详情
+     * @return CategoryVo
+     */
+    @Override
+    public ArticleCategoryVo queryCategoryById(Long categoryId) {
+        Assert.notNull(categoryId, "参数错误");
+        ArticleCategoryVo categoryVo = articleCategoryMapper.selectCategoryDetail(categoryId);
+        Assert.notNull(categoryVo, "类别信息不存在");
+        return categoryVo;
+    }
+
+    /**
+     * 查询前台标签详情
+     *
+     * @param tagId 查询详情
+     * @return TagVo
+     */
+    @Override
+    public ArticleTagVo queryTagById(Long tagId) {
+        Assert.notNull(tagId, "参数错误");
+        ArticleTagVo tagVo = articleTagMapper.selectTagDetail(tagId);
+        Assert.notNull(tagVo, "标签信息不存在");
+        return tagVo;
     }
 
     private void notice(Comment comment) {

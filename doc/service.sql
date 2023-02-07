@@ -167,19 +167,6 @@ CREATE TABLE `article_img_relation` (
   UNIQUE KEY `KEY_ARTICLE_TAG` (`ARTICLE_ID`, `FILE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
 
-/*Table structure for table `article_like_recode` */
-DROP TABLE IF EXISTS `article_like_recode`;
-CREATE TABLE `article_like_recode` (
-  `ID` BIGINT(64) UNSIGNED NOT NULL,
-  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-  `SOURCE` TINYINT(1) NOT NULL COMMENT '来源，1：系统内用户；2：匿名',
-  `ACCESS_IP` VARCHAR(200) NOT NULL COMMENT '点赞用户访问IP',
-  `ACCESS_ADDRESS` VARCHAR(500) NOT NULL DEFAULT '' COMMENT '点赞用户访问地址',
-  `ACCESS_USER` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '点赞用户：匿名/系统用户名',
-  `ACCESS_TIME` VARCHAR(50) NOT NULL COMMENT '点赞时间',
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章点赞记录表';
-
 /*Table structure for table `article_view_recode` */
 DROP TABLE IF EXISTS `article_view_recode`;
 CREATE TABLE `article_view_recode` (

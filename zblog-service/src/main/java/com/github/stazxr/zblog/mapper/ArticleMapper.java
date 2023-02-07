@@ -206,4 +206,42 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return 文章 ID 列表
      */
     List<Long> splitAuditArticleIds(List<Long> articleIds, @Param("status") Integer status);
+
+    /**
+     * 查询前台归档列表
+     *
+     * @return ArticleList
+     */
+    List<ArticleVo> selectArchiveList();
+
+    /**
+     * 查找上一篇文章
+     *
+     * @param articleId 文章ID
+     * @return ArticleVo
+     */
+    ArticleVo selectLastArticle(@Param("articleId") Long articleId);
+
+    /**
+     * 查找下一篇文章
+     *
+     * @param articleId 文章ID
+     * @return ArticleVo
+     */
+    ArticleVo selectNextArticle(@Param("articleId") Long articleId);
+
+    /**
+     * 查找推荐文章（按照标签、类别查询）
+     *
+     * @param articleId 文章ID
+     * @return ArticleVos
+     */
+    List<ArticleVo> selectRecommendList(@Param("articleId") Long articleId);
+
+    /**
+     * 查找最新文章
+     *
+     * @return ArticleVos
+     */
+    List<ArticleVo> selectNewestList();
 }

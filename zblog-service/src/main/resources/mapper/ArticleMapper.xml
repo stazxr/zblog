@@ -45,11 +45,24 @@
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="viewCount" column="VIEW_COUNT" />
         <result property="likeCount" column="LIKE_COUNT" />
+        <result property="wordCount" column="EXTEND2" />
         <collection property="tagList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
             <result property="id" column="TAG_ID" />
             <result property="name" column="TAG_NAME" />
             <result property="type" column="TAG_TYPE" />
         </collection>
+        <collection property="articleImg" ofType="com.github.stazxr.zblog.base.domain.entity.File">
+            <result property="id" column="FILE_ID" />
+            <result property="originalFilename" column="ORIGINAL_FILENAME" />
+            <result property="downloadUrl" column="DOWNLOAD_URL" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="articleVoSimpleMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
         <collection property="articleImg" ofType="com.github.stazxr.zblog.base.domain.entity.File">
             <result property="id" column="FILE_ID" />
             <result property="originalFilename" column="ORIGINAL_FILENAME" />
@@ -70,16 +83,8 @@
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="viewCount" column="VIEW_COUNT" />
         <result property="likeCount" column="LIKE_COUNT" />
-        <collection property="tagList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
-            <result property="id" column="TAG_ID" />
-            <result property="name" column="TAG_NAME" />
-            <result property="type" column="TAG_TYPE" />
-        </collection>
-        <collection property="articleImg" ofType="com.github.stazxr.zblog.base.domain.entity.File">
-            <result property="id" column="FILE_ID" />
-            <result property="originalFilename" column="ORIGINAL_FILENAME" />
-            <result property="downloadUrl" column="DOWNLOAD_URL" />
-        </collection>
+        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo" select="selectArticleTagList" column="ID" />
+        <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />
     </resultMap>
 
     <insert id="insertArticleTmpContent">
@@ -176,7 +181,7 @@
             a.ARTICLE_PERM, a.`DESC`, a.EXTEND2 WORD_COUNT, a.ARTICLE_STATUS, a.COVER_IMAGE_TYPE,
             a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
             (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
         FROM article a
         LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
@@ -252,7 +257,7 @@
             a.ARTICLE_PERM, a.`DESC`, a.EXTEND2 WORD_COUNT, a.ARTICLE_STATUS, a.COVER_IMAGE_TYPE,
             a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
             (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
         FROM article a
         LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
@@ -315,11 +320,11 @@
 
     <select id="selectArticleDetail" resultMap="articleVoDetailMap">
         SELECT
-            a.ID, a.TITLE, a.REMARK, a.CONTENT, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.ARTICLE_TYPE, a.ARTICLE_STATUS,
+            a.ID, a.TITLE, a.REMARK, a.CONTENT, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.EXTEND2,
             a.ARTICLE_PERM, a.COVER_IMAGE_TYPE, a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, a.COMMENT_FLAG, u.NICKNAME AUTHOR_NICKNAME,
             a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,
             (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
         FROM
             article a
         LEFT JOIN (
@@ -338,23 +343,22 @@
 
     <select id="selectWebArticleList" resultMap="articleVoWebListMap">
         SELECT
-            a.ID, a.TITLE, a.REMARK, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME,
-            a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,
+            a.ID, a.TITLE, a.REMARK, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
+            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
             (SELECT COUNT(1) FROM article_view_recode WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like_recode WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
         FROM article a
         LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
-        LEFT JOIN (
-            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID, ata.DELETED FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
-        ) tag ON tag.ARTICLE_ID = a.ID AND tag.DELETED = 0
-        LEFT JOIN (
-            SELECT
-                air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
-            FROM article_img_relation air
-            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
-        ) img ON img.ARTICLE_ID = a.ID
         WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
+        <if test="categoryId != null">
+            AND a.CATEGORY_ID = #{categoryId}
+        </if>
+        <if test="tagId != null">
+            AND a.ID IN (
+                SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID = #{tagId}
+            )
+        </if>
         ORDER BY a.CREATE_TIME DESC
     </select>
 
@@ -414,5 +418,69 @@
                 ('no choose')
             </otherwise>
         </choose>
+    </select>
+
+    <select id="selectArchiveList" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT ID, TITLE, CREATE_TIME FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1 ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectLastArticle" resultMap="articleVoSimpleMap">
+        SELECT
+            a.ID, a.TITLE, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME
+        FROM article a
+        LEFT JOIN (
+            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND a.ID &lt; #{articleId}
+        ORDER BY a.ID DESC LIMIT 1
+    </select>
+
+    <select id="selectNextArticle" resultMap="articleVoSimpleMap">
+        SELECT
+            a.ID, a.TITLE, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME
+        FROM article a
+        LEFT JOIN (
+            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND a.ID &gt; #{articleId}
+        ORDER BY a.ID LIMIT 1
+    </select>
+
+    <select id="selectRecommendList" resultMap="articleVoSimpleMap">
+        SELECT
+            a.ID, a.TITLE, a.CREATE_TIME, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME
+        FROM article a
+        LEFT JOIN (
+            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND (
+            a.CATEGORY_ID IN (
+                SELECT CATEGORY_ID FROM article WHERE ID = #{articleId}
+            ) OR a.ID IN (
+                SELECT ARTICLE_ID FROM ARTICLE_TAG_RELATION WHERE TAG_ID IN (
+                    SELECT TAG_ID FROM ARTICLE_TAG_RELATION WHERE ARTICLE_ID = #{articleId}
+                )
+            )
+        ) AND a.ID != #{articleId}
+        ORDER BY RAND() limit 6
+    </select>
+
+    <select id="selectNewestList" resultMap="articleVoSimpleMap">
+        SELECT
+            a.ID, a.TITLE, a.CREATE_TIME, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME
+        FROM article a
+        LEFT JOIN (
+            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+            FROM article_img_relation air
+            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        ) img ON img.ARTICLE_ID = a.ID
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
+        ORDER BY CREATE_TIME DESC LIMIT 10
     </select>
 </mapper>

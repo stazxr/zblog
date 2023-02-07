@@ -43,4 +43,12 @@
             SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID = #{tagId}
         )
     </select>
+
+    <select id="selectWebTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+        SELECT ID, `NAME` FROM article_tag WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
+            SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (
+                SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+            )
+        )
+    </select>
 </mapper>
