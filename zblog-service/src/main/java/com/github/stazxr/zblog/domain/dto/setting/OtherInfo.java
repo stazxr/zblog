@@ -21,6 +21,11 @@ public class OtherInfo {
     private String userAvatar = "";
 
     /**
+     * 文章浏览配置
+     */
+    private int articleViewInterval = -1;
+
+    /**
      * 是否评论审核
      */
     private Integer isCommentReview = 1;

@@ -194,4 +194,13 @@ public interface PortalService {
      * @return TagVo
      */
     ArticleTagVo queryTagById(Long tagId);
+
+    /**
+     * 浏览文章
+     *
+     * @param request   请求信息
+     * @param articleId 文章序列
+     * @return 是否新增成功
+     */
+    boolean viewArticle(HttpServletRequest request, Long articleId);
 }

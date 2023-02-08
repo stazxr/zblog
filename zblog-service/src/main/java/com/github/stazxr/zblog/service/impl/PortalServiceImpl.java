@@ -38,6 +38,7 @@ import com.github.stazxr.zblog.util.time.DateUtils;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,6 +56,7 @@ import java.util.concurrent.CompletableFuture;
  * @author SunTao
  * @since 2022-11-25
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
@@ -100,6 +103,8 @@ public class PortalServiceImpl implements PortalService {
     private final TalkLikeMapper talkLikeMapper;
 
     private final ArticleLikeMapper articleLikeMapper;
+
+    private final ArticleViewMapper articleViewMapper;
 
     /**
      * 查询博客前台信息
@@ -474,6 +479,55 @@ public class PortalServiceImpl implements PortalService {
             articleLike.setIpSource(IpImplUtils.getCityInfo(ip));
             articleLikeMapper.insert(articleLike);
         }
+    }
+
+    /**
+     * 浏览文章
+     *
+     * @param request   请求信息
+     * @param articleId 文章序列
+     * @return 是否新增成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean viewArticle(HttpServletRequest request, Long articleId) {
+        if (articleId != null) {
+            try {
+                // 文章浏览配置
+                WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
+                OtherInfo otherInfo = websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class);
+                int interval = otherInfo.getArticleViewInterval();
+                String accessIp = IpUtils.getIp(request);
+                if (interval != 0) {
+                    // 浏览记录非每次都增加，需验证上一次浏览记录
+                    ArticleView record = articleViewMapper.selectLastedRecord(articleId, accessIp);
+                    if (record != null) {
+                        if (interval == -1) {
+                            return false;
+                        }
+
+                        // 浏览时间校验
+                        Date beforeDate = DateUtils.addMinutes(new Date(), - interval);
+                        if (DateUtils.parseDate(record.getAccessTime(), DateUtils.YMD_HMS_PATTERN).after(beforeDate)) {
+                            return false;
+                        }
+                    }
+                }
+
+                // 新增
+                ArticleView view = new ArticleView();
+                view.setId(GenerateIdUtils.getId());
+                view.setArticleId(articleId);
+                view.setAccessIp(accessIp);
+                view.setAccessAddress(IpImplUtils.getCityInfo(accessIp));
+                view.setAccessTime(DateUtils.formatNow());
+                return 1 == articleViewMapper.insert(view);
+            } catch (Exception e) {
+                log.error("set viewArticle failed", e);
+            }
+        }
+
+        return false;
     }
 
     /**

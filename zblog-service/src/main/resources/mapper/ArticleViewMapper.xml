@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.mapper.ArticleViewMapper">
+    <select id="selectLastedRecord" resultType="com.github.stazxr.zblog.domain.entity.ArticleView">
+        SELECT * FROM article_view WHERE ARTICLE_ID = #{articleId} AND ACCESS_IP = #{accessIp} ORDER BY ACCESS_TIME DESC LIMIT 1
+    </select>
+</mapper>

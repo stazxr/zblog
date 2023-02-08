@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
@@ -264,6 +265,19 @@ public class PortalController {
     public Result likeArticle(HttpServletRequest request, @RequestBody ArticleLikeDto articleDto) {
         portalService.likeArticle(request, articleDto);
         return Result.success();
+    }
+
+    /**
+     * 浏览文章
+     *
+     * @param request   请求信息
+     * @param articleId 文章序列
+     * @return Result
+     */
+    @PostMapping(value = "/viewArticle")
+    @Router(name = "浏览文章", code = "viewArticle", level = BaseConst.PermLevel.OPEN)
+    public Result viewArticle(HttpServletRequest request, @RequestPostSingleParam Long articleId) {
+        return portalService.viewArticle(request, articleId) ? Result.success() : Result.failure();
     }
 
     /**

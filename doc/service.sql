@@ -167,17 +167,6 @@ CREATE TABLE `article_img_relation` (
   UNIQUE KEY `KEY_ARTICLE_TAG` (`ARTICLE_ID`, `FILE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
 
-/*Table structure for table `article_view_recode` */
-DROP TABLE IF EXISTS `article_view_recode`;
-CREATE TABLE `article_view_recode` (
-  `ID` BIGINT(64) UNSIGNED NOT NULL,
-  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-  `ACCESS_IP` VARCHAR(200) NOT NULL COMMENT '用户访问IP',
-  `ACCESS_ADDRESS` VARCHAR(500) NOT NULL DEFAULT '' COMMENT '用户访问地址',
-  `ACCESS_TIME` VARCHAR(50) NOT NULL COMMENT '访问时间',
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章访问记录表';
-
 /*Table structure for table `article` */
 DROP TABLE IF EXISTS `article`;
 CREATE TABLE `article` (
@@ -284,7 +273,7 @@ CREATE TABLE `website_config` (
 /*Data for the table `website_config` */
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAdminLink":"https://admin.suntaoblog.com","websiteAuthor":"恋、長安","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550267120476487680.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊","websiteLink":"https://www.suntaoblog.com","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629","websiteRecordNo":"陕ICP备2021003044号-1"}', 5, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '{"gitee":"https://gitee.com/stazxr/zblog","github":"https://github.com/stazxr/zblog","qq":"http://wpa.qq.com/msgrd?v=3&uin=1027353579&site=qq&menu=yes","qqNum":"1027353579"}', 3, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273434476871680.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272378833469440.jpg","isCommentReview":1,"isEmailNotice":1,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272186411384832.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550271987156779008.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273418534322176.jpg"}', 2, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
+INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273434476871680.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/08/3562125716982071296.jpg","articleViewInterval":3,"isCommentReview":1,"isEmailNotice":1,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550272186411384832.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550271987156779008.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-01/06/3550273418534322176.jpg"}', 6, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 
 /*Table structure for table `visitor` */
 DROP TABLE IF EXISTS `visitor`;
@@ -517,4 +506,21 @@ CREATE TABLE `article_like` (
   `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
   PRIMARY KEY (`ID`) USING BTREE,
   UNIQUE KEY `KEY_USER_ID_ARTICLE_ID` (`USER_ID`, `ARTICLE_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章点赞信息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章点赞记录';
+
+/*Table structure for table `article_view` */
+DROP TABLE IF EXISTS `article_view`;
+CREATE TABLE `article_view` (
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+  `ACCESS_IP` VARCHAR(200) NOT NULL COMMENT '访问IP',
+  `ACCESS_ADDRESS` VARCHAR(500) NOT NULL DEFAULT '' COMMENT '访问地址',
+  `ACCESS_TIME` VARCHAR(50) NOT NULL COMMENT '访问时间',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
+  `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章浏览记录';
