@@ -26,6 +26,11 @@ public class OtherInfo {
     private int articleViewInterval = -1;
 
     /**
+     * 文章搜索策略
+     */
+    private String articleSearchStrategy = "mysql";
+
+    /**
      * 是否评论审核
      */
     private Integer isCommentReview = 1;

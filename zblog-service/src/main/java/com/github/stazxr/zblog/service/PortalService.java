@@ -203,4 +203,12 @@ public interface PortalService {
      * @return 是否新增成功
      */
     boolean viewArticle(HttpServletRequest request, Long articleId);
+
+    /**
+     * 根据关键字搜索文章
+     *
+     * @param keywords 查询关键字
+     * @return ArticleList
+     */
+    List<ArticleVo> searchArticleList(String keywords);
 }

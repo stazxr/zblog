@@ -43,6 +43,11 @@ public class ArticleDto {
     private String content;
 
     /**
+     * 文章内容（去除标签）
+     */
+    private String contentMd;
+
+    /**
      * 文章关键字
      */
     private String keywords;

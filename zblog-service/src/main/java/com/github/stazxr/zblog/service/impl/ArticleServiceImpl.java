@@ -32,6 +32,7 @@ import com.github.stazxr.zblog.service.ArticleService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
+import com.github.stazxr.zblog.util.http.HtmlContentUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -439,6 +440,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 操作状态校验
         actionCheck(articleDto);
+
+        // 设置文章内容（去除标签）
+        articleDto.setContentMd(HtmlContentUtils.getTextFromHtml(articleDto.getContent()));
 
         // 设置文章状态（对外不可见的文章无须审批）
         Integer articlePerm = articleDto.getArticlePerm();

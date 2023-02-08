@@ -40,7 +40,7 @@ public class Article extends BaseEntityWithExtend {
     private String content;
 
     /**
-     * 文章内容（预留字段）
+     * 文章内容（去除标签）
      */
     private String contentMd;
 

@@ -337,4 +337,16 @@ public class PortalController {
     public Result queryTagById(@RequestParam Long tagId) {
         return Result.success().data(portalService.queryTagById(tagId));
     }
+
+    /**
+     * 根据关键字搜索文章
+     *
+     * @param keywords 查询关键字
+     * @return ArticleList
+     */
+    @GetMapping("/searchArticleList")
+    @Router(name = "根据关键字搜索文章", code = "searchArticleList", level = BaseConst.PermLevel.OPEN)
+    public Result searchArticleList(@RequestParam String keywords) {
+        return Result.success().data(portalService.searchArticleList(keywords));
+    }
 }

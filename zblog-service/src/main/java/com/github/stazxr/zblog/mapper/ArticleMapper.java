@@ -244,4 +244,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return ArticleVos
      */
     List<ArticleVo> selectNewestList();
+
+    /**
+     * 根据关键字搜索文章
+     *
+     * @param keywords 查询关键字
+     * @return ArticleList
+     */
+    List<ArticleVo> selectArticleByKeywords(@Param("keywords") String keywords);
 }

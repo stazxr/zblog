@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.util;
 
-import com.github.stazxr.zblog.domain.enums.ArticleStatus;
-
 /**
  * 业务常量类
  *
@@ -10,7 +8,12 @@ import com.github.stazxr.zblog.domain.enums.ArticleStatus;
  */
 public class YwConstants {
     /**
-     * 前台只允许展示已发布状态的文章
+     * 高亮标签
      */
-    public static final int APG = ArticleStatus.PUBLISHED.getType();
+    public static final String PRE_TAG = "<span style='color:#f47466'>";
+
+    /**
+     * 高亮标签
+     */
+    public static final String POST_TAG = "</span>";
 }

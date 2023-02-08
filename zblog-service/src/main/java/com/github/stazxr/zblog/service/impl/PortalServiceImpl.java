@@ -28,6 +28,7 @@ import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
 import com.github.stazxr.zblog.domain.vo.*;
 import com.github.stazxr.zblog.mapper.*;
 import com.github.stazxr.zblog.service.PortalService;
+import com.github.stazxr.zblog.strategy.context.ArticleSearchStrategyContext;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.http.HtmlContentUtils;
@@ -105,6 +106,8 @@ public class PortalServiceImpl implements PortalService {
     private final ArticleLikeMapper articleLikeMapper;
 
     private final ArticleViewMapper articleViewMapper;
+
+    private final ArticleSearchStrategyContext articleSearchStrategyContext;
 
     /**
      * 查询博客前台信息
@@ -528,6 +531,17 @@ public class PortalServiceImpl implements PortalService {
         }
 
         return false;
+    }
+
+    /**
+     * 根据关键字搜索文章
+     *
+     * @param keywords 查询关键字
+     * @return ArticleList
+     */
+    @Override
+    public List<ArticleVo> searchArticleList(String keywords) {
+        return articleSearchStrategyContext.executeSearchStrategy(keywords);
     }
 
     /**

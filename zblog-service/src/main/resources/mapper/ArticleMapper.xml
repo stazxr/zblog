@@ -483,4 +483,13 @@
         WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
         ORDER BY CREATE_TIME DESC LIMIT 10
     </select>
+
+    <select id="selectArticleByKeywords" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT
+            a.ID, a.TITLE, a.CONTENT_MD AS CONTENT
+        FROM article a
+        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
+        AND (a.TITLE LIKE CONCAT('%', #{keywords}, '%') OR a.CONTENT_MD LIKE CONCAT('%', #{keywords}, '%'))
+        ORDER BY CREATE_TIME DESC LIMIT 10
+    </select>
 </mapper>
