@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -329,8 +330,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
         if (StringUtils.isNotBlank(secret)) {
             try {
                 // encrypt
-                ClassPathResource classPathResource = new ClassPathResource("pri.key");
-                String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+                Resource resource = new ClassPathResource("pri.key");
+                String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
                 return RsaUtils.decryptByPrivateKey(priKeyBase64, secret);
             } catch (Exception e) {
                 log.error("获取存储配置时，decodeSecret失败: {}", secret, e);

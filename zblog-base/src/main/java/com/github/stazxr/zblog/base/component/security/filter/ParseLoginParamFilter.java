@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -62,8 +63,8 @@ public class ParseLoginParamFilter extends OncePerRequestFilter {
                     password = (password != null) ? password : "";
 
                     // 对密码进行解密
-                    ClassPathResource classPathResource = new ClassPathResource("pri.key");
-                    String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+                    Resource resource = new ClassPathResource("pri.key");
+                    String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
                     password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
                     request.setAttribute(SPRING_SECURITY_FORM_PASSWORD_KEY, password);
 

@@ -41,6 +41,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -217,18 +218,19 @@ public class PortalServiceImpl implements PortalService {
 
         // 查询文章信息
         ArticleVo articleVo = articleMapper.selectArticleDetail(articleId);
+        if (articleVo != null) {
+            // 查找上一篇文章
+            articleVo.setLastArticle(articleMapper.selectLastArticle(articleId));
 
-        // 查找上一篇文章
-        articleVo.setLastArticle(articleMapper.selectLastArticle(articleId));
+            // 查找下一篇文章
+            articleVo.setNextArticle(articleMapper.selectNextArticle(articleId));
 
-        // 查找下一篇文章
-        articleVo.setNextArticle(articleMapper.selectNextArticle(articleId));
+            // 查找推荐文章（按照标签、类别查询）
+            articleVo.setRecommendList(articleMapper.selectRecommendList(articleId));
 
-        // 查找推荐文章（按照标签、类别查询）
-        articleVo.setRecommendList(articleMapper.selectRecommendList(articleId));
-
-        // 查找最新文章
-        articleVo.setNewestList(articleMapper.selectNewestList());
+            // 查找最新文章
+            articleVo.setNewestList(articleMapper.selectNewestList());
+        }
 
         return articleVo;
     }
@@ -291,19 +293,19 @@ public class PortalServiceImpl implements PortalService {
         String username = loginDto.getUsername();
         String password = loginDto.getPassword();
         Assert.isTrue(StringUtils.isBlank(username), "登录账号不能为空");
-        Assert.isTrue(StringUtils.isBlank(password), "登陆密码不能为空");
+        Assert.isTrue(StringUtils.isBlank(password), "登录密码不能为空");
 
         // 判断用户名或邮箱是否存在
         boolean isEmail = username.contains("@");
         User user = userMapper.selectLoginUserByUsernameOrEmail(username, isEmail);
-        DataValidated.notNull(user, "用户不存在");
-        DataValidated.isTrue(!user.isEnabled(), "用户未启用");
-        DataValidated.isTrue(user.getLocked(), "用户被锁定");
+        DataValidated.notNull(user, "账户不存在");
+        DataValidated.isTrue(!user.isEnabled(), "账户未启用");
+        DataValidated.isTrue(user.getLocked(), "账户被锁定");
 
         // 对密码进行解密
         try {
-            ClassPathResource classPathResource = new ClassPathResource("pri.key");
-            String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+            Resource resource = new ClassPathResource("pri.key");
+            String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
             password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
         } catch (Exception e) {
             throw new ServiceException("密码解析失败，请联系管理员", e);

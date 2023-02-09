@@ -42,6 +42,7 @@ import com.github.stazxr.zblog.util.secret.RsaUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -487,8 +488,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         try {
             // 对密码进行解密
-            ClassPathResource classPathResource = new ClassPathResource("pri.key");
-            String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+            Resource resource = new ClassPathResource("pri.key");
+            String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
             password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
         } catch (Exception e) {
             throw new ServiceException("密码解析失败，请联系管理员", e);

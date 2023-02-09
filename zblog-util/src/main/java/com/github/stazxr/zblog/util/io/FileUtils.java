@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.util.io;
 import com.github.stazxr.zblog.util.secret.Md5Utils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -48,9 +49,28 @@ public class FileUtils {
      * @throws IOException 写入异常
      */
     public static void writeFile(String data, File file) throws IOException {
-        try (OutputStream out = new FileOutputStream(file)) {
+        try (OutputStream out = Files.newOutputStream(file.toPath())) {
             out.write(data.getBytes());
             out.flush();
+        }
+    }
+
+    /**
+     * 从流中读取文件内容
+     *
+     * @param inputStream 输入流
+     * @return 字符串
+     * @throws IOException 读取异常
+     */
+    public static String readFileFromStream(InputStream inputStream) throws IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+            return out.toString();
         }
     }
 
@@ -62,7 +82,7 @@ public class FileUtils {
      * @throws IOException 读取异常
      */
     public static String readFile(File file) throws IOException {
-        try (InputStream in = new FileInputStream(file);ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (InputStream in = Files.newInputStream(file.toPath()); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {

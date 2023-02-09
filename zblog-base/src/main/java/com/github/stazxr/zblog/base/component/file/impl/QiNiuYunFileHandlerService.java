@@ -20,6 +20,7 @@ import com.github.stazxr.zblog.util.secret.RsaUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -160,8 +161,8 @@ public class QiNiuYunFileHandlerService extends BaseFileService {
         }
 
         String secret = config.getSk();
-        ClassPathResource classPathResource = new ClassPathResource("pri.key");
-        String priKeyBase64 = FileUtils.readFile(classPathResource.getFile());
+        Resource resource = new ClassPathResource("pri.key");
+        String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
         secret = RsaUtils.decryptByPrivateKey(priKeyBase64, secret);
         return QiNiuYunUtil.getOssConfig(config.getAk(), secret, config.getZone(), config.getBucketName());
     }

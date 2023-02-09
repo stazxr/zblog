@@ -62,56 +62,77 @@
     </dependencies>
 
     <build>
-        <finalName>zblog</finalName>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <archive>
-                        <!-- 生成的jar中，包含pom.xml和pom.properties这两个文件 -->
-                        <addMavenDescriptor>true</addMavenDescriptor>
-                        <!-- 生成MANIFEST.MF的设置 -->
-                        <manifest>
-                            <!-- 打包时MANIFEST.MF文件不记录时间戳版本 -->
-                            <useUniqueVersions>false</useUniqueVersions>
-                            <!-- 为依赖包添加路径, 这些路径会写在MANIFEST.MF文件的Class-Path下 -->
-                            <addClasspath>true</addClasspath>
-                            <!-- 这个jar所依赖的jar包添加classPath的时候的前缀，如果这个jar本身和依赖包在同一级目录，则不需要添加 -->
-                            <classpathPrefix>libs/</classpathPrefix>
-                            <!-- jar启动入口类 -->
-                            <mainClass>${mainClass}</mainClass>
-                        </manifest>
-                    </archive>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/libs
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.ulisesbocchio</groupId>
-                <artifactId>jasypt-maven-plugin</artifactId>
-                <version>3.0.3</version>
             </plugin>
         </plugins>
     </build>
+
+<!--    <build>-->
+<!--        <finalName>zblog</finalName>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <version>3.2.2</version>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        &lt;!&ndash; 生成的jar中，包含pom.xml和pom.properties这两个文件 &ndash;&gt;-->
+<!--                        <addMavenDescriptor>true</addMavenDescriptor>-->
+<!--                        &lt;!&ndash; 生成MANIFEST.MF的设置 &ndash;&gt;-->
+<!--                        <manifest>-->
+<!--                            &lt;!&ndash; 打包时MANIFEST.MF文件不记录时间戳版本 &ndash;&gt;-->
+<!--                            <useUniqueVersions>false</useUniqueVersions>-->
+<!--                            &lt;!&ndash; 为依赖包添加路径, 这些路径会写在MANIFEST.MF文件的Class-Path下 &ndash;&gt;-->
+<!--                            <addClasspath>true</addClasspath>-->
+<!--                            &lt;!&ndash; 这个jar所依赖的jar包添加classPath的时候的前缀，如果这个jar本身和依赖包在同一级目录，则不需要添加 &ndash;&gt;-->
+<!--                            <classpathPrefix>libs/</classpathPrefix>-->
+<!--                            &lt;!&ndash; jar启动入口类 &ndash;&gt;-->
+<!--                            <mainClass>${mainClass}</mainClass>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-dependency-plugin</artifactId>-->
+<!--                <version>3.1.2</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>copy-dependencies</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>copy-dependencies</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>-->
+<!--                                ${project.build.directory}/libs-->
+<!--                            </outputDirectory>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>com.github.ulisesbocchio</groupId>-->
+<!--                <artifactId>jasypt-maven-plugin</artifactId>-->
+<!--                <version>3.0.3</version>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
     <profiles>
         <profile>

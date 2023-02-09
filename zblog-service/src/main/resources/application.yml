@@ -2,7 +2,7 @@ spring:
   application:
     name: zblog
   profiles:
-    active: beta
+    active: dev
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver

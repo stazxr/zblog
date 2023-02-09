@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:31945}
+  port: ${SERVER_PORT:8081}
 spring:
   datasource:
     druid:
