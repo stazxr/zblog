@@ -48,6 +48,11 @@ public class Constants {
     public static final long DEFAULT_ROLE_ID = 3561010960472735744L;
 
     /**
+     * 默认排序
+     */
+    public static final int DEFAULT_SORT = 99999;
+
+    /**
      * 否
      */
     public static final Integer FALSE = 0;

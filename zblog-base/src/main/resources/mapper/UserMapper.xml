@@ -85,7 +85,7 @@
 
     <select id="selectLoginUserByUsernameOrEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
         SELECT
-            ID, NICKNAME, HEAD_IMG_URL, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`, ENABLED, `LOCKED`
+            ID, NICKNAME, HEAD_IMG_URL, GENDER, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`, ENABLED, `LOCKED`
         FROM user
         WHERE DELETED = 0
         <if test="isEmail == true">

@@ -31,14 +31,6 @@ public interface PageMapper extends BaseMapper<Page> {
     PageVo selectPageDetail(@Param("pageId") Long pageId);
 
     /**
-     * 根据页面标签查询页面信息
-     *
-     * @param pageLabel 页面标签
-     * @return Page
-     */
-    Page selectByPageLabel(@Param("pageLabel") String pageLabel);
-
-    /**
      * 查询前台页面列表
      *
      * @return PageList

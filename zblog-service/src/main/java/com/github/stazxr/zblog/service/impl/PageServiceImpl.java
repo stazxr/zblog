@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.converter.PageConverter;
 import com.github.stazxr.zblog.core.util.DataValidated;
@@ -87,9 +88,8 @@ public class PageServiceImpl extends ServiceImpl<PageMapper, Page> implements Pa
         Assert.isTrue(StringUtils.isBlank(page.getPageCover()), "页面封面不能为空");
         Assert.notNull(page.getPageSort(), "页面排序不能为空");
 
+        // 参数处理
         page.setPageLabel(page.getPageLabel().trim());
-        Page dbPage = baseMapper.selectByPageLabel(page.getPageLabel());
-        boolean isExist = dbPage != null && !dbPage.getId().equals(page.getId());
-        DataValidated.isTrue(isExist, "页面标签已存在");
+        page.setPageSort(page.getPageSort() == null ? Constants.DEFAULT_SORT : page.getPageSort());
     }
 }

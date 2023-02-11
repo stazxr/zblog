@@ -2,18 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.PageMapper">
     <select id="selectPageList" resultType="com.github.stazxr.zblog.domain.vo.PageVo">
-        SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER FROM page ORDER BY PAGE_SORT
+        SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER FROM page ORDER BY PAGE_LABEL, PAGE_SORT
     </select>
 
     <select id="selectPageDetail" resultType="com.github.stazxr.zblog.domain.vo.PageVo">
         SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT FROM page WHERE ID = #{pageId}
     </select>
 
-    <select id="selectByPageLabel" resultType="com.github.stazxr.zblog.domain.entity.Page">
-        SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER, PAGE_SORT FROM page WHERE PAGE_LABEL = #{pageLabel}
-    </select>
-
     <select id="selectWebPageList" resultType="com.github.stazxr.zblog.domain.bo.PageInfo">
-        SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER FROM page ORDER BY PAGE_SORT
+        SELECT ID, PAGE_NAME, PAGE_LABEL, PAGE_COVER FROM page ORDER BY RAND()
     </select>
 </mapper>
