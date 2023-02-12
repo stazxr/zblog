@@ -216,6 +216,17 @@ public class PortalController {
     }
 
     /**
+     * 获取标签云数据
+     *
+     * @return CloudTagVos
+     */
+    @GetMapping("/queryBoardTagList")
+    @Router(name = "获取标签云数据", code = "queryWebBoardTagList", level = BaseConst.PermLevel.OPEN)
+    public Result queryBoardTagList() {
+        return Result.success().data(portalService.queryBoardTagList());
+    }
+
+    /**
      * 查询前台说说列表
      *
      * @param queryDto 查询参数

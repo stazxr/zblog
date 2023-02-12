@@ -73,7 +73,7 @@
     <resultMap id="articleVoWebListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">
         <result property="id" column="ID" />
         <result property="title" column="TITLE" />
-        <result property="remark" column="REMARK" />
+        <result property="content" column="CONTENT" />
         <result property="articleType" column="ARTICLE_TYPE" />
         <result property="categoryId" column="CATEGORY_ID" />
         <result property="categoryName" column="CATEGORY_NAME" />
@@ -83,6 +83,7 @@
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="viewCount" column="VIEW_COUNT" />
         <result property="likeCount" column="LIKE_COUNT" />
+        <result property="commentCount" column="COMMENT_COUNT" />
         <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo" select="selectArticleTagList" column="ID" />
         <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />
     </resultMap>
@@ -343,10 +344,11 @@
 
     <select id="selectWebArticleList" resultMap="articleVoWebListMap">
         SELECT
-            a.ID, a.TITLE, a.REMARK, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
+            a.ID, a.TITLE, a.CONTENT_MD AS CONTENT, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
             a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
             (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND TYPE = 1 AND OBJECT_ID = a.ID) COMMENT_COUNT
         FROM article a
         LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID

@@ -4,9 +4,9 @@
     <select id="selectTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
         SELECT
             at.ID, at.`NAME`, at.TYPE, at.ENABLED, at.CREATE_USER, at.CREATE_TIME,
-        (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
-            SELECT atr.ARTICLE_ID FROM article_tag_relation atr WHERE atr.TAG_ID = at.ID
-        )) ARTICLE_COUNT
+            (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+                SELECT atr.ARTICLE_ID FROM article_tag_relation atr WHERE atr.TAG_ID = at.ID
+            )) ARTICLE_COUNT
         FROM article_tag at
         WHERE DELETED = 0
         <if test="name != null and name != ''">
@@ -46,6 +46,18 @@
 
     <select id="selectWebTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
         SELECT ID, `NAME` FROM article_tag WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
+            SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (
+                SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+            )
+        )
+    </select>
+
+    <select id="queryBoardTagList" resultType="com.github.stazxr.zblog.domain.vo.CloudTagVo">
+        SELECT
+            at.ID, at.`NAME`, (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+                SELECT atr.ARTICLE_ID FROM article_tag_relation atr WHERE atr.TAG_ID = at.ID
+            )) AS VALUE
+        FROM article_tag at WHERE at.DELETED = 0 AND at.ENABLED = 1 AND at.ID IN (
             SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (
                 SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
             )

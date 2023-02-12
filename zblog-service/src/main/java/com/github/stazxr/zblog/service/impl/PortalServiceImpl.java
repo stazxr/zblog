@@ -547,6 +547,16 @@ public class PortalServiceImpl implements PortalService {
     }
 
     /**
+     * 获取标签云数据
+     *
+     * @return CloudTagVos
+     */
+    @Override
+    public List<CloudTagVo> queryBoardTagList() {
+        return articleTagMapper.queryBoardTagList();
+    }
+
+    /**
      * 查询前台说说详情
      *
      * @param talkId 查询详情

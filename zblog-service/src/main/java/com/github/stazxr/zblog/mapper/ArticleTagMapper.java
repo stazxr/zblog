@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import com.github.stazxr.zblog.domain.dto.query.ArticleTagQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleTag;
 import com.github.stazxr.zblog.domain.vo.ArticleTagVo;
+import com.github.stazxr.zblog.domain.vo.CloudTagVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -53,4 +54,11 @@ public interface ArticleTagMapper extends BaseMapper<ArticleTag> {
      * @return TagList
      */
     List<ArticleTagVo> selectWebTagList();
+
+    /**
+     * 获取标签云数据
+     *
+     * @return CloudTagVos
+     */
+    List<CloudTagVo> queryBoardTagList();
 }

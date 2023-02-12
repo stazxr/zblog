@@ -20,7 +20,19 @@
             ) TAG_COUNT,
             (
                 SELECT WEB_COUNT FROM visitor_count WHERE ID = 1
-            ) VIEWS_COUNT
+            ) VIEWS_COUNT,
+            (
+                SELECT COUNT(DISTINCT ADDRESS_IP) FROM visitor
+            ) VISITOR_COUNT,
+            (
+                SELECT COUNT(1) FROM user WHERE DELETED = 0
+            ) USER_COUNT,
+            (
+                SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1
+            ) COMMENT_COUNT,
+            (
+                SELECT COUNT(1) FROM message WHERE IS_REVIEW = 1
+            ) MESSAGE_COUNT
         FROM DUAL
     </select>
 

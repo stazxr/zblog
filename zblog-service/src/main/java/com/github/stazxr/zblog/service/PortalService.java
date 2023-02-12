@@ -211,4 +211,11 @@ public interface PortalService {
      * @return ArticleList
      */
     List<ArticleVo> searchArticleList(String keywords);
+
+    /**
+     * 获取标签云数据
+     *
+     * @return CloudTagVos
+     */
+    List<CloudTagVo> queryBoardTagList();
 }

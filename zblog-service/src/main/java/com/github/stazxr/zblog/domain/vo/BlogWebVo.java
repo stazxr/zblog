@@ -36,9 +36,29 @@ public class BlogWebVo {
     private Integer tagCount;
 
     /**
-     * 访问量
+     * 访问数
      */
     private Integer viewsCount;
+
+    /**
+     * 游客数
+     */
+    private Integer visitorCount;
+
+    /**
+     * 用户数
+     */
+    private Integer userCount;
+
+    /**
+     * 评论数
+     */
+    private Integer commentCount;
+
+    /**
+     * 留言数
+     */
+    private Integer messageCount;
 
     /**
      * 网站信息
