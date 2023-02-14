@@ -48,9 +48,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * 前台服务实现层
@@ -554,6 +557,51 @@ public class PortalServiceImpl implements PortalService {
     @Override
     public List<CloudTagVo> queryBoardTagList() {
         return articleTagMapper.queryBoardTagList();
+    }
+
+    /**
+     * 获取热门文章列表
+     *
+     * @return ArticleVos
+     */
+    @Override
+    public List<ArticleVo> queryBoardHotArticleList() {
+        return articleMapper.selectWebBoardHotArticleList();
+    }
+
+    /**
+     * 获取分类专栏列表
+     *
+     * @return CategoryVos
+     */
+    @Override
+    public List<ArticleCategoryVo> queryBoardCategoryList() {
+        List<ArticleCategoryVo> categoryList = articleCategoryMapper.selectWebBoardCategoryList();
+        Map<Long, List<ArticleCategoryVo>> categoryPidGroupMap = categoryList.stream().collect(
+            Collectors.groupingBy(v -> v.getPid() == null ? Constants.TOP_ID : v.getPid())
+        );
+
+        List<ArticleCategoryVo> result = new ArrayList<>();
+        for (ArticleCategoryVo categoryVo : categoryList) {
+            if (categoryVo.getPid() == null) {
+                result.add(categoryVo);
+                if (categoryPidGroupMap.containsKey(categoryVo.getId())) {
+                    result.addAll(categoryPidGroupMap.get(categoryVo.getId()));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 获取最新评论列表
+     *
+     * @return CommentVos
+     */
+    @Override
+    public List<CommentVo> queryBoardLastedCommentList() {
+        return commentMapper.selectBoardLastedCommentList();
     }
 
     /**

@@ -494,4 +494,13 @@
         AND (a.TITLE LIKE CONCAT('%', #{keywords}, '%') OR a.CONTENT_MD LIKE CONCAT('%', #{keywords}, '%'))
         ORDER BY CREATE_TIME DESC LIMIT 10
     </select>
+
+    <select id="selectWebBoardHotArticleList" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT ID, TITLE, VIEW_COUNT FROM (
+            SELECT
+                a.ID, a.TITLE, (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT
+            FROM article a
+            WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5
+        ) tmp ORDER BY VIEW_COUNT DESC LIMIT 5
+    </select>
 </mapper>

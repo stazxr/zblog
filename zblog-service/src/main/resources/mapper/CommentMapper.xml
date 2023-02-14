@@ -112,7 +112,7 @@
         <if test="objectId != null">
             AND c.OBJECT_ID = #{objectId}
         </if>
-        ORDER BY c.CREATE_TIME
+        ORDER BY c.CREATE_TIME DESC
     </select>
 
     <select id="selectWebCommentReplyList" resultMap="webCommentVoReplyListMap">
@@ -126,5 +126,13 @@
         LEFT JOIN user ru on c.REPLY_USER_ID = ru.ID
         WHERE c.DELETED = 0 AND c.IS_REVIEW = 1 AND c.PARENT_ID = #{parentId}
         ORDER BY c.CREATE_TIME
+    </select>
+
+    <select id="selectBoardLastedCommentList" resultType="com.github.stazxr.zblog.domain.vo.CommentVo">
+        SELECT
+            c.ID, u.NICKNAME, u.HEAD_IMG_URL AVATAR, c.IP_SOURCE, c.CONTENT, c.TYPE, c.OBJECT_ID
+        FROM comment c
+        LEFT JOIN user u on c.USER_ID = u.ID
+        WHERE c.DELETED = 0 AND c.IS_REVIEW = 1 ORDER BY c.CREATE_TIME DESC LIMIT 5
     </select>
 </mapper>

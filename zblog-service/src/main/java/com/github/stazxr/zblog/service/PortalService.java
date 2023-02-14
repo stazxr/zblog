@@ -218,4 +218,25 @@ public interface PortalService {
      * @return CloudTagVos
      */
     List<CloudTagVo> queryBoardTagList();
+
+    /**
+     * 获取热门文章列表
+     *
+     * @return ArticleVos
+     */
+    List<ArticleVo> queryBoardHotArticleList();
+
+    /**
+     * 获取分类专栏列表
+     *
+     * @return CategoryVos
+     */
+    List<ArticleCategoryVo> queryBoardCategoryList();
+
+    /**
+     * 获取最新评论列表
+     *
+     * @return CommentVos
+     */
+    List<CommentVo> queryBoardLastedCommentList();
 }

@@ -53,4 +53,11 @@ public interface ArticleCategoryMapper extends BaseMapper<ArticleCategory> {
      * @return CategoryList
      */
     List<ArticleCategoryVo> selectWebCategoryList();
+
+    /**
+     * 获取分类专栏列表
+     *
+     * @return CategoryVos
+     */
+    List<ArticleCategoryVo> selectWebBoardCategoryList();
 }

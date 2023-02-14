@@ -81,6 +81,11 @@ public class CommentVo extends BaseVo {
     private Integer type;
 
     /**
+     * 评论对象
+     */
+    private Long objectId;
+
+    /**
      * 是否审核
      */
     private Boolean isReview;

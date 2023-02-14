@@ -316,6 +316,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public void batchDeleteArticle(List<Long> articleIds) {
         if (articleIds != null && articleIds.size() > 0) {
             baseMapper.batchInvalidateArticlePublishTiming(articleIds, "文章移至回收站【" + DateUtils.formatNow() + "】");
+            baseMapper.batchUpdateArticleStatus(articleIds, ArticleStatus.RECYCLE.getType(), "文章被批量移至回收站");
         }
     }
 

@@ -6,10 +6,10 @@
             c.ID, c.PID, c.NAME, c.IMAGE_URL, c.`DESC`, c.SORT, c.ENABLED,
             IF(c.PID IS NULL, (
                 SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID IN (
-                    SELECT c1.ID FROM article_category c1 WHERE c1.ID = c.PID
+                    SELECT c1.ID FROM article_category c1 WHERE c1.PID = c.ID
                 )
             ), (
-                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = c.PID
+                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = c.ID
             )) AS ARTICLE_COUNT
         FROM article_category c
         WHERE c.DELETED = 0
@@ -51,6 +51,25 @@
             ac.ID, ac.NAME, (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND CATEGORY_ID = ac.ID) AS ARTICLE_COUNT
         FROM article_category ac WHERE ac.DELETED = 0 AND ac.ENABLED = 1 AND ac.PID IS NOT NULL AND ac.ID IN (
             SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+        )
+    </select>
+
+    <select id="selectWebBoardCategoryList" resultType="com.github.stazxr.zblog.domain.vo.ArticleCategoryVo">
+        SELECT
+            ac.ID, ac.PID, ac.NAME, ac.IMAGE_URL,
+            IF(ac.PID IS NULL, (
+                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID IN (
+                    SELECT c1.ID FROM article_category c1 WHERE c1.PID = ac.ID
+                )
+            ), (
+               SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = ac.ID
+           )) AS ARTICLE_COUNT
+        FROM article_category ac WHERE ac.ID IN (
+            SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+        ) OR ac.ID IN (
+            SELECT PID FROM article_category WHERE ID IN (
+                SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+            )
         )
     </select>
 </mapper>

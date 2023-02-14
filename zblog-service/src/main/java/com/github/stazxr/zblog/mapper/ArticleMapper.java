@@ -252,4 +252,11 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return ArticleList
      */
     List<ArticleVo> selectArticleByKeywords(@Param("keywords") String keywords);
+
+    /**
+     * 获取热门文章列表
+     *
+     * @return ArticleVos
+     */
+    List<ArticleVo> selectWebBoardHotArticleList();
 }

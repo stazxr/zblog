@@ -227,6 +227,39 @@ public class PortalController {
     }
 
     /**
+     * 获取热门文章列表
+     *
+     * @return ArticleVos
+     */
+    @GetMapping("/queryBoardHotArticleList")
+    @Router(name = "获取热门文章列表", code = "queryWebBoardHotArticleList", level = BaseConst.PermLevel.OPEN)
+    public Result queryBoardHotArticleList() {
+        return Result.success().data(portalService.queryBoardHotArticleList());
+    }
+
+    /**
+     * 获取分类专栏列表
+     *
+     * @return CategoryVos
+     */
+    @GetMapping("/queryBoardCategoryList")
+    @Router(name = "获取分类专栏列表", code = "queryWebBoardCategoryList", level = BaseConst.PermLevel.OPEN)
+    public Result queryBoardCategoryList() {
+        return Result.success().data(portalService.queryBoardCategoryList());
+    }
+
+    /**
+     * 获取最新评论列表
+     *
+     * @return CommentVos
+     */
+    @GetMapping("/queryBoardLastedCommentList")
+    @Router(name = "获取最新评论列表", code = "queryWebBoardLastedCommentList", level = BaseConst.PermLevel.OPEN)
+    public Result queryBoardLastedCommentList() {
+        return Result.success().data(portalService.queryBoardLastedCommentList());
+    }
+
+    /**
      * 查询前台说说列表
      *
      * @param queryDto 查询参数

@@ -45,4 +45,11 @@ public interface CommentMapper extends BaseMapper<Comment> {
      * @param commentIds 评论列表
      */
     void auditComment(List<Long> commentIds);
+
+    /**
+     * 获取最新评论列表
+     *
+     * @return CommentVos
+     */
+    List<CommentVo> selectBoardLastedCommentList();
 }
