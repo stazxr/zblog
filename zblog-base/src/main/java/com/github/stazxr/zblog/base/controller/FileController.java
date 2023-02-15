@@ -14,17 +14,18 @@ import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.io.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -134,6 +135,10 @@ public class FileController {
         Assert.notNull(type, "参数【type】不能为空".toLowerCase(Locale.ROOT));
         Assert.isTrue(file == null, "上传失败，待上传文件列表为空");
 
+        // 白名单检查
+        MultipartFile[] files = new MultipartFile[] {file};
+        whiteListPreCheck(files);
+
         try {
             // 上传文件
             FileHandler fileHandler = FileTypeHandler.of(type);
@@ -210,9 +215,13 @@ public class FileController {
     }
 
     private void whiteListPreCheck(MultipartFile[] files) {
+        Set<String> whiteList = fileService.getFileWhiteList();
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
-
+                String suffix = FileUtils.getExtensionName(file.getOriginalFilename());
+                if (StringUtils.isNotBlank(suffix)) {
+                    DataValidated.isTrue(!whiteList.contains(suffix.toLowerCase()), "不支持的文件类型：[" + suffix + "]，请联系管理员添加");
+                }
             }
         }
     }

@@ -65,6 +65,19 @@ public class UserController {
     }
 
     /**
+     * 强制修改密码
+     *
+     * @param passDto 用户密码信息
+     * @return Result
+     */
+    @PostMapping("forceUpdatePass")
+    @Router(name = "强制修改密码", code = "forceUpdateUserPass", level = BaseConst.PermLevel.OPEN)
+    public Result forceUpdatePass(@RequestBody UserUpdatePassDto passDto) {
+        userService.forceUpdatePass(passDto);
+        return Result.success();
+    }
+
+    /**
      * 修改个人邮箱
      *
      * @param emailDto 用户邮箱信息

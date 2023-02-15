@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -234,8 +235,8 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        if (admin) {
-            // admin not check this.
+        if (admin || Constants.USER_TEST.equals(username)) {
+            // admin / test not check this.
             return true;
         }
 

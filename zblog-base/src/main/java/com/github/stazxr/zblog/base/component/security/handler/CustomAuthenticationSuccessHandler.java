@@ -50,6 +50,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String token = jwtTokenGenerator.generateToken(request, user, 1, null);
         Map<String, Object> data = new HashMap<>(2);
         data.put("access_token", Constants.AUTHENTICATION_PREFIX.concat(token));
+        data.put("change_pwd", user.getChangePwd());
 
         // storage token
         Long userId = user.getId();

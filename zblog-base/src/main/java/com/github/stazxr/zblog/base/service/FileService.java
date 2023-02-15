@@ -11,6 +11,7 @@ import com.github.stazxr.zblog.base.domain.vo.ActiveStorageTypeVo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 附件上传业务
@@ -103,4 +104,11 @@ public interface FileService extends IService<File> {
      * @return StorageType
      */
     ActiveStorageTypeVo getConfigStorageType();
+
+    /**
+     * 查询文件上传白名单
+     *
+     * @return fileSuffix
+     */
+    Set<String> getFileWhiteList();
 }

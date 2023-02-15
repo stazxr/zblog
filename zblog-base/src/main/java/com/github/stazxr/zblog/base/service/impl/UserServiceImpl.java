@@ -41,6 +41,7 @@ import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.secret.RsaUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -59,6 +60,7 @@ import java.util.List;
  * @author SunTao
  * @since 2020-11-15
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -160,34 +162,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUserPass(UserUpdatePassDto passDto) {
-        // 非空校验
-        String oldPass = passDto.getOldPass();
-        Assert.isTrue(StringUtils.isBlank(oldPass), "修改失败，旧密码不能为空");
-        String newPass = passDto.getNewPass();
-        Assert.isTrue(StringUtils.isBlank(newPass), "新密码不能为空");
-        String ensurePass = passDto.getConfirmPass();
-        DataValidated.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
-
-        // 获取用户信息
-        User user = queryUserByUsername(SecurityUtils.getLoginUsername());
-        Assert.notNull(user, "修改失败，用户不存在");
-
-        // 密码校验：旧密码是否正确 -> 新旧密码是否一致 ->
-        DataValidated.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), "旧密码错误");
-        DataValidated.isTrue(passwordEncoder.matches(newPass, user.getPassword()), "新密码与旧密码不能相同");
-
-        // 密码历史校验
-        Long userId = user.getId();
-        List<String> oldPassList = userPassLogMapper.selectUserOldPass(userId, OLD_PASS_COUNT);
-        oldPassList.forEach(pass -> DataValidated.isTrue(passwordEncoder.matches(newPass, pass), "新密码不能与历史近三次使用过的密码相同"));
-
-        // 密码复杂度校验
-        DataValidated.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
-        DataValidated.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
-
-        // 修改密码
-        doUpdateUserPass(user.getId(), newPass);
+        passDto.setUsername(SecurityUtils.getLoginUsername());
+        preDoUpdateUserPass(passDto);
         return true;
+    }
+
+    /**
+     * 强制修改密码
+     *
+     * @param passDto 用户密码信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void forceUpdatePass(UserUpdatePassDto passDto) {
+        preDoUpdateUserPass(passDto);
     }
 
     /**
@@ -355,6 +343,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 邮件通知（邮件发送失败也回滚，因为没有人知道新用户密码是多少）
         sendAddUserNoticeEmail(user.getEmail(), user.getUsername(), password);
+        log.info("新增用户[{}]成功，初始密码为：{}", user.getUsername(), password);
     }
 
     /**
@@ -502,6 +491,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 修改密码
         doUpdateUserPass(user.getId(), password);
+    }
+
+    private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
+        // 非空校验
+        Assert.isTrue(StringUtils.isBlank(passDto.getUsername()), "修改失败，用户名不能为空");
+        String oldPass = passDto.getOldPass();
+        Assert.isTrue(StringUtils.isBlank(oldPass), "修改失败，旧密码不能为空");
+        String newPass = passDto.getNewPass();
+        Assert.isTrue(StringUtils.isBlank(newPass), "新密码不能为空");
+        String ensurePass = passDto.getConfirmPass();
+        DataValidated.isTrue(!newPass.equals(ensurePass), "两次新密码设置不相同");
+
+        // 获取用户信息
+        User user = queryUserByUsername(passDto.getUsername());
+        Assert.notNull(user, "修改失败，用户不存在");
+
+        // 密码校验：旧密码是否正确 -> 新旧密码是否一致 ->
+        DataValidated.isTrue(!passwordEncoder.matches(oldPass, user.getPassword()), "旧密码错误");
+        DataValidated.isTrue(passwordEncoder.matches(newPass, user.getPassword()), "新密码与旧密码不能相同");
+
+        // 密码历史校验
+        Long userId = user.getId();
+        List<String> oldPassList = userPassLogMapper.selectUserOldPass(userId, OLD_PASS_COUNT);
+        oldPassList.forEach(pass -> DataValidated.isTrue(newPass.equals(pass), "新密码不能与历史近三次使用过的密码相同"));
+
+        // 密码复杂度校验
+        DataValidated.isTrue(newPass.contains(user.getUsername()), "密码不能包含用户名");
+        DataValidated.isTrue(!RegexUtils.match(newPass, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
+
+        // 修改密码
+        doUpdateUserPass(user.getId(), newPass);
     }
 
     private void doUpdateUserPass(Long userId, String password) {

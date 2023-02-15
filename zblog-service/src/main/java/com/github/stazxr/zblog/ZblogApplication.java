@@ -8,8 +8,8 @@ import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * 前后端分离个人博客开源项目 - zblog.
- *  本项目链接：https://github.com/stazxr/zblog
- *  基于单体的 3.1 版本进行改造，单体链接：https://github.com/stazxr/Blog
+ *  本项目链接：<a href="https://github.com/stazxr/zblog">...</a>
+ *  基于单体的 3.1 版本进行改造，单体链接：<a href="https://github.com/stazxr/Blog">...</a>
  *
  * @author SunTao
  * @since 2020-11-14

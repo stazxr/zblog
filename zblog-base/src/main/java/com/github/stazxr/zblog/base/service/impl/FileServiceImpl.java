@@ -12,6 +12,7 @@ import com.github.stazxr.zblog.base.domain.bo.storage.BaseStorageConfig;
 import com.github.stazxr.zblog.base.domain.bo.storage.LocalConfig;
 import com.github.stazxr.zblog.base.domain.bo.storage.QiNiuYunConfig;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
+import com.github.stazxr.zblog.base.domain.entity.Dict;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.domain.vo.ActiveStorageTypeVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
@@ -41,10 +42,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 附件上传业务处理
@@ -324,6 +323,17 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
         }
 
         return typeVo;
+    }
+
+    /**
+     * 查询文件上传白名单
+     *
+     * @return fileSuffix
+     */
+    @Override
+    public Set<String> getFileWhiteList() {
+        List<Dict> dicts = dictMapper.selectItems(BaseConst.DictKey.FILE_UPLOAD_WHITE_LIST);
+        return dicts.stream().map(Dict::getValue).collect(Collectors.toSet());
     }
 
     private String decodeSecret(String secret) {

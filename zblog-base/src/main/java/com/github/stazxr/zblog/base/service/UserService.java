@@ -50,6 +50,13 @@ public interface UserService extends BaseService<User> {
     boolean updateUserPass(UserUpdatePassDto passDto);
 
     /**
+     * 强制修改密码
+     *
+     * @param passDto 用户密码信息
+     */
+    void forceUpdatePass(UserUpdatePassDto passDto);
+
+    /**
      * 修改个人邮箱
      *
      * @param emailDto 用户邮箱信息

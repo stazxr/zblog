@@ -48,7 +48,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     }
 
     private Result genResult(String username, AuthenticationException exception) {
-        log.warn("user [{}] login failed: [{}]", username, exception.getMessage());
+        log.error("user [{}] login failed", username, exception);
         if (exception instanceof CredentialsExpiredException) {
             return Result.failure(ResultCode.PASSWORD_EXPIRED, errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED);
         }
@@ -59,14 +59,14 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     private void exceptionHandle(AuthenticationException exception, HttpServletRequest request) {
         String username = (String) request.getAttribute(SPRING_SECURITY_FORM_USERNAME_KEY);
         if (exception instanceof BadCredentialsException) {
-            // 密码输入错误，记录用户密码输入错误次数，满足条件则锁定用户
+            // 密码输入错误，记录用户密码输入错误次数，满足匹配规则则锁定用户
             log.warn("user [{}] input wrong password", username);
         }
 
         if (exception instanceof UsernameNotFoundException) {
-            // 用户不存在，记录IP对网站的访问次数，满足条件则拉黑IP
-            String ipAddr = IpUtils.getIp(request);
-            log.warn("ip [{}] input wrong username [{}]", ipAddr, username);
+            // 用户不存在，记录IP对网站的访问次数，满足匹配规则则拉黑IP
+            String ipAddress = IpUtils.getIp(request);
+            log.warn("ip [{}] input wrong username [{}]", ipAddress, username);
         }
     }
 
@@ -84,7 +84,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         } else if (e instanceof BadCredentialsException) {
             return "密码错误";
         } else if (e instanceof CredentialsExpiredException) {
-            return "密码已过期";
+            return "密码已过期，请修改密码";
         } else {
             return "系统异常：".concat(e.getMessage());
         }

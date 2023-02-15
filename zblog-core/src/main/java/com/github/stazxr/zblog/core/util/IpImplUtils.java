@@ -15,7 +15,16 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class IpImplUtils extends IpUtils {
-    private static final ZblogProperties PROPERTIES = SpringContextHolder.getBean(ZblogProperties.class);
+    private static final ZblogProperties PROPERTIES;
+
+    static {
+        PROPERTIES = SpringContextHolder.getBean(ZblogProperties.class);
+        if (PROPERTIES == null) {
+            throw new ServiceException(ResultCode.DATA_NOT_EXIST, "Bean ZblogProperties not exist.");
+        }
+
+        log.info("IP Parse Model [{}]", PROPERTIES.getIsLocalIpParsing() ? "LOCAL" : "HTTP");
+    }
 
     /**
      * 根据ip获取详细地址
@@ -25,10 +34,6 @@ public class IpImplUtils extends IpUtils {
      */
     public static String getCityInfo(String ip) {
         try {
-            if (PROPERTIES == null) {
-                throw new ServiceException(ResultCode.DATA_NOT_EXIST, "Bean ZblogProperties not exist.");
-            }
-
             return PROPERTIES.getIsLocalIpParsing() ? getLocalCityInfo(ip) : getHttpCityInfo(ip);
         } catch (Exception e) {
             log.error("getCityInfo catch eor: {}", e.getMessage());

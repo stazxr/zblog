@@ -60,6 +60,11 @@ public class BaseConst {
         public static final String ACTIVE_UPLOAD_TYPE = "ACTIVE_UPLOAD_TYPE";
 
         /**
+         * 文件上传白名单
+         */
+        public static final String FILE_UPLOAD_WHITE_LIST = "FILE_UPLOAD_WHITE_LIST";
+
+        /**
          * 云存储配置-本地
          */
         public static final String CLOUD_STORAGE_LOCAL_CONFIG = "CLOUD_STORAGE_LOCAL_CONFIG";

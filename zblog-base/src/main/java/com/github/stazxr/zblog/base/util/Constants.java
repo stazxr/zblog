@@ -28,9 +28,19 @@ public class Constants {
     public static final String USER_ADMIN = "admin";
 
     /**
+     * 测试用户
+     */
+    public static final String USER_TEST = "admin";
+
+    /**
      * 系统管理员序列
      */
     public static final Long USER_ADMIN_ID = 1L;
+
+    /**
+     * 测试用户序列
+     */
+    public static final Long USER_TEST_ID = 2L;
 
     /**
      * 缓存不设置过期时间
