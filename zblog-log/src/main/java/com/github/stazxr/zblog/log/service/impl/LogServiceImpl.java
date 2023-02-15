@@ -27,6 +27,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,7 +64,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      * @param e         异常信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void saveLog(ProceedingJoinPoint joinPoint, Log log, Object result, Throwable e) {
         // 获取路由信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -121,7 +122,6 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         log.setId(IdUtils.getId());
         String parameter = getParameter(method, joinPoint.getArgs());
         log.setRequestParam(parameter.length() > MAX_PARAM_LENGTH ? "参数内容过长" : parameter);
-        log.setOperateUser(SecurityUtils.getLoginUsernameNoEor());
         save(log);
     }
 

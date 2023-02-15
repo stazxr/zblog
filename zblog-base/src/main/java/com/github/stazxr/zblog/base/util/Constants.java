@@ -30,7 +30,7 @@ public class Constants {
     /**
      * 测试用户
      */
-    public static final String USER_TEST = "admin";
+    public static final String USER_TEST = "test";
 
     /**
      * 系统管理员序列
@@ -104,6 +104,11 @@ public class Constants {
          * 角色：ROLE_NULL（接口不存在，不允许访问）
          */
         public static final String NULL = "ROLE_NULL";
+
+        /**
+         * 角色：ROLE_NO_TEST（此角色标记的资源不允许测试用户访问）
+         */
+        public static final String NO_TEST = "ROLE_NO_TEST";
     }
 
     /**

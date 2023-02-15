@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.log.aop;
 
+import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.core.util.SpringContextUtils;
 import com.github.stazxr.zblog.log.annotation.properties.LogProperties;
 import com.github.stazxr.zblog.log.domain.entity.Log;
@@ -15,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 切面日志
@@ -48,7 +50,7 @@ public class LogAspect {
     /**
      * 配置接口的切入点，扫描所有controller包下的异常信息
      */
-    @Pointcut("execution(public * com.github.stazxr.zblog*.controller..*.*(..))")
+    @Pointcut("execution(public * com.github.stazxr.zblog..*Controller.*(..))")
     public void ctlLogPointCut() {
     }
 
@@ -76,7 +78,8 @@ public class LogAspect {
             log.setCostTime(costTime);
             log.setEventTime(operateTime);
             log.setRequestInfo(getHttpServletRequest());
-            logService.saveLog(joinPoint, log, result, null);
+            log.setOperateUser(SecurityUtils.getLoginUsernameNoEor());
+            CompletableFuture.runAsync(() -> logService.saveLog(joinPoint, log, result, null));
         } catch (Exception e) {
             log.error("==================== LogAspect[logPointCut] catch eor", e);
         }
@@ -107,7 +110,8 @@ public class LogAspect {
             log.setCostTime(costTime);
             log.setEventTime(DateUtils.formatNow());
             log.setRequestInfo(getHttpServletRequest());
-            logService.saveLog((ProceedingJoinPoint) joinPoint, log, null, e);
+            log.setOperateUser(SecurityUtils.getLoginUsernameNoEor());
+            CompletableFuture.runAsync(() -> logService.saveLog((ProceedingJoinPoint) joinPoint, log, null, e));
         } catch (Exception ex) {
             log.error("==================== LogAspect[expLogPointCut] catch eor", e);
         }

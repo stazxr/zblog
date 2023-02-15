@@ -50,7 +50,7 @@ public class AuthController {
      * @return {img: %二维码的Base64编码%; uuid: %存储二维码的缓存主键%}
      */
     @GetMapping("/loginCode")
-    @Router(name = "获取当前登录用户的用户名", code = "loginCode", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取登录验证码", code = "loginCode", level = BaseConst.PermLevel.OPEN)
     public Result loginCode() {
         // 从缓存中获取登录验证码的配置
         String cacheKey = Constants.CacheKey.captchaConfig.cacheKey().concat(":loginCode");

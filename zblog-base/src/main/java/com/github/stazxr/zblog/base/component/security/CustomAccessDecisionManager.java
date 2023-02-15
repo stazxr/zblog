@@ -55,9 +55,16 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         List<String> allowRoles = new ArrayList<>();
         configAttributes.forEach(attribute -> allowRoles.add(attribute.getAttribute()));
 
+        // 测试用户不允许调用 Constants.USER_TEST 标记的资源
+        if (Constants.USER_TEST.equalsIgnoreCase(authentication.getName())) {
+            if (allowRoles.contains(Constants.SecurityRole.NO_TEST)) {
+                throw new AccessDeniedException("测试用户被拒绝执行此操作");
+            }
+        }
+
         // 判断是否允许访问资源
         if (allowRoles.contains(NONE) || allowRoles.contains(NULL) || allowRoles.contains(FORBIDDEN)) {
-            throw new AccessDeniedException("没有权限");
+            throw new AccessDeniedException("资源被禁止访问");
         } else if (allowRoles.contains(OPEN)) {
             return;
         } else if (allowRoles.contains(PUBLIC)) {
@@ -78,7 +85,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
             }
         }
 
-        throw new AccessDeniedException("没有权限");
+        throw new AccessDeniedException("权限不足，请联系管理员");
     }
 
     @Override

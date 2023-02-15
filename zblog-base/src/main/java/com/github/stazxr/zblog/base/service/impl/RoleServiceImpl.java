@@ -42,7 +42,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     /**
      * 内置角色列表
      */
-    private static final String[] INNER_ROLES = { OPEN, PUBLIC, FORBIDDEN, NONE, NULL };
+    private static final String[] INNER_ROLES = { OPEN, PUBLIC, FORBIDDEN, NONE, NULL, NO_TEST };
 
     private final RoleMapper roleMapper;
 

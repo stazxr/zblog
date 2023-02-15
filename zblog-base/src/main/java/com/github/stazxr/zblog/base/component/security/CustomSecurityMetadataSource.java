@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.base.component.security;
 
 import com.github.stazxr.zblog.base.service.RouterService;
+import com.github.stazxr.zblog.base.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -41,6 +43,12 @@ public class CustomSecurityMetadataSource implements FilterInvocationSecurityMet
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
         String requestMethod = ((FilterInvocation) object).getRequest().getMethod();
         Set<String> roles = routerService.findRoles(requestUrl, requestMethod);
+
+        // 非 GET 请求标记测试用户不允许调用
+        if (!HttpMethod.GET.name().equalsIgnoreCase(requestMethod)) {
+            roles.add(Constants.SecurityRole.NO_TEST);
+        }
+
         String[] attributes1 = new String[roles.size()];
         return SecurityConfig.createList(roles.toArray(attributes1));
     }
