@@ -70,7 +70,9 @@
             PERM_LEVEL IN (1, 2) OR (
                 PERM_LEVEL = 3 AND ID IN (
                     SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
-                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                        SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
+                            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                        )
                     )
                 )
             )
@@ -89,13 +91,15 @@
         SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND ENABLED = 1 AND PERM_CODE IS NOT NULL AND (
             PERM_LEVEL != 3 OR ID IN (
                 SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
-                    SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                    SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
+                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                    )
                 )
             )
         )
         UNION ALL
         SELECT CODE FROM router WHERE DEFAULT_LEVEL != 3 AND CODE NOT IN (
-            SELECT PERM_CODE FROM permission WHERE DELETED = 0
+            SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND PERM_CODE IS NOT NULL
         )
     </select>
 </mapper>

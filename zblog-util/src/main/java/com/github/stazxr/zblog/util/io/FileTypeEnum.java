@@ -13,7 +13,8 @@ enum FileTypeEnum {
      * 图片
      */
     IMAGE("图片", "image", new String[]{
-        "bmp", "dib", "pcp", "dif", "wmf", "gif", "jpg", "tif", "eps", "psd", "cdr", "iff", "tga", "pcd", "mpt", "png", "jpeg"
+        "bmp", "dib", "pcp", "dif", "wmf", "gif", "jpg", "tif", "eps", "psd",
+        "cdr", "iff", "tga", "pcd", "mpt", "png", "jpeg", "webp"
     }),
 
     /**

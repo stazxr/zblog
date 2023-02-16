@@ -443,7 +443,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         actionCheck(articleDto);
 
         // 设置文章内容（去除标签）
-        articleDto.setContentMd(HtmlContentUtils.getTextFromHtml(articleDto.getContent()));
+        articleDto.setContentMd(HtmlContentUtils.getTextFromHtml(articleDto.getContent()).replaceAll("&nbsp;", ""));
 
         // 设置文章状态（对外不可见的文章无须审批）
         Integer articlePerm = articleDto.getArticlePerm();
