@@ -3,7 +3,6 @@ package com.github.stazxr.zblog.util.net;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.github.stazxr.zblog.util.Constants;
 import com.github.stazxr.zblog.util.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +12,7 @@ import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * IP工具类
@@ -28,6 +22,8 @@ import java.util.Map;
  */
 @Slf4j
 public class IpUtils {
+    private static final String LOCAL_AREA_NET = "局域网";
+
     private static final String UNKNOWN = "unknown";
 
     private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
@@ -92,7 +88,12 @@ public class IpUtils {
     public static String getHttpCityInfo(String ip) {
         String api = String.format(Constants.Url.IP_URL, ip);
         JSONObject object = JSONUtil.parseObj(HttpUtil.get(api));
-        return object.get("addr", String.class);
+        String address = object.get("addr", String.class);
+        if (LOCAL_AREA_NET.equals(address)) {
+            return LOCAL_AREA_NET;
+        } else {
+            return address.length() > 2 ? address.substring(0, 2) : address;
+        }
     }
 
     /**

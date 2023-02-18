@@ -40,11 +40,13 @@
         <result property="reprintLink" column="REPRINT_LINK" />
         <result property="reprintDesc" column="REPRINT_DESC" />
         <result property="authorId" column="AUTHOR_ID" />
+        <result property="authorGender" column="AUTHOR_GENDER" />
         <result property="authorNickname" column="AUTHOR_NICKNAME" />
         <result property="createTime" column="CREATE_TIME" />
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="viewCount" column="VIEW_COUNT" />
         <result property="likeCount" column="LIKE_COUNT" />
+        <result property="commentCount" column="COMMENT_COUNT" />
         <result property="wordCount" column="EXTEND2" />
         <collection property="tagList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
             <result property="id" column="TAG_ID" />
@@ -79,6 +81,7 @@
         <result property="categoryName" column="CATEGORY_NAME" />
         <result property="coverImageType" column="COVER_IMAGE_TYPE" />
         <result property="authorNickname" column="AUTHOR_NICKNAME" />
+        <result property="authorGender" column="AUTHOR_GENDER" />
         <result property="createTime" column="CREATE_TIME" />
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="viewCount" column="VIEW_COUNT" />
@@ -322,10 +325,11 @@
     <select id="selectArticleDetail" resultMap="articleVoDetailMap">
         SELECT
             a.ID, a.TITLE, a.REMARK, a.CONTENT, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.EXTEND2,
-            a.ARTICLE_PERM, a.COVER_IMAGE_TYPE, a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, a.COMMENT_FLAG, u.NICKNAME AUTHOR_NICKNAME,
+            a.ARTICLE_PERM, a.COVER_IMAGE_TYPE, a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, a.COMMENT_FLAG, u.GENDER AUTHOR_GENDER, u.NICKNAME AUTHOR_NICKNAME,
             a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,
             (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
-            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT
+            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT,
+            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND TYPE = 1 AND OBJECT_ID = a.ID) COMMENT_COUNT
         FROM
             article a
         LEFT JOIN (
@@ -345,7 +349,7 @@
     <select id="selectWebArticleList" resultMap="articleVoWebListMap">
         SELECT
             a.ID, a.TITLE, a.CONTENT_MD AS CONTENT, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
-            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, a.CREATE_TIME, a.UPDATE_TIME,
+            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, u.GENDER AUTHOR_GENDER, a.CREATE_TIME, a.UPDATE_TIME,
             (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT,
             (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT,
             (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND TYPE = 1 AND OBJECT_ID = a.ID) COMMENT_COUNT

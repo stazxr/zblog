@@ -3,7 +3,7 @@
 <mapper namespace="com.github.stazxr.zblog.mapper.CommentMapper">
     <resultMap id="webCommentVoListMap" type="com.github.stazxr.zblog.domain.vo.CommentVo">
         <result property="id" column="ID" />
-        <result property="userId" column="USER_ID" />
+        <result property="userId" javaType="java.lang.Long" column="USER_ID" />
         <result property="nickname" column="NICKNAME" />
         <result property="avatar" column="HEAD_IMG_URL" />
         <result property="website" column="WEBSITE" />

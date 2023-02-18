@@ -31,7 +31,7 @@
 
     <select id="selectWebTalkList" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
         SELECT
-            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
+            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.ID userId, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
             (SELECT COUNT(1) FROM talk_like WHERE TALK_ID = t.ID) likeCount,
             (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND OBJECT_ID = t.ID) commentCount
         FROM talk t
@@ -42,7 +42,7 @@
 
     <select id="selectWebTalkDetail" resultType="com.github.stazxr.zblog.domain.vo.TalkVo">
         SELECT
-            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
+            t.ID, t.CONTENT, t.IMAGES, t.IS_TOP, t.CREATE_TIME, u.ID userId, u.NICKNAME userNickname, u.HEAD_IMG_URL userAvatar,
             (SELECT COUNT(1) FROM talk_like WHERE TALK_ID = t.ID) likeCount,
             (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1 AND OBJECT_ID = t.ID) commentCount
         FROM talk t

@@ -32,7 +32,10 @@
             ) COMMENT_COUNT,
             (
                 SELECT COUNT(1) FROM message WHERE IS_REVIEW = 1
-            ) MESSAGE_COUNT
+            ) MESSAGE_COUNT,
+            (
+                SELECT VERSION_NAME FROM version WHERE DELETED = 0 ORDER BY CREATE_TIME DESC LIMIT 1
+            ) WEBSITE_VERSION
         FROM DUAL
     </select>
 

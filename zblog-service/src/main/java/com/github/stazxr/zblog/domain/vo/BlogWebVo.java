@@ -23,42 +23,52 @@ public class BlogWebVo {
     /**
      * 文章数量
      */
-    private Integer articleCount;
+    private int articleCount;
 
     /**
      * 分类数量
      */
-    private Integer categoryCount;
+    private int categoryCount;
+
+    /**
+     * 分类数量
+     */
+    private int columnCount;
 
     /**
      * 标签数量
      */
-    private Integer tagCount;
+    private int tagCount;
 
     /**
      * 访问数
      */
-    private Integer viewsCount;
+    private int viewsCount;
 
     /**
      * 游客数
      */
-    private Integer visitorCount;
+    private int visitorCount;
 
     /**
      * 用户数
      */
-    private Integer userCount;
+    private int userCount;
 
     /**
      * 评论数
      */
-    private Integer commentCount;
+    private int commentCount;
 
     /**
      * 留言数
      */
-    private Integer messageCount;
+    private int messageCount;
+
+    /**
+     * 网站版本
+     */
+    private String websiteVersion;
 
     /**
      * 网站信息

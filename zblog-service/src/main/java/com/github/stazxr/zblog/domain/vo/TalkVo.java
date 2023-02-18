@@ -50,6 +50,11 @@ public class TalkVo extends BaseVo {
     private Boolean isTop;
 
     /**
+     * 用户序号
+     */
+    private Long userId;
+
+    /**
      * 用户昵称
      */
     private String userNickname;
@@ -72,12 +77,12 @@ public class TalkVo extends BaseVo {
     /**
      * 点赞数
      */
-    private Long likeCount;
+    private int likeCount;
 
     /**
      * 评论数
      */
-    private Long commentCount;
+    private int commentCount;
 
     public List<String> getImagesList() {
         imagesList = new ArrayList<>();

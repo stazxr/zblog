@@ -100,6 +100,11 @@ public class ArticleVo extends BaseVo {
     private String authorNickname;
 
     /**
+     * 作者性别
+     */
+    private Integer authorGender;
+
+    /**
      * 创建时间
      */
     private String createTime;
