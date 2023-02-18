@@ -97,7 +97,7 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
 
     private void checkFriendLink(FriendLink friendLink) {
         Assert.isTrue(StringUtils.isBlank(friendLink.getName()), "友链名称不能为空");
-        Assert.isTrue(StringUtils.isBlank(friendLink.getHeadUrl()), "友链地址不能为空");
+        Assert.isTrue(StringUtils.isBlank(friendLink.getLinkUrl()), "友链地址不能为空");
         Assert.notNull(friendLink.getValid(), "友链状态不能为空");
 
         FriendLink dbLink = baseMapper.selectByLinkUrl(friendLink.getLinkUrl());
