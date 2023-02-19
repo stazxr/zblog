@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.service.impl;
 
-import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
@@ -65,9 +64,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
-    private static final String UNKNOWN_AREA = "未知地域";
-
-    private static final String LOCAL_AREA_NET = "局域网";
+    private static final String UNKNOWN_AREA = "未知";
 
     private final PortalMapper portalMapper;
 
@@ -164,18 +161,14 @@ public class PortalServiceImpl implements PortalService {
         boolean exists = visitorMapper.exists(new LambdaQueryWrapper<Visitor>().eq(Visitor::getId, md5Uuid));
         if (!exists) {
             // 第一次访问
-            JSONObject cityInfo = IpImplUtils.getHttpCityDetailInfo(ipAddress);
-            String province = cityInfo.get("addr", String.class);
-            if (StringUtils.isBlank(province) || LOCAL_AREA_NET.equals(province.trim())) {
-                updateVisitorAreaCount(UNKNOWN_AREA);
-            } else {
-                province = province.trim().substring(0, 2);
-                visitor.setProvince(province);
-                visitor.setAreaCode(cityInfo.get("cityCode", String.class));
-                updateVisitorAreaCount(province);
+            String province = IpImplUtils.getIpSource(ipAddress);
+            if (StringUtils.isBlank(province)) {
+                province = UNKNOWN_AREA;
             }
 
             // 保存访客信息
+            visitor.setProvince(province);
+            updateVisitorAreaCount(province);
             visitorMapper.insert(visitor);
         }
 
@@ -257,7 +250,7 @@ public class PortalServiceImpl implements PortalService {
         String ip = IpUtils.getIp(request);
         message.setIpAddress(ip);
         message.setMessageContent(HtmlContentUtils.filter(message.getMessageContent()));
-        message.setIpSource(IpImplUtils.getCityInfo(ip));
+        message.setIpSource(IpImplUtils.getIpSource(ip));
         message.setId(GenerateIdUtils.getId());
         message.setIsReview(1 != isReview);
         messageMapper.insert(message);
@@ -372,7 +365,7 @@ public class PortalServiceImpl implements PortalService {
         comment.setId(GenerateIdUtils.getId());
         String ip = IpUtils.getIp(request);
         comment.setIpAddress(ip);
-        comment.setIpSource(IpImplUtils.getCityInfo(ip));
+        comment.setIpSource(IpImplUtils.getIpSource(ip));
         comment.setIsReview(1 != isReview);
         commentMapper.insert(comment);
 
@@ -402,7 +395,7 @@ public class PortalServiceImpl implements PortalService {
             commentLike.setCommentId(commentDto.getCommentId());
             String ip = IpUtils.getIp(request);
             commentLike.setIpAddress(ip);
-            commentLike.setIpSource(IpImplUtils.getCityInfo(ip));
+            commentLike.setIpSource(IpImplUtils.getIpSource(ip));
             commentLikeMapper.insert(commentLike);
         }
     }
@@ -459,7 +452,7 @@ public class PortalServiceImpl implements PortalService {
             talkLike.setTalkId(talkDto.getTalkId());
             String ip = IpUtils.getIp(request);
             talkLike.setIpAddress(ip);
-            talkLike.setIpSource(IpImplUtils.getCityInfo(ip));
+            talkLike.setIpSource(IpImplUtils.getIpSource(ip));
             talkLikeMapper.insert(talkLike);
         }
     }
@@ -484,7 +477,7 @@ public class PortalServiceImpl implements PortalService {
             articleLike.setArticleId(articleDto.getArticleId());
             String ip = IpUtils.getIp(request);
             articleLike.setIpAddress(ip);
-            articleLike.setIpSource(IpImplUtils.getCityInfo(ip));
+            articleLike.setIpSource(IpImplUtils.getIpSource(ip));
             articleLikeMapper.insert(articleLike);
         }
     }
@@ -527,7 +520,7 @@ public class PortalServiceImpl implements PortalService {
                 view.setId(GenerateIdUtils.getId());
                 view.setArticleId(articleId);
                 view.setAccessIp(accessIp);
-                view.setAccessAddress(IpImplUtils.getCityInfo(accessIp));
+                view.setAccessAddress(IpImplUtils.getIpSource(accessIp));
                 view.setAccessTime(DateUtils.formatNow());
                 return 1 == articleViewMapper.insert(view);
             } catch (Exception e) {

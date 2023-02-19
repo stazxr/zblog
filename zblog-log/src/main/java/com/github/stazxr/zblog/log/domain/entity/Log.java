@@ -105,7 +105,7 @@ public class Log extends BaseEntity {
         this.requestIp = IpUtils.getIp(request);
         this.requestUri = request.getRequestURI();
         this.requestMethod = request.getMethod();
-        this.address = IpImplUtils.getCityInfo(this.requestIp);
+        this.address = IpImplUtils.getIpSource(this.requestIp);
         this.browser = IpUtils.getBrowser(request);
     }
 }

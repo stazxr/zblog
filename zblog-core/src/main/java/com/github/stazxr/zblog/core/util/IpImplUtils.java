@@ -27,14 +27,14 @@ public class IpImplUtils extends IpUtils {
     }
 
     /**
-     * 根据ip获取详细地址
+     * 根据ip地址获取IP来源
      *
-     * @param ip IP 地址
+     * @param ip IP地址
      * @return 详细地址
      */
-    public static String getCityInfo(String ip) {
+    public static String getIpSource(String ip) {
         try {
-            return PROPERTIES.getIsLocalIpParsing() ? getLocalCityInfo(ip) : getHttpCityInfo(ip);
+            return PROPERTIES.getIsLocalIpParsing() ? getIpSourceByLocal(ip) : getIpSourceByHttp(ip);
         } catch (Exception e) {
             log.error("getCityInfo catch eor: {}", e.getMessage());
             return "";
