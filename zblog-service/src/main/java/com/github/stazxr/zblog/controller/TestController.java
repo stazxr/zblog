@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
@@ -28,6 +29,7 @@ public class TestController {
      * @return IP来源
      */
     @IgnoredLog
+    @IgnoreResult
     @GetMapping(value = "/getIpSource")
     @Router(name = "测试IP工具类", code = "getIpSourceByTest", level = BaseConst.PermLevel.OPEN)
     public String testIpUtils(String ip) {

@@ -11,17 +11,13 @@ user, role, permission, router, interface...
 路由（router） - 接口（interface）：一对多的关系，一个路由可能对应多个请求地址（一般是一个）
     关联字段：权限编码
 
-3、基本链路
-request -> obtain requestUri, requestMethod -> interface（未查询到则请求失败） -> obtain permCode
--> obtain permission -> 判断用户的角色是否允许访问该权限，不允许则请求失败
-
-4、特殊规则
+3、特殊规则
 a: 路由纳管规则，如果路由在权限表中有记录，则被纳管，否则未纳管
 b: 路由访问级别，纳管的路由，已 permission 为准，未纳管的路由，已 router 为准
     OPEN，放行
     PUBLIC，判断用户是否认证，未认证则提示用户需要登录
     PERM，获取用户对应的权限列表，如果包含该权限则放行，否则抛出异常，没有权限（实际就是走 3 的流程）
 
-5、开发规范
+4、开发规范
 a: 暂不支持不建议使用PathVariable开发，如果有需要，需要定制代码
-b: 接口需要使用@Router注解才可生效，否则默认该接口不允许访问
+b: 接口需要使用@Router注解才可生效，否则该接口不允许访问

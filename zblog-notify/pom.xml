@@ -12,5 +12,5 @@
 	<packaging>jar</packaging>
 
 	<name>zblog-notify</name>
-	<description>消息中心（待实现）</description>
+	<description>ZBLOG 框架的消息组件（待实现）</description>
 </project>

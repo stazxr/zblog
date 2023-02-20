@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <name>zblog-util</name>
-    <description>ZBLOG 框架的公共工具类组件，实现字符串、日期、加解密、IO、Assert、OSS、JSCH 等工具的的封装</description>
+    <description>ZBLOG 框架的工具组件，实现字符串、日期、加解密、IO、Assert、OSS、JSCH 等工具的的封装</description>
 
     <properties>
         <pinyin4j.version>2.5.1</pinyin4j.version>
