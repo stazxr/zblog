@@ -74,7 +74,8 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-      max-request-size: 10MB
+      max-request-size: 100MB
+      location: /data/upload_tmp
   mail:
     host: smtp.qq.com
     port: 587
