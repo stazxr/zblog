@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
 import com.github.stazxr.zblog.domain.dto.setting.SocialInfo;
 import com.github.stazxr.zblog.domain.dto.setting.WebInfo;
@@ -10,6 +11,7 @@ import com.github.stazxr.zblog.domain.enums.WebsiteConfigType;
 import com.github.stazxr.zblog.mapper.WebSettingMapper;
 import com.github.stazxr.zblog.service.WebSettingService;
 import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.YwConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,7 @@ public class WebSettingServiceImpl extends ServiceImpl<WebSettingMapper, Website
         Assert.notNull(websiteConfig, "网站配置信息不存在，KEY 为: " + dbKey);
         websiteConfig.setConfig(JSON.toJSONString(webInfo));
         baseMapper.updateById(websiteConfig);
+        CacheUtils.remove(YwConstants.CacheKey.webInfo.cacheKey());
     }
 
     /**
@@ -77,6 +80,7 @@ public class WebSettingServiceImpl extends ServiceImpl<WebSettingMapper, Website
         Assert.notNull(websiteConfig, "网站社交信息不存在，KEY 为: " + dbKey);
         websiteConfig.setConfig(JSON.toJSONString(socialInfo));
         baseMapper.updateById(websiteConfig);
+        CacheUtils.remove(YwConstants.CacheKey.socialInfo.cacheKey());
     }
 
     /**
@@ -105,5 +109,6 @@ public class WebSettingServiceImpl extends ServiceImpl<WebSettingMapper, Website
         Assert.notNull(websiteConfig, "网站其他信息不存在，KEY 为: " + dbKey);
         websiteConfig.setConfig(JSON.toJSONString(otherInfo));
         baseMapper.updateById(websiteConfig);
+        CacheUtils.remove(YwConstants.CacheKey.otherInfo.cacheKey());
     }
 }

@@ -12,6 +12,7 @@ import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.converter.CommentConverter;
 import com.github.stazxr.zblog.converter.MessageConverter;
 import com.github.stazxr.zblog.core.exception.ServiceException;
+import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.domain.dto.*;
@@ -30,6 +31,7 @@ import com.github.stazxr.zblog.service.PortalService;
 import com.github.stazxr.zblog.strategy.context.ArticleSearchStrategyContext;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.YwConstants;
 import com.github.stazxr.zblog.util.http.HtmlContentUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -120,16 +122,18 @@ public class PortalServiceImpl implements PortalService {
         BlogWebVo webVo = portalMapper.selectBlogWebInfo();
 
         // WebInfo
-        WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.WEB_INFO.value());
-        webVo.setWebInfo(websiteConfig == null ? new WebInfo() : JSON.parseObject(websiteConfig.getConfig(), WebInfo.class));
+        String websiteConfig = getWebInfoFromCache();
+        webVo.setWebInfo(StringUtils.isBlank(websiteConfig) ? new WebInfo() : JSON.parseObject(websiteConfig, WebInfo.class));
 
         // SocialInfo
-        websiteConfig = webSettingMapper.selectById(WebsiteConfigType.SOCIAL_INFO.value());
-        webVo.setSocialInfo(websiteConfig == null ? new SocialInfo() : JSON.parseObject(websiteConfig.getConfig(), SocialInfo.class));
+        websiteConfig = getSocialInfoFromCache();
+        webVo.setSocialInfo(websiteConfig == null ? new SocialInfo() : JSON.parseObject(websiteConfig, SocialInfo.class));
 
         // OtherInfo
-        websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
-        webVo.setOtherInfo(websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class));
+        websiteConfig = getOtherInfoFromCache();
+        OtherInfo otherInfo = websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig, OtherInfo.class);
+        webVo.setOtherInfo(otherInfo);
+        webVo.setArticleDefaultImg(otherInfo.getArticleCover());
 
         // PageInfo
         List<PageInfo> pageList = pageMapper.selectWebPageList();
@@ -670,6 +674,57 @@ public class PortalServiceImpl implements PortalService {
         ArticleTagVo tagVo = articleTagMapper.selectTagDetail(tagId);
         Assert.notNull(tagVo, "标签信息不存在");
         return tagVo;
+    }
+
+    private String getWebInfoFromCache() {
+        YwConstants.CacheKey cacheKey = YwConstants.CacheKey.webInfo;
+        String cacheConfig = CacheUtils.get(cacheKey.cacheKey());
+        if (cacheConfig == null) {
+            // 查询数据库
+            WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.WEB_INFO.value());
+            if (websiteConfig == null) {
+                return null;
+            }
+
+            // 返回数据
+            return CacheUtils.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+        }
+
+        return cacheConfig;
+    }
+
+    private String getSocialInfoFromCache() {
+        YwConstants.CacheKey cacheKey = YwConstants.CacheKey.socialInfo;
+        String cacheConfig = CacheUtils.get(cacheKey.cacheKey());
+        if (cacheConfig == null) {
+            // 查询数据库
+            WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.SOCIAL_INFO.value());
+            if (websiteConfig == null) {
+                return null;
+            }
+
+            // 返回数据
+            return CacheUtils.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+        }
+
+        return cacheConfig;
+    }
+
+    private String getOtherInfoFromCache() {
+        YwConstants.CacheKey cacheKey = YwConstants.CacheKey.otherInfo;
+        String cacheConfig = CacheUtils.get(cacheKey.cacheKey());
+        if (cacheConfig == null) {
+            // 查询数据库
+            WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
+            if (websiteConfig == null) {
+                return null;
+            }
+
+            // 返回数据
+            return CacheUtils.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+        }
+
+        return cacheConfig;
     }
 
     private void notice(Comment comment) {

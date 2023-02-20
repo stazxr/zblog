@@ -71,6 +71,11 @@ public class BlogWebVo {
     private String websiteVersion;
 
     /**
+     * 默认封面
+     */
+    private String articleDefaultImg;
+
+    /**
      * 网站信息
      */
     private WebInfo webInfo;
