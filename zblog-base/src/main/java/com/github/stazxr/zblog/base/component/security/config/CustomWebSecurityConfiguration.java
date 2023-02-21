@@ -56,6 +56,11 @@ public class CustomWebSecurityConfiguration {
     public static final String LOGIN_PROCESSING_URL = "/api/process";
 
     /**
+     * logout url
+     */
+    public static final String LOGOUT_URL = "/api/logout";
+
+    /**
      * 使用 Security 推荐的 BCryptPasswordEncoder 进行加解密
      *
      * @return 加密手段 BCryptPasswordEncoder
@@ -257,7 +262,7 @@ public class CustomWebSecurityConfiguration {
                     .failureHandler(authenticationFailureHandler);
 
             // 登出配置
-            http.logout().addLogoutHandler(logoutHandler).logoutSuccessHandler(logoutSuccessHandler);
+            http.logout().logoutUrl(LOGOUT_URL).addLogoutHandler(logoutHandler).logoutSuccessHandler(logoutSuccessHandler);
 
             // 异常处理
             http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)

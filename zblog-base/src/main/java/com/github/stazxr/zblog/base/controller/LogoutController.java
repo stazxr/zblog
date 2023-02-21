@@ -1,7 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
-import com.github.stazxr.zblog.log.annotation.IgnoredLog;
+import com.github.stazxr.zblog.log.annotation.Log;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +19,9 @@ public class LogoutController {
     /**
      * 系统登出，这里只做路由注册，逻辑在处理器中
      */
-    @IgnoredLog
-    @PostMapping("/logout")
+    @Log
+    @IgnoreResult
+    @PostMapping("/api/logout")
     @Router(name = "系统注销", code = "logout", level = PUBLIC)
     public void logout() {
     }

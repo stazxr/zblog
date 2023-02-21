@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.util;
 
+import com.github.stazxr.zblog.core.config.properties.CacheConfigProperties;
+
 /**
  * 全局常量类
  *
@@ -45,7 +47,7 @@ public class Constants {
     /**
      * 缓存不设置过期时间
      */
-    public static final int FOREVER_CACHE = 0;
+    public static final int FOREVER_CACHE = CacheConfigProperties.FOREVER_CACHE;
 
     /**
      * AUTHENTICATION_PREFIX

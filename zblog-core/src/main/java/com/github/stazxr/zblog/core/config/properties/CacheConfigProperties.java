@@ -17,6 +17,11 @@ import java.util.Arrays;
 @ConfigurationProperties(prefix= "cache")
 public class CacheConfigProperties {
     /**
+     * 永久缓存
+     */
+    public static final int FOREVER_CACHE = 0;
+
+    /**
      * 系统缓存类型
      */
     private String type = "memory";
