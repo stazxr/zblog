@@ -149,21 +149,21 @@
             <id>alpha</id>
             <properties>
                 <activeProfile>alpha</activeProfile>
-                <desc>测试环境，关闭SQL等日志信息，使用本地的链接信息</desc>
+                <desc>测试环境</desc>
             </properties>
         </profile>
         <profile>
             <id>beta</id>
             <properties>
                 <activeProfile>beta</activeProfile>
-                <desc>回归环境，关闭SQL等日志信息，数据库使用生产的，Redis使用本地的</desc>
+                <desc>回归环境</desc>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
                 <activeProfile>prod</activeProfile>
-                <desc>生产环境，关闭SQL等日志信息，使用生产的链接信息</desc>
+                <desc>生产环境</desc>
             </properties>
         </profile>
     </profiles>

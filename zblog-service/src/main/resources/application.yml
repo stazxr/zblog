@@ -1,14 +1,16 @@
+server:
+  port: 19992
 spring:
   application:
     name: zblog
   profiles:
-    active: dev
+    active: prod
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
       url: jdbc:mysql://localhost:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       username: root
-      password: root
+      password: mysqlPwd
       initial-size: 5
       min-idle: 15
       max-active: 30
@@ -81,7 +83,7 @@ spring:
     port: 587
     protocol: smtp
     username: stazxr@qq.com
-    password:
+    password: emailPwd
     default-encoding: UTF-8
     properties:
       mail:
@@ -100,6 +102,7 @@ mybatis-plus:
       logic-not-delete-value: false
 jasypt:
   encryptor:
+    password: jasyptPwd
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
     salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
@@ -119,14 +122,15 @@ jwt:
     cert-location: zblog.jks
   claims:
     issuer: http://localhost:${server.port}
-    subject: Login
+    audience: all
+    subject: user
 cache:
-  default-duration: 300
   type: memory
+  default-duration: 300
 zblog:
   deploy-type: single
-  is-local-ip-parsing: true
   base-package: com.github.stazxr.zblog
+  is-local-ip-parsing: true
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**

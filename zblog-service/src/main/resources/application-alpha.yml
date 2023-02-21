@@ -1,4 +1,0 @@
-server:
-  port: 19991
-cache:
-  type: redis

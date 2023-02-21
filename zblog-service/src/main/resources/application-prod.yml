@@ -7,10 +7,10 @@ spring:
       username: ENC(hisvsQ4rjMY755ISBof8XuElj9jw2dmG)
       password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
   redis:
-    host: ENC(wEAkOysMms4sh54ilxS+TLLkIXxGGN7L)
-    port: 6481
+    host: ENC(G5O94K/WQEO+2HeROvSnudsM3vOYxV1Fap/Hmx+TYkjqFKS+R8ZuoQx70BY14XdhmQfs9fwB4KI=)
+    port: 6379
     client-type: lettuce
-    password: ENC(yLNmRC4j7X2ucajRvSutQTSbnrwi9eoM)
+    password: ENC(oI3js2fIR+9A4T+4efsloFIU9XMyBY7J)
     connect-timeout: 5000
     database: ${REDIS_DB:0}
 jwt:
