@@ -4,7 +4,7 @@ spring:
   application:
     name: zblog
   profiles:
-    active: prod
+    active: ${PROFILES:dev}
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver

@@ -49,6 +49,11 @@ public class WebInfo {
     private String websiteAdminLink = "";
 
     /**
+     * 关于我
+     */
+    private String readMeLink = "";
+
+    /**
      * 网站公告
      */
     private String websiteNotice = "";
