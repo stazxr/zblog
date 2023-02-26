@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.service;
 
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
+import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
@@ -10,6 +11,7 @@ import com.github.stazxr.zblog.domain.vo.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 前台服务层
@@ -239,4 +241,12 @@ public interface PortalService {
      * @return CommentVos
      */
     List<CommentVo> queryBoardLastedCommentList();
+
+    /**
+     * 查询 Github 贡献日历数据
+     *
+     * @param username Github 用户名
+     * @return 贡献日历数据
+     */
+    GitCalendarData queryGithubCalendarData(String username);
 }

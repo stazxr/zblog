@@ -393,4 +393,16 @@ public class PortalController {
     public Result searchArticleList(@RequestParam String keywords) {
         return Result.success().data(portalService.searchArticleList(keywords));
     }
+
+    /**
+     * 查询 Github 贡献日历数据
+     *
+     * @param username Github 用户名
+     * @return 贡献日历数据
+     */
+    @GetMapping("/queryGithubCalendarData")
+    @Router(name = "查询 Github 贡献日历数据", code = "queryWebGithubCalendarData", level = BaseConst.PermLevel.OPEN)
+    public Result queryGithubCalendarData(@RequestParam String username) {
+        return Result.success().data(portalService.queryGithubCalendarData(username));
+    }
 }

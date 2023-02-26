@@ -27,6 +27,7 @@
         <aliyun.oss.version>3.8.0</aliyun.oss.version>
         <qiniu.version>7.9.5</qiniu.version>
         <sensitive-word.version>0.2.0</sensitive-word.version>
+        <unirest.version>1.4.9</unirest.version>
     </properties>
 
     <dependencies>
@@ -121,6 +122,12 @@
             <groupId>com.github.houbb</groupId>
             <artifactId>sensitive-word</artifactId>
             <version>${sensitive-word.version}</version>
+        </dependency>
+        <!-- unirest -->
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>${unirest.version}</version>
         </dependency>
     </dependencies>
 </project>

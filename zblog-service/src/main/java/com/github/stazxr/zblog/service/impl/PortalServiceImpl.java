@@ -15,6 +15,7 @@ import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
+import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.bo.PageInfo;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
@@ -32,6 +33,7 @@ import com.github.stazxr.zblog.strategy.context.ArticleSearchStrategyContext;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.YwConstants;
+import com.github.stazxr.zblog.util.git.GithubUtils;
 import com.github.stazxr.zblog.util.http.HtmlContentUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -177,7 +179,17 @@ public class PortalServiceImpl implements PortalService {
         }
 
         // 网站访问量自增
+        addVisitorCount();
+    }
+
+    private void addVisitorCount() {
+        String today = DateUtils.formatDate();
         visitorMapper.addWebVisitorCount();
+        if (visitorMapper.existsDate(today)) {
+            visitorMapper.addWebVisitorTodayCount(today);
+        } else {
+            visitorMapper.insertWebVisitorTodayCount(today);
+        }
     }
 
     /**
@@ -599,6 +611,38 @@ public class PortalServiceImpl implements PortalService {
     @Override
     public List<CommentVo> queryBoardLastedCommentList() {
         return commentMapper.selectBoardLastedCommentList();
+    }
+
+    /**
+     * 查询 Github 贡献日历数据
+     *
+     * @param username Github 用户名
+     * @return 贡献日历数据
+     */
+    @Override
+    public GitCalendarData queryGithubCalendarData(String username) {
+        try {
+            // 从 Redis 拿去数据
+            YwConstants.CacheKey cacheKey = YwConstants.CacheKey.githubCalendarData;
+            String key = cacheKey.cacheKey().concat(username);
+            String jsonData = CacheUtils.get(key);
+            if (jsonData != null) {
+                return JSON.parseObject(jsonData, GitCalendarData.class);
+            }
+
+            // 查询新数据
+            List<Map<String, Object>> data = GithubUtils.getGithubCalendarData(username);
+            GitCalendarData calendarData = new GitCalendarData();
+            calendarData.setGithubUser(username);
+            calendarData.setGithubUrl(GithubUtils.BASE_URL.concat("/").concat(username));
+            calendarData.initData(data);
+
+            // 缓存新数据
+            CacheUtils.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
+            return calendarData;
+        } catch (Exception e) {
+            throw new ServiceException("贡献日历数据获取异常", e);
+        }
     }
 
     /**

@@ -71,6 +71,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     private static final String[] FOURTH_QUARTER = new String[]{"10", "11", "12"};
 
     /**
+     * 月份中文名称
+     */
+    public static final String[] MONTH_ZH = new String[]{"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"};
+
+    /**
      * 获取系统默认的时间格式样式
      *
      * @return DEFAULT_PATTERN
@@ -667,6 +672,31 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return result;
     }
 
+    /**
+     * 获取日期所属的周
+     *
+     * @param date 日期，格式 yyyy-MM-dd
+     * @return 周 [1, 12]
+     * @throws ParseException 日期格式不正确
+     */
+    public static int getWeekCountOfYear(String date) throws ParseException {
+        Date choose = parseDate(date, YMD_PATTERN);
+
+        // 转为 Calendar 对象
+        Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(0);
+        calendar.setTime(choose);
+
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        if (week == 1 && calendar.get(Calendar.MONTH) == Calendar.DECEMBER) {
+            calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - 7);
+            week = calendar.get(Calendar.WEEK_OF_YEAR) + 1;
+        }
+
+        return week;
+    }
+
     private static void setActualMaximumDay(Calendar calendar) {
         calendar.set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY));
         calendar.set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE));
@@ -679,5 +709,34 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         calendar.set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE));
         calendar.set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND));
         calendar.set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND));
+    }
+
+    /**
+     * 计算日期 {date} 前 {amount} {type} 的日期
+     *
+     * @param date   日期
+     * @param amount 偏移量
+     * @param type   类型，日、月、年
+     * @return Date
+     */
+    public static Date getLastDate(Date date, int amount, int type) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        setActualMinimumDay(calendar);
+        calendar.add(type, - amount);
+        return calendar.getTime();
+    }
+
+    /**
+     * 获取月份的中文名称
+     *
+     * @param date 日期
+     * @return 月份
+     */
+    public static String getMonthZh(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int monthIndex = calendar.get(Calendar.MONTH);
+        return MONTH_ZH[monthIndex];
     }
 }

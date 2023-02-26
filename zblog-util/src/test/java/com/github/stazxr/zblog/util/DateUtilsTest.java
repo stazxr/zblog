@@ -5,9 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 import static com.github.stazxr.zblog.util.time.DateUtils.YMD_PATTERN;
 
@@ -149,5 +147,58 @@ public class DateUtilsTest {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, - Integer.parseInt(StringUtils.isBlank(hour) ? "0" : hour));
         System.out.println(DateUtils.format(calendar.getTime(), DateUtils.YMD_HMS_PATTERN));
+    }
+
+    @Test
+    @Ignore
+    public void test10() throws ParseException {
+        Date choose = DateUtils.parseDate("2023-12-24", YMD_PATTERN);
+
+        // 转为 Calendar 对象
+        Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(0);
+        calendar.setTime(choose);
+
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        if (week == 1 && calendar.get(Calendar.MONTH) == Calendar.DECEMBER) {
+            calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - 7);
+            week = calendar.get(Calendar.WEEK_OF_YEAR) + 1;
+        }
+
+        System.out.println(week);
+    }
+
+    @Test
+    @Ignore
+    public void test11() throws ParseException {
+        Date lastDate = DateUtils.parseDate("2023-02-26", DateUtils.YMD_PATTERN);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(lastDate);
+        calendar.add(Calendar.DATE, - 6);
+        System.out.println(DateUtils.format(calendar.getTime(), YMD_PATTERN));
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(lastDate);
+        calendar2.add(Calendar.MONTH, - 1);
+        System.out.println(DateUtils.format(calendar2.getTime(), YMD_PATTERN));
+
+        System.out.println(DateUtils.format(DateUtils.getLastDate(lastDate, 6, Calendar.DATE)));
+        System.out.println(DateUtils.format(DateUtils.getLastDate(lastDate, 1, Calendar.MONTH)));
+    }
+
+    @Test
+    @Ignore
+    public void test12() throws ParseException {
+        Date date = DateUtils.parseDate("2023-11-26", DateUtils.YMD_PATTERN);
+        List<String> months = Arrays.asList(DateUtils.MONTH_ZH);
+        String month = DateUtils.getMonthZh(date);
+        int index = months.indexOf(month) + 1;
+        List<String> preList = months.subList(index, months.size());
+        List<String> sufList = months.subList(0, index);
+        List<String> result = new ArrayList<>();
+        result.addAll(preList);
+        result.addAll(sufList);
+        System.out.println(result);
     }
 }

@@ -39,7 +39,12 @@ public class YwConstants {
         /**
          * otherInfo
          */
-        otherInfo("portal:otherInfo", Constants.FOREVER_CACHE);
+        otherInfo("portal:otherInfo", Constants.FOREVER_CACHE),
+
+        /**
+         * githubCalendarData，默认缓存 12 个小时
+         */
+        githubCalendarData("portal:githubCalendar:", 12 * 3600);
 
         /**
          * 缓存Key
