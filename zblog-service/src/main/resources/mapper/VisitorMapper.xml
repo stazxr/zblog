@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.VisitorMapper">
+    <insert id="insertWebVisitorTodayCount">
+        INSERT INTO visitor_count (WEB_COUNT, DATA_DATE) VALUES (1, #{date})
+    </insert>
+
+    <update id="addWebVisitorTodayCount">
+        UPDATE visitor_count SET WEB_COUNT = WEB_COUNT + 1 WHERE DATA_DATE = #{date}
+    </update>
+
     <update id="addWebVisitorCount">
         UPDATE visitor_count SET WEB_COUNT = WEB_COUNT + 1 WHERE ID = 1
     </update>
+
+    <select id="existsDate" resultType="java.lang.Boolean">
+        SELECT COUNT(1) FROM visitor_count WHERE DATA_DATE = #{date}
+    </select>
 </mapper>
