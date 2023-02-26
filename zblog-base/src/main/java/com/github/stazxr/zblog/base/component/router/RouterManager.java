@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 public class RouterManager {
     private static final String ALL_METHOD = "ANY";
 
+    private static final int BATCH_COUNT = 30;
+
     private final WebApplicationContext applicationContext;
 
     private final RouterService routerService;
@@ -52,15 +54,19 @@ public class RouterManager {
         RouterInterface routerInterface = parseRouter();
 
         // save router
-        checkRouterCodeUnique(routerInterface.getRouters());
+        List<Router> routerList = routerInterface.getRouters();
+        checkRouterCodeUnique(routerList);
         routerService.clearRouter();
-        List<List<Router>> routers = ArrayUtils.averageAssign(routerInterface.getRouters());
+        int batchCount = (routerList.size() % BATCH_COUNT) > 0 ? (routerList.size() / BATCH_COUNT) + 1 : routerList.size() / BATCH_COUNT;
+        List<List<Router>> routers = ArrayUtils.averageAssign(routerList, batchCount);
         routers.forEach(routerService::saveBatch);
 
         // save interface
+        List<Interface> interfaceList = routerInterface.getPermInterfaces();
         interfaceService.clearInterface();
-        routerInterface.getPermInterfaces().addAll(routerInterface.getNullInterfaces());
-        List<List<Interface>> interfaces = ArrayUtils.averageAssign(routerInterface.getPermInterfaces());
+        interfaceList.addAll(routerInterface.getNullInterfaces());
+        batchCount = (interfaceList.size() % BATCH_COUNT) > 0 ? (interfaceList.size() / BATCH_COUNT) + 1 : interfaceList.size() / BATCH_COUNT;
+        List<List<Interface>> interfaces = ArrayUtils.averageAssign(interfaceList, batchCount);
         interfaces.forEach(interfaceService::saveBatch);
     }
 
