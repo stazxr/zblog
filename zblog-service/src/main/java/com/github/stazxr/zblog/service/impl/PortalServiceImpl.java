@@ -18,6 +18,7 @@ import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.bo.PageInfo;
+import com.github.stazxr.zblog.domain.dto.query.AlbumPhotoQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
@@ -111,6 +112,10 @@ public class PortalServiceImpl implements PortalService {
     private final ArticleLikeMapper articleLikeMapper;
 
     private final ArticleViewMapper articleViewMapper;
+
+    private final AlbumMapper albumMapper;
+
+    private final AlbumPhotoMapper albumPhotoMapper;
 
     private final ArticleSearchStrategyContext articleSearchStrategyContext;
 
@@ -643,6 +648,41 @@ public class PortalServiceImpl implements PortalService {
         } catch (Exception e) {
             throw new ServiceException("贡献日历数据获取异常", e);
         }
+    }
+
+    /**
+     * 查询前台相册列表
+     *
+     * @return AlbumVo
+     */
+    @Override
+    public List<AlbumVo> queryAlbumList() {
+        return albumMapper.selectWebAlbumList();
+    }
+
+    /**
+     * 查询前台相册照片列表
+     *
+     * @param queryDto 查询参数
+     * @return PortalAlbumPhotoVo
+     */
+    @Override
+    public PortalAlbumPhotoVo queryAlbumPhotoList(AlbumPhotoQueryDto queryDto) {
+        Assert.notNull(queryDto.getAlbumId(), "参数【albumId】不能为空");
+        AlbumVo albumVo = albumMapper.selectAlbumDetail(queryDto.getAlbumId());
+        Assert.notNull(albumVo, "相册信息不存在");
+
+        queryDto.checkPage();
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        List<AlbumPhotoVo> photoVos = albumPhotoMapper.selectAlbumPhotoList(queryDto);
+
+        PortalAlbumPhotoVo albumPhotoVo = new PortalAlbumPhotoVo();
+        albumPhotoVo.setPhotoAlbumName(albumVo.getAlbumName());
+        albumPhotoVo.setPhotoAlbumCover(albumVo.getAlbumCover());
+        albumPhotoVo.setPhotoAlbumAuthor(albumVo.getUserNickname());
+        albumPhotoVo.setList(photoVos);
+
+        return albumPhotoVo;
     }
 
     /**

@@ -10,6 +10,8 @@ import com.github.stazxr.zblog.domain.entity.Album;
 import com.github.stazxr.zblog.domain.vo.AlbumPhotoVo;
 import com.github.stazxr.zblog.domain.vo.AlbumVo;
 
+import java.util.List;
+
 /**
  * 相册服务层
  *
@@ -56,9 +58,53 @@ public interface AlbumService extends IService<Album> {
     PageInfo<AlbumPhotoVo> pagePhotoList(AlbumPhotoQueryDto queryDto);
 
     /**
-     * 保存相册照片列表
+     * 上传相册照片
      *
      * @param albumPhotoDto 相册照片信息
      */
     void saveAlbumPhoto(AlbumPhotoDto albumPhotoDto);
+
+    /**
+     * 移动相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    void moveAlbumPhoto(AlbumPhotoDto albumPhotoDto);
+
+    /**
+     * 删除相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    void deleteAlbumPhoto(AlbumPhotoDto albumPhotoDto);
+
+    /**
+     * 查询用户相册列表
+     *
+     * @param queryDto 查询参数
+     * @return AlbumVoList
+     */
+    List<AlbumVo> queryUserAlbumList(AlbumQueryDto queryDto);
+
+    /**
+     * 分页查询回收站照片列表
+     *
+     * @param queryDto 查询参数
+     * @return PhotoVoList
+     */
+    PageInfo<AlbumPhotoVo> pageDeletePhotoList(AlbumPhotoQueryDto queryDto);
+
+    /**
+     * 永久删除相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    void deleteAlbumPhotoForever(AlbumPhotoDto albumPhotoDto);
+
+    /**
+     * 恢复相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    void recoverAlbumPhoto(AlbumPhotoDto albumPhotoDto);
 }

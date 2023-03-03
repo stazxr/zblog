@@ -8,13 +8,45 @@
         </foreach>
     </insert>
 
+    <update id="deleteAlbumPhoto">
+        UPDATE album_photo SET IS_DELETED = 1 WHERE ID IN
+        <foreach collection="photoIdList" item="photoId" index="index" open="(" separator="," close=")">
+            #{photoId}
+        </foreach>
+    </update>
+
+    <update id="moveAlbumPhoto">
+        UPDATE album_photo SET ALBUM_ID = #{albumId} WHERE ID IN
+        <foreach collection="photoIdList" item="photoId" index="index" open="(" separator="," close=")">
+            #{photoId}
+        </foreach>
+    </update>
+
+    <update id="recoverAlbumPhoto">
+        UPDATE album_photo SET IS_DELETED = 0 WHERE ID IN
+        <foreach collection="photoIdList" item="photoId" index="index" open="(" separator="," close=")">
+            #{photoId}
+        </foreach>
+    </update>
+
     <select id="selectAlbumPhotoList" resultType="com.github.stazxr.zblog.domain.vo.AlbumPhotoVo">
         SELECT
-            ID, ALBUM_ID, PHOTO_NAME, PHOTO_DESC, PHOTO_LINK, IS_DELETED, CREATE_TIME
+            ID, ALBUM_ID, PHOTO_NAME, PHOTO_LINK, CREATE_DATE
         FROM album_photo WHERE IS_DELETED = 0
         <if test="albumId != null">
             AND ALBUM_ID = #{albumId}
         </if>
         ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectDeletePhotoList" resultType="com.github.stazxr.zblog.domain.vo.AlbumPhotoVo">
+        SELECT
+            ap.ID, ap.ALBUM_ID, ap.PHOTO_NAME, ap.PHOTO_LINK, ap.CREATE_DATE, a.ALBUM_NAME
+        FROM album_photo ap
+        LEFT JOIN album a ON a.ID = ap.ALBUM_ID
+        WHERE ap.IS_DELETED = 1 AND a.DELETED = 0 AND ap.CREATE_USER = (
+            SELECT USERNAME FROM user WHERE ID = #{userId}
+        )
+        ORDER BY ap.CREATE_TIME DESC
     </select>
 </mapper>

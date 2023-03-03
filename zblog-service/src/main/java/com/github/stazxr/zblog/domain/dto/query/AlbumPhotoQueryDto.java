@@ -19,4 +19,9 @@ public class AlbumPhotoQueryDto extends PageParam {
      * 相册ID
      */
     private Long albumId;
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
 }

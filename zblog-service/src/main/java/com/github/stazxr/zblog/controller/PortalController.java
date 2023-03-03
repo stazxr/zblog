@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.*;
+import com.github.stazxr.zblog.domain.dto.query.AlbumPhotoQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
@@ -404,5 +405,28 @@ public class PortalController {
     @Router(name = "查询 Github 贡献日历数据", code = "queryWebGithubCalendarData", level = BaseConst.PermLevel.OPEN)
     public Result queryGithubCalendarData(@RequestParam String username) {
         return Result.success().data(portalService.queryGithubCalendarData(username));
+    }
+
+    /**
+     * 查询前台相册列表
+     *
+     * @return AlbumVo
+     */
+    @GetMapping("/queryAlbumList")
+    @Router(name = "查询前台相册列表", code = "queryWebAlbumList", level = BaseConst.PermLevel.OPEN)
+    public Result queryAlbumList() {
+        return Result.success().data(portalService.queryAlbumList());
+    }
+
+    /**
+     * 查询前台相册照片列表
+     *
+     * @param queryDto 查询参数
+     * @return AlbumPhotoVo
+     */
+    @GetMapping("/queryAlbumPhotoList")
+    @Router(name = "查询前台相册照片列表", code = "queryWebAlbumPhotoList", level = BaseConst.PermLevel.OPEN)
+    public Result queryAlbumPhotoList(AlbumPhotoQueryDto queryDto) {
+        return Result.success().data(portalService.queryAlbumPhotoList(queryDto));
     }
 }

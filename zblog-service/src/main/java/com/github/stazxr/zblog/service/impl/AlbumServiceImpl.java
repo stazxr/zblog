@@ -118,23 +118,24 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
     }
 
     /**
-     * 保存相册照片列表
+     * 上传相册照片
      *
      * @param albumPhotoDto 相册照片信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveAlbumPhoto(AlbumPhotoDto albumPhotoDto) {
         Assert.notNull(albumPhotoDto.getAlbumId(), "参数【albumId】不能为空");
-        Assert.isTrue(albumPhotoDto.getPhotoList().size() == 0, "请上传照片列表");
+        Assert.isTrue(albumPhotoDto.getPhotoList().size() == 0, "请选择需要上传的照片");
 
-        // 批量插入照片列表
+        // 批量插入照片列表（暂不限制单次上传大小）
         List<AlbumPhoto> photos = new ArrayList<>();
         for (File file : albumPhotoDto.getPhotoList()) {
             AlbumPhoto albumPhoto = new AlbumPhoto();
             albumPhoto.setId(GenerateIdUtils.getId());
             albumPhoto.setAlbumId(albumPhotoDto.getAlbumId());
             albumPhoto.setFileId(file.getId());
-            albumPhoto.setPhotoName(file.getOriginalFilename());
+            albumPhoto.setPhotoName(file.getFilename());
             albumPhoto.setPhotoLink(file.getDownloadUrl());
             albumPhoto.setIsDeleted(false);
             albumPhoto.setCreateUser(SecurityUtils.getLoginUsername());
@@ -144,6 +145,88 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
         }
 
         albumPhotoMapper.batchInsert(photos);
+    }
+
+    /**
+     * 移动相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void moveAlbumPhoto(AlbumPhotoDto albumPhotoDto) {
+        List<Long> photoIdList = albumPhotoDto.getPhotoIdList();
+        Assert.notNull(albumPhotoDto.getAlbumId(), "请选择目标相册");
+        Assert.isTrue(photoIdList == null || photoIdList.size() == 0, "请选择需要移动的照片");
+        albumPhotoMapper.moveAlbumPhoto(albumPhotoDto.getAlbumId(), photoIdList);
+    }
+
+    /**
+     * 删除相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteAlbumPhoto(AlbumPhotoDto albumPhotoDto) {
+        List<Long> photoIdList = albumPhotoDto.getPhotoIdList();
+        if (photoIdList != null && photoIdList.size() > 0) {
+            albumPhotoMapper.deleteAlbumPhoto(photoIdList);
+        }
+    }
+
+    /**
+     * 查询用户相册列表
+     *
+     * @param queryDto 查询参数
+     * @return AlbumVoList
+     */
+    @Override
+    public List<AlbumVo> queryUserAlbumList(AlbumQueryDto queryDto) {
+        Assert.notNull(queryDto.getLoginUserId(), "查询相册列表失败");
+        return baseMapper.selectUserAlbumList(queryDto);
+    }
+
+    /**
+     * 分页查询回收站照片列表
+     *
+     * @param queryDto 查询参数
+     * @return PhotoVoList
+     */
+    @Override
+    public PageInfo<AlbumPhotoVo> pageDeletePhotoList(AlbumPhotoQueryDto queryDto) {
+        queryDto.checkPage();
+        queryDto.setUserId(SecurityUtils.getLoginId());
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        return new PageInfo<>(albumPhotoMapper.selectDeletePhotoList(queryDto));
+    }
+
+    /**
+     * 永久删除相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteAlbumPhotoForever(AlbumPhotoDto albumPhotoDto) {
+        List<Long> photoIdList = albumPhotoDto.getPhotoIdList();
+        if (photoIdList != null && photoIdList.size() > 0) {
+            albumPhotoMapper.deleteBatchIds(photoIdList);
+        }
+    }
+
+    /**
+     * 恢复相册照片
+     *
+     * @param albumPhotoDto 相册照片信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recoverAlbumPhoto(AlbumPhotoDto albumPhotoDto) {
+        List<Long> photoIdList = albumPhotoDto.getPhotoIdList();
+        if (photoIdList != null && photoIdList.size() > 0) {
+            albumPhotoMapper.recoverAlbumPhoto(photoIdList);
+        }
     }
 
     private void checkAlbum(Album album) {

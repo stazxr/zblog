@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
+import com.github.stazxr.zblog.domain.dto.query.AlbumPhotoQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
@@ -249,4 +250,19 @@ public interface PortalService {
      * @return 贡献日历数据
      */
     GitCalendarData queryGithubCalendarData(String username);
+
+    /**
+     * 查询前台相册列表
+     *
+     * @return AlbumVo
+     */
+    List<AlbumVo> queryAlbumList();
+
+    /**
+     * 查询前台相册照片列表
+     *
+     * @param queryDto 查询参数
+     * @return PortalAlbumPhotoVo
+     */
+    PortalAlbumPhotoVo queryAlbumPhotoList(AlbumPhotoQueryDto queryDto);
 }

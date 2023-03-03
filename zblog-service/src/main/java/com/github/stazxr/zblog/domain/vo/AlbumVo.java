@@ -42,4 +42,14 @@ public class AlbumVo extends BaseVo {
      * 照片数（未删除）
      */
     private int photoCount;
+
+    /**
+     * 作者
+     */
+    private Long userId;
+
+    /**
+     * 作者昵称
+     */
+    private String userNickname;
 }

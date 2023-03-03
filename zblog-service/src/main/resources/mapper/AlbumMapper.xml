@@ -3,35 +3,60 @@
 <mapper namespace="com.github.stazxr.zblog.mapper.AlbumMapper">
     <select id="selectAlbumList" resultType="com.github.stazxr.zblog.domain.vo.AlbumVo">
         SELECT
-            ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME, UPDATE_TIME,
+            t.ID, t.ALBUM_NAME, t.ALBUM_DESC, t.ALBUM_COVER, t.STATUS, u.ID userId, u.nickname userNickname,
             (SELECT COUNT(1) FROM album_photo WHERE ALBUM_ID = t.ID AND IS_DELETED = 0) photoCount
         FROM (
             SELECT
-                ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME, UPDATE_TIME
+                ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME
             FROM album WHERE DELETED = 0 AND STATUS = 1
             <if test="loginUser != null and loginUser != ''">
                 UNION ALL
                 SELECT
-                    ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME, UPDATE_TIME
+                    ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME
                 FROM album WHERE DELETED = 0 AND STATUS = 2 AND CREATE_USER = #{loginUser}
             </if>
         ) t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
         <where>
             <if test="albumName != null and albumName != ''">
                 <bind name="nameBind" value="'%' + albumName + '%'"/>
-                ALBUM_NAME LIKE #{nameBind}
+                t.ALBUM_NAME LIKE #{nameBind}
             </if>
             <if test="status != null">
                 t.STATUS = #{status}
             </if>
         </where>
-        ORDER BY CREATE_TIME DESC
+        ORDER BY t.CREATE_TIME DESC
     </select>
 
     <select id="selectAlbumDetail" resultType="com.github.stazxr.zblog.domain.vo.AlbumVo">
         SELECT
-            ID, ALBUM_NAME, ALBUM_DESC, ALBUM_COVER, STATUS, CREATE_USER, CREATE_TIME, UPDATE_TIME,
+            t.ID, t.ALBUM_NAME, t.ALBUM_DESC, t.ALBUM_COVER, t.STATUS, u.ID userId, u.nickname userNickname,
             (SELECT COUNT(1) FROM album_photo WHERE ALBUM_ID = t.ID AND IS_DELETED = 0) photoCount
-        FROM album t WHERE DELETED = 0 AND ID = #{albumId}
+        FROM album t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
+        WHERE t.DELETED = 0 AND t.ID = #{albumId}
+    </select>
+
+    <select id="selectUserAlbumList" resultType="com.github.stazxr.zblog.domain.vo.AlbumVo">
+        SELECT
+            ID, ALBUM_NAME, ALBUM_COVER
+        FROM album
+        WHERE CREATE_USER = (SELECT USERNAME FROM user WHERE ID = #{loginUserId})
+        ORDER BY CREATE_DATE DESC
+    </select>
+
+    <select id="selectWebAlbumList" resultType="com.github.stazxr.zblog.domain.vo.AlbumVo">
+        SELECT
+            t.ID, t.ALBUM_NAME, t.ALBUM_DESC, t.ALBUM_COVER, u.nickname userNickname, t.CREATE_DATE
+        FROM (
+            SELECT
+                a.ID, a.ALBUM_NAME, a.ALBUM_DESC, a.ALBUM_COVER, a.CREATE_USER, a.CREATE_TIME, a.CREATE_DATE,
+                (SELECT COUNT(ID) FROM album_photo WHERE ALBUM_ID = a.ID AND IS_DELETED = 0) photoCount
+            FROM album a WHERE DELETED = 0 AND STATUS = 1
+        ) t
+        LEFT JOIN user u ON u.USERNAME = t.CREATE_USER
+        WHERE t.photoCount > 0
+        ORDER BY t.CREATE_TIME DESC
     </select>
 </mapper>

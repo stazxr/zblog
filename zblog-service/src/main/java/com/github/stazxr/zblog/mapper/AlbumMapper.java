@@ -29,4 +29,19 @@ public interface AlbumMapper extends BaseMapper<Album> {
      * @return AlbumVo
      */
     AlbumVo selectAlbumDetail(Long albumId);
+
+    /**
+     * 查询用户相册列表
+     *
+     * @param queryDto 查询参数
+     * @return AlbumVoList
+     */
+    List<AlbumVo> selectUserAlbumList(AlbumQueryDto queryDto);
+
+    /**
+     * 查询前台相册列表
+     *
+     * @return AlbumVo
+     */
+    List<AlbumVo> selectWebAlbumList();
 }

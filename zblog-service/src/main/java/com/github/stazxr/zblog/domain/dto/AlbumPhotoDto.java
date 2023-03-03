@@ -26,4 +26,9 @@ public class AlbumPhotoDto {
      * 照片列表
      */
     private List<File> photoList;
+
+    /**
+     * 照片ID列表
+     */
+    private List<Long> photoIdList;
 }

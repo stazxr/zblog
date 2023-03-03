@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,6 @@ public class AlbumPhotoVo extends BaseVo {
     /**
      * 主键
      */
-    @TableId
     private Long id;
 
     /**
@@ -44,4 +42,9 @@ public class AlbumPhotoVo extends BaseVo {
      * 是否删除
      */
     private Integer isDeleted;
+
+    /**
+     * 相册名称
+     */
+    private String albumName;
 }

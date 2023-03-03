@@ -21,6 +21,11 @@ public class AlbumQueryDto extends PageParam {
     private String loginUser;
 
     /**
+     * 当前登录用户Id
+     */
+    private String loginUserId;
+
+    /**
      * 相册名称
      */
     private String albumName;
