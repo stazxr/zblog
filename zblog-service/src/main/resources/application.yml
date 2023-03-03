@@ -45,7 +45,7 @@ spring:
         stat:
           enabled: true
           log-slow-sql: true
-          slow-sql-millis: 1000
+          slow-sql-millis: 3000
           merge-sql: true
         wall:
           enabled: true

@@ -24,8 +24,9 @@ public class ThreadConfig {
     @Bean
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        // 设置核心线程数
-        executor.setCorePoolSize(5);
+
+        // 设置核心线程数（可根据自己的服务器配置进行适当调整）
+        executor.setCorePoolSize(2);
 
         // 设置最大线程数
         executor.setMaxPoolSize(10);

@@ -63,8 +63,12 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         }
 
         // 判断是否允许访问资源
-        if (allowRoles.contains(NONE) || allowRoles.contains(NULL) || allowRoles.contains(FORBIDDEN)) {
-            throw new AccessDeniedException("资源被禁止访问");
+        if (allowRoles.contains(NONE)) {
+            throw new AccessDeniedException("没有权限");
+        } else if (allowRoles.contains(NULL)) {
+            throw new AccessDeniedException("请求资源不存在");
+        } else if (allowRoles.contains(FORBIDDEN)) {
+            throw new AccessDeniedException("请求资源被禁止访问");
         } else if (allowRoles.contains(OPEN)) {
             return;
         } else if (allowRoles.contains(PUBLIC)) {
