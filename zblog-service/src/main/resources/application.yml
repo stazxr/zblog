@@ -5,6 +5,8 @@ spring:
     name: zblog
   profiles:
     active: ${PROFILES:dev}
+  main:
+    allow-bean-definition-overriding: false
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.component.security.handler;
 
+import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.User;
-import com.github.stazxr.zblog.base.component.security.jwt.storage.impl.JwtTokenStorageImpl;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CustomLogoutHandler implements LogoutHandler {
     private final ZblogService zblogService;
 
-    private final JwtTokenStorageImpl jwtTokenStorage;
+    private final JwtTokenStorage jwtTokenStorage;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
