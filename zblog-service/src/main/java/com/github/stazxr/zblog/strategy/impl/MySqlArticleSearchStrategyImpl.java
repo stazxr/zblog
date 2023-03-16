@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.github.stazxr.zblog.util.YwConstants.POST_TAG;
@@ -44,21 +45,22 @@ public class MySqlArticleSearchStrategyImpl implements ArticleSearchStrategy {
         return articleList.stream().peek(item -> {
             // 获取关键词第一次出现的位置
             String articleContent = item.getContent();
-            int index = item.getContent().indexOf(keywords);
+            int index = item.getContent().toLowerCase(Locale.ROOT).indexOf(keywords.toLowerCase(Locale.ROOT));
             if (index != -1) {
                 // 获取关键词前面的文字
                 int preIndex = index > 25 ? index - 25 : 0;
                 String preText = item.getContent().substring(preIndex, index);
+
                 // 获取关键词到后面的文字
                 int last = index + keywords.length();
                 int postLength = item.getContent().length() - last;
                 int postIndex = postLength > 175 ? last + 175 : last + postLength;
                 String postText = item.getContent().substring(index, postIndex);
-                articleContent = (preText + postText).replaceAll(keywords, PRE_TAG + keywords + POST_TAG);
+                articleContent = (preText + postText).replaceAll("(?i)" + keywords, PRE_TAG + keywords + POST_TAG);
             }
 
             // 文章标题高亮
-            String articleTitle = item.getTitle().replaceAll(keywords, PRE_TAG + keywords + POST_TAG);
+            String articleTitle = item.getTitle().replaceAll("(?i)" + keywords, PRE_TAG + keywords + POST_TAG);
             item.setTitle(articleTitle);
             item.setContent(articleContent);
         }).collect(Collectors.toList());
