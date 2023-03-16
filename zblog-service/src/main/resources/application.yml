@@ -94,6 +94,9 @@ spring:
           starttls:
             enable: true
             required: true
+mybatis:
+  configuration-properties:
+    close-implicitly: true
 mybatis-plus:
   mapper-locations: classpath*:mapper/**/*.xml
   configuration:
