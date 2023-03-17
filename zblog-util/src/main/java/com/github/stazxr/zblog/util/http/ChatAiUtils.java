@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.util.http;
 
-import com.alibaba.fastjson.JSON;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -10,8 +8,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * 聊天助手 API
@@ -47,15 +43,7 @@ public class ChatAiUtils {
             conn.setDoOutput(true);
 
             // 自定义参数
-            Map<String, Object> param = new LinkedHashMap<>();
-            param.put("prompt", content);
-            param.put("max_tokens", 150);
-            param.put("temperature", 0.7D);
-            param.put("n", "1");
-            param.put("stop", "\n");
-
             String jsonParam = "{\"prompt\": \"" + content + "\", \"max_tokens\": " + 150 + ", \"temperature\": " + 0.7 + ", \"n\": " + 1 + ", \"stop\": \"" + "\n" + "\"}";
-            // String jsonParam = JSON.toJSONString(param);
             OutputStream os = conn.getOutputStream();
             byte[] input = jsonParam.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
