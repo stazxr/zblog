@@ -58,7 +58,7 @@ jobs:
          uses: apisec-inc/apisec-run-scan@025432089674a28ba8fb55f8ab06c10215e772ea
          with:
           # The APIsec username with which the scans will be executed
-          apisec-username: 1027353579@qq.com
+          apisec-username: GithubZblog
           # The Password of the APIsec user with which the scans will be executed
           apisec-password: ST@zxr0410..
           # The name of the project for security scan
