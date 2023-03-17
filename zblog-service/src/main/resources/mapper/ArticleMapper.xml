@@ -265,7 +265,7 @@
         FROM article a
         LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
-        WHERE a.DELETED = 0 AND a.ARTICLE_STATUS != 8 AND a.ARTICLE_PERM = 1
+        WHERE a.DELETED = 0 AND a.ARTICLE_STATUS NOT IN (1, 8) AND a.ARTICLE_PERM = 1
         <if test="title != null and title != ''">
             <bind name="titleBind" value="'%' + title + '%'"/>
             AND a.TITLE LIKE #{titleBind}
@@ -314,7 +314,7 @@
 
     <select id="selectPublicArticleCountData" resultType="com.github.stazxr.zblog.domain.bo.ArticleCountData">
         SELECT
-            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS != 8 AND ARTICLE_PERM = 1) AS allCount,
+            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS NOT IN (1, 8) AND ARTICLE_PERM = 1) AS allCount,
             (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1) AS publishedCount,
             (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS IN (2, 3) AND ARTICLE_PERM = 1) AS auditCount,
             (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS IN (4, 6, 7) AND ARTICLE_PERM = 1) AS dealCount,
