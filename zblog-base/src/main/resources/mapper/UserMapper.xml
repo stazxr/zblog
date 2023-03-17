@@ -11,6 +11,7 @@
         <result property="gender" column="GENDER" />
         <result property="email" column="EMAIL" />
         <result property="enabled" column="ENABLED" />
+        <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" />
     </resultMap>
 
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
@@ -38,6 +39,10 @@
             <result column="ROLE_NAME" />
         </collection>
     </resultMap>
+
+    <select id="selectUserRoleIdList" resultType="java.lang.Long">
+        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+    </select>
 
     <select id="selectUserList" resultMap="userVoMap">
         SELECT
