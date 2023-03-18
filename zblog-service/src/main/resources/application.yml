@@ -38,16 +38,17 @@ spring:
         enabled: true
       stat-view-servlet:
         enabled: true
-        url-pattern: /druid/*
+        url-pattern: /api/druid/*
         reset-enable: false
         # 密码登录
         # login-username: admin
         # login-password: druid@123
+        allow:
       filter:
         stat:
           enabled: true
           log-slow-sql: true
-          slow-sql-millis: 3000
+          slow-sql-millis: 5000
           merge-sql: true
         wall:
           enabled: true
