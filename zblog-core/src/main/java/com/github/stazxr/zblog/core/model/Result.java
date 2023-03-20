@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.core.model;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.stazxr.zblog.core.enums.ResultCode;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -16,6 +18,7 @@ import java.time.format.DateTimeFormatter;
  * @since 2020-11-16
  */
 @Getter
+@ApiModel(value = "Result", description = "统一返回")
 public final class Result implements Serializable {
     /**
      * serialVersionUID
@@ -25,26 +28,31 @@ public final class Result implements Serializable {
     /**
      * Http 响应码
      */
+    @ApiModelProperty(name = "code", value = "响应码", example = "200")
     private Integer code;
 
     /**
      * 响应信息
      */
+    @ApiModelProperty(name = "message", value = "响应信息", example = "操作成功")
     private final String message;
 
     /**
      * 响应数据
      */
+    @ApiModelProperty(name = "data", value = "响应数据")
     private Object data;
 
     /**
      * 业务响应码（在某些特殊场景，做更细致的业务划分）
      */
+    @ApiModelProperty(name = "identifier", value = "业务码", example = "1")
     private final Integer identifier;
 
     /**
      * 时间戳
      */
+    @ApiModelProperty(name = "identifier", value = "响应时间", example = "1996-03-01 00:04:10")
     private final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     private Result(ResultCode resultCode) {

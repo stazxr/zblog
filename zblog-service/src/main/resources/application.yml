@@ -130,6 +130,18 @@ jwt:
     issuer: http://localhost:${server.port}
     audience: all
     subject: user
+swagger:
+  config:
+    enable: true
+    title: Z-BLOG 接口文档
+    description: Z-BLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，仓库链接：https://github.com/stazxr/zblog
+    base-package: com.github.stazxr.zblog
+    server-url: https://www.suntaoblog.com
+    version: V_4.0.0
+    contact:
+      name: 孙涛
+      email: stazxr@qq.com
+      url: https://www.suntaoblog.com
 cache:
   type: memory
   default-duration: 300

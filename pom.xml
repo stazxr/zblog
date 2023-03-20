@@ -18,7 +18,7 @@
 
     <name>zblog-parent</name>
     <url>https://github.com/stazxr/zblog</url>
-    <description>ZBLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速搭建项目</description>
+    <description>ZBLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建</description>
 
     <developers>
         <developer>
@@ -73,6 +73,8 @@
         <junit.version>4.12</junit.version>
         <okhttp.version>3.14.9</okhttp.version>
         <jsch.version>0.1.55</jsch.version>
+        <swagger.version>3.0.0</swagger.version>
+        <knife4j.version>3.0.2</knife4j.version>
     </properties>
 
     <!-- 公共依赖管理 -->
@@ -166,6 +168,17 @@
             <artifactId>okhttp</artifactId>
             <version>${okhttp.version}</version>
             <optional>true</optional>
+        </dependency>
+        <!-- swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>${knife4j.version}</version>
         </dependency>
     </dependencies>
 

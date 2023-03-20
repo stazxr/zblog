@@ -14,7 +14,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * 统一返回体包装器
@@ -26,6 +28,15 @@ import java.util.LinkedHashMap;
 @RestControllerAdvice
 public class ResultAdvice implements ResponseBodyAdvice<Object> {
     private static final String ERROR_PATH = "/error";
+
+    /**
+     * 不需要进行统一包装的三方接口
+     */
+    private static final String[] NOT_PACKAGE_URI = {
+        "/swagger-resources", "/v3/api-docs", "/v2/api-docs"
+    };
+
+    private final List<String> notPackageUriList = Arrays.asList(NOT_PACKAGE_URI);
 
     @Override
     public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> aClass) {
@@ -45,7 +56,12 @@ public class ResultAdvice implements ResponseBodyAdvice<Object> {
             return o;
         }
 
+        final String urlParamSplit = "\\?";
         String uri = serverHttpRequest.getURI().getPath();
+        if (notPackageUriList.contains(uri.split(urlParamSplit)[0])) {
+            return o;
+        }
+
         if (ERROR_PATH.equals(uri)) {
             try {
                 LinkedHashMap<String, Object> val = (LinkedHashMap<String, Object>) o;

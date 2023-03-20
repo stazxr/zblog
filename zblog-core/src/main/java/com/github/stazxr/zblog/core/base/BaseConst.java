@@ -146,4 +146,23 @@ public class BaseConst {
          */
         public static final String DELETE = "delete";
     }
+
+    /**
+     * API 版本
+     */
+    public static final class ApiVersion {
+        private ApiVersion() {
+            throw new IllegalStateException();
+        }
+
+        /**
+         * V_4.0.0
+         */
+        public static final String V_4_0_0 = "V_4.0.0";
+
+        /**
+         * V_4.1.0
+         */
+        public static final String V_4_1_0 = "V_4.1.0";
+    }
 }

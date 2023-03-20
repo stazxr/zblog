@@ -34,6 +34,10 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 @EnableWebMvc
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+    private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+        "classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"
+    };
+
     /**
      * 文件的访问地址
      */
@@ -121,8 +125,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // local file
         log.info("Local File Config ===> fileDomain: {}, fileUploadPath: {}", fileDomain, fileUploadPath);
         registry.addResourceHandler(fileDomain).addResourceLocations("file:" + fileUploadPath);
+
+        // resource
+        final String fullPattern = "/**";
+        if (!registry.hasMappingForPattern(fullPattern)) {
+            registry.addResourceHandler(fullPattern).addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+        }
+
+        // swagger
+        registry.addResourceHandler("doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     @Override

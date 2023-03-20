@@ -93,7 +93,7 @@ public class RouterManager {
         List<Router> routers = new ArrayList<>();
         List<Interface> permInterfaces = new ArrayList<>();
         List<Interface> nullInterfaces = new ArrayList<>();
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = applicationContext.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> m : map.entrySet()) {
             RequestMappingInfo info = m.getKey();
