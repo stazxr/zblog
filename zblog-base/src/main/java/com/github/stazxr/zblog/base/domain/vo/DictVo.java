@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * DictVo
+ * 字典信息
  *
  * @author SunTao
  * @since 2022-09-20
@@ -20,7 +20,7 @@ public class DictVo extends BaseVo {
     private Long id;
 
     /**
-     * ID
+     * PID
      */
     private Long pid;
 
@@ -45,12 +45,12 @@ public class DictVo extends BaseVo {
     private String desc;
 
     /**
-     * 类型，1：组；2：项
+     * 字典类型，1：组；2：项
      */
     private Integer type;
 
     /**
-     * 排序
+     * 字典排序
      */
     private Integer sort;
 

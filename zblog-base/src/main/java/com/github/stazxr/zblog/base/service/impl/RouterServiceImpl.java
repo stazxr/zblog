@@ -290,6 +290,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteBlackOrWhiteRouter(Long dictId) {
+        Assert.notNull(dictId, "参数【dictId】不能为空");
         Dict dbDict = dictMapper.selectById(dictId);
         int i = dictMapper.deleteById(dictId);
         Assert.isTrue(i != 1, "删除失败");

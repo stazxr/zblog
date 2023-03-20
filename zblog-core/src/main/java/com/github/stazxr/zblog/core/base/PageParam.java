@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * PageParam
@@ -31,16 +30,10 @@ public class PageParam implements Serializable {
     @ApiModelProperty(name = "pageSize", value = "每页显示的数目", example = "10")
     private Integer pageSize;
 
-    /**
-     * 以下列格式排序标准：property[,asc | desc]。
-     * 默认排序顺序为升序。支持多种排序条件：
-     * 如：id,asc
-     */
-    @ApiModelProperty(name = "sort", value = "排序", notes = "以下列格式排序标准：property[,asc | desc]", example = "id,asc")
-    private List<String> sort;
-
+    @ApiModelProperty(hidden = true)
     private Integer defaultPage = 1;
 
+    @ApiModelProperty(hidden = true)
     private Integer defaultPageSize = 10;
 
     public void checkPage() {

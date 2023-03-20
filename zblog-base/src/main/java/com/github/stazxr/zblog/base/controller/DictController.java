@@ -3,11 +3,16 @@ package com.github.stazxr.zblog.base.controller;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.service.DictService;
+import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dict")
+@Api(value = "DictController", tags = { "字典控制器" })
 public class DictController {
     private final DictService dictService;
 
@@ -32,6 +38,8 @@ public class DictController {
      * @return dictList
      */
     @GetMapping(value = "/pageList")
+    @ApiOperation(value = "分页查询字典列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询字典列表", code = "queryDictListByPage")
     public Result queryDictListByPage(DictQueryDto queryDto) {
         return Result.success().data(dictService.queryDictListByPage(queryDto));
@@ -44,6 +52,8 @@ public class DictController {
      * @return dictList
      */
     @GetMapping(value = "/queryChildList")
+    @ApiOperation(value = "查询字典子列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询字典子列表", code = "queryDictChildList", level = BaseConst.PermLevel.PUBLIC)
     public Result queryChildList(@RequestParam Long pid) {
         return Result.success().data(dictService.queryChildList(pid));
@@ -55,22 +65,11 @@ public class DictController {
      * @param dictId 字典序列
      * @return DictVo
      */
-    @Log
     @GetMapping(value = "/queryDictDetail")
-    @Router(name = "查询字典详情", code = "queryDictDetail")
+    @ApiOperation(value = "查询字典详情")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询字典详情", code = "queryDictDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryDictDetail(@RequestParam Long dictId) {
-        return Result.success().data(dictService.queryDictDetail(dictId));
-    }
-
-    /**
-     * 查询字典信息
-     *
-     * @param dictId 字典序列
-     * @return DictVo
-     */
-    @GetMapping(value = "/queryDictInfo")
-    @Router(name = "查询字典信息", code = "queryDictInfo", level = BaseConst.PermLevel.PUBLIC)
-    public Result queryDictInfo(@RequestParam Long dictId) {
         return Result.success().data(dictService.queryDictDetail(dictId));
     }
 
@@ -82,6 +81,8 @@ public class DictController {
      */
     @Log
     @PostMapping(value = "/addDict")
+    @ApiOperation(value = "新增字典")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "新增字典", code = "addDict")
     public Result addDict(@RequestBody DictDto dictDto) {
         dictService.addDict(dictDto);
@@ -96,6 +97,8 @@ public class DictController {
      */
     @Log
     @PostMapping(value = "/editDict")
+    @ApiOperation(value = "编辑字典")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "编辑字典", code = "editDict")
     public Result editDict(@RequestBody DictDto dictDto) {
         dictService.editDict(dictDto);
@@ -110,6 +113,11 @@ public class DictController {
      */
     @Log
     @PostMapping(value = "/deleteDict")
+    @ApiOperation(value = "删除字典")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "dictId", value = "(Long) 字典id", required = true)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除字典", code = "deleteDict")
     public Result deleteDict(@RequestPostSingleParam Long dictId) {
         dictService.deleteDict(dictId);

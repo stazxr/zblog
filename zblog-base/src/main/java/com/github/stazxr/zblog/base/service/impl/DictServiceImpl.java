@@ -11,7 +11,7 @@ import com.github.stazxr.zblog.base.domain.enums.DictType;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.core.exception.ServiceException;
+import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -129,14 +129,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     @Transactional(rollbackFor = Exception.class)
     public void deleteDict(Long dictId) {
         DictVo dictVo = queryDictDetail(dictId);
-        if (dictVo.getLocked()) {
-            throw new ServiceException("该字典被锁定，不允许删除");
-        }
-
-        if (dictVo.getHasChildren()) {
-            throw new ServiceException("存在子节点，无法被删除");
-        }
-
+        DataValidated.isTrue(dictVo.getLocked(), "该字典被锁定，不允许删除");
+        DataValidated.isTrue(dictVo.getHasChildren(), "该字典存在子节点，无法被删除");
         Assert.isTrue(dictMapper.deleteById(dictId) != 1, "删除失败");
     }
 
@@ -153,6 +147,12 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     }
 
     private void checkDict(Dict dict) {
+        if (dict.getId() != null) {
+            Dict dbDict = dictMapper.selectById(dict.getId());
+            Assert.notNull(dbDict, "字典【" + dict.getId() + "】不存在");
+            DataValidated.isTrue(dbDict.getLocked(), "该字典被锁定，不允许编辑");
+        }
+
         dict.setLocked(Boolean.FALSE);
         Assert.isTrue(StringUtils.isBlank(dict.getName()), "字典名称不能为空");
         Assert.notNull(dict.getSort(), "字典排序不能为空");
@@ -167,13 +167,6 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             Assert.notNull(dict.getPid(), "父字典不能为空");
             Assert.isTrue(StringUtils.isBlank(dict.getKey()), "字典KEY不能为空");
             Assert.notNull(dict.getEnabled(), "字典状态不能为空");
-        }
-
-        if (dict.getId() != null) {
-            Dict dbDict = dictMapper.selectById(dict.getId());
-            if (dbDict.getLocked()) {
-                throw new ServiceException("该字典被锁定，不允许编辑");
-            }
         }
     }
 }

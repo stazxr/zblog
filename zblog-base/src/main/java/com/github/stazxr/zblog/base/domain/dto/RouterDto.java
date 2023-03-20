@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -9,19 +11,23 @@ import lombok.Data;
  * @since 2022-09-20
  */
 @Data
+@ApiModel
 public class RouterDto {
     /**
      * 请求地址
      */
+    @ApiModelProperty(value = "请求地址", required = true)
     private String uri;
 
     /**
      * 请求方式
      */
+    @ApiModelProperty(value = "请求方式", required = true)
     private String method;
 
     /**
      * 日志是否展示
      */
+    @ApiModelProperty(value = "日志是否展示", required = true)
     private Boolean logShowed;
 }
