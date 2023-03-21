@@ -4,14 +4,11 @@ import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.service.DictService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,12 +111,9 @@ public class DictController {
     @Log
     @PostMapping(value = "/deleteDict")
     @ApiOperation(value = "删除字典")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "dictId", value = "(Long) 字典id", required = true)
-    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除字典", code = "deleteDict")
-    public Result deleteDict(@RequestPostSingleParam Long dictId) {
+    public Result deleteDict(@RequestParam Long dictId) {
         dictService.deleteDict(dictId);
         return Result.success();
     }
