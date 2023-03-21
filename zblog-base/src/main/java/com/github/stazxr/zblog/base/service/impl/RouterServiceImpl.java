@@ -48,16 +48,6 @@ import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 @Service
 @RequiredArgsConstructor
 public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> implements RouterService {
-    private static final Set<String> ROLE_OPEN_SET = new HashSet<String>() {{add(OPEN);}};
-
-    private static final Set<String> ROLE_PUBLIC_SET = new HashSet<String>() {{add(PUBLIC);}};
-
-    private static final Set<String> ROLE_FORBIDDEN_SET = new HashSet<String>() {{add(FORBIDDEN);}};
-
-    private static final Set<String> ROLE_NULL_SET = new HashSet<String>() {{add(NULL);}};
-
-    private static final Set<String> ROLE_NONE_SET = new HashSet<String>() {{add(NONE);}};
-
     private final RouterMapper routerMapper;
 
     private final InterfaceMapper interfaceMapper;
@@ -145,21 +135,23 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         // 获取访问接口访问级别，返回允许访问的角色集合,这里的目的只是为了减少查询库的次数
         int level = calculateInterfaceLevel(requestUri, requestMethod);
         if (BaseConst.PermLevel.OPEN == level) {
-            return ROLE_OPEN_SET;
+            return new HashSet<String>() {{add(OPEN);}};
         } else if (BaseConst.PermLevel.PUBLIC == level) {
-            return ROLE_PUBLIC_SET;
+            return new HashSet<String>() {{add(PUBLIC);}};
         } else if (BaseConst.PermLevelExtend.FORBIDDEN == level) {
-            return ROLE_FORBIDDEN_SET;
+            return new HashSet<String>() {{add(FORBIDDEN);}};
         } else if (BaseConst.PermLevelExtend.NULL == level) {
-            return ROLE_NULL_SET;
+            return new HashSet<String>() {{add(NULL);}};
         } else {
             // 接口访问级别为BaseConst.PermLevel.PERM，需要查询允许访问该接口的角色列表
             requestUri = requestUri.contains(Constants.URL_SPLIT_LABEL) ? requestUri.substring(0, requestUri.indexOf("?")) : requestUri;
             List<Role> roles = roleMapper.selectRolesByUriAndMethod(requestUri, requestMethod.toUpperCase(Locale.ROOT));
             roles = roles.stream().filter(Role::getEnabled).collect(Collectors.toList());
             if (roles.isEmpty()) {
-                return ROLE_NONE_SET;
+                return new HashSet<String>() {{add(NONE);}};
             }
+
+            // 返回授权的角色列表
             Set<String> attributes = new HashSet<>();
             roles.forEach(role -> attributes.add(role.getRoleCode()));
             return attributes;
