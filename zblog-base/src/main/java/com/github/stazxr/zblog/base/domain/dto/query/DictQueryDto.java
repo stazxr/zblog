@@ -15,8 +15,8 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ApiModel
 @ToString
+@ApiModel("字典查询参数")
 public class DictQueryDto extends PageParam {
     /**
      * 字典名称

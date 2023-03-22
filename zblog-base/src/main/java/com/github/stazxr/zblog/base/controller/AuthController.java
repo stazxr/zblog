@@ -56,7 +56,7 @@ public class AuthController {
      * @return {img: %二维码的Base64编码%; uuid: %存储二维码的缓存主键%}
      */
     @GetMapping("/loginCode")
-    @ApiOperation(value = "获取登录验证码")
+    @ApiOperation(value = "获取登录验证码", notes = "不需要token")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取登录验证码", code = "loginCode", level = BaseConst.PermLevel.OPEN)
     public Result loginCode() {

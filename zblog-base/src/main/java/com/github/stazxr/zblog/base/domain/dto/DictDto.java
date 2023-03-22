@@ -11,7 +11,7 @@ import lombok.Data;
  * @since 2022-09-21
  */
 @Data
-@ApiModel
+@ApiModel("字典信息")
 public class DictDto {
     /**
      * 字典序列（黑白名单用）

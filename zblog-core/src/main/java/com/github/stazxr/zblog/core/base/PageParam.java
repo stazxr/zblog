@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@ApiModel
+@ApiModel("分页参数")
 public class PageParam implements Serializable {
     /**
      * 页码

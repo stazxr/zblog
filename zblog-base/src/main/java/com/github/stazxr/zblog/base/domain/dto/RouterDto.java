@@ -11,7 +11,7 @@ import lombok.Data;
  * @since 2022-09-20
  */
 @Data
-@ApiModel
+@ApiModel("路由日志状态变更参数")
 public class RouterDto {
     /**
      * 请求地址

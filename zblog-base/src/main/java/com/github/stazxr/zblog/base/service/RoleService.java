@@ -74,7 +74,7 @@ public interface RoleService extends IService<Role> {
     void authRole(RoleAuthDto authDto);
 
     /**
-     * 查询角色对应的权限序号列表
+     * 查询角色对应的权限列表
      *
      * @param roleId 角色序列
      * @return permIdList

@@ -31,7 +31,7 @@ public class HomeServiceImpl implements HomeService {
     /**
      * 根据图标名称获取对应的折现图标数据
      *
-     * @param type 图标名称
+     * @param type 图表类型
      * @return SingleLineChartDataVo
      */
     @Override

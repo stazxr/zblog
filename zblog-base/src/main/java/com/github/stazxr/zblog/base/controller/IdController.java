@@ -1,12 +1,17 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/id")
+@Api(value = "IdController", tags = { "ID控制器" })
 public class IdController {
     /**
      * 生成唯一ID
@@ -25,6 +31,8 @@ public class IdController {
      */
     @IgnoredLog
     @GetMapping("/getId")
+    @ApiOperation(value = "生成唯一序列")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "生成唯一序列", code = "getId", level = BaseConst.PermLevel.PUBLIC)
     public Result getId() {
         try {
@@ -37,11 +45,17 @@ public class IdController {
     /**
      * 生成ID列表
      *
+     * @param count 需要生成的序列数量
      * @return 唯一ID列表
      */
     @IgnoredLog
     @GetMapping("/getIds")
-    @Router(name = "生成序列列表", code = "getIds", level = BaseConst.PermLevel.PUBLIC)
+    @ApiOperation(value = "批量生成序列")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "count", value = "数量", required = true, dataTypeClass = Integer.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "批量生成序列", code = "getIds", level = BaseConst.PermLevel.PUBLIC)
     public Result getIds(@RequestParam("count") Integer count) {
         Integer tmpCount = count;
         if (tmpCount == null || tmpCount == 0) {

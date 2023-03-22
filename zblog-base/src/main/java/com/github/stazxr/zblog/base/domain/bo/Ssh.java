@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.domain.bo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,24 +15,29 @@ import java.io.Serializable;
  */
 @Data
 @AllArgsConstructor
+@ApiModel("节点 SSH 信息")
 public class Ssh implements Serializable {
     /**
-     * IP
+     * 节点ip
      */
+    @ApiModelProperty("节点ip")
     private String ip;
 
     /**
-     * 端口
+     * 节点端口
      */
+    @ApiModelProperty("节点端口")
     private Integer port;
 
     /**
-     * 登录用户
+     * ssh用户
      */
+    @ApiModelProperty("ssh用户")
     private String user;
 
     /**
-     * 登录密码
+     * ssh密码
      */
+    @ApiModelProperty("ssh密码")
     private String password;
 }

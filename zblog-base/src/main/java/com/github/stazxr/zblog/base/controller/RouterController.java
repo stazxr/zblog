@@ -6,7 +6,6 @@ import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
@@ -70,6 +69,9 @@ public class RouterController {
      */
     @GetMapping(value = "/queryRouterByCode")
     @ApiOperation("根据权限编码查询路由信息")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "code", value = "权限编码", required = true, dataTypeClass = String.class)
+    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "根据权限编码查询路由信息", code = "queryRouterByCode", level = BaseConst.PermLevel.PUBLIC)
     public Result queryRouterByCode(@RequestParam String code) {
@@ -152,11 +154,11 @@ public class RouterController {
     @PostMapping(value = "/deleteBlackOrWhiteRouter")
     @ApiOperation("删除黑白名单")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "dictId", value = "(Long) 字典id", required = true)
+        @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除黑白名单", code = "deleteBlackOrWhiteRouter")
-    public Result deleteBlackOrWhiteRouter(@RequestPostSingleParam Long dictId) {
+    public Result deleteBlackOrWhiteRouter(@RequestParam Long dictId) {
         routerService.deleteBlackOrWhiteRouter(dictId);
         return Result.success();
     }

@@ -168,6 +168,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
         List<Map<String, Object>> data = new ArrayList<>();
         for (LogVo logVo : dataList) {
             Map<String, Object> item = new LinkedHashMap<>();
+            item.put("日志序列", String.valueOf(logVo.getId()));
             item.put("日志类型", LogType.of(logVo.getLogType()));
             item.put("操作描述", logVo.getDescription());
             item.put("操作用户", logVo.getOperateUser());
@@ -175,7 +176,6 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
             item.put("请求来源", logVo.getAddress());
             item.put("浏览器", logVo.getBrowser());
             item.put("请求地址", logVo.getRequestUri().concat("_").concat(logVo.getRequestMethod()));
-            item.put("请求参数", logVo.getRequestParam());
             item.put("请求结果", LogType.ERROR.getValue() == logVo.getLogType() ? "系统错误" : logVo.isExecResult() ? "成功" : "失败");
             item.put("请求耗时", logVo.getCostTime());
             item.put("结果描述", logVo.getExecMessage());

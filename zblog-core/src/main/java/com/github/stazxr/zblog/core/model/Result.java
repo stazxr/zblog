@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
  * @since 2020-11-16
  */
 @Getter
-@ApiModel(value = "Result", description = "统一返回")
+@ApiModel("统一返回")
 public final class Result implements Serializable {
     /**
      * serialVersionUID

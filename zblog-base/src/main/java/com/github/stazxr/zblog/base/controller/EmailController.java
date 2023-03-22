@@ -15,6 +15,8 @@ import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.math.RandomUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,9 @@ public class EmailController {
      */
     @PostMapping("sendCode")
     @ApiOperation(value = "发送邮箱验证码")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "email", value = "邮箱地址", required = true, dataTypeClass = String.class)
+    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.OPEN)
     public Result sendCode(@RequestParam String email) {

@@ -158,7 +158,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     /**
-     * 查询角色对应的权限序号列表
+     * 查询角色对应的权限列表
      *
      * @param roleId 角色序列
      * @return permIdList

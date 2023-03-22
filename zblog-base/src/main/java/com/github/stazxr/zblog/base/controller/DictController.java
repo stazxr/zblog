@@ -9,6 +9,8 @@ import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,9 @@ public class DictController {
      */
     @GetMapping(value = "/queryChildList")
     @ApiOperation(value = "查询字典子列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "pid", value = "字典pid", required = true, dataTypeClass = Long.class)
+    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询字典子列表", code = "queryDictChildList", level = BaseConst.PermLevel.PUBLIC)
     public Result queryChildList(@RequestParam Long pid) {
@@ -64,6 +69,9 @@ public class DictController {
      */
     @GetMapping(value = "/queryDictDetail")
     @ApiOperation(value = "查询字典详情")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
+    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询字典详情", code = "queryDictDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryDictDetail(@RequestParam Long dictId) {
@@ -111,6 +119,9 @@ public class DictController {
     @Log
     @PostMapping(value = "/deleteDict")
     @ApiOperation(value = "删除字典")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
+    })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除字典", code = "deleteDict")
     public Result deleteDict(@RequestParam Long dictId) {

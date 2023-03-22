@@ -97,7 +97,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     /**
-     * 查询权限可访问的接口列表
+     * 查询权限对应的接口列表
      *
      * @param queryDto 查询参数
      * @return interfaceList
@@ -112,7 +112,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     /**
-     * 查询可以访问权限的角色列表
+     * 查询权限对应的角色列表
      *
      * @param queryDto 查询参数
      * @return roleList
@@ -127,7 +127,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     /**
-     * 查询权限的操作日志列表
+     * 查询权限对应的日志列表
      *
      * @param queryDto 查询参数
      * @return logList

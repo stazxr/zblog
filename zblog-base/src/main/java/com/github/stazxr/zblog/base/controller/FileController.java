@@ -8,7 +8,7 @@ import com.github.stazxr.zblog.base.component.file.model.FileUploadType;
 import com.github.stazxr.zblog.base.domain.dto.FileDeleteDto;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.service.FileService;
-import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
+import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
@@ -19,6 +19,10 @@ import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +40,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/file")
 @RequiredArgsConstructor
+@RequestMapping("/api/file")
+@Api(value = "FileController", tags = { "存储控制器" })
 public class FileController {
     private final FileService fileService;
 
@@ -48,6 +53,8 @@ public class FileController {
      * @return fileList
      */
     @GetMapping(value = "/queryFileListByPage")
+    @ApiOperation(value = "分页查询文件列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询文件列表", code = "queryFileListByPage")
     public Result queryFileListByPage(FileQueryDto queryDto) {
         return Result.success().data(fileService.queryFileListByPage(queryDto));
@@ -61,6 +68,8 @@ public class FileController {
      * @return FileUploadVo List
      */
     @PostMapping("/uploadFile")
+    @ApiOperation(value = "文件上传", notes = "只需要认证")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "文件上传", code = "uploadFile", level = BaseConst.PermLevel.PUBLIC)
     public Result uploadFile(@RequestPart(value = "files", required = false) MultipartFile[] files,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -102,8 +111,14 @@ public class FileController {
      * @return Result
      */
     @GetMapping("/downloadFile")
+    @ApiOperation(value = "下载文件", notes = "不需要token")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "fileId", value = "文件id", required = true, dataTypeClass = Long.class),
+        @ApiImplicitParam(name = "isDown", value = "是否强制下载", required = true, dataTypeClass = Boolean.class, example = "false")
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "下载文件", code = "downloadFile", level = BaseConst.PermLevel.OPEN)
-    public Result downloadFile(Long fileId, Boolean isDown, HttpServletResponse response) {
+    public Result downloadFile(@RequestParam Long fileId, Boolean isDown, HttpServletResponse response) {
         fileService.downloadFile(fileId, isDown, response);
         return Result.success("下载成功");
     }
@@ -115,6 +130,8 @@ public class FileController {
      * @return Result
      */
     @PostMapping("/deleteFile")
+    @ApiOperation(value = "删除文件", notes = "只需要认证")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除文件", code = "deleteFile", level = BaseConst.PermLevel.PUBLIC)
     public Result deleteFile(@RequestBody FileDeleteDto paramDto) {
         fileService.deleteFile(paramDto.getFileId(), paramDto.getBusinessId());
@@ -130,6 +147,11 @@ public class FileController {
      */
     @Log
     @PostMapping("/testUploadFile")
+    @ApiOperation(value = "测试文件上传")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "type", value = "上传方式，0：默认、1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "测试文件上传", code = "testUploadFile")
     public Result testUploadFile(@RequestPart(value = "file") MultipartFile file, @RequestParam Integer type) {
         Assert.notNull(type, "参数【type】不能为空".toLowerCase(Locale.ROOT));
@@ -157,7 +179,9 @@ public class FileController {
      */
     @Log
     @PostMapping("/testDeleteFile")
-    @Router(name = "测试文件删除", code = "testDeleteFile")
+    @ApiOperation(value = "测试文件批量删除")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "测试文件批量删除", code = "testDeleteFile")
     public Result testDeleteFile(@RequestBody List<Long> fileIds) {
         fileService.testDeleteFile(fileIds);
         return Result.success();
@@ -170,6 +194,11 @@ public class FileController {
      * @return Result
      */
     @GetMapping("/getConfigInfo")
+    @ApiOperation(value = "获取配置信息")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "storageType", value = "上传方式，1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取配置信息", code = "getStorageConfigInfo")
     public Result getConfigInfo(@RequestParam Integer storageType) {
         return Result.success().data(fileService.getConfigInfo(storageType));
@@ -183,6 +212,8 @@ public class FileController {
      */
     @Log
     @PostMapping("/setConfigInfo")
+    @ApiOperation(value = "保存配置信息")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "保存配置信息", code = "setStorageConfigInfo")
     public Result setConfigInfo(@RequestBody JSONObject param) {
         fileService.setConfigInfo(param);
@@ -195,6 +226,8 @@ public class FileController {
      * @return StorageType
      */
     @GetMapping("/getConfigStorageType")
+    @ApiOperation(value = "获取激活的存储类型")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取激活的存储类型", code = "getConfigStorageType")
     public Result getConfigStorageType() {
         return Result.success().data(fileService.getConfigStorageType());
@@ -208,8 +241,13 @@ public class FileController {
      */
     @Log
     @PostMapping("/activeStorageConfig")
+    @ApiOperation("激活存储配置")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "storageType", value = "上传方式，0：默认、1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "激活存储配置", code = "activeStorageConfig")
-    public Result activeStorageConfig(@RequestPostSingleParam Integer storageType) {
+    public Result activeStorageConfig(@RequestParam Integer storageType) {
         fileService.activeStorageConfig(storageType);
         return Result.success();
     }

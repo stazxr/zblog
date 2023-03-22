@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,38 +23,45 @@ import java.util.Objects;
 @Getter
 @Setter
 @TableName("role")
+@ApiModel("角色实体")
 public class Role extends BaseEntity implements GrantedAuthority {
     /**
-     * 主键
+     * 角色id
      */
     @TableId
+    @ApiModelProperty("角色id")
     private Long id;
 
     /**
      * 角色名称
      */
+    @ApiModelProperty("角色名称")
     private String roleName;
 
     /**
      * 角色编码
      */
+    @ApiModelProperty("角色编码")
     private String roleCode;
 
     /**
      * 角色描述
      */
     @TableField(value = "`DESC`")
+    @ApiModelProperty("角色描述")
     private String desc;
 
     /**
      * 角色状态
      */
+    @ApiModelProperty(value = "角色状态", example = "true")
     private Boolean enabled;
 
     /**
-     * 是否有效
+     * 是否删除
      */
     @TableLogic
+    @ApiModelProperty("是否删除")
     private Boolean deleted;
 
     /**
