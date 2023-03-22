@@ -378,6 +378,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Long loginId = SecurityUtils.getLoginId();
         DataValidated.isTrue(userId.equals(loginId), "自己无法删除自己");
 
+        // 管理员、测试用户不允许删除
+        DataValidated.isTrue(Constants.USER_ADMIN_ID.equals(userId), "无法删除管理员");
+        DataValidated.isTrue(Constants.USER_TEST_ID.equals(userId), "无法删除测试用户");
+
         User user = userMapper.selectById(userId);
         Assert.notNull(user, "查询用户信息失败，用户【" + userId + "】不存在");
         DataValidated.notNull(user.getBuildIn(), "用户【" + user.getUsername() + "】为内置用户，不允许删除");
