@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.domain.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,39 +15,47 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@ApiModel("类别信息")
 public class ArticleCategoryDto {
     /**
-     * 主键
+     * 类别id
      */
+    @ApiModelProperty("类别id")
     private Long id;
 
     /**
-     * 上级分类
+     * 类别pid
      */
+    @ApiModelProperty("类别pid")
     private Long pid;
 
     /**
-     * 分类名称
+     * 类别名称
      */
+    @ApiModelProperty("类别名称")
     private String name;
 
     /**
-     * 分类预览图
+     * 类别预览图
      */
+    @ApiModelProperty("类别预览图")
     private String imageUrl;
 
     /**
      * 分类描述
      */
+    @ApiModelProperty("分类描述")
     private String desc;
 
     /**
-     * 排序
+     * 分类排序
      */
+    @ApiModelProperty("分类排序")
     private Integer sort;
 
     /**
-     * 是否启用
+     * 分类状态
      */
+    @ApiModelProperty("分类状态")
     private Boolean enabled;
 }

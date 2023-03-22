@@ -727,7 +727,8 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public com.github.pagehelper.PageInfo<ArticleVo> queryArchiveList(Integer current) {
-        PageHelper.startPage(current, 10);
+        int page = current == null ? 1 : current;
+        PageHelper.startPage(page, 10);
         List<ArticleVo> articleVos = articleMapper.selectArchiveList();
         return new com.github.pagehelper.PageInfo<>(articleVos);
     }

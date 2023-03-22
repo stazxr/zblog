@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.domain.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,34 +15,41 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@ApiModel("友链信息")
 public class FriendLinkDto {
     /**
-     * 主键
+     * 友链id
      */
+    @ApiModelProperty("友链id")
     private Long id;
 
     /**
-     * 链接名称
+     * 友链名称
      */
+    @ApiModelProperty("友链名称")
     private String name;
 
     /**
-     * 头像地址
+     * 友链头像地址
      */
+    @ApiModelProperty("友链头像地址")
     private String headUrl;
 
     /**
-     * 链接地址
+     * 友链地址
      */
+    @ApiModelProperty("友链地址")
     private String linkUrl;
 
     /**
-     * 链接介绍
+     * 友链介绍
      */
+    @ApiModelProperty("友链介绍")
     private String linkRemark;
 
     /**
-     * 是否有效
+     * 友链状态
      */
+    @ApiModelProperty("友链状态")
     private Boolean valid;
 }

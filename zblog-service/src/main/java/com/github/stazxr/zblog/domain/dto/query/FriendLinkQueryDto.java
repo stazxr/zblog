@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.domain.dto.query;
 
 import com.github.stazxr.zblog.core.base.PageParam;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,14 +16,17 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@ApiModel("友链查询参数")
 public class FriendLinkQueryDto extends PageParam {
     /**
-     * 链接名称
+     * 友链名称
      */
+    @ApiModelProperty(value = "友链名称", notes = "模糊查询")
     private String name;
 
     /**
-     * 链接状态
+     * 友链状态
      */
+    @ApiModelProperty("友链状态")
     private Boolean valid;
 }

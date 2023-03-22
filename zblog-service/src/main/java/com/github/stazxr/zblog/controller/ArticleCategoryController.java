@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.controller;
 
-import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
+import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
@@ -8,6 +8,10 @@ import com.github.stazxr.zblog.domain.dto.ArticleCategoryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.service.ArticleCategoryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/categories")
+@Api(value = "ArticleCategoryController", tags = { "类别控制器" })
 public class ArticleCategoryController {
     private final ArticleCategoryService articleCategoryService;
 
@@ -32,6 +37,8 @@ public class ArticleCategoryController {
      * @return CategoryVoList
      */
     @GetMapping(value = "/treeList")
+    @ApiOperation(value = "查询类别列表（树）")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询类别列表（树）", code = "queryCategoryTreeList")
     public Result queryCategoryTreeList(ArticleCategoryQueryDto queryDto) {
         return Result.success().data(articleCategoryService.queryCategoryTreeList(queryDto));
@@ -44,6 +51,8 @@ public class ArticleCategoryController {
      * @return CategoryVoList
      */
     @GetMapping(value = "/queryFirstCategoryList")
+    @ApiOperation(value = "查询一级类别列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询一级类别列表", code = "queryFirstCategoryList", level = BaseConst.PermLevel.PUBLIC)
     public Result queryFirstCategoryList(ArticleCategoryQueryDto queryDto) {
         return Result.success().data(articleCategoryService.queryFirstCategoryList(queryDto));
@@ -56,8 +65,13 @@ public class ArticleCategoryController {
      * @return CategoryVo
      */
     @GetMapping(value = "/queryCategoryDetail")
+    @ApiOperation(value = "查询类别详情")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryId", value = "类别id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询类别详情", code = "queryCategoryDetail")
-    public Result queryCategoryDetail(Long categoryId) {
+    public Result queryCategoryDetail(@RequestParam Long categoryId) {
         return Result.success().data(articleCategoryService.queryCategoryDetail(categoryId));
     }
 
@@ -69,6 +83,8 @@ public class ArticleCategoryController {
      */
     @Log
     @PostMapping(value = "/addCategory")
+    @ApiOperation(value = "新增类别")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "新增类别", code = "addCategory")
     public Result addCategory(@RequestBody ArticleCategoryDto categoryDto) {
         articleCategoryService.addCategory(categoryDto);
@@ -83,6 +99,8 @@ public class ArticleCategoryController {
      */
     @Log
     @PostMapping(value = "/editCategory")
+    @ApiOperation(value = "编辑类别")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "编辑类别", code = "editCategory")
     public Result editCategory(@RequestBody ArticleCategoryDto categoryDto) {
         articleCategoryService.editCategory(categoryDto);
@@ -97,8 +115,13 @@ public class ArticleCategoryController {
      */
     @Log
     @PostMapping(value = "/deleteCategory")
+    @ApiOperation(value = "删除类别")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryId", value = "类别id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "删除类别", code = "deleteCategory")
-    public Result deleteCategory(@RequestPostSingleParam Long categoryId) {
+    public Result deleteCategory(@RequestParam Long categoryId) {
         articleCategoryService.deleteCategory(categoryId);
         return Result.success();
     }
