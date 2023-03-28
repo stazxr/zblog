@@ -59,7 +59,7 @@ public class ExcelUtils {
         File file = new File(tempPath);
         BigExcelWriter writer = ExcelUtil.getBigWriter(file);
         writer.write(list, true);
-        SXSSFSheet sheet = (SXSSFSheet)writer.getSheet();
+        SXSSFSheet sheet = (SXSSFSheet) writer.getSheet();
         sheet.trackAllColumnsForAutoSizing();
         writer.autoSizeColumnAll();
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
