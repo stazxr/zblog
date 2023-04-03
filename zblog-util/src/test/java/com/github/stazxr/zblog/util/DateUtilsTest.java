@@ -5,6 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.github.stazxr.zblog.util.time.DateUtils.YMD_PATTERN;
@@ -200,5 +202,17 @@ public class DateUtilsTest {
         result.addAll(preList);
         result.addAll(sufList);
         System.out.println(result);
+    }
+
+    @Test
+    @Ignore
+    public void test13() throws ParseException {
+        LocalDate localDate = LocalDate.now();
+        System.out.println(localDate);
+        System.out.println(DateUtils.format(localDate));
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        System.out.println(localDateTime);
+        System.out.println(DateUtils.format(localDateTime));
     }
 }

@@ -193,6 +193,23 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
+     * 检查日期格式是否正确
+     *
+     * @param dateStr 日期
+     * @param pattern 日期格式
+     * @return boolean
+     */
+    public static boolean checkDatePattern(String dateStr, String pattern) {
+        try {
+            Date date = parseDate(dateStr, pattern);
+            Assert.notNull(date, "转换日期为空");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 格式话时间
      *
      * @param dateStr 日期
@@ -221,6 +238,52 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      */
     public static LocalDateTime parseLocalDateTimeFormat(String localDateTime, DateTimeFormatter dateTimeFormatter) {
         return LocalDateTime.from(dateTimeFormatter.parse(localDateTime));
+    }
+
+    /**
+     * 格式化 LocalDate 为字符串
+     *
+     * @param date    日期
+     * @return String 格式化后的日期
+     */
+    public static String format(LocalDate date) {
+        return format(date, YMD_PATTERN);
+    }
+
+    /**
+     * 格式化 LocalDate 为字符串
+     *
+     * @param date    日期
+     * @param pattern 格式
+     * @return String 格式化后的日期
+     */
+    public static String format(LocalDate date, String pattern) {
+        Assert.notNull(date, "待格式化日期不能为空");
+        String pattern2 = StringUtils.isEmpty(pattern) ? YMD_PATTERN : pattern;
+        return DateTimeFormatter.ofPattern(pattern2).format(date);
+    }
+
+    /**
+     * 格式化 LocalDateTime 为字符串
+     *
+     * @param date    日期
+     * @return String 格式化后的日期
+     */
+    public static String format(LocalDateTime date) {
+        return format(date, YMD_HMS_PATTERN);
+    }
+
+    /**
+     * 格式化 LocalDateTime 为字符串
+     *
+     * @param date    日期
+     * @param pattern 格式
+     * @return String 格式化后的日期
+     */
+    public static String format(LocalDateTime date, String pattern) {
+        Assert.notNull(date, "待格式化日期不能为空");
+        String pattern2 = StringUtils.isEmpty(pattern) ? YMD_HMS_PATTERN : pattern;
+        return DateTimeFormatter.ofPattern(pattern2).format(date);
     }
 
     /**

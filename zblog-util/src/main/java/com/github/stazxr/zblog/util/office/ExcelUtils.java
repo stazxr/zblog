@@ -9,6 +9,8 @@ import com.github.stazxr.zblog.util.UuidUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 import javax.servlet.ServletOutputStream;
@@ -46,6 +48,16 @@ public class ExcelUtils {
      */
     public static boolean isExcelFile(String filename) {
         return filename.endsWith(XLS) || filename.endsWith(XLSX);
+    }
+
+    /**
+     * 单元格是否为空
+     *
+     * @param cell 单元格
+     * @return boolean
+     */
+    public static boolean isCellBlank(Cell cell) {
+        return cell == null || cell.getCellType() == CellType.BLANK || cell.getCellType() == CellType._NONE;
     }
 
     /**
