@@ -17,6 +17,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import com.mashape.unirest.http.Unirest;
 
+/**
+ * 测试github贡献日历接口
+ *
+ * @author Thomas Sun
+ * @since 2022-02-27
+ */
 public class GitTest {
     private static final String BASE_URL = "https://api.github.com";
 

@@ -16,6 +16,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 测试 ChatGPT API
+ *
+ * @author Thomas Sun
+ * @since 2022-03-06
+ */
 public class Gpt3Test {
     @Test
     @Ignore

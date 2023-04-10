@@ -28,6 +28,7 @@
         <qiniu.version>7.9.5</qiniu.version>
         <sensitive-word.version>0.2.0</sensitive-word.version>
         <unirest.version>1.4.9</unirest.version>
+        <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
     <dependencies>
@@ -128,6 +129,12 @@
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
             <version>${unirest.version}</version>
+        </dependency>
+        <!-- jjwt -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
     </dependencies>
 </project>
