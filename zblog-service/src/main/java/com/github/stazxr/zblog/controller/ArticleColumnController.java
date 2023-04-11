@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 文章专栏管理
  *
@@ -31,16 +33,16 @@ public class ArticleColumnController {
     private final ArticleColumnService articleColumnService;
 
     /**
-     * 查询专栏列表
+     * 分页查询专栏列表
      *
      * @param queryDto 查询参数
      * @return ColumnVoList
      */
-    @GetMapping(value = "/pageList")
-    @ApiOperation(value = "查询专栏列表")
+    @GetMapping(value = "/pageColumnList")
+    @ApiOperation(value = "分页查询专栏列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询专栏列表", code = "queryColumnListByPage")
-    public Result queryColumnListByPage(ArticleColumnQueryDto queryDto) {
+    @Router(name = "分页查询专栏列表", code = "pageColumnList")
+    public Result pageColumnList(ArticleColumnQueryDto queryDto) {
         return Result.success().data(articleColumnService.queryColumnListByPage(queryDto));
     }
 
@@ -56,7 +58,7 @@ public class ArticleColumnController {
         @ApiImplicitParam(name = "columnId", value = "专栏id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询专栏详情", code = "queryColumnDetail")
+    @Router(name = "查询专栏详情", code = "queryColumnDetail", level = BaseConst.PermLevel.PUBLIC)
     public Result queryColumnDetail(@RequestParam Long columnId) {
         return Result.success().data(articleColumnService.queryColumnDetail(columnId));
     }
@@ -94,6 +96,22 @@ public class ArticleColumnController {
     }
 
     /**
+     * 配置专栏
+     *
+     * @param columnDto 专栏信息
+     * @return Result
+     */
+    @Log
+    @PostMapping(value = "/configColumn")
+    @ApiOperation(value = "配置专栏")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "配置专栏", code = "configColumn")
+    public Result configColumn(@RequestBody ArticleColumnDto columnDto) {
+        articleColumnService.configColumn(columnDto);
+        return Result.success();
+    }
+
+    /**
      * 删除专栏
      *
      * @param columnId 专栏id
@@ -110,5 +128,23 @@ public class ArticleColumnController {
     public Result deleteColumn(@RequestParam Long columnId) {
         articleColumnService.deleteColumn(columnId);
         return Result.success();
+    }
+
+    /**
+     * 查询非专栏对应的文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleVo
+     */
+    @PostMapping(value = "/queryArticleListNotColumn")
+    @ApiOperation(value = "查询非专栏对应的文章列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "articleTitle", value = "文章标题", dataTypeClass = String.class),
+        @ApiImplicitParam(name = "articleIds", value = "文章id列表（不包含的关系）", dataTypeClass = List.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "查询非专栏对应的文章列表", code = "queryArticleListNotColumn", level = BaseConst.PermLevel.PUBLIC)
+    public Result queryArticleListNotColumn(@RequestBody ArticleColumnQueryDto queryDto) {
+        return Result.success().data(articleColumnService.queryArticleListNotColumn(queryDto));
     }
 }

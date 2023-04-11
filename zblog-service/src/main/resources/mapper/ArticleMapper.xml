@@ -469,8 +469,8 @@
             a.CATEGORY_ID IN (
                 SELECT CATEGORY_ID FROM article WHERE ID = #{articleId}
             ) OR a.ID IN (
-                SELECT ARTICLE_ID FROM ARTICLE_TAG_RELATION WHERE TAG_ID IN (
-                    SELECT TAG_ID FROM ARTICLE_TAG_RELATION WHERE ARTICLE_ID = #{articleId}
+                SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID IN (
+                    SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID = #{articleId}
                 )
             )
         ) AND a.ID != #{articleId}

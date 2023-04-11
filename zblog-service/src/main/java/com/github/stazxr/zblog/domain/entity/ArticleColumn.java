@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 文章栏目
+ * 文章专栏
  *
  * @author SunTao
  * @since 2022-05-31
@@ -24,18 +24,18 @@ public class ArticleColumn extends BaseEntity {
     private Long id;
 
     /**
-     * 栏目名称
+     * 专栏名称
      */
     @TableField(value = "`NAME`")
     private String name;
 
     /**
-     * 栏目预览图
+     * 专栏预览图
      */
     private String imageUrl;
 
     /**
-     * 栏目描述
+     * 专栏描述
      */
     @TableField(value = "`DESC`")
     private String desc;
@@ -44,6 +44,11 @@ public class ArticleColumn extends BaseEntity {
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 是否首页展示
+     */
+    private Boolean pageShow;
 
     /**
      * 是否启用

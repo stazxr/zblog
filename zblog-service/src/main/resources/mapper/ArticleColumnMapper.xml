@@ -3,23 +3,32 @@
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnMapper">
     <select id="selectColumnList" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnVo">
         SELECT
-            ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
-        FROM article_column
+            ID, `NAME`, `DESC`, PAGE_SHOW, SORT, ENABLED, CREATE_USER, CREATE_TIME,
+            (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+                SELECT atr.ARTICLE_ID FROM article_column_relation atr WHERE atr.COLUMN_ID = ac.ID
+            )) ARTICLE_COUNT
+        FROM article_column ac
         <where>
             <if test="name != null and name != ''">
                 <bind name="nameBind" value="'%' + name + '%'"/>
-                NAME LIKE #{nameBind}
+                `NAME` LIKE #{nameBind}
+            </if>
+            <if test="pageShow != null">
+                PAGE_SHOW = #{pageShow}
             </if>
             <if test="enabled != null">
                 ENABLED = #{enabled}
             </if>
         </where>
-        ORDER BY SORT, NAME
+        ORDER BY SORT, `NAME`
     </select>
 
     <select id="selectColumnDetail" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnVo">
         SELECT
-            ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
+            ID, `NAME`, IMAGE_URL, `DESC`, SORT, PAGE_SHOW, ENABLED, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+            (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+                SELECT atr.ARTICLE_ID FROM article_column_relation atr WHERE atr.COLUMN_ID = #{columnId}
+            )) ARTICLE_COUNT
         FROM article_column
         WHERE ID = #{columnId}
     </select>
@@ -29,5 +38,23 @@
             ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
         FROM article_column
         WHERE NAME = #{name}
+    </select>
+
+    <select id="selectArticleListNotColumn" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        SELECT
+            ID, TITLE
+        FROM article
+        WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
+        <if test="articleTitle != null and articleTitle != ''">
+            <bind name="articleTitleBind" value="'%' + articleTitle + '%'"/>
+            AND `TITLE` LIKE #{articleTitleBind}
+        </if>
+        <if test="articleIds != null and articleIds.size() > 0">
+            AND ID NOT IN
+            <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">
+                #{articleId}
+            </foreach>
+        </if>
+        LIMIT 20
     </select>
 </mapper>

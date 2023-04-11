@@ -4,6 +4,8 @@ import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * ArticleColumnVo
  *
@@ -19,17 +21,17 @@ public class ArticleColumnVo extends BaseVo {
     private Long id;
 
     /**
-     * 栏目名称
+     * 专栏名称
      */
     private String name;
 
     /**
-     * 栏目预览图
+     * 专栏预览图
      */
     private String imageUrl;
 
     /**
-     * 栏目描述
+     * 专栏描述
      */
     private String desc;
 
@@ -39,7 +41,22 @@ public class ArticleColumnVo extends BaseVo {
     private Integer sort;
 
     /**
+     * 是否首页显示
+     */
+    private Boolean pageShow;
+
+    /**
      * 是否启用
      */
     private Boolean enabled;
+
+    /**
+     * 文章数
+     */
+    private Integer articleCount;
+
+    /**
+     * 文章列表
+     */
+    List<ArticleColumnArticleVo> articles;
 }

@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
- * 栏目信息
+ * 专栏信息
  *
  * @author SunTao
  * @since 2022-11-24
@@ -48,8 +50,20 @@ public class ArticleColumnDto {
     private Integer sort;
 
     /**
+     * 是否首页展示
+     */
+    @ApiModelProperty("是否首页展示")
+    private Boolean pageShow;
+
+    /**
      * 专栏状态
      */
     @ApiModelProperty("专栏状态")
     private Boolean enabled;
+
+    /**
+     * 专栏文章列表
+     */
+    @ApiModelProperty("专栏文章列表")
+    private List<ArticleColumnArticleDto> articleList;
 }

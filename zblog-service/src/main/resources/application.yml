@@ -18,7 +18,7 @@ spring:
       max-active: 30
       # 超时时间（以秒数为单位）
       remove-abandoned-timeout: 180
-      max-wait: 3000
+      max-wait: 5000
       # 连接有效性检测时间
       time-between-eviction-runs-millis: 60000
       # 连接在池中最小生存的时间

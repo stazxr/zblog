@@ -29,7 +29,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) {
         if (webSocketMessage instanceof TextMessage) {
             String payload = ((TextMessage) webSocketMessage).getPayload();
-            log.info("【WebSSH】用户 {} 发送命令: {}", user(webSocketSession), payload);
+            log.debug("【WebSSH】用户 {} 发送命令: {}", user(webSocketSession), payload);
             webSshService.recvHandle(payload, webSocketSession);
         } else if (webSocketMessage instanceof BinaryMessage) {
             log.warn("【WebSSH】用户 {} 发送 BinaryMessage 命令，暂不支持处理", user(webSocketSession));

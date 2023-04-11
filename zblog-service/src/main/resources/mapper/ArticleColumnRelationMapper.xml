@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnRelationMapper">
+    <insert id="batchInsert">
+        INSERT INTO article_column_relation (ID, COLUMN_ID, ARTICLE_ID, ARTICLE_TITLE, SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE) VALUES
+        <foreach collection="articles" item="article" index="index" separator=",">
+            (#{article.id}, #{article.columnId}, #{article.articleId}, #{article.articleTitle}, #{article.sort}, 1, #{article.createUser}, #{article.createTime}, #{article.createDate})
+        </foreach>
+    </insert>
+
     <delete id="deleteByColumnId">
         DELETE FROM article_column_relation WHERE COLUMN_ID = #{columnId}
     </delete>
@@ -8,4 +15,26 @@
     <delete id="deleteByArticleId">
         DELETE FROM article_column_relation WHERE ARTICLE_ID = #{articleId}
     </delete>
+
+    <select id="selectArticleCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+            SELECT atr.ARTICLE_ID FROM article_column_relation atr WHERE atr.COLUMN_ID = #{columnId}
+        )
+    </select>
+
+    <select id="selectArticleList" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnArticleVo">
+        SELECT
+            acr.ARTICLE_ID, acr.ARTICLE_TITLE, acr.SORT, acr.CREATE_USER, acr.CREATE_TIME, acr.CREATE_DATE,
+            CASE
+                WHEN a.ID IS NULL THEN '文章不存在'
+                WHEN a.DELETED = 1 THEN '文章已被删除'
+                WHEN a.ARTICLE_STATUS != 5 THEN '文章未发布'
+                WHEN a.ARTICLE_PERM != 1 THEN '文章未公开'
+                ELSE ''
+            END AS ARTICLE_STATUS
+        FROM article_column_relation acr
+        LEFT JOIN article a ON a.ID = acr.ARTICLE_ID
+        WHERE acr.COLUMN_ID = #{columnId}
+        ORDER BY SORT
+    </select>
 </mapper>

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 文章栏目关系表
+ * 文章专栏关系表
  *
  * @author SunTao
  * @since 2022-05-31
@@ -24,18 +24,22 @@ public class ArticleColumnRelation extends BaseEntity {
     private Long id;
 
     /**
+     * 专栏序列
+     */
+    private Long columnId;
+
+    /**
      * 文章序列
      */
     private Long articleId;
 
     /**
-     * 栏目序列
+     * 文章标题
      */
-    private Long columnId;
+    private String articleTitle;
 
     /**
-     * 是否已删除（使用逻辑操作，保护数据），修改时采用硬删除
+     * 排序
      */
-    @TableLogic
-    private Boolean deleted;
+    private Integer sort;
 }

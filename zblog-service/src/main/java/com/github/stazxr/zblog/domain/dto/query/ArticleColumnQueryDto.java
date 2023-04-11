@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * 专栏查询参数
  *
@@ -25,8 +27,26 @@ public class ArticleColumnQueryDto extends PageParam {
     private String name;
 
     /**
+     * 是否首页展示
+     */
+    @ApiModelProperty("是否首页展示")
+    private Boolean pageShow;
+
+    /**
      * 专栏状态
      */
     @ApiModelProperty("专栏状态")
     private Boolean enabled;
+
+    /**
+     * 文章标题
+     */
+    @ApiModelProperty("文章标题")
+    private String articleTitle;
+
+    /**
+     * 文章id列表
+     */
+    @ApiModelProperty("文章id列表")
+    private List<Long> articleIds;
 }

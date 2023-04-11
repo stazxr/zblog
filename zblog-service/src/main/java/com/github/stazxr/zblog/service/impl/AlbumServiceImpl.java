@@ -129,6 +129,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
         Assert.isTrue(albumPhotoDto.getPhotoList().size() == 0, "请选择需要上传的照片");
 
         // 批量插入照片列表（暂不限制单次上传大小）
+        String loginUsername = SecurityUtils.getLoginUsername();
         List<AlbumPhoto> photos = new ArrayList<>();
         for (File file : albumPhotoDto.getPhotoList()) {
             AlbumPhoto albumPhoto = new AlbumPhoto();
@@ -138,7 +139,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
             albumPhoto.setPhotoName(file.getFilename());
             albumPhoto.setPhotoLink(file.getDownloadUrl());
             albumPhoto.setIsDeleted(false);
-            albumPhoto.setCreateUser(SecurityUtils.getLoginUsername());
+            albumPhoto.setCreateUser(loginUsername);
             albumPhoto.setCreateDate(DateUtils.formatDate());
             albumPhoto.setCreateTime(DateUtils.formatTime());
             photos.add(albumPhoto);
