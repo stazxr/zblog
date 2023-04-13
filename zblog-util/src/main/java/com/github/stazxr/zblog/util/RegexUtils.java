@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,25 @@ public class RegexUtils {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();
+    }
+
+    /**
+     * 正则查找符合条件的字符串列表
+     *
+     * @param str   正则查找的字符串
+     * @param regex 正则表达式
+     * @return 符合条件的字符串列表
+     */
+    public static List<String> findGroup(String str, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+
+        List<String> result = new ArrayList<>();
+        while (matcher.find()) {
+            result.add(matcher.group());
+        }
+
+        return result;
     }
 
     public static class Const {
