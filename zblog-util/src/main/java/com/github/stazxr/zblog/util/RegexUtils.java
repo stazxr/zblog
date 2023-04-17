@@ -59,7 +59,12 @@ public class RegexUtils {
 
     public static class Const {
         /**
-         * 邮箱正则表达式
+         * ${变量}正则表达式
+         */
+        public static final String DOLLAR_VARIATE_REGEX = "\\$\\{[^}]+\\}";
+
+        /**
+         * 用户名正则表达式
          */
         public static final String USERNAME_REGEX = "^[0-9A-Za-z]{4,20}$";
 
