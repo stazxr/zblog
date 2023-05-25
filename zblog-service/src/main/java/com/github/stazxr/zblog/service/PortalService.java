@@ -265,4 +265,12 @@ public interface PortalService {
      * @return PortalAlbumPhotoVo
      */
     PortalAlbumPhotoVo queryAlbumPhotoList(AlbumPhotoQueryDto queryDto);
+
+    /**
+     * 查询前台专栏列表
+     *
+     * @param current 页码
+     * @return ColumnList
+     */
+    PageInfo<ArticleColumnVo> queryColumnList(Integer current);
 }

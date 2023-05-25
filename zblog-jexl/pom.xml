@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.stazxr.zblog</groupId>
+		<artifactId>zblog-parent</artifactId>
+		<version>4.0.0</version>
+	</parent>
+
+	<artifactId>zblog-jexl</artifactId>
+	<packaging>jar</packaging>
+
+	<name>zblog-jexl</name>
+	<description>ZBLOG 框架的 JEXL 表达式组件</description>
+
+	<properties>
+		<jexl3.version>3.2.1</jexl3.version>
+	</properties>
+
+	<dependencies>
+		<!-- Zblog Util -->
+		<dependency>
+			<groupId>com.github.stazxr.zblog</groupId>
+			<artifactId>zblog-util</artifactId>
+			<version>${zblog.version}</version>
+		</dependency>
+		<!-- Jexl3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-jexl3</artifactId>
+			<version>${jexl3.version}</version>
+		</dependency>
+	</dependencies>
+</project>

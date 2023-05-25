@@ -2,7 +2,7 @@
 
 <p align=center>
   <a href="https://github.com/stazxr/zblog">
-    <img src="https://file.suntaoblog.com/image/github/header.png" alt="风丶宇的个人博客" style="border-radius: 50%">
+    <img src="https://file.suntaoblog.com/image/github/header.png" alt="孙涛的个人博客" style="border-radius: 50%">
   </a>
 </p>
 <p align=center>
@@ -23,7 +23,7 @@
    </a>
 </p>
 
-[在线地址](#在线地址) | [目录结构](#目录结构) | [项目特点](#项目特点) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [注意事项](#注意事项) | [交流群](#交流群) | [鸣谢](#鸣谢) | [项目截图](#项目截图)
+[在线地址](#在线地址) | [目录结构](#目录结构) | [项目特点](#项目特点) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [注意事项](#注意事项) | [更新日志](#更新日志) | [鸣谢](#鸣谢)
 
 ## 在线地址
 
@@ -192,36 +192,10 @@ zblog
 
 博客作为新手入门项目是十分不错的，项目所用的技术栈覆盖的也比较广，适合初学者学习。主要难点在于权限管理、第三方登录、websocket这块。做的不好的地方请大家见谅，有问题的或者有好的建议可以私聊联系我。
 
+## 更新日志
+
 ## 鸣谢
 
 - 感谢 [PanJiaChen](https://github.com/elunez/eladmin) 大佬提供的前端模板（后台）
 
 - 感谢 [风丶宇](https://github.com/X1192176811/blog) 大佬提供的前端模板（前台），仓库已下线
-
-## 交流群
-
-QQ：760210629
-
-## 项目截图
-
-![首页01](https://file.suntaoblog.com/image/github/page1.jpg)
-
-![首页02](https://file.suntaoblog.com/image/github/page2.jpg)
-
-![搜索](https://file.suntaoblog.com/image/github/page3.jpg)
-
-![专栏](https://file.suntaoblog.com/image/github/page4.jpg)
-
-![分类](https://file.suntaoblog.com/image/github/page5.jpg)
-
-![标签](https://file.suntaoblog.com/image/github/page6.jpg)
-
-![说说](https://file.suntaoblog.com/image/github/page7.jpg)
-
-![友链](https://file.suntaoblog.com/image/github/page8.jpg)
-
-![但幕墙](https://file.suntaoblog.com/image/github/page9.jpg)
-
-![文章-白天](https://file.suntaoblog.com/image/github/page10.jpg)
-
-![文章-黑夜](https://file.suntaoblog.com/image/github/page11.jpg)

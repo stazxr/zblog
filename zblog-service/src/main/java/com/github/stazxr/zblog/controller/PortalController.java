@@ -524,4 +524,21 @@ public class PortalController {
     public Result queryAlbumPhotoList(AlbumPhotoQueryDto queryDto) {
         return Result.success().data(portalService.queryAlbumPhotoList(queryDto));
     }
+
+    /**
+     * 查询前台专栏列表
+     *
+     * @param current 页码
+     * @return ColumnList
+     */
+    @GetMapping("/queryColumnList")
+    @ApiOperation(value = "查询前台专栏列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "current", value = "页码", required = true, dataTypeClass = Integer.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "查询前台专栏列表", code = "queryColumnList", level = BaseConst.PermLevel.OPEN)
+    public Result queryColumnList(@RequestParam Integer current) {
+        return Result.success().data(portalService.queryColumnList(current));
+    }
 }

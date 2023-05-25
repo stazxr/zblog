@@ -117,6 +117,8 @@ public class PortalServiceImpl implements PortalService {
 
     private final AlbumPhotoMapper albumPhotoMapper;
 
+    private final ArticleColumnMapper articleColumnMapper;
+
     private final ArticleSearchStrategyContext articleSearchStrategyContext;
 
     /**
@@ -683,6 +685,20 @@ public class PortalServiceImpl implements PortalService {
         albumPhotoVo.setList(photoVos);
 
         return albumPhotoVo;
+    }
+
+    /**
+     * 查询前台专栏列表
+     *
+     * @param current 页码
+     * @return ColumnList
+     */
+    @Override
+    public com.github.pagehelper.PageInfo<ArticleColumnVo> queryColumnList(Integer current) {
+        int page = current == null ? 1 : current;
+        PageHelper.startPage(page, 8);
+        List<ArticleColumnVo> articleVos = articleColumnMapper.selectWebColumnList();
+        return new com.github.pagehelper.PageInfo<>(articleVos);
     }
 
     /**

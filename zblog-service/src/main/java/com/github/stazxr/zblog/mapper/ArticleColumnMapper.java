@@ -48,4 +48,11 @@ public interface ArticleColumnMapper extends BaseMapper<ArticleColumn> {
      * @return ArticleVo
      */
     List<ArticleVo> selectArticleListNotColumn(ArticleColumnQueryDto queryDto);
+
+    /**
+     * 查询前台专栏列表
+     *
+     * @return ColumnList
+     */
+    List<ArticleColumnVo> selectWebColumnList();
 }

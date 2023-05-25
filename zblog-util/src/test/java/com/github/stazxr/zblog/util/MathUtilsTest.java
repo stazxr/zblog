@@ -46,5 +46,13 @@ public class MathUtilsTest {
         BigDecimal bigDecimal = new BigDecimal("0.0");
         System.out.println(BigDecimal.ZERO.equals(bigDecimal)); // false
         System.out.println(BigDecimal.ZERO.compareTo(bigDecimal)); // 0
+
+        BigDecimal bigDecimal2 = new BigDecimal("800");
+        System.out.println(bigDecimal2.setScale(4, RoundingMode.HALF_UP)); // 8E+2
+
+        BigDecimal var1 = new BigDecimal("1.5");
+        BigDecimal var2 = new BigDecimal("2");
+        String sort = var1.add(var2).divide(new BigDecimal("2.0"), 10, RoundingMode.HALF_UP).stripTrailingZeros().toString();
+        System.out.println(sort);
     }
 }

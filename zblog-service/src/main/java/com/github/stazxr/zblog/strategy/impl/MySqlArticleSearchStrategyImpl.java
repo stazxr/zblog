@@ -18,7 +18,7 @@ import static com.github.stazxr.zblog.util.YwConstants.PRE_TAG;
 /**
  * mysql搜索策略
  *
- * @author yezhiqiu
+ * @author yezhiqiu（原作者）
  * @date 2021/07/27
  */
 @Component("mySqlArticleSearchStrategyImpl")
