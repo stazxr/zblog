@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.jexl.function;
 
 import com.github.stazxr.zblog.jexl.util.ExpressionUtils;
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
  * @since 2022-05-23
  */
 public class ListHandle {
+    private static final int MAX_EXTEND = 6;
+
     private final static ThreadLocal<Map<String, Object>> KEYS = new ThreadLocal<>();
 
     private final static ThreadLocal<List<Map<String, Object>>> ORIGIN_DATA = new ThreadLocal<>();
@@ -47,6 +50,81 @@ public class ListHandle {
         RANK_KEYS.remove();
     }
 
+    /**
+     * 求最大值
+     *
+     * @param fieldName 字段名称
+     * @return BigDecimal
+     */
+    public static BigDecimal max(String fieldName) {
+        Object result = getDataFromLocal("MAX", fieldName);
+        if (result != null) {
+            return new BigDecimal(result.toString());
+        } else {
+            List<Map<String, Object>> mapList = ORIGIN_DATA.get();
+            Optional<Map<String, Object>> max = mapList.stream().max(Comparator.comparing((data) -> getBigDecimal(fieldName, data)));
+            if (max.isPresent()) {
+                Map<String, Object> maxObject = max.get();
+                Object maxResult = getResult(fieldName, maxObject);
+                if (maxResult != null) {
+                    setDataFromLocal("MAX", fieldName, maxResult);
+                    return new BigDecimal(maxResult.toString());
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * 求最小值
+     *
+     * @param fieldName 字段名称
+     * @return BigDecimal
+     */
+    public static BigDecimal min(String fieldName) {
+        Object result = getDataFromLocal("MIN", fieldName);
+        if (result != null) {
+            return new BigDecimal(result.toString());
+        } else {
+            List<Map<String, Object>> mapList = ORIGIN_DATA.get();
+            Optional<Map<String, Object>> min = mapList.stream().min(Comparator.comparing((data) -> getBigDecimal(fieldName, data)));
+            if (min.isPresent()) {
+                Map<String, Object> minObject = min.get();
+                Object minResult = getResult(fieldName, minObject);
+                if (minResult != null) {
+                    setDataFromLocal("MIN", fieldName, minResult);
+                    return new BigDecimal(minResult.toString());
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * 计数,参与统计的数据数
+     *
+     * @param fieldName 字段名称
+     * @return BigDecimal
+     */
+    public static BigDecimal count(String fieldName) {
+        Object result = getDataFromLocal("COUNT", fieldName);
+        if (null != result) {
+            return new BigDecimal(result.toString());
+        } else {
+            BigDecimal countResult = new BigDecimal((ORIGIN_DATA.get()).size());
+            setDataFromLocal("COUNT", fieldName, countResult);
+            return countResult;
+        }
+    }
+
+    /**
+     * 求和
+     *
+     * @param fieldName 字段名称
+     * @return BigDecimal
+     */
     public static BigDecimal sum(String fieldName) {
         Object result = getDataFromLocal("SUM", fieldName);
         if (result != null) {
@@ -59,48 +137,12 @@ public class ListHandle {
         }
     }
 
-    public static BigDecimal min(String fieldName) {
-        Object result = getDataFromLocal("MIN", fieldName);
-        if (result != null) {
-            return new BigDecimal(result.toString());
-        } else {
-            List<Map<String, Object>> mapList = ORIGIN_DATA.get();
-            Optional<Map<String, Object>> min = mapList.stream().min(Comparator.comparing((data) -> getBigDecimal(fieldName, data)));
-            if (min.isPresent()) {
-                Map<String, Object> minObject = min.get();
-                Object minResult = getResult(fieldName, minObject);
-                setDataFromLocal("MIN", fieldName, minResult);
-                return new BigDecimal(minResult.toString());
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public static BigDecimal max(String fieldName) {
-        Object result = getDataFromLocal("MAX", fieldName);
-        if (null != result) {
-            return new BigDecimal(result.toString());
-        } else {
-            List<Map<String, Object>> mapList = ORIGIN_DATA.get();
-            Map<String, Object> maxObject = mapList.stream().max(Comparator.comparing((data) -> getBigDecimal(fieldName, data))).get();
-            Object maxResult = getResult(fieldName, maxObject);
-            setDataFromLocal("MAX", fieldName, maxResult);
-            return new BigDecimal(maxResult.toString());
-        }
-    }
-
-    public static BigDecimal count(String fieldName) {
-        Object result = getDataFromLocal("COUNT", fieldName);
-        if (null != result) {
-            return new BigDecimal(result.toString());
-        } else {
-            BigDecimal countResult = new BigDecimal((ORIGIN_DATA.get()).size());
-            setDataFromLocal("COUNT", fieldName, countResult);
-            return countResult;
-        }
-    }
-
+    /**
+     * 求平均数
+     *
+     * @param fieldName 字段名称
+     * @return BigDecimal
+     */
     public static BigDecimal avg(String fieldName) {
         Object result = getDataFromLocal("AVG", fieldName);
         if (null != result) {
@@ -108,22 +150,33 @@ public class ListHandle {
         } else {
             List<Map<String, Object>> mapList = ORIGIN_DATA.get();
             double sum = mapList.stream().mapToDouble((data) -> getDouble(fieldName, data)).sum();
-            BigDecimal avgResult = new BigDecimal(sum / (double)mapList.size());
+            BigDecimal avgResult = new BigDecimal(sum / (double) mapList.size());
             setDataFromLocal("AVG", fieldName, avgResult);
             return avgResult;
         }
     }
 
+    /**
+     * 取排名为 number 的值
+     *
+     * @param fieldName 字段名称
+     * @param number    排名
+     * @return BigDecimal
+     */
     public static BigDecimal rank(String fieldName, String number) {
-        Object result = getDataFromLocal("RANKASC", fieldName);
+        Object result = getDataFromLocal("RANK", fieldName);
         if (null != result) {
             return new BigDecimal(result.toString());
         } else {
             List<Map<String, Object>> mapList = ORIGIN_DATA.get();
             List<Map<String, Object>> newMapList = mapList.stream().sorted(Comparator.comparing((data) -> getBigDecimal(fieldName, data))).collect(Collectors.toList());
             Object rankAscResult = getResult(fieldName, newMapList.get(Integer.parseInt(number) - 1));
-            setDataFromLocal("RANKASC", fieldName, rankAscResult);
-            return new BigDecimal(rankAscResult.toString());
+            if (rankAscResult != null) {
+                setDataFromLocal("RANK", fieldName, rankAscResult);
+                return new BigDecimal(rankAscResult.toString());
+            }
+
+            return null;
         }
     }
 
@@ -135,37 +188,12 @@ public class ListHandle {
     private static void setDataFromLocal(String funcName, String fieldName, Object result) {
         Map<String, Object> keysMap = KEYS.get();
         if (keysMap == null) {
-            keysMap = new HashMap<>();
+            keysMap = new HashMap<>(CollectionUtils.mapSize(MAX_EXTEND));
         }
 
         keysMap.put(funcName + "_" + fieldName, result);
         KEYS.set(keysMap);
     }
-
-
-
-
-
-
-
-
-
-    public static BigDecimal rankDesc(String fieldName, String number) {
-        // Object result = getDataFromLocal("RANKDESC", fieldName);
-        // if (null != result) {
-        //     return new BigDecimal(result.toString());
-        // } else {
-        //     List<Map<String, Object>> mapList = originData.get();
-        //     List<Map<String, Object>> newMapList = mapList.stream().sorted(Comparator.comparing((data) -> getBigDecimal(fieldName, data)).reversed()).collect(Collectors.toList());
-        //     Object rankDescResult = getResult(fieldName, newMapList.get(Integer.parseInt(number) - 1));
-        //     setDataFromLocal("RANKDESC", fieldName, rankDescResult);
-        //     return new BigDecimal(rankDescResult.toString());
-        // }
-
-        return null;
-    }
-
-
 
     private static BigDecimal getNumeric(Object number) {
         try {
@@ -179,10 +207,14 @@ public class ListHandle {
         String pattern = "^[a-zA-Z\\d_\\u4e00-\\u9fa5]+$";
         if (!Pattern.matches(pattern, fieldName)) {
             String expression = "(" + fieldName + ")";
-            ExpressionUtils.executeExpression(expression, data);
-            return new BigDecimal(data.get("result").toString());
+            String value = ExpressionUtils.executeExpression(expression, data);
+            return new BigDecimal(value);
         } else {
-            return new BigDecimal(data.get(fieldName).toString());
+            if (data.containsKey(fieldName)) {
+                return new BigDecimal(data.get(fieldName).toString());
+            } else {
+                return BigDecimal.ZERO;
+            }
         }
     }
 
@@ -190,10 +222,14 @@ public class ListHandle {
         String pattern = "^[a-zA-Z\\d_\\u4e00-\\u9fa5]+$";
         if (!Pattern.matches(pattern, fieldName)) {
             String expression = "(" + fieldName + ")";
-            ExpressionUtils.executeExpression(expression, data);
-            return Double.parseDouble(data.get("result").toString());
+            String value = ExpressionUtils.executeExpression(expression, data);
+            return Double.parseDouble(value);
         } else {
-            return Double.parseDouble(data.get(fieldName).toString());
+            if (data.containsKey(fieldName)) {
+                return Double.parseDouble(data.get(fieldName).toString());
+            } else {
+                return Double.parseDouble("0");
+            }
         }
     }
 

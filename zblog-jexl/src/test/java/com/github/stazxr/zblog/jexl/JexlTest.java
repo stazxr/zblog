@@ -5,7 +5,6 @@ import com.github.stazxr.zblog.jexl.util.ExpressionUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +20,15 @@ import java.util.Map;
 public class JexlTest {
     @Test
     public void test1() {
-        String script = "工程费*(工程费占比/100)";
+        String script = "工程费/工程费占比";
         Map<String, Object> data = new HashMap<>();
-        data.put("工程费", 99999);
-        data.put("工程费占比", 9.1);
+        data.put("工程费", 3);
+        data.put("工程费占比", 2);
         long begin = System.currentTimeMillis();
-        ExpressionUtils.executeScript(script, data);
+        String result = ExpressionUtils.executeExpression(script, data);
         long end = System.currentTimeMillis();
         System.out.println("耗费时长" + (end - begin) + "毫秒");
-        System.out.println(data.get("result"));
+        System.out.println(result);
     }
 
     @Test
@@ -37,10 +36,10 @@ public class JexlTest {
         String script = "91/2.0";
         Map<String, Object> data = new HashMap<>();
         long begin = System.currentTimeMillis();
-        ExpressionUtils.executeExpression(script, data);
+        String result = ExpressionUtils.executeExpression(script, data);
         long end = System.currentTimeMillis();
         System.out.println("耗费时长" + (end - begin) + "毫秒");
-        System.out.println(data.get("result"));
+        System.out.println(result);
     }
 
     @Test
@@ -57,10 +56,10 @@ public class JexlTest {
         Map<String, Object> data = new HashMap<>();
         data.put("工程费含税", "100000");
         long begin = System.currentTimeMillis();
-        ExpressionUtils.executeScript(script, data);
+        String result = ExpressionUtils.executeScript(script, data);
         long end = System.currentTimeMillis();
         System.out.println("耗费时长" + (end - begin) + "毫秒");
-        System.out.println(data.get("result"));
+        System.out.println(result);
     }
 
     @Test
@@ -157,25 +156,102 @@ public class JexlTest {
     }
 
     @Test
-    public void test12() {
-        List<Map<String, Object>> dataList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("姓名", "张三");
-            dataMap.put("性别", "男");
-            dataMap.put("数学成绩", 90);
-            dataMap.put("物理成绩", 93);
-            dataMap.put("化学成绩", 78);
-            dataMap.put("体育成绩", 65.599);
-            dataMap.put("成绩系数", 0.58);
-            dataList.add(dataMap);
-        }
-
-        String script = "return List.max('数学成绩')";
+    public void test11_2() {
+        String script = "return 3/2";
         long begin = System.currentTimeMillis();
-        ExpressionUtils.executeScript(script, dataList);
+        Object result = ExpressionUtils.executeScript(script);
         long end = System.currentTimeMillis();
         System.out.println("耗费时长" + (end - begin) + "毫秒");
-        System.out.println(dataList.get(0).get("result"));
+        System.out.println(result);
+    }
+
+    @Test
+    public void test11_3() {
+        String script = "3.0/2";
+        long begin = System.currentTimeMillis();
+        Object result = ExpressionUtils.executeExpression(script);
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时长" + (end - begin) + "毫秒");
+        System.out.println(result);
+    }
+
+    @Test
+    public void test12() {
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("姓名", "张三");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 90);
+        dataMap.put("物理成绩", 93);
+        dataMap.put("化学成绩", 78);
+        dataMap.put("体育成绩", 62);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        dataMap = new HashMap<>();
+        dataMap.put("姓名", "李四");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 91);
+        dataMap.put("物理成绩", 94);
+        dataMap.put("化学成绩", 76);
+        dataMap.put("体育成绩", 63);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        dataMap = new HashMap<>();
+        dataMap.put("姓名", "小二");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 96);
+        dataMap.put("物理成绩", 54);
+        dataMap.put("化学成绩", 76);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        String script = "return List.sum('体育成绩')";
+        long begin = System.currentTimeMillis();
+        String result = ExpressionUtils.executeScript(script, dataList);
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时长" + (end - begin) + "毫秒");
+        System.out.println(result);
+    }
+
+    @Test
+    public void test13() {
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("姓名", "张三");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 90);
+        dataMap.put("物理成绩", 93);
+        dataMap.put("化学成绩", 78);
+        dataMap.put("体育成绩", 62);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        dataMap = new HashMap<>();
+        dataMap.put("姓名", "李四");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 91);
+        dataMap.put("物理成绩", 94);
+        dataMap.put("化学成绩", 76);
+        dataMap.put("体育成绩", 63);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        dataMap = new HashMap<>();
+        dataMap.put("姓名", "小二");
+        dataMap.put("性别", "男");
+        dataMap.put("数学成绩", 99);
+        dataMap.put("物理成绩", 54);
+        dataMap.put("化学成绩", 76);
+        dataMap.put("成绩系数", 0.58);
+        dataList.add(dataMap);
+
+        String script = "return Arithmetic.round(List.avg('体育成绩'), 2)";
+        long begin = System.currentTimeMillis();
+        String result = ExpressionUtils.executeScript(script, dataList);
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时长" + (end - begin) + "毫秒");
+        System.out.println(result);
     }
 }

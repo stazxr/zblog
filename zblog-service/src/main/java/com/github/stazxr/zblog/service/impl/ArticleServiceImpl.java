@@ -629,7 +629,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Set<Long> tagIds = new HashSet<>();
         StringBuilder keywords = new StringBuilder();
         for (String tag : articleDto.getArticleTag()) {
-            if (MathUtils.isInteger(tag)) {
+            if (MathUtils.isPositiveInteger(tag)) {
                 Long tagId = Long.parseLong(tag);
                 ArticleTag articleTag = articleTagMapper.selectById(tagId);
                 if (articleTag != null) {

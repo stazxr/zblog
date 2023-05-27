@@ -119,9 +119,24 @@ public class MathUtils {
      * @param numStr 待判定字符串
      * @return boolean
      */
-    public static boolean isInteger(String numStr) {
+    public static boolean isPositiveInteger(String numStr) {
         try {
             return Long.parseLong(numStr) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 判断字符串是否是数字
+     *
+     * @param numStr 待判定字符串
+     * @return boolean
+     */
+    public static boolean isNumeric(String numStr) {
+        try {
+            Double.parseDouble(numStr);
+            return true;
         } catch (Exception e) {
             return false;
         }
