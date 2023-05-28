@@ -58,5 +58,5 @@ public class ArticleColumnVo extends BaseVo {
     /**
      * 文章列表
      */
-    List<ArticleColumnArticleVo> articles;
+    List<ColumnArticleVo> articles;
 }

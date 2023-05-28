@@ -16,7 +16,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @ApiModel("专栏文章信息")
-public class ArticleColumnArticleVo {
+public class ColumnArticleVo {
     /**
      * 文章序列
      */

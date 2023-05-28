@@ -55,6 +55,12 @@ public class ArticleQueryDto extends PageParam {
     private Long tagId;
 
     /**
+     * 文章专栏
+     */
+    @ApiModelProperty("文章专栏")
+    private Long columnId;
+
+    /**
      * 文章类型
      */
     @ApiModelProperty("文章类型，1：原创、2：转载、3：翻译")

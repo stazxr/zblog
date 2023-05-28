@@ -52,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -118,6 +119,8 @@ public class PortalServiceImpl implements PortalService {
     private final AlbumPhotoMapper albumPhotoMapper;
 
     private final ArticleColumnMapper articleColumnMapper;
+
+    private final ArticleColumnRelationMapper articleColumnRelationMapper;
 
     private final ArticleSearchStrategyContext articleSearchStrategyContext;
 
@@ -648,7 +651,7 @@ public class PortalServiceImpl implements PortalService {
             CacheUtils.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
             return calendarData;
         } catch (Exception e) {
-            throw new ServiceException("贡献日历数据获取异常", e);
+            throw new ServiceException("贡献日历数据获取超时", e);
         }
     }
 
@@ -699,6 +702,30 @@ public class PortalServiceImpl implements PortalService {
         PageHelper.startPage(page, 8);
         List<ArticleColumnVo> articleVos = articleColumnMapper.selectWebColumnList();
         return new com.github.pagehelper.PageInfo<>(articleVos);
+    }
+
+    /**
+     * 查询前台专栏详情
+     *
+     * @param columnId 专栏id
+     * @return ColumnVo
+     */
+    @Override
+    public ArticleColumnVo queryColumnById(Long columnId) {
+        return articleColumnMapper.selectColumnDetail(columnId);
+    }
+
+    /**
+     * 分页查询前台专栏文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    @Override
+    public com.github.pagehelper.PageInfo<ArticleVo> queryColumnArticleList(ArticleQueryDto queryDto) {
+        queryDto.checkPage();
+        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
+        return new com.github.pagehelper.PageInfo<>(articleColumnRelationMapper.selectWebArticleList(queryDto.getColumnId()));
     }
 
     /**

@@ -541,4 +541,35 @@ public class PortalController {
     public Result queryColumnList(@RequestParam Integer current) {
         return Result.success().data(portalService.queryColumnList(current));
     }
+
+    /**
+     * 查询前台专栏详情
+     *
+     * @param columnId 专栏id
+     * @return ColumnVo
+     */
+    @GetMapping("/queryColumnById")
+    @ApiOperation(value = "查询前台专栏详情")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "columnId", value = "专栏id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "查询前台专栏详情", code = "queryWebColumnById", level = BaseConst.PermLevel.OPEN)
+    public Result queryColumnById(@RequestParam Long columnId) {
+        return Result.success().data(portalService.queryColumnById(columnId));
+    }
+
+    /**
+     * 分页查询前台专栏文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    @GetMapping("/queryColumnArticleList")
+    @ApiOperation(value = "分页查询前台专栏文章列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "分页查询前台专栏文章列表", code = "queryWebColumnArticleList", level = BaseConst.PermLevel.OPEN)
+    public Result queryColumnArticleList(ArticleQueryDto queryDto) {
+        return Result.success().data(portalService.queryColumnArticleList(queryDto));
+    }
 }

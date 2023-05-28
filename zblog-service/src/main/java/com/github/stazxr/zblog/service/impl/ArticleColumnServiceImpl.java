@@ -13,7 +13,7 @@ import com.github.stazxr.zblog.domain.dto.query.ArticleColumnQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleCategory;
 import com.github.stazxr.zblog.domain.entity.ArticleColumn;
 import com.github.stazxr.zblog.domain.entity.ArticleColumnRelation;
-import com.github.stazxr.zblog.domain.vo.ArticleColumnArticleVo;
+import com.github.stazxr.zblog.domain.vo.ColumnArticleVo;
 import com.github.stazxr.zblog.domain.vo.ArticleColumnVo;
 import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.mapper.ArticleColumnMapper;
@@ -68,7 +68,7 @@ public class ArticleColumnServiceImpl extends ServiceImpl<ArticleColumnMapper, A
         Assert.notNull(columnVo, "查询栏目信息失败，栏目【" + columnId + "】不存在");
 
         // 查询文章列表
-        List<ArticleColumnArticleVo> articles = articleColumnRelationMapper.selectArticleList(columnId);
+        List<ColumnArticleVo> articles = articleColumnRelationMapper.selectArticleList(columnId);
         columnVo.setArticles(articles);
         return columnVo;
     }

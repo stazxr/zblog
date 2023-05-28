@@ -2,7 +2,8 @@ package com.github.stazxr.zblog.mapper;
 
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import com.github.stazxr.zblog.domain.entity.ArticleColumnRelation;
-import com.github.stazxr.zblog.domain.vo.ArticleColumnArticleVo;
+import com.github.stazxr.zblog.domain.vo.ColumnArticleVo;
+import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -49,5 +50,13 @@ public interface ArticleColumnRelationMapper extends BaseMapper<ArticleColumnRel
      * @param columnId 专栏id
      * @return ArticleColumnArticleVoList
      */
-    List<ArticleColumnArticleVo> selectArticleList(@Param("columnId") Long columnId);
+    List<ColumnArticleVo> selectArticleList(@Param("columnId") Long columnId);
+
+    /**
+     * 分页查询前台专栏文章列表
+     *
+     * @param columnId 专栏id
+     * @return ArticleList
+     */
+    List<ArticleVo> selectWebArticleList(@Param("columnId") Long columnId);
 }

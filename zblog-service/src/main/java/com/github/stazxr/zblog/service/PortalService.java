@@ -12,7 +12,6 @@ import com.github.stazxr.zblog.domain.vo.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 前台服务层
@@ -273,4 +272,20 @@ public interface PortalService {
      * @return ColumnList
      */
     PageInfo<ArticleColumnVo> queryColumnList(Integer current);
+
+    /**
+     * 查询前台专栏详情
+     *
+     * @param columnId 专栏id
+     * @return ColumnVo
+     */
+    ArticleColumnVo queryColumnById(Long columnId);
+
+    /**
+     * 分页查询前台专栏文章列表
+     *
+     * @param queryDto 查询参数
+     * @return ArticleList
+     */
+    PageInfo<ArticleVo> queryColumnArticleList(ArticleQueryDto queryDto);
 }

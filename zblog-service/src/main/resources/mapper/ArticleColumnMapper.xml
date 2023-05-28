@@ -59,13 +59,16 @@
     </select>
 
     <select id="selectWebColumnList" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnVo">
-        SELECT
-            ID, `NAME`, `DESC`, CREATE_USER, CREATE_TIME,
-            (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
-            SELECT atr.ARTICLE_ID FROM article_column_relation atr WHERE atr.COLUMN_ID = ac.ID
-            )) ARTICLE_COUNT
-        FROM article_column ac
-        WHERE ENABLED = 1 AND PAGE_SHOW = 1
-        ORDER BY SORT, `NAME`
+        SELECT * FROM (
+            SELECT
+                ID, `NAME`, `DESC`, IMAGE_URL, CREATE_USER, CREATE_TIME,
+                (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (
+                    SELECT atr.ARTICLE_ID FROM article_column_relation atr WHERE atr.COLUMN_ID = ac.ID
+                )) ARTICLE_COUNT
+            FROM article_column ac
+            WHERE ENABLED = 1 AND PAGE_SHOW = 1
+            ORDER BY SORT, `NAME`
+        ) tmp
+        WHERE tmp.ARTICLE_COUNT > 0
     </select>
 </mapper>

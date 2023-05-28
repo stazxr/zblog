@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.ArticleColumnRelationMapper">
+    <resultMap id="articleVoWebListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="ARTICLE_TITLE" />
+        <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="categoryId" column="CATEGORY_ID" />
+        <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="authorNickname" column="AUTHOR_NICKNAME" />
+        <result property="authorGender" column="AUTHOR_GENDER" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo" select="selectArticleTagList" column="ID" />
+        <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />
+    </resultMap>
+
     <insert id="batchInsert">
         INSERT INTO article_column_relation (ID, COLUMN_ID, ARTICLE_ID, ARTICLE_TITLE, SORT, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE) VALUES
         <foreach collection="articles" item="article" index="index" separator=",">
@@ -22,7 +37,7 @@
         )
     </select>
 
-    <select id="selectArticleList" resultType="com.github.stazxr.zblog.domain.vo.ArticleColumnArticleVo">
+    <select id="selectArticleList" resultType="com.github.stazxr.zblog.domain.vo.ColumnArticleVo">
         SELECT
             acr.ARTICLE_ID, acr.ARTICLE_TITLE, acr.SORT, acr.CREATE_USER, acr.CREATE_TIME, acr.CREATE_DATE,
             CASE
@@ -36,5 +51,33 @@
         LEFT JOIN article a ON a.ID = acr.ARTICLE_ID
         WHERE acr.COLUMN_ID = #{columnId}
         ORDER BY SORT
+    </select>
+
+    <select id="selectWebArticleList" resultMap="articleVoWebListMap">
+        SELECT
+            acr.ARTICLE_ID AS ID, acr.ARTICLE_TITLE, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
+            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, u.GENDER AUTHOR_GENDER, a.CREATE_TIME, a.UPDATE_TIME
+        FROM article_column_relation acr
+        LEFT JOIN article a ON a.ID = acr.ARTICLE_ID
+        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
+        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        WHERE acr.COLUMN_ID = #{columnId}
+        ORDER BY acr.SORT
+    </select>
+
+    <select id="selectArticleTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+        SELECT
+            ata.ID, ata.NAME, ata.TYPE
+        FROM article_tag_relation atr
+        LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID
+        WHERE ata.DELETED = 0 AND atr.ARTICLE_ID = #{ID}
+    </select>
+
+    <select id="selectArticleImgList" resultType="com.github.stazxr.zblog.base.domain.entity.File">
+        SELECT
+            f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME
+        FROM article_img_relation air
+        LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0
+        WHERE air.ARTICLE_ID = #{ID}
     </select>
 </mapper>
