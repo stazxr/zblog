@@ -2,12 +2,14 @@ package com.github.stazxr.zblog.jexl.util;
 
 import com.github.stazxr.zblog.jexl.function.ArithmeticHandle;
 import com.github.stazxr.zblog.jexl.function.ListHandle;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.jexl3.*;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -76,6 +78,23 @@ public class ExpressionUtils {
             ListHandle.removeRankKeys();
             ListHandle.removeOriginData();
         }
+    }
+
+    /**
+     * 执行携带变量的脚本
+     *
+     * @param script 脚本
+     * @param data   数据信息
+     * @param format 结果格式
+     * @return 计算结果, 计算错误返回 { ExpressionUtils.DATA_ERROR }
+     */
+    public static String executeScript(String script, Map<String, Object> data, DecimalFormat format) {
+        String result = executeScript(script, data);
+        if (StringUtils.isNotBlank(result) && !DATA_ERROR.equals(result)) {
+            result = format.format(result);
+        }
+
+        return result;
     }
 
     /**
@@ -161,6 +180,7 @@ public class ExpressionUtils {
      * 执行携带变量的公式
      *
      * @param expression 公式
+     * @param data       数据
      * @return 计算结果, 计算错误返回 { ExpressionUtils.DATA_ERROR }
      */
     public static String executeExpression(String expression, Map<String, Object> data) {
@@ -176,6 +196,23 @@ public class ExpressionUtils {
             ListHandle.removeRankKeys();
             ListHandle.removeOriginData();
         }
+    }
+
+    /**
+     * 执行携带变量的公式
+     *
+     * @param expression 公式
+     * @param data       数据
+     * @param format     返回数据格式
+     * @return 计算结果, 计算错误返回 { ExpressionUtils.DATA_ERROR }
+     */
+    public static String executeExpression(String expression, Map<String, Object> data, DecimalFormat format) {
+        String result = executeExpression(expression, data);
+        if (StringUtils.isNotBlank(result) && !DATA_ERROR.equals(result)) {
+            result = format.format(result);
+        }
+
+        return result;
     }
 
     private static Object calculateScript(String script, Map<String, String> varMap, Map<String, Object> valueMap, Map<String, Class<?>> custom) {
