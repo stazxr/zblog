@@ -1,12 +1,20 @@
 package com.github.stazxr.zblog.base.service.impl;
 
+import com.github.stazxr.zblog.base.domain.bo.DateCount;
 import com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo;
 import com.github.stazxr.zblog.base.domain.vo.echarts.SingleLineChartDataVo;
+import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.HomeService;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.time.DateUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 首页面板管理服务实现层
@@ -15,8 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2022-07-19
  */
 @Service
+@RequiredArgsConstructor
 @Transactional(rollbackFor = Exception.class)
 public class HomeServiceImpl implements HomeService {
+    private final ZblogMapper zblogMapper;
+
     /**
      * 获取通知面板的统计信息
      *
@@ -24,8 +35,7 @@ public class HomeServiceImpl implements HomeService {
      */
     @Override
     public HomePanelDataCountVo getHomePanelDataCount() {
-        // TODO 待实现
-        return new HomePanelDataCountVo();
+        return zblogMapper.queryHomePanelDataCount();
     }
 
     /**
@@ -36,15 +46,21 @@ public class HomeServiceImpl implements HomeService {
      */
     @Override
     public SingleLineChartDataVo getHomePanelDetailDataByType(String type) {
-        // TODO 待实现
         String[] xAxisData = DateUtils.getDateAry(7, true, false);
 
-        int[] legendDataAry = new int[xAxisData.length];
+        List<DateCount> dateCounts;
         switch (type) {
-            case "visits":
-            case "messages":
-            case "articles":
-            case "warnings":
+            case "pv":
+                dateCounts = zblogMapper.queryPvRangeData(xAxisData);
+                break;
+            case "uv":
+                dateCounts = zblogMapper.queryUvRangeData(xAxisData);
+                break;
+            case "uu":
+                dateCounts = zblogMapper.queryUuRangeData(xAxisData);
+                break;
+            case "av":
+                dateCounts = zblogMapper.queryAvRangeData(xAxisData);
                 break;
             default:
                 throw new ServiceException("不支持的类型：" + type);
@@ -53,7 +69,17 @@ public class HomeServiceImpl implements HomeService {
         SingleLineChartDataVo singleLineChartDataVo = new SingleLineChartDataVo();
         singleLineChartDataVo.setXAxisData(xAxisData);
         singleLineChartDataVo.setLegendName("趋势图");
-        singleLineChartDataVo.setLegendData(legendDataAry);
+        singleLineChartDataVo.setLegendData(parseDateCounts(dateCounts, xAxisData));
         return singleLineChartDataVo;
+    }
+
+    private List<Integer> parseDateCounts(List<DateCount> dateCounts, String[] dates) {
+        Map<String, Integer> dataMap = dateCounts.stream().collect(Collectors.toMap(DateCount::getDate, DateCount::getCount));
+        List<Integer> result = new ArrayList<>();
+        for (String date : dates) {
+            result.add(dataMap.getOrDefault(date, 0));
+        }
+
+        return result;
     }
 }

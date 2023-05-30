@@ -3,6 +3,8 @@ package com.github.stazxr.zblog.base.domain.vo.echarts;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * 单折线图
  *
@@ -30,5 +32,5 @@ public class SingleLineChartDataVo {
     /**
      * Y轴数据
      */
-    private int[] legendData;
+    private List<Integer> legendData;
 }

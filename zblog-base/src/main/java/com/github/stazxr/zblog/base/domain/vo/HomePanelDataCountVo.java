@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 首页面板数量统计（访问量，评论数等）
@@ -9,26 +9,26 @@ import lombok.ToString;
  * @author SunTao
  * @since 2022-07-19
  */
-@Data
-@ToString
+@Getter
+@Setter
 public class HomePanelDataCountVo {
     /**
-     * 访问量
+     * 浏览量，当用户打开一个网页并加载完成时，会被计为一个页面浏览量
      */
-    private final int visits = 0;
+    private int pv = 0;
 
     /**
-     * 评论数
+     * 立访客，访问网站的唯一用户数量，每个用户只被计为一个独立访客。
      */
-    private final int messages = 0;
+    private int uv = 0;
 
     /**
-     * 文章数
+     * 用户数，注册的系统用户数
      */
-    private final int articles = 0;
+    private int uu = 0;
 
     /**
-     * 告警数
+     * 阅读量，文章访问量
      */
-    private final int warnings = 0;
+    private int av = 0;
 }

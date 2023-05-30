@@ -4,4 +4,45 @@
     <delete id="removeRememberMe">
         DELETE FROM persistent_logins WHERE username = #{username}
     </delete>
+
+    <select id="queryHomePanelDataCount" resultType="com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo">
+        SELECT
+            (SELECT WEB_COUNT FROM visitor_count WHERE ID = 1) AS pv,
+            (SELECT COUNT(1) FROM visitor) AS uv,
+            (SELECT COUNT(1) FROM user) AS uu,
+            (SELECT COUNT(1) FROM article_view) AS av
+        FROM DUAL
+    </select>
+
+    <select id="queryPvRangeData" resultType="com.github.stazxr.zblog.base.domain.bo.DateCount">
+        SELECT DATA_DATE AS date, WEB_COUNT AS count FROM visitor_count WHERE DATA_DATE IN
+        <foreach collection="dates" item="date" index="index" open="(" separator="," close=")">
+            #{date}
+        </foreach>
+        ORDER BY DATA_DATE
+    </select>
+
+    <select id="queryUvRangeData" resultType="com.github.stazxr.zblog.base.domain.bo.DateCount">
+        SELECT CREATE_DATE AS date, COUNT(1) AS count FROM visitor WHERE CREATE_DATE IN
+        <foreach collection="dates" item="date" index="index" open="(" separator="," close=")">
+            #{date}
+        </foreach>
+        GROUP BY CREATE_DATE ORDER BY CREATE_DATE
+    </select>
+
+    <select id="queryUuRangeData" resultType="com.github.stazxr.zblog.base.domain.bo.DateCount">
+        SELECT CREATE_DATE AS date, COUNT(1) AS count FROM user WHERE CREATE_DATE IN
+        <foreach collection="dates" item="date" index="index" open="(" separator="," close=")">
+            #{date}
+        </foreach>
+        GROUP BY CREATE_DATE ORDER BY CREATE_DATE
+    </select>
+
+    <select id="queryAvRangeData" resultType="com.github.stazxr.zblog.base.domain.bo.DateCount">
+        SELECT CREATE_DATE AS date, COUNT(1) AS count FROM article_view WHERE CREATE_DATE IN
+        <foreach collection="dates" item="date" index="index" open="(" separator="," close=")">
+            #{date}
+        </foreach>
+        GROUP BY CREATE_DATE ORDER BY CREATE_DATE
+    </select>
 </mapper>
