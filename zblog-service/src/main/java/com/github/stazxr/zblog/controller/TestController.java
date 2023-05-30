@@ -159,7 +159,7 @@ public class TestController {
                 }
             }
 
-            String realFilename = "项目导入模板.xls";
+            String realFilename = "file.xls";
             response.setContentType("application/octet-stream;charset=utf-8");
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(realFilename, "UTF-8"));
             response.flushBuffer();
@@ -174,13 +174,13 @@ public class TestController {
         int columnIndex = cell.getColumnIndex();
         switch (columnIndex) {
             case 0:
-                cell.setCellValue("实例名称");
+                cell.setCellValue("XXX");
                 return;
             case 1:
-                cell.setCellValue("2023（格式：yyyy）");
+                cell.setCellValue("XXX（格式：yyyy）");
                 return;
             case 2:
-                cell.setCellValue("请选择（非必选）");
+                cell.setCellValue("XXX（非必选）");
                 return;
             case 3:
             case 4:
@@ -188,35 +188,35 @@ public class TestController {
             case 6:
             case 10:
             case 11:
-                cell.setCellValue("请选择");
+                cell.setCellValue("AAA");
                 return;
             case 7:
-                cell.setCellValue("xx万吨/年，xx储罐");
+                cell.setCellValue("BBB");
                 return;
             case 8:
             case 9:
-                cell.setCellValue("xx单位");
+                cell.setCellValue("CCC");
                 return;
             case 12:
-                cell.setCellValue("2023-03（格式：yyyy-MM）");
+                cell.setCellValue("2023-01（格式：yyyy-MM）");
                 return;
             case 13:
-                cell.setCellValue("2023-06（格式：yyyy-MM）");
+                cell.setCellValue("2023-02（格式：yyyy-MM）");
                 return;
             case 14:
-                cell.setCellValue("10（整数）");
+                cell.setCellValue("1（整数）");
                 return;
             case 15:
-                cell.setCellValue("15（整数，非必填）");
+                cell.setCellValue("1（整数，非必填）");
                 return;
             case 16:
-                cell.setCellValue("xx万元（非必填，测算时要填）");
+                cell.setCellValue("XXX（非必填）");
                 return;
             case 17:
-                cell.setCellValue("中标（非必填）");
+                cell.setCellValue("YYY（非必填）");
                 return;
             case 18:
-                cell.setCellValue("中海油定额及相关依据（非必填）");
+                cell.setCellValue("BBB（非必填）");
                 return;
             default:
                 cell.setCellValue("");
