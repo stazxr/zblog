@@ -55,10 +55,23 @@ public class HomeController {
     @ApiOperation(value = "获取面板折现图表数据")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "图表类型：visits、messages、articles、warnings", required = true, dataTypeClass = String.class)
+        @ApiImplicitParam(name = "type", value = "图表类型：pv、uv、uu、av", required = true, dataTypeClass = String.class)
     })
     @Router(name = "获取首页面板的折现图表数据", code = "getHomePanelDetailDataByType", level = PUBLIC)
     public Result getHomePanelDetailDataByType(@RequestParam String type) {
         return Result.success().data(homeService.getHomePanelDetailDataByType(type));
+    }
+
+    /**
+     * 获取首页面板的访客地域数据
+     *
+     * @return NameValue
+     */
+    @GetMapping("/getHomePanelVisitorAreaCount")
+    @ApiOperation(value = "获取首页面板的访客地域数据")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "获取首页面板的访客地域数据", code = "getHomePanelVisitorAreaCount", level = PUBLIC)
+    public Result getHomePanelVisitorAreaCount() {
+        return Result.success().data(homeService.getHomePanelVisitorAreaCount());
     }
 }

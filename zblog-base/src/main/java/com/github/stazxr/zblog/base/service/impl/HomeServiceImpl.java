@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.github.stazxr.zblog.base.domain.bo.DateCount;
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo;
 import com.github.stazxr.zblog.base.domain.vo.echarts.SingleLineChartDataVo;
 import com.github.stazxr.zblog.base.mapper.ZblogMapper;
@@ -71,6 +72,16 @@ public class HomeServiceImpl implements HomeService {
         singleLineChartDataVo.setLegendName("趋势图");
         singleLineChartDataVo.setLegendData(parseDateCounts(dateCounts, xAxisData));
         return singleLineChartDataVo;
+    }
+
+    /**
+     * 获取首页面板的访客地域数据
+     *
+     * @return NameValue
+     */
+    @Override
+    public List<NameValue> getHomePanelVisitorAreaCount() {
+        return zblogMapper.queryVisitorAreaCount();
     }
 
     private List<Integer> parseDateCounts(List<DateCount> dateCounts, String[] dates) {

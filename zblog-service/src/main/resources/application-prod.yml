@@ -32,4 +32,5 @@ cache:
   type: redis
 zblog:
   deploy-type: multi
+  is-local-ip-parsing: false
   file-base-url: https://www.suntaoblog.com/file/

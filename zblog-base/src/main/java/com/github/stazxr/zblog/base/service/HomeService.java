@@ -1,7 +1,10 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo;
 import com.github.stazxr.zblog.base.domain.vo.echarts.SingleLineChartDataVo;
+
+import java.util.List;
 
 /**
  * 首页面板管理服务层
@@ -24,4 +27,11 @@ public interface HomeService {
      * @return SingleLineChartDataVo
      */
     SingleLineChartDataVo getHomePanelDetailDataByType(String type);
+
+    /**
+     * 获取首页面板的访客地域数据
+     *
+     * @return NameValue
+     */
+    List<NameValue> getHomePanelVisitorAreaCount();
 }

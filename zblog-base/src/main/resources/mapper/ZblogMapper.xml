@@ -45,4 +45,8 @@
         </foreach>
         GROUP BY CREATE_DATE ORDER BY CREATE_DATE
     </select>
+
+    <select id="queryVisitorAreaCount" resultType="com.github.stazxr.zblog.base.domain.bo.NameValue">
+        SELECT DISTINCT AREA AS name, AREA_COUNT AS value FROM visitor_area
+    </select>
 </mapper>

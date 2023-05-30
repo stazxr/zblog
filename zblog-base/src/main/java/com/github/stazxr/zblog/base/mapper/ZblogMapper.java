@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.mapper;
 
 import com.github.stazxr.zblog.base.domain.bo.DateCount;
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -58,4 +59,11 @@ public interface ZblogMapper {
      * @return 阅读量数据信息
      */
     List<DateCount> queryAvRangeData(String[] dates);
+
+    /**
+     * 获取首页面板的访客地域数据
+     *
+     * @return NameValue
+     */
+    List<NameValue> queryVisitorAreaCount();
 }

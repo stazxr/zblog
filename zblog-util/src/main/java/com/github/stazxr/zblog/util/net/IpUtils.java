@@ -134,14 +134,16 @@ public class IpUtils {
         final String outOfChinaCode = "999999";
         String api = String.format(Constants.Url.IP_URL, ip);
         JSONObject object = JSONUtil.parseObj(HttpUtil.get(api));
-        String address = object.get("addr", String.class).trim();
+        String address = object.get("pro", String.class).trim();
         String proCode = object.get("proCode", String.class).trim();
         if (LOCAL_LIST.contains(address)) {
             return LOCAL_IP_SOURCE;
         } else if (outOfChinaCode.equals(proCode)) {
             return OUT_IP_SOURCE;
         } else {
-            return address.length() > 2 ? address.substring(0, 2) : address;
+            String proFix = "省";
+            String cityFix = "市";
+            return address.replace(proFix, "").replace(cityFix, "");
         }
     }
 
@@ -186,7 +188,7 @@ public class IpUtils {
         } else if (china.equals(country)) {
             return ipInfo.getProvince();
         } else {
-            return country;
+            return OUT_IP_SOURCE;
         }
     }
 }
