@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.jexl.util;
+package com.github.stazxr.zblog.jexl;
 
 import com.github.stazxr.zblog.jexl.function.ArithmeticHandle;
 import com.github.stazxr.zblog.jexl.function.ListHandle;

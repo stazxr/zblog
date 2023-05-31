@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.jexl.function;
 
-import com.github.stazxr.zblog.jexl.util.ExpressionUtils;
+import com.github.stazxr.zblog.jexl.ExpressionUtils;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 
 import java.math.BigDecimal;
