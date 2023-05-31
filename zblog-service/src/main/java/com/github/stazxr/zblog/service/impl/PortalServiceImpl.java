@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
+import com.github.stazxr.zblog.base.mapper.VersionMapper;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.converter.CommentConverter;
@@ -52,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -119,6 +120,8 @@ public class PortalServiceImpl implements PortalService {
     private final AlbumPhotoMapper albumPhotoMapper;
 
     private final ArticleColumnMapper articleColumnMapper;
+
+    private final VersionMapper versionMapper;
 
     private final ArticleColumnRelationMapper articleColumnRelationMapper;
 
@@ -726,6 +729,16 @@ public class PortalServiceImpl implements PortalService {
         queryDto.checkPage();
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new com.github.pagehelper.PageInfo<>(articleColumnRelationMapper.selectWebArticleList(queryDto.getColumnId()));
+    }
+
+    /**
+     * 查询前台版本列表
+     *
+     * @return VersionList
+     */
+    @Override
+    public List<Version> queryVersionList() {
+        return versionMapper.selectVersionList(null);
     }
 
     /**

@@ -572,4 +572,17 @@ public class PortalController {
     public Result queryColumnArticleList(ArticleQueryDto queryDto) {
         return Result.success().data(portalService.queryColumnArticleList(queryDto));
     }
+
+    /**
+     * 查询前台版本列表
+     *
+     * @return VersionList
+     */
+    @GetMapping("/queryVersionList")
+    @ApiOperation(value = "查询前台版本列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+    @Router(name = "查询前台版本列表", code = "queryWebVersionList", level = BaseConst.PermLevel.OPEN)
+    public Result queryVersionList() {
+        return Result.success().data(portalService.queryVersionList());
+    }
 }

@@ -27,7 +27,6 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     /**
      * 新增日期访问量
      *
-     * @param id   ID
      * @param date 日期
      */
     void insertWebVisitorTodayCount(@Param("date") String date);

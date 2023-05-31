@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.service;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
@@ -288,4 +289,11 @@ public interface PortalService {
      * @return ArticleList
      */
     PageInfo<ArticleVo> queryColumnArticleList(ArticleQueryDto queryDto);
+
+    /**
+     * 查询前台版本列表
+     *
+     * @return VersionList
+     */
+    List<Version> queryVersionList();
 }
