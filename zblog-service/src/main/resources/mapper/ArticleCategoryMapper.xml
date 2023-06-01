@@ -58,11 +58,11 @@
         SELECT
             ac.ID, ac.PID, ac.NAME, ac.IMAGE_URL,
             IF(ac.PID IS NULL, (
-                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID IN (
+                SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1 AND a.CATEGORY_ID IN (
                     SELECT c1.ID FROM article_category c1 WHERE c1.PID = ac.ID
                 )
             ), (
-               SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = ac.ID
+               SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1 AND a.CATEGORY_ID = ac.ID
            )) AS ARTICLE_COUNT
         FROM article_category ac WHERE ac.ID IN (
             SELECT CATEGORY_ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1

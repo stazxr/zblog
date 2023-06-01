@@ -56,6 +56,11 @@ public class BlogWebVo {
     private int userCount;
 
     /**
+     * 文章阅读数
+     */
+    private int articleViewCount;
+
+    /**
      * 评论数
      */
     private int commentCount;

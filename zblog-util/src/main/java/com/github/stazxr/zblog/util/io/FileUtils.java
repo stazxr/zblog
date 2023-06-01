@@ -108,7 +108,7 @@ public class FileUtils {
                 return filePath;
             }
         }
-        return null;
+        return "";
     }
 
     /**
@@ -126,7 +126,7 @@ public class FileUtils {
                 return filename;
             }
         }
-        return null;
+        return "";
     }
 
     /**
@@ -144,7 +144,7 @@ public class FileUtils {
                 return "";
             }
         }
-        return null;
+        return "";
     }
 
     /**

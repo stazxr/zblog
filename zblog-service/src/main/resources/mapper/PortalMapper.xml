@@ -12,6 +12,11 @@
                 )
             ) CATEGORY_COUNT,
             (
+                SELECT COUNT(1) FROM article_column WHERE ENABLED = 1 AND ID IN (
+                    SELECT DISTINCT COLUMN_ID FROM article_column_relation
+                )
+            ) COLUMN_COUNT,
+            (
                 SELECT COUNT(1) FROM article_tag WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
                     SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (
                         SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1
@@ -27,6 +32,9 @@
             (
                 SELECT COUNT(1) FROM user WHERE DELETED = 0
             ) USER_COUNT,
+            (
+                SELECT COUNT(1) FROM article_view
+            ) ARTICLE_VIEW_COUNT,
             (
                 SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND IS_REVIEW = 1
             ) COMMENT_COUNT,

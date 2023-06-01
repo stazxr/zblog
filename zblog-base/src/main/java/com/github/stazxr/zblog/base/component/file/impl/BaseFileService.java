@@ -27,9 +27,10 @@ public abstract class BaseFileService implements FileHandler {
      */
     protected FileInfo parseMultiFile(MultipartFile file) throws Exception {
         FileInfo fileInfo = new FileInfo();
+        String extensionName = FileUtils.getExtensionName(file.getOriginalFilename());
         String filename = FileUtils.getFileNameNoEx(FileUtils.verifyFilename(file.getOriginalFilename()));
-        fileInfo.setOriginalFileName(filename);
-        fileInfo.setSuffix(FileUtils.getExtensionName(filename));
+        fileInfo.setOriginalFileName(filename.concat(".").concat(extensionName));
+        fileInfo.setSuffix(extensionName);
         fileInfo.setSize(file.getSize());
         fileInfo.setMd5(Md5Utils.getMessageDigest(file.getBytes()));
         return fileInfo;
