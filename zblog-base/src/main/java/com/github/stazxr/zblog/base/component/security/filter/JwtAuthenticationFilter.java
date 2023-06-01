@@ -159,6 +159,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (isPrevious) {
                 // 这里Token已经续签完成，不做后续校验
                 log.warn("user {} token has been renew finish, but continue use the previous token, request '{}'", username, request.getRequestURL());
+                response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(jwtTokenStorage.getAccessToken(userId)));
                 setContextAuthentication(request, user);
                 return;
             } else {
@@ -235,7 +236,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String newToken = jwtTokenGenerator.generateToken(request, user, newVersion, loginIp);
 
             // cache previous token
-            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, MAX_RENEW_WAIT_SECONDS);
+            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, MAX_RENEW_WAIT_SECONDS * 2);
 
             // set token
             response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newToken));

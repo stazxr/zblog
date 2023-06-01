@@ -106,6 +106,11 @@ public class UserVo {
     private String expiredTime;
 
     /**
+     * 登录令牌
+     */
+    private String userToken;
+
+    /**
      * 用户对应的角色序号列表
      */
     private List<Long> roleIds;

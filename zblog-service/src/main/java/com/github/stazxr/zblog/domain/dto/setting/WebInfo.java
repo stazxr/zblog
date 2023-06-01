@@ -81,4 +81,22 @@ public class WebInfo {
      */
     @ApiModelProperty("社交登录列表")
     private List<String> socialLoginList = new ArrayList<>();
+
+    /**
+     * QQ OAUTH API ID
+     */
+    @ApiModelProperty("QQ OAUTH API ID")
+    private String qqAppId = "";
+
+    /**
+     * QQ OAUTH API KEY
+     */
+    @ApiModelProperty("QQ OAUTH API KEY")
+    private String qqAppKey = "";
+
+    /**
+     * QQ OAUTH 回调地址
+     */
+    @ApiModelProperty("QQ OAUTH 回调地址")
+    private String qqCallBackUrl = "";
 }

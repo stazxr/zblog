@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
+import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.Version;
@@ -126,6 +127,8 @@ public class PortalServiceImpl implements PortalService {
     private final ArticleColumnRelationMapper articleColumnRelationMapper;
 
     private final ArticleSearchStrategyContext articleSearchStrategyContext;
+
+    private final JwtTokenGenerator jwtTokenGenerator;
 
     /**
      * 查询博客前台信息
@@ -344,6 +347,9 @@ public class PortalServiceImpl implements PortalService {
         userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
         userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
 
+        // 封装 Token
+        String token = jwtTokenGenerator.generateToken(request, user, 1, null);
+        userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
         return userVo;
     }
 
