@@ -60,36 +60,30 @@ public class SwaggerConfig {
 
     @Bean
     public Docket v4g0l0() {
-        return new Docket(DocumentationType.OAS_30)
-            .enable(swaggerConfigProperties().getEnable())
-            .apiInfo(apiInfo())
-            .groupName(BaseConst.ApiVersion.V_4_0_0)
-            .select()
-            .apis((input) -> {
-                if (input.isAnnotatedWith(ApiVersion.class)) {
-                    Optional<ApiVersion> annotation = input.findAnnotation(ApiVersion.class);
-                    if (annotation.isPresent()) {
-                        return Arrays.asList(annotation.get().group()).contains(BaseConst.ApiVersion.V_4_0_0);
-                    }
-                }
-                return false;
-            })
-            .paths(PathSelectors.any())
-            .build();
+        return createDocket(BaseConst.ApiVersion.V_4_0_0);
     }
 
     @Bean
     public Docket v4g1l0() {
+        return createDocket(BaseConst.ApiVersion.V_4_1_0);
+    }
+
+    @Bean
+    public Docket v4g2l0() {
+        return createDocket(BaseConst.ApiVersion.V_4_2_0);
+    }
+
+    private Docket createDocket(String version) {
         return new Docket(DocumentationType.OAS_30)
             .enable(swaggerConfigProperties().getEnable())
             .apiInfo(apiInfo())
-            .groupName(BaseConst.ApiVersion.V_4_1_0)
+            .groupName(version)
             .select()
             .apis(input -> {
                 if (input.isAnnotatedWith(ApiVersion.class)) {
                     Optional<ApiVersion> annotation = input.findAnnotation(ApiVersion.class);
                     if (annotation.isPresent()) {
-                        return Arrays.asList(annotation.get().group()).contains(BaseConst.ApiVersion.V_4_1_0);
+                        return Arrays.asList(annotation.get().group()).contains(version);
                     }
                 }
                 return false;
