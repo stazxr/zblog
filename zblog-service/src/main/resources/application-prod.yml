@@ -15,16 +15,15 @@ spring:
     database: ${REDIS_DB:0}
 jwt:
   # Token 有效时长，单位秒
-  # access-token-duration: 7200
-  access-token-duration: 180
+  access-token-duration: 7200
   # R-Token 有效时长，单位秒
-  refresh-token-duration: 300
+  refresh-token-duration: 86400
   # 可续签的时间范围，单位秒，当 Token 剩余有效时间小于等于该值，则允许续签
-  refresh-min-duration: 60
+  refresh-min-duration: 1800
   # 是否允许续签
   allowed-renew-token: true
   # 允许的续签次数
-  max-version: 3
+  max-version: 10
   # 签名类型
   algorithm: RS256
   # 证书信息
