@@ -114,6 +114,16 @@ public class Constants {
     }
 
     /**
+     * 三方接口
+     *
+     * @author SunTao
+     * @since 2020-11-14
+     */
+    public static final class OpenApi {
+
+    }
+
+    /**
      * Cache Key
      *
      * @author SunTao

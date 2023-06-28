@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://rm-2zesvm06o324og1k3bo.mysql.rds.aliyuncs.com:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      username: ENC(hisvsQ4rjMY755ISBof8XuElj9jw2dmG)
-      password: ENC(PHOwc8TXSX9upQ0FgWJ7KbyIn26EfI19)
+      url: jdbc:mysql://8.141.59.135:3306/suntaoblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      username: ENC(VxYvhJGhVJV64cgn6Uxn0w==)
+      password: ENC(1H9bB9PErqdrG3Ye0Wz1txEFCDBmdqHK)
   redis:
     host: ENC(G5O94K/WQEO+2HeROvSnudsM3vOYxV1Fap/Hmx+TYkjqFKS+R8ZuoQx70BY14XdhmQfs9fwB4KI=)
     port: 6379

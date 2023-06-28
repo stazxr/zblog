@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -584,5 +585,19 @@ public class PortalController {
     @Router(name = "查询前台版本列表", code = "queryWebVersionList", level = BaseConst.PermLevel.OPEN)
     public Result queryVersionList() {
         return Result.success().data(portalService.queryVersionList());
+    }
+
+    /**
+     * QQ 登录
+     *
+     * @param qqLoginParam qq 登录信息
+     * @param request      请求信息
+     * @return UserVo 用户信息
+     */
+    @PostMapping("/oauth/login/qq")
+    @ApiOperation(value = "QQ登录")
+    @Router(name = "QQ登录", code = "oauthLoginQq", level = BaseConst.PermLevel.OPEN)
+    public Result qqLogin(@RequestBody QqLoginParam qqLoginParam, HttpServletRequest request) {
+        return Result.success().data(portalService.qqLogin(qqLoginParam, request));
     }
 }

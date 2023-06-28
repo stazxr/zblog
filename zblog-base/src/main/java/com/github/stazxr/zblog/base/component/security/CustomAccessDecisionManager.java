@@ -58,7 +58,7 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         // 测试用户不允许调用 Constants.USER_TEST 标记的资源
         if (Constants.USER_TEST.equalsIgnoreCase(authentication.getName())) {
             if (allowRoles.contains(Constants.SecurityRole.NO_TEST)) {
-                throw new AccessDeniedException("测试用户被拒绝执行此操作");
+                throw new AccessDeniedException("测试用户不允许执行增删改操作");
             }
         }
 
@@ -66,9 +66,9 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
         if (allowRoles.contains(NONE)) {
             throw new AccessDeniedException("没有权限");
         } else if (allowRoles.contains(NULL)) {
-            throw new AccessDeniedException("请求资源不存在");
+            throw new AccessDeniedException("资源未公开，禁止访问");
         } else if (allowRoles.contains(FORBIDDEN)) {
-            throw new AccessDeniedException("请求资源被禁止访问");
+            throw new AccessDeniedException("资源被禁止访问");
         } else if (allowRoles.contains(OPEN)) {
             return;
         } else if (allowRoles.contains(PUBLIC)) {

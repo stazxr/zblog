@@ -104,7 +104,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         Integer type = anInterface.getType();
         String code = anInterface.getCode();
         if (InterfaceType.NULL.getType().equals(type) || StringUtils.isBlank(code)) {
-            // 未配置@Router注解，接口不对外，不允许访问
+            // 未配置 @Router 注解，接口不对外，不允许访问
             level = BaseConst.PermLevelExtend.NULL;
         } else {
             // 根据权限编码查询接口的访问级别

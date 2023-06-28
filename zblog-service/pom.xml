@@ -146,17 +146,10 @@
             </activation>
         </profile>
         <profile>
-            <id>alpha</id>
+            <id>test</id>
             <properties>
-                <activeProfile>alpha</activeProfile>
+                <activeProfile>test</activeProfile>
                 <desc>测试环境</desc>
-            </properties>
-        </profile>
-        <profile>
-            <id>beta</id>
-            <properties>
-                <activeProfile>beta</activeProfile>
-                <desc>回归环境</desc>
             </properties>
         </profile>
         <profile>

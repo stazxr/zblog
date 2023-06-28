@@ -42,4 +42,20 @@ public interface PortalMapper {
      * @return likes
      */
     Set<Long> selectArticleLikeSet(@Param("userId") Long userId);
+
+    /**
+     * 根据 qq openid 查询关联用户id
+     *
+     * @param openId qq openId
+     * @return userId
+     */
+    Long selectUserIdByQqOpenId(@Param("openId") String openId);
+
+    /**
+     * 插入 qq openid 和用户的关联关系
+     *
+     * @param userId 用户id
+     * @param openId openid
+     */
+    void insertUserOauthQqRelation(@Param("userId") Long userId, @Param("openId") String openId);
 }

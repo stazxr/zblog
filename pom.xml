@@ -13,8 +13,8 @@
 
     <groupId>com.github.stazxr.zblog</groupId>
     <artifactId>zblog-parent</artifactId>
-    <packaging>pom</packaging>
     <version>4.0.0</version>
+    <packaging>pom</packaging>
 
     <name>zblog-parent</name>
     <url>https://github.com/stazxr/zblog</url>
@@ -47,6 +47,7 @@
         <module>zblog-service</module>
     </modules>
 
+    <!-- 版本号管理 -->
     <properties>
         <!-- maven properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,7 +73,6 @@
         <lombok.version>1.18.4</lombok.version>
         <oshi.version>3.9.1</oshi.version>
         <mapstruct.version>1.3.0.Final</mapstruct.version>
-        <junit.version>4.12</junit.version>
         <okhttp.version>3.14.9</okhttp.version>
         <jsch.version>0.1.55</jsch.version>
         <swagger.version>3.0.0</swagger.version>
@@ -97,7 +97,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Common Utils -->

@@ -36,8 +36,16 @@ public class IpImplUtils extends IpUtils {
         try {
             return PROPERTIES.getIsLocalIpParsing() ? getIpSourceByLocal(ip) : getIpSourceByHttp(ip);
         } catch (Exception e) {
-            log.error("get ip source catch eor: {}", e.getMessage());
-            return "";
+            // 失败补偿
+            try {
+                if (PROPERTIES.getIsLocalIpParsing()) {
+                    return getIpSourceByHttp(ip);
+                } else {
+                    return getIpSourceByLocal(ip);
+                }
+            } catch (Exception ie) {
+                return "";
+            }
         }
     }
 }

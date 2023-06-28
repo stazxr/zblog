@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.mapper.PortalMapper">
+    <insert id="insertUserOauthQqRelation">
+        INSERT INTO user_oauth_qq_relation (USER_ID, OPEN_ID) VALUES (#{userId}, #{openId})
+    </insert>
+
     <select id="selectBlogWebInfo" resultType="com.github.stazxr.zblog.domain.vo.BlogWebVo">
         SELECT
             (
@@ -57,5 +61,11 @@
 
     <select id="selectArticleLikeSet" resultType="java.lang.Long">
         SELECT DISTINCT ARTICLE_ID FROM article_like WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="selectUserIdByQqOpenId" resultType="java.lang.Long">
+        SELECT USER_ID FROM user_oauth_qq_relation WHERE OPEN_ID = #{openId} AND USER_ID IN (
+            SELECT ID FROM `user` WHERE DELETED = 0
+        )
     </select>
 </mapper>

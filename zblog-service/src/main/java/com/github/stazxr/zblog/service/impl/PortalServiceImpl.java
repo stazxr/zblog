@@ -1,12 +1,15 @@
 package com.github.stazxr.zblog.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.converter.UserConverter;
+import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.Version;
+import com.github.stazxr.zblog.base.domain.enums.Gender;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.VersionMapper;
@@ -34,11 +37,11 @@ import com.github.stazxr.zblog.domain.vo.*;
 import com.github.stazxr.zblog.mapper.*;
 import com.github.stazxr.zblog.service.PortalService;
 import com.github.stazxr.zblog.strategy.context.ArticleSearchStrategyContext;
-import com.github.stazxr.zblog.util.Assert;
-import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.YwConstants;
+import com.github.stazxr.zblog.util.*;
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import com.github.stazxr.zblog.util.git.GithubUtils;
 import com.github.stazxr.zblog.util.http.HtmlContentUtils;
+import com.github.stazxr.zblog.util.http.HttpUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import com.github.stazxr.zblog.util.secret.RsaUtils;
@@ -55,10 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -340,17 +340,11 @@ public class PortalServiceImpl implements PortalService {
         }
 
         DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码错误");
-        UserVo userVo = userConverter.entityToVo(user);
 
-        // 查询用户点赞列表
-        userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
-        userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
-        userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
-
-        // 封装 Token
-        String token = jwtTokenGenerator.generateToken(request, user, 1, null);
-        userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
-        return userVo;
+        // 更新用户登录时间
+        user.setLoginTime(DateUtils.formatNow());
+        userMapper.updateById(user);
+        return parseTokenUser(user, request);
     }
 
     /**
@@ -394,8 +388,7 @@ public class PortalServiceImpl implements PortalService {
         OtherInfo otherInfo = websiteConfig == null ? new OtherInfo() : JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class);
         Integer isReview = otherInfo.getIsCommentReview();
 
-        // 保存评论
-        commentDto.setContent(HtmlContentUtils.filter(commentDto.getContent()));
+        // 保存评论 如果需要过滤不文明字符，使用 HtmlContentUtils.filter(commentDto.getContent())
         Comment comment = commentConverter.dtoToEntity(commentDto);
         comment.setId(GenerateIdUtils.getId());
         String ip = IpUtils.getIp(request);
@@ -821,6 +814,89 @@ public class PortalServiceImpl implements PortalService {
         ArticleTagVo tagVo = articleTagMapper.selectTagDetail(tagId);
         Assert.notNull(tagVo, "标签信息不存在");
         return tagVo;
+    }
+
+    /**
+     * QQ 登录
+     *
+     * @param qqLoginParam qq 登录信息
+     * @param request      请求信息
+     * @return UserVo 用户信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public UserVo qqLogin(QqLoginParam qqLoginParam, HttpServletRequest request) {
+        Assert.notBlank(qqLoginParam.getAccessToken(), "登录失败，access_token 不能为空");
+
+        // 获取 openId
+        String openId = getQqOpenId(qqLoginParam.getAccessToken());
+        Assert.notBlank(openId, "登录失败，获取用户信息异常");
+
+        // 判断用户是否存在
+        Long userId = portalMapper.selectUserIdByQqOpenId(openId);
+        if (userId == null) {
+            // 第一次登录，获取用户基本信息
+            JSONObject userInfo = getQqUserInfo(qqLoginParam.getAccessToken(), openId);
+            User newUser = new User();
+            newUser.setId(IdUtils.getId());
+            newUser.setNickname(userInfo.getString("nickname"));
+            newUser.setUsername(String.valueOf(newUser.getId()));
+            newUser.setPassword(passwordEncoder.encode(UuidUtils.generateShortUuid()));
+            newUser.setGender(Gender.HIDE.getType());
+            newUser.setHeadImgUrl(userInfo.getString("figureurl_qq_2"));
+            newUser.setLoginTime(DateUtils.formatNow());
+            newUser.setChangePwd(false);
+            newUser.setLocked(false);
+            newUser.setTemp(false);
+            newUser.setAdmin(false);
+            newUser.setEnabled(true);
+            userMapper.insert(newUser);
+
+            // 插入用户与 QQ 的关联关系
+            portalMapper.insertUserOauthQqRelation(newUser.getId(), openId);
+            return parseTokenUser(newUser, request);
+        } else {
+            // 用户已存在，查询用户信息
+            User user = userMapper.selectById(userId);
+            user.setLoginTime(DateUtils.formatNow());
+            userMapper.updateById(user);
+            return parseTokenUser(user, request);
+        }
+    }
+
+    private JSONObject getQqUserInfo(String accessToken, String openId) {
+        String websiteConfig = getWebInfoFromCache();
+        WebInfo webInfo = StringUtils.isBlank(websiteConfig) ? new WebInfo() : JSON.parseObject(websiteConfig, WebInfo.class);
+
+        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(3));
+        param.put("access_token", accessToken);
+        param.put("oauth_consumer_key", webInfo.getQqAppId());
+        param.put("openid", openId);
+        String result = HttpUtils.get("https://graph.qq.com/user/get_user_info", param, null);
+        return JSON.parseObject(result);
+    }
+
+    private String getQqOpenId(String accessToken) {
+        Map<String, Object> param = new HashMap<>(CollectionUtils.mapSize(2));
+        param.put("access_token", accessToken);
+        param.put("fmt", "json");
+        String result = HttpUtils.get("https://graph.qq.com/oauth2.0/me", param, null);
+        JSONObject jsonObject = JSON.parseObject(result);
+        return jsonObject.getString("openid");
+    }
+
+    private UserVo parseTokenUser(User user, HttpServletRequest request) {
+        UserVo userVo = userConverter.entityToVo(user);
+
+        // 查询用户点赞列表
+        userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
+        userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
+        userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
+
+        // 封装 Token
+        String token = jwtTokenGenerator.generateToken(request, user, 1, null);
+        userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
+        return userVo;
     }
 
     private String getWebInfoFromCache() {

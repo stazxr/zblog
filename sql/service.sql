@@ -550,3 +550,10 @@ CREATE TABLE `article_view` (
   `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章浏览记录';
+
+/*Table structure for table `user_oauth_qq_relation` */
+DROP TABLE IF EXISTS `user_oauth_qq_relation`;
+CREATE TABLE `user_oauth_qq_relation` (
+  `USER_ID` BIGINT(64) NOT NULL COMMENT '用户id',
+  `OPEN_ID` VARCHAR(200) NOT NULL COMMENT 'openid'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户 QQ 登录关联表';

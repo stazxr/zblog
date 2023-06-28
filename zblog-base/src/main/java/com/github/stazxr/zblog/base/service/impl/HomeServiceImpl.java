@@ -47,7 +47,7 @@ public class HomeServiceImpl implements HomeService {
      */
     @Override
     public SingleLineChartDataVo getHomePanelDetailDataByType(String type) {
-        String[] xAxisData = DateUtils.getDateAry(7, true, false);
+        String[] xAxisData = DateUtils.getDateAry(7, true, true);
 
         List<DateCount> dateCounts;
         switch (type) {

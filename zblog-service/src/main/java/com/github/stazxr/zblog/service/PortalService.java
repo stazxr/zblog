@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.service;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
@@ -296,4 +297,13 @@ public interface PortalService {
      * @return VersionList
      */
     List<Version> queryVersionList();
+
+    /**
+     * QQ 登录
+     *
+     * @param qqLoginParam qq 登录信息
+     * @param request      请求信息
+     * @return UserVo 用户信息
+     */
+    UserVo qqLogin(QqLoginParam qqLoginParam, HttpServletRequest request);
 }

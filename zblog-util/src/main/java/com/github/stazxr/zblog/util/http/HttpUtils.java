@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * HttpUtils
  *
- *  testURL: http://httpbin.org/get
+ *  testURL: <a href="http://httpbin.org/get">...</a>
  *
  * @author SunTao
  * @since 2022-09-06
