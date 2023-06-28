@@ -7,7 +7,9 @@ import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
+import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -47,15 +49,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         // generate token
         int tokenVersion = 1;
-        String token = jwtTokenGenerator.generateToken(request, user, 1, null);
-        Map<String, Object> data = new HashMap<>(2);
-        data.put("access_token", Constants.AUTHENTICATION_PREFIX.concat(token));
-        data.put("change_pwd", user.getChangePwd());
+        String token = jwtTokenGenerator.generateToken(request, user, tokenVersion, null);
 
         // storage token
         Long userId = user.getId();
         UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userId).lastedToken(token).version(tokenVersion).build();
         userService.storageUserToken(tokenStorage, 1);
+
+        // sso token
+        Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
+        CacheUtils.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), token, ssoTkn.duration());
 
         // set login time
         userService.updateUserLoginInfo(request, userId);
@@ -67,6 +70,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         // return
+        Map<String, Object> data = new HashMap<>(2);
+        data.put("access_token", Constants.AUTHENTICATION_PREFIX.concat(token));
+        data.put("change_pwd", user.getChangePwd());
         ResponseUtils.responseJsonWriter(response, Result.success("登录成功").data(data));
     }
 }

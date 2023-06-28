@@ -2,7 +2,11 @@ package com.github.stazxr.zblog.base.component.security.handler;
 
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.service.ZblogService;
+import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -24,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 public class CustomLogoutHandler implements LogoutHandler {
     private final ZblogService zblogService;
 
+    private final UserService userService;
+
     private final JwtTokenStorage jwtTokenStorage;
 
     @Override
@@ -33,10 +39,16 @@ public class CustomLogoutHandler implements LogoutHandler {
             String username = user.getUsername();
             log.info("用户 {} 正在注销...", username);
 
-            // 注销token
+            // 注销 token
             jwtTokenStorage.expire(user.getId());
+            userService.clearUserStorageToken(user.getId());
+            CacheUtils.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(user.getId())));
 
-            // 清除RememberMe
+            // 清除统一登陆的用户信息
+            String ip = IpUtils.getIp(request);
+            CacheUtils.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+
+            // 清除 RememberMe
             zblogService.removeRememberMe(username);
         }
     }

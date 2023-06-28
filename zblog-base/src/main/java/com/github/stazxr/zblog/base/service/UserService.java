@@ -89,6 +89,13 @@ public interface UserService extends BaseService<User> {
     UserTokenStorage queryUserStorageToken(Long userId);
 
     /**
+     * 清除用户持久化的令牌信息
+     *
+     * @param userId 用户序列
+     */
+    void clearUserStorageToken(Long userId);
+
+    /**
      * 查询用户列表
      *
      * @param queryDto 查询参数

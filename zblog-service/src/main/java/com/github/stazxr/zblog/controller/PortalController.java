@@ -596,8 +596,23 @@ public class PortalController {
      */
     @PostMapping("/oauth/login/qq")
     @ApiOperation(value = "QQ登录")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
     @Router(name = "QQ登录", code = "oauthLoginQq", level = BaseConst.PermLevel.OPEN)
     public Result qqLogin(@RequestBody QqLoginParam qqLoginParam, HttpServletRequest request) {
         return Result.success().data(portalService.qqLogin(qqLoginParam, request));
+    }
+
+    /**
+     * 查询用户各种明细
+     *
+     * @param userId 用户id
+     * @return UserVo 用户信息
+     */
+    @GetMapping("/queryUserDetail")
+    @ApiOperation(value = "查询用户各种明细")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
+    @Router(name = "查询用户各种明细", code = "queryUserWebDetail", level = BaseConst.PermLevel.OPEN)
+    public Result queryUserDetail(Long userId) {
+        return Result.success().data(portalService.queryUserDetail(userId));
     }
 }

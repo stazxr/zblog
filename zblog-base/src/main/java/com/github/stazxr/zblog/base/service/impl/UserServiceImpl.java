@@ -289,6 +289,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
+     * 清除用户持久化的令牌信息
+     *
+     * @param userId 用户序列
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void clearUserStorageToken(Long userId) {
+        userTokenStorageMapper.deleteUserTokenStorage(userId);
+    }
+
+    /**
      * 查询用户列表
      *
      * @param queryDto 查询参数

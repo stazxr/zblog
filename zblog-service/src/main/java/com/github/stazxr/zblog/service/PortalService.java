@@ -306,4 +306,12 @@ public interface PortalService {
      * @return UserVo 用户信息
      */
     UserVo qqLogin(QqLoginParam qqLoginParam, HttpServletRequest request);
+
+    /**
+     * 查询用户各种明细
+     *
+     * @param userId 用户id
+     * @return UserVo 用户信息
+     */
+    UserVo queryUserDetail(Long userId);
 }

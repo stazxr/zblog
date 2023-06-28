@@ -157,6 +157,16 @@ public class Constants {
         usrTkn("usrTkn", 1800),
 
         /**
+         * ssoTkn
+         */
+        ssoTkn("ssoTkn", 604800),
+
+        /**
+         * preTkn
+         */
+        preTkn("preTkn", FOREVER_CACHE),
+
+        /**
          * email code
          */
         emailCode("emailCode", 300);

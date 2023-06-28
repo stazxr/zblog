@@ -5,14 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.VersionMapper;
+import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
 import com.github.stazxr.zblog.converter.CommentConverter;
@@ -118,6 +121,8 @@ public class PortalServiceImpl implements PortalService {
 
     private final AlbumMapper albumMapper;
 
+    private final UserService userService;
+
     private final AlbumPhotoMapper albumPhotoMapper;
 
     private final ArticleColumnMapper articleColumnMapper;
@@ -129,6 +134,8 @@ public class PortalServiceImpl implements PortalService {
     private final ArticleSearchStrategyContext articleSearchStrategyContext;
 
     private final JwtTokenGenerator jwtTokenGenerator;
+
+    private final JwtTokenStorage jwtTokenStorage;
 
     /**
      * 查询博客前台信息
@@ -864,6 +871,27 @@ public class PortalServiceImpl implements PortalService {
         }
     }
 
+    /**
+     * 查询用户各种明细
+     *
+     * @param userId 用户id
+     * @return UserVo 用户信息
+     */
+    @Override
+    public UserVo queryUserDetail(Long userId) {
+        if (userId != null) {
+            User user = userMapper.selectById(userId);
+            UserVo userVo = userConverter.entityToVo(user);
+            userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
+            userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
+            userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
+            userVo.setUserToken(jwtTokenStorage.getAccessToken(userId));
+            return userVo;
+        }
+
+        return null;
+    }
+
     private JSONObject getQqUserInfo(String accessToken, String openId) {
         String websiteConfig = getWebInfoFromCache();
         WebInfo webInfo = StringUtils.isBlank(websiteConfig) ? new WebInfo() : JSON.parseObject(websiteConfig, WebInfo.class);
@@ -894,7 +922,13 @@ public class PortalServiceImpl implements PortalService {
         userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
 
         // 封装 Token
-        String token = jwtTokenGenerator.generateToken(request, user, 1, null);
+        int tokenVersion = 1;
+        String token = jwtTokenGenerator.generateToken(request, user, tokenVersion, null);
+        UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userVo.getId()).lastedToken(token).version(tokenVersion).build();
+        userService.storageUserToken(tokenStorage, 1);
+        Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
+        CacheUtils.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), token, ssoTkn.duration());
+
         userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
         return userVo;
     }

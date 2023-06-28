@@ -14,16 +14,25 @@ spring:
     connect-timeout: 5000
     database: ${REDIS_DB:0}
 jwt:
-  access-token-duration: 7200
-  refresh-token-duration: 86400
+  # Token 有效时长，单位秒
+  # access-token-duration: 7200
+  access-token-duration: 180
+  # R-Token 有效时长，单位秒
+  refresh-token-duration: 300
+  # 可续签的时间范围，单位秒，当 Token 剩余有效时间小于等于该值，则允许续签
+  refresh-min-duration: 60
+  # 是否允许续签
   allowed-renew-token: true
-  refresh-min-duration: 1800
-  max-version: 10
+  # 允许的续签次数
+  max-version: 3
+  # 签名类型
   algorithm: RS256
+  # 证书信息
   cert-info:
     alias: suntaoblogcom
     key-password: ENC(kUfidmIYBnle2iOXS1MSqQvzU+VOhCXQ)
     cert-location: suntaoblogcom.jks
+  # Token 基础信息
   claims:
     issuer: https://www.suntaoblog.com
     subject: Login

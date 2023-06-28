@@ -30,7 +30,7 @@ public class JwtProperties {
     private boolean allowedRenewToken = false;
 
     /**
-     * token 续期检查时间范围（默认30分钟，单位秒），要求小于 accessTokenDuration
+     * 可续签的时间范围（默认30分钟，单位秒），要求小于 accessTokenDuration，当 Token 剩余有效时间小于等于该值，则允许续签
      */
     private int refreshMinDuration = accessTokenDuration / 4;
 

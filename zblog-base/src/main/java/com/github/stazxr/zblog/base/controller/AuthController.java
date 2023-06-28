@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeEnum;
 import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeProperties;
+import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,9 +38,12 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @Api(value = "AuthController", tags = { "认证控制器" })
 public class AuthController {
+    private final ZblogService zblogService;
+
     /**
      * 获取当前登录用户信息
      *
+     * @param request 请求信息
      * @return login username
      */
     @IgnoredLog
@@ -46,7 +51,7 @@ public class AuthController {
     @ApiOperation(value = "获取当前登录用户信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
-    public Result currentUserDetail() {
+    public Result currentUserDetail(HttpServletRequest request) {
         return Result.success().data(SecurityUtils.getLoginUser());
     }
 
@@ -89,5 +94,19 @@ public class AuthController {
             put("uuid", uuid);
         }};
         return Result.success().data(data);
+    }
+
+    /**
+     * 检查用户的登录状态
+     *
+     * @param request 请求信息
+     * @return userId
+     */
+    @PostMapping("/checkUserLoginStatus")
+    @ApiOperation(value = "检查用户的登录状态")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
+    @Router(name = "检查用户的登录状态", code = "checkUserLoginStatus", level = BaseConst.PermLevel.OPEN)
+    public Result checkUserLoginStatus(HttpServletRequest request) {
+        return Result.success().data(zblogService.checkUserLoginStatus(request));
     }
 }

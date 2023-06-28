@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private static final int RENEW_WAIT_INTERVAL_MILL_SECONDS = 500;
 
-    private static final String PREVIOUS_TOKEN_KEY_TEMPLATE = "previousTkn:%s";
+    private static final String PREVIOUS_TOKEN_KEY_TEMPLATE = Constants.CacheKey.preTkn.cacheKey().concat(":%s");
 
     private static final String AUTH_ERROR_MESSAGE_TEMPLATE = "An error occurred while authentication token: %s";
 
@@ -120,6 +120,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticationTokenHandle(jwtToken, request, response);
                     chain.doFilter(request, response);
                 } catch (AuthenticationException ex) {
+                    String ip = IpUtils.getIp(request);
+                    CacheUtils.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
                     log.error("authentication token handle exec failed: {} - [{}]", ex.getMessage(), jwtToken);
                     authenticationEntryPoint.commence(request, response, ex);
                 }
@@ -145,67 +147,78 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Date requestTime = new Date();
             JWTClaimsSet claimsSet = jwtDecoder.decode(jwtToken);
 
-            // get user
-            User user = getUserFromClaimSet(claimsSet);
+            // get token user
+            User tokenUser = getUserFromClaimSet(claimsSet);
 
             // check loginIp
-            String username = user.getUsername();
-            checkTokenLoginIp(request, claimsSet, username);
+            Long userId = tokenUser.getId();
+            String username = tokenUser.getUsername();
+            checkTokenLoginIp(request, claimsSet, tokenUser);
 
-            // check is user previous token
-            Long userId = user.getId();
+            // check the token is previous token
             String previousToken = CacheUtils.get(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
             boolean isPrevious = previousToken != null && previousToken.equals(jwtToken);
+            boolean allowedRenewToken = claimsSet.getBooleanClaim("renewToken");
             if (isPrevious) {
-                // 这里Token已经续签完成，不做后续校验
+                // 这里 Token 已经续签完成，通知前端刷新令牌，不做后续校验
                 log.warn("user {} token has been renew finish, but continue use the previous token, request '{}'", username, request.getRequestURL());
                 response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(jwtTokenStorage.getAccessToken(userId)));
-                setContextAuthentication(request, user);
+                setContextAuthentication(request, tokenUser);
                 return;
             } else {
                 // check token consistency
-                checkTokenIsMatch(jwtToken, userId, username);
+                checkTokenIsMatch(jwtToken, userId, username, allowedRenewToken);
             }
 
             // check token is expired
             boolean expired = checkTokenIsExpired(claimsSet, requestTime);
-            boolean allowedRenewToken = claimsSet.getBooleanClaim("renewToken");
             if (expired && !allowedRenewToken) {
+                clearUserTokenInfo(userId);
                 log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} token expired without renew"));
                 throw new PreJwtCheckAuthenticationException(TokenError.TE008.value());
             }
 
-            // check is need to renew token
-            boolean needRenewToken = checkTokenIsNeededRenew(claimsSet, requestTime);
-            if (needRenewToken) {
+            // check is enabled to renew token
+            boolean enabledRenewToken = checkTokenIsNeededRenew(claimsSet, requestTime);
+            if (allowedRenewToken && enabledRenewToken) {
                 // check is allowed renew token
                 String refreshToken = jwtTokenStorage.getRefreshToken(userId);
-                checkTokenIsAllowedRenew(claimsSet, expired, refreshToken, username);
+                checkTokenIsAllowedRenew(claimsSet, expired, refreshToken, tokenUser);
 
                 // renewToken
-                Assert.isTrue(checkRequestDoOrWait(userId, username), () -> renewToken(request, response, jwtToken, user, claimsSet), () -> {
+                Assert.isTrue(checkRequestDoOrWait(userId, username), () -> {
+                    // 续签操作
+                    renewToken(request, response, jwtToken, tokenUser, claimsSet);
+                }, () -> {
+                    // 续签中，等待续签操作结束
                     if (expired) {
                         int count = 0;
                         int maxWaitCount = MAX_RENEW_WAIT_SECONDS * 1000 / RENEW_WAIT_INTERVAL_MILL_SECONDS;
                         do {
                             ThreadUtils.sleepMillisecond(RENEW_WAIT_INTERVAL_MILL_SECONDS);
                             if (count++ > maxWaitCount) {
+                                clearUserTokenInfo(userId);
                                 log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token failed, overtime"), username);
                                 throw new PreJwtCheckAuthenticationException(TokenError.TE012.value());
                             }
                         } while (RENEW_LOCK_MAP.containsKey(userId));
 
                         // renew token finish, check result is success
-                        if (StringUtils.isBlank(jwtTokenStorage.getAccessToken(userId))) {
+                        String newAtk = jwtTokenStorage.getAccessToken(userId);
+                        if (StringUtils.isBlank(newAtk)) {
+                            clearUserTokenInfo(userId);
                             log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token failed"), username);
                             throw new PreJwtCheckAuthenticationException(TokenError.TE011.value());
+                        } else {
+                            // 通知前端刷新令牌
+                            response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newAtk));
                         }
                     }
                 });
             }
 
             // set UsernamePasswordAuthenticationToken
-            setContextAuthentication(request, user);
+            setContextAuthentication(request, tokenUser);
         } catch (PreJwtCheckAuthenticationException ex) {
             throw ex;
         } catch (JwtException ex) {
@@ -219,9 +232,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void setContextAuthentication(HttpServletRequest request, User user) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, PASSWORD, user.getAuthorities());
-        token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(token);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, PASSWORD, user.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
     private void renewToken(HttpServletRequest request, HttpServletResponse response, String jwtToken, User user, JWTClaimsSet claimsSet) {
@@ -236,23 +249,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String newToken = jwtTokenGenerator.generateToken(request, user, newVersion, loginIp);
 
             // cache previous token
-            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, MAX_RENEW_WAIT_SECONDS * 2);
+            int preTokenExpiredTime = getPreTokenFreeTime(jwtToken);
+            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, preTokenExpiredTime);
 
             // set token
             response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newToken));
             String remark = "续签: ".concat(String.valueOf(newVersion));
             UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userId).lastedToken(newToken).version(newVersion).remark(remark).build();
-            userService.storageUserToken(tokenStorage, 1);
+            userService.storageUserToken(tokenStorage, 2);
             log.info("续签 - 用户 {}: 续签成功，版本【{}】", username, newVersion);
+
+            // set sso token
+            Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
+            CacheUtils.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), newToken, ssoTkn.duration());
         } catch (Exception ex) {
-            jwtTokenStorage.expire(userId);
-            CacheUtils.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            clearUserTokenInfo(user.getId());
             log.error("续签 - 用户 {}: 续签失败", username);
             log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token catch error"), username, ex);
             throw new PreJwtCheckAuthenticationException(TokenError.TE011.value(), ex);
         } finally {
             log.info("续签 - 用户 {}: 释放锁", username);
             RENEW_LOCK_MAP.remove(userId);
+        }
+    }
+
+    private int getPreTokenFreeTime(String jwtToken) {
+        try {
+            return 0;
+        } catch (Exception e) {
+            log.warn(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "get pre token free time catch unexpected error, use 'MAX_RENEW_WAIT_SECONDS * 2', jwt is: " + jwtToken));
+            return MAX_RENEW_WAIT_SECONDS * 2;
         }
     }
 
@@ -266,19 +292,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void checkTokenIsAllowedRenew(JWTClaimsSet claimsSet, boolean expired, String refreshToken, String username) throws ParseException {
+    private void checkTokenIsAllowedRenew(JWTClaimsSet claimsSet, boolean expired, String refreshToken, User user) throws ParseException {
         if (expired) {
-            // accessToken已过期，校验refreshToken是否过期
+            // accessToken 已过期，校验 refreshToken 是否过期
             if (StringUtils.isBlank(refreshToken)) {
-                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} refresh token expired"), username);
+                clearUserTokenInfo(user.getId());
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} refresh token expired"), user.getUsername());
                 throw new PreJwtCheckAuthenticationException(TokenError.TE009.value());
             }
         } else {
-            // accessToken未过期，校验version是否已经达到了阙值
+            // accessToken 未过期，校验 version 是否已经达到了阙值
             int version = claimsSet.getIntegerClaim("version");
             int maxVersion = jwtProperties.getMaxVersion();
             if (version >= maxVersion) {
-                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token over max count[{}]"), username, maxVersion);
+                clearUserTokenInfo(user.getId());
+                log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} renew token over max count[{}]"), user.getUsername(), maxVersion);
                 throw new PreJwtCheckAuthenticationException(TokenError.TE010.value());
             }
         }
@@ -295,16 +323,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return requestTime.after(expirationTime);
     }
 
-    private void checkTokenIsMatch(String jwtToken, Long userId, String username) {
+    private void checkTokenIsMatch(String jwtToken, Long userId, String username, boolean allowedRenewToken) {
         String accessToken = jwtTokenStorage.getAccessToken(userId);
         if (accessToken == null) {
-            // 令牌已经过期，对比持久化的Token
-            UserTokenStorage tokenStorage = userService.queryUserStorageToken(userId);
-            if (tokenStorage != null && jwtToken.equals(tokenStorage.getLastedToken())) {
-                return;
-            }
+            // 令牌已经过期
+            if (allowedRenewToken) {
+                // 续签功能开启的情况下，可以对比持久化的 Token
+                UserTokenStorage tokenStorage = userService.queryUserStorageToken(userId);
+                if (tokenStorage != null && jwtToken.equals(tokenStorage.getLastedToken())) {
+                    return;
+                }
 
-            log.warn(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token consistency failed, token may different or expired forever"), username);
+                log.warn(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token consistency failed, token may different or expired forever"), username);
+            }
         } else {
             // 令牌未过期
             if (jwtToken.equals(accessToken)) {
@@ -312,10 +343,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        clearUserTokenInfo(userId);
         throw new PreJwtCheckAuthenticationException(TokenError.TE007.value());
     }
 
-    private void checkTokenLoginIp(HttpServletRequest request, JWTClaimsSet claimsSet, String username) {
+    private void clearUserTokenInfo(Long userId) {
+        jwtTokenStorage.expire(userId);
+        userService.clearUserStorageToken(userId);
+        CacheUtils.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+    }
+
+    private void checkTokenLoginIp(HttpServletRequest request, JWTClaimsSet claimsSet, User user) {
         try {
             String loginIp = claimsSet.getStringClaim("loginIp");
             String requestIp = IpUtils.getIp(request);
@@ -323,12 +361,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip failed, requestIp: {}, loginId: {}"), username, requestIp, loginIp);
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip failed, requestIp: {}, loginId: {}"), user.getUsername(), requestIp, loginIp);
         } catch (Exception ex) {
             // loginIp not exist or parse eor
-            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip catch eor"), username, ex);
+            log.error(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "user {} check token ip catch eor"), user.getUsername(), ex);
         }
 
+        clearUserTokenInfo(user.getId());
         throw new PreJwtCheckAuthenticationException(TokenError.TE006.value());
     }
 
@@ -363,9 +402,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private User findUserBySearchDb(Long userId) {
         User user = userService.getById(userId);
         if (user != null) {
+            // user roles
             List<Role> userRoles = roleService.queryRolesByUserId(user.getId());
             user.setAuthorities(userRoles);
 
+            // user perms
             Set<String> userPerms = permissionService.queryUserPerms(user.getId());
             user.setPerms(userPerms);
         }
