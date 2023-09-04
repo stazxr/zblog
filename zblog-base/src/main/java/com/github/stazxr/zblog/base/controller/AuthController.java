@@ -102,6 +102,7 @@ public class AuthController {
      * @param request 请求信息
      * @return userId
      */
+    @IgnoredLog
     @PostMapping("/checkUserLoginStatus")
     @ApiOperation(value = "检查用户的登录状态")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
