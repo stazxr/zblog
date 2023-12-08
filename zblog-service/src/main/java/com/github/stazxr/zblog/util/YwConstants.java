@@ -29,22 +29,22 @@ public class YwConstants {
         /**
          * webInfo
          */
-        webInfo("portal:webInfo", Constants.FOREVER_CACHE),
+        webInfo("portal:webInfo", Constants.ONE_WEEK_SEC_UNIT),
 
         /**
          * socialInfo
          */
-        socialInfo("portal:socialInfo", Constants.FOREVER_CACHE),
+        socialInfo("portal:socialInfo", Constants.ONE_WEEK_SEC_UNIT),
 
         /**
          * otherInfo
          */
-        otherInfo("portal:otherInfo", Constants.FOREVER_CACHE),
+        otherInfo("portal:otherInfo", Constants.ONE_WEEK_SEC_UNIT),
 
         /**
-         * githubCalendarData，默认缓存 12 个小时
+         * githubCalendarData，默认缓存 24 个小时
          */
-        githubCalendarData("portal:githubCalendar:", 12 * 3600);
+        githubCalendarData("portal:githubCalendar:", Constants.ONE_DAY_SEC_UNIT);
 
         /**
          * 缓存Key

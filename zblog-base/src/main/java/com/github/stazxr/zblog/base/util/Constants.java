@@ -50,6 +50,21 @@ public class Constants {
     public static final int FOREVER_CACHE = CacheConfigProperties.FOREVER_CACHE;
 
     /**
+     * 一时的秒数
+     */
+    public static final int ONE_HOUR_SEC_UNIT = 3600;
+
+    /**
+     * 一天的秒数
+     */
+    public static final int ONE_DAY_SEC_UNIT = ONE_HOUR_SEC_UNIT * 24;
+
+    /**
+     * 一周的秒数
+     */
+    public static final int ONE_WEEK_SEC_UNIT = ONE_DAY_SEC_UNIT * 7;
+
+    /**
      * AUTHENTICATION_PREFIX
      */
     public static final String AUTHENTICATION_PREFIX = "Bearer ";

@@ -34,7 +34,7 @@
         <!-- 工具组件 -->
         <module>zblog-util</module>
         <!-- 表达式组件 -->
-        <module>zblog-jexl</module>
+        <!-- <module>zblog-jexl</module> -->
         <!-- 核心组件 -->
         <module>zblog-core</module>
         <!-- 切面日志 -->
