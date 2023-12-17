@@ -275,6 +275,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private int getPreTokenFreeTime(String jwtToken) {
         try {
+            // 此处设置不过期
             return 0;
         } catch (Exception e) {
             log.warn(String.format(AUTH_ERROR_MESSAGE_TEMPLATE, "get pre token free time catch unexpected error, use 'MAX_RENEW_WAIT_SECONDS * 2', jwt is: " + jwtToken));

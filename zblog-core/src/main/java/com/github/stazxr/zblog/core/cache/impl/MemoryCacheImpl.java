@@ -112,8 +112,10 @@ public class MemoryCacheImpl extends BaseCache {
 
             synchronized (CacheMap.class) {
                 if (null == instance) {
-                    startExpiredCheckThread();
+                    expiredDateMap = new CacheMap<>();
                     instance = new CacheMap<>();
+                    startExpiredCheckThread();
+
                 }
             }
             return instance;
@@ -145,7 +147,7 @@ public class MemoryCacheImpl extends BaseCache {
         public String cacheGet(String key) {
             Date expireDate = expiredDateMap.get(key);
             if (expireDate != null && new Date().after(expireDate)) {
-                // expired
+                // 惰性删除过期的 Key
                 instance.remove(key);
                 expiredDateMap.remove(key);
             }
@@ -155,16 +157,15 @@ public class MemoryCacheImpl extends BaseCache {
 
         @SuppressWarnings("AlibabaAvoidManuallyCreateThread")
         private static void startExpiredCheckThread() {
-            expiredDateMap = new CacheMap<>();
-
             Thread thread = new Thread(() -> {
                 while (true) {
-                    // 每10分种遍历一次 expiredDateMap
+                    // 主动删除过期的 Key：每10分种遍历一次 expiredDateMap
                     checkExpiredMap();
                     ThreadUtils.sleepMinute(10);
                 }
             });
 
+            thread.setName("CacheMapExpiredCheckThread");
             thread.start();
         }
 

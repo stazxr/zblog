@@ -26,13 +26,13 @@ public class InitRouterRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
-            log.info("===> Start Init Router");
+            log.info("=====> Start Init Router");
             routerManager.initRouter();
         } catch (Exception ex) {
             log.error("Init Router Failed, Exit system", ex);
             System.exit(1);
         }
 
-        log.info("Init Router End <===");
+        log.info("=====> Init Router End");
     }
 }

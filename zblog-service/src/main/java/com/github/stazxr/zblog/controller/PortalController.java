@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.controller;
 
 import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
+import com.github.stazxr.zblog.core.annotation.FormResubmitCheck;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
@@ -202,6 +203,7 @@ public class PortalController {
      * @param commentDto 评论信息
      * @return Result
      */
+    @FormResubmitCheck
     @PostMapping(value = "/likeComment")
     @ApiOperation(value = "点赞评论")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
@@ -361,6 +363,7 @@ public class PortalController {
      * @param articleDto 文章信息
      * @return Result
      */
+    @FormResubmitCheck
     @PostMapping(value = "/likeArticle")
     @ApiOperation(value = "点赞文章")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
