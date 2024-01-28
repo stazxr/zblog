@@ -60,4 +60,12 @@ public interface ArticleTagService extends IService<ArticleTag> {
      * @param tagId 标签ID
      */
     void deleteTag(Long tagId);
+
+    /**
+     * 通过加锁的方式获取标签信息
+     *
+     * @param tagId 标签id
+     * @return ArticleTag
+     */
+    ArticleTag getByIdWithRowLock(Long tagId);
 }

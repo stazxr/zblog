@@ -5,7 +5,10 @@ import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.util.IpImplUtils;
+import com.github.stazxr.zblog.domain.entity.ArticleTag;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
+import com.github.stazxr.zblog.service.ArticleTagService;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -16,6 +19,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +38,8 @@ import java.net.URLEncoder;
 @RequestMapping("/api/test")
 @Api(value = "TestController", tags = { "接口测试控制器" })
 public class TestController {
+    private ArticleTagService articleTagService;
+
     String[] headers = {
         "第一列", "第二列", "第三列", "第四列", "第五列", "第六列", "第七列", "第八列",
         "第九列", "第十列", "第十一列", "第十二列", "第十三列", "第十四列", "第十五列", "第十六列",
@@ -59,21 +65,46 @@ public class TestController {
 
     String[] businessAreaAry = { "1", "2", "3", "4", "5" };
 
+    @Autowired
+    public TestController(ArticleTagService articleTagService) {
+        this.articleTagService = articleTagService;
+    }
+
     /**
-     * 测试IP工具类
+     * 测试数据库的行锁
      *
-     * @param ip IP地址
-     * @return IP来源
+     * @param tagId 标签id
+     * @return ArticleTag
+     */
+    @IgnoredLog
+    @IgnoreResult
+    @GetMapping(value = "/testMysqlRowLock")
+    @ApiOperation(value = "测试数据库的行锁")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "tagId", value = "标签id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
+    @Router(name = "测试数据库的行锁", code = "testMysqlRowLock", level = BaseConst.PermLevel.OPEN)
+    public ArticleTag testMysqlRowLock(@RequestParam Long tagId) {
+        System.out.println("[" + tagId + "] one...");
+        return articleTagService.getByIdWithRowLock(tagId);
+    }
+
+    /**
+     * 测试 IP 工具类
+     *
+     * @param ip IP 地址
+     * @return IP 来源
      */
     @IgnoredLog
     @IgnoreResult
     @GetMapping(value = "/getIpSource")
-    @ApiOperation(value = "测试IP工具类")
+    @ApiOperation(value = "测试 IP 工具类")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "ip", value = "ip地址", required = true, dataTypeClass = String.class)
+        @ApiImplicitParam(name = "ip", value = "ip 地址", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "测试IP工具类", code = "getIpSourceByTest", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "测试 IP 工具类", code = "getIpSourceByTest", level = BaseConst.PermLevel.OPEN)
     public String testIpUtils(@RequestParam String ip) {
         log.info("IpImplUtils.getIpSourceByHttp({}): {}", ip, IpImplUtils.getIpSourceByHttp(ip));
         log.info("IpImplUtils.getIpSourceByLocal({}): {}", ip, IpImplUtils.getIpSourceByLocal(ip));
@@ -81,14 +112,14 @@ public class TestController {
     }
 
     /**
-     * 测试POI
+     * 测试 POI
      */
     @IgnoredLog
     @IgnoreResult
     @PostMapping(value = "/excelPoi")
-    @ApiOperation(value = "测试POI")
+    @ApiOperation(value = "测试 POI")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "测试POI", code = "excelPoiByTest", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "测试 POI", code = "excelPoiByTest", level = BaseConst.PermLevel.OPEN)
     public void testExcelPoi(HttpServletResponse response) {
         try (Workbook workbook = new XSSFWorkbook()) {
             // 创建表单

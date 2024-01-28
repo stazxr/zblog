@@ -61,4 +61,12 @@ public interface ArticleTagMapper extends BaseMapper<ArticleTag> {
      * @return CloudTagVos
      */
     List<CloudTagVo> queryBoardTagList();
+
+    /**
+     * 通过加锁的方式获取标签信息
+     *
+     * @param tagId 标签id
+     * @return ArticleTag
+     */
+    ArticleTag getByIdWithRowLock(@Param("tagId") Long tagId);
 }

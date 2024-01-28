@@ -15,6 +15,7 @@ import com.github.stazxr.zblog.mapper.ArticleTagRelationMapper;
 import com.github.stazxr.zblog.service.ArticleTagService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,6 +119,25 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
 
         // 删除中间表的数据
         articleTagRelationMapper.deleteByTagId(tagId);
+    }
+
+    /**
+     * 通过加锁的方式获取标签信息
+     *
+     * @param tagId 标签id
+     * @return ArticleTag
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ArticleTag getByIdWithRowLock(Long tagId) {
+        System.out.println("[" + tagId + "] two...");
+
+        // 上锁，整个方法返回后会释放锁，其他线程会在此阻塞（可以用来实现多个跑一个逻辑，如定时）
+        ArticleTag articleTag = baseMapper.getByIdWithRowLock(tagId);
+        System.out.println("[" + tagId + "] three...");
+        ThreadUtils.sleepSecond(10);
+        System.out.println("[" + tagId + "] four...");
+        return articleTag;
     }
 
     private void checkArticleTag(ArticleTag articleTag) {

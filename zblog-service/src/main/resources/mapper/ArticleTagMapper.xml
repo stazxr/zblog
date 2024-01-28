@@ -63,4 +63,8 @@
             )
         )
     </select>
+
+    <select id="getByIdWithRowLock" resultType="com.github.stazxr.zblog.domain.entity.ArticleTag">
+        SELECT `NAME` FROM article_tag WHERE ID = #{tagId} FOR UPDATE
+    </select>
 </mapper>
