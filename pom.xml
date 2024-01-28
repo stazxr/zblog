@@ -13,7 +13,7 @@
 
     <groupId>com.github.stazxr.zblog</groupId>
     <artifactId>zblog-parent</artifactId>
-    <version>4.0.0</version>
+    <version>4.1.0_u2</version>
     <packaging>pom</packaging>
 
     <name>zblog-parent</name>
@@ -55,7 +55,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
         <!-- zblog properties -->
-        <zblog.version>4.0.0</zblog.version>
+        <zblog.version>4.1.0_u2</zblog.version>
         <!-- third party properties -->
         <springboot.version>2.5.2</springboot.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>

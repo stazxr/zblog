@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.github.stazxr.zblog</groupId>
 		<artifactId>zblog-parent</artifactId>
-		<version>4.0.0</version>
+		<version>4.1.0_u2</version>
 	</parent>
 
 	<artifactId>zblog-jexl</artifactId>
