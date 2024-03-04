@@ -45,7 +45,7 @@
             <artifactId>jasypt-spring-boot-starter</artifactId>
         </dependency>
         <!-- RabbitMQ -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
@@ -53,7 +53,7 @@
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit-test</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <!-- Springboot Test -->
         <dependency>
             <groupId>org.springframework</groupId>

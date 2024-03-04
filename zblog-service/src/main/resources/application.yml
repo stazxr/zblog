@@ -60,12 +60,12 @@ spring:
     port: 6379
     client-type: lettuce
     password: redisPwd
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
-    virtual-host: /
+  # rabbitmq:
+    # host: 127.0.0.1
+    # port: 5672
+    # username: guest
+    # password: guest
+    # virtual-host: /
   web:
     resources:
       add-mappings: false

@@ -27,7 +27,6 @@ import com.github.stazxr.zblog.domain.enums.*;
 import com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo;
 import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.mapper.*;
-import com.github.stazxr.zblog.rabbitmq.producer.DelayProducer;
 import com.github.stazxr.zblog.service.ArticleService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -74,8 +73,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleTagRelationMapper articleTagRelationMapper;
 
     private final WebSettingMapper webSettingMapper;
-
-    private final DelayProducer delayProducer;
 
     /**
      * 分页查询用户的文章列表
@@ -278,7 +275,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         baseMapper.invalidateArticlePublishTiming(articleDto.getId(), "重新定时发布【" + nowTime + "】");
         Long publishId = GenerateIdUtils.getId();
         baseMapper.insertArticlePublishTiming(publishId, articleDto.getId(), articleDto.getAutoPublishTime(), nowTime);
-        delayProducer.producerArticlePublishMessage(publishId, delay);
+        throw new ServiceException("功能已关闭，优化中");
     }
 
     /**
