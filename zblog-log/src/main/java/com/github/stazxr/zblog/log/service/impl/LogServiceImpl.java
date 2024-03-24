@@ -8,7 +8,6 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
@@ -59,70 +58,75 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      * 保存日志信息
      *
      * @param joinPoint 切点信息
-     * @param log       日志信息
+     * @param logInfo   日志信息
      * @param result    执行结果
      * @param e         异常信息
      */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void saveLog(ProceedingJoinPoint joinPoint, Log log, Object result, Throwable e) {
-        // 获取路由信息
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        IgnoredLog ignoredLog = method.getAnnotation(IgnoredLog.class);
-        if (ignoredLog != null && e == null) {
-            // 过滤非异常日志
-            return;
-        }
-
-        Router aopRouter = method.getAnnotation(Router.class);
-        if (aopRouter == null) {
-            return;
-        }
-
-        com.github.stazxr.zblog.log.annotation.Log aopLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
-        if (aopLog != null) {
-            // 操作日志
-            log.setLogType(LogType.OPERATE.getValue());
-            log.setDescription(StringUtils.isBlank(aopLog.value()) ? aopRouter.name() : aopLog.value());
-        } else {
-            // 接口日志
-            log.setLogType(LogType.API.getValue());
-            log.setDescription(aopRouter.name());
-        }
-
-        // 设置响应结果
-        if (result != null && RESULT_CLASS.equals(method.getReturnType().getSimpleName())) {
-            // 标准返回
-            String resultStr = JSON.toJSONString(result);
-            JSONObject resultObj = JSON.parseObject(resultStr, JSONObject.class);
-            log.setExecResult(HttpStatus.OK.value() == resultObj.getInteger("code"));
-            log.setExecMessage(resultObj.getString("message"));
-        } else {
-            // 返回不是Result，默认返回的是数据，默认成功
-            log.setExecResult(true);
-            log.setExecMessage(result == null ? null : JSON.toJSONString(result));
-        }
-
-        // 异常信息
-        if (e != null) {
-            log.setExecResult(false);
-            if (e instanceof ServiceException) {
-                // 业务异常
-                log.setExecMessage(e.getMessage());
-            } else {
-                // 系统异常
-                log.setLogType(LogType.ERROR.getValue());
-                log.setExecMessage("系统发生未知错误：".concat(e.getMessage()));
-                log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+    public void saveLog(ProceedingJoinPoint joinPoint, Log logInfo, Object result, Throwable e) {
+        try {
+            // 获取路由信息
+            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+            Method method = signature.getMethod();
+            IgnoredLog ignoredLog = method.getAnnotation(IgnoredLog.class);
+            if (ignoredLog != null && e == null) {
+                // 过滤非异常日志
+                return;
             }
-        }
 
-        // 设置其他信息
-        log.setId(IdUtils.getId());
-        String parameter = getParameter(method, joinPoint.getArgs());
-        log.setRequestParam(parameter.length() > MAX_PARAM_LENGTH ? "参数内容过长" : parameter);
-        save(log);
+            Router aopRouter = method.getAnnotation(Router.class);
+            if (aopRouter == null) {
+                return;
+            }
+
+            com.github.stazxr.zblog.log.annotation.Log aopLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
+            if (aopLog != null) {
+                // 操作日志
+                logInfo.setLogType(LogType.OPERATE.getValue());
+                logInfo.setDescription(StringUtils.isBlank(aopLog.value()) ? aopRouter.name() : aopLog.value());
+            } else {
+                // 接口日志
+                logInfo.setLogType(LogType.API.getValue());
+                logInfo.setDescription(aopRouter.name());
+            }
+
+            // 设置响应结果
+            if (result != null && RESULT_CLASS.equals(method.getReturnType().getSimpleName())) {
+                // 标准返回
+                String resultStr = JSON.toJSONString(result);
+                JSONObject resultObj = JSON.parseObject(resultStr, JSONObject.class);
+                logInfo.setExecResult(HttpStatus.OK.value() == resultObj.getInteger("code"));
+                logInfo.setExecMessage(resultObj.getString("message"));
+            } else {
+                // 返回不是Result，默认返回的是数据，默认成功
+                logInfo.setExecResult(true);
+                logInfo.setExecMessage(result == null ? null : JSON.toJSONString(result));
+            }
+
+            // 异常信息
+            if (e != null) {
+                logInfo.setExecResult(false);
+                if (e instanceof ServiceException) {
+                    // 业务异常
+                    logInfo.setExecMessage(e.getMessage());
+                } else {
+                    // 系统异常
+                    logInfo.setLogType(LogType.ERROR.getValue());
+                    logInfo.setExecMessage("系统发生未知错误：".concat(e.getMessage()));
+                    logInfo.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+                }
+            }
+
+            // 设置其他信息
+            logInfo.setId(IdUtils.getId());
+            String parameter = getParameter(method, joinPoint.getArgs());
+            logInfo.setRequestParam(parameter.length() > MAX_PARAM_LENGTH ? "参数内容过长" : parameter);
+            save(logInfo);
+        } catch (Exception ex) {
+            // 失败打印日志即可，不往出抛
+            log.error("save log catch eor", ex);
+        }
     }
 
     /**
