@@ -6,7 +6,7 @@
       "captchaCode": {
         "length": 2,
         "width": 111,
-        "height": 36
+        "height": 32
       }
     }
   },
