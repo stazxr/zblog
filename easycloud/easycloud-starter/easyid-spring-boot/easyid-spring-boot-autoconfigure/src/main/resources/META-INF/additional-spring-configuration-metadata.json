@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "easycloud.idgen",
+      "type": "com.github.stazxr.easycloud.starter.easyid.autoconfigure.EasyIdProperties",
+      "sourceType": "com.github.stazxr.easycloud.starter.easyid.autoconfigure.EasyIdProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "easycloud.idgen.datacenterId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.easycloud.starter.easyid.autoconfigure.EasyIdProperties",
+      "description": "数据中心ID."
+    },
+    {
+      "name": "easycloud.idgen.machineId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.easycloud.starter.easyid.autoconfigure.EasyIdProperties",
+      "description": "机器ID."
+    }
+  ]
+}
