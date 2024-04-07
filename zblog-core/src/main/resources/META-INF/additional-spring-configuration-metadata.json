@@ -38,13 +38,6 @@
       "defaultValue": 300
     },
     {
-      "name": "zblog.deploy-type",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "部署类型：single - 单机部署；multi - 多节点部署.",
-      "defaultValue": "single"
-    },
-    {
       "name": "zblog.base-package",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
@@ -159,19 +152,6 @@
         {
           "value": "redis",
           "description": "redis cache."
-        }
-      ]
-    },
-    {
-      "name": "zblog.deploy-type",
-      "values": [
-        {
-          "value": "single",
-          "description": "单机部署."
-        },
-        {
-          "value": "multi",
-          "description": "多节点部署."
         }
       ]
     }

@@ -18,11 +18,6 @@ public class ZblogProperties {
     private String basePackage = "com.github.stazxr.zblog";
 
     /**
-     * 部署类型：single - 单机部署；multi - 多节点部署. 默认单机部署
-     */
-    private String deployType = "single";
-
-    /**
      * IP 是否采用本地解析. 默认是
      */
     private Boolean isLocalIpParsing = true;

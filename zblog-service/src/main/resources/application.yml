@@ -146,10 +146,13 @@ cache:
   type: memory
   default-duration: 300
 zblog:
-  deploy-type: single
   base-package: com.github.stazxr.zblog
   is-local-ip-parsing: true
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**
   file-upload-type: 1
+easycloud:
+  idgen:
+    datacenter-id: 0
+    machine-id: 0

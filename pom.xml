@@ -20,6 +20,13 @@
     <url>https://github.com/stazxr/zblog</url>
     <description>ZBLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建</description>
 
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>https://github.com/stazxr/zblog/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
     <developers>
         <developer>
             <name>Sun Tao</name>
@@ -28,13 +35,19 @@
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:git@github.com:stazxr/zblog.git</connection>
+        <developerConnection>scm:git:git@github.com:stazxr/zblog.git</developerConnection>
+        <url>https://github.com/stazxr/zblog</url>
+    </scm>
+
     <modules>
         <!-- 定时任务 -->
         <!-- <module>zblog-xxljob</module> -->
         <!-- 工具组件 -->
         <module>zblog-util</module>
         <!-- 表达式组件 -->
-        <!-- <module>zblog-jexl</module> -->
+        <module>zblog-jexl</module>
         <!-- 核心组件 -->
         <module>zblog-core</module>
         <!-- 切面日志 -->

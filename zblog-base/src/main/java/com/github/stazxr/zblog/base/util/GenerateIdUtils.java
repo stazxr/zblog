@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.util;
 
-import com.github.stazxr.zblog.base.component.id.IdGenerator;
+import com.github.stazxr.easycloud.id.core.service.IdGeneratorService;
 import com.github.stazxr.zblog.core.util.SpringContextUtils;
 
 import java.util.ArrayList;
@@ -13,13 +13,13 @@ import java.util.List;
  * @since 2021-12-17
  */
 public class GenerateIdUtils {
-    private static IdGenerator idGenerator;
+    private static IdGeneratorService idGeneratorService;
 
-    private static IdGenerator instance() {
-        if (GenerateIdUtils.idGenerator == null) {
-            GenerateIdUtils.idGenerator = SpringContextUtils.getBean("IdGeneratorService", IdGenerator.class);
+    private static IdGeneratorService instance() {
+        if (GenerateIdUtils.idGeneratorService == null) {
+            GenerateIdUtils.idGeneratorService = SpringContextUtils.getBean("EasyIdGeneratorService", IdGeneratorService.class);
         }
-        return GenerateIdUtils.idGenerator;
+        return GenerateIdUtils.idGeneratorService;
     }
 
     /**
