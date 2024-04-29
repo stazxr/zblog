@@ -114,7 +114,7 @@ jasypt:
     salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
 logging:
   file:
-    path: /home/${spring.application.name}/logs/services
+    path: /home/${spring.application.name}/log/services
 jwt:
   access-token-duration: 1800
   refresh-token-duration: 43200

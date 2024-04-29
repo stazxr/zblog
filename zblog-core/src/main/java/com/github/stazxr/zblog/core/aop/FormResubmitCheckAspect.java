@@ -42,9 +42,7 @@ public class FormResubmitCheckAspect {
         String methodString = signature.toLongString();
         String methodSignature = methodString.concat(argString);
         methodSignature = formResubmitCheck.global() ? methodSignature : methodSignature.concat(String.valueOf(SecurityUtils.getLoginId()));
-        System.out.println("methodSignature: " + methodSignature);
         String messageDigest = Md5Utils.getMessageDigest(methodSignature.getBytes(StandardCharsets.UTF_8));
-        System.out.println("messageDigest: " + messageDigest);
 
         // 规则校验
         String rk = "frc:" + messageDigest;

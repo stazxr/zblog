@@ -18,23 +18,23 @@
     <select id="selectRouterVoByCode" resultType="com.github.stazxr.zblog.base.domain.vo.RouterVo">
         SELECT * FROM (
             SELECT
-                R.NAME, R.CODE, p.ID permId, p.ENABLED PERM_ENABLED,
-                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL
-            FROM router R
-            LEFT JOIN permission P ON P.DELETED = 0 AND P.PERM_CODE = R.CODE
+                r.NAME, r.CODE, p.ID permId, p.ENABLED PERM_ENABLED,
+                IF(p.PERM_LEVEL IS NULL, r.DEFAULT_LEVEL, p.PERM_LEVEL) AS PERM_LEVEL
+            FROM router r
+            LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = r.CODE
         ) temp WHERE CODE = #{code}
     </select>
 
     <select id="selectRouterList" resultType="com.github.stazxr.zblog.base.domain.vo.RouterVo">
         SELECT * FROM (
             SELECT
-                R.NAME, I.CODE, I.URI, I.METHOD, p.ID permId, p.ENABLED PERM_ENABLED,
-                IF(P.PERM_LEVEL IS NULL, R.DEFAULT_LEVEL, P.PERM_LEVEL) AS PERM_LEVEL,
-                IF(LSF.SHOWED IS NULL, false, LSF.SHOWED) AS LOG_SHOWED
-            FROM interface I
-            LEFT JOIN router R ON R.CODE = I.CODE
-            LEFT JOIN log_show_flag LSF ON LSF.URI = I.URI AND LSF.METHOD = I.METHOD
-            LEFT JOIN permission P ON P.DELETED = 0 AND P.PERM_CODE = I.CODE
+                r.NAME, i.CODE, i.URI, i.METHOD, p.ID permId, p.ENABLED PERM_ENABLED,
+                IF(p.PERM_LEVEL IS NULL, r.DEFAULT_LEVEL, p.PERM_LEVEL) AS PERM_LEVEL,
+                IF(lsf.SHOWED IS NULL, false, lsf.SHOWED) AS LOG_SHOWED
+            FROM interface i
+            LEFT JOIN router r ON r.CODE = i.CODE
+            LEFT JOIN log_show_flag lsf ON lsf.URI = i.URI AND lsf.METHOD = i.METHOD
+            LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = i.CODE
         ) temp
         <where>
             <if test="code != null and code != ''">
@@ -72,7 +72,7 @@
 
     <select id="selectBlackOrWhiteList" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
         SELECT
-            ID, NAME, `KEY`, `VALUE`, `DESC`, SORT, ENABLED, LOCKED
+            ID, `NAME`, `KEY`, `VALUE`, `DESC`, SORT, ENABLED, `LOCKED`
         FROM dict
         WHERE `KEY` = #{dictKey} AND DELETED = '0'
         <if test="uri != null and uri != ''">

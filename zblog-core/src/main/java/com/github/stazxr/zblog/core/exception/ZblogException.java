@@ -28,8 +28,7 @@ class ZblogException extends RuntimeException {
         super(cause);
     }
 
-    public ZblogException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+    public ZblogException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

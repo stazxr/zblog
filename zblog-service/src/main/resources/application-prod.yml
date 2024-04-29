@@ -3,11 +3,11 @@ server:
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://8.141.59.135:3306/suntaoblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://47.109.187.143:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       username: ENC(VxYvhJGhVJV64cgn6Uxn0w==)
-      password: ENC(1H9bB9PErqdrG3Ye0Wz1txEFCDBmdqHK)
+      password: ENC(pQhIZ+hXq87nposdNpQVJx3RU0sW7/wm)
   redis:
-    host: ENC(cRE10cZLWTya9lKyfPxIsQJBBO8N5qil)
+    host: ENC(OkgoWjp68cUCJ0Fi1EoCoXM65WLmc0Vc)
     port: ENC(LoWe9Gu+B7ML/c7YmYWxZg==)
     client-type: lettuce
     password: ENC(8aUFig2UTMrubh5geq+IxeNKvHlWXvM6)

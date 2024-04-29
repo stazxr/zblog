@@ -104,8 +104,8 @@ public class GlobalExceptionHandler {
      * @throws IOException write json failed
      */
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public void methodNotSupportedExceptionHandler(HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
-        log.error("全局捕获 -> 请求方式错误", e);
+    public void methodNotSupportedExceptionHandler(HttpServletRequest request, HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
+        log.error("全局捕获 -> 请求方式错误: [{}] {}", request.getMethod(), request.getRequestURL(), e);
         ErrorMeta errorMeta = new ErrorMeta(e);
         Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT, "请求方式不正确：".concat(e.getMessage())).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result);

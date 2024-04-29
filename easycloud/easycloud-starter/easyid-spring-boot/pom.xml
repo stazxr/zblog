@@ -58,7 +58,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.github.stazxr.easycloud</groupId>
+				<groupId>com.github.stazxr.easycloud.starter</groupId>
 				<artifactId>easyid</artifactId>
 				<version>${easyid.version}</version>
 			</dependency>
