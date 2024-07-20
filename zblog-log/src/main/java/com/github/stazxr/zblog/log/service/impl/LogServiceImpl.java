@@ -113,7 +113,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
                 } else {
                     // 系统异常
                     logInfo.setLogType(LogType.ERROR.getValue());
-                    logInfo.setExecMessage("系统发生未知错误：".concat(e.getMessage()));
+                    String errorMessage = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+                    logInfo.setExecMessage("系统发生未知错误：".concat(errorMessage));
                     logInfo.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
                 }
             }

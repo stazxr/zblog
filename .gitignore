@@ -33,5 +33,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### 日志 ###
+logs/
+
 ### online data ###
 /doc/prod.sql
