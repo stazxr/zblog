@@ -299,4 +299,21 @@ public class FileUtils {
         fileName = fileName.replaceAll("^(.*)(\\.[^.]*)$", "$1").replaceAll("\\.", "") + fileName.replaceAll("^(.*)(\\.[^.]*)$", "$2");
         return fileName;
     }
+
+    /**
+     * 确保文件路径存在，不存在则创建
+     *
+     * @param file 文件
+     */
+    public static void ensureFileDirExist(File file) {
+        if (file == null || file.exists()) {
+            return;
+        }
+
+        if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdirs()) {
+                throw new RuntimeException("文件路径不存在，且创建失败！");
+            }
+        }
+    }
 }

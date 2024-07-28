@@ -8,7 +8,7 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
  * @author SunTao
  * @since 2020-11-16
  */
-public class ServiceException extends ZblogException {
+public class ServiceException extends BaseException {
     /**
      * serialId
      */
@@ -114,22 +114,6 @@ public class ServiceException extends ZblogException {
      */
     public ServiceException(Integer code, String message, Throwable cause) {
         super(message, cause);
-        this.identifier = code;
-        this.message = message;
-        this.throwable = cause;
-    }
-
-    /**
-     * 抛出自定义异常
-     *
-     * @param code                异常标识
-     * @param message             异常信息
-     * @param cause               异常详情
-     * @param enableSuppression   是否异常挂起
-     * @param writableStackTrace  表示是否生成栈追踪信息
-     */
-    public ServiceException(Integer code, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
         this.identifier = code;
         this.message = message;
         this.throwable = cause;

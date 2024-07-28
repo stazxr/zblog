@@ -16,7 +16,7 @@ public class Assert {
      * @throws AssertionViolatedException if the object is null
      */
     public static void notNull(Object object) {
-        notNull(object, "参数不能为空");
+        notNull(object, "param is null");
     }
 
     /**
