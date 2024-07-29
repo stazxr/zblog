@@ -3,52 +3,53 @@ server:
 spring:
   application:
     name: zblog
-  profiles:
-    include:
   main:
-    allow-bean-definition-overriding: false
+    allow-bean-definition-overriding: false # 是否允许覆盖BEAN
   datasource:
     druid:
-      driver-class-name: ${DbDriver}
-      url: ${DbUrl}
-      username: ${DbUser}
-      password: ${DbPass}
-      initial-size: 5
-      min-idle: 15
-      max-active: 30
-      remove-abandoned-timeout: 180 # 超时时间（以秒数为单位）
-      max-wait: 5000
-      time-between-eviction-runs-millis: 60000 # 连接有效性检测时间
-      min-evictable-idle-time-millis: 300000 # 连接在池中最小生存的时间
-      max-evictable-idle-time-millis: 900000 # 连接在池中最大生存的时间
-      test-while-idle: true # 指明连接是否被空闲连接回收器（如果有）进行检验. 如果检测失败, 则连接将被从池中去除
-      test-on-borrow: true # 指明是否在从池中取出连接前进行检验, 如果检验失败, 则从池中去除连接并尝试取出另一个
-      test-on-return: false # 是否在归还到池中前进行检验
+      driver-class-name: ${DbDriver} # 数据源驱动
+      url: ${DbUrl} # 数据库连接 URL
+      username: ${DbUser} # 数据库用户名
+      password: ${DbPass} # 数据库密码
+      initial-size: 5 # 连接池的初始连接数
+      min-idle: 15 # 连接池的最小连接数
+      max-active: 30 # 连接池的最大连接数
+      max-wait: 10000 # 连接池的最大等待时间（毫秒）
+      remove-abandoned-timeout: 180 # 连接在被视为可回收之前需要空闲的最长时间（以秒数为单位）
+      time-between-eviction-runs-millis: 180000 # 空闲连接清理任务的运行间隔时间（毫秒）
+      max-evictable-idle-time-millis: 900000 # 连接池的最大生存时间（毫秒）
+      min-evictable-idle-time-millis: 300000 # 连接池的最小生存时间（毫秒）
       validation-query: select 1 # 检测连接是否有效
-      web-stat-filter: # 配置监控统计
-        enabled: true
+      test-on-borrow: true # 指明是否在从池中取出连接前进行检验, 如果检验失败, 则从池中去除连接并尝试取出另一个
+      test-while-idle: true # 指明连接是否被空闲连接回收器（如果有）进行检验. 如果检测失败, 则连接将被从池中去除
+      test-on-return: false # 是否在归还到池中前进行检验
       stat-view-servlet:
-        enabled: true
-        url-pattern: /api/druid/*
-        reset-enable: false
-        login-username: admin # 控制台登录用户
-        login-password: admin # 控制台登录密码
-        allow:
+        enabled: true # 启用 Druid 监控功能
+        url-pattern: /api/druid/* # 配置监控界面的 URL 映射
+        reset-enable: true # 是否可以重置统计信息
+        # login-username: admin # 控制台登录用户 bugs 20240730 登录页面访问不到
+        # login-password: admin # 控制台登录密码
+        allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）
+        deny: # 禁止访问监控界面的 IP（优先于 allow）
+      web-stat-filter:
+        enabled: true # 启用统计和监控 Web 应用程序的请求和响应数据
+        url-pattern: /api/* # 配置监控的 URL 映射
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.ico,/api/druid/*' # 设置不需要统计的 URL
       filter:
-        stat:
+        stat: # 用于 SQL 执行的统计和监控，提供 SQL 执行时间、慢查询等信息的记录
           enabled: true
-          log-slow-sql: true
-          slow-sql-millis: 5000
-          merge-sql: true
-        wall:
+          log-slow-sql: true # 打印慢SQL
+          slow-sql-millis: 5000 # 慢SQL阙值（单位秒）
+          merge-sql: true # 合并 SQL 查询
+        wall: # 用于 SQL 安全控制，防止 SQL 注入和管理 SQL 执行权限
           enabled: true
           config:
-            drop-table-allow: false
-            multi-statement-allow: true
+            drop-table-allow: false # 不允许删除表
+            multi-statement-allow: false # 指定是否允许在一个 Statement 对象中执行多个 SQL 语句
   redis:
+    client-type: lettuce
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
-    client-type: lettuce
     password: ${REDIS_PASSWORD:redisPwd}
   # rabbitmq:
     # host: 127.0.0.1

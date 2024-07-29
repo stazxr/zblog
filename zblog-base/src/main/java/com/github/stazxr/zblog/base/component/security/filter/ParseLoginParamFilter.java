@@ -5,12 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.stazxr.zblog.base.component.security.config.CustomWebSecurityConfiguration;
 import com.github.stazxr.zblog.encryption.util.RsaUtils;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.io.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -40,6 +38,9 @@ import static org.springframework.security.web.authentication.UsernamePasswordAu
 public class ParseLoginParamFilter extends OncePerRequestFilter {
     private static final String REMEMBER_ME_PARAMETER = "rememberMe";
 
+    @Value("${PrivateKey}")
+    private String secretKey;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (CustomWebSecurityConfiguration.LOGIN_PROCESSING_URL.equals(request.getRequestURI())
@@ -54,18 +55,11 @@ public class ParseLoginParamFilter extends OncePerRequestFilter {
 
                     // username
                     String username = param.getString(SPRING_SECURITY_FORM_USERNAME_KEY);
-                    username = (username != null) ? username : "";
-                    username = username.trim();
                     request.setAttribute(SPRING_SECURITY_FORM_USERNAME_KEY, username);
 
                     // password
                     String password = param.getString(SPRING_SECURITY_FORM_PASSWORD_KEY);
-                    password = (password != null) ? password : "";
-
-                    // 对密码进行解密
-                    Resource resource = new ClassPathResource("pri.key");
-                    String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
-                    password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
+                    password = RsaUtils.decryptByPrivateKey(secretKey, password);
                     request.setAttribute(SPRING_SECURITY_FORM_PASSWORD_KEY, password);
 
                     // remember me
