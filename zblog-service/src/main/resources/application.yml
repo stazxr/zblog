@@ -138,7 +138,6 @@ cache:
   default-duration: 300
 zblog:
   base-package: com.github.stazxr.zblog
-  is-local-ip-parsing: true
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**

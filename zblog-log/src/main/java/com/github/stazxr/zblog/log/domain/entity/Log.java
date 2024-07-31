@@ -3,7 +3,6 @@ package com.github.stazxr.zblog.log.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
-import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 @Setter
 @TableName("log")
 public class Log extends BaseEntity {
+    private static final long serialVersionUID = 3244794484450592745L;
+
     /**
      * 主键
      */
@@ -105,7 +106,7 @@ public class Log extends BaseEntity {
         this.requestIp = IpUtils.getIp(request);
         this.requestUri = request.getRequestURI();
         this.requestMethod = request.getMethod();
-        this.address = IpImplUtils.getIpSource(this.requestIp);
+        this.address = IpUtils.getIpLocation(this.requestIp, IpUtils.IP_LOCATION_PRO);
         this.browser = IpUtils.getBrowser(request);
     }
 }

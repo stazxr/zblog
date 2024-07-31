@@ -23,7 +23,6 @@ import com.github.stazxr.zblog.converter.MessageConverter;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
-import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.bo.PageInfo;
@@ -190,7 +189,7 @@ public class PortalServiceImpl implements PortalService {
         boolean exists = visitorMapper.exists(new LambdaQueryWrapper<Visitor>().eq(Visitor::getId, md5Uuid));
         if (!exists) {
             // 第一次访问
-            String province = IpImplUtils.getIpSource(ipAddress);
+            String province = IpUtils.getIpLocation(ipAddress, IpUtils.IP_LOCATION_PRO);
             if (StringUtils.isBlank(province)) {
                 province = UNKNOWN_AREA;
             }
@@ -289,7 +288,7 @@ public class PortalServiceImpl implements PortalService {
         String ip = IpUtils.getIp(request);
         message.setIpAddress(ip);
         message.setMessageContent(HtmlContentUtils.filter(message.getMessageContent()));
-        message.setIpSource(IpImplUtils.getIpSource(ip));
+        message.setIpSource(IpUtils.getIpLocation(ip));
         message.setId(GenerateIdUtils.getId());
         message.setIsReview(1 != isReview);
         messageMapper.insert(message);
@@ -400,7 +399,7 @@ public class PortalServiceImpl implements PortalService {
         comment.setId(GenerateIdUtils.getId());
         String ip = IpUtils.getIp(request);
         comment.setIpAddress(ip);
-        comment.setIpSource(IpImplUtils.getIpSource(ip));
+        comment.setIpSource(IpUtils.getIpLocation(ip));
         comment.setIsReview(1 != isReview);
         commentMapper.insert(comment);
 
@@ -430,7 +429,7 @@ public class PortalServiceImpl implements PortalService {
             commentLike.setCommentId(commentDto.getCommentId());
             String ip = IpUtils.getIp(request);
             commentLike.setIpAddress(ip);
-            commentLike.setIpSource(IpImplUtils.getIpSource(ip));
+            commentLike.setIpSource(IpUtils.getIpLocation(ip));
             commentLikeMapper.insert(commentLike);
         }
     }
@@ -487,7 +486,7 @@ public class PortalServiceImpl implements PortalService {
             talkLike.setTalkId(talkDto.getTalkId());
             String ip = IpUtils.getIp(request);
             talkLike.setIpAddress(ip);
-            talkLike.setIpSource(IpImplUtils.getIpSource(ip));
+            talkLike.setIpSource(IpUtils.getIpLocation(ip));
             talkLikeMapper.insert(talkLike);
         }
     }
@@ -512,7 +511,7 @@ public class PortalServiceImpl implements PortalService {
             articleLike.setArticleId(articleDto.getArticleId());
             String ip = IpUtils.getIp(request);
             articleLike.setIpAddress(ip);
-            articleLike.setIpSource(IpImplUtils.getIpSource(ip));
+            articleLike.setIpSource(IpUtils.getIpLocation(ip));
             articleLikeMapper.insert(articleLike);
         }
     }
@@ -555,7 +554,7 @@ public class PortalServiceImpl implements PortalService {
                 view.setId(GenerateIdUtils.getId());
                 view.setArticleId(articleId);
                 view.setAccessIp(accessIp);
-                view.setAccessAddress(IpImplUtils.getIpSource(accessIp));
+                view.setAccessAddress(IpUtils.getIpLocation(accessIp));
                 view.setAccessTime(DateUtils.formatNow());
                 return 1 == articleViewMapper.insert(view);
             } catch (Exception e) {

@@ -7,9 +7,9 @@ import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.util.CacheUtils;
-import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.net.IpUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class ZblogServiceImpl implements ZblogService {
     public LoginUser checkUserLoginStatus(HttpServletRequest request) {
         try {
             // 查找当前 IP 对应的登录令牌
-            String ip = IpImplUtils.getIp(request);
+            String ip = IpUtils.getIp(request);
             String ssoToken = CacheUtils.get(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
 
             if (StringUtils.isNotBlank(ssoToken)) {

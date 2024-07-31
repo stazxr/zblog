@@ -18,11 +18,6 @@ public class ZblogProperties {
     private String basePackage = "com.github.stazxr.zblog";
 
     /**
-     * IP 是否采用本地解析. 默认是
-     */
-    private Boolean isLocalIpParsing = true;
-
-    /**
      * 文件的访问地址
      */
     private String fileDomain;

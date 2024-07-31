@@ -4,11 +4,9 @@ import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.util.IpImplUtils;
 import com.github.stazxr.zblog.domain.entity.ArticleTag;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import com.github.stazxr.zblog.service.ArticleTagService;
-import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -88,27 +86,6 @@ public class TestController {
     public ArticleTag testMysqlRowLock(@RequestParam Long tagId) {
         System.out.println("[" + tagId + "] one...");
         return articleTagService.getByIdWithRowLock(tagId);
-    }
-
-    /**
-     * 测试 IP 工具类
-     *
-     * @param ip IP 地址
-     * @return IP 来源
-     */
-    @IgnoredLog
-    @IgnoreResult
-    @GetMapping(value = "/getIpSource")
-    @ApiOperation(value = "测试 IP 工具类")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "ip", value = "ip 地址", required = true, dataTypeClass = String.class)
-    })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "测试 IP 工具类", code = "getIpSourceByTest", level = BaseConst.PermLevel.OPEN)
-    public String testIpUtils(@RequestParam String ip) {
-        log.info("IpImplUtils.getIpSourceByHttp({}): {}", ip, IpImplUtils.getIpSourceByHttp(ip));
-        log.info("IpImplUtils.getIpSourceByLocal({}): {}", ip, IpImplUtils.getIpSourceByLocal(ip));
-        return IpImplUtils.getIpSource(ip);
     }
 
     /**

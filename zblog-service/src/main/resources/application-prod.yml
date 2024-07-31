@@ -37,5 +37,4 @@ cache:
   default-duration: 300
   type: redis
 zblog:
-  is-local-ip-parsing: false
   file-base-url: https://www.suntaoblog.com/file/
