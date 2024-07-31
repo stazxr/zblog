@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * IP工具类
@@ -37,6 +36,23 @@ public class IpUtils {
     private static final String LOCAL_IP_LOCATION = "局域网";
     private static final List<String> LOCAL_LIST = Arrays.asList("局域网", "本地局域网", "内网IP");
     private static final String IP_SEARCH_URL = "https://whois.pconline.com.cn/ipJson.jsp?ip=%s&json=true";
+
+    /**
+     * IP地理位置缓存，保证性能，不需要关注并发
+     */
+    private static final Map<Integer, Map<String, String>> CACHE = new HashMap<>();
+    private static final Map<String, String> CACHE1 = new HashMap<>();
+    private static final Map<String, String> CACHE2 = new HashMap<>();
+    private static final Map<String, String> CACHE3 = new HashMap<>();
+    private static final int MAX_CACHE_SIZE = 4096;
+    private static final int RESIZE_CACHE_SIZE = MAX_CACHE_SIZE / 4;
+    private static final Object RESIZE_LOCK = new Object();
+
+    static {
+        CACHE.put(IP_LOCATION_PRO, CACHE1);
+        CACHE.put(IP_LOCATION_PRO_CITY, CACHE2);
+        CACHE.put(IP_LOCATION_PRO_CITY_REGION, CACHE3);
+    }
 
     /**
      * 获取浏览器信息
@@ -78,7 +94,6 @@ public class IpUtils {
         if (Constants.LOCAL_HOST_V4.equals(ip) || Constants.LOCAL_HOST_V6.equals(ip)) {
             try {
                 // 获取本机真正的ip地址
-                log.warn("get local host ip!");
                 ip = LocalHostUtils.getFirstLocalIp();
             } catch (UnknownHostException e) {
                 log.error("获取本机真正的ip地址发生异常", e);
@@ -116,38 +131,56 @@ public class IpUtils {
      */
     public static String getIpLocation(String ip, int ipLocationType) {
         try {
+            if (ipLocationType < IP_LOCATION_PRO || ipLocationType > IP_LOCATION_PRO_CITY_REGION) {
+                return "";
+            }
+
+            // read from cache
+            if (CACHE.get(ipLocationType).containsKey(ip)) {
+                return CACHE.get(ipLocationType).get(ip);
+            }
+
             final String noProvinceCode = "999999";
             String url = String.format(IP_SEARCH_URL, ip);
             JSONObject resultJson = JSONUtil.parseObj(HttpUtil.get(url));
 
             String proCode = resultJson.getStr("proCode");
-            if (noProvinceCode.equals(proCode)) {
+            if (proCode == null || noProvinceCode.equals(proCode.trim())) {
                 String addr = resultJson.getStr("addr");
-                return (addr != null && LOCAL_LIST.contains(addr)) ? LOCAL_IP_LOCATION : "";
+                String address = (addr != null && LOCAL_LIST.contains(addr.trim())) ? LOCAL_IP_LOCATION : "";
+                putCache(ip, ipLocationType, address);
+                return address;
             }
 
-            String address = "";
-            if (ipLocationType >= IP_LOCATION_PRO) {
-                String pro = resultJson.getStr("pro");
-                address = address + pro;
-                if (ipLocationType >= IP_LOCATION_PRO_CITY) {
-                    String city = resultJson.getStr("city");
-                    address = address + city;
-                    if (ipLocationType == IP_LOCATION_PRO_CITY_REGION) {
-                        String region = resultJson.getStr("region");
-                        address = address + region;
-                    }
-                    if (ipLocationType > IP_LOCATION_PRO_CITY_REGION) {
-                        // error param
-                        address = "";
-                    }
+            String address = resultJson.getStr("pro").trim();
+            if (ipLocationType >= IP_LOCATION_PRO_CITY) {
+                address = address + resultJson.getStr("city").trim();
+                if (ipLocationType == IP_LOCATION_PRO_CITY_REGION) {
+                    address = address + resultJson.getStr("region").trim();
                 }
             }
             return address;
         } catch (Exception e) {
-            log.error("get ip location by url failed: {}", IP_SEARCH_URL, e);
+            log.error("根据IP获取地理位置信息发生异常: {}", IP_SEARCH_URL, e);
             return "";
         }
+    }
+
+    private static void putCache(String ip, int ipLocationType, String address) {
+        Map<String, String> cacheMap = CACHE.get(ipLocationType);
+        if (cacheMap.size() > MAX_CACHE_SIZE) {
+            synchronized (RESIZE_LOCK) {
+                if (cacheMap.size() > MAX_CACHE_SIZE) {
+                    Iterator<String> iterator = cacheMap.keySet().iterator();
+                    while (iterator.hasNext() && cacheMap.size() > RESIZE_CACHE_SIZE) {
+                        iterator.next();
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        CACHE.get(ipLocationType).put(ip, address.trim());
     }
 
     private static boolean ipIsEmpty(String ip) {
