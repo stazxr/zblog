@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.config.props;
+package com.github.stazxr.zblog.props;
 
 import com.github.stazxr.zblog.core.exception.BaseException;
 

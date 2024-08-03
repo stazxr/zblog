@@ -25,7 +25,6 @@
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-base</artifactId>
-            <version>${zblog.version}</version>
         </dependency>
         <!-- Springboot Configuration -->
         <dependency>

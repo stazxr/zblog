@@ -9,27 +9,17 @@
 		<version>4.1.0_u2</version>
 	</parent>
 
-	<artifactId>zblog-jexl</artifactId>
+	<artifactId>zblog-exception</artifactId>
 	<packaging>jar</packaging>
 
-	<name>zblog-jexl</name>
-	<description>ZBLOG 框架的 JEXL 表达式组件, 基于 JEXL3 进行封装和扩展</description>
-
-	<properties>
-		<jexl3.version>3.2.1</jexl3.version>
-	</properties>
+	<name>zblog-exception</name>
+	<description>异常处理组件</description>
 
 	<dependencies>
 		<!-- Zblog 工具组件 -->
 		<dependency>
 			<groupId>com.github.stazxr.zblog</groupId>
 			<artifactId>zblog-util</artifactId>
-		</dependency>
-		<!-- Jexl3 -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-jexl3</artifactId>
-			<version>${jexl3.version}</version>
 		</dependency>
 	</dependencies>
 </project>

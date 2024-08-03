@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.datasource;
+package com.github.stazxr.zblog.props.datasource;
 
 import com.github.stazxr.zblog.encryption.Encryptor;
 import com.github.stazxr.zblog.encryption.EncryptorContext;
@@ -10,13 +10,13 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import java.util.Properties;
 
 /**
- * 扩展自 {@link DriverManagerDataSource}，提供支持加密密码的功能。
+ * 参数配置数据源，扩展自 {@link DriverManagerDataSource}，提供支持加密密码的功能。
  *
  * @author SunTao
  * @since 2024-07-25
  */
 @Slf4j
-public class SecurityDriverManagerDataSource extends DriverManagerDataSource {
+public class PropsDriverManagerDataSource extends DriverManagerDataSource {
     private String encryptorFile = null;
 
     private String encryptorKey = null;
@@ -26,7 +26,7 @@ public class SecurityDriverManagerDataSource extends DriverManagerDataSource {
      *
      * @param config 包含数据库连接和加密相关配置的 {@link Properties} 对象
      */
-    public SecurityDriverManagerDataSource(Properties config) {
+    public PropsDriverManagerDataSource(Properties config) {
         this.setDriverClassName(config.getProperty("zblog.props.db-driver"));
         this.setUrl(config.getProperty("zblog.props.db-url"));
         this.setUsername(config.getProperty("zblog.props.db-user"));

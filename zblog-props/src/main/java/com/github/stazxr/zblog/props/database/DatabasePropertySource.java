@@ -1,6 +1,7 @@
-package com.github.stazxr.zblog.core.config.props;
+package com.github.stazxr.zblog.props.database;
 
-import com.github.stazxr.zblog.core.datasource.SecurityDriverManagerDataSource;
+import com.github.stazxr.zblog.props.PropertySourceLoadException;
+import com.github.stazxr.zblog.props.datasource.PropsDriverManagerDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.env.PropertySource;
@@ -29,6 +30,8 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
      */
     private JdbcTemplate jdbcTemplate;
 
+    private static final String PROPS_FILE = "props-config.properties";
+
     /**
      * 创建属性源。
      *
@@ -42,15 +45,15 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
     }
 
     private void loadConfigFile() {
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("props-config.properties")) {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(PROPS_FILE)) {
             config.load(is);
         } catch (Exception e) {
-            throw new PropertySourceLoadException("Load config file catch exception", e);
+            throw new PropertySourceLoadException("Load config file catch exception[file=" + PROPS_FILE + "]", e);
         }
     }
 
     private void initJdbcTemplate() {
-        jdbcTemplate = new JdbcTemplate(new SecurityDriverManagerDataSource(config));
+        jdbcTemplate = new JdbcTemplate(new PropsDriverManagerDataSource(config));
     }
 
     /**
