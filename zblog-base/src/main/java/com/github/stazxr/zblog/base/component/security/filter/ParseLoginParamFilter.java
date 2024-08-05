@@ -38,7 +38,7 @@ import static org.springframework.security.web.authentication.UsernamePasswordAu
 public class ParseLoginParamFilter extends OncePerRequestFilter {
     private static final String REMEMBER_ME_PARAMETER = "rememberMe";
 
-    @Value("${PrivateKey}")
+    @Value("${zblog.globalKey.PrivateKey}")
     private String secretKey;
 
     @Override

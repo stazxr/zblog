@@ -1,12 +1,14 @@
-package com.github.stazxr.zblog.base.component.email.impl;
+package com.github.stazxr.zblog.notify.mail.impl;
 
-import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
-import com.github.stazxr.zblog.base.component.email.MailService;
-import com.github.stazxr.zblog.core.exception.ServiceException;
+import com.github.stazxr.zblog.notify.mail.MailException;
+import com.github.stazxr.zblog.notify.mail.MailReceiver;
+import com.github.stazxr.zblog.notify.mail.MailService;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,6 +18,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +44,11 @@ public class MailServiceImpl implements MailService {
      * 发送普通文本邮件
      *
      * @param receive 收件人
-     * @param subject 主题
+     * @param subject 主体
      * @param content 内容
      */
     @Override
-    public void sendSimpleMail(MailReceiveHandler receive, String subject, String content) {
+    public void sendSimpleMail(MailReceiver receive, String subject, String content) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom(from);
@@ -62,8 +65,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(mailMessage);
             log.info("send simple email success");
         } catch (Exception e) {
-            log.error("send simple email failed");
-            throw new ServiceException(e);
+            throw new MailException("send simple email failed", e);
         }
     }
 
@@ -71,11 +73,11 @@ public class MailServiceImpl implements MailService {
      * 发送普通HTML邮件
      *
      * @param receive 收件人
-     * @param subject 主题
+     * @param subject 主体
      * @param content 内容
      */
     @Override
-    public void sendHtmlMail(MailReceiveHandler receive, String subject, String content) {
+    public void sendHtmlMail(MailReceiver receive, String subject, String content) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -84,9 +86,8 @@ public class MailServiceImpl implements MailService {
             helper.setText(content, true);
             javaMailSender.send(message);
             log.info("send html email success");
-        } catch (MessagingException e) {
-            log.error("send html email failed");
-            throw new ServiceException(e);
+        } catch (Exception e) {
+            throw new MailException("send html email failed", e);
         }
     }
 
@@ -94,12 +95,12 @@ public class MailServiceImpl implements MailService {
      * 发送带图片的Html邮件
      *
      * @param receive 收件人
-     * @param subject 主题
+     * @param subject 主体
      * @param content 内容
      * @param images  图片信息（可以是多个图片，Key为CID，value为图片路径）
      */
     @Override
-    public void sendHtmlMailWithImg(MailReceiveHandler receive, String subject, String content, List<Map<String, String>> images) {
+    public void sendHtmlMailWithImg(MailReceiver receive, String subject, String content, List<Map<String, String>> images) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -111,17 +112,14 @@ public class MailServiceImpl implements MailService {
             for (Map<String, String> image : images) {
                 String cid = image.get("cid");
                 String path = image.get("path");
-                FileSystemResource resource = new FileSystemResource(path);
-                if (resource.exists() && resource.isFile()) {
-                    helper.addInline(cid, resource);
-                }
+                Resource resource = getResourceFromPath(path);
+                helper.addInline(cid, resource);
             }
 
             javaMailSender.send(message);
             log.info("send image email success");
-        } catch (MessagingException e) {
-            log.error("send image email failed");
-            throw new ServiceException(e);
+        } catch (Exception e) {
+            throw new MailException("send image email failed", e);
         }
     }
 
@@ -129,12 +127,12 @@ public class MailServiceImpl implements MailService {
      * 发送带附件的邮件
      *
      * @param receive 收件人
-     * @param subject 主题
+     * @param subject 主体
      * @param content 内容
      * @param files   文件路径
      */
     @Override
-    public void sendAttachmentMail(MailReceiveHandler receive, String subject, String content, List<String> files) {
+    public void sendAttachmentMail(MailReceiver receive, String subject, String content, List<String> files) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -144,19 +142,18 @@ public class MailServiceImpl implements MailService {
 
             // 设置附件信息
             for (String file : files) {
-                FileSystemResource resource = new FileSystemResource(new File(file));
-                if (resource.exists() && resource.isFile()) {
-                    String fileName = resource.getFilename();
-                    if (fileName != null) {
-                        helper.addAttachment(fileName, resource);
-                    }
+                Resource resource = getResourceFromPath(file);
+                String fileName = resource.getFilename();
+                if (fileName != null) {
+                    helper.addAttachment(fileName, resource);
+                } else {
+                    throw new IllegalArgumentException("File is invalid: " + file);
                 }
             }
             javaMailSender.send(message);
             log.info("send attachment email success");
         } catch (Exception e) {
-            log.error("send attachment email failed");
-            throw new ServiceException(e);
+            throw new MailException("send attachment email failed", e);
         }
     }
 
@@ -167,7 +164,7 @@ public class MailServiceImpl implements MailService {
      * @param helper  MimeMessageHelper
      * @throws MessagingException e
      */
-    private void setReceive(MailReceiveHandler receive, MimeMessageHelper helper) throws MessagingException {
+    private void setReceive(MailReceiver receive, MimeMessageHelper helper) throws MessagingException {
         helper.setFrom(from);
         helper.setTo(InternetAddress.parse(receive.to()));
         if (StringUtils.isNotBlank(receive.cc())) {
@@ -176,5 +173,26 @@ public class MailServiceImpl implements MailService {
         if (StringUtils.isNotBlank(receive.bcc())) {
             helper.setBcc(InternetAddress.parse(receive.bcc()));
         }
+    }
+
+    private Resource getResourceFromPath(String path) throws MalformedURLException {
+        Resource resource;
+        final String http = "http:";
+        final String https = "https:";
+        final String resourcePathPrefix = "/";
+        if (path.startsWith(http) || path.startsWith(https)) {
+            resource = new UrlResource(path);
+        } else {
+            if (!path.startsWith(resourcePathPrefix)) {
+                path = resourcePathPrefix.concat(path);
+            }
+            resource = new FileSystemResource(path);
+        }
+
+        if (!resource.exists()) {
+            throw new IllegalArgumentException("File not exist: " + path);
+        }
+
+        return resource;
     }
 }

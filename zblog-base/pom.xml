@@ -30,13 +30,16 @@
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-core</artifactId>
-            <version>${zblog.version}</version>
+        </dependency>
+        <!-- Zblog Notify -->
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-notify</artifactId>
         </dependency>
         <!-- Zblog Log -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-log</artifactId>
-            <version>${zblog.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>

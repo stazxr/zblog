@@ -102,11 +102,6 @@
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
         </dependency>
-        <!-- Springboot Email -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
         <!-- AOP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -2,15 +2,15 @@ server:
   port: ${SERVER_PORT:8081}
 spring:
   application:
-    name: zblog
+    name: ${APP_NAME:zblog}
   main:
     allow-bean-definition-overriding: false # 是否允许覆盖BEAN
   datasource:
     druid:
-      driver-class-name: ${DbDriver} # 数据源驱动
-      url: ${DbUrl} # 数据库连接 URL
-      username: ${DbUser} # 数据库用户名
-      password: ${DbPass} # 数据库密码
+      driver-class-name: ${zblog.db.DbDriver} # 数据源驱动
+      url: ${zblog.db.DbUrl} # 数据库连接 URL
+      username: ${zblog.db.DbUser} # 数据库用户名
+      password: ${zblog.db.DbPass} # 数据库密码
       initial-size: 5 # 连接池的初始连接数
       min-idle: 15 # 连接池的最小连接数
       max-active: 30 # 连接池的最大连接数
@@ -46,6 +46,7 @@ spring:
           config:
             drop-table-allow: false # 不允许删除表
             multi-statement-allow: false # 指定是否允许在一个 Statement 对象中执行多个 SQL 语句
+
   redis:
     client-type: lettuce
     host: ${REDIS_HOST:127.0.0.1}
@@ -73,19 +74,20 @@ spring:
       max-request-size: 100MB
       location: /tmp/zblog_upload_tmp
   mail:
-    host: smtp.qq.com
-    port: 587
-    protocol: smtp
-    username: ${EMAIL_ADDRESS:stazxr@qq.com}
-    password: ${EMAIL_PASSWORD:emailPwd}
-    default-encoding: UTF-8
+    host: ${zblog.email.host} # 邮箱服务器
+    port: ${zblog.email.port} # 邮箱服务器端口 25/465/587
+    username: ${zblog.email.username} # 邮箱用户
+    password: ${zblog.email.password} # 邮箱授权码（非登录密码）
     properties:
       mail:
         smtp:
           auth: true
-          starttls:
-            enable: true
-            required: true
+          ssl: # 465
+            enable: true # 启用 SSL/TLS 加密
+            required: true # 所有与 SMTP 服务器的连接是否都必须使用 SSL/TLS 加密
+          # starttls: # 587
+            # enable: true # 启用 STARTTLS 协议。如果服务器支持 STARTTLS，这将会启用加密连接
+            # required: true # 强制要求使用 STARTTLS 协议。如果 SMTP 服务器不支持 STARTTLS，连接将失败
 mybatis:
   configuration-properties:
     close-implicitly: true

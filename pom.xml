@@ -42,13 +42,12 @@
     </scm>
 
     <modules>
-
         <!-- 工具组件 -->
         <module>zblog-util</module>
         <!-- 定时任务 -->
         <!-- <module>zblog-xxljob</module> -->
         <!-- 消息中心 -->
-        <!-- <module>zblog-notify</module> -->
+        <module>zblog-notify</module>
         <!-- 表达式组件 -->
         <module>zblog-jexl</module>
         <!-- 异常处理组件 -->
@@ -248,6 +247,12 @@
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-log</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <!-- Zblog 消息通知组件 -->
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-notify</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
             <!-- Zblog 基础组件 -->

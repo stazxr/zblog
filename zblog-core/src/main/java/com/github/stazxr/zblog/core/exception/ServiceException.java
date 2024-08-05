@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.core.exception;
 
 import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.exception.BaseException;
 
 /**
  * 自定义业务异常

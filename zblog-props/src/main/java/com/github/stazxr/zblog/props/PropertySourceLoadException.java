@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.props;
 
-import com.github.stazxr.zblog.core.exception.BaseException;
+import com.github.stazxr.zblog.exception.BaseException;
 
 /**
  * 属性源加载异常类，用于表示在加载属性源时发生的异常情况。

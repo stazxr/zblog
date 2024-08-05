@@ -12,5 +12,23 @@
 	<packaging>jar</packaging>
 
 	<name>zblog-notify</name>
-	<description>ZBLOG 框架的消息组件（待实现）</description>
+	<description>ZBLOG 框架的消息组件</description>
+
+	<dependencies>
+		<!-- Zblog 工具组件 -->
+		<dependency>
+			<groupId>com.github.stazxr.zblog</groupId>
+			<artifactId>zblog-util</artifactId>
+		</dependency>
+		<!-- Zblog 异常处理组件 -->
+		<dependency>
+			<groupId>com.github.stazxr.zblog</groupId>
+			<artifactId>zblog-exception</artifactId>
+		</dependency>
+		<!-- Springboot Email -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+	</dependencies>
 </project>

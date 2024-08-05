@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.exception;
+package com.github.stazxr.zblog.exception;
 
 import com.github.stazxr.zblog.util.ThrowableUtils;
 

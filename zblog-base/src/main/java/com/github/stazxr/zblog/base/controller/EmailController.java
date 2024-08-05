@@ -1,13 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
-import com.github.stazxr.zblog.base.component.email.MailService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.notify.mail.MailReceiver;
+import com.github.stazxr.zblog.notify.mail.MailService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -63,8 +63,8 @@ public class EmailController {
         ctx.setVariable("code", random);
         ctx.setVariable("year", DateUtils.formatNow("yyyy"));
         String emailContext = templateEngine.process("sendMailCode", ctx);
-        MailReceiveHandler handler = MailReceiveHandler.setReceive(email);
-        mailService.sendHtmlMail(handler, BaseConst.SYS_NAME, emailContext);
+        MailReceiver receiver = MailReceiver.setReceive(email);
+        mailService.sendHtmlMail(receiver, BaseConst.SYS_NAME, emailContext);
 
         // 缓存验证码
         Constants.CacheKey emailCode = Constants.CacheKey.emailCode;

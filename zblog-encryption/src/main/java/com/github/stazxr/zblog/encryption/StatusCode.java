@@ -42,7 +42,9 @@ public enum StatusCode {
 
     private final String message;
 
-    // 用于缓存状态码和错误信息的映射
+    /**
+     * 用于缓存状态码和错误信息的映射
+     */
     private static final Map<String, String> CACHE_MAP = new HashMap<>();
 
     /**

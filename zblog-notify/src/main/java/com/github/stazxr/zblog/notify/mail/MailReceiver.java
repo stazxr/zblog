@@ -1,18 +1,18 @@
-package com.github.stazxr.zblog.base.component.email;
+package com.github.stazxr.zblog.notify.mail;
 
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 邮件接收人处理器
+ * 邮件接收人
  *
  * @author SunTao
  * @since 2020-11-15
  */
-public class MailReceiveHandler {
+public class MailReceiver {
     /**
      * 邮件接收人，抄送人，密送人信息
      */
@@ -66,7 +66,7 @@ public class MailReceiveHandler {
      * @param to 邮件接收方
      * @return MailReceiveHandler
      */
-    public static MailReceiveHandler setReceive(String to) {
+    public static MailReceiver setReceive(String to) {
         return setReceive(to, null, null);
     }
 
@@ -77,7 +77,7 @@ public class MailReceiveHandler {
      * @param cc 抄送方
      * @return MailReceiveHandler
      */
-    public static MailReceiveHandler setReceive(String to, String cc) {
+    public static MailReceiver setReceive(String to, String cc) {
         return setReceive(to, cc, null);
     }
 
@@ -89,9 +89,13 @@ public class MailReceiveHandler {
      * @param bcc 密送方
      * @return MailReceiveHandler
      */
-    public static MailReceiveHandler setReceive(String to, String cc, String bcc) {
-        Assert.notNull(to, "邮件接收方不能为空");
-        MailReceiveHandler handler = new MailReceiveHandler();
+    public static MailReceiver setReceive(String to, String cc, String bcc) {
+        if (StringUtils.isBlank(to)) {
+            throw new RuntimeException("请配置邮件的接收人");
+        }
+
+        // 封装邮件接收方信息，包含接收人，抄送人，密送人
+        MailReceiver handler = new MailReceiver();
         handler.receive.clear();
         handler.receive.put(MAIL_TO, to);
         handler.receive.put(MAIL_CC, cc);
