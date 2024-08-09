@@ -44,6 +44,8 @@
     <modules>
         <!-- 工具模块 -->
         <module>zblog-util</module>
+        <!-- 公共模块 -->
+        <module>zblog-component</module>
         <!-- 组件模块 -->
         <module>zblog-component</module>
         <!-- 定时任务 -->
@@ -52,12 +54,8 @@
         <module>zblog-sequence</module>
         <!-- 消息组件 -->
         <module>zblog-notify</module>
-        <!-- 表达式组件 -->
-        <module>zblog-jexl</module>
         <!-- 异常处理组件 -->
         <module>zblog-exception</module>
-        <!-- 加解密组件 -->
-        <module>zblog-encryption</module>
         <!-- 参数配置组件 -->
         <module>zblog-props</module>
         <!-- 核心组件 -->

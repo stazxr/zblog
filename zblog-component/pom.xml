@@ -16,7 +16,12 @@
     <description>ZBLOG 组件库</description>
 
     <modules>
+        <!-- 去敏组件 -->
         <module>zblog-mask</module>
+        <!-- 加解密组件 -->
+        <module>zblog-encryption</module>
+        <!-- 表达式组件 -->
+        <module>zblog-jexl</module>
     </modules>
 
     <dependencies>
