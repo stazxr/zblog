@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.sequence.core.snowflake;
 
 import com.github.stazxr.zblog.sequence.SequenceException;
 import com.github.stazxr.zblog.sequence.core.BaseWorkSequenceGenerator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Calendar;
 import java.util.concurrent.locks.Lock;
@@ -28,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author SunTao
  * @since 2021-12-19
  */
+@Slf4j
 public class SnowflakeSequenceGenerator extends BaseWorkSequenceGenerator {
     /**
      * 开始时间戳
@@ -132,6 +134,7 @@ public class SnowflakeSequenceGenerator extends BaseWorkSequenceGenerator {
 
         this.datacenterId = datacenterId;
         this.machineId = machineId;
+        log.info("Create snowflake sequence generator: datacenterId={}, machineId={}", this.datacenterId, this.machineId);
     }
 
     /**
