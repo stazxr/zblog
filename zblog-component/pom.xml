@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.stazxr.zblog</groupId>
+        <artifactId>zblog-parent</artifactId>
+        <version>4.1.0_u2</version>
+    </parent>
+
+    <artifactId>zblog-component</artifactId>
+	<packaging>pom</packaging>
+
+    <name>zblog-component</name>
+    <description>ZBLOG 组件库</description>
+
+    <modules>
+        <module>zblog-mask</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-util</artifactId>
+        </dependency>
+    </dependencies>
+</project>

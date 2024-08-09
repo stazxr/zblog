@@ -42,11 +42,15 @@
     </scm>
 
     <modules>
-        <!-- 工具组件 -->
+        <!-- 工具模块 -->
         <module>zblog-util</module>
+        <!-- 组件模块 -->
+        <module>zblog-component</module>
         <!-- 定时任务 -->
         <!-- <module>zblog-xxljob</module> -->
-        <!-- 消息中心 -->
+        <!-- 序列号组件 -->
+        <module>zblog-sequence</module>
+        <!-- 消息组件 -->
         <module>zblog-notify</module>
         <!-- 表达式组件 -->
         <module>zblog-jexl</module>
