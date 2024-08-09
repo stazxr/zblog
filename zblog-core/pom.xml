@@ -107,11 +107,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <!-- EasyCloud: EasyId -->
         <dependency>
-            <groupId>com.github.stazxr.easycloud.starter</groupId>
-            <artifactId>easyid-spring-boot-starter</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zseq-spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
 </project>

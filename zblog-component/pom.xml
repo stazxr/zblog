@@ -22,6 +22,8 @@
         <module>zblog-encryption</module>
         <!-- 表达式组件 -->
         <module>zblog-jexl</module>
+        <!-- 序列号组件 -->
+        <module>zblog-sequence</module>
     </modules>
 
     <dependencies>

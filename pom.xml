@@ -45,13 +45,14 @@
         <!-- 工具模块 -->
         <module>zblog-util</module>
         <!-- 公共模块 -->
-        <module>zblog-component</module>
+        <module>zblog-common</module>
         <!-- 组件模块 -->
         <module>zblog-component</module>
+
         <!-- 定时任务 -->
         <!-- <module>zblog-xxljob</module> -->
-        <!-- 序列号组件 -->
-        <module>zblog-sequence</module>
+        <!-- 缓存组件 -->
+        <module>zblog-cache</module>
         <!-- 消息组件 -->
         <module>zblog-notify</module>
         <!-- 异常处理组件 -->
@@ -209,6 +210,22 @@
     <!-- 版本管理 -->
     <dependencyManagement>
         <dependencies>
+            <!-- ZBLOG 框架依赖开始 -->
+
+            <!-- 序列号组件 -->
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-sequence</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zseq-spring-boot-autoconfigure</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+
+            <!-- ZBLOG 框架依赖结束 -->
+
             <!-- Zblog 工具组件 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>

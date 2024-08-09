@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "zblog.seq",
+      "type": "com.github.stazxr.zblog.sequence.autoconfigure.SequenceGeneratorProperties",
+      "sourceType": "com.github.stazxr.zblog.sequence.autoconfigure.SequenceGeneratorProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "zblog.seq.datacenterId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.zblog.sequence.autoconfigure.SequenceGeneratorProperties",
+      "description": "数据中心ID."
+    },
+    {
+      "name": "zblog.seq.machineId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.zblog.sequence.autoconfigure.SequenceGeneratorProperties",
+      "description": "机器ID."
+    }
+  ]
+}

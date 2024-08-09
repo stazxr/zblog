@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.util;
 
-import com.github.stazxr.easycloud.id.core.service.IdGeneratorService;
 import com.github.stazxr.zblog.core.util.SpringContextUtils;
+import com.github.stazxr.zblog.sequence.core.id.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +13,13 @@ import java.util.List;
  * @since 2021-12-17
  */
 public class GenerateIdUtils {
-    private static IdGeneratorService idGeneratorService;
+    private static IdGenerator idGenerator;
 
-    private static IdGeneratorService instance() {
-        if (GenerateIdUtils.idGeneratorService == null) {
-            GenerateIdUtils.idGeneratorService = SpringContextUtils.getBean("EasyIdGeneratorService", IdGeneratorService.class);
+    private static IdGenerator instance() {
+        if (GenerateIdUtils.idGenerator == null) {
+            GenerateIdUtils.idGenerator = SpringContextUtils.getBean("idGeneratorService", IdGenerator.class);
         }
-        return GenerateIdUtils.idGeneratorService;
+        return GenerateIdUtils.idGenerator;
     }
 
     /**
@@ -28,7 +28,7 @@ public class GenerateIdUtils {
      * @return Long id
      */
     public static Long getId() {
-        return instance().generateId();
+        return Long.valueOf(instance().generateId());
     }
 
     /**
@@ -40,7 +40,7 @@ public class GenerateIdUtils {
     public static List<Long> getIdList(Integer count) {
         List<Long> ids = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            ids.add(instance().generateId());
+            ids.add(getId());
         }
         return ids;
     }
