@@ -1,6 +1,6 @@
-package com.github.stazxr.muses.utils.mask.core;
+package com.github.stazxr.zblog.mask.core;
 
-import com.github.stazxr.muses.utils.mask.MaskType;
+import com.github.stazxr.zblog.mask.MaskType;
 
 import java.lang.annotation.*;
 

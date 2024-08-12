@@ -85,7 +85,7 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
             Map<String, String> properties = new HashMap<>(64);
             String enabled = config.getProperty("zblog.props.enabled");
             if (Boolean.TRUE.toString().equals(enabled)) {
-                log.info("Load properties from database.");
+                log.info("Loading properties from database.");
                 jdbcTemplate.query(config.getProperty("zblog.props.load-sql"), resultSet -> {
                     String name = resultSet.getString("k");
                     String value = resultSet.getString("v");

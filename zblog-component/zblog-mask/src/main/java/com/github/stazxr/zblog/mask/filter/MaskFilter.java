@@ -1,8 +1,8 @@
-package com.github.stazxr.muses.utils.mask.filter;
+package com.github.stazxr.zblog.mask.filter;
 
 import com.alibaba.fastjson.serializer.ValueFilter;
-import com.github.stazxr.muses.utils.mask.MaskUtil;
-import com.github.stazxr.muses.utils.mask.core.FieldMask;
+import com.github.stazxr.zblog.mask.MaskUtil;
+import com.github.stazxr.zblog.mask.core.FieldMask;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 
 import java.lang.reflect.Field;

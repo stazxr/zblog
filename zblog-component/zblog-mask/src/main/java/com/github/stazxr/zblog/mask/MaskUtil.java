@@ -1,8 +1,8 @@
-package com.github.stazxr.muses.utils.mask;
+package com.github.stazxr.zblog.mask;
 
 import com.alibaba.fastjson.JSON;
-import com.github.stazxr.muses.utils.mask.core.MaskStrategy;
-import com.github.stazxr.muses.utils.mask.filter.MaskFilter;
+import com.github.stazxr.zblog.mask.core.MaskStrategy;
+import com.github.stazxr.zblog.mask.filter.MaskFilter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MaskUtil {
     private static final MaskFilter MASK_FILTER = new MaskFilter();
 
-    private static final String MASK_LOG_LABEL = "muses-utils-mask:mask data error";
+    private static final String MASK_LOG_LABEL = "[ZMAS]:mask data error";
 
     /**
      * Masking data.

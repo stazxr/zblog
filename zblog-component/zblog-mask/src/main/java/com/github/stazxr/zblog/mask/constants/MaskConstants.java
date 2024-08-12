@@ -1,4 +1,4 @@
-package com.github.stazxr.muses.utils.mask.constants;
+package com.github.stazxr.zblog.mask.constants;
 
 /**
  * Constants for data masking.

@@ -1,4 +1,4 @@
-package com.github.stazxr.muses.utils.mask;
+package com.github.stazxr.zblog.mask;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,12 +25,12 @@ public class MaskTest {
         System.out.println("100-1212-0012: " + MaskType.LANDLINE_NUMBER.mask("100-1212-0012"));
         System.out.println("10012120012: " + MaskType.LANDLINE_NUMBER.mask("10012120012"));
         System.out.println("---------邮箱");
-        System.out.println("muses: " + MaskType.EMAIL.mask("muses"));
-        System.out.println("muses@123.com: " + MaskType.EMAIL.mask("muses@123.com"));
-        System.out.println("muses@123.com: " + MaskType.EMAIL_WEAK.mask("muses@123.com"));
+        System.out.println("zblog: " + MaskType.EMAIL.mask("zblog"));
+        System.out.println("zblog@123.com: " + MaskType.EMAIL.mask("zblog@123.com"));
+        System.out.println("zblog@123.com: " + MaskType.EMAIL_WEAK.mask("zblog@123.com"));
         System.out.println("---------用户名");
-        System.out.println("mus: " + MaskType.USERNAME.mask("mus"));
-        System.out.println("muses: " + MaskType.USERNAME.mask("muses"));
+        System.out.println("zbg: " + MaskType.USERNAME.mask("zbg"));
+        System.out.println("zblog: " + MaskType.USERNAME.mask("zblog"));
         System.out.println("---------身份证号");
         System.out.println("142622199201103125: " + MaskType.ID_CARD.mask("142622199201103125"));
         System.out.println("1231232131: " + MaskType.ID_CARD.mask("1231232131"));

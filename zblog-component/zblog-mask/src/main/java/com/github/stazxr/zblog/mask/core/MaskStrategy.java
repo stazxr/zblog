@@ -1,4 +1,4 @@
-package com.github.stazxr.muses.utils.mask.core;
+package com.github.stazxr.zblog.mask.core;
 
 import com.github.stazxr.zblog.util.StringUtils;
 

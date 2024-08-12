@@ -192,4 +192,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
         return sb.toString();
     }
+
+    /**
+     * Masks the first character of a string with an asterisk.
+     *
+     * @param data The string to mask
+     * @return The masked string
+     */
+    public static String hideFirstChar(String data) {
+        if (data != null && data.length() > 0) {
+            return "*" + (data.length() < 2 ? "" : data.substring(1));
+        }
+        return data;
+    }
 }

@@ -1,7 +1,7 @@
-package com.github.stazxr.muses.utils.mask;
+package com.github.stazxr.zblog.mask;
 
-import com.github.stazxr.muses.utils.mask.constants.MaskConstants;
-import com.github.stazxr.muses.utils.mask.core.MaskStrategy;
+import com.github.stazxr.zblog.mask.constants.MaskConstants;
+import com.github.stazxr.zblog.mask.core.MaskStrategy;
 import com.github.stazxr.zblog.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

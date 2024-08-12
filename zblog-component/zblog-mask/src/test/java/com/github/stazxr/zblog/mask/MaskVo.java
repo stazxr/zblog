@@ -1,6 +1,6 @@
-package com.github.stazxr.muses.utils.mask;
+package com.github.stazxr.zblog.mask;
 
-import com.github.stazxr.muses.utils.mask.core.FieldMask;
+import com.github.stazxr.zblog.mask.core.FieldMask;
 
 import java.util.List;
 import java.util.Map;

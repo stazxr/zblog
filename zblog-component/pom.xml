@@ -13,10 +13,10 @@
 	<packaging>pom</packaging>
 
     <name>zblog-component</name>
-    <description>ZBLOG 组件库</description>
+    <description>ZBLOG 组件库，组件解耦，不同组件之间没有依赖关系</description>
 
     <modules>
-        <!-- 去敏组件 -->
+        <!-- 脱敏组件 -->
         <module>zblog-mask</module>
         <!-- 加解密组件 -->
         <module>zblog-encryption</module>
@@ -24,6 +24,8 @@
         <module>zblog-jexl</module>
         <!-- 序列号组件 -->
         <module>zblog-sequence</module>
+        <!-- 上下文组件 -->
+        <module>zblog-context</module>
     </modules>
 
     <dependencies>

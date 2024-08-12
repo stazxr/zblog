@@ -139,12 +139,23 @@ cache:
   type: memory
   default-duration: 300
 zblog:
+  base:
+    header: # 请求头配置
+      sys-code: ZBLOG # 系统编码
+      app-code: ZSERV # 应用编码
+      deploy:
+        deploy-area: bj # 部署地域
+        deploy-center: j # 部署机房
+        deploy-unit: 0 # 部署单元
+        deploy-ip: # 部署IP
+    context:
+      tags: # 自定义标签配置
+        - {tag-name: Conversion-Id} # ConversionId
+  seq: # 序号配置
+    datacenter-id: 0 # 数据中心ID
+    machine-id: 0 # 机器ID
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**
   file-upload-type: 1
-easycloud:
-  idgen:
-    datacenter-id: 0
-    machine-id: 0

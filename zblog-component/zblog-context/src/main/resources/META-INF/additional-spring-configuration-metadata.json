@@ -1,0 +1,72 @@
+{
+  "groups": [
+    {
+      "name": "zblog.base.header",
+      "type": "com.github.stazxr.zblog.context.properties.HeaderProperties",
+      "sourceType": "com.github.stazxr.zblog.context.properties.HeaderProperties"
+    },
+    {
+      "name": "zblog.base.header.deploy",
+      "type": "com.github.stazxr.zblog.context.properties.HeaderProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.context.properties.HeaderProperties$Deploy"
+    }
+  ],
+  "properties": [
+    {
+      "name": "zblog.base.header.sysCode",
+      "type": "java.lang.String",
+      "description": "Caller system code."
+    },
+    {
+      "name": "zblog.base.header.appCode",
+      "type": "java.lang.String",
+      "description": "Caller application code."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployArea",
+      "type": "java.lang.String",
+      "description": "Deployment region."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployCenter",
+      "type": "java.lang.String",
+      "description": "Deployment center/room."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployIp",
+      "type": "java.lang.String",
+      "description": "Deployment server address."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployUnit",
+      "type": "java.lang.Integer",
+      "description": "Deployment unit.",
+      "defaultValue": 0
+    }
+  ],
+  "hints": [
+    {
+      "name": "zblog.base.header.deploy.deployUnit",
+      "values": [
+        { "value": 0, "description": "Unit 0, default." },
+        { "value": 1, "description": "Unit 1." },
+        { "value": 2, "description": "Unit 2." },
+        { "value": 3, "description": "Unit 3." },
+        { "value": 4, "description": "Unit 4." },
+        { "value": 5, "description": "Unit 5." },
+        { "value": 6, "description": "Unit 6." },
+        { "value": 7, "description": "Unit 7." },
+        { "value": 8, "description": "Unit 8." },
+        { "value": 9, "description": "Unit 9." },
+        { "value": 10, "description": "Unit 10." },
+        { "value": 11, "description": "Unit 11." },
+        { "value": 12, "description": "Unit 12." },
+        { "value": 13, "description": "Unit 13." },
+        { "value": 14, "description": "Unit 14." },
+        { "value": 15, "description": "Unit 15." },
+        { "value": 16, "description": "Unit 16." },
+        { "value": 17, "description": "Unit 17." }
+      ]
+    }
+  ]
+}

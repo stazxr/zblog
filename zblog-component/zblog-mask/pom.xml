@@ -14,6 +14,6 @@
 
     <name>zblog-mask</name>
     <description>
-        ZBLOG Data Masking Component, provides utility classes for data masking, extends serialization with FastJson 1.x.
+        ZBLOG Data Masking Component[ZMAS], provides utility classes for data masking, extends serialization with FastJson 1.x.
     </description>
 </project>
