@@ -12,5 +12,5 @@
 	<packaging>jar</packaging>
 
 	<name>zblog-sequence</name>
-	<description>ZBLOG 框架的序列号组件</description>
+	<description>ZBLOG 框架的序列号组件[ZSEQ]</description>
 </project>

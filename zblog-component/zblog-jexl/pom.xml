@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 
 	<name>zblog-jexl</name>
-	<description>ZBLOG 框架 JEXL 表达式组件, 基于 JEXL3 进行封装和扩展</description>
+	<description>ZBLOG 框架 JEXL 表达式组件[ZJXL], 基于 JEXL3 进行封装和扩展</description>
 
 	<properties>
 		<jexl3.version>3.2.1</jexl3.version>
