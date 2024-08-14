@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.github.stazxr.zblog</groupId>
-		<artifactId>zblog-parent</artifactId>
+		<artifactId>zblog-component</artifactId>
 		<version>4.1.0_u2</version>
 	</parent>
 
@@ -15,11 +15,6 @@
 	<description>ZBLOG 框架的消息组件</description>
 
 	<dependencies>
-		<!-- Zblog 工具组件 -->
-		<dependency>
-			<groupId>com.github.stazxr.zblog</groupId>
-			<artifactId>zblog-util</artifactId>
-		</dependency>
 		<!-- Zblog 异常处理组件 -->
 		<dependency>
 			<groupId>com.github.stazxr.zblog</groupId>

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;

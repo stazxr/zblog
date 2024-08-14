@@ -53,8 +53,6 @@
         <!-- <module>zblog-xxljob</module> -->
         <!-- 缓存组件 -->
         <module>zblog-cache</module>
-        <!-- 消息组件 -->
-        <module>zblog-notify</module>
         <!-- 异常处理组件 -->
         <module>zblog-exception</module>
         <!-- 参数配置组件 -->

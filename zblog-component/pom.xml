@@ -26,6 +26,8 @@
         <module>zblog-sequence</module>
         <!-- 上下文组件 -->
         <module>zblog-context</module>
+        <!-- 消息组件 -->
+        <module>zblog-notify</module>
     </modules>
 
     <dependencies>
