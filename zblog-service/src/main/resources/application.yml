@@ -150,7 +150,7 @@ zblog:
         deploy-ip: # 部署IP
     context:
       tags: # 自定义标签配置
-        - {tag-name: Conversion-Id} # ConversionId
+        - {tag-name: conversion-id} # conversion-id
   seq: # 序号配置
     datacenter-id: 0 # 数据中心ID
     machine-id: 0 # 机器ID

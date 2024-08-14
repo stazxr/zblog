@@ -7,6 +7,7 @@ import com.github.stazxr.zblog.context.properties.ContextProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,9 +61,9 @@ class CoreContext {
         } else {
             // Initialize cache status for the tag
             List<String> tags = contextProperties.getTagNames();
-            boolean shouldCache = tags.contains(tagName);
-            CACHE_MAP.put(tagName, shouldCache);
-            if (shouldCache) {
+            boolean isAllowedTag = tags.stream().anyMatch(tag -> tag.toLowerCase(Locale.ROOT).equals(tagName.toLowerCase(Locale.ROOT)));
+            CACHE_MAP.put(tagName, isAllowedTag);
+            if (isAllowedTag) {
                 // Store the tag value if it is configured to be cached
                 CONTEXT_MAP.put(tagName, contextTag.getTagValue());
             }
@@ -76,5 +77,14 @@ class CoreContext {
      */
     public void putAll(List<ContextTag> contextTags) {
         contextTags.forEach(this::put);
+    }
+
+    /**
+     * get context map by toString().
+     *
+     * @return CONTEXT_MAP.toString()
+     */
+    public String getContextMapAsString() {
+        return CONTEXT_MAP.toString();
     }
 }

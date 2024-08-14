@@ -4,9 +4,8 @@ import com.github.stazxr.zblog.context.entity.ContextTag;
 import com.github.stazxr.zblog.context.properties.ContextProperties;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class for managing Muses context based on HTTP request headers.
@@ -15,6 +14,8 @@ import java.util.List;
  * @since 2024-07-02
  */
 public class ContextHelper {
+    private static final Map<String, Boolean> CACHE_MAP = new ConcurrentHashMap<>();
+
     /**
      * Creates and sets MusesCoreContext based on HTTP request headers.
      *
@@ -51,10 +52,22 @@ public class ContextHelper {
      */
     private static List<String> filterHeaderNames(List<String> headerNames, List<String> tagNames) {
         List<String> result = new ArrayList<>();
-        for (String headerName : headerNames) {
-            if (tagNames.contains(headerName)) {
-                result.add(headerName);
+        LOOP1: for (String headerName : headerNames) {
+            if (CACHE_MAP.containsKey(headerName)) {
+                if (CACHE_MAP.get(headerName)) {
+                    result.add(headerName);
+                }
+                continue;
             }
+
+            for (String tagName : tagNames) {
+                if (tagName.toLowerCase(Locale.ROOT).equals(headerName.toLowerCase(Locale.ROOT))) {
+                    result.add(tagName);
+                    CACHE_MAP.put(headerName, true);
+                    continue LOOP1;
+                }
+            }
+            CACHE_MAP.put(headerName, false);
         }
         return result;
     }

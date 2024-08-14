@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.context;
 
 import com.github.stazxr.zblog.context.entity.ContextTag;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author SunTao
  * @since 2024-07-02
  */
+@Slf4j
 public class Context {
     /**
      * Retrieves the value associated with the specified key from the context.
@@ -38,6 +40,14 @@ public class Context {
      */
     public static void putAll(List<ContextTag> tags) {
         getContext().putAll(tags);
+    }
+
+    /**
+     * Print context map.
+     */
+    public static void print() {
+        String contextMap = getContext().getContextMapAsString();
+        log.info("Context map: " + contextMap);
     }
 
     /**

@@ -1,7 +1,9 @@
 package com.github.stazxr.zblog.context.filter;
 
+import com.github.stazxr.zblog.context.Context;
 import com.github.stazxr.zblog.context.ContextHelper;
 import com.github.stazxr.zblog.context.properties.ContextProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import java.io.IOException;
  * @author SunTao
  * @since 2024-07-02
  */
+@Slf4j
 @Component
 public class ContextFilter extends OncePerRequestFilter {
     private ContextProperties contextProperties;
@@ -45,9 +48,13 @@ public class ContextFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+            @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         try {
-            ContextHelper.createContext(request, contextProperties);
+            final String options = "OPTIONS";
+            if (!options.equals(request.getMethod())) {
+                ContextHelper.createContext(request, contextProperties);
+                Context.print();
+            }
             filterChain.doFilter(request, response);
         } finally {
             ContextHelper.clearContext();
