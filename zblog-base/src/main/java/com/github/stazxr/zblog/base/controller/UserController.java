@@ -31,6 +31,20 @@ public class UserController {
     private final UserService userService;
 
     /**
+     * 查询用户列表
+     *
+     * @param queryDto 查询参数
+     * @return userList
+     */
+    @GetMapping(value = "/pageList")
+    @ApiOperation("查询用户列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询用户列表", code = "queryUserListByPage")
+    public Result pageList(UserQueryDto queryDto) {
+        return Result.success().data(userService.queryUserListByPage(queryDto));
+    }
+
+    /**
      * 修改个人头像
      *
      * @param updateDto 用户信息
@@ -116,20 +130,6 @@ public class UserController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询用户列表（公共）", code = "pageUserListOfCommon", level = BaseConst.PermLevel.PUBLIC)
     public Result pageUserListOfCommon(UserQueryDto queryDto) {
-        return Result.success().data(userService.queryUserListByPage(queryDto));
-    }
-
-    /**
-     * 查询用户列表
-     *
-     * @param queryDto 查询参数
-     * @return userList
-     */
-    @GetMapping(value = "/pageList")
-    @ApiOperation("查询用户列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询用户列表", code = "queryUserListByPage")
-    public Result pageList(UserQueryDto queryDto) {
         return Result.success().data(userService.queryUserListByPage(queryDto));
     }
 

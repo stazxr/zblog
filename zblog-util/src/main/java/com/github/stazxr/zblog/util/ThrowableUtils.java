@@ -11,11 +11,27 @@ import java.io.StringWriter;
  */
 public class ThrowableUtils {
     /**
-     * 构建包含根异常信息的完整异常消息。
+     * 获取异常的堆栈信息的字符串表示。
      *
-     * @param message 基础消息
-     * @param cause 根异常
-     * @return 完整的异常消息
+     * @param throwable 异常对象
+     * @return 堆栈信息的字符串表示
+     */
+    public static String getStackTrace(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+            throwable.printStackTrace(pw);
+            return sw.toString();
+        } catch (Exception e) {
+            return throwable == null ? null : throwable.toString();
+        }
+    }
+
+    /**
+     * Build a message for the given base message and root cause.
+     *
+     * @param message the base message
+     * @param cause the root cause
+     * @return the full exception message
      */
     public static String buildMessage(String message, Throwable cause) {
         if (cause == null) {
@@ -30,33 +46,35 @@ public class ThrowableUtils {
     }
 
     /**
-     * 获取异常的堆栈信息字符串。
+     * Retrieve the innermost cause of the given exception, if any.
      *
-     * @param throwable 异常对象
-     * @return 包含堆栈信息的字符串
+     * @param original the original exception to introspect
+     * @return the innermost exception, or {@code null} if none
      */
-    public static String getStackTrace(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        try (PrintWriter pw = new PrintWriter(sw)) {
-            throwable.printStackTrace(pw);
-            return sw.toString();
+    public static Throwable getRootCause(Throwable original) {
+        if (original == null) {
+            return null;
         }
+        Throwable rootCause = null;
+        Throwable cause = original.getCause();
+        while (cause != null && cause != rootCause) {
+            rootCause = cause;
+            cause = cause.getCause();
+        }
+        return rootCause;
     }
 
     /**
-     * 将异常对象转换为包含异常名、消息和堆栈跟踪信息的字符串。
+     * Retrieve the most specific cause of the given exception, that is,
+     * either the innermost cause (root cause) or the exception itself.
      *
-     * @param throwable 异常对象
-     * @return 包含异常名、消息和堆栈跟踪信息的字符串
+     * <p>Differs from {@link #getRootCause} in that it falls back
+     * to the original exception if there is no root cause.
+     * @param original the original exception to introspect
+     * @return the most specific cause (never {@code null})
      */
-    public static String stackTraceToString(Throwable throwable) {
-        String expName = throwable.getClass().getName();
-        String message = throwable.getMessage();
-        StackTraceElement[] elements = throwable.getStackTrace();
-        StringBuilder buffer = new StringBuilder();
-        for (StackTraceElement stet : elements) {
-            buffer.append(stet).append("\n");
-        }
-        return expName + ":" + message + "\n\t" + buffer;
+    public static Throwable getMostSpecificCause(Throwable original) {
+        Throwable rootCause = getRootCause(original);
+        return (rootCause != null ? rootCause : original);
     }
 }

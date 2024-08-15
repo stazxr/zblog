@@ -148,12 +148,12 @@ zblog:
         deploy-center: j # 部署机房
         deploy-unit: 0 # 部署单元
         deploy-ip: # 部署IP
-    context:
+    seq: # 序号配置
+      datacenter-id: 0 # 数据中心ID
+      machine-id: 0 # 机器ID
+    context: # 上下文配置
       tags: # 自定义标签配置
         - {tag-name: conversion-id} # conversion-id
-  seq: # 序号配置
-    datacenter-id: 0 # 数据中心ID
-    machine-id: 0 # 机器ID
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/

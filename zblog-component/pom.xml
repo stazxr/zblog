@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 
     <name>zblog-component</name>
-    <description>ZBLOG 组件库，组件解耦，不同组件之间没有依赖关系</description>
+    <description>ZBLOG 组件库</description>
 
     <modules>
         <!-- 脱敏组件 -->
@@ -28,12 +28,15 @@
         <module>zblog-context</module>
         <!-- 消息组件 -->
         <module>zblog-notify</module>
+        <!-- 参数配置组件 -->
+        <module>zblog-props</module>
     </modules>
 
     <dependencies>
+        <!-- ZBLOG 公共模块 -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
-            <artifactId>zblog-util</artifactId>
+            <artifactId>zblog-common</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -96,7 +96,7 @@ public interface UserService extends BaseService<User> {
     void clearUserStorageToken(Long userId);
 
     /**
-     * 查询用户列表
+     * 分页查询用户列表
      *
      * @param queryDto 查询参数
      * @return userList

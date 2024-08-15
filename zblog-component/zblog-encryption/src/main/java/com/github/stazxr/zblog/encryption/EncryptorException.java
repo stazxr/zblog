@@ -1,12 +1,15 @@
 package com.github.stazxr.zblog.encryption;
 
+import com.github.stazxr.zblog.common.exception.BaseException;
+import com.github.stazxr.zblog.common.exception.ExpMessageCode;
+
 /**
  * 加解密过程中的异常基类
  *
  * @author SunTao
  * @since 2024-07-25
  */
-public class EncryptorException extends RuntimeException {
+public class EncryptorException extends BaseException {
     private static final long serialVersionUID = 7808497479350394417L;
 
     /**
@@ -14,7 +17,7 @@ public class EncryptorException extends RuntimeException {
      * @param message 错误信息
      */
     public EncryptorException(String message) {
-        super(message);
+        super(new ExpMessageCode(message));
     }
 
     /**
@@ -23,7 +26,7 @@ public class EncryptorException extends RuntimeException {
      * @param cause 原因
      */
     public EncryptorException(String message, Throwable cause) {
-        super(message, cause);
+        super(new ExpMessageCode(message), cause);
     }
 
     /**
@@ -34,10 +37,10 @@ public class EncryptorException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        String messageCode = super.getMessage();
+        String messageCode = getCode();
         String message = StatusCode.of(messageCode);
         if (message != null) {
-            messageCode = messageCode.concat(": ").concat(message);
+            messageCode = "[" + messageCode + "] ".concat(message).concat(super.getMessage());
         }
         return messageCode;
     }

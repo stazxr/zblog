@@ -2,11 +2,10 @@ package com.github.stazxr.zblog.util.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.crypto.MacProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,9 +19,8 @@ import java.util.UUID;
  * @author SunTao
  * @since 2023-04-07
  */
+@Slf4j
 public class JwtUtils {
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
     private static final String JWT_SEPARATOR = "Bearer ";
 
     /**
@@ -121,7 +119,7 @@ public class JwtUtils {
             SecretKey key = generateKey(JWT_ALG, jwtRule);
             flag = parseJwt(key, claimsJws).getBody() != null;
         } catch (Exception var4) {
-            logger.warn("JWT验证出错，错误原因：{}", var4.getMessage());
+            log.warn("JWT验证出错，错误原因：{}", var4.getMessage());
         }
 
         return flag;
@@ -138,7 +136,7 @@ public class JwtUtils {
             Claims claims = parseJwt(key, claimsJws).getBody();
             flag = claims.getSubject().equals(sub);
         } catch (Exception var5) {
-            logger.warn("JWT验证出错，错误原因：{}", var5.getMessage());
+            log.warn("JWT验证出错，错误原因：{}", var5.getMessage());
         }
 
         return flag;

@@ -28,6 +28,8 @@ import java.util.*;
 @Slf4j
 @TableName("user")
 public class User extends BaseEntity implements UserDetails {
+    private static final long serialVersionUID = 4174772175234327859L;
+
     /**
      * 密码有效期, 单位天数，默认一年
      */

@@ -3,7 +3,10 @@ package com.github.stazxr.zblog.util.io;
 import com.github.stazxr.zblog.util.secret.Md5Utils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -42,17 +45,15 @@ public class FileUtils {
     private static final DecimalFormat DF = new DecimalFormat("0.00");
 
     /**
-     * 将数据写入文件中
+     * 读取文件
      *
-     * @param data 待写入的数据
-     * @param file 文件
-     * @throws IOException 写入异常
+     * @param filepath 文件路径
+     * @param encode   文件编码
+     * @return 文件内容
+     * @throws IOException 读取异常
      */
-    public static void writeFile(String data, File file) throws IOException {
-        try (OutputStream out = Files.newOutputStream(file.toPath())) {
-            out.write(data.getBytes());
-            out.flush();
-        }
+    public static String readFile(String filepath, String encode) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(filepath)), encode);
     }
 
     /**
@@ -90,6 +91,100 @@ public class FileUtils {
             }
             out.flush();
             return out.toString();
+        }
+    }
+
+    /**
+     * 将文件转换成Byte数组
+     *
+     * @param file 文件
+     * @return Byte数组
+     * @throws Exception 文件读取异常
+     */
+    public static byte[] readFileBytes(File file) throws Exception {
+        try (FileInputStream fis = new FileInputStream(file);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream(1000)) {
+            byte[] b = new byte[1000];
+            int n;
+            while ((n = fis.read(b)) != -1) {
+                bos.write(b, 0, n);
+            }
+            return bos.toByteArray();
+        }
+    }
+
+    /**
+     * 写入文件
+     *
+     * @param data   文件内容
+     * @param file   输出文件
+     * @param encode 文件编码
+     * @throws IOException 写入异常
+     */
+    public static void writeFile(String data, String file, String encode) throws IOException {
+        Path outPath = Paths.get(file);
+        if (!Files.exists(outPath.getParent())) {
+            Files.createDirectories(outPath.getParent());
+        }
+        Files.write(outPath, data.getBytes(encode));
+    }
+
+    /**
+     * 写入文件
+     *
+     * @param data   文件内容
+     * @param file   输出文件
+     * @throws IOException 写入异常
+     */
+    public static void writeFile(String data, File file) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file.toPath())))) {
+            writer.write(data);
+            writer.flush();
+        }
+    }
+
+    /**
+     * 写入文件
+     *
+     * @param data    文件内容
+     * @param file    输出文件
+     * @param charset 文件编码
+     * @throws IOException 写入异常
+     */
+    public static void writeFile(String data, String file, Charset charset) throws IOException {
+        writeFile(data, new File(file), charset);
+    }
+
+    /**
+     * 写入文件
+     *
+     * @param data    文件内容
+     * @param file    输出文件
+     * @param charset 文件编码
+     * @throws IOException 写入异常
+     */
+    public static void writeFile(String data, File file, Charset charset) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file.toPath()), charset))) {
+            writer.write(data);
+            writer.flush();
+        }
+    }
+
+    /**
+     * 将Byte数组转换成文件
+     *
+     * @param bytes 字节数组
+     * @param fileFullPath 文件路径
+     * @throws Exception IO异常
+     */
+    public static void writeFile(byte[] bytes, String fileFullPath) throws Exception {
+        File dest = new File(fileFullPath).getCanonicalFile();
+        if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
+            throw new IOException("目录创建失败，" + dest.getParentFile().getAbsolutePath());
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(dest); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+            bos.write(bytes);
         }
     }
 
@@ -199,45 +294,7 @@ public class FileUtils {
      * @return MD5
      */
     public static String getFileMd5(File file) throws Exception {
-        return Md5Utils.getMessageDigest(getFileBytes(file));
-    }
-
-    /**
-     * 将文件转换成Byte数组
-     *
-     * @param file 文件
-     * @return Byte数组
-     * @throws Exception 文件读取异常
-     */
-    public static byte[] getFileBytes(File file) throws Exception {
-        try (FileInputStream fis = new FileInputStream(file);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream(1000)) {
-            byte[] b = new byte[1000];
-            int n;
-            while ((n = fis.read(b)) != -1) {
-                bos.write(b, 0, n);
-            }
-            return bos.toByteArray();
-        }
-    }
-
-    /**
-     * 将Byte数组转换成文件
-     *
-     * @param bytes 字节数组
-     * @param fileFullPath 文件路径
-     * @throws Exception IO异常
-     */
-    public static void getFileByBytes(byte[] bytes, String fileFullPath) throws Exception {
-        File dest = new File(fileFullPath).getCanonicalFile();
-        if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
-            throw new IOException("目录创建失败，" + dest.getParentFile().getAbsolutePath());
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(dest);
-             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
-            bos.write(bytes);
-        }
+        return Md5Utils.getMessageDigest(readFileBytes(file));
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.util.collection;
 
-import org.springframework.lang.Nullable;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -28,7 +26,7 @@ public class CollectionUtils {
      * @param collection 集合
      * @return Return {@code true} if the supplied Collection is {@code null} or empty.
      */
-    public static boolean isEmpty(@Nullable Collection<?> collection) {
+    public static boolean isEmpty(Collection<?> collection) {
         return (collection == null || collection.isEmpty());
     }
 
@@ -38,7 +36,7 @@ public class CollectionUtils {
      * @param map 字典
      * @return Return {@code true} if the supplied Map is {@code null} or empty.
      */
-    public static boolean isEmpty(@Nullable Map<?, ?> map) {
+    public static boolean isEmpty(Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
 }

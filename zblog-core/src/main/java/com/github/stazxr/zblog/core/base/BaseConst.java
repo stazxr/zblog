@@ -169,5 +169,10 @@ public class BaseConst {
          * V_4.2.0
          */
         public static final String V_4_2_0 = "V_4.2.0";
+
+        /**
+         * V_5.0.0
+         */
+        public static final String V_5_0_0 = "V_5.0.0";
     }
 }

@@ -184,7 +184,7 @@ public class IpUtils {
             }
             return address;
         } catch (Exception e) {
-            log.error("根据IP获取地理位置信息发生异常: {}", IP_SEARCH_URL, e);
+            log.error("根据IP获取地理位置信息发生异常: {} -> {}", IP_SEARCH_URL, e.getMessage());
             return "";
         }
     }

@@ -64,7 +64,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(mailMessage);
             log.info("send simple email success");
         } catch (Exception e) {
-            throw new MailException("send simple email failed", e);
+            throw new MailException("ZNTFM01", e);
         }
     }
 
@@ -86,7 +86,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send html email success");
         } catch (Exception e) {
-            throw new MailException("send html email failed", e);
+            throw new MailException("ZNTFM02", e);
         }
     }
 
@@ -118,7 +118,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send image email success");
         } catch (Exception e) {
-            throw new MailException("send image email failed", e);
+            throw new MailException("ZNTFM03", e);
         }
     }
 
@@ -152,7 +152,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send attachment email success");
         } catch (Exception e) {
-            throw new MailException("send attachment email failed", e);
+            throw new MailException("ZNTFM04", e);
         }
     }
 

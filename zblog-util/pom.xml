@@ -21,34 +21,55 @@
         <poi.version>4.0.0</poi.version>
         <easyexcel.version>3.0.5</easyexcel.version>
         <xercesImpl.version>2.12.2</xercesImpl.version>
-        <useragent.version>5.23</useragent.version>
-        <jackson.version>2.13.0</jackson.version>
         <aliyun.oss.version>3.8.0</aliyun.oss.version>
         <qiniu.version>7.9.5</qiniu.version>
         <sensitive-word.version>0.2.0</sensitive-word.version>
-        <unirest.version>1.4.9</unirest.version>
         <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
     <dependencies>
-        <!-- jackson -->
+        <!-- hutool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <!-- Json -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+        <!-- okhttp -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <!-- Jsch -->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+        </dependency>
+        <!-- Httpclient5 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+        </dependency>
+        <!-- Common Utils: // TODO 待替换 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
         <!-- servlet api -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- useragent 解析客户端操作系统、浏览器信息 -->
-        <dependency>
-            <groupId>nl.basjes.parse.useragent</groupId>
-            <artifactId>yauaa</artifactId>
-            <version>${useragent.version}</version>
         </dependency>
         <!-- pinyin4j -->
         <dependency>
@@ -105,23 +126,11 @@
             <artifactId>qiniu-java-sdk</artifactId>
             <version>${qiniu.version}</version>
         </dependency>
-        <!-- Jsch -->
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <optional>true</optional>
-        </dependency>
         <!-- Sensitive-word -->
         <dependency>
             <groupId>com.github.houbb</groupId>
             <artifactId>sensitive-word</artifactId>
             <version>${sensitive-word.version}</version>
-        </dependency>
-        <!-- unirest -->
-        <dependency>
-            <groupId>com.mashape.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>${unirest.version}</version>
         </dependency>
         <!-- jjwt -->
         <dependency>

@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.base.component.email.MailReceiveHandler;
-import com.github.stazxr.zblog.base.component.email.MailService;
 import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.dto.*;
@@ -25,20 +24,23 @@ import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.context.constant.TagConstants;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
+import com.github.stazxr.zblog.encryption.util.RsaUtils;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
 import com.github.stazxr.zblog.log.mapper.LogMapper;
+import com.github.stazxr.zblog.notify.mail.MailReceiver;
+import com.github.stazxr.zblog.notify.mail.MailService;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
-import com.github.stazxr.zblog.util.secret.RsaUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -300,16 +302,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 查询用户列表
+     * 分页查询用户列表
      *
      * @param queryDto 查询参数
      * @return userList
      */
     @Override
     public PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto) {
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.SYS_CODE_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.APP_CODE_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_AREA_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_CENTER_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_UNIT_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_IP_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_CODE_TAG));
+        System.out.println(com.github.stazxr.zblog.context.Context.get("conversion-id"));
+        System.out.println(com.github.stazxr.zblog.context.Context.get("User-Id"));
         queryDto.checkPage();
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(userMapper.selectUserList(queryDto));
+        try (Page<UserVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            return page.doSelectPageInfo(() -> userMapper.selectUserList(queryDto));
+        }
     }
 
     /**
@@ -575,8 +587,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             ctx.setVariable("password", password);
             ctx.setVariable("year", DateUtils.formatNow("yyyy"));
             String emailContext = templateEngine.process("addUserNotice", ctx);
-            MailReceiveHandler handler = MailReceiveHandler.setReceive(email);
-            mailService.sendHtmlMail(handler, BaseConst.SYS_NAME, emailContext);
+            MailReceiver receiver = MailReceiver.setReceive(email);
+            mailService.sendHtmlMail(receiver, BaseConst.SYS_NAME, emailContext);
         } catch (Exception e) {
             throw new ServiceException(500, "邮件推送失败", e);
         }

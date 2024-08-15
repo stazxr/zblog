@@ -14,4 +14,9 @@ public class SequenceExceptionTest {
     public void testThrowException() {
         throw new SequenceException("ZSEQ001");
     }
+
+    @Test
+    public void testThrowException2() {
+        throw new SequenceException("ZSEQ001", new IllegalArgumentException("参数异常"));
+    }
 }

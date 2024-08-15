@@ -10,13 +10,15 @@
     </parent>
 
     <artifactId>zblog-common</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>zblog-common</name>
     <description>ZBLOG 公共模块</description>
 
-    <modules>
-        <!-- ID 生成器自动配置 -->
-        <module>zseq-spring-boot-autoconfigure</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-util</artifactId>
+        </dependency>
+    </dependencies>
 </project>

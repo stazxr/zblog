@@ -20,8 +20,10 @@ import java.lang.reflect.Field;
 @Slf4j
 @Getter
 @Setter
-@ApiModel("实体信息")
+@ApiModel("公共实体")
 public class BaseEntity extends Model<BaseEntity> {
+	private static final long serialVersionUID = 5802079762879978466L;
+
 	/**
 	 * 创建用户
 	 */

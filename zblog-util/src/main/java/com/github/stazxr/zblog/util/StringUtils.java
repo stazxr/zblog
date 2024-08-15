@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.util;
 
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.regex.Matcher;

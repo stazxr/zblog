@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${druid-starter.version}</version>
+            <version>${spring-druid.version}</version>
         </dependency>
         <!-- Springboot Configuration -->
         <dependency>
@@ -109,11 +109,24 @@
         </dependency>
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
-            <artifactId>zseq-spring-boot-autoconfigure</artifactId>
+            <artifactId>zblog-sequence</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-context</artifactId>
+        </dependency>
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
         </dependency>
     </dependencies>
 </project>
