@@ -41,7 +41,23 @@ public class ThreadUtils {
      */
     @SuppressWarnings("all")
     public static Thread runThread(Task task) {
+        return runThread("", task);
+    }
+
+    /**
+     * 运行一个线程
+     *
+     * @param task 执行内容
+     * @return Thread
+     */
+    @SuppressWarnings("all")
+    public static Thread runThread(String name, Task task) {
         Thread thread = new Thread(() -> task.execute());
+        if (task != null && !"".equals(task)) {
+            thread.setName(name);
+        }
+
+        // 启动线程
         thread.start();
         return thread;
     }

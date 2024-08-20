@@ -2,8 +2,8 @@ package com.github.stazxr.zblog.base.component.file.impl;
 
 import com.github.stazxr.zblog.base.component.file.FileHandler;
 import com.github.stazxr.zblog.base.component.file.model.FileInfo;
+import com.github.stazxr.zblog.encryption.util.Md5Utils;
 import com.github.stazxr.zblog.util.io.FileUtils;
-import com.github.stazxr.zblog.util.secret.Md5Utils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

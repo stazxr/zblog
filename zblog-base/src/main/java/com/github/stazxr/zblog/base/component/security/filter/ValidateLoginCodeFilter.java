@@ -3,11 +3,12 @@ package com.github.stazxr.zblog.base.component.security.filter;
 import com.github.stazxr.zblog.base.component.security.exception.NumCodeException;
 import com.github.stazxr.zblog.base.component.security.handler.CustomAuthenticationFailureHandler;
 import com.github.stazxr.zblog.base.component.security.config.CustomWebSecurityConfiguration;
-import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.captcha.handler.CaptchaHandler;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,13 +27,14 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ValidateLoginCodeFilter extends OncePerRequestFilter {
     public static final String DEFAULT_CODE_KEY = "code";
 
     public static final String DEFAULT_CACHE_KEY = "uuid";
 
-    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+    private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+    private CaptchaHandler captchaHandler;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
@@ -53,14 +55,14 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
             }
 
             // 获取后台绑定的验证码信息，并判断是否为空
-            String cacheCode = CacheUtils.getThenRemove(uuid);
+            String cacheCode = captchaHandler.getCaptchaText(uuid);
             if (cacheCode == null) {
                 authenticationFailureHandler.onAuthenticationFailure(request, response, new NumCodeException("验证码已过期"));
                 return;
             }
 
             // 判断验证码是否正确
-            if (!cacheCode.equalsIgnoreCase(code)) {
+            if (!captchaHandler.verifyCaptcha(uuid, code)) {
                 authenticationFailureHandler.onAuthenticationFailure(request, response, new NumCodeException("验证码不正确"));
                 return;
             }
@@ -68,5 +70,15 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
 
         // 校验通过
         filterChain.doFilter(request, response);
+    }
+
+    @Autowired
+    public void setAuthenticationFailureHandler(CustomAuthenticationFailureHandler authenticationFailureHandler) {
+        this.authenticationFailureHandler = authenticationFailureHandler;
+    }
+
+    @Autowired
+    public void setCaptchaHandler(CaptchaHandler captchaHandler) {
+        this.captchaHandler = captchaHandler;
     }
 }

@@ -1,21 +1,15 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeEnum;
-import com.github.stazxr.zblog.base.component.captcha.CaptchaCodeProperties;
 import com.github.stazxr.zblog.base.service.ZblogService;
-import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.captcha.Captcha;
+import com.github.stazxr.zblog.captcha.factory.CaptchaFactory;
+import com.github.stazxr.zblog.captcha.handler.CaptchaHandler;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
-import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.UuidUtils;
-import com.wf.captcha.base.Captcha;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +35,14 @@ import java.util.Map;
 public class AuthController {
     private final ZblogService zblogService;
 
+    private final CaptchaHandler captchaHandler;
+
     @Value("${zblog.globalKey.PublicKey}")
     private String globalPublicKey;
 
     /**
      * 获取当前登录用户信息
      *
-     * @param request 请求信息
      * @return login username
      */
     @IgnoredLog
@@ -55,7 +50,7 @@ public class AuthController {
     @ApiOperation(value = "获取当前登录用户信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
-    public Result currentUserDetail(HttpServletRequest request) {
+    public Result currentUserDetail() {
         return Result.success().data(SecurityUtils.getLoginUser());
     }
 
@@ -69,34 +64,10 @@ public class AuthController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取登录验证码", code = "loginCode", level = BaseConst.PermLevel.OPEN)
     public Result loginCode() {
-        // 从缓存中获取登录验证码的配置
-        String cacheKey = Constants.CacheKey.captchaConfig.cacheKey().concat(":loginCode");
-        String captchaConfigStr = CacheUtils.get(cacheKey);
-        if (StringUtils.isBlank(captchaConfigStr)) {
-            throw new ServiceException("获取验证码配置信息失败");
-        }
-
-        // 生成验证码
-        CaptchaCodeProperties codeProperties = JSON.parseObject(captchaConfigStr, CaptchaCodeProperties.class);
-        Captcha captcha = codeProperties.getCaptcha();
-
-        // 缓存验证码
-        Constants.CacheKey loginCode = Constants.CacheKey.loginCode;
-        String uuid = loginCode.cacheKey().concat(":").concat(UuidUtils.generateShortUuid());
-
-        // 当验证码类型为 arithmetic时且长度 >= 2 时，captcha.text()的结果有几率为浮点型
-        String captchaValue = captcha.text();
-        String point = ".";
-        if (captcha.getCharType() - 1 == CaptchaCodeEnum.Arithmetic.ordinal() && captchaValue.contains(point)) {
-            captchaValue = captchaValue.split("\\.")[0];
-        }
-        CacheUtils.put(uuid, captchaValue, codeProperties.getDuration());
-
-        // 返回验证码信息
-        Map<String, Object> data = new HashMap<String, Object>(2) {{
-            put("img", captcha.toBase64());
-            put("uuid", uuid);
-        }};
+        Map<String, Object> data = new HashMap<>(2);
+        Captcha captcha = captchaHandler.createCaptcha("loginCode");
+        data.put("img", captcha.getBase64());
+        data.put("uuid", captcha.getCaptchaId());
         return Result.success().data(data);
     }
 

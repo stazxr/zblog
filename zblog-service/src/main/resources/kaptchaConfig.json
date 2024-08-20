@@ -3,17 +3,10 @@
     "name": "loginCode",
     "properties": {
       "captchaType": "Arithmetic",
-      "captchaCode": {
-        "length": 2,
-        "width": 111,
-        "height": 32
-      }
-    }
-  },
-  {
-    "name": "changePwdWhenForget",
-    "properties": {
-      "duration": 180
+      "duration": 60,
+      "length": 2,
+      "width": 111,
+      "height": 32
     }
   }
 ]

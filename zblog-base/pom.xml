@@ -20,18 +20,18 @@
         路由管理、字典管理、操作日志、接口日志、数据监控、服务监控、版本维护、存储管理、节点管理等模块
     </description>
 
-    <properties>
-        <kaptcha.version>2.3.2</kaptcha.version>
-        <easy-captcha.version>1.6.2</easy-captcha.version>
-    </properties>
-
     <dependencies>
         <!-- Zblog Core -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-core</artifactId>
         </dependency>
-        <!-- Zblog Notify -->
+        <!-- Zblog: 验证码组件 -->
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-captcha</artifactId>
+        </dependency>
+        <!-- Zblog: 消息通知组件 -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-notify</artifactId>
@@ -51,16 +51,14 @@
         <dependency>
             <groupId>com.github.penggle</groupId>
             <artifactId>kaptcha</artifactId>
-            <version>${kaptcha.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.whvcse</groupId>
             <artifactId>easy-captcha</artifactId>
-            <version>${easy-captcha.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <!-- OS -->
         <dependency>
@@ -93,11 +91,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <!-- Fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
 </project>

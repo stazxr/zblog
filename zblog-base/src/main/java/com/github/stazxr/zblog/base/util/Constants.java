@@ -146,22 +146,6 @@ public class Constants {
      */
     public enum CacheKey {
         /**
-         * 登录验证码
-         */
-        @Deprecated
-        loginNumCode("loginNumCode", 300),
-
-        /**
-         * 系统内置的验证码配置信息
-         */
-        captchaConfig("captchaConfig", FOREVER_CACHE),
-
-        /**
-         * 登录验证码缓存的Key值，有效时间已配置文件为准，配置文件未配置则已此处为准
-         */
-        loginCode("loginCode", 90),
-
-        /**
          * 缓存接口访问级别
          */
         interfaceLevel("interfaceLevel", 3600),

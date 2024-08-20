@@ -47,7 +47,7 @@ public class Context {
      */
     public static void print() {
         String contextMap = getContext().getContextMapAsString();
-        log.info("Context map: " + contextMap);
+        log.debug("Context map: " + contextMap);
     }
 
     /**

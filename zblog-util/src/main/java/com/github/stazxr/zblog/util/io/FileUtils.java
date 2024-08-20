@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.util.io;
 
-import com.github.stazxr.zblog.util.secret.Md5Utils;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -64,6 +62,17 @@ public class FileUtils {
      * @throws IOException 读取异常
      */
     public static String readFileFromStream(InputStream inputStream) throws IOException {
+        return readFileFromStream(inputStream, "UTF-8");
+    }
+
+    /**
+     * 从流中读取文件内容
+     *
+     * @param inputStream 输入流
+     * @return 字符串
+     * @throws IOException 读取异常
+     */
+    public static String readFileFromStream(InputStream inputStream, String charsetName) throws IOException {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
@@ -71,7 +80,7 @@ public class FileUtils {
                 out.write(buf, 0, len);
             }
             out.flush();
-            return out.toString();
+            return out.toString(charsetName);
         }
     }
 
@@ -285,16 +294,6 @@ public class FileUtils {
     public static String getFileEnType(String suffix) {
         suffix = suffix == null ? "" : suffix.toLowerCase(Locale.ROOT);
         return FileTypeEnum.matchFileEnType(suffix);
-    }
-
-    /**
-     * 获取文件的MD5值
-     *
-     * @param file 文件
-     * @return MD5
-     */
-    public static String getFileMd5(File file) throws Exception {
-        return Md5Utils.getMessageDigest(readFileBytes(file));
     }
 
     /**

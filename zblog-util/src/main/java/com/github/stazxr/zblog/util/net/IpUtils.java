@@ -153,6 +153,7 @@ public class IpUtils {
      * @return 地理位置信息
      */
     public static String getIpLocation(String ip, int ipLocationType) {
+        String response = "";
         try {
             if (ipLocationType < IP_LOCATION_PRO || ipLocationType > IP_LOCATION_PRO_CITY_REGION) {
                 return "";
@@ -165,7 +166,8 @@ public class IpUtils {
 
             final String noProvinceCode = "999999";
             String url = String.format(IP_SEARCH_URL, ip);
-            JSONObject resultJson = JSONUtil.parseObj(HttpUtil.get(url));
+            response = HttpUtil.get(url);
+            JSONObject resultJson = JSONUtil.parseObj(response);
 
             String proCode = resultJson.getStr("proCode");
             if (proCode == null || noProvinceCode.equals(proCode.trim())) {
@@ -184,7 +186,7 @@ public class IpUtils {
             }
             return address;
         } catch (Exception e) {
-            log.error("根据IP获取地理位置信息发生异常: {} -> {}", IP_SEARCH_URL, e.getMessage());
+            log.error("根据IP获取地理位置信息发生异常: {} -> {}", e.getMessage(), response);
             return "";
         }
     }

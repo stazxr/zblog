@@ -16,20 +16,22 @@
     <description>ZBLOG 组件库</description>
 
     <modules>
+        <!-- 表达式组件 -->
+        <module>zblog-jexl</module>
         <!-- 脱敏组件 -->
         <module>zblog-mask</module>
         <!-- 加解密组件 -->
         <module>zblog-encryption</module>
-        <!-- 表达式组件 -->
-        <module>zblog-jexl</module>
+        <!-- 参数配置组件 -->
+        <module>zblog-props</module>
         <!-- 序列号组件 -->
         <module>zblog-sequence</module>
         <!-- 上下文组件 -->
         <module>zblog-context</module>
         <!-- 消息组件 -->
         <module>zblog-notify</module>
-        <!-- 参数配置组件 -->
-        <module>zblog-props</module>
+        <!-- 图形验证码组件 -->
+        <module>zblog-captcha</module>
     </modules>
 
     <dependencies>

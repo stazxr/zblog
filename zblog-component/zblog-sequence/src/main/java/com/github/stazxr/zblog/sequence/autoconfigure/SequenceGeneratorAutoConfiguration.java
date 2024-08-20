@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * EasyId 自动配置
+ * 序号生成器自动配置
  *
  * @author SunTao
  * @since 2024-04-07

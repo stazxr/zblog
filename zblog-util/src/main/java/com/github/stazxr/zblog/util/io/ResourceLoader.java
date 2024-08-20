@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.util.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 /**
@@ -16,7 +17,7 @@ public class ResourceLoader {
     /**
      * 获取 Resource 目录下的文件的绝对路径
      *
-     * @param resourceName 资源名称
+     * @param resourceName 资源名称 eg: conf/dnc.conf  dnc.conf
      * @return 资源绝对路径
      */
     public static String getResourceAbsolutePath(String resourceName) {
@@ -28,11 +29,11 @@ public class ResourceLoader {
             ClassLoader classLoader = ResourceLoader.class.getClassLoader();
             URL resourceUrl = classLoader.getResource(resource);
             if (resourceUrl == null) {
-                throw new IllegalArgumentException("Resource not found: " + resourceName);
+                throw new FileNotFoundException("Resource not found: " + resourceName);
             }
             return new File(resourceUrl.getFile()).getAbsolutePath();
         } catch (Exception e) {
-            throw new RuntimeException("资源【" + resourceName + "】加载失败", e);
+            throw new IllegalStateException("资源【" + resourceName + "】加载失败", e);
         }
     }
 }

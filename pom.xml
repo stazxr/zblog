@@ -102,6 +102,8 @@
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <mysql.version>5.1.47</mysql.version>
         <nimbus-jose-jwt.version>9.10</nimbus-jose-jwt.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
     </properties>
 
     <!-- 公共依赖管理 -->
@@ -143,6 +145,12 @@
             </dependency>
             <!-- ZBLOG 组件模块开始 -->
 
+            <!-- 表达式组件 -->
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-jexl</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
             <!-- 脱敏组件 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
@@ -155,10 +163,10 @@
                 <artifactId>zblog-encryption</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- 表达式组件 -->
+            <!-- 参数配置组件 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
-                <artifactId>zblog-jexl</artifactId>
+                <artifactId>zblog-props</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
             <!-- 序列号组件 -->
@@ -179,10 +187,10 @@
                 <artifactId>zblog-notify</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- 参数配置组件 -->
+            <!-- 验证码组件 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
-                <artifactId>zblog-props</artifactId>
+                <artifactId>zblog-captcha</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
 
@@ -194,25 +202,25 @@
                 <artifactId>zblog-exception</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- Zblog 核心组件 -->
+            <!-- Zblog 核心模块 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-core</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- Zblog 日志组件 -->
+            <!-- Zblog 日志模块 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-log</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- Zblog 基础组件 -->
+            <!-- Zblog 基础模块 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-base</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
-            <!-- Zblog 业务组件 -->
+            <!-- Zblog 业务模块 -->
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-service</artifactId>
@@ -415,6 +423,17 @@
                 <groupId>com.nimbusds</groupId>
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>${nimbus-jose-jwt.version}</version>
+            </dependency>
+            <!-- Captcha -->
+            <dependency>
+                <groupId>com.github.penggle</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.whvcse</groupId>
+                <artifactId>easy-captcha</artifactId>
+                <version>${easy-captcha.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
