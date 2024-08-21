@@ -46,12 +46,26 @@ spring:
           config:
             drop-table-allow: false # 不允许删除表
             multi-statement-allow: false # 指定是否允许在一个 Statement 对象中执行多个 SQL 语句
-
   redis:
+    database: ${zblog.redis.database} # 指定 Redis 使用的数据库索引，Redis 默认有 16 个数据库，索引从 0 到 15
+    host: ${zblog.redis.host} # Redis 服务器地址
+    port: ${zblog.redis.port} # Redis 服务器的端口号
+    password: ${zblog.redis.password} # Redis 服务器的密码
+    connect-timeout: ${zblog.redis.connect.timeout} # 连接超时时间，单位为毫秒，用于定义客户端连接到 Redis 服务器的最大等待时间
     client-type: lettuce
-    host: ${REDIS_HOST:127.0.0.1}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:redisPwd}
+    lettuce:
+      pool:
+        # 连接池中保持的最小空闲连接数
+        min-idle: ${zblog.redis.lettuce.pool.minIdle}
+        # 连接池中允许的最大空闲连接数
+        max-idle: ${zblog.redis.lettuce.pool.maxIdle}
+        # 连接池中允许的最大活动连接数，如果活动连接数超过此值，将会有新的连接请求被阻塞或抛出异常
+        max-active: ${zblog.redis.lettuce.pool.maxActive}
+        # 从连接池中获取连接时的最大等待时间，单位为毫秒。如果超过此时间仍未获取到连接，将会抛出异常
+        max-wait: ${zblog.redis.lettuce.pool.maxWait}
+        # 连接池中连接的清理周期，单位为毫秒。用于定义多长时间执行一次空闲连接的检查和清理，以保持连接池的健康
+        time-between-eviction-runs: ${zblog.redis.lettuce.pool.timeBetweenEvictionRuns}
+
   # rabbitmq:
     # host: 127.0.0.1
     # port: 5672
@@ -135,9 +149,6 @@ swagger:
       name: 孙涛
       email: stazxr@qq.com
       url: https://www.suntaoblog.com
-cache:
-  type: memory
-  default-duration: 300
 zblog:
   base:
     header: # 请求头配置
@@ -154,6 +165,9 @@ zblog:
     context: # 上下文配置
       tags: # 自定义标签配置
         - {tag-name: conversion-id} # conversion-id
+  global:
+    cache:
+      type: redis # 全局缓存类型
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/

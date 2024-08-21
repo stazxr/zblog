@@ -16,8 +16,8 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.exception.DataValidatedException;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
@@ -453,7 +453,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             if (!interfaces.isEmpty()) {
                 interfaces.forEach(interfaceVo -> {
                     String key = interfaceLevel.cacheKey().concat(":").concat(interfaceVo.getUri()).concat("_").concat(interfaceVo.getMethod());
-                    CacheUtils.remove(key);
+                    GlobalCacheHelper.remove(key);
                 });
             }
         }

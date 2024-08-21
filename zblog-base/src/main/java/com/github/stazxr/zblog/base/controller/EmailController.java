@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.notify.mail.MailService;
 import com.github.stazxr.zblog.util.Assert;
@@ -69,7 +69,7 @@ public class EmailController {
         // 缓存验证码
         Constants.CacheKey emailCode = Constants.CacheKey.emailCode;
         String uuid = emailCode.cacheKey().concat(":").concat(email).concat(":").concat(UuidUtils.generateShortUuid());
-        CacheUtils.put(uuid, random, emailCode.duration());
+        GlobalCacheHelper.put(uuid, random, emailCode.duration());
         return Result.success("发送成功").data(uuid);
     }
 }

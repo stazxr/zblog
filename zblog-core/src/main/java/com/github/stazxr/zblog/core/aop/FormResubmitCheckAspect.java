@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.core.aop;
 
 import com.alibaba.fastjson.JSON;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.annotation.FormResubmitCheck;
 import com.github.stazxr.zblog.core.annotation.RequestPostSingleParam;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.encryption.util.Md5Utils;
 import com.github.stazxr.zblog.util.Assert;
@@ -46,14 +46,14 @@ public class FormResubmitCheckAspect {
 
         // 规则校验
         String rk = "frc:" + messageDigest;
-        Predicate<String> p = k -> CacheUtils.get(k) != null;
+        Predicate<String> p = k -> GlobalCacheHelper.get(k) != null;
         Assert.isTrue(p.test(rk), formResubmitCheck.value());
 
         try {
-            CacheUtils.put(rk, "formResubmitCheck", formResubmitCheck.timeout());
+            GlobalCacheHelper.put(rk, "formResubmitCheck", formResubmitCheck.timeout());
             return joinPoint.proceed();
         } finally {
-             CacheUtils.remove(messageDigest);
+            GlobalCacheHelper.remove(messageDigest);
         }
     }
 

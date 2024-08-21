@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.util.collection;
 
-import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
 
@@ -45,13 +44,12 @@ public class TimeMap<K, V> {
      *
      * @param key        键
      * @param value      值
-     * @param expireTime 过期时间（秒）
+     * @param expireTime 过期时间（毫秒）
      */
-    public void put(K key, V value, int expireTime) {
-        Assert.isTrue(expireTime < 0, "expireTime must not be negative");
+    public void put(K key, V value, long expireTime) {
         dataMap.put(key, value);
-        if (expireTime != 0) {
-            Instant expireDate = Instant.now().plus(Duration.ofSeconds(expireTime));
+        if (expireTime > 0) {
+            Instant expireDate = Instant.now().plus(Duration.ofMillis(expireTime));
             expiredDateMap.put(key, expireDate);
         }
     }
@@ -80,6 +78,14 @@ public class TimeMap<K, V> {
     public void remove(K key) {
         dataMap.remove(key);
         expiredDateMap.remove(key);
+    }
+
+    /**
+     * 清空缓存。
+     */
+    public void clear() {
+        dataMap.clear();
+        expiredDateMap.clear();
     }
 
     /**

@@ -5,7 +5,7 @@ import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +42,11 @@ public class CustomLogoutHandler implements LogoutHandler {
             // 注销 token
             jwtTokenStorage.expire(user.getId());
             userService.clearUserStorageToken(user.getId());
-            CacheUtils.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(user.getId())));
+            GlobalCacheHelper.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(user.getId())));
 
             // 清除统一登陆的用户信息
             String ip = IpUtils.getIp(request);
-            CacheUtils.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+            GlobalCacheHelper.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
 
             // 清除 RememberMe
             zblogService.removeRememberMe(username);

@@ -22,8 +22,8 @@ import com.github.stazxr.zblog.base.mapper.RouterMapper;
 import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.Constants;
@@ -88,7 +88,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
 
         // 读取缓存
         String key = interfaceLevel.cacheKey().concat(":").concat(requestUri).concat("_").concat(requestMethod);
-        String cacheValue = CacheUtils.get(key);
+        String cacheValue = (String) GlobalCacheHelper.get(key);
         if (StringUtils.isNotBlank(cacheValue)) {
             return Integer.parseInt(cacheValue);
         }
@@ -119,7 +119,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         }
 
         // 缓存数据
-        CacheUtils.put(key, String.valueOf(level), interfaceLevel.duration());
+        GlobalCacheHelper.put(key, String.valueOf(level), interfaceLevel.duration());
         return level;
     }
 
@@ -304,6 +304,9 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         String postKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_POST");
         String putKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_PUT");
         String deleteKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_DELETE");
-        CacheUtils.remove(getKey, postKey, putKey, deleteKey);
+        GlobalCacheHelper.remove(getKey);
+        GlobalCacheHelper.remove(postKey);
+        GlobalCacheHelper.remove(putKey);
+        GlobalCacheHelper.remove(deleteKey);
     }
 }

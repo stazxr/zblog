@@ -17,8 +17,8 @@ import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -121,7 +121,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     chain.doFilter(request, response);
                 } catch (AuthenticationException ex) {
                     String ip = IpUtils.getIp(request);
-                    CacheUtils.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+                    GlobalCacheHelper.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
                     log.error("authentication token handle exec failed: {} - [{}]", ex.getMessage(), jwtToken);
                     authenticationEntryPoint.commence(request, response, ex);
                 }
@@ -156,7 +156,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             checkTokenLoginIp(request, claimsSet, tokenUser);
 
             // check the token is previous token
-            String previousToken = CacheUtils.get(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            String previousToken = (String) GlobalCacheHelper.get(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
             boolean isPrevious = previousToken != null && previousToken.equals(jwtToken);
             boolean allowedRenewToken = claimsSet.getBooleanClaim("renewToken");
             if (isPrevious) {
@@ -250,7 +250,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // cache previous token
             int preTokenExpiredTime = getPreTokenFreeTime(jwtToken);
-            CacheUtils.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, preTokenExpiredTime);
+            GlobalCacheHelper.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, preTokenExpiredTime);
 
             // set token
             response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newToken));
@@ -261,7 +261,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // set sso token
             Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
-            CacheUtils.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), newToken, ssoTkn.duration());
+            GlobalCacheHelper.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), newToken, ssoTkn.duration());
         } catch (Exception ex) {
             clearUserTokenInfo(user.getId());
             log.error("续签 - 用户 {}: 续签失败", username);
@@ -351,7 +351,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void clearUserTokenInfo(Long userId) {
         jwtTokenStorage.expire(userId);
         userService.clearUserStorageToken(userId);
-        CacheUtils.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+        GlobalCacheHelper.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
     }
 
     private void checkTokenLoginIp(HttpServletRequest request, JWTClaimsSet claimsSet, User user) {

@@ -6,8 +6,8 @@ import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +58,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         // sso token
         Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
-        CacheUtils.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), token, ssoTkn.duration());
+        GlobalCacheHelper.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), token, ssoTkn.duration());
 
         // set login time
         userService.updateUserLoginInfo(request, userId);

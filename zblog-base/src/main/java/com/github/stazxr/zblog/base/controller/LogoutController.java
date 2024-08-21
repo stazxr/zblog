@@ -3,12 +3,12 @@ package com.github.stazxr.zblog.base.controller;
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.model.Result;
-import com.github.stazxr.zblog.core.util.CacheUtils;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import io.swagger.annotations.Api;
@@ -60,11 +60,11 @@ public class LogoutController {
         // 注销 token
         jwtTokenStorage.expire(userId);
         userService.clearUserStorageToken(userId);
-        CacheUtils.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(userId)));
+        GlobalCacheHelper.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(userId)));
 
         // 清除统一登陆的用户信息
         String ip = IpUtils.getIp(request);
-        CacheUtils.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+        GlobalCacheHelper.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
         return Result.success();
     }
 }

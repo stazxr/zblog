@@ -51,8 +51,6 @@
 
         <!-- 定时任务 -->
         <!-- <module>zblog-xxljob</module> -->
-        <!-- 缓存组件 -->
-        <module>zblog-cache</module>
         <!-- 异常处理组件 -->
         <module>zblog-exception</module>
         <!-- 核心组件 -->
@@ -161,6 +159,12 @@
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
                 <artifactId>zblog-encryption</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <!-- 缓存组件 -->
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-cache</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
             <!-- 参数配置组件 -->

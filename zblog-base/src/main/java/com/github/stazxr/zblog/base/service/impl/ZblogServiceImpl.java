@@ -6,7 +6,7 @@ import com.github.stazxr.zblog.base.domain.bo.LoginUser;
 import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -58,7 +58,7 @@ public class ZblogServiceImpl implements ZblogService {
         try {
             // 查找当前 IP 对应的登录令牌
             String ip = IpUtils.getIp(request);
-            String ssoToken = CacheUtils.get(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+            String ssoToken = (String) GlobalCacheHelper.get(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
 
             if (StringUtils.isNotBlank(ssoToken)) {
                 // 解析该 token 拿到用户信息

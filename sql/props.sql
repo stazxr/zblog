@@ -46,6 +46,16 @@ INSERT INTO `sys_props` VALUES ('zblog.email.host', 'smtp.qq.com', 'zblog.servic
 INSERT INTO `sys_props` VALUES ('zblog.email.port', '25', 'zblog.service', '邮箱服务器端口', 0);
 INSERT INTO `sys_props` VALUES ('zblog.email.username', 'zblog@qq.com', 'zblog.service', '邮箱用户', 0);
 INSERT INTO `sys_props` VALUES ('zblog.email.password', '', 'zblog.service', '邮箱授权码（非登录密码）', 0);
-INSERT INTO `sys_props` VALUES ('zblog.email.subject', 'ZBLOG', 'zblog.service', '邮箱发送主体', 0);
+INSERT INTO `sys_props` VALUES ('zblog.email.subject', 'ZBLOG', 'zblog.service', '邮箱发送主体（名称不规范可能导致邮件发送到对方的垃圾箱中）', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.database', '0', 'zblog.service', '指定 Redis 使用的数据库索引，Redis 默认有 16 个数据库，索引从 0 到 15', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.host', '127.0.0.1', 'zblog.service', 'Redis 服务器地址', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.port', '6379', 'zblog.service', 'Redis 服务器的端口号', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.password', 'redisPwd', 'zblog.service', 'Redis 服务器的密码', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.connect.timeout', '60000ms', 'zblog.service', '连接超时时间，单位为毫秒，用于定义客户端连接到 Redis 服务器的最大等待时间', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.minIdle', '2', 'zblog.service', '连接池中保持的最小空闲连接数', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxIdle', '10', 'zblog.service', '连接池中允许的最大空闲连接数', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxActive', '10', 'zblog.service', '连接池中允许的最大活动连接数，如果活动连接数超过此值，将会有新的连接请求被阻塞或抛出异常', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxWait', '30000ms', 'zblog.service', '从连接池中获取连接时的最大等待时间，单位为毫秒。如果超过此时间仍未获取到连接，将会抛出异常', 0);
+INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.timeBetweenEvictionRuns', '-1ms', 'zblog.service', '连接池中连接的清理周期，单位为毫秒。用于定义多长时间执行一次空闲连接的检查和清理，以保持连接池的健康', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

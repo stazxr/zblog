@@ -26,7 +26,7 @@ public class CaptchaCache {
      * @param expireTime 验证码的过期时间（秒）
      */
     public static void put(String captchaId, String text, int expireTime) {
-        CACHE_MAP.put(captchaId, text, expireTime);
+        CACHE_MAP.put(captchaId, text, 1000L * expireTime);
     }
 
     /**

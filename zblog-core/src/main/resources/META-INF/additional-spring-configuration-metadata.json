@@ -1,11 +1,6 @@
 {
   "groups": [
     {
-      "name": "cache",
-      "type": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties"
-    },
-    {
       "name": "zblog",
       "type": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties"
@@ -23,20 +18,6 @@
     }
   ],
   "properties": [
-    {
-      "name": "cache.type",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
-      "description": "系统缓存类型.",
-      "defaultValue": "memory"
-    },
-    {
-      "name": "cache.defaultDuration",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.CacheConfigProperties",
-      "description": "默认有效时间, 单位秒, 0 代表永久有效.",
-      "defaultValue": 300
-    },
     {
       "name": "zblog.base-package",
       "type": "java.lang.String",
@@ -132,21 +113,6 @@
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties$Contact",
       "description": "联系人邮箱.",
       "defaultValue": "stazxr@qq.com"
-    }
-  ],
-  "hints": [
-    {
-      "name": "cache.type",
-      "values": [
-        {
-          "value": "memory",
-          "description": "memory cache."
-        },
-        {
-          "value": "redis",
-          "description": "redis cache."
-        }
-      ]
     }
   ]
 }

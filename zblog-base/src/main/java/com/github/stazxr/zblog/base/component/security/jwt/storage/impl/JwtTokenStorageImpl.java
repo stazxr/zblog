@@ -2,7 +2,7 @@ package com.github.stazxr.zblog.base.component.security.jwt.storage.impl;
 
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.util.CacheUtils;
+import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
 import com.github.stazxr.zblog.util.Assert;
 
 /**
@@ -34,7 +34,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     public String putAccessToken(String accessToken, Long uid, int duration) {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(accessToken, "JwtTokenStorage put 'accessToken' is null");
-        CacheUtils.put(TOKEN_CACHE_1.concat(String.valueOf(uid)), accessToken, duration);
+        GlobalCacheHelper.put(TOKEN_CACHE_1.concat(String.valueOf(uid)), accessToken, duration);
         return getAccessToken(uid);
     }
 
@@ -50,7 +50,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     public String putRefreshToken(String refreshToken, Long uid, int duration) {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(refreshToken, "JwtTokenStorage put 'refreshToken' is null");
-        CacheUtils.put(TOKEN_CACHE_2.concat(String.valueOf(uid)), refreshToken, duration);
+        GlobalCacheHelper.put(TOKEN_CACHE_2.concat(String.valueOf(uid)), refreshToken, duration);
         return getRefreshToken(uid);
     }
 
@@ -61,8 +61,8 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public void expire(Long uid) {
-        CacheUtils.remove(TOKEN_CACHE_1.concat(String.valueOf(uid)));
-        CacheUtils.remove(TOKEN_CACHE_2.concat(String.valueOf(uid)));
+        GlobalCacheHelper.remove(TOKEN_CACHE_1.concat(String.valueOf(uid)));
+        GlobalCacheHelper.remove(TOKEN_CACHE_2.concat(String.valueOf(uid)));
     }
 
     /**
@@ -73,7 +73,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public String getAccessToken(Long uid) {
-        return CacheUtils.get(TOKEN_CACHE_1.concat(String.valueOf(uid)));
+        return (String) GlobalCacheHelper.get(TOKEN_CACHE_1.concat(String.valueOf(uid)));
     }
 
     /**
@@ -84,6 +84,6 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public String getRefreshToken(Long uid) {
-        return CacheUtils.get(TOKEN_CACHE_2.concat(String.valueOf(uid)));
+        return (String) GlobalCacheHelper.get(TOKEN_CACHE_2.concat(String.valueOf(uid)));
     }
 }
