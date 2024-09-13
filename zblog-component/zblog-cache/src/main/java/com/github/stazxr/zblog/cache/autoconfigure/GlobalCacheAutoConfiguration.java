@@ -4,7 +4,7 @@ import com.github.stazxr.zblog.cache.Cache;
 import com.github.stazxr.zblog.cache.autoconfigure.properties.GlobalCacheConfigProperties;
 import com.github.stazxr.zblog.cache.memory.MemoryCache;
 import com.github.stazxr.zblog.cache.redis.RedisCache;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -29,7 +29,7 @@ import javax.annotation.Resource;
 @EnableConfigurationProperties(GlobalCacheConfigProperties.class)
 public class GlobalCacheAutoConfiguration {
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     /**
      * 创建内存缓存 Bean。
@@ -38,10 +38,10 @@ public class GlobalCacheAutoConfiguration {
      */
     @Bean("globalCache")
     @ConditionalOnProperty(name = "zblog.global.cache.type", havingValue = "memory")
-    public Cache<String, Object> memoryCache() {
+    public Cache<String, String> memoryCache() {
         log.info("Global Cache Type: memory");
-        MemoryCache<String, Object> memoryCache = new MemoryCache<>();
-        GlobalCacheHelper.setCache(memoryCache);
+        MemoryCache<String, String> memoryCache = new MemoryCache<>();
+        GlobalCache.setCache(memoryCache);
         return memoryCache;
     }
 
@@ -52,11 +52,11 @@ public class GlobalCacheAutoConfiguration {
      */
     @Bean("globalCache")
     @ConditionalOnProperty(name = "zblog.global.cache.type", havingValue = "redis")
-    public Cache<String, Object> redisCache() {
+    public Cache<String, String> redisCache() {
         log.info("Global Cache Type: redis");
-        RedisCache<String, Object> redisCache = new RedisCache<>();
+        RedisCache<String, String> redisCache = new RedisCache<>();
         redisCache.setRedisTemplate(redisTemplate);
-        GlobalCacheHelper.setCache(redisCache);
+        GlobalCache.setCache(redisCache);
         return redisCache;
     }
 }

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.Locale;
 
 /**
  * 邮箱管理
@@ -67,9 +69,9 @@ public class EmailController {
         mailService.sendHtmlMail(receiver, BaseConst.SYS_NAME, emailContext);
 
         // 缓存验证码
-        Constants.CacheKey emailCode = Constants.CacheKey.emailCode;
-        String uuid = emailCode.cacheKey().concat(":").concat(email).concat(":").concat(UuidUtils.generateShortUuid());
-        GlobalCacheHelper.put(uuid, random, emailCode.duration());
-        return Result.success("发送成功").data(uuid);
+        Constants.SysCacheKey emailCodeKey = Constants.SysCacheKey.emailCode;
+        String emailCodeCacheKey = String.format(emailCodeKey.cacheKey(), email, UuidUtils.generateShortUuid(), Locale.ROOT);
+        GlobalCache.put(emailCodeCacheKey, random, emailCodeKey.duration());
+        return Result.success("发送成功").data(emailCodeCacheKey);
     }
 }

@@ -42,12 +42,12 @@ public class JwtTokenGenerator {
         // refresh_token
         JWTClaimsSet refreshTokenClaims = buildRefreshJwtChaimSet(issueTime, user);
         String refreshToken = jwtEncoder.encode(algorithm, refreshTokenClaims);
-        refreshToken = jwtTokenStorage.putRefreshToken(refreshToken, user.getId(), jwtProperties.getRefreshTokenDuration());
-        Assert.notNull(refreshToken, "'refreshToken' 缓存失败");
 
         // cache token
         accessToken = jwtTokenStorage.putAccessToken(accessToken, user.getId(), jwtProperties.getAccessTokenDuration());
         Assert.notNull(refreshToken, "'accessToken' 缓存失败");
+        refreshToken = jwtTokenStorage.putRefreshToken(refreshToken, user.getId(), jwtProperties.getRefreshTokenDuration());
+        Assert.notNull(refreshToken, "'refreshToken' 缓存失败");
         return accessToken;
     }
 
@@ -61,9 +61,9 @@ public class JwtTokenGenerator {
                 .subject(claims.getSubject())
                 .notBeforeTime(issueTime)
                 .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getAccessTokenDuration() * 1000L)))
-                .claim("loginIp", StringUtils.isBlank(loginIp) ? IpUtils.getIp(request) : loginIp)
-                .claim("renewToken", jwtProperties.isAllowedRenewToken())
-                .claim("version", version)
+                .claim(JwtConstants.LOGIN_IP, StringUtils.isBlank(loginIp) ? IpUtils.getIp(request) : loginIp)
+                .claim(JwtConstants.RENEW_TOKEN, jwtProperties.isAllowedRenewToken())
+                .claim(JwtConstants.JWT_VERSION, version)
                 .build();
     }
 

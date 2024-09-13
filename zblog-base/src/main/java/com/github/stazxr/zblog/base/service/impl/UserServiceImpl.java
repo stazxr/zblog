@@ -24,7 +24,7 @@ import com.github.stazxr.zblog.base.mapper.UserTokenStorageMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.context.constant.TagConstants;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.exception.ServiceException;
@@ -205,7 +205,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码不正确");
 
         // 校验验证码
-        String cacheCode = (String) GlobalCacheHelper.get(emailDto.getUuid());
+        String cacheCode = (String) GlobalCache.get(emailDto.getUuid());
         DataValidated.isTrue(!code.equalsIgnoreCase(cacheCode), "验证码不正确");
 
         // 邮箱校验：相同校验 -> 格式校验 -> 存在性校验
@@ -309,15 +309,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto) {
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.SYS_CODE_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.APP_CODE_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_AREA_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_CENTER_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_UNIT_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_IP_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get(TagConstants.DEPLOY_CODE_TAG));
-        System.out.println(com.github.stazxr.zblog.context.Context.get("conversion-id"));
-        System.out.println(com.github.stazxr.zblog.context.Context.get("User-Id"));
         queryDto.checkPage();
         try (Page<UserVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             return page.doSelectPageInfo(() -> userMapper.selectUserList(queryDto));
@@ -444,7 +435,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 邮箱验证码校验
         String uuid = registerDto.getUuid();
         Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
-        String cacheCode = (String) GlobalCacheHelper.get(uuid);
+        String cacheCode = (String) GlobalCache.get(uuid);
         DataValidated.isTrue(!registerDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
 
         // 密码复杂度校验
@@ -496,7 +487,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 邮箱验证码校验
         String uuid = forgetPwdDto.getUuid();
         Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
-        String cacheCode = (String) GlobalCacheHelper.get(uuid);
+        String cacheCode = (String) GlobalCache.get(uuid);
         DataValidated.isTrue(!forgetPwdDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
 
         // 密码校验

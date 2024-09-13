@@ -2,8 +2,10 @@ package com.github.stazxr.zblog.base.component.security.jwt.storage.impl;
 
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.util.Assert;
+
+import java.util.Locale;
 
 /**
  * JwtTokenCacheStorage
@@ -15,12 +17,12 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     /**
      * Cache Label Of accessToken
      */
-    public static final String TOKEN_CACHE_1 = Constants.CacheKey.usrTkn.cacheKey().concat("-atk:");
+    public static final String TOKEN_CACHE_1 = Constants.SysCacheKey.usrTkn.cacheKey().concat("-atk:%s");
 
     /**
      * Cache Label Of refreshToken
      */
-    public static final String TOKEN_CACHE_2 = Constants.CacheKey.usrTkn.cacheKey().concat("-rtk:");
+    public static final String TOKEN_CACHE_2 = Constants.SysCacheKey.usrTkn.cacheKey().concat("-rtk:%s");
 
     /**
      * Put accessToken
@@ -34,7 +36,8 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     public String putAccessToken(String accessToken, Long uid, int duration) {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(accessToken, "JwtTokenStorage put 'accessToken' is null");
-        GlobalCacheHelper.put(TOKEN_CACHE_1.concat(String.valueOf(uid)), accessToken, duration);
+        String utkCacheKey = String.format(TOKEN_CACHE_1, uid, Locale.ROOT);
+        GlobalCache.put(utkCacheKey, accessToken, duration);
         return getAccessToken(uid);
     }
 
@@ -50,19 +53,9 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     public String putRefreshToken(String refreshToken, Long uid, int duration) {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(refreshToken, "JwtTokenStorage put 'refreshToken' is null");
-        GlobalCacheHelper.put(TOKEN_CACHE_2.concat(String.valueOf(uid)), refreshToken, duration);
+        String rtkCacheKey = String.format(TOKEN_CACHE_2, uid, Locale.ROOT);
+        GlobalCache.put(rtkCacheKey, refreshToken, duration);
         return getRefreshToken(uid);
-    }
-
-    /**
-     * Expire.
-     *
-     * @param uid userId
-     */
-    @Override
-    public void expire(Long uid) {
-        GlobalCacheHelper.remove(TOKEN_CACHE_1.concat(String.valueOf(uid)));
-        GlobalCacheHelper.remove(TOKEN_CACHE_2.concat(String.valueOf(uid)));
     }
 
     /**
@@ -73,7 +66,8 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public String getAccessToken(Long uid) {
-        return (String) GlobalCacheHelper.get(TOKEN_CACHE_1.concat(String.valueOf(uid)));
+        String utkCacheKey = String.format(TOKEN_CACHE_1, uid, Locale.ROOT);
+        return GlobalCache.get(utkCacheKey);
     }
 
     /**
@@ -84,6 +78,19 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public String getRefreshToken(Long uid) {
-        return (String) GlobalCacheHelper.get(TOKEN_CACHE_2.concat(String.valueOf(uid)));
+        String rtkCacheKey = String.format(TOKEN_CACHE_2, uid, Locale.ROOT);
+        return GlobalCache.get(rtkCacheKey);
+    }
+
+    /**
+     * Expire.
+     *
+     * @param uid userId
+     */
+    @Override
+    public void expire(Long uid) {
+        String utkCacheKey = String.format(TOKEN_CACHE_1, uid, Locale.ROOT);
+        String rtkCacheKey = String.format(TOKEN_CACHE_2, uid, Locale.ROOT);
+        GlobalCache.remove(utkCacheKey, rtkCacheKey);
     }
 }

@@ -18,7 +18,7 @@ import com.github.stazxr.zblog.base.mapper.VersionMapper;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.converter.CommentConverter;
 import com.github.stazxr.zblog.converter.MessageConverter;
 import com.github.stazxr.zblog.core.exception.ServiceException;
@@ -643,7 +643,7 @@ public class PortalServiceImpl implements PortalService {
             // 从 Redis 拿去数据
             YwConstants.CacheKey cacheKey = YwConstants.CacheKey.githubCalendarData;
             String key = cacheKey.cacheKey().concat(username);
-            String jsonData = (String) GlobalCacheHelper.get(key);
+            String jsonData = GlobalCache.get(key);
             if (jsonData != null) {
                 return JSON.parseObject(jsonData, GitCalendarData.class);
             }
@@ -656,7 +656,7 @@ public class PortalServiceImpl implements PortalService {
             calendarData.initData(data);
 
             // 缓存新数据
-            GlobalCacheHelper.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
+            GlobalCache.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
             return calendarData;
         } catch (Exception e) {
             throw new ServiceException("贡献日历数据获取超时", e);
@@ -925,8 +925,9 @@ public class PortalServiceImpl implements PortalService {
         String token = jwtTokenGenerator.generateToken(request, user, tokenVersion, null);
         UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userVo.getId()).lastedToken(token).version(tokenVersion).build();
         userService.storageUserToken(tokenStorage, 1);
-        Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
-        GlobalCacheHelper.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), token, ssoTkn.duration());
+        Constants.SysCacheKey ssoTknKey = Constants.SysCacheKey.ssoTkn;
+        String ssoTknCacheKey = String.format(ssoTknKey.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
+        GlobalCache.put(ssoTknCacheKey, token, ssoTknKey.duration());
 
         userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
         return userVo;
@@ -934,7 +935,7 @@ public class PortalServiceImpl implements PortalService {
 
     private String getWebInfoFromCache() {
         YwConstants.CacheKey cacheKey = YwConstants.CacheKey.webInfo;
-        String cacheConfig = (String) GlobalCacheHelper.get(cacheKey.cacheKey());
+        String cacheConfig = GlobalCache.get(cacheKey.cacheKey());
         if (cacheConfig == null) {
             // 查询数据库
             WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.WEB_INFO.value());
@@ -943,7 +944,7 @@ public class PortalServiceImpl implements PortalService {
             }
 
             // 返回数据
-            GlobalCacheHelper.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+            GlobalCache.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
             return websiteConfig.getConfig();
         }
 
@@ -952,7 +953,7 @@ public class PortalServiceImpl implements PortalService {
 
     private String getSocialInfoFromCache() {
         YwConstants.CacheKey cacheKey = YwConstants.CacheKey.socialInfo;
-        String cacheConfig = (String) GlobalCacheHelper.get(cacheKey.cacheKey());
+        String cacheConfig = GlobalCache.get(cacheKey.cacheKey());
         if (cacheConfig == null) {
             // 查询数据库
             WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.SOCIAL_INFO.value());
@@ -961,7 +962,7 @@ public class PortalServiceImpl implements PortalService {
             }
 
             // 返回数据
-            GlobalCacheHelper.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+            GlobalCache.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
             return websiteConfig.getConfig();
         }
 
@@ -970,7 +971,7 @@ public class PortalServiceImpl implements PortalService {
 
     private String getOtherInfoFromCache() {
         YwConstants.CacheKey cacheKey = YwConstants.CacheKey.otherInfo;
-        String cacheConfig = (String) GlobalCacheHelper.get(cacheKey.cacheKey());
+        String cacheConfig = GlobalCache.get(cacheKey.cacheKey());
         if (cacheConfig == null) {
             // 查询数据库
             WebsiteConfig websiteConfig = webSettingMapper.selectById(WebsiteConfigType.OTHER_INFO.value());
@@ -979,7 +980,7 @@ public class PortalServiceImpl implements PortalService {
             }
 
             // 返回数据
-            GlobalCacheHelper.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
+            GlobalCache.put(cacheKey.cacheKey(), websiteConfig.getConfig(), cacheKey.duration());
             return websiteConfig.getConfig();
         }
 

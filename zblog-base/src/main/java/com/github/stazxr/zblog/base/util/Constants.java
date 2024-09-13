@@ -137,11 +137,11 @@ public class Constants {
      * @author SunTao
      * @since 2020-11-14
      */
-    public enum CacheKey {
+    public enum SysCacheKey {
         /**
          * 缓存接口访问级别
          */
-        interfaceLevel("interfaceLevel", 3600),
+        interfaceLevel("interfaceLevel:%s", 3600),
 
         /**
          * token
@@ -151,17 +151,17 @@ public class Constants {
         /**
          * ssoTkn
          */
-        ssoTkn("ssoTkn", 604800),
+        ssoTkn("ssoTkn:%s", 604800),
 
         /**
          * preTkn
          */
-        preTkn("preTkn", -1),
+        preTkn("preTkn:%s", -1),
 
         /**
          * email code
          */
-        emailCode("emailCode", 300);
+        emailCode("emailCode:%s:%s", 300);
 
         /**
          * 缓存Key
@@ -173,7 +173,7 @@ public class Constants {
          */
         private final int duration;
 
-        CacheKey(String cacheKey, int duration) {
+        SysCacheKey(String cacheKey, int duration) {
             this.cacheKey = cacheKey;
             this.duration = duration;
         }

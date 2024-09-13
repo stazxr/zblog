@@ -11,6 +11,7 @@ import com.github.stazxr.zblog.base.component.security.handler.CustomAuthenticat
 import com.github.stazxr.zblog.base.component.security.handler.CustomAuthenticationSuccessHandler;
 import com.github.stazxr.zblog.base.component.security.handler.CustomLogoutHandler;
 import com.github.stazxr.zblog.base.component.security.handler.CustomLogoutSuccessHandler;
+import com.github.stazxr.zblog.base.component.security.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;

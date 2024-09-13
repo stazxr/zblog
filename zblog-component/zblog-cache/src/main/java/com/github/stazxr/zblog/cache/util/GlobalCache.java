@@ -12,18 +12,18 @@ import com.github.stazxr.zblog.cache.Cache;
  * @author SunTao
  * @since 2024-08-22
  */
-public class GlobalCacheHelper {
-    private static Cache<String, Object> cache;
+public class GlobalCache {
+    private static Cache<String, String> cache;
 
     /**
-     * 设置缓存实例，供静态方法使用。
+     * 设置缓存实例
      *
      * @param cache 缓存实例
      */
-    public static void setCache(Cache<String, Object> cache) {
-        if (GlobalCacheHelper.cache == null) {
+    public synchronized static void setCache(Cache<String, String> cache) {
+        if (GlobalCache.cache == null) {
             // 只能在项目启动时设置一次
-            GlobalCacheHelper.cache = cache;
+            GlobalCache.cache = cache;
         }
     }
 
@@ -33,7 +33,7 @@ public class GlobalCacheHelper {
      * @param key   缓存的键
      * @param value 缓存的值
      */
-    public static synchronized void put(String key, Object value) {
+    public static synchronized void put(String key, String value) {
         checkCacheInitialized();
         cache.put(key, value);
     }
@@ -45,7 +45,7 @@ public class GlobalCacheHelper {
      * @param value   缓存的值
      * @param timeout 失效时长，单位为毫秒
      */
-    public static synchronized void put(String key, Object value, long timeout) {
+    public static synchronized void put(String key, String value, long timeout) {
         checkCacheInitialized();
         cache.put(key, value, timeout);
     }
@@ -53,11 +53,15 @@ public class GlobalCacheHelper {
     /**
      * 从缓存中移除指定的键。
      *
-     * @param key 要移除的键
+     * @param keys 要移除的键列表
      */
-    public static synchronized void remove(String key) {
+    public static synchronized void remove(String... keys) {
         checkCacheInitialized();
-        cache.remove(key);
+        if (keys != null && keys.length > 0) {
+            for (String key : keys) {
+                cache.remove(key);
+            }
+        }
     }
 
     /**
@@ -66,7 +70,7 @@ public class GlobalCacheHelper {
      * @param key 缓存的键
      * @return 与键关联的值，如果键不存在则返回 {@code null}
      */
-    public static synchronized Object get(String key) {
+    public static synchronized String get(String key) {
         checkCacheInitialized();
         return cache.get(key);
     }
@@ -77,9 +81,9 @@ public class GlobalCacheHelper {
      * @param key 缓存的键
      * @return 与键关联的值，如果键不存在则返回 {@code null}
      */
-    public static synchronized Object getThenRemove(String key) {
+    public static synchronized String getThenRemove(String key) {
         checkCacheInitialized();
-        Object result = cache.get(key);
+        String result = cache.get(key);
         cache.remove(key);
         return result;
     }

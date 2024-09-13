@@ -28,13 +28,6 @@ public interface JwtTokenStorage {
     String putRefreshToken(String refreshToken, Long uid, int duration);
 
     /**
-     * Expire.
-     *
-     * @param uid userId
-     */
-    void expire(Long uid);
-
-    /**
      * Get accessToken
      *
      * @param uid userId
@@ -49,4 +42,11 @@ public interface JwtTokenStorage {
      * @return refreshToken
      */
     String getRefreshToken(Long uid);
+
+    /**
+     * Expire.
+     *
+     * @param uid userId
+     */
+    void expire(Long uid);
 }

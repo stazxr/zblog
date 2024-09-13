@@ -6,7 +6,7 @@ import com.github.stazxr.zblog.base.domain.bo.LoginUser;
 import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 部分公共接口实现
@@ -58,7 +59,8 @@ public class ZblogServiceImpl implements ZblogService {
         try {
             // 查找当前 IP 对应的登录令牌
             String ip = IpUtils.getIp(request);
-            String ssoToken = (String) GlobalCacheHelper.get(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+            String ssoTknCacheKey = String.format(Constants.SysCacheKey.ssoTkn.cacheKey(), ip, Locale.ROOT);
+            String ssoToken = GlobalCache.get(ssoTknCacheKey);
 
             if (StringUtils.isNotBlank(ssoToken)) {
                 // 解析该 token 拿到用户信息

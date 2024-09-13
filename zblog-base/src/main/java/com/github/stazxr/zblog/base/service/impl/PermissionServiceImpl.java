@@ -16,7 +16,7 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.core.exception.DataValidatedException;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
@@ -31,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.github.stazxr.zblog.base.util.Constants.CacheKey.interfaceLevel;
 
 /**
  * 权限业务实现层
@@ -452,8 +450,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             List<InterfaceVo> interfaces = interfaceMapper.selectInterfacesByCode(permission.getPermCode());
             if (!interfaces.isEmpty()) {
                 interfaces.forEach(interfaceVo -> {
-                    String key = interfaceLevel.cacheKey().concat(":").concat(interfaceVo.getUri()).concat("_").concat(interfaceVo.getMethod());
-                    GlobalCacheHelper.remove(key);
+                    String uriInfo = interfaceVo.getUri() + "_" + interfaceVo.getMethod();
+                    String interfaceLevelCacheKey = String.format(Constants.SysCacheKey.interfaceLevel.cacheKey(), uriInfo, Locale.ROOT);
+                    GlobalCache.remove(interfaceLevelCacheKey);
                 });
             }
         }

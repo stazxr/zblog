@@ -1,15 +1,12 @@
-package com.github.stazxr.zblog.base.component.security.filter;
+package com.github.stazxr.zblog.base.component.security.jwt.filter;
 
 import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
-import com.github.stazxr.zblog.base.component.security.jwt.JwtException;
-import com.github.stazxr.zblog.base.component.security.jwt.JwtProperties;
-import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.base.component.security.jwt.*;
 import com.github.stazxr.zblog.base.component.security.jwt.decoder.JwtDecoder;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.component.security.exception.CustomAuthenticationEntryPoint;
 import com.github.stazxr.zblog.base.component.security.exception.PreJwtCheckAuthenticationException;
-import com.github.stazxr.zblog.base.component.security.jwt.TokenError;
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
 import com.github.stazxr.zblog.base.service.PermissionService;
@@ -17,7 +14,7 @@ import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -42,10 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -74,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private static final int RENEW_WAIT_INTERVAL_MILL_SECONDS = 500;
 
-    private static final String PREVIOUS_TOKEN_KEY_TEMPLATE = Constants.CacheKey.preTkn.cacheKey().concat(":%s");
+    private static final String PREVIOUS_TOKEN_KEY_TEMPLATE = Constants.SysCacheKey.preTkn.cacheKey();
 
     private static final String AUTH_ERROR_MESSAGE_TEMPLATE = "An error occurred while authentication token: %s";
 
@@ -121,7 +115,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     chain.doFilter(request, response);
                 } catch (AuthenticationException ex) {
                     String ip = IpUtils.getIp(request);
-                    GlobalCacheHelper.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+                    String ssoTknCacheKey = String.format(Constants.SysCacheKey.ssoTkn.cacheKey(), ip, Locale.ROOT);
+                    GlobalCache.remove(ssoTknCacheKey);
                     log.error("authentication token handle exec failed: {} - [{}]", ex.getMessage(), jwtToken);
                     authenticationEntryPoint.commence(request, response, ex);
                 }
@@ -155,14 +150,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = tokenUser.getUsername();
             checkTokenLoginIp(request, claimsSet, tokenUser);
 
+            // TODO 是否验证上一次 Token 的失效时间 2024-09-14
             // check the token is previous token
-            String previousToken = (String) GlobalCacheHelper.get(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+            String preTknCacheKey = String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId, Locale.ROOT);
+            String previousToken = GlobalCache.get(preTknCacheKey);
             boolean isPrevious = previousToken != null && previousToken.equals(jwtToken);
-            boolean allowedRenewToken = claimsSet.getBooleanClaim("renewToken");
+            boolean allowedRenewToken = claimsSet.getBooleanClaim(JwtConstants.RENEW_TOKEN);
             if (isPrevious) {
                 // 这里 Token 已经续签完成，通知前端刷新令牌，不做后续校验
                 log.warn("user {} token has been renew finish, but continue use the previous token, request '{}'", username, request.getRequestURL());
-                response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(jwtTokenStorage.getAccessToken(userId)));
+                response.addHeader(JwtConstants.NEW_TOKEN_HEADER, Constants.AUTHENTICATION_PREFIX.concat(jwtTokenStorage.getAccessToken(userId)));
                 setContextAuthentication(request, tokenUser);
                 return;
             } else {
@@ -211,7 +208,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             throw new PreJwtCheckAuthenticationException(TokenError.TE011.value());
                         } else {
                             // 通知前端刷新令牌
-                            response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newAtk));
+                            response.addHeader(JwtConstants.NEW_TOKEN_HEADER, Constants.AUTHENTICATION_PREFIX.concat(newAtk));
                         }
                     }
                 });
@@ -243,25 +240,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // generate new token
             log.info("续签 - 用户 {}: 开始续签", username);
-            int version = claimsSet.getIntegerClaim("version");
-            String loginIp = claimsSet.getStringClaim("loginIp");
+            int version = claimsSet.getIntegerClaim(JwtConstants.JWT_VERSION);
+            String loginIp = claimsSet.getStringClaim(JwtConstants.LOGIN_IP);
             int newVersion = version + 1;
             String newToken = jwtTokenGenerator.generateToken(request, user, newVersion, loginIp);
 
             // cache previous token
             int preTokenExpiredTime = getPreTokenFreeTime(jwtToken);
-            GlobalCacheHelper.put(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId), jwtToken, preTokenExpiredTime);
+            String preTknCacheKey = String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId, Locale.ROOT);
+            GlobalCache.put(preTknCacheKey, jwtToken, preTokenExpiredTime);
 
             // set token
-            response.addHeader("new-token", Constants.AUTHENTICATION_PREFIX.concat(newToken));
+            response.addHeader(JwtConstants.NEW_TOKEN_HEADER, Constants.AUTHENTICATION_PREFIX.concat(newToken));
             String remark = "续签: ".concat(String.valueOf(newVersion));
             UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userId).lastedToken(newToken).version(newVersion).remark(remark).build();
             userService.storageUserToken(tokenStorage, 2);
             log.info("续签 - 用户 {}: 续签成功，版本【{}】", username, newVersion);
 
             // set sso token
-            Constants.CacheKey ssoTkn = Constants.CacheKey.ssoTkn;
-            GlobalCacheHelper.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), newToken, ssoTkn.duration());
+            Constants.SysCacheKey ssoTkn = Constants.SysCacheKey.ssoTkn;
+            GlobalCache.put(ssoTkn.cacheKey().concat(":").concat(IpUtils.getIp(request)), newToken, ssoTkn.duration());
         } catch (Exception ex) {
             clearUserTokenInfo(user.getId());
             log.error("续签 - 用户 {}: 续签失败", username);
@@ -273,7 +271,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private int getPreTokenFreeTime(String jwtToken) {
+    protected int getPreTokenFreeTime(String jwtToken) {
         try {
             // 此处设置不过期
             return 0;
@@ -351,7 +349,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void clearUserTokenInfo(Long userId) {
         jwtTokenStorage.expire(userId);
         userService.clearUserStorageToken(userId);
-        GlobalCacheHelper.remove(String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId));
+        String preTknCacheKey = String.format(PREVIOUS_TOKEN_KEY_TEMPLATE, userId, Locale.ROOT);
+        GlobalCache.remove(preTknCacheKey);
     }
 
     private void checkTokenLoginIp(HttpServletRequest request, JWTClaimsSet claimsSet, User user) {

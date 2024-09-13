@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.base.controller;
 import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.annotation.Router;
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Locale;
 
 import static com.github.stazxr.zblog.core.base.BaseConst.PermLevel.OPEN;
 import static com.github.stazxr.zblog.core.base.BaseConst.PermLevel.PUBLIC;
@@ -58,13 +60,13 @@ public class LogoutController {
     @Router(name = "自定义用户注销", code = "customLogout", level = OPEN)
     public Result customLogout(@RequestParam Long userId, HttpServletRequest request) {
         // 注销 token
-        jwtTokenStorage.expire(userId);
         userService.clearUserStorageToken(userId);
-        GlobalCacheHelper.remove(Constants.CacheKey.preTkn.cacheKey().concat(":").concat(String.valueOf(userId)));
 
-        // 清除统一登陆的用户信息
-        String ip = IpUtils.getIp(request);
-        GlobalCacheHelper.remove(Constants.CacheKey.ssoTkn.cacheKey().concat(":").concat(ip));
+        // 清除缓存
+        jwtTokenStorage.expire(userId);
+        String preTknCacheKey = String.format(Constants.SysCacheKey.preTkn.cacheKey(), userId, Locale.ROOT);
+        String ssoTknCacheKey = String.format(Constants.SysCacheKey.ssoTkn.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
+        GlobalCache.remove(preTknCacheKey, ssoTknCacheKey);
         return Result.success();
     }
 }

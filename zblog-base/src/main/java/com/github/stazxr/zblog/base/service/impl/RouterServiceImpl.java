@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.converter.DictConverter;
@@ -21,12 +22,12 @@ import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RouterMapper;
 import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.service.RouterService;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.base.util.GenerateIdUtils;
-import com.github.stazxr.zblog.cache.util.GlobalCacheHelper;
+import com.github.stazxr.zblog.cache.util.GlobalCache;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.Assert;
-import com.github.stazxr.zblog.util.Constants;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.stazxr.zblog.base.util.Constants.CacheKey.interfaceLevel;
 import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 
 /**
@@ -75,7 +75,8 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      */
     @Override
     public int calculateInterfaceLevel(String requestUri, String requestMethod) {
-        requestUri = requestUri.contains(Constants.URL_SPLIT_LABEL) ? requestUri.substring(0, requestUri.indexOf("?")) : requestUri;
+        final String whLabel = "?";
+        requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
         if (RouterBlackWhiteListCache.containsWhite(requestUri)) {
             // 白名单代表允许访问
             return BaseConst.PermLevel.OPEN;
@@ -87,10 +88,12 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         }
 
         // 读取缓存
-        String key = interfaceLevel.cacheKey().concat(":").concat(requestUri).concat("_").concat(requestMethod);
-        String cacheValue = (String) GlobalCacheHelper.get(key);
-        if (StringUtils.isNotBlank(cacheValue)) {
-            return Integer.parseInt(cacheValue);
+        Constants.SysCacheKey interfaceLevelKey = Constants.SysCacheKey.interfaceLevel;
+        String uriInfo = requestUri + "_" + requestMethod;
+        String interfaceLevelCacheKey = String.format(interfaceLevelKey.cacheKey(), uriInfo, Locale.ROOT);
+        String interfaceLevel = GlobalCache.get(interfaceLevelCacheKey);
+        if (StringUtils.isNotBlank(interfaceLevel)) {
+            return Integer.parseInt(interfaceLevel);
         }
 
         Interface anInterface = interfaceMapper.selectOneByRequest(requestUri, requestMethod.toUpperCase(Locale.ROOT));
@@ -119,7 +122,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         }
 
         // 缓存数据
-        GlobalCacheHelper.put(key, String.valueOf(level), interfaceLevel.duration());
+        GlobalCache.put(interfaceLevelCacheKey, String.valueOf(level), interfaceLevelKey.duration());
         return level;
     }
 
@@ -134,28 +137,29 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     public Set<String> findRoles(String requestUri, String requestMethod) {
         // 获取访问接口访问级别，返回允许访问的角色集合,这里的目的只是为了减少查询库的次数
         int level = calculateInterfaceLevel(requestUri, requestMethod);
+        Set<String> roles = new HashSet<>();
         if (BaseConst.PermLevel.OPEN == level) {
-            return new HashSet<String>() {{add(OPEN);}};
+            roles.add(OPEN);
         } else if (BaseConst.PermLevel.PUBLIC == level) {
-            return new HashSet<String>() {{add(PUBLIC);}};
+            roles.add(PUBLIC);
         } else if (BaseConst.PermLevelExtend.FORBIDDEN == level) {
-            return new HashSet<String>() {{add(FORBIDDEN);}};
+            roles.add(FORBIDDEN);
         } else if (BaseConst.PermLevelExtend.NULL == level) {
-            return new HashSet<String>() {{add(NULL);}};
+            roles.add(NULL);
         } else {
             // 接口访问级别为BaseConst.PermLevel.PERM，需要查询允许访问该接口的角色列表
-            requestUri = requestUri.contains(Constants.URL_SPLIT_LABEL) ? requestUri.substring(0, requestUri.indexOf("?")) : requestUri;
-            List<Role> roles = roleMapper.selectRolesByUriAndMethod(requestUri, requestMethod.toUpperCase(Locale.ROOT));
-            roles = roles.stream().filter(Role::getEnabled).collect(Collectors.toList());
-            if (roles.isEmpty()) {
-                return new HashSet<String>() {{add(NONE);}};
+            final String whLabel = "?";
+            requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
+            List<Role> dbRoles = roleMapper.selectRolesByUriAndMethod(requestUri, requestMethod.toUpperCase(Locale.ROOT));
+            dbRoles = dbRoles.stream().filter(Role::getEnabled).collect(Collectors.toList());
+            if (dbRoles.isEmpty()) {
+                roles.add(NONE);
+            } else {
+                // 返回授权的角色列表
+                dbRoles.forEach(role -> roles.add(role.getRoleCode()));
             }
-
-            // 返回授权的角色列表
-            Set<String> attributes = new HashSet<>();
-            roles.forEach(role -> attributes.add(role.getRoleCode()));
-            return attributes;
         }
+        return roles;
     }
 
     /**
@@ -179,9 +183,9 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     public PageInfo<RouterVo> queryRouterListByPage(RouterQueryDto queryDto) {
         queryDto.checkPage();
-
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(routerMapper.selectRouterList(queryDto));
+        try (Page<RouterVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            return page.doSelectPageInfo(() -> routerMapper.selectRouterList(queryDto));
+        }
     }
 
     /**
@@ -194,8 +198,9 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     public PageInfo<DictVo> pageBlackOrWhiteList(RouterQueryDto queryDto) {
         Assert.notNull(queryDto.getDictKey(), "参数【dictKey】不能为空");
         queryDto.checkPage();
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(routerMapper.selectBlackOrWhiteList(queryDto));
+        try (Page<DictVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            return page.doSelectPageInfo(() -> routerMapper.selectBlackOrWhiteList(queryDto));
+        }
     }
 
     /**
@@ -300,13 +305,11 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     }
 
     private void removeCache(String url) {
-        String getKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_GET");
-        String postKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_POST");
-        String putKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_PUT");
-        String deleteKey = interfaceLevel.cacheKey().concat(":").concat(url).concat("_DELETE");
-        GlobalCacheHelper.remove(getKey);
-        GlobalCacheHelper.remove(postKey);
-        GlobalCacheHelper.remove(putKey);
-        GlobalCacheHelper.remove(deleteKey);
+        Constants.SysCacheKey interfaceLevelKey = Constants.SysCacheKey.interfaceLevel;
+        String getKey = String.format(interfaceLevelKey.cacheKey(), url.concat("_GET"), Locale.ROOT);
+        String postKey = String.format(interfaceLevelKey.cacheKey(), url.concat("_POST"), Locale.ROOT);
+        String putKey = String.format(interfaceLevelKey.cacheKey(), url.concat("_PUT"), Locale.ROOT);
+        String deleteKey = String.format(interfaceLevelKey.cacheKey(), url.concat("_DELETE"), Locale.ROOT);
+        GlobalCache.remove(getKey, postKey, putKey, deleteKey);
     }
 }
