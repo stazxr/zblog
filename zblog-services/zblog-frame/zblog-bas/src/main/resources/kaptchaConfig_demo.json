@@ -1,0 +1,19 @@
+[
+  {
+    "name": "captchaName-0",
+    "properties": {
+      "captchaType": "Default",
+      "duration": 60,
+      "length": 4,
+      "width": 111,
+      "height": 32
+    }
+  },
+  {
+    "name": "captchaName-1"
+  },
+  {
+    "name": "captchaName-2",
+    "properties": { }
+  }
+]

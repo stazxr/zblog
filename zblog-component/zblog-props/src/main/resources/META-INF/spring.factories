@@ -1,3 +1,0 @@
-# Initializers
-org.springframework.context.ApplicationContextInitializer=\
-com.github.stazxr.zblog.props.database.DatabasePropertySourceInitializer

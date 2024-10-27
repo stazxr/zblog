@@ -1,0 +1,10 @@
+# Initializers
+org.springframework.context.ApplicationContextInitializer=\
+com.github.stazxr.zblog.bas.props.database.DatabasePropertySourceInitializer
+
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.github.stazxr.zblog.bas.context.config.ContextConfig,\
+com.github.stazxr.zblog.bas.log.config.LogConfiguration,\
+com.github.stazxr.zblog.bas.captcha.autoconfigure.CaptchaLoadAutoConfigure,\
+com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorAutoConfiguration

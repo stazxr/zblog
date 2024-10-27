@@ -1,0 +1,52 @@
+:root {
+    /* 字体 */
+    --globalFont: customFont;
+    /* --globalFont: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif; */
+    --globalFontSize: 16px;
+
+    /* 箭头 */
+    --globalCursor: url(https://file.suntaoblog.com/cur/default.cur), default;
+    --globalPointer: url(https://file.suntaoblog.com/cur/pointer.cur), pointer;
+
+    /* 字体颜色 */
+    --theme-light-color: #4c4948;
+    --theme-dark-color: rgba(255, 255, 255, 0.8);
+
+    /* 透明 */
+    --transparent: rgba(0, 0, 0, 0);
+
+    /* 蓝色 */
+    --blue-color: #49b1f5;
+    --light-blue-color: #80c8f8;
+
+    /* 白色 */
+    --white-color: #eee;
+
+    /* 古董白 */
+    --antique-white-color: antiquewhite;
+
+    /* 黑色 */
+    --black-color: #4c4948;
+
+    /* nav - 白天模式/夜间模式：白灰配带遮罩 */
+    --nav-bg-color: rgba(0, 0, 0, 0);
+    --nav-font-color: #eee;
+
+    /* nav-fixed - 白天模式：白灰配带遮罩 */
+    --light-nav-fixed-box-shadow: 0 5px 6px -5px rgba(133, 133, 133, 0.6);
+    --light-nav-fixed-bg-color: rgba(255, 255, 255, 0.8);
+    --light-nav-fixed-font-color: var(--theme-light-color);
+
+    /* nav-fixed - 夜间模式：黑白配 */
+    --dark-nav-fixed-bg-color: rgba(18, 18, 18, 0.8);
+    --dark-nav-fixed-font-color: var(--theme-dark-color);
+
+    /* menus-submenu - 白天模式：白灰配 */
+    --light-menus-submenu-box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.5);
+    --light-menus-submenu-bg-color: #fff;
+    --light-menus-submenu-font-color: var(--theme-light-color);
+
+    /* menus-submenu - 夜间模式：黑白配带遮罩 */
+    --dark-menus-submenu-bg-color: rgba(18, 18, 18, 0.8);
+    --dark-menus-submenu-font-color: var(--theme-dark-color);
+}

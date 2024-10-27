@@ -1,0 +1,3 @@
+SERVER_PORT: 应用端口，默认 8081
+APP_NAME: 应用名称，默认 zblog
+

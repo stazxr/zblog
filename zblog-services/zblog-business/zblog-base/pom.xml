@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.stazxr.zblog</groupId>
+        <artifactId>zblog-business</artifactId>
+        <version>5.0.0</version>
+    </parent>
+
+    <artifactId>zblog-base</artifactId>
+    <packaging>jar</packaging>
+
+    <name>zblog-base</name>
+    <description>
+        ZBLOG 框架的基础功能组件，提供基于 nimbus-jose-jwt 的权限认证、续签方案、基于 EasyCaptcha 的验证码实现、
+        雪花ID实现、基于阿里云、七牛云、本地的文件存储实现，Websocket、Email等。包含用户管理、角色管理、权限管理、
+        路由管理、字典管理、操作日志、接口日志、数据监控、服务监控、版本维护、存储管理、节点管理等模块
+    </description>
+
+    <dependencies>
+        <!-- Zblog Core -->
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-core</artifactId>
+            <version>${zblog.version}</version>
+        </dependency>
+        <!-- Zblog Log -->
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-log</artifactId>
+            <version>${zblog.version}</version>
+        </dependency>
+        <!-- Nimbus Jose Jwt -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+        </dependency>
+        <!-- OS -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- Springboot Configuration -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+        <!-- WebSocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,72 @@
+{
+  "name": "zblog-web-portal",
+  "version": "1.0.0",
+  "description": "ZBLOG 前端源码-门户",
+  "author": "Sun Tao",
+  "license": "MIT",
+  "scripts": {
+    "server": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^1.0.2",
+    "@wangeditor/plugin-formula": "^1.0.11",
+    "@wangeditor/plugin-upload-attachment": "^1.1.0",
+    "animate.css": "^3.7.2",
+    "axios": "^1.2.1",
+    "clipboard": "^2.0.6",
+    "core-js": "^3.6.5",
+    "dayjs": "^1.10.6",
+    "easy-typer-js": "^2.1.0",
+    "highlight.js": "^11.6.0",
+    "jquery": "^3.6.0",
+    "jsencrypt": "^3.0.0-rc.1",
+    "json-bigint": "^1.0.0",
+    "katex": "^0.16.3",
+    "tocbot": "^4.18.2",
+    "qs": "^6.10.1",
+    "vue": "^2.6.14",
+    "vue-baberrage": "^3.2.4",
+    "vue-cute-timeline": "^1.2.8",
+    "vue-image-swipe": "^1.0.5",
+    "vue-infinite-loading": "^2.4.5",
+    "vue-router": "^3.2.0",
+    "vuetify": "^2.6.0",
+    "vuex": "^3.4.0",
+    "vuex-persistedstate": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-plugin-eslint": "~4.5.15",
+    "@vue/cli-plugin-router": "~4.5.15",
+    "@vue/cli-plugin-vuex": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
+    "@vue/eslint-config-standard": "^5.1.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "lint-staged": "^9.5.0",
+    "sass": "^1.32.13",
+    "sass-loader": "^8.0.0",
+    "stylus": "^0.54.7",
+    "stylus-loader": "^3.0.2",
+    "vue-cli-plugin-vuetify": "^2.5.8",
+    "vue-template-compiler": "^2.6.14",
+    "vuetify-loader": "^1.7.0"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
+}
