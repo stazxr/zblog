@@ -32,11 +32,12 @@ public class LogPathCache {
     /**
      * Determines if logging is allowed for the given path, considering exclusion list.
      *
-     * @param path        Request path
-     * @param excludeList List of paths to exclude from logging
+     * @param path   Request path
+     * @param model  the log model
+     * @param paths  List of paths to enabled/exclude from logging
      * @return boolean true if logging is allowed, false otherwise
      */
-    public static boolean allowedLogWithCache(String path, List<String> excludeList) {
+    public static boolean allowedLogWithCache(String path, int model, List<String> paths) {
         if (PATH_EXCLUDE_MAP.containsKey(path)) {
             return false;
         }
@@ -45,17 +46,29 @@ public class LogPathCache {
             return true;
         }
 
-        for (String excludePath : excludeList) {
-            if (PATH_MATCHER.match(excludePath, path)) {
-                log.info("log control path cache in exclude map: {}", path);
-                PATH_EXCLUDE_MAP.put(path, new Date());
-                return false;
+        for (String path0 : paths) {
+            if (PATH_MATCHER.match(path0, path)) {
+                if (model == 0) {
+                    PATH_INCLUDE_MAP.put(path, new Date());
+                    log.debug("log control path cache in include map: {}", path);
+                    return true;
+                } else {
+                    PATH_EXCLUDE_MAP.put(path, new Date());
+                    log.debug("log control path cache in exclude map: {}", path);
+                    return false;
+                }
             }
         }
 
-        PATH_INCLUDE_MAP.put(path, new Date());
-        log.info( "log control path cache in include map: {}", path);
-        return true;
+        if (model == 0) {
+            PATH_EXCLUDE_MAP.put(path, new Date());
+            log.debug("log control path cache in exclude map: {}", path);
+            return false;
+        } else {
+            PATH_INCLUDE_MAP.put(path, new Date());
+            log.debug("log control path cache in include map: {}", path);
+            return true;
+        }
     }
 
     /**

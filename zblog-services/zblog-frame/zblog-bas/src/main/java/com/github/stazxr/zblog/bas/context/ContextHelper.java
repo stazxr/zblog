@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.bas.context.entity.ContextTag;
 import com.github.stazxr.zblog.bas.context.properties.ContextProperties;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Closeable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author SunTao
  * @since 2024-07-02
  */
-public class ContextHelper {
+public class ContextHelper implements AutoCloseable {
     private static final Map<String, Boolean> CACHE_MAP = new ConcurrentHashMap<>();
 
     /**
@@ -85,5 +86,13 @@ public class ContextHelper {
             result.add(headerNames.nextElement());
         }
         return result;
+    }
+
+    /**
+     * 清除上下文
+     */
+    @Override
+    public void close() {
+        clearContext();
     }
 }

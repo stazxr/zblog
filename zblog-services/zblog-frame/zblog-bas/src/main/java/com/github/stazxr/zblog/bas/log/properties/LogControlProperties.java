@@ -25,9 +25,15 @@ public class LogControlProperties {
     private boolean enabled = false;
 
     /**
-     * List of paths for which logging should be disabled.
+     * The model of paths.
+     * Default is 0 (the paths is enabled path list)
      */
-    private List<String> excludePath = new ArrayList<>();
+    private int model = 0;
+
+    /**
+     * List of paths for which logging should be disabled or enabled(by model).
+     */
+    private List<String> paths = new ArrayList<>();
 
     public boolean isEnabled() {
         return enabled;
@@ -37,11 +43,19 @@ public class LogControlProperties {
         this.enabled = enabled;
     }
 
-    public List<String> getExcludePath() {
-        return excludePath == null ? new ArrayList<>() : excludePath;
+    public int getModel() {
+        return model;
     }
 
-    public void setExcludePath(List<String> excludePath) {
-        this.excludePath = excludePath;
+    public void setModel(int model) {
+        this.model = model;
+    }
+
+    public List<String> getPaths() {
+        return paths == null ? new ArrayList<>() : paths;
+    }
+
+    public void setPaths(List<String> paths) {
+        this.paths = paths;
     }
 }

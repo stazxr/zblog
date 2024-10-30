@@ -137,21 +137,32 @@ swagger:
 zblog:
   base:
     header: # 请求头配置
-      sys-code: ZBLOG # 系统编码
-      app-code: ZSERV # 应用编码
+      sys-code: ST # 系统编码
+      app-code: ZBLOG # 应用编码
       deploy:
         deploy-area: bj # 部署地域
         deploy-center: j # 部署机房
         deploy-unit: 0 # 部署单元
         deploy-ip: # 部署IP
+    context: # 上下文配置
+      tags: # 自定义标签配置
+        - { tag-name: conversion-id } # conversion-id
     seq: # 序号配置
       datacenter-id: 0 # 数据中心ID
       machine-id: 0 # 机器ID
-    context: # 上下文配置
-      tags: # 自定义标签配置
-        - {tag-name: conversion-id} # conversion-id
     cache:
       type: memory # 全局缓存类型
+    file:
+      model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云
+      local:
+        base-url: http://localhost:${server.port}/file/
+        file-upload-path: /home/${spring.application.name}/file/upload/
+    log:
+      control:
+        enabled: true # 开启全局请求响应日志打印
+        model: 0 # 默认值，paths 为允许记录日志的路径列表
+        paths:
+  # TODO 待替换
   base-package: com.github.stazxr.zblog
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/

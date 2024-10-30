@@ -35,7 +35,7 @@ public class LogPathCacheManager {
      */
     public boolean enabledLog(String path) {
         try {
-            return LogPathCache.allowedLogWithCache(path, logControlProperties.getExcludePath());
+            return LogPathCache.allowedLogWithCache(path, logControlProperties.getModel(), logControlProperties.getPaths());
         } catch (Exception e) {
             log.error("LogControlPathCacheManager -> LogControlPathCache error", e);
             return false;

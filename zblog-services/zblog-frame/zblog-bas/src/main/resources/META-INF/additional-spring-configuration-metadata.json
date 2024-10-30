@@ -105,10 +105,17 @@
       "defaultValue": false
     },
     {
-      "name": "zblog.base.log.control.excludePath",
+      "name": "zblog.base.log.control.model",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
+      "description": "The control log model.",
+      "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.log.control.paths",
       "type": "java.util.List",
       "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
-      "description": "List of paths for which logging should be disabled."
+      "description": "List of paths for which logging should be enabled/disabled."
     },
     {
       "name": "zblog.base.file.model",
@@ -165,6 +172,21 @@
           "value": "redis",
           "description": "Redis缓存."
         }
+      ]
+    },
+    {
+      "name": "zblog.base.file.model",
+      "values": [
+        { "value": 1, "description": "本地存储." },
+        { "value": 2, "description": "阿里云存储." },
+        { "value": 3, "description": "七牛云存储." }
+      ]
+    },
+    {
+      "name": "zblog.base.log.control.model",
+      "values": [
+        { "value": 0, "description": "zblog.base.log.control.paths 为允许记录日志的路径列表." },
+        { "value": 1, "description": "zblog.base.log.control.paths 为禁止记录日志的路径列表." }
       ]
     }
   ]

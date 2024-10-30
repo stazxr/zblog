@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Plugins>
+        <Plugin package="com.github.stazxr.zblog.bas.log.slf4j"/>
+    </Plugins>
+
+    <Appenders>
+        <!-- 控制台输出的 Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+        <!-- 文件输出的 Appender -->
+        <File name="File" fileName="logs/zblog.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <!-- 使用自定义的 MDC 过滤器 -->
+            <Filters>
+                <LogMdcFilter enabled="true" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- 根日志记录器，定义全局日志级别 -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
