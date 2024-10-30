@@ -12,7 +12,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.lang.reflect.Field;
 
 /**
- * BaseEntity
+ * 公共实体类，包含基本的创建和修改信息。
+ * 该类可以作为其他实体类的基类，提供通用字段。
  *
  * @author SunTao
  * @since 2020-11-15
@@ -25,42 +26,35 @@ public class BaseEntity extends Model<BaseEntity> {
 	private static final long serialVersionUID = 5802079762879978466L;
 
 	/**
-	 * 创建用户
+	 * 创建用户，存储该实体的创建用户标识。
 	 */
 	@TableField(fill = FieldFill.INSERT)
 	@ApiModelProperty(hidden = true)
-	private String createUser;
+	private Long createUser;
 
 	/**
-	 * 创建时间
+	 * 创建时间，存储该实体的创建时间。
 	 */
 	@TableField(fill = FieldFill.INSERT)
 	@ApiModelProperty(hidden = true)
 	private String createTime;
 
 	/**
-	 * 创建日期
-	 */
-	@TableField(fill = FieldFill.INSERT)
-	@ApiModelProperty(hidden = true)
-	private String createDate;
-
-	/**
-	 * 修改用户
+	 * 修改用户，存储最后修改该实体的用户标识。
 	 */
 	@TableField(fill = FieldFill.UPDATE)
 	@ApiModelProperty(hidden = true)
-	private String updateUser;
+	private Long updateUser;
 
 	/**
-	 * 修改时间
+	 * 修改时间，存储该实体的最后修改时间。
 	 */
 	@TableField(fill = FieldFill.UPDATE)
 	@ApiModelProperty(hidden = true)
 	private String updateTime;
 
 	/**
-	 * 乐观锁配置
+	 * 乐观锁版本号，用于处理并发修改。
 	 */
 	@Version
 	@ApiModelProperty(hidden = true)
@@ -70,14 +64,14 @@ public class BaseEntity extends Model<BaseEntity> {
 	public String toString() {
 		ToStringBuilder builder = new ToStringBuilder(this);
 		Field[] fields = this.getClass().getDeclaredFields();
-		try {
-			for (Field f : fields) {
-				f.setAccessible(true);
-				builder.append(f.getName(), f.get(this)).append("\n");
+		for (Field field : fields) {
+			try {
+				field.setAccessible(true);
+				builder.append(field.getName(), field.get(this));
+			} catch (Exception e) {
+				log.error("Error accessing field: {}", field.getName(), e);
+				builder.append(field.getName(), "access error");
 			}
-		} catch (Exception e) {
-			log.error("entity toString builder catch an error", e);
-			return "toString builder catch an error";
 		}
 		return builder.toString();
 	}
