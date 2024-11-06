@@ -27,9 +27,4 @@ public class BaseEntityWithExtend extends BaseEntity {
     @TableField(typeHandler = FastjsonTypeHandler.class)
     @ApiModelProperty("扩展字段")
     private String extensionsJson;
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }

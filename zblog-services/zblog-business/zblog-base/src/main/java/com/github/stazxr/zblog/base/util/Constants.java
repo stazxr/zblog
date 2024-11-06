@@ -122,16 +122,6 @@ public class Constants {
     }
 
     /**
-     * 三方接口
-     *
-     * @author SunTao
-     * @since 2020-11-14
-     */
-    public static final class OpenApi {
-
-    }
-
-    /**
      * Cache Key
      *
      * @author SunTao
@@ -141,7 +131,7 @@ public class Constants {
         /**
          * 缓存接口访问级别
          */
-        interfaceLevel("interfaceLevel:%s", 3600),
+        interfaceLevel("intLevel:%s", 3600),
 
         /**
          * token

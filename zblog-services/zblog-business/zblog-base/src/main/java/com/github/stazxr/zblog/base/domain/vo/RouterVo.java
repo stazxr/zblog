@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 路由综合信息
@@ -9,8 +9,8 @@ import lombok.ToString;
  * @author SunTao
  * @since 2022-06-24
  */
-@Data
-@ToString
+@Getter
+@Setter
 public class RouterVo {
     /**
      * 路由名称
@@ -51,4 +51,9 @@ public class RouterVo {
      * 日志是否展示
      */
     private Boolean logShowed;
+
+    /**
+     * 备注
+     */
+    private String remark;
 }

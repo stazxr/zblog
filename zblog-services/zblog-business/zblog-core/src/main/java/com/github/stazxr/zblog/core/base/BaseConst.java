@@ -15,26 +15,12 @@ public class BaseConst {
     /**
      * system username
      */
-    public static final String USER_SYSTEM = "system";
+    public static final String SYSTEM_USER = "system";
 
     /**
-     * 系统初始化内置字典ID
+     * system userId
      */
-    public static final class DictId {
-        private DictId() {
-            throw new IllegalStateException();
-        }
-
-        /**
-         * 系统参数字典ID
-         */
-        public static final Long SYS = 1L;
-
-        /**
-         * 系统参数字典ID
-         */
-        public static final Long WORK_ID = 1314L;
-    }
+    public static final Long SYSTEM_USER_ID = 0L;
 
     /**
      * 系统初始化内置字典Key
@@ -96,16 +82,16 @@ public class BaseConst {
         /**
          * 公共权限，认证即可访问
          */
-        public static final int PUBLIC = 2;
+        public static final int PUBLIC = 1 << 1;
 
         /**
          * 受控权限，授权即可访问
          */
-        public static final int PERM = 3;
+        public static final int PERM = 1 << 2;
     }
 
     /**
-     * 扩展的接口访问级别,特殊用途
+     * 扩展的接口访问级别，特殊用途
      */
     public static final class PermLevelExtend {
         private PermLevelExtend() {
@@ -118,7 +104,7 @@ public class BaseConst {
         public static final int FORBIDDEN = 99;
 
         /**
-         * 未配置@Router注解,接口不对外,不允许访问
+         * 接口编码没有对应的路由配置
          */
         public static final int NULL = 98;
     }
@@ -174,5 +160,38 @@ public class BaseConst {
          * V_5.0.0
          */
         public static final String V_5_0_0 = "V_5.0.0";
+    }
+
+    /**
+     * 全局缓存键值
+     */
+    public enum GlobalCacheKey {
+        /**
+         * 接口访问级别，默认 5 分钟
+         */
+        interfaceLevel("intLevel:%s_%s", 5 * 60 * 1000);
+
+        /**
+         * 缓存Key
+         */
+        private final String cacheKey;
+
+        /**
+         * 缓存有效时间，单位秒
+         */
+        private final int duration;
+
+        GlobalCacheKey(String cacheKey, int duration) {
+            this.cacheKey = cacheKey;
+            this.duration = duration;
+        }
+
+        public String cacheKey() {
+            return cacheKey;
+        }
+
+        public int duration() {
+            return duration;
+        }
     }
 }

@@ -139,8 +139,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
             albumPhoto.setPhotoName(file.getFilename());
             albumPhoto.setPhotoLink(file.getDownloadUrl());
             albumPhoto.setIsDeleted(false);
-            albumPhoto.setCreateUser(loginUsername);
-            albumPhoto.setCreateDate(DateUtils.formatDate());
+            albumPhoto.setCreateUser(1L);
             albumPhoto.setCreateTime(DateUtils.formatTime());
             photos.add(albumPhoto);
         }

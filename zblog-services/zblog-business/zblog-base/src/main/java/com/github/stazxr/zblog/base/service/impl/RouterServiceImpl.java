@@ -11,11 +11,9 @@ import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.RouterDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
-import com.github.stazxr.zblog.base.domain.entity.Interface;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.enums.DictType;
-import com.github.stazxr.zblog.base.domain.enums.InterfaceType;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
@@ -75,43 +73,42 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      */
     @Override
     public int calculateInterfaceLevel(String requestUri, String requestMethod) {
+        // 处理请求地址和请求方式
         final String whLabel = "?";
         requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
+        requestMethod = requestMethod.toUpperCase(Locale.ROOT);
+
+        // 白名单接口允许访问
         if (RouterBlackWhiteListCache.containsWhite(requestUri)) {
-            // 白名单代表允许访问
             return BaseConst.PermLevel.OPEN;
         }
 
+        // 黑名单接口禁止访问
         if (RouterBlackWhiteListCache.containsBlack(requestUri)) {
-            // 黑名单代表禁止访问
             return BaseConst.PermLevelExtend.FORBIDDEN;
         }
 
-        // 读取缓存
-        Constants.SysCacheKey interfaceLevelKey = Constants.SysCacheKey.interfaceLevel;
-        String uriInfo = requestUri + "_" + requestMethod;
-        String interfaceLevelCacheKey = String.format(interfaceLevelKey.cacheKey(), uriInfo, Locale.ROOT);
-        String interfaceLevel = GlobalCache.get(interfaceLevelCacheKey);
+        // 从缓存中读取接口访问级别
+        BaseConst.GlobalCacheKey intLevelKey = BaseConst.GlobalCacheKey.interfaceLevel;
+        String intLevelCacheKey = String.format(intLevelKey.cacheKey(), requestUri, requestMethod, Locale.ROOT);
+        String interfaceLevel = GlobalCache.get(intLevelCacheKey);
         if (StringUtils.isNotBlank(interfaceLevel)) {
             return Integer.parseInt(interfaceLevel);
         }
 
-        Interface anInterface = interfaceMapper.selectOneByRequest(requestUri, requestMethod.toUpperCase(Locale.ROOT));
-        if (anInterface == null) {
-            // 放行
-            return BaseConst.PermLevel.OPEN;
+        // 查询接口的权限编码
+        String permCode = interfaceMapper.selectCodeByUriAndMethod(requestUri, requestMethod);
+        if (permCode == null) {
+            // 未配置 @Router 注解，接口默认登录可访问
+            return BaseConst.PermLevel.PUBLIC;
         }
 
-        // 判断访问级别
+        // 根据权限编码查询路由信息
         int level;
-        Integer type = anInterface.getType();
-        String code = anInterface.getCode();
-        if (InterfaceType.NULL.getType().equals(type) || StringUtils.isBlank(code)) {
-            // 未配置 @Router 注解，接口不对外，不允许访问
+        RouterVo routerVo = routerMapper.selectRouterVoByCode(permCode);
+        if (routerVo == null) {
             level = BaseConst.PermLevelExtend.NULL;
         } else {
-            // 根据权限编码查询接口的访问级别
-            RouterVo routerVo = routerMapper.selectRouterVoByCode(code);
             if (routerVo.getPermEnabled() != null && !routerVo.getPermEnabled()) {
                 // 接口被禁用了
                 level = BaseConst.PermLevelExtend.FORBIDDEN;
@@ -122,7 +119,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         }
 
         // 缓存数据
-        GlobalCache.put(interfaceLevelCacheKey, String.valueOf(level), interfaceLevelKey.duration());
+        GlobalCache.put(intLevelCacheKey, String.valueOf(level), intLevelKey.duration());
         return level;
     }
 

@@ -1,12 +1,11 @@
 package com.github.stazxr.zblog.core.base;
 
+import com.github.stazxr.zblog.core.util.ToStringUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 /**
  * BaseVo
@@ -21,7 +20,7 @@ public class BaseVo implements Serializable {
     /**
      * 创建用户
      */
-    private String createUser;
+    private Long createUser;
 
     /**
      * 创建时间
@@ -29,14 +28,9 @@ public class BaseVo implements Serializable {
     private String createTime;
 
     /**
-     * 创建日期
-     */
-    private String createDate;
-
-    /**
      * 修改用户
      */
-    private String updateUser;
+    private Long updateUser;
 
     /**
      * 修改时间
@@ -45,17 +39,6 @@ public class BaseVo implements Serializable {
 
     @Override
     public String toString() {
-        ToStringBuilder builder = new ToStringBuilder(this);
-        Field[] fields = this.getClass().getDeclaredFields();
-        try {
-            for (Field f : fields) {
-                f.setAccessible(true);
-                builder.append(f.getName(), f.get(this)).append("\n");
-            }
-        } catch (Exception e) {
-            log.error("vo toString builder catch an error", e);
-            return "toString builder catch an error";
-        }
-        return builder.toString();
+        return ToStringUtils.buildString(this);
     }
 }

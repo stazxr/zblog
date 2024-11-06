@@ -1,12 +1,11 @@
 package com.github.stazxr.zblog.core.base;
 
+import com.github.stazxr.zblog.core.util.ToStringUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 /**
  * BaseDto
@@ -45,17 +44,6 @@ public class BaseDto implements Serializable {
 
     @Override
     public String toString() {
-        ToStringBuilder builder = new ToStringBuilder(this);
-        Field[] fields = this.getClass().getDeclaredFields();
-        try {
-            for (Field f : fields) {
-                f.setAccessible(true);
-                builder.append(f.getName(), f.get(this)).append("\n");
-            }
-        } catch (Exception e) {
-            log.error("dto toString builder catch an error", e);
-            return "toString builder catch an error";
-        }
-        return builder.toString();
+        return ToStringUtils.buildString(this);
     }
 }

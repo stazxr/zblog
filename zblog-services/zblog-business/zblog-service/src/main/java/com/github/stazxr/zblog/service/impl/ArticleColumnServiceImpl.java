@@ -127,8 +127,7 @@ public class ArticleColumnServiceImpl extends ServiceImpl<ArticleColumnMapper, A
                 relation.setArticleId(article.getArticleId());
                 relation.setArticleTitle(article.getArticleTitle());
                 relation.setSort(article.getSort());
-                relation.setCreateUser(loginUsername);
-                relation.setCreateDate(DateUtils.formatDate());
+                relation.setCreateUser(1L);
                 relation.setCreateTime(DateUtils.formatTime());
                 relations.add(relation);
             });

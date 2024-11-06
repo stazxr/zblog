@@ -6,6 +6,8 @@ import com.github.stazxr.zblog.util.time.DateUtils;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * 自定义实现 MetaObjectHandler 元对象处理器接口
  *
@@ -25,11 +27,6 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     private static final String CREATE_TIME = "createTime";
 
     /**
-     * 插入时自动填充创建日期
-     */
-    private static final String CREATE_DATE = "createDate";
-
-    /**
      * 修改时自动填充修改用户
      */
     private static final String UPDATE_USER = "updateUser";
@@ -39,29 +36,30 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
      */
     private static final String UPDATE_TIME = "updateTime";
 
+    /**
+     * 默认日期编码
+     */
+    private static final String TIME_PATTERN = DateUtils.YMD_HMS_PATTERN;
+
     @Override
     public void insertFill(MetaObject metaObject) {
         if (getFieldValByName(CREATE_USER, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_USER, String.class, SecurityUtils.getLoginUsernameNoEor());
+            this.strictInsertFill(metaObject, CREATE_USER, Long.class, SecurityUtils.getLoginIdNoEor());
         }
 
         if (getFieldValByName(CREATE_TIME, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_TIME, String.class, DateUtils.formatTime());
-        }
-
-        if (getFieldValByName(CREATE_DATE, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_DATE, String.class, DateUtils.formatDate());
+            this.strictInsertFill(metaObject, CREATE_TIME, String.class, DateUtils.format(new Date(), TIME_PATTERN));
         }
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         if (getFieldValByName(UPDATE_USER, metaObject) == null) {
-            this.strictUpdateFill(metaObject, UPDATE_USER, String.class, SecurityUtils.getLoginUsernameNoEor());
+            this.strictUpdateFill(metaObject, UPDATE_USER, Long.class, SecurityUtils.getLoginIdNoEor());
         }
 
         if (getFieldValByName(UPDATE_TIME, metaObject) == null) {
-            this.strictUpdateFill(metaObject, UPDATE_TIME, String.class, DateUtils.formatNow());
+            this.strictUpdateFill(metaObject, UPDATE_TIME, String.class, DateUtils.format(new Date(), TIME_PATTERN));
         }
     }
 }

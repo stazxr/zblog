@@ -2,17 +2,19 @@ package com.github.stazxr.zblog.base.domain.bo;
 
 import com.github.stazxr.zblog.base.domain.entity.Interface;
 import com.github.stazxr.zblog.base.domain.entity.Router;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
- * 路由 - 接口信息封装
+ * 路由和接口信息封装
  *
  * @author SunTao
  * @since 2022-06-23
  */
-@Data
+@Getter
+@Setter
 public class RouterInterface {
     /**
      * 路由列表
@@ -20,12 +22,12 @@ public class RouterInterface {
     List<Router> routers;
 
     /**
-     * 受权限管控的接口列表
+     * 接口列表
      */
-    List<Interface> permInterfaces;
+    List<Interface> interfaces;
 
-    /**
-     * 不可以访问的接口列表
-     */
-    List<Interface> nullInterfaces;
+    public RouterInterface(List<Router> routers, List<Interface> interfaces) {
+        this.routers = routers;
+        this.interfaces = interfaces;
+    }
 }

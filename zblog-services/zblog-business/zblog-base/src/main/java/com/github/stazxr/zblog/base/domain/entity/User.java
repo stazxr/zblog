@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.stazxr.zblog.bas.mask.MaskType;
+import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -63,6 +66,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Getter
     @Setter
+    @FieldMask(type = MaskType.PASSWORD)
     private String password;
 
     /**
@@ -70,6 +74,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Getter
     @Setter
+    @FieldMask(type = MaskType.EMAIL_WEAK)
     private String email;
 
     /**
@@ -141,6 +146,7 @@ public class User extends BaseEntity implements UserDetails {
      */
     @Getter
     @Setter
+    @JSONField(name = "accountNonLocked")
     private Boolean locked;
 
     /**
@@ -207,6 +213,7 @@ public class User extends BaseEntity implements UserDetails {
      * @return true: 没有过期
      */
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         if (temp) {
             try {
@@ -236,6 +243,7 @@ public class User extends BaseEntity implements UserDetails {
      * @return true 凭据有效
      */
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         if (admin || Constants.USER_TEST.equals(username)) {
             // admin / test not check this.
@@ -324,12 +332,5 @@ public class User extends BaseEntity implements UserDetails {
             }
             return g1.getAuthority().compareTo(g2.getAuthority());
         }
-    }
-
-    @Override
-    public String toString() {
-        // 密码脱敏
-        // setPassword("[PROTECT]");
-        return super.toString();
     }
 }

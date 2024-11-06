@@ -20,12 +20,13 @@ public interface InterfaceMapper extends BaseMapper<Interface> {
     void clearInterface();
 
     /**
-     * 根据请求信息查询接口信息
+     * 根据接口请求地址和接口请求方式查询接口的权限编码
+     *
      * @param requestUri    请求地址
      * @param requestMethod 请求方式
-     * @return Interface
+     * @return 权限编码
      */
-    Interface selectOneByRequest(@Param("uri") String requestUri, @Param("method") String requestMethod);
+    String selectCodeByUriAndMethod(@Param("uri") String requestUri, @Param("method") String requestMethod);
 
     /**
      * 查询权限对应的接口列表

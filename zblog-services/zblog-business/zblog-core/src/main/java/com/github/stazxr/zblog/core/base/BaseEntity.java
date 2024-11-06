@@ -2,14 +2,12 @@ package com.github.stazxr.zblog.core.base;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.github.stazxr.zblog.core.util.ToStringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.lang.reflect.Field;
 
 /**
  * 公共实体类，包含基本的创建和修改信息。
@@ -62,17 +60,6 @@ public class BaseEntity extends Model<BaseEntity> {
 
 	@Override
 	public String toString() {
-		ToStringBuilder builder = new ToStringBuilder(this);
-		Field[] fields = this.getClass().getDeclaredFields();
-		for (Field field : fields) {
-			try {
-				field.setAccessible(true);
-				builder.append(field.getName(), field.get(this));
-			} catch (Exception e) {
-				log.error("Error accessing field: {}", field.getName(), e);
-				builder.append(field.getName(), "access error");
-			}
-		}
-		return builder.toString();
+		return ToStringUtils.buildString(this);
 	}
 }

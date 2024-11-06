@@ -53,7 +53,7 @@ public interface RouterService extends IService<Router> {
      * 分页查询路由列表
      *
      * @param queryDto 查询参数
-     * @return routerList
+     * @return 路由列表
      */
     PageInfo<RouterVo> queryRouterListByPage(RouterQueryDto queryDto);
 

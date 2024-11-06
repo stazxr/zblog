@@ -52,7 +52,7 @@ public final class Result implements Serializable {
     /**
      * 时间戳
      */
-    @ApiModelProperty(name = "identifier", value = "响应时间", example = "1996-03-01 00:04:10")
+    @ApiModelProperty(name = "timestamp", value = "响应时间", example = "1996-03-01 00:04:10")
     private final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     private Result(ResultCode resultCode) {

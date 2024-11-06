@@ -37,12 +37,12 @@ public class RouterController {
      * 分页查询路由列表
      *
      * @param queryDto 查询参数
-     * @return routerList
+     * @return 路由列表
      */
     @GetMapping("pageList")
     @ApiOperation("分页查询路由列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询路由列表", code = "queryRouterListByPage")
+    @Router(name = "分页查询路由列表", code = "router:pageList")
     public Result pageList(RouterQueryDto queryDto) {
         return Result.success().data(routerService.queryRouterListByPage(queryDto));
     }
@@ -51,12 +51,12 @@ public class RouterController {
      * 分页查询黑白名单列表
      *
      * @param queryDto 查询参数
-     * @return blackOrWhiteList
+     * @return 黑白名单列表
      */
     @GetMapping("pageBlackOrWhiteList")
     @ApiOperation("分页查询黑白名单列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询黑白名单列表", code = "pageBlackOrWhiteList")
+    @Router(name = "分页查询黑白名单列表", code = "router:pageBlackOrWhiteList")
     public Result pageBlackOrWhiteList(RouterQueryDto queryDto) {
         return Result.success().data(routerService.pageBlackOrWhiteList(queryDto));
     }
@@ -65,7 +65,7 @@ public class RouterController {
      * 根据权限编码查询路由信息
      *
      * @param code 权限编码
-     * @return routerVo
+     * @return 路由详情
      */
     @GetMapping(value = "/queryRouterByCode")
     @ApiOperation("根据权限编码查询路由信息")
@@ -73,7 +73,7 @@ public class RouterController {
         @ApiImplicitParam(name = "code", value = "权限编码", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "根据权限编码查询路由信息", code = "queryRouterByCode", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "根据权限编码查询路由信息", code = "router:queryRouterByCode", level = BaseConst.PermLevel.PUBLIC)
     public Result queryRouterByCode(@RequestParam String code) {
         RouterVo routerVo = routerService.queryRouterByCode(code);
         Assert.notNull(routerVo, "根据权限编码查询路由信息失败，数据不存在");

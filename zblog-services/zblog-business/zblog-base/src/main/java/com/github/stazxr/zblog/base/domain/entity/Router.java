@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 系统路由
@@ -22,6 +22,15 @@ import java.util.Arrays;
 @Setter
 @TableName("router")
 public class Router extends BaseEntity {
+    /**
+     * 允许配置的路由级别
+     */
+    private static final List<Integer> LEVELS = Arrays.asList(
+            BaseConst.PermLevel.OPEN,
+            BaseConst.PermLevel.PUBLIC,
+            BaseConst.PermLevel.PERM
+    );
+
     /**
      * 主键
      */
@@ -60,17 +69,11 @@ public class Router extends BaseEntity {
      */
     public Router(com.github.stazxr.zblog.core.annotation.Router router) {
         Assert.notNull(router, "router must not be null");
+        Assert.isTrue(!LEVELS.contains(router.level()), "router level is out of range: " + LEVELS);
+
         name = router.name();
         code = router.code();
         defaultLevel = router.level();
-        Assert.isTrue(!Arrays.asList(new Integer[]{
-            BaseConst.PermLevel.OPEN, BaseConst.PermLevel.PUBLIC, BaseConst.PermLevel.PERM
-        }).contains(router.level()), "router level is out of range");
         remark = router.remark();
-    }
-
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
     }
 }

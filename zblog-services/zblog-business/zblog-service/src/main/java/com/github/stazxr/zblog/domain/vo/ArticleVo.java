@@ -4,7 +4,6 @@ import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ToString
 public class ArticleVo extends BaseVo {
     /**
      * 主键

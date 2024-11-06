@@ -38,6 +38,19 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取当前登录用户ID，如果未登录，返回系统用户
+     *
+     * @return 当前登录用户ID
+     */
+    public static Long getLoginIdNoEor() {
+        try {
+            return getLoginId();
+        } catch (Exception e) {
+            return BaseConst.SYSTEM_USER_ID;
+        }
+    }
+
+    /**
      * 获取当前登录用户名称
      *
      * @return 当前登录用户名称
@@ -54,9 +67,9 @@ public class SecurityUtils {
      */
     public static String getLoginUsernameNoEor() {
         try {
-            return SecurityUtils.getLoginUsername();
-        } catch (IllegalStateException e) {
-            return BaseConst.USER_SYSTEM;
+            return getLoginUsername();
+        } catch (Exception e) {
+            return BaseConst.SYSTEM_USER;
         }
     }
 }

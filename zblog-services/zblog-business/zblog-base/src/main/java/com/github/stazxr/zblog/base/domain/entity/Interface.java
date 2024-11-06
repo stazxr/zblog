@@ -28,17 +28,12 @@ public class Interface extends BaseEntity {
     private String code;
 
     /**
-     * 请求地址
+     * 接口请求地址
      */
     private String uri;
 
     /**
-     * 请求方式
+     * 接口请求方式
      */
     private String method;
-
-    /**
-     * 接口类型
-     */
-    private Integer type;
 }

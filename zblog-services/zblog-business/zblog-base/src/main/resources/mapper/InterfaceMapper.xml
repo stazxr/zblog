@@ -5,17 +5,15 @@
         DELETE FROM interface WHERE ID > 0
     </delete>
 
-    <select id="selectOneByRequest" resultType="com.github.stazxr.zblog.base.domain.entity.Interface">
-        SELECT
-            ID, CODE, URI, METHOD, CREATE_DATE
-        FROM
-            interface
-        WHERE
-            URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
+    <select id="selectCodeByUriAndMethod" resultType="java.lang.String">
+        SELECT DISTINCT CODE FROM interface WHERE CODE IS NOT NULL AND URI = #{uri} AND METHOD IN (#{method}, '*')
     </select>
 
     <select id="selectPermInterfaces" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
-        SELECT CODE, URI, METHOD, TYPE, CREATE_TIME FROM interface
+        SELECT
+            CODE, URI, METHOD, TYPE, CREATE_TIME
+        FROM
+            interface
         <where>
             <if test="permId != null and permId != ''">
                 AND CODE IN (
@@ -26,6 +24,11 @@
     </select>
 
     <select id="selectInterfacesByCode" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
-        SELECT CODE, URI, METHOD, TYPE, CREATE_TIME FROM interface WHERE CODE = #{code}
+        SELECT
+            CODE, URI, METHOD, TYPE, CREATE_TIME
+        FROM
+            interface
+        WHERE
+            CODE = #{code}
     </select>
 </mapper>
