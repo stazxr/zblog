@@ -18,6 +18,8 @@ import java.io.Serializable;
 @Setter
 @ApiModel("分页参数")
 public class PageParam implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 页码
      */

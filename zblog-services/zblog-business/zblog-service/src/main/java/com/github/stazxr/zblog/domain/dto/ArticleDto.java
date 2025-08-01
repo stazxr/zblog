@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.domain.dto;
 
 import com.github.stazxr.zblog.base.domain.entity.File;
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.List;
 @Setter
 @ToString
 @ApiModel("文章信息")
-public class ArticleDto {
+public class ArticleDto extends BaseDto {
     /**
      * 操作类型：add/edit
      */

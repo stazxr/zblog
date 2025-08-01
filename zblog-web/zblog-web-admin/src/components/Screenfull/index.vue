@@ -8,7 +8,7 @@
 import screenfull from 'screenfull'
 
 export default {
-  name: 'Screenfull',
+  name: 'ScreenFull',
   data() {
     return {
       isFullscreen: false
@@ -24,7 +24,7 @@ export default {
     click() {
       if (!screenfull.enabled) {
         this.$message({
-          message: 'you browser can not work',
+          message: '当前浏览器不支持全屏',
           type: 'warning'
         })
         return false
@@ -47,14 +47,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.screenfull-svg {
-  display: inline-block;
-  cursor: pointer;
-  fill: #5a5e66;;
-  width: 20px;
-  height: 20px;
-  vertical-align: 10px;
-}
-</style>

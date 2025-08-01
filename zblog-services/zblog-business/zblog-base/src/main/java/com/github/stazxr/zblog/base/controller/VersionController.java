@@ -1,12 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.service.VersionService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -56,7 +57,7 @@ public class VersionController {
         @ApiImplicitParam(name = "versionId", value = "版本id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询版本信息", code = "queryVersionInfo", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询版本信息", code = "queryVersionInfo", level = RouterLevel.PUBLIC)
     public Result queryVersionInfo(@RequestParam Long versionId) {
         return Result.success().data(versionService.queryVersionInfo(versionId));
     }

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author SunTao
  * @since 2021-01-29
  */
+@Deprecated
 public class SecurityUtils {
     /**
      * 获取当前登录的用户信息

@@ -73,6 +73,11 @@ public class SwaggerConfig {
         return createDocket(BaseConst.ApiVersion.V_4_2_0);
     }
 
+    @Bean
+    public Docket v5g0l0() {
+        return createDocket(BaseConst.ApiVersion.V_5_0_0);
+    }
+
     private Docket createDocket(String version) {
         return new Docket(DocumentationType.OAS_30)
             .enable(swaggerConfigProperties().getEnable())

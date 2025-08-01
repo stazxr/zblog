@@ -27,7 +27,7 @@ public class ContextFilter extends OncePerRequestFilter {
     private ContextProperties contextProperties;
 
     /**
-     * Sets the ContextProperties instance.
+     * Set the ContextProperties instance.
      *
      * @param contextProperties The ContextProperties instance to set
      */

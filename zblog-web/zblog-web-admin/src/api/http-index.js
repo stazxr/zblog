@@ -3,6 +3,7 @@ import communal from '@/api/communal.js'
 import home from '@/api/home.js'
 
 // base
+import menu from '@/api/base/menu.js'
 import perm from '@/api/base/perm.js'
 import user from '@/api/base/user.js'
 import log from '@/api/base/log.js'
@@ -29,6 +30,6 @@ import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
 export default {
-  communal, home, perm, user, log, router, role, dict, server, version, file, node,
+  communal, home, menu, perm, user, log, router, role, dict, server, version, file, node,
   column, category, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

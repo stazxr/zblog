@@ -15,5 +15,21 @@ import org.mapstruct.ReportingPolicy;
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PermissionConverter extends BaseConverter<Permission, PermissionDto, PermissionVo> {
+    /**
+     * 数据对象转实体对象
+     *
+     * @param dto 数据对象
+     * @return po 实体对象
+     */
+    @Override
+    Permission dtoToEntity(PermissionDto dto);
 
+    /**
+     * 实体对象转视图对象
+     *
+     * @param po 实体对象
+     * @return vo 视图对象
+     */
+    @Override
+    PermissionVo entityToVo(Permission po);
 }

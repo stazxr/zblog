@@ -3,11 +3,11 @@ package com.github.stazxr.zblog.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.converter.AlbumConverter;
 import com.github.stazxr.zblog.core.util.DataValidated;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.domain.dto.AlbumDto;
 import com.github.stazxr.zblog.domain.dto.AlbumPhotoDto;
 import com.github.stazxr.zblog.domain.dto.query.AlbumPhotoQueryDto;
@@ -196,7 +196,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
     @Override
     public PageInfo<AlbumPhotoVo> pageDeletePhotoList(AlbumPhotoQueryDto queryDto) {
         queryDto.checkPage();
-        queryDto.setUserId(SecurityUtils.getLoginId());
+        queryDto.setUserId(SecurityUtils.getLoginUserId());
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(albumPhotoMapper.selectDeletePhotoList(queryDto));
     }

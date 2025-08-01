@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.ArticleCategoryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -53,7 +54,7 @@ public class ArticleCategoryController {
     @GetMapping(value = "/queryFirstCategoryList")
     @ApiOperation(value = "查询一级类别列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询一级类别列表", code = "queryFirstCategoryList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询一级类别列表", code = "queryFirstCategoryList", level = RouterLevel.PUBLIC)
     public Result queryFirstCategoryList(ArticleCategoryQueryDto queryDto) {
         return Result.success().data(articleCategoryService.queryFirstCategoryList(queryDto));
     }

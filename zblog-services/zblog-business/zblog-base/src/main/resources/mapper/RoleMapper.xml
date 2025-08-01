@@ -3,7 +3,7 @@
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RoleMapper">
     <select id="selectRoleList" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
-            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME
+            ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ENABLED, CREATE_USER, CREATE_TIME
         FROM role
         WHERE DELETED = '0'
         <if test="permId != null and permId != ''">
@@ -37,21 +37,6 @@
 
     <select id="selectByRoleCode" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ROLE_CODE = #{roleCode}
-    </select>
-
-    <select id="selectPermRoles" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
-        SELECT
-            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME
-        FROM role
-        WHERE DELETED = '0' AND ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
-        )
-        <if test="blurry != null and blurry != ''">
-            <bind name="blurryBind" value="'%' + blurry + '%'"/>
-            AND (
-                ROLE_NAME LIKE #{blurryBind} OR ROLE_CODE LIKE #{blurryBind}
-            )
-        </if>
     </select>
 
     <select id="selectUsersByRoleId" resultType="com.github.stazxr.zblog.base.domain.vo.UserVo">

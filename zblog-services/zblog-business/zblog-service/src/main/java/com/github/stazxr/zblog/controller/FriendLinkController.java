@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;

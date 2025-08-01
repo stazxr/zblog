@@ -68,7 +68,10 @@ public class BaseConst {
 
     /**
      * 接口访问级别
+     *
+     * 该类将会被删除，使用 bas 框架的 RouterLevel 替换
      */
+    @Deprecated
     public static final class PermLevel {
         private PermLevel() {
             throw new IllegalStateException();

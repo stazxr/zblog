@@ -13,8 +13,6 @@ public class UserTest {
         user.setUsername("suntao");
         user.setPassword("password");
         user.setEmail("1027353579@qq.com");
-        user.setEnabled(true);
-        user.setCreateUser(1L);
         System.out.println("TOString: " + user);
     }
 }

@@ -18,11 +18,7 @@ import lombok.ToString;
 @ToString
 @ApiModel("用户查询参数")
 public class UserQueryDto extends PageParam {
-    /**
-     * 业务id
-     */
-    @ApiModelProperty("业务id")
-    private Long businessId;
+    private static final long serialVersionUID = -2928961627904492808L;
 
     /**
      * 用户名
@@ -43,16 +39,27 @@ public class UserQueryDto extends PageParam {
     private String email;
 
     /**
-     * 手机号
+     * 用户类型
      */
-    @ApiModelProperty("手机号")
-    private String telephone;
+    @ApiModelProperty("用户类型")
+    private Integer userType;
 
     /**
-     * 启用状态
+     * 用户状态
      */
-    @ApiModelProperty(value = "启用状态", example = "true")
-    private Boolean enabled;
+    @ApiModelProperty("用户状态")
+    private Integer userStatus;
+
+
+
+
+
+
+    /**
+     * 业务id
+     */
+    @ApiModelProperty("业务id")
+    private Long businessId;
 
     /**
      * 登录开始时间

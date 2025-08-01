@@ -7,5 +7,5 @@ package com.github.stazxr.zblog.core.base;
  * @author SunTao
  * @since 2021-07-03
  */
-public interface BaseMapper<E> extends com.baomidou.mybatisplus.core.mapper.BaseMapper<E> {
+public interface BaseMapper<E extends BaseEntity> extends com.baomidou.mybatisplus.core.mapper.BaseMapper<E> {
 }

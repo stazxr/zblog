@@ -1,13 +1,13 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
- * 系统接口
+ * 接口
  *
  * @author SunTao
  * @since 2022-06-23
@@ -15,12 +15,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("interface")
-public class Interface extends BaseEntity {
-    /**
-     * 主键
-     */
-    @TableId
-    private Long id;
+public class Interface implements Serializable {
+    private static final long serialVersionUID = 3483968961273114029L;
 
     /**
      * 权限编码

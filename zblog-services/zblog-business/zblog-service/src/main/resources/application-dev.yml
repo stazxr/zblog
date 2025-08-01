@@ -1,8 +1,9 @@
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#logging:
-#  level:
-#    com.alibaba.druid.sql: debug
-#    com.github.spring.security.mapper: debug
-#    org.springframework.security: debug
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    '*': info
+    com.alibaba.druid.sql: debug
+    com.github.spring.security.mapper: debug
+    org.springframework.security: debug

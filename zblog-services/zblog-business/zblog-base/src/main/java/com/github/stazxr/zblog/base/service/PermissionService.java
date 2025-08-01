@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.router.Resource;
+import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
@@ -24,7 +26,7 @@ public interface PermissionService extends IService<Permission> {
      * @param queryDto 查询参数
      * @return permsList
      */
-    List<PermissionVo> queryPermTreeList(PermissionQueryDto queryDto);
+    List<PermissionVo> queryPermTree(PermissionQueryDto queryDto);
 
     /**
      * 查询权限详情
@@ -35,50 +37,59 @@ public interface PermissionService extends IService<Permission> {
     PermissionVo queryPermDetail(Long permId);
 
     /**
-     * 查询权限对应的接口列表
+     * 分页查询权限接口列表
      *
      * @param queryDto 查询参数
-     * @return interfaceList
+     * @return PageInfo<InterfaceVo>
      */
-    PageInfo<InterfaceVo> queryPermInterfaces(PermissionQueryDto queryDto);
+    PageInfo<InterfaceVo> pagePermInterfaces(PermissionQueryDto queryDto);
 
     /**
-     * 查询权限对应的角色列表
+     * 分页查询权限角色列表
      *
      * @param queryDto 查询参数
-     * @return roleList
+     * @return PageInfo<RoleVo>
      */
-    PageInfo<RoleVo> queryPermRoles(PermissionQueryDto queryDto);
+    PageInfo<RoleVo> pagePermRoles(PermissionQueryDto queryDto);
 
     /**
-     * 查询权限对应的日志列表
+     * 分页查询权限日志列表
      *
      * @param queryDto 查询参数
-     * @return logList
+     * @return PageInfo<LogVo>
      */
-    PageInfo<LogVo> queryPermLogs(PermissionQueryDto queryDto);
+    PageInfo<LogVo> pagePermLogs(PermissionQueryDto queryDto);
 
     /**
      * 查询权限编码列表
      *
      * @param searchKey 查询条件
-     * @return PermCodeVo
+     * @return List<PermCodeVo>
      */
     List<PermCodeVo> queryPermCodes(String searchKey);
 
     /**
+     * 根据权限编码查询资源信息
+     *
+     * @param permCode 权限编码
+     * @return Resource
+     */
+    Resource queryResourceByPermCode(String permCode);
+
+
+    /**
      * 新增权限
      *
-     * @param permission 权限
+     * @param permissionDto 权限信息
      */
-    void addPermission(Permission permission);
+    void addPermission(PermissionDto permissionDto);
 
     /**
      * 编辑权限
      *
-     * @param permission 权限
+     * @param permissionDto 权限信息
      */
-    void editPermission(Permission permission);
+    void editPermission(PermissionDto permissionDto);
 
     /**
      * 删除权限
@@ -88,25 +99,9 @@ public interface PermissionService extends IService<Permission> {
     void deletePermission(Long permId);
 
     /**
-     * 查询用户菜单列表
-     *
-     * @param userId 用户序列
-     * @return menuTree
-     */
-    List<MenuVo> queryUserMenus(Long userId);
-
-    /**
      * 批量删除角色权限
      *
      * @param rolePermDto 角色 - 权限对应信息
      */
     void batchDeleteRolePerm(RolePermDto rolePermDto);
-
-    /**
-     * 查询用户的权限列表（权限编码）
-     *
-     * @param userId 用户序列
-     * @return permCodes
-     */
-    Set<String> queryUserPerms(Long userId);
 }

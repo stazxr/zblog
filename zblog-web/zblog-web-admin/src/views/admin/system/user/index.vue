@@ -57,7 +57,7 @@
         border
         style="width: 100%"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="username" label="头像" align="center" width="80">
+        <el-table-column prop="username" label="头像" align="center" width="60">
           <template v-slot="scope">
             <el-image :src="scope.row['headImgUrl']" :preview-src-list="[scope.row['headImgUrl']]" fit="contain" lazy class="el-avatar">
               <div slot="error">
@@ -188,7 +188,7 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.user.pageList(param).then(res => {
+      this.$mapi.user.queryUserListByPage(param).then(res => {
         const { data } = res
         this.tableData = data.list
         this.total = data.total
@@ -263,3 +263,14 @@ export default {
   }
 }
 </script>
+<style>
+.search-opts .muses-search-form-item[btn] {
+  display: flex;
+  justify-content: flex-start;  /* 左对齐按钮 */
+  gap: 10px;  /* 按钮之间的间距 */
+}
+
+.search-opts .el-button {
+  flex: 0 0 auto;  /* 按钮大小自适应 */
+}
+</style>

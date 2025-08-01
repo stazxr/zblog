@@ -21,6 +21,26 @@
       "sourceType": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.GlobalCacheConfigProperties"
     },
     {
+      "name": "zblog.base.security",
+      "type": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties"
+    },
+    {
+      "name": "zblog.base.security.jwt",
+      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info",
+      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+    },
+    {
+      "name": "zblog.base.security.jwt.claims",
+      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+    },
+    {
       "name": "zblog.base.log.control",
       "type": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
       "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties"
@@ -98,6 +118,127 @@
       "defaultValue": "memory"
     },
     {
+      "name": "zblog.base.security.login-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "登录 URL.",
+      "defaultValue": "/api/login"
+    },
+    {
+      "name": "zblog.base.security.logout-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "登出 URL.",
+      "defaultValue": "/api/logout"
+    },
+    {
+      "name": "zblog.base.security.password-limited-day",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "密码有效天数，默认 90 天.",
+      "defaultValue": 90
+    },
+    {
+      "name": "zblog.base.security.resource-roles-cache-mills",
+      "type": "java.lang.Long",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "资源与角色关联关系的缓存时长, 单位毫秒, 默认 30 分钟.",
+      "defaultValue": 1800000
+    },
+    {
+      "name": "zblog.base.security.sso-token-cache-mills",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "SSO 令牌缓存时长, 单位毫秒, 默认 3 天.",
+      "defaultValue": 86400000
+    },
+    {
+      "name": "zblog.base.security.enable-additional-checks",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "登录认证是否扩展额外检查规则.",
+      "defaultValue": false
+    },
+    {
+      "name": "zblog.base.security.hide-user-not-found-exceptions",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "是否隐藏用户找不到异常.",
+      "defaultValue": true
+    },
+    {
+      "name": "zblog.base.security.jwt.access-token-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "访问令牌有效时间，单位为秒，默认值 30 分钟.",
+      "defaultValue": 1200
+    },
+    {
+      "name": "zblog.base.security.jwt.refresh-token-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "刷新令牌有效时间，单位为秒，通常为访问令牌有效时间的两倍.",
+      "defaultValue": 2400
+    },
+    {
+      "name": "zblog.base.security.jwt.allowed-renew-token",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "是否允许续签，默认不允许.",
+      "defaultValue": false
+    },
+    {
+      "name": "zblog.base.security.jwt.refresh-min-duration",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "续签判定阙值，单位为秒，当访问令牌剩余时间小于该值时，可进行续签操作.",
+      "defaultValue": 300
+    },
+    {
+      "name": "zblog.base.security.jwt.max-version",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "最大续签次数，默认 5 次.",
+      "defaultValue": 5
+    },
+    {
+      "name": "zblog.base.security.jwt.algorithm",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
+      "description": "JWT 签名算法 {@link com.nimbusds.jose.JWSAlgorithm}，默认为 RS256.",
+      "defaultValue": "RS256"
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.alias",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
+      "description": "证书名称."
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.key-password",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
+      "description": "证书密钥."
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.cert-location",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
+      "description": "证书路径."
+    },
+    {
+      "name": "zblog.base.security.jwt.claims.issuer",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
+      "description": "JWT 发布者的 URL 地址."
+    },
+    {
+      "name": "zblog.base.security.jwt.claims.subject",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
+      "description": "JWT 面向的用户."
+    },
+    {
       "name": "zblog.base.log.control.enabled",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
@@ -172,6 +313,25 @@
           "value": "redis",
           "description": "Redis缓存."
         }
+      ]
+    },
+    {
+      "name": "zblog.base.security.jwt.algorithm",
+      "values": [
+        { "value": "RS256", "description": "RS256, default." },
+        { "value": "ES256", "description": "ES256." },
+        { "value": "HS256", "description": "HS256." },
+        { "value": "HS384", "description": "HS384." },
+        { "value": "HS512", "description": "HS512." },
+        { "value": "RS384", "description": "RS384." },
+        { "value": "RS512", "description": "RS512." },
+        { "value": "ES256K", "description": "ES256K." },
+        { "value": "ES384", "description": "ES384." },
+        { "value": "ES512", "description": "ES512." },
+        { "value": "PS256", "description": "PS256." },
+        { "value": "PS384", "description": "PS384." },
+        { "value": "PS512", "description": "PS512." },
+        { "value": "EdDSA", "description": "EdDSA." }
       ]
     },
     {

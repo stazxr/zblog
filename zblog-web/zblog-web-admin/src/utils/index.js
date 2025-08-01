@@ -1,3 +1,11 @@
+/**
+ * 防抖函数
+ *
+ * @param func 需要防抖的函数
+ * @param wait 防抖的时间间隔（毫秒）
+ * @param immediate 如果为 true，则在第一次触发时立即执行函数，否则等待 wait 毫秒后再执行
+ * @returns {function(...[*]): *}
+ */
 export function debounce(func, wait, immediate = false) {
   let timeout, args, context, timestamp, result
 
@@ -33,14 +41,33 @@ export function debounce(func, wait, immediate = false) {
   }
 }
 
+/**
+ * 判断元素是否具有某个 CSS 类
+ *
+ * @param ele 目标 DOM 元素
+ * @param cls 要判断的 CSS 类名
+ * @returns {boolean}
+ */
 export function hasClass(ele, cls) {
-  return !!ele.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'))
+  return !!ele.className.match(new RegExp('\\b' + cls + '\\b'))
 }
 
+/**
+ * 向元素添加指定的 CSS 类
+ *
+ * @param ele 目标 DOM 元素
+ * @param cls 要添加的 CSS 类名
+ */
 export function addClass(ele, cls) {
   if (!hasClass(ele, cls)) ele.className += ' ' + cls
 }
 
+/**
+ * 从元素中移除指定的 CSS 类
+ *
+ * @param ele 目标 DOM 元素
+ * @param cls 要移除的 CSS 类名
+ */
 export function removeClass(ele, cls) {
   if (hasClass(ele, cls)) {
     const reg = new RegExp('(\\s|^)' + cls + '(\\s|$)')
@@ -48,11 +75,23 @@ export function removeClass(ele, cls) {
   }
 }
 
+/**
+ * 通过创建 Blob 对象并生成 URL，触发文件下载
+ *
+ * @param obj 要下载的数据，可以是文本、JSON 等
+ * @param filename 下载的文件名
+ */
 export function downloadFile(obj, filename) {
   const url = window.URL.createObjectURL(new Blob([obj]))
   downloadFileByUrl(url, filename)
 }
 
+/**
+ * 通过传入文件 URL 和文件名，触发浏览器下载文件
+ *
+ * @param url 文件的 URL 地址
+ * @param filename 下载时的文件名
+ */
 export function downloadFileByUrl(url, filename) {
   const link = document.createElement('a')
   link.style.display = 'none'
@@ -63,10 +102,22 @@ export function downloadFileByUrl(url, filename) {
   document.body.removeChild(link)
 }
 
+/**
+ * 格式化日期中的月份，保证两位数
+ *
+ * @param date JavaScript 的 Date 对象
+ * @returns {string}
+ */
 export function formatMonth(date) {
   return ('0' + (date.getMonth() + 1)).slice(-2)
 }
 
+/**
+ * 格式化日期中的天数，保证两位数
+ *
+ * @param date JavaScript 的 Date 对象
+ * @returns {string}
+ */
 export function formatDay(date) {
   return ('0' + date.getDate()).slice(-2)
 }

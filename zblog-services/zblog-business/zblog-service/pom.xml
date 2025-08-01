@@ -18,7 +18,7 @@
     </description>
 
     <properties>
-        <mainClass>com.github.stazxr.zblog.ZblogApplication</mainClass>
+        <mainClass>com.github.stazxr.zblog.Application</mainClass>
         <bitwalker.version>1.21</bitwalker.version>
     </properties>
 

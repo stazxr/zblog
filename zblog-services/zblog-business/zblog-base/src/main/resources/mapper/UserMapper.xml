@@ -10,8 +10,8 @@
         <result property="headImgUrl" column="HEAD_IMG_URL" />
         <result property="gender" column="GENDER" />
         <result property="email" column="EMAIL" />
-        <result property="enabled" column="ENABLED" />
-        <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" />
+<!--        <result property="enabled" column="ENABLED" />-->
+<!--        <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" />-->
     </resultMap>
 
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
@@ -23,30 +23,64 @@
         <result property="gender" column="GENDER" />
         <result property="signature" column="SIGNATURE" />
         <result property="website" column="WEBSITE" />
-        <result property="enabled" column="ENABLED" />
-        <result property="locked" column="LOCKED" />
-        <result property="temp" column="TEMP" />
+<!--        <result property="enabled" column="ENABLED" />-->
+<!--        <result property="locked" column="LOCKED" />-->
+<!--        <result property="temp" column="TEMP" />-->
         <result property="loginTime" column="LOGIN_TIME" />
         <result property="expiredTime" column="EXPIRED_TIME" />
         <result property="createUser" column="CREATE_USER" />
         <result property="createTime" column="CREATE_TIME" />
         <result property="updateUser" column="UPDATE_USER" />
         <result property="updateTime" column="UPDATE_TIME" />
-        <collection property="roleIds" ofType="Long">
-            <result column="ROLE_ID" />
-        </collection>
-        <collection property="roleNames" ofType="String">
-            <result column="ROLE_NAME" />
-        </collection>
+<!--        <collection property="roleIds" ofType="Long">-->
+<!--            <result column="ROLE_ID" />-->
+<!--        </collection>-->
+<!--        <collection property="roleNames" ofType="String">-->
+<!--            <result column="ROLE_NAME" />-->
+<!--        </collection>-->
     </resultMap>
 
-    <select id="selectUserRoleIdList" resultType="java.lang.Long">
-        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+    <select id="selectUserById" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE ID = #{userId}
     </select>
 
-    <select id="selectUserList" resultMap="userVoMap">
+    <select id="selectUserByUsername" resultType="com.github.stazxr.zblog.base.domain.entity.User">
+        SELECT * FROM user WHERE USERNAME = #{username}
+    </select>
+
+    <update id="updateUserLoginInfo">
+        SELECT * FROM user WHERE USERNAME = #{username}
+    </update>
+
+    <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
+        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
+            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+        )
+    </select>
+
+    <select id="selectMd5PermCodesByUserId" resultType="java.lang.String">
+        SELECT MD5(PERM_CODE) FROM permission WHERE DELETED = 0 AND ENABLED = 1 AND PERM_CODE IS NOT NULL AND (
+            PERM_LEVEL IN (1, 2) OR ID IN (
+                SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
+                    SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
+                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                    )
+                )
+            )
+        )
+        UNION ALL
+        SELECT DISTINCT MD5(RESOURCE_CODE) FROM resource WHERE RESOURCE_LEVEL IN (1, 2) AND RESOURCE_CODE NOT IN (
+            SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND PERM_CODE IS NOT NULL
+        )
+    </select>
+
+    <select id="selectAllMd5PermCodes" resultType="java.lang.String">
+        SELECT DISTINCT MD5(RESOURCE_CODE) FROM resource WHERE RESOURCE_CODE IS NOT NULL
+    </select>
+
+    <select id="selectUsers" resultType="com.github.stazxr.zblog.base.domain.entity.User">
         SELECT
-            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER, u.ENABLED, u.LOGIN_TIME
+            u.ID, u.USERNAME, u.USER_TYPE, u.USER_STATUS, u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER, u.LOGIN_TIME
         FROM user u
         WHERE u.DELETED = '0'
         <if test="username != null and username != ''">
@@ -57,16 +91,38 @@
             <bind name="nicknameBind" value="'%' + nickname + '%'"/>
             AND u.NICKNAME LIKE #{nicknameBind}
         </if>
-        <if test="enabled != null">
-            AND u.ENABLED = #{enabled}
+        <if test="email != null and email != ''">
+            <bind name="emailBind" value="'%' + email + '%'"/>
+            AND u.EMAIL LIKE #{emailBind}
+        </if>
+        <if test="userType != null">
+            AND u.USER_TYPE = #{userType}
+        </if>
+        <if test="userStatus != null">
+            AND u.USER_STATUS = #{userStatus}
         </if>
         ORDER BY u.LOGIN_TIME DESC
     </select>
 
+
+
+
+
+
+
+
+
+
+    <select id="selectUserRoleIdList" resultType="java.lang.Long">
+        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+    </select>
+
+
+
     <select id="selectUserDetail" resultMap="userVoDetailMap">
         SELECT
             u.ID, u.USERNAME, u.NICKNAME, u.GENDER, u.EMAIL, ur.ROLE_ID, r.ROLE_NAME,
-            u.ENABLED, u.LOCKED, u.TEMP, u.HEAD_IMG_URL, u.SIGNATURE, u.WEBSITE,
+            u.HEAD_IMG_URL, u.SIGNATURE, u.WEBSITE,
             u.EXPIRED_TIME, u.LOGIN_TIME, u.CREATE_TIME, u.CREATE_USER, u.UPDATE_TIME, u.UPDATE_USER
         FROM user u
         LEFT JOIN (
@@ -74,10 +130,6 @@
         ) ur ON ur.USER_ID = u.ID
         LEFT JOIN role r ON r.ID = ur.ROLE_ID
         WHERE u.ID = #{userId}
-    </select>
-
-    <select id="selectByUsername" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT * FROM user WHERE USERNAME = #{username}
     </select>
 
     <select id="selectByEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
@@ -90,7 +142,7 @@
 
     <select id="selectLoginUserByUsernameOrEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
         SELECT
-            ID, NICKNAME, HEAD_IMG_URL, GENDER, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`, ENABLED, `LOCKED`
+            ID, NICKNAME, HEAD_IMG_URL, GENDER, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`
         FROM user
         WHERE DELETED = 0
         <if test="isEmail == true">

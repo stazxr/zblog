@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.AlbumDto;
 import com.github.stazxr.zblog.domain.dto.AlbumPhotoDto;
 import com.github.stazxr.zblog.domain.dto.query.AlbumQueryDto;
@@ -58,7 +59,7 @@ public class AlbumController {
         @ApiImplicitParam(name = "albumId", value = "相册id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询相册详情", code = "queryAlbumDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询相册详情", code = "queryAlbumDetail", level = RouterLevel.PUBLIC)
     public Result queryAlbumDetail(@RequestParam Long albumId) {
         return Result.success().data(albumService.queryAlbumDetail(albumId));
     }
@@ -121,7 +122,7 @@ public class AlbumController {
     @GetMapping(value = "/queryUserAlbumList")
     @ApiOperation(value = "查询用户相册列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询用户相册列表", code = "queryUserAlbumList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询用户相册列表", code = "queryUserAlbumList", level = RouterLevel.PUBLIC)
     public Result queryUserAlbumList(AlbumQueryDto queryDto) {
         return Result.success().data(albumService.queryUserAlbumList(queryDto));
     }

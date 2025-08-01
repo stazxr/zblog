@@ -4,6 +4,10 @@ import api from '../custom-axios'
 const userApi = '/api/users'
 
 export default {
+  // 分页查询用户列表
+  queryUserListByPage: params => {
+    return api.httpRequest().get(`${userApi}/queryUserListByPage`, params)
+  },
   // 修改头像
   updateUserHeadImg: params => {
     return api.httpRequest().post(`${userApi}/updateUserHeadImg`, params)
@@ -27,10 +31,6 @@ export default {
   // 分页查询用户列表（公共方法）
   pageListOfCommon: params => {
     return api.httpRequest().get(`${userApi}/pageListOfCommon`, params)
-  },
-  // 分页查询用户列表
-  pageList: params => {
-    return api.httpRequest().get(`${userApi}/pageList`, params)
   },
   // 查询用户详情
   queryUserDetail: params => {

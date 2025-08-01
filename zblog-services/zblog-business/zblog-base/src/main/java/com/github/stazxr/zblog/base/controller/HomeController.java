@@ -1,10 +1,11 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.service.HomeService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.github.stazxr.zblog.core.base.BaseConst.PermLevel.*;
 
 /**
  * 面板管理
@@ -40,7 +39,7 @@ public class HomeController {
     @GetMapping("/getHomePanelDataCount")
     @ApiOperation(value = "获取面板统计数据")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "获取首页面板的统计数据", code = "getHomePanelDataCount", level = PUBLIC)
+    @Router(name = "获取首页面板的统计数据", code = "getHomePanelDataCount", level = RouterLevel.PUBLIC)
     public Result getHomePanelDataCount() {
         return Result.success().data(homeService.getHomePanelDataCount());
     }
@@ -57,7 +56,7 @@ public class HomeController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "type", value = "图表类型：pv、uv、uu、av", required = true, dataTypeClass = String.class)
     })
-    @Router(name = "获取首页面板的折现图表数据", code = "getHomePanelDetailDataByType", level = PUBLIC)
+    @Router(name = "获取首页面板的折现图表数据", code = "getHomePanelDetailDataByType", level = RouterLevel.PUBLIC)
     public Result getHomePanelDetailDataByType(@RequestParam String type) {
         return Result.success().data(homeService.getHomePanelDetailDataByType(type));
     }
@@ -70,7 +69,7 @@ public class HomeController {
     @GetMapping("/getHomePanelVisitorAreaCount")
     @ApiOperation(value = "获取首页面板的访客地域数据")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "获取首页面板的访客地域数据", code = "getHomePanelVisitorAreaCount", level = PUBLIC)
+    @Router(name = "获取首页面板的访客地域数据", code = "getHomePanelVisitorAreaCount", level = RouterLevel.PUBLIC)
     public Result getHomePanelVisitorAreaCount() {
         return Result.success().data(homeService.getHomePanelVisitorAreaCount());
     }

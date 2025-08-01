@@ -30,6 +30,7 @@ export default {
   },
   methods: {
     handleSetSize(size) {
+      console.log('this.$ELEMENT', this.$ELEMENT)
       this.$ELEMENT.size = size
       this.$store.dispatch('app/SetSize', size)
       this.refreshView()
@@ -46,6 +47,5 @@ export default {
       })
     }
   }
-
 }
 </script>

@@ -1,19 +1,23 @@
-const wsUrl = process.env.VUE_APP_WS_API
-const baseUrl = process.env.VUE_APP_BASE_API === '/' ? '' : process.env.VUE_APP_BASE_API
+// 获取环境变量
+const wsUrl = process.env.VUE_APP_WS_API || ''
+const baseUrl = process.env.VUE_APP_BASE_API === '/' ? '' : process.env.VUE_APP_BASE_API || ''
+
+// 创建一个函数用于拼接完整的 API 地址
+const createApiUrl = (path) => `${baseUrl}${path}`
+
 const api = {
   state: {
-    // baseUrl
     baseApi: baseUrl,
     // 通用文件上传
-    fileUploadApi: baseUrl + '/api/file/uploadFile',
+    fileUploadApi: createApiUrl('/api/file/uploadFile'),
     // 文件上传测试接口
-    testUploadFile: baseUrl + '/api/file/testUploadFile',
+    testUploadFile: createApiUrl('/api/file/testUploadFile'),
     // Druid
-    sqlApi: baseUrl + '/api/druid/index.html',
+    sqlApi: createApiUrl('/api/druid/index.html'),
     // Swagger
-    swaggerApi: baseUrl + '/doc.html',
+    swaggerApi: createApiUrl('/doc.html'),
     // webSsh
-    webSshApi: wsUrl + '/webssh'
+    webSshApi: wsUrl ? `${wsUrl}/webssh` : ''
   }
 }
 

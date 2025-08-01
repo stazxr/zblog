@@ -1,5 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
@@ -7,9 +10,7 @@ import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -42,7 +43,7 @@ public class RoleController {
     @GetMapping(value = "/list")
     @ApiOperation(value = "查询角色列表（公共）")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色列表（公共）", code = "queryRoleList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询角色列表（公共）", code = "queryRoleList", level = RouterLevel.PUBLIC)
     public Result queryRoleList(RoleQueryDto queryDto) {
         return Result.success().data(roleService.queryRoleList(queryDto));
     }
@@ -73,7 +74,7 @@ public class RoleController {
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色详情", code = "queryRoleDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询角色详情", code = "queryRoleDetail", level = RouterLevel.PUBLIC)
     public Result queryRoleDetail(@RequestParam Long roleId) {
         return Result.success().data(roleService.queryRoleDetail(roleId));
     }
@@ -130,7 +131,7 @@ public class RoleController {
     }
 
     /**
-     * 角色授权
+     * 角色授权（依赖权限查询接口）
      *
      * @param authDto 授权信息
      * @return Result
@@ -157,7 +158,7 @@ public class RoleController {
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色对应的权限列表", code = "queryPermIdsByRoleId", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询角色对应的权限列表", code = "queryPermIdsByRoleId", level = RouterLevel.PUBLIC)
     public Result queryPermIdsByRoleId(@RequestParam Long roleId) {
         return Result.success().data(roleService.queryPermIdsByRoleId(roleId));
     }

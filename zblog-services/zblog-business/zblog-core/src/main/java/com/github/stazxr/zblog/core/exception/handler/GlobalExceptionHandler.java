@@ -1,17 +1,15 @@
 package com.github.stazxr.zblog.core.exception.handler;
 
+import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.DataValidatedException;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.model.ErrorMeta;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.ResponseUtils;
 import com.github.stazxr.zblog.util.exception.AssertionViolatedException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.unit.DataSize;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,9 +36,6 @@ import java.io.IOException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @Value("${spring.servlet.multipart.max-file-size:1MB}")
-    private DataSize maxFileSize;
-
     /**
      * 实体校验异常
      *
@@ -93,8 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     public void maxUploadSizeExceededExceptionHandler(HttpServletResponse response, MaxUploadSizeExceededException e) throws IOException {
         log.error("全局捕获 -> 文件上传失败", e);
-        String eorMsg = ResultCode.FILE_SIZE_OVER_LIMIT.message().concat(":").concat(maxFileSize.toString());
-        ResponseUtils.responseJsonWriter(response, Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT, eorMsg));
+        ResponseUtils.responseJsonWriter(response, Result.failure(ResultCode.FILE_SIZE_OVER_LIMIT.message()));
     }
 
     /**
@@ -107,7 +101,7 @@ public class GlobalExceptionHandler {
     public void methodNotSupportedExceptionHandler(HttpServletRequest request, HttpServletResponse response, HttpRequestMethodNotSupportedException e) throws IOException {
         log.error("全局捕获 -> 请求方式错误: [{}] {}", request.getMethod(), request.getRequestURL(), e);
         ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT, "请求方式不正确：".concat(e.getMessage())).data(errorMeta);
+        Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT.message()).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result);
     }
 
@@ -121,7 +115,7 @@ public class GlobalExceptionHandler {
     public void badRequestExceptionHandler(HttpServletResponse response, ServletRequestBindingException e) throws IOException {
         log.error("全局捕获 -> 请求数据格式不正确", e);
         ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.BAD_REQUEST).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        Result result = Result.failure(ResultCode.BAD_REQUEST.message()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -135,7 +129,7 @@ public class GlobalExceptionHandler {
     public void resourceNotFoundExceptionHandler(HttpServletRequest request, HttpServletResponse response, NoHandlerFoundException e) throws IOException {
         log.warn("全局捕获 -> 请求资源不存在: {}", request.getRequestURL());
         ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.NOT_FOUND).code(HttpStatus.NOT_FOUND).data(errorMeta);
+        Result result = Result.failure(ResultCode.NOT_FOUND.message()).code(HttpStatus.NOT_FOUND).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.NOT_FOUND);
     }
 
@@ -147,15 +141,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Throwable.class)
     public void exceptionHandler(HttpServletResponse response, Throwable e) throws IOException {
         ErrorMeta errorMeta = new ErrorMeta(e);
-        ResultCode resultCode = ResultCode.SERVER_ERROR;
+        String errorMsg = ResultCode.SERVER_ERROR.message();
         if (e instanceof DuplicateKeyException) {
-            resultCode = ResultCode.DATA_EXIST;
+            errorMsg = ResultCode.DATA_EXIST.message();
             log.error("全局捕获 -> 系统发生未知错误[数据已存在]", e);
         } else {
             log.error("全局捕获 -> 系统发生未知错误", e);
         }
 
-        Result result = Result.failure(resultCode).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
+        Result result = Result.failure(errorMsg).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

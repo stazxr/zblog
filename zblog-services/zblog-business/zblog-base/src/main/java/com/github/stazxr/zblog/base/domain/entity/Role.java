@@ -1,16 +1,9 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
+import com.github.stazxr.zblog.bas.security.core.SecurityRole;
 import com.github.stazxr.zblog.util.StringUtils;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Objects;
 
@@ -22,61 +15,52 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@TableName("role")
-@ApiModel("角色实体")
-public class Role extends BaseEntity implements GrantedAuthority {
+public class Role extends SecurityRole {
+    private static final long serialVersionUID = 4908839100794920133L;
+
     /**
      * 角色id
      */
-    @TableId
-    @ApiModelProperty("角色id")
     private Long id;
 
     /**
      * 角色名称
      */
-    @ApiModelProperty("角色名称")
     private String roleName;
-
-    /**
-     * 角色编码
-     */
-    @ApiModelProperty("角色编码")
-    private String roleCode;
 
     /**
      * 角色描述
      */
-    @TableField(value = "`DESC`")
-    @ApiModelProperty("角色描述")
     private String desc;
 
     /**
-     * 角色状态
+     * 是否有效
      */
-    @ApiModelProperty(value = "角色状态", example = "true")
-    private Boolean enabled;
-
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    @ApiModelProperty("是否删除")
     private Boolean deleted;
 
     /**
-     * 返回角色编码
-     *
-     * @return roleCode
+     * 创建用户，存储该实体的创建用户标识。
      */
-    @Override
-    public String getAuthority() {
-        return roleCode;
-    }
+    private Long createUser;
+
+    /**
+     * 创建时间，存储该实体的创建时间。
+     */
+    private String createTime;
+
+    /**
+     * 修改用户，存储最后修改该实体的用户标识。
+     */
+    private Long updateUser;
+
+    /**
+     * 修改时间，存储该实体的最后修改时间。
+     */
+    private String updateTime;
 
     @Override
     public int hashCode() {
-        return Objects.hash(roleCode);
+        return Objects.hash(getRoleCode());
     }
 
     @Override
@@ -89,7 +73,7 @@ public class Role extends BaseEntity implements GrantedAuthority {
         }
 
         Role other = (Role) obj;
-        return !StringUtils.isEmpty(roleCode) && roleCode.equalsIgnoreCase(other.getRoleCode());
+        return !StringUtils.isEmpty(getRoleCode()) && getRoleCode().equalsIgnoreCase(other.getRoleCode());
     }
 
     @Override

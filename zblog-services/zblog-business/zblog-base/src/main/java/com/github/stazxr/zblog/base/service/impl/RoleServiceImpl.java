@@ -3,8 +3,8 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import com.github.stazxr.zblog.base.component.security.handler.UserCacheHandler;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
  */
 @Service
 @RequiredArgsConstructor
-public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
+public class RoleServiceImpl implements RoleService {
     /**
      * 内置角色列表
      */
@@ -49,8 +50,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private final UserRoleMapper userRoleMapper;
 
     private final RolePermMapper rolePermMapper;
-
-    private final UserCacheHandler userCacheHandler;
 
     /**
      * 查询角色列表
@@ -114,7 +113,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.notNull(role.getId(), "参数【id】不能为空");
         checkRole(role);
         Assert.isTrue(roleMapper.updateById(role) != 1, "修改失败");
-        userCacheHandler.clean();
+        SecurityUserCache.clean();
     }
 
     /**
@@ -133,7 +132,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.isTrue(roleMapper.deleteById(roleId) != 1, "删除失败");
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
-        userCacheHandler.clean();
+        SecurityUserCache.clean();
     }
 
     /**
@@ -154,7 +153,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             rolePermMapper.insert(rolePerm);
         }
 
-        userCacheHandler.clean();
+        SecurityUserCache.clean();
     }
 
     /**
@@ -215,7 +214,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             userRole.setUserId(userId);
             userRole.setRoleId(userRoleDto.getRoleId());
             userRoleMapper.insert(userRole);
-            userCacheHandler.removeUserFromCache(userId);
+            SecurityUserCache.clean();
         }
     }
 
@@ -234,13 +233,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
 
         userRoleMapper.batchDeleteUserRole(userRoleDto);
-        userIds.forEach(userCacheHandler::removeUserFromCache);
+        userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
     }
 
     private void checkRole(Role role) {
         Assert.notNull(role.getRoleName(), "角色名称不能为空");
         Assert.notNull(role.getRoleCode(), "角色编码不能为空");
-        Assert.notNull(role.getEnabled(), "角色状态不能为空");
+        Assert.notNull(role.isEnabled(), "角色状态不能为空");
 
         // 检查角色编码是否允许使用
         role.setRoleCode(role.getRoleCode().trim());
@@ -253,5 +252,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 检查角色编码是否存在
         dbRole = roleMapper.selectByRoleCode(role.getRoleCode());
         DataValidated.isTrue(dbRole != null && !dbRole.getId().equals(role.getId()), "角色编码已存在");
+    }
+
+    /**
+     * 获取指定资源的允许访问角色集合。
+     *
+     * @param requestUri    请求的 URL 路径，表示要访问的资源地址。
+     * @param requestMethod 请求的 HTTP 方法类型（例如 GET、POST 等），
+     *                      用于标识请求的操作类型。
+     * @return 角色编码集合。
+     */
+    @Override
+    public Set<String> selectResourceRoles(String requestUri, String requestMethod) {
+        return new HashSet<>();
     }
 }

@@ -5,15 +5,16 @@ import com.github.stazxr.zblog.bas.file.FileHandler;
 import com.github.stazxr.zblog.bas.file.FileTypeHandler;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.model.UploadFileType;
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.FileDeleteDto;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.Assert;
@@ -70,7 +71,7 @@ public class FileController {
     @PostMapping("/uploadFile")
     @ApiOperation(value = "文件上传", notes = "只需要认证")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "文件上传", code = "uploadFile", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "文件上传", code = "uploadFile", level = RouterLevel.PUBLIC)
     public Result uploadFile(@RequestPart(value = "files", required = false) MultipartFile[] files,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         Assert.isTrue((files == null || files.length < 1) && file == null, "上传失败，待上传文件列表为空");
@@ -117,7 +118,7 @@ public class FileController {
         @ApiImplicitParam(name = "isDown", value = "是否强制下载", required = true, dataTypeClass = Boolean.class, example = "false")
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "下载文件", code = "downloadFile", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "下载文件", code = "downloadFile", level = RouterLevel.OPEN)
     public Result downloadFile(@RequestParam Long fileId, Boolean isDown, HttpServletResponse response) {
         fileService.downloadFile(fileId, isDown, response);
         return Result.success("下载成功");
@@ -132,7 +133,7 @@ public class FileController {
     @PostMapping("/deleteFile")
     @ApiOperation(value = "删除文件", notes = "只需要认证")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除文件", code = "deleteFile", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "删除文件", code = "deleteFile", level = RouterLevel.PUBLIC)
     public Result deleteFile(@RequestBody FileDeleteDto paramDto) {
         fileService.deleteFile(paramDto.getFileId(), paramDto.getBusinessId());
         return Result.success("删除成功");

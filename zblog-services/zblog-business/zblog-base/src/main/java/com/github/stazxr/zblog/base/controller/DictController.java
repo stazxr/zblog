@@ -1,12 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.service.DictService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -56,7 +57,7 @@ public class DictController {
         @ApiImplicitParam(name = "pid", value = "字典pid", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询字典子列表", code = "queryDictChildList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询字典子列表", code = "queryDictChildList", level = RouterLevel.PUBLIC)
     public Result queryChildList(@RequestParam Long pid) {
         return Result.success().data(dictService.queryChildList(pid));
     }
@@ -73,7 +74,7 @@ public class DictController {
         @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询字典详情", code = "queryDictDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询字典详情", code = "queryDictDetail", level = RouterLevel.PUBLIC)
     public Result queryDictDetail(@RequestParam Long dictId) {
         return Result.success().data(dictService.queryDictDetail(dictId));
     }

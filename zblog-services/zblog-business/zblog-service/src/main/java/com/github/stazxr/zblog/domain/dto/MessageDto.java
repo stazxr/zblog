@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.domain.dto;
 
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @ApiModel("弹幕信息")
-public class MessageDto {
+public class MessageDto extends BaseDto {
     /**
      * 用户昵称
      */

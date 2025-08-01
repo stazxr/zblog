@@ -29,7 +29,7 @@ public class CollectionUtils {
      * @return Return {@code true} if the supplied Collection is {@code null} or empty.
      */
     public static boolean isEmpty(Collection<?> collection) {
-        return (collection == null || collection.isEmpty());
+        return collection == null || collection.isEmpty();
     }
 
     /**

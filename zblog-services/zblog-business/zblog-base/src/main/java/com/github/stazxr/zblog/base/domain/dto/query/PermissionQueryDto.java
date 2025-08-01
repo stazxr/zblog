@@ -18,6 +18,8 @@ import lombok.ToString;
 @ToString
 @ApiModel("权限查询参数")
 public class PermissionQueryDto extends PageParam {
+    private static final long serialVersionUID = 4162110989469140333L;
+
     /**
      * 权限id
      */

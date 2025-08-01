@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * RoleVo
@@ -8,10 +9,11 @@ import lombok.Data;
  * @author SunTao
  * @since 2022-08-29
  */
-@Data
+@Getter
+@Setter
 public class RoleVo {
     /**
-     * ID
+     * 角色id
      */
     private Long id;
 
@@ -28,7 +30,7 @@ public class RoleVo {
     /**
      * 角色描述
      */
-    private String desc;
+    private String roleDesc;
 
     /**
      * 角色状态

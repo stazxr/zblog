@@ -1,87 +1,112 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.PermissionMapper">
-    <sql id="BaseVoColumn">
-        ID, PID, PERM_NAME, ICON, SORT, PERM_CODE, PERM_TYPE, PERM_LEVEL,
-        ROUTER_PATH, COMPONENT_NAME, COMPONENT_PATH, ENABLED, I_FRAME, `CACHE`, HIDDEN,
-        CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
-    </sql>
-
-    <update id="updatePermission">
-        UPDATE permission SET
-            PID = #{pid}, PERM_NAME = #{permName}, PERM_CODE = #{permCode}, PERM_LEVEL = #{permLevel},
-            COMPONENT_NAME = #{componentName}, COMPONENT_PATH = #{componentPath}, ROUTER_PATH = #{routerPath},
-            <if test="icon != null and icon != ''">
-                ICON = #{icon},
-            </if>
-            SORT = #{sort}, `CACHE` = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
-        WHERE ID = #{id}
-    </update>
-
     <select id="selectPermList" resultType="com.github.stazxr.zblog.base.domain.vo.PermissionVo">
-        SELECT <include refid="BaseVoColumn" />
-        FROM permission
-        WHERE DELETED = 0
+        SELECT
+            p.ID, p.PID, p.PERM_NAME, p.PERM_CODE, p.PERM_TYPE, p.PERM_LEVEL,
+            p.COMPONENT_NAME, p.COMPONENT_PATH, p.ROUTER_PATH,
+            p.ICON, p.SORT, p.CACHEABLE, p.HIDDEN, p.I_FRAME, p.ENABLED
+        FROM permission p WHERE p.DELETED = 0
         <if test="blurry != null and blurry != ''">
             <bind name="blurryBind" value="'%' + blurry + '%'"/>
             AND (
-                PERM_NAME LIKE #{blurryBind} OR PERM_CODE LIKE #{blurryBind} OR
-                COMPONENT_NAME LIKE #{blurryBind} OR COMPONENT_PATH LIKE #{blurryBind}
+                p.PERM_NAME LIKE #{blurryBind} OR p.PERM_CODE LIKE #{blurryBind} OR
+                p.COMPONENT_NAME LIKE #{blurryBind} OR p.COMPONENT_PATH LIKE #{blurryBind}
             )
         </if>
         <if test="enabled != null">
-            AND ENABLED = #{enabled}
+            AND p.ENABLED = #{enabled}
         </if>
         <if test="iFrame != null">
-            AND I_FRAME = #{iFrame}
+            AND p.I_FRAME = #{iFrame}
         </if>
         <if test="onlyShowMenu != null and onlyShowMenu == true">
-            AND PERM_TYPE != 3
+            AND p.PERM_TYPE != 3
         </if>
-        ORDER BY SORT, PERM_NAME
+        ORDER BY p.SORT, p.PERM_NAME
     </select>
 
     <select id="selectPermDetail" resultType="com.github.stazxr.zblog.base.domain.vo.PermissionVo">
-        SELECT <include refid="BaseVoColumn" />
-        FROM permission
-        WHERE DELETED = 0 AND ID = #{permId}
+        SELECT
+            p.ID, p.PID, p.PERM_NAME, p.PERM_CODE, p.PERM_TYPE, p.PERM_LEVEL,
+            p.COMPONENT_NAME, p.COMPONENT_PATH, p.ROUTER_PATH, p.ICON, p.SORT,
+            p.CACHEABLE, p.HIDDEN, p.I_FRAME, p.ENABLED, p.CREATE_TIME, p.UPDATE_TIME,
+        (SELECT USERNAME FROM user u WHERE u.ID = p.CREATE_USER) AS CREATE_USERNAME,
+        (SELECT USERNAME FROM user u WHERE u.ID = p.UPDATE_USER) AS UPDATE_USERNAME
+        FROM permission p
+        WHERE p.DELETED = 0 AND p.ID = #{permId}
+    </select>
+
+    <select id="selectPermInterfaces" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT
+            RESOURCE_NAME AS NAME, RESOURCE_URI AS URI, RESOURCE_METHOD AS METHOD
+        FROM resource WHERE RESOURCE_CODE IN (
+            SELECT PERM_CODE FROM permission WHERE ID = #{permId} AND DELETED = 0
+        )
+    </select>
+
+    <select id="selectPermRoles" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
+        SELECT ID, ROLE_NAME, ROLE_CODE, ENABLED FROM role WHERE DELETED = 0 AND ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
+        )
+        <if test="blurry != null and blurry != ''">
+            <bind name="blurryBind" value="'%' + blurry + '%'"/>
+            AND (
+                ROLE_NAME LIKE #{blurryBind} OR ROLE_CODE LIKE #{blurryBind}
+            )
+        </if>
+    </select>
+
+    <select id="selectPermLogs" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
+        SELECT
+            ID, LOG_TYPE, OPERATE_USER, EVENT_TIME, `DESCRIPTION`,
+            REQUEST_IP, REQUEST_URI, REQUEST_METHOD, ADDRESS, BROWSER, COST_TIME,
+            REQUEST_PARAM, EXEC_RESULT, EXEC_MESSAGE
+        FROM log
+
+        <if test="username != null and username != ''">
+            <bind name="usernameBind" value="'%' + username + '%'"/>
+            AND OPERATE_USER LIKE #{usernameBind}
+        </if>
+        <if test='logType != null and logType != ""'>
+            AND LOG_TYPE = #{logType}
+        </if>
+        <if test="execResult != null">
+            AND EXEC_RESULT = #{execResult}
+        </if>
+        <if test="permId != null and permId != ''">
+            AND CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (
+            SELECT CONCAT(URI, '_', METHOD) FROM res WHERE CODE = (
+                SELECT PERM_CODE FROM permission WHERE ID = #{permId} AND DELETED = 0
+            )
+            )
+        </if>
+        ORDER BY EVENT_TIME DESC
     </select>
 
     <select id="selectPermCodes" resultType="com.github.stazxr.zblog.base.domain.vo.PermCodeVo">
         SELECT
-            r.NAME, r.CODE value, r.DEFAULT_LEVEL permLevel,
-            (SELECT IF(COUNT(1) > 0, true, false) FROM permission WHERE PERM_CODE = r.CODE) DISABLED
-        FROM router r
-        <where>
-            <if test="searchKey != null and searchKey != ''">
-                <bind name="searchKeyBind" value="'%' + searchKey + '%'"/>
-                r.NAME LIKE #{searchKeyBind} OR r.CODE LIKE #{searchKeyBind}
-            </if>
-        </where>
-        ORDER BY r.NAME
+            r.RESOURCE_NAME NAME, r.RESOURCE_CODE value, r.RESOURCE_LEVEL level,
+            (SELECT IF(COUNT(1) > 0, true, false) FROM permission p WHERE p.DELETED = 0 AND p.PERM_CODE = r.RESOURCE_CODE) DISABLED
+        FROM resource r WHERE r.RESOURCE_CODE IS NOT NULL
+        <if test="searchKey != null and searchKey != ''">
+            <bind name="searchKeyBind" value="'%' + searchKey + '%'"/>
+            AND r.RESOURCE_NAME LIKE #{searchKeyBind} OR r.RESOURCE_CODE LIKE #{searchKeyBind}
+        </if>
+        ORDER BY r.RESOURCE_NAME
     </select>
 
-    <select id="selectAllMenu" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
-        SELECT * FROM permission WHERE DELETED = 0 AND PERM_TYPE != 3 ORDER BY SORT, PERM_NAME
+    <select id="selectResourceByPermCode" resultType="com.github.stazxr.zblog.bas.router.Resource">
+        SELECT * FROM resource WHERE RESOURCE_CODE = #{permCode}
     </select>
 
-    <select id="selectMenuByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
-        SELECT * FROM permission WHERE DELETED = 0 AND PERM_TYPE != 3 AND ENABLED = 1 AND (
-            PERM_LEVEL IN (1, 2) OR (
-                PERM_LEVEL = 3 AND ID IN (
-                    SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
-                        SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
-                            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
-                        )
-                    )
-                )
-            )
-        ) ORDER BY SORT, PERM_NAME
-    </select>
 
-    <select id="selectByPermName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
-        SELECT * FROM permission WHERE PERM_NAME = #{permName} AND DELETED = 0
-    </select>
+
+
+
+
+
+
 
     <select id="selectByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
         SELECT * FROM permission WHERE COMPONENT_NAME = #{componentName} AND DELETED = 0
@@ -102,4 +127,15 @@
             SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND PERM_CODE IS NOT NULL
         )
     </select>
+
+    <update id="updatePermission">
+        UPDATE permission SET
+        PID = #{pid}, PERM_NAME = #{permName}, PERM_CODE = #{permCode}, PERM_LEVEL = #{permLevel},
+        COMPONENT_NAME = #{componentName}, COMPONENT_PATH = #{componentPath}, ROUTER_PATH = #{routerPath},
+        <if test="icon != null and icon != ''">
+            ICON = #{icon},
+        </if>
+        SORT = #{sort}, CACHEABLE = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
+        WHERE ID = #{id}
+    </update>
 </mapper>

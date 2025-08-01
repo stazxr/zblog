@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 权限编码实体
@@ -8,10 +9,11 @@ import lombok.Data;
  * @author SunTao
  * @since 2022-08-26
  */
-@Data
+@Getter
+@Setter
 public class PermCodeVo {
     /**
-     * 路由名称
+     * 权限名称
      */
     private String name;
 
@@ -21,9 +23,9 @@ public class PermCodeVo {
     private String value;
 
     /**
-     * 权限默认级别
+     * 访问级别（默认）
      */
-    private Integer permLevel;
+    private Integer level;
 
     /**
      * 是否禁用（select）

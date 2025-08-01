@@ -1,35 +1,55 @@
 <template>
   <div class="app-container">
     <div class="head-container">
-      <div>
-        <el-form ref="searchForm" :inline="true" size="small">
-          <el-form-item label="模糊搜索">
-            <el-input v-model="filters.blurry" clearable placeholder="模糊搜索" style="width: 200px" class="filter-item" @keyup.enter.native="search" />
-          </el-form-item>
-          <el-form-item label="状态">
-            <el-select v-model="filters.enabled" clearable placeholder="状态" style="width: 90px" class="filter-item">
-              <el-option label="启用" value="true" />
-              <el-option label="禁用" value="false" />
+      <div class="search-opts">
+        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="160">
+          <muses-search-form-item label="" prop="search-blurry">
+            <el-input
+              id="search-blurry"
+              v-model="filters.blurry"
+              placeholder="模糊搜索"
+              clearable
+              @keyup.enter.native="search"
+            />
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-enabled">
+            <el-select id="search-enabled" v-model="filters.enabled" placeholder="权限状态" clearable>
+              <el-option label="启用" :value="true" />
+              <el-option label="禁用" :value="false" />
             </el-select>
-          </el-form-item>
-          <el-form-item label="仅显示菜单">
-            <el-switch v-model="filters.onlyShowMenu" @change="search" />
-          </el-form-item>
-          <el-form-item>
-            <el-button class="filter-item" size="small" type="success" icon="el-icon-search" @click="search">查询</el-button>
-            <el-button class="filter-item" size="small" type="warning" icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
-          </el-form-item>
-        </el-form>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-onlyShowMenu">
+            <el-select id="search-onlyShowMenu" v-model="filters.onlyShowMenu" placeholder="是否只显示菜单" clearable>
+              <el-option label="是" :value="true" />
+              <el-option label="否" :value="false" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item btn btn-open-name="" btn-close-name="">
+            <el-button type="success" icon="el-icon-search" @click="search()">查询</el-button>
+            <el-button type="warning" icon="el-icon-refresh-right" @click="resetSearch()">重置</el-button>
+          </muses-search-form-item>
+        </muses-search-form>
       </div>
-      <div>
-        <el-button v-perm="['addPerm']" size="small" type="primary" @click="addPerm()">
-          新增
-        </el-button>
+      <div class="crud-opts">
+        <span class="crud-opts-left">
+          <el-button v-perm="['PERMA001']" type="success" @click="addPerm">新增</el-button>
+          <el-button v-perm="['PERMQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['PERMU001']" :disabled="row === null" type="primary" @click="editPerm">编辑</el-button>
+          <el-button v-perm="['PERMD001']" :disabled="row === null" type="danger" @click="deletePerm">删除</el-button>
+        </span>
       </div>
     </div>
-
     <div class="components-container">
-      <el-table v-loading="tableLoading" :data="tableData" row-key="id" :tree-props="tableProps" border>
+      <el-table
+        v-loading="tableLoading"
+        :data="tableData"
+        :header-cell-style="{background:'#FAFAFA'}"
+        highlight-current-row
+        row-key="id"
+        :tree-props="tableProps"
+        border
+        @current-change="handleCurrentChange"
+      >
         <el-table-column :show-overflow-tooltip="true" label="菜单标题" width="200px" prop="permName">
           <template v-slot="scope">
             <span>
@@ -40,44 +60,41 @@
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" width="100px" prop="routerPath" label="组件路径" />
         <el-table-column :show-overflow-tooltip="true" width="150px" prop="permCode" label="权限编码" />
-        <el-table-column :show-overflow-tooltip="true" width="150px" prop="componentName" label="组件名称" />
-        <el-table-column :show-overflow-tooltip="true" prop="componentPath" label="组件路径" />
-        <el-table-column prop="permType" label="类型" align="center" width="75px">
+        <el-table-column :show-overflow-tooltip="true" prop="routerPath" label="路由地址" />
+        <el-table-column :show-overflow-tooltip="true" prop="componentName" label="组件名称" />
+        <el-table-column :show-overflow-tooltip="true" width="250px" prop="componentPath" label="组件路径" />
+        <el-table-column prop="cacheable" label="是否缓存" align="center" width="80px">
           <template v-slot="scope">
-            <el-tag v-if="scope.row['permType'] === 1" size="small">目录</el-tag>
-            <el-tag v-else-if="scope.row['permType'] === 2" size="small" type="success">菜单</el-tag>
-            <el-tag v-else-if="scope.row['permType'] === 3" size="small" type="info">按钮</el-tag>
+            <el-tag v-if="scope.row['cacheable'] === true" type="info">是</el-tag>
+            <el-tag v-else-if="scope.row['cacheable'] === false" type="info">否</el-tag>
             <span v-else> - </span>
           </template>
         </el-table-column>
-        <el-table-column prop="permLevel" label="级别" align="center" width="75px">
+        <el-table-column prop="permType" label="类型" align="center" width="80px">
           <template v-slot="scope">
-            <el-tag v-if="scope.row['permLevel'] === 1" size="small" type="warning">公开</el-tag>
-            <el-tag v-else-if="scope.row['permLevel'] === 2" size="small" type="info">认证</el-tag>
-            <el-tag v-else-if="scope.row['permLevel'] === 3" size="small" type="success">授权</el-tag>
+            <el-tag v-if="scope.row['permType'] === 1">目录</el-tag>
+            <el-tag v-else-if="scope.row['permType'] === 2" type="success">菜单</el-tag>
+            <el-tag v-else-if="scope.row['permType'] === 3" type="info">按钮</el-tag>
             <span v-else> - </span>
           </template>
         </el-table-column>
-        <el-table-column prop="enabled" label="状态" width="75px">
+        <el-table-column prop="permLevel" label="访问级别" align="center" width="80px">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.enabled" size="small">启用</el-tag>
-            <el-tag v-else size="small" type="warning">禁用</el-tag>
+            <el-tag v-if="scope.row['permLevel'] === 1" type="warning">公开</el-tag>
+            <el-tag v-else-if="scope.row['permLevel'] === 2" type="success">认证</el-tag>
+            <el-tag v-else-if="scope.row['permLevel'] === 4">授权</el-tag>
+            <span v-else> - </span>
           </template>
         </el-table-column>
-        <el-table-column prop="menuSort" label="排序" align="center" width="75px">
+        <el-table-column prop="enabled" label="状态" width="80px">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.enabled">启用</el-tag>
+            <el-tag v-else type="warning">禁用</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="menuSort" label="排序" align="center" width="80px">
           <template v-slot="scope">
             {{ scope.row.sort }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="200">
-          <template v-slot="scope">
-            <el-button-group>
-              <el-button type="info" size="mini" @click="showPermDetail(scope.row)">详情</el-button>
-              <el-button v-perm="['editPerm']" type="success" size="mini" @click="editPerm(scope.row)">编辑</el-button>
-              <el-popconfirm v-perm="['deletePerm']" title="操作不可撤销，确定删除吗？" @confirm="deletePerm(scope.row)">
-                <el-button v-show="allowDelete(scope.row)" slot="reference" type="danger" size="mini">删除</el-button>
-              </el-popconfirm>
-            </el-button-group>
           </template>
         </el-table-column>
         <div slot="empty">
@@ -86,39 +103,39 @@
       </el-table>
     </div>
 
+    <!-- 查看详情 -->
+    <detailDialog
+      ref="detailDialogRef"
+      :dialog-visible="detailDialogVisible"
+      :data-id="row && row.id"
+      @showDetailDone="showDetailDone"
+    />
     <!-- 新增 / 编辑 -->
     <addOrEditDialog
       ref="addOrEditDialogRef"
       :dialog-visible="addOrEditDialogVisible"
       :dialog-title="addOrEditDialogTitle"
-      :data-id="editId"
+      :data-id="dataId"
       @addOrEditDone="addOrEditDone"
-    />
-    <!-- 查看详情 -->
-    <showDetailDialog
-      ref="showDetailDialogRef"
-      :dialog-visible="showDetailDialogVisible"
-      :data-id="detailId"
-      @showDetailDone="showDetailDone"
     />
   </div>
 </template>
 
 <script>
+import detailDialog from '@/views/admin/system/perm/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/perm/template/addOrEditDialog'
-import showDetailDialog from '@/views/admin/system/perm/template/showDetailDialog'
 export default {
   name: 'Perm',
   components: {
-    addOrEditDialog,
-    showDetailDialog
+    detailDialog,
+    addOrEditDialog
   },
   data() {
     return {
       filters: {
         blurry: '',
-        enabled: '',
-        onlyShowMenu: false
+        enabled: null,
+        onlyShowMenu: null
       },
       tableData: [],
       tableProps: {
@@ -126,30 +143,33 @@ export default {
         hasChildren: 'hasChildren'
       },
       tableLoading: false,
-      editId: null,
+      row: null,
+      detailDialogVisible: false,
       addOrEditDialogVisible: false,
       addOrEditDialogTitle: '',
-      detailId: null,
-      showDetailDialogVisible: false
+      dataId: null
     }
   },
   mounted() {
     this.listTableData()
   },
   methods: {
+    handleCurrentChange(row) {
+      this.row = row
+    },
     search() {
       this.listTableData()
     },
     resetSearch() {
       this.filters.blurry = ''
-      this.filters.enabled = ''
-      this.filters.onlyShowMenu = false
+      this.filters.enabled = null
+      this.filters.onlyShowMenu = null
       this.listTableData()
     },
     listTableData() {
       const param = { ... this.filters }
       this.tableLoading = true
-      this.$mapi.perm.queryPermTreeList(param).then(res => {
+      this.$mapi.perm.queryPermTree(param).then(res => {
         this.tableData = res.data
       }).catch(_ => {
         this.tableData = []
@@ -157,22 +177,30 @@ export default {
         this.tableLoading = false
       })
     },
+    showDetail() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的权限')
+        return
+      }
+      this.$nextTick(() => {
+        this.detailDialogVisible = true
+        this.$refs.detailDialogRef.initData()
+      })
+    },
+    showDetailDone() {
+      this.detailDialogVisible = false
+    },
     allowDelete(row) {
       return !row.children || !row.children.length || row.children.length === 0
     },
-    showPermDetail(row) {
-      this.detailId = row.id.toString()
-      this.showDetailDialogVisible = true
-      this.$refs.showDetailDialogRef.initData()
-    },
     addPerm() {
-      this.editId = null
+      this.dataId = null
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增权限'
       this.$refs.addOrEditDialogRef.initData()
     },
     editPerm(row) {
-      this.editId = row.id.toString()
+      this.dataId = row.id.toString()
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '编辑权限'
       this.$refs.addOrEditDialogRef.initData()
@@ -185,18 +213,11 @@ export default {
     },
     addOrEditDone(result = false) {
       this.editId = null
-      this.addOrEditDialogVisible = false
       this.addOrEditDialogTitle = ''
+      this.addOrEditDialogVisible = false
       if (result) {
         this.listTableData()
       }
-    },
-    showDetailDone() {
-      this.detailId = null
-      this.showDetailDialogVisible = false
-    },
-    hasPerm(value) {
-      return this.checkPerm(value)
     }
   }
 }

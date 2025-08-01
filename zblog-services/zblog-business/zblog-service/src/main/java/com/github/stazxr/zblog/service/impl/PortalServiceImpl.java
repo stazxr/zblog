@@ -6,10 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.encryption.util.RsaUtils;
+import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import com.github.stazxr.zblog.base.component.security.jwt.JwtTokenGenerator;
-import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
-import com.github.stazxr.zblog.base.converter.UserConverter;
 import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserTokenStorage;
@@ -107,8 +106,6 @@ public class PortalServiceImpl implements PortalService {
     private final CommentConverter commentConverter;
 
     private final UserMapper userMapper;
-
-    private final UserConverter userConverter;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -324,33 +321,34 @@ public class PortalServiceImpl implements PortalService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserVo webLogin(HttpServletRequest request, UserLoginDto loginDto) {
-        String username = loginDto.getUsername();
-        String password = loginDto.getPassword();
-        Assert.isTrue(StringUtils.isBlank(username), "登录账号不能为空");
-        Assert.isTrue(StringUtils.isBlank(password), "登录密码不能为空");
-
-        // 判断用户名或邮箱是否存在
-        boolean isEmail = username.contains("@");
-        User user = userMapper.selectLoginUserByUsernameOrEmail(username, isEmail);
-        DataValidated.notNull(user, "账户不存在");
-        DataValidated.isTrue(!user.isEnabled(), "账户未启用");
-        DataValidated.isTrue(user.getLocked(), "账户被锁定");
-
-        // 对密码进行解密
-        try {
-            Resource resource = new ClassPathResource("pri.key");
-            String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
-            password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
-        } catch (Exception e) {
-            throw new ServiceException("密码解析失败，请联系管理员", e);
-        }
-
-        DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码错误");
-
-        // 更新用户登录时间
-        user.setLoginTime(DateUtils.formatNow());
-        userMapper.updateById(user);
-        return parseTokenUser(user, request);
+//        String username = loginDto.getUsername();
+//        String password = loginDto.getPassword();
+//        Assert.isTrue(StringUtils.isBlank(username), "登录账号不能为空");
+//        Assert.isTrue(StringUtils.isBlank(password), "登录密码不能为空");
+//
+//        // 判断用户名或邮箱是否存在
+//        boolean isEmail = username.contains("@");
+//        User user = userMapper.selectLoginUserByUsernameOrEmail(username, isEmail);
+//        DataValidated.notNull(user, "账户不存在");
+//        DataValidated.isTrue(!user.isEnabled(), "账户未启用");
+//        DataValidated.isTrue(user.getLocked(), "账户被锁定");
+//
+//        // 对密码进行解密
+//        try {
+//            Resource resource = new ClassPathResource("pri.key");
+//            String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
+//            password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
+//        } catch (Exception e) {
+//            throw new ServiceException("密码解析失败，请联系管理员", e);
+//        }
+//
+//        DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码错误");
+//
+//        // 更新用户登录时间
+//        user.setLoginTime(DateUtils.formatNow());
+////        userMapper.updateById(user);
+//        return parseTokenUser(user, request);
+        return null;
     }
 
     /**
@@ -851,21 +849,21 @@ public class PortalServiceImpl implements PortalService {
             newUser.setGender(Gender.HIDE.getType());
             newUser.setHeadImgUrl(userInfo.getString("figureurl_qq_2"));
             newUser.setLoginTime(DateUtils.formatNow());
-            newUser.setChangePwd(false);
-            newUser.setLocked(false);
-            newUser.setTemp(false);
-            newUser.setAdmin(false);
-            newUser.setEnabled(true);
-            userMapper.insert(newUser);
+//            newUser.setChangePwd(false);
+//            newUser.setLocked(false);
+//            newUser.setTemp(false);
+//            newUser.setAdmin(false);
+//            newUser.setEnabled(true);
+//            userMapper.insert(newUser);
 
             // 插入用户与 QQ 的关联关系
             portalMapper.insertUserOauthQqRelation(newUser.getId(), openId);
             return parseTokenUser(newUser, request);
         } else {
             // 用户已存在，查询用户信息
-            User user = userMapper.selectById(userId);
+            User user = userMapper.selectUserById(userId);
             user.setLoginTime(DateUtils.formatNow());
-            userMapper.updateById(user);
+//            userMapper.updateById(user);
             return parseTokenUser(user, request);
         }
     }
@@ -878,15 +876,15 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public UserVo queryUserDetail(Long userId) {
-        if (userId != null) {
-            User user = userMapper.selectById(userId);
-            UserVo userVo = userConverter.entityToVo(user);
-            userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
-            userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
-            userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
-            userVo.setUserToken(jwtTokenStorage.getAccessToken(userId));
-            return userVo;
-        }
+//        if (userId != null) {
+//            User user = userMapper.selectUserById(userId);
+//            UserVo userVo = userConverter.entityToVo(user);
+//            userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
+//            userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
+//            userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
+//            userVo.setUserToken(jwtTokenStorage.getAccessToken(String.valueOf(userId)));
+//            return userVo;
+//        }
 
         return null;
     }
@@ -913,24 +911,25 @@ public class PortalServiceImpl implements PortalService {
     }
 
     private UserVo parseTokenUser(User user, HttpServletRequest request) {
-        UserVo userVo = userConverter.entityToVo(user);
+//        UserVo userVo = userConverter.entityToVo(user);
 
         // 查询用户点赞列表
-        userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
-        userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
-        userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
-
-        // 封装 Token
-        int tokenVersion = 1;
-        String token = jwtTokenGenerator.generateToken(request, user, tokenVersion, null);
-        UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userVo.getId()).lastedToken(token).version(tokenVersion).build();
-        userService.storageUserToken(tokenStorage, 1);
-        Constants.SysCacheKey ssoTknKey = Constants.SysCacheKey.ssoTkn;
-        String ssoTknCacheKey = String.format(ssoTknKey.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
-        GlobalCache.put(ssoTknCacheKey, token, ssoTknKey.duration());
-
-        userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
-        return userVo;
+//        userVo.setCommentLikeSet(portalMapper.selectCommentLikeSet(userVo.getId()));
+//        userVo.setTalkLikeSet(portalMapper.selectTalkLikeSet(userVo.getId()));
+//        userVo.setArticleLikeSet(portalMapper.selectArticleLikeSet(userVo.getId()));
+//
+//        // 封装 Token
+//        int tokenVersion = 1;
+//        String token = jwtTokenGenerator.generateToken(request, String.valueOf(user.getId()), tokenVersion, null);
+//        UserTokenStorage tokenStorage = UserTokenStorage.builder().userId(userVo.getId()).lastedToken(token).version(tokenVersion).build();
+//        userService.storageUserToken(tokenStorage, 1);
+//        Constants.SysCacheKey ssoTknKey = Constants.SysCacheKey.ssoTkn;
+//        String ssoTknCacheKey = String.format(ssoTknKey.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
+//        GlobalCache.put(ssoTknCacheKey, token, ssoTknKey.duration());
+//
+//        userVo.setUserToken(Constants.AUTHENTICATION_PREFIX.concat(token));
+//        return userVo;
+        return null;
     }
 
     private String getWebInfoFromCache() {

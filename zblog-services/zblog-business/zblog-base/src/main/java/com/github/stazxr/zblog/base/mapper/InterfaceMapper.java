@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.stazxr.zblog.base.domain.entity.Interface;
 import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
-import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

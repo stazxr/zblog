@@ -4,7 +4,7 @@ import api from './custom-axios'
 export default {
   // 登录
   login: params => {
-    return api.httpRequest().post(`/api/process`, params)
+    return api.httpRequest().post(`/api/login`, params)
   },
   // 登出
   logout: params => {

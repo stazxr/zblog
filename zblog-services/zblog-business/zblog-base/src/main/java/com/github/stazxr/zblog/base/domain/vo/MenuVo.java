@@ -2,7 +2,6 @@ package com.github.stazxr.zblog.base.domain.vo;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.stazxr.zblog.base.domain.bo.MenuMeta;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,28 +16,35 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MenuVo implements Serializable {
+    private static final long serialVersionUID = 1937699132190889664L;
+
     /**
-     * 菜单名称
+     * TODO 菜单名称
      */
     private String name;
 
     /**
-     * 菜单路径
+     * TODO 菜单路径
      */
     private String path;
 
     /**
-     * 是否隐藏
+     * 菜单是否显示
      */
-    private Boolean hidden;
+    private Boolean show;
 
     /**
-     * 是否重定向
+     * TODO 是否展示
+     */
+    private Boolean alwaysShow;
+
+    /**
+     * 重定向路径，"noredirect" 代表不允许重定向
      */
     private String redirect;
 
     /**
-     * 组件路径
+     * TODO 组件路径
      *  Layout
      *  ParentView
      *  return (resolve) => require([`@/views/${component}`], resolve)
@@ -46,14 +52,9 @@ public class MenuVo implements Serializable {
     private String component;
 
     /**
-     * 是否展示
+     * 菜单元数据（菜单标题，菜单图标，是否展示等）
      */
-    private Boolean alwaysShow;
-
-    /**
-     * 基础数据
-     */
-    private MenuMeta meta;
+    private MenuMetaVo meta;
 
     /**
      * 子菜单

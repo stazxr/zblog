@@ -1,15 +1,9 @@
 <template>
   <div>
-    <el-table v-loading="tableLoading" :data="tableData" border style="width: 100%;">
-      <el-table-column :show-overflow-tooltip="true" prop="uri" label="请求地址" />
-      <el-table-column :show-overflow-tooltip="true" prop="method" label="请求方式" />
-      <el-table-column :show-overflow-tooltip="true" prop="type" label="接口状态" align="center">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row['type'] === 1" size="small">正常</el-tag>
-          <el-tag v-else-if="scope.row['type'] === 2" size="small" type="danger">禁止访问</el-tag>
-          <span v-else> - </span>
-        </template>
-      </el-table-column>
+    <el-table v-loading="tableLoading" :data="tableData" :header-cell-style="{background:'#FAFAFA'}" highlight-current-row border style="width: 100%;">
+      <el-table-column :show-overflow-tooltip="true" prop="name" label="接口名称" />
+      <el-table-column :show-overflow-tooltip="true" prop="uri" label="接口地址" />
+      <el-table-column :show-overflow-tooltip="true" prop="method" label="接口方式" />
     </el-table>
     <!-- 分页组件 -->
     <el-pagination
@@ -52,7 +46,7 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.perm.queryPermInterfaces(param).then(res => {
+      this.$mapi.perm.pagePermInterfaces(param).then(res => {
         const { data } = res
         this.tableData = data.list
         this.total = data.total

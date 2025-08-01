@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.PageDto;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.service.PageService;
@@ -54,7 +55,7 @@ public class WebPageController {
         @ApiImplicitParam(name = "pageId", value = "页面id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询页面详情", code = "queryPageDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询页面详情", code = "queryPageDetail", level = RouterLevel.PUBLIC)
     public Result queryPageDetail(@RequestParam Long pageId) {
         return Result.success().data(pageService.queryPageDetail(pageId));
     }

@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 公共实体类，包含基本的创建和修改信息。
@@ -16,12 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  * @author SunTao
  * @since 2020-11-15
  */
-@Slf4j
 @Getter
 @Setter
 @ApiModel("公共实体")
-public class BaseEntity extends Model<BaseEntity> {
-	private static final long serialVersionUID = 5802079762879978466L;
+public abstract class BaseEntity extends Model<BaseEntity> {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 创建用户，存储该实体的创建用户标识。

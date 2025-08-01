@@ -17,6 +17,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class BaseDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 创建用户
      */

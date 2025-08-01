@@ -6,7 +6,7 @@
   </a>
 </p>
 <p align=center>
-   基于 Springboot + Vue 开发的前后端分离博客
+   基于 Springboot + Vue 开发的前后端分离博客（暂停维护）
 </p>
 
 <p align="center">

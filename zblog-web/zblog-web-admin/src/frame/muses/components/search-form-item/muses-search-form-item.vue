@@ -2,7 +2,7 @@
   <el-form-item
     ref="musesSearchFormItem"
     name="musesSearchFormItem"
-    :style="{ minWidth: expandInfo1.minWidth + 'px' }"
+    :style="{ minWidth: parentExpandInfo.itemWidth + 'px', paddingRight: btn ? '0px' : parentExpandInfo.paddingRight + 'px' }"
     :class="{ 'muses-auto-btn': isShowBtn, 'muses-hidden': isHidden }"
     v-bind="$attrs"
     v-on="$listeners"
@@ -10,9 +10,9 @@
     <slot />
     <slot name="label" />
     <!-- 收起/展开 -->
-    <el-button v-show="isNeedShowBtn && isShowBtn" class="muses-expend" type="text" @click="handleClick1">
-      {{ expandInfo1.isShowAll ? btnCloseName : btnOpenName }}
-      <i class="el-icon-d-arrow-left" :class="{'is-active': !expandInfo1.isShowAll }" />
+    <el-button v-show="isNeedShowBtn && isShowBtn" class="muses-expend" type="text" @click="parentHandleClick">
+      {{ parentExpandInfo.isShowAll ? btnCloseName : btnOpenName }}
+      <i class="el-icon-d-arrow-left" :class="{'is-active': !parentExpandInfo.isShowAll }" />
     </el-button>
   </el-form-item>
 </template>
@@ -47,12 +47,12 @@ export default {
       return this.expandInfo.isShowAll ? false : !this.isShow
     },
     isNeedShowBtn() {
-      return this.expandInfo.nodeLength > this.expandInfo.count
+      return this.expandInfo.nodeLength > this.expandInfo.showNodeCount
     },
-    expandInfo1() {
+    parentExpandInfo() {
       return this.expandInfo
     },
-    handleClick1() {
+    parentHandleClick() {
       return this.handleClick
     }
   },
@@ -67,17 +67,12 @@ export default {
   inject: ['expandInfo', 'handleClick'],
   methods: {
     setBase(val) {
-      let base = base = (1 / val.count) * 100 + '%'
-      this.$refs.musesSearchFormItem.$el['style'].flexBasis = base
+      this.$refs.musesSearchFormItem.$el['style'].flexBasis = (1 / val.showNodeCount) * 100 + '%'
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-.el-form-item {
-  // 平均分配每一个 el-form-item 的长度
-  // flex: 1;
-}
 .muses-auto-btn {
   display: block !important;
   max-width: none;
@@ -105,8 +100,8 @@ export default {
 .muses-hidden {
   display: none;
 }
-//.justify-content-flex-end {
-//  display: flex;
-//  justify-content: flex-end;
-//}
+.justify-content-flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
 </style>

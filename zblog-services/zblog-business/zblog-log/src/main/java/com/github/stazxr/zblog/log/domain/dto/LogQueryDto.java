@@ -18,6 +18,8 @@ import lombok.ToString;
 @ToString
 @ApiModel("日志查询参数")
 public class LogQueryDto extends PageParam {
+    private static final long serialVersionUID = -7041770535475955047L;
+
     /**
      * 操作人
      */

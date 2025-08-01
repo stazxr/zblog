@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.domain.dto;
 
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @ApiModel("页面信息")
-public class PageDto {
+public class PageDto extends BaseDto {
     /**
      * 页面id
      */

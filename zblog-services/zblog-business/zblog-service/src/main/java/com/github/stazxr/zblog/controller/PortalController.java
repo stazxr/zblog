@@ -1,11 +1,12 @@
 package com.github.stazxr.zblog.controller;
 
 import com.github.stazxr.zblog.bas.idempotence.FormResubmitCheck;
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.bo.QqLoginParam;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.*;
 import com.github.stazxr.zblog.domain.dto.query.AlbumPhotoQueryDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
@@ -44,7 +45,7 @@ public class PortalController {
     @GetMapping("/queryBlogInfo")
     @ApiOperation(value = "查询博客前台信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询博客前台信息", code = "queryBlogWebInfo", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询博客前台信息", code = "queryBlogWebInfo", level = RouterLevel.OPEN)
     public Result queryBlogWebInfo() {
         return Result.success().data(portalService.queryBlogWebInfo());
     }
@@ -58,7 +59,7 @@ public class PortalController {
     @PostMapping(value = "/recordVisitor")
     @ApiOperation(value = "记录访客信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "记录访客信息", code = "recordVisitor", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "记录访客信息", code = "recordVisitor", level = RouterLevel.OPEN)
     public Result recordVisitor(HttpServletRequest request) {
         portalService.recordVisitor(request);
         return Result.success();
@@ -73,7 +74,7 @@ public class PortalController {
     @GetMapping("/queryArticleList")
     @ApiOperation(value = "分页查询前台文章列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询前台文章列表", code = "queryWebArticleList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "分页查询前台文章列表", code = "queryWebArticleList", level = RouterLevel.OPEN)
     public Result queryArticleList(ArticleQueryDto queryDto) {
         return Result.success().data(portalService.queryArticleList(queryDto));
     }
@@ -90,7 +91,7 @@ public class PortalController {
         @ApiImplicitParam(name = "articleId", value = "文章id", dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台文章详情", code = "queryWebArticleDetail", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台文章详情", code = "queryWebArticleDetail", level = RouterLevel.OPEN)
     public Result queryArticleDetail(@RequestParam(required = false) Long articleId) {
         return Result.success().data(portalService.queryArticleDetail(articleId));
     }
@@ -103,7 +104,7 @@ public class PortalController {
     @GetMapping("/queryMessageList")
     @ApiOperation(value = "查询前台弹幕列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台弹幕列表", code = "queryWebMessageList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台弹幕列表", code = "queryWebMessageList", level = RouterLevel.OPEN)
     public Result queryMessageList() {
         return Result.success().data(portalService.queryMessageList());
     }
@@ -118,7 +119,7 @@ public class PortalController {
     @PostMapping(value = "/saveMessage")
     @ApiOperation(value = "弹幕留言")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "弹幕留言", code = "saveMessage", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "弹幕留言", code = "saveMessage", level = RouterLevel.OPEN)
     public Result recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
         portalService.saveMessage(request, messageDto);
         return Result.success();
@@ -132,7 +133,7 @@ public class PortalController {
     @GetMapping("/queryFriendLinkList")
     @ApiOperation(value = "查询前台友链列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台友链列表", code = "queryWebFriendLinkList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台友链列表", code = "queryWebFriendLinkList", level = RouterLevel.OPEN)
     public Result queryFriendLinkList() {
         return Result.success().data(portalService.queryFriendLinkList());
     }
@@ -147,7 +148,7 @@ public class PortalController {
     @PostMapping(value = "/webLogin")
     @ApiOperation(value = "前台登录")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "前台登录", code = "webLogin", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "前台登录", code = "webLogin", level = RouterLevel.OPEN)
     public Result webLogin(HttpServletRequest request, @RequestBody UserLoginDto loginDto) {
         return Result.success().data(portalService.webLogin(request, loginDto));
     }
@@ -161,7 +162,7 @@ public class PortalController {
     @GetMapping("/queryCommentList")
     @ApiOperation(value = "查询前台评论列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台评论列表", code = "queryWebCommentList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台评论列表", code = "queryWebCommentList", level = RouterLevel.OPEN)
     public Result queryCommentList(CommentQueryDto queryDto) {
         return Result.success().data(portalService.queryCommentList(queryDto));
     }
@@ -175,7 +176,7 @@ public class PortalController {
     @GetMapping("/queryCommentReplyList")
     @ApiOperation(value = "获取评论回复列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取评论回复列表", code = "queryCommentReplyList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取评论回复列表", code = "queryCommentReplyList", level = RouterLevel.OPEN)
     public Result queryCommentReplyList(CommentQueryDto queryDto) {
         return Result.success().data(portalService.queryCommentReplyList(queryDto));
     }
@@ -190,7 +191,7 @@ public class PortalController {
     @PostMapping(value = "/saveComment")
     @ApiOperation(value = "新增评论")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "新增评论", code = "saveComment", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "新增评论", code = "saveComment", level = RouterLevel.OPEN)
     public Result saveComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
         portalService.saveComment(request, commentDto);
         return Result.success();
@@ -207,7 +208,7 @@ public class PortalController {
     @PostMapping(value = "/likeComment")
     @ApiOperation(value = "点赞评论")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "点赞评论", code = "likeComment", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "点赞评论", code = "likeComment", level = RouterLevel.OPEN)
     public Result saveComment(HttpServletRequest request, @RequestBody CommentLikeDto commentDto) {
         portalService.likeComment(request, commentDto);
         return Result.success();
@@ -223,7 +224,7 @@ public class PortalController {
     @PostMapping(value = "/replyComment")
     @ApiOperation(value = "回复评论")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "回复评论", code = "replyComment", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "回复评论", code = "replyComment", level = RouterLevel.OPEN)
     public Result replyComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
         portalService.saveComment(request, commentDto);
         return Result.success();
@@ -238,7 +239,7 @@ public class PortalController {
     @PostMapping(value = "/deleteComment")
     @ApiOperation(value = "删除评论")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除评论", code = "deleteWebComment", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "删除评论", code = "deleteWebComment", level = RouterLevel.OPEN)
     public Result deleteComment(@RequestBody CommentDeleteDto commentDto) {
         portalService.deleteComment(commentDto);
         return Result.success();
@@ -252,7 +253,7 @@ public class PortalController {
     @GetMapping("/queryBoardTalkList")
     @ApiOperation(value = "查询首页轮播的说说列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询首页轮播的说说列表", code = "queryWebBoardTalkList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询首页轮播的说说列表", code = "queryWebBoardTalkList", level = RouterLevel.OPEN)
     public Result queryBoardTalkList() {
         return Result.success().data(portalService.queryBoardTalkList());
     }
@@ -265,7 +266,7 @@ public class PortalController {
     @GetMapping("/queryBoardTagList")
     @ApiOperation(value = "获取标签云数据")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取标签云数据", code = "queryWebBoardTagList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取标签云数据", code = "queryWebBoardTagList", level = RouterLevel.OPEN)
     public Result queryBoardTagList() {
         return Result.success().data(portalService.queryBoardTagList());
     }
@@ -278,7 +279,7 @@ public class PortalController {
     @GetMapping("/queryBoardHotArticleList")
     @ApiOperation(value = "获取热门文章列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取热门文章列表", code = "queryWebBoardHotArticleList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取热门文章列表", code = "queryWebBoardHotArticleList", level = RouterLevel.OPEN)
     public Result queryBoardHotArticleList() {
         return Result.success().data(portalService.queryBoardHotArticleList());
     }
@@ -291,7 +292,7 @@ public class PortalController {
     @GetMapping("/queryBoardCategoryList")
     @ApiOperation(value = "获取分类专栏列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取分类专栏列表", code = "queryWebBoardCategoryList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取分类专栏列表", code = "queryWebBoardCategoryList", level = RouterLevel.OPEN)
     public Result queryBoardCategoryList() {
         return Result.success().data(portalService.queryBoardCategoryList());
     }
@@ -304,7 +305,7 @@ public class PortalController {
     @GetMapping("/queryBoardLastedCommentList")
     @ApiOperation(value = "获取最新评论列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取最新评论列表", code = "queryWebBoardLastedCommentList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取最新评论列表", code = "queryWebBoardLastedCommentList", level = RouterLevel.OPEN)
     public Result queryBoardLastedCommentList() {
         return Result.success().data(portalService.queryBoardLastedCommentList());
     }
@@ -318,7 +319,7 @@ public class PortalController {
     @GetMapping("/queryTalkList")
     @ApiOperation(value = "查询前台说说列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台说说列表", code = "queryWebTalkList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台说说列表", code = "queryWebTalkList", level = RouterLevel.OPEN)
     public Result queryTalkList(TalkQueryDto queryDto) {
         return Result.success().data(portalService.queryTalkList(queryDto));
     }
@@ -335,7 +336,7 @@ public class PortalController {
         @ApiImplicitParam(name = "talkId", value = "说说id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台说说详情", code = "queryWebTalkById", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台说说详情", code = "queryWebTalkById", level = RouterLevel.OPEN)
     public Result queryTalkById(@RequestParam Long talkId) {
         return Result.success().data(portalService.queryTalkById(talkId));
     }
@@ -350,7 +351,7 @@ public class PortalController {
     @PostMapping(value = "/likeTalk")
     @ApiOperation(value = "点赞说说")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "点赞说说", code = "likeTalk", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "点赞说说", code = "likeTalk", level = RouterLevel.OPEN)
     public Result likeTalk(HttpServletRequest request, @RequestBody TalkLikeDto talkDto) {
         portalService.likeTalk(request, talkDto);
         return Result.success();
@@ -367,7 +368,7 @@ public class PortalController {
     @PostMapping(value = "/likeArticle")
     @ApiOperation(value = "点赞文章")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "点赞文章", code = "likeArticle", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "点赞文章", code = "likeArticle", level = RouterLevel.OPEN)
     public Result likeArticle(HttpServletRequest request, @RequestBody ArticleLikeDto articleDto) {
         portalService.likeArticle(request, articleDto);
         return Result.success();
@@ -386,7 +387,7 @@ public class PortalController {
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "浏览文章", code = "viewArticle", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "浏览文章", code = "viewArticle", level = RouterLevel.OPEN)
     public Result viewArticle(HttpServletRequest request, @RequestParam Long articleId) {
         return portalService.viewArticle(request, articleId) ? Result.success() : Result.failure();
     }
@@ -399,7 +400,7 @@ public class PortalController {
     @GetMapping("/queryTagList")
     @ApiOperation(value = "查询前台标签列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台标签列表", code = "queryWebTagList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台标签列表", code = "queryWebTagList", level = RouterLevel.OPEN)
     public Result queryTagList() {
         return Result.success().data(portalService.queryTagList());
     }
@@ -412,7 +413,7 @@ public class PortalController {
     @GetMapping("/queryCategoryList")
     @ApiOperation(value = "查询前台分类列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台分类列表", code = "queryWebCategoryList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台分类列表", code = "queryWebCategoryList", level = RouterLevel.OPEN)
     public Result queryCategoryList() {
         return Result.success().data(portalService.queryCategoryList());
     }
@@ -429,7 +430,7 @@ public class PortalController {
         @ApiImplicitParam(name = "current", value = "页码", dataTypeClass = Integer.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台归档列表", code = "queryArchiveList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台归档列表", code = "queryArchiveList", level = RouterLevel.OPEN)
     public Result queryArchiveList(@RequestParam(required = false) Integer current) {
         return Result.success().data(portalService.queryArchiveList(current));
     }
@@ -446,7 +447,7 @@ public class PortalController {
         @ApiImplicitParam(name = "categoryId", value = "类别id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台分类详情", code = "queryWebCategoryById", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台分类详情", code = "queryWebCategoryById", level = RouterLevel.OPEN)
     public Result queryCategoryById(@RequestParam Long categoryId) {
         return Result.success().data(portalService.queryCategoryById(categoryId));
     }
@@ -463,7 +464,7 @@ public class PortalController {
         @ApiImplicitParam(name = "tagId", value = "标签id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询前台标签详情", code = "queryWebTagById", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台标签详情", code = "queryWebTagById", level = RouterLevel.OPEN)
     public Result queryTagById(@RequestParam Long tagId) {
         return Result.success().data(portalService.queryTagById(tagId));
     }
@@ -480,7 +481,7 @@ public class PortalController {
         @ApiImplicitParam(name = "keywords", value = "关键字", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "根据关键字搜索文章", code = "searchArticleList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "根据关键字搜索文章", code = "searchArticleList", level = RouterLevel.OPEN)
     public Result searchArticleList(@RequestParam String keywords) {
         return Result.success().data(portalService.searchArticleList(keywords));
     }
@@ -497,7 +498,7 @@ public class PortalController {
         @ApiImplicitParam(name = "username", value = "github用户名", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询 Github 贡献日历数据", code = "queryWebGithubCalendarData", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询 Github 贡献日历数据", code = "queryWebGithubCalendarData", level = RouterLevel.OPEN)
     public Result queryGithubCalendarData(@RequestParam String username) {
         return Result.success().data(portalService.queryGithubCalendarData(username));
     }
@@ -510,7 +511,7 @@ public class PortalController {
     @GetMapping("/queryAlbumList")
     @ApiOperation(value = "查询前台相册列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询前台相册列表", code = "queryWebAlbumList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台相册列表", code = "queryWebAlbumList", level = RouterLevel.OPEN)
     public Result queryAlbumList() {
         return Result.success().data(portalService.queryAlbumList());
     }
@@ -524,7 +525,7 @@ public class PortalController {
     @GetMapping("/queryAlbumPhotoList")
     @ApiOperation(value = "查询前台相册照片列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询前台相册照片列表", code = "queryWebAlbumPhotoList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台相册照片列表", code = "queryWebAlbumPhotoList", level = RouterLevel.OPEN)
     public Result queryAlbumPhotoList(AlbumPhotoQueryDto queryDto) {
         return Result.success().data(portalService.queryAlbumPhotoList(queryDto));
     }
@@ -541,7 +542,7 @@ public class PortalController {
         @ApiImplicitParam(name = "current", value = "页码", required = true, dataTypeClass = Integer.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询前台专栏列表", code = "queryColumnList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台专栏列表", code = "queryColumnList", level = RouterLevel.OPEN)
     public Result queryColumnList(@RequestParam Integer current) {
         return Result.success().data(portalService.queryColumnList(current));
     }
@@ -558,7 +559,7 @@ public class PortalController {
         @ApiImplicitParam(name = "columnId", value = "专栏id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询前台专栏详情", code = "queryWebColumnById", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台专栏详情", code = "queryWebColumnById", level = RouterLevel.OPEN)
     public Result queryColumnById(@RequestParam Long columnId) {
         return Result.success().data(portalService.queryColumnById(columnId));
     }
@@ -572,7 +573,7 @@ public class PortalController {
     @GetMapping("/queryColumnArticleList")
     @ApiOperation(value = "分页查询前台专栏文章列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "分页查询前台专栏文章列表", code = "queryWebColumnArticleList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "分页查询前台专栏文章列表", code = "queryWebColumnArticleList", level = RouterLevel.OPEN)
     public Result queryColumnArticleList(ArticleQueryDto queryDto) {
         return Result.success().data(portalService.queryColumnArticleList(queryDto));
     }
@@ -585,7 +586,7 @@ public class PortalController {
     @GetMapping("/queryVersionList")
     @ApiOperation(value = "查询前台版本列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询前台版本列表", code = "queryWebVersionList", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询前台版本列表", code = "queryWebVersionList", level = RouterLevel.OPEN)
     public Result queryVersionList() {
         return Result.success().data(portalService.queryVersionList());
     }
@@ -600,7 +601,7 @@ public class PortalController {
     @PostMapping("/oauth/login/qq")
     @ApiOperation(value = "QQ登录")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
-    @Router(name = "QQ登录", code = "oauthLoginQq", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "QQ登录", code = "oauthLoginQq", level = RouterLevel.OPEN)
     public Result qqLogin(@RequestBody QqLoginParam qqLoginParam, HttpServletRequest request) {
         return Result.success().data(portalService.qqLogin(qqLoginParam, request));
     }
@@ -614,7 +615,7 @@ public class PortalController {
     @GetMapping("/queryUserDetail")
     @ApiOperation(value = "查询用户各种明细")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
-    @Router(name = "查询用户各种明细", code = "queryUserWebDetail", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询用户各种明细", code = "queryUserWebDetail", level = RouterLevel.OPEN)
     public Result queryUserDetail(Long userId) {
         return Result.success().data(portalService.queryUserDetail(userId));
     }

@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.ArticleColumnDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleColumnQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -58,7 +59,7 @@ public class ArticleColumnController {
         @ApiImplicitParam(name = "columnId", value = "专栏id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询专栏详情", code = "queryColumnDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询专栏详情", code = "queryColumnDetail", level = RouterLevel.PUBLIC)
     public Result queryColumnDetail(@RequestParam Long columnId) {
         return Result.success().data(articleColumnService.queryColumnDetail(columnId));
     }
@@ -143,7 +144,7 @@ public class ArticleColumnController {
         @ApiImplicitParam(name = "articleIds", value = "文章id列表（不包含的关系）", dataTypeClass = List.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "查询非专栏对应的文章列表", code = "queryArticleListNotColumn", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询非专栏对应的文章列表", code = "queryArticleListNotColumn", level = RouterLevel.PUBLIC)
     public Result queryArticleListNotColumn(@RequestBody ArticleColumnQueryDto queryDto) {
         return Result.success().data(articleColumnService.queryArticleListNotColumn(queryDto));
     }

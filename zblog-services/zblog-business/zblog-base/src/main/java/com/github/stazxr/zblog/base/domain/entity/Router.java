@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.base.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.util.Assert;
 import lombok.Getter;
@@ -22,13 +22,15 @@ import java.util.List;
 @Setter
 @TableName("router")
 public class Router extends BaseEntity {
+    private static final long serialVersionUID = -3970834842294808278L;
+
     /**
      * 允许配置的路由级别
      */
     private static final List<Integer> LEVELS = Arrays.asList(
-            BaseConst.PermLevel.OPEN,
-            BaseConst.PermLevel.PUBLIC,
-            BaseConst.PermLevel.PERM
+            RouterLevel.OPEN,
+            RouterLevel.PUBLIC,
+            RouterLevel.PERM
     );
 
     /**
@@ -50,7 +52,7 @@ public class Router extends BaseEntity {
 
     /**
      * 路由默认访问级别
-     * {@link com.github.stazxr.zblog.core.base.BaseConst.PermLevel}
+     * {@link RouterLevel}
      */
     private Integer defaultLevel;
 
@@ -63,17 +65,16 @@ public class Router extends BaseEntity {
     }
 
     /**
-     * 通过 {@link com.github.stazxr.zblog.core.annotation.Router} 构造Route对象
+     * 通过 {@link com.github.stazxr.zblog.bas.router.Router} 构造Route对象
      *
      * @param router 路由信息
      */
-    public Router(com.github.stazxr.zblog.core.annotation.Router router) {
+    public Router(com.github.stazxr.zblog.bas.router.Router router) {
         Assert.notNull(router, "router must not be null");
         Assert.isTrue(!LEVELS.contains(router.level()), "router level is out of range: " + LEVELS);
 
         name = router.name();
         code = router.code();
         defaultLevel = router.level();
-        remark = router.remark();
     }
 }

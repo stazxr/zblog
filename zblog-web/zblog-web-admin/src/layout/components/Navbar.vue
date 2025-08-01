@@ -10,9 +10,9 @@
     <div class="right-menu">
       <template v-if="device !== 'mobile'">
         <!-- 菜单搜索 -->
-        <search id="header-search" class="right-menu-item" />
+        <header-search id="header-search" class="right-menu-item" />
         <!-- 网站首页 -->
-        <el-tooltip content="前往首页" effect="dark" placement="bottom">
+        <el-tooltip content="孙涛个人博客" effect="dark" placement="bottom">
           <Web class="right-menu-item hover-effect" />
         </el-tooltip>
         <!-- 全屏缩放 -->
@@ -54,7 +54,7 @@ import Hamburger from '@/components/Hamburger'
 import Web from '@/components/Web'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
+import HeaderSearch from '@/components/HeaderSearch'
 import Avatar from '@/assets/images/avatar.png'
 import { removeToken } from '@/utils/token'
 
@@ -64,7 +64,7 @@ export default {
     Hamburger,
     Screenfull,
     SizeSelect,
-    Search,
+    HeaderSearch,
     Web
   },
   data() {
@@ -92,6 +92,7 @@ export default {
     }
   },
   methods: {
+    // 切换侧边栏的状态为显示/隐藏
     toggleSideBar() {
       this.$store.dispatch('app/ToggleSideBar')
     },

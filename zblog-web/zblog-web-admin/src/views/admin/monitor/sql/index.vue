@@ -8,10 +8,8 @@
 import elFrame from '@/components/Iframe/index'
 export default {
   name: 'Sql',
-  components: { elFrame }
+  components: {
+    elFrame
+  }
 }
 </script>
-
-<style rel="stylesheet/scss" lang="scss" scoped>
-
-</style>

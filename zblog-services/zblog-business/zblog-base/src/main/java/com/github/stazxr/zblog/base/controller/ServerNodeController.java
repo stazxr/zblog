@@ -1,13 +1,14 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.bo.Ssh;
 import com.github.stazxr.zblog.base.domain.dto.NodeDto;
 import com.github.stazxr.zblog.base.domain.dto.query.NodeQueryDto;
 import com.github.stazxr.zblog.base.service.ServerNodeService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -57,7 +58,7 @@ public class ServerNodeController {
         @ApiImplicitParam(name = "nodeId", value = "节点id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询节点详情", code = "queryNodeDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询节点详情", code = "queryNodeDetail", level = RouterLevel.PUBLIC)
     public Result queryNodeDetail(@RequestParam Long nodeId) {
         return Result.success().data(serverNodeService.queryNodeDetail(nodeId));
     }
@@ -122,7 +123,7 @@ public class ServerNodeController {
     @PostMapping(value = "/sshTest")
     @ApiOperation("测试节点 SSH 连通性")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "测试节点 SSH 连通性", code = "sshTest", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "测试节点 SSH 连通性", code = "sshTest", level = RouterLevel.PUBLIC)
     public Result sshTest(@RequestBody Ssh ssh) {
         boolean flag = serverNodeService.sshTest(ssh);
         return flag ? Result.success("连接成功") : Result.failure("连接失败");

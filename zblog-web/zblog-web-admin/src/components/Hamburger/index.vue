@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 0 15px;" @click="toggleClick">
     <svg
-      :class="{'is-active': isActive}"
+      :class="{ 'is-active': isActive }"
       class="hamburger"
       viewBox="0 0 1024 1024"
       xmlns="http://www.w3.org/2000/svg"
@@ -32,13 +32,13 @@ export default {
 
 <style scoped>
 .hamburger {
-  display: inline-block;
-  vertical-align: middle;
-  width: 20px;
-  height: 20px;
+  display: inline-block; /* 设置图标为行内块级元素 */
+  vertical-align: middle; /* 垂直居中 */
+  width: 20px; /* 设置图标的宽度 */
+  height: 20px; /* 设置图标的高度 */
 }
 
 .hamburger.is-active {
-  transform: rotate(180deg);
+  transform: rotate(180deg); /* 如果 'is-active' 类存在，则旋转图标 180 度 */
 }
 </style>

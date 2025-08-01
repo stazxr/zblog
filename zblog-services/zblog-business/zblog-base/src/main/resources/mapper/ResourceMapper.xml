@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.stazxr.zblog.base.mapper.ResourceMapper">
+    <select id="selectByUriAndMethod" resultType="com.github.stazxr.zblog.bas.router.Resource">
+        SELECT
+            r.RESOURCE_NAME, r.RESOURCE_URI, r.RESOURCE_METHOD, r.RESOURCE_CODE,
+            CASE
+                WHEN p.ENABLED = 0 THEN 8
+                WHEN p.PERM_LEVEL IS NOT NULL THEN p.PERM_LEVEL
+                ELSE r.RESOURCE_LEVEL
+            END AS RESOURCE_LEVEL
+        FROM resource r
+        LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = r.RESOURCE_CODE
+        WHERE r.RESOURCE_URI = #{requestUri} AND r.RESOURCE_METHOD IN (#{requestMethod}, '*')
+    </select>
+
+    <delete id="deleteAll">
+        DELETE FROM resource WHERE RESOURCE_LEVEL >= 0
+    </delete>
+
+    <insert id="insertBatch">
+        INSERT INTO resource (RESOURCE_NAME, RESOURCE_URI, RESOURCE_METHOD, RESOURCE_CODE, RESOURCE_LEVEL)
+        VALUES
+        <foreach collection="resources" item="resource" separator=",">
+            (#{resource.resourceName}, #{resource.resourceUri}, #{resource.resourceMethod}, #{resource.resourceCode}, #{resource.resourceLevel})
+        </foreach>
+    </insert>
+</mapper>

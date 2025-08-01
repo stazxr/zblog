@@ -1,28 +1,26 @@
 // base color
-$blue:#324157;
-$light-blue:#3A71A8;
-$red:#C03639;
-$pink: #E65D6E;
-$green: #30B08F;
+$blue:#324157; // 蓝色
+$light-blue:#3A71A8; // 浅蓝色
+$red:#C03639; // 红色
+$pink: #E65D6E; // 粉红色
+$green: #30B08F; // 绿色
 $tiffany: #4AB7BD;
-$yellow:#FEC171;
-$panGreen: #30B08F;
+$yellow:#FEC171; // 黄色
+$panGreen: #0b4435;
 
 // sidebar
-$menuText:#bfcbd9;
-$menuActiveText:#409EFF;
-$subMenuActiveText:#f4f4f5; // https://github.com/ElemeFE/element/issues/12951
+$menuText:#bfcbd9; // 侧边栏主菜单的文本颜色
+$menuActiveText:#409EFF; // 当前活动菜单的文本颜色
+$subMenuActiveText:#f4f4f5; // 子菜单项激活时的文本颜色
 
-$menuBg:#304156;
-$menuHover:#263445;
+$menuBg:#304156; // 侧边栏的背景色
+$menuHover:#263445; // 侧边栏菜单项在悬停时的背景色
 
-$subMenuBg:#1f2d3d;
-$subMenuHover:#001528;
+$subMenuBg:#1f2d3d; // 子菜单的背景色
+$subMenuHover:#001528; // 子菜单项在悬停时的背景色
 
-$sideBarWidth: 205px;
+$sideBarWidth: 205px; // 侧边栏的宽度
 
-// the :export directive is the magic sauce for webpack
-// https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
 :export {
   menuText: $menuText;
   menuActiveText: $menuActiveText;

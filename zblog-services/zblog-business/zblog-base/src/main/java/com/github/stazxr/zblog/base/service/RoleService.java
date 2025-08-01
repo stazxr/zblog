@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
@@ -19,8 +19,7 @@ import java.util.Set;
  * @author SunTao
  * @since 2020-11-16
  */
-public interface RoleService extends IService<Role> {
-
+public interface RoleService extends SecurityRoleService {
     /**
      * 查询角色列表
      *

@@ -38,7 +38,7 @@ export function validEmail(email) {
  * @returns {boolean}
  */
 export function isExternal(path) {
-  return /^(https?:|mailto:|tel:)/.test(path)
+  return /^(https?:|http?:|mailto:|tel:)/.test(path)
 }
 
 /**

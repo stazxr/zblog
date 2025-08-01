@@ -54,6 +54,10 @@
   margin: 0 auto;
 }
 
+.el-dialog__body {
+  padding: 10px 20px !important;
+}
+
 // zblog no need this muses, author by thomas at 20221222
 // refine element ui upload
 // .upload-container {
@@ -72,6 +76,11 @@
   a {
     display: block
   }
+}
+
+// 保持跟 .el-input 一致
+.el-select {
+  width: 100%;
 }
 
 // fix date-picker ui bug in filter-item

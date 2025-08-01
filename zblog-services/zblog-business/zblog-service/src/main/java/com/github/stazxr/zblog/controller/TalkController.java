@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.TalkDto;
 import com.github.stazxr.zblog.domain.dto.query.TalkQueryDto;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -56,7 +57,7 @@ public class TalkController {
         @ApiImplicitParam(name = "talkId", value = "说说id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询说说详情", code = "queryTalkDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询说说详情", code = "queryTalkDetail", level = RouterLevel.PUBLIC)
     public Result queryTalkDetail(@RequestParam Long talkId) {
         return Result.success().data(talkService.queryTalkDetail(talkId));
     }

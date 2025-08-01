@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.core.util;
 
-import com.github.stazxr.zblog.core.model.Result;
+import com.github.stazxr.zblog.bas.msg.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;

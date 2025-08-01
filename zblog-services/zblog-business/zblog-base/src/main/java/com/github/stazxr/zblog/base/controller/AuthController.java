@@ -2,11 +2,13 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.captcha.Captcha;
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.ValidateLoginCodeFilter;
 import com.github.stazxr.zblog.base.service.ZblogService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import io.swagger.annotations.Api;
@@ -48,7 +50,7 @@ public class AuthController {
     @GetMapping("/loginId")
     @ApiOperation(value = "获取当前登录用户信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取当前登录用户信息", code = "loginId", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "获取当前登录用户信息", code = "loginId", level = RouterLevel.PUBLIC)
     public Result currentUserDetail() {
         return Result.success().data(SecurityUtils.getLoginUser());
     }
@@ -59,14 +61,14 @@ public class AuthController {
      * @return {img: %二维码的Base64编码%; uuid: %存储二维码的缓存主键%}
      */
     @GetMapping("/loginCode")
-    @ApiOperation(value = "获取登录验证码", notes = "不需要token")
+    @ApiOperation(value = "获取登录验证码")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取登录验证码", code = "loginCode", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "获取登录验证码", code = "loginCode", level = RouterLevel.OPEN)
     public Result loginCode() {
         Map<String, Object> data = new HashMap<>(2);
         Captcha captcha = captchaHandler.createCaptcha("loginCode");
         data.put("img", captcha.getBase64());
-        data.put("uuid", captcha.getCaptchaId());
+        data.put(ValidateLoginCodeFilter.DEFAULT_CACHE_KEY, captcha.getCaptchaId());
         return Result.success().data(data);
     }
 
@@ -80,7 +82,7 @@ public class AuthController {
     @PostMapping("/checkUserLoginStatus")
     @ApiOperation(value = "检查用户的登录状态")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
-    @Router(name = "检查用户的登录状态", code = "checkUserLoginStatus", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "检查用户的登录状态", code = "checkUserLoginStatus", level = RouterLevel.OPEN)
     public Result checkUserLoginStatus(HttpServletRequest request) {
         return Result.success().data(zblogService.checkUserLoginStatus(request));
     }
@@ -93,7 +95,7 @@ public class AuthController {
     @GetMapping("/queryGlobalKey")
     @ApiOperation(value = "获取默认公钥")
     @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
-    @Router(name = "获取默认公钥", code = "queryGlobalKey", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "获取默认公钥", code = "queryGlobalKey", level = RouterLevel.PUBLIC)
     public Result queryGlobalKey() {
         return Result.success().data(globalPublicKey);
     }

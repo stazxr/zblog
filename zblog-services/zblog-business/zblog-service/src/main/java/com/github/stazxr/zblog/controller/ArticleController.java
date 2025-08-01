@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.domain.dto.ArticleAuditDto;
 import com.github.stazxr.zblog.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
@@ -81,7 +82,7 @@ public class ArticleController {
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询文章详情", code = "queryArticleDetail", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询文章详情", code = "queryArticleDetail", level = RouterLevel.PUBLIC)
     public Result queryArticleDetail(@RequestParam Long articleId) {
         return Result.success().data(articleService.queryArticleDetail(articleId));
     }
@@ -112,7 +113,7 @@ public class ArticleController {
     @PostMapping(value = "/editArticle")
     @ApiOperation(value = "编辑文章")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "编辑文章", code = "editArticle", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "编辑文章", code = "editArticle", level = RouterLevel.PUBLIC)
     public Result editArticle(@RequestBody ArticleDto articleDto) {
         articleService.editArticle(articleDto);
         return Result.success();
@@ -128,7 +129,7 @@ public class ArticleController {
     @PostMapping(value = "/saveArticleDraft")
     @ApiOperation(value = "保存文章草稿")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "保存文章草稿", code = "saveArticleDraft", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "保存文章草稿", code = "saveArticleDraft", level = RouterLevel.PUBLIC)
     public Result saveArticleDraft(@RequestBody ArticleDto articleDto) {
         return Result.success().data(articleService.saveArticleDraft(articleDto));
     }
@@ -141,7 +142,7 @@ public class ArticleController {
     @GetMapping(value = "/queryLastArticleDraft")
     @ApiOperation(value = "查询最新的文章草稿")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询最新的文章草稿", code = "queryLastArticleDraft", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询最新的文章草稿", code = "queryLastArticleDraft", level = RouterLevel.PUBLIC)
     public Result queryLastArticleDraft() {
         return Result.success().data(articleService.queryLastArticleDraft());
     }
@@ -156,7 +157,7 @@ public class ArticleController {
     @PostMapping(value = "/autoSaveArticleContent")
     @ApiOperation(value = "文章内容自动保存")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "文章内容自动保存", code = "autoSaveArticleContent", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "文章内容自动保存", code = "autoSaveArticleContent", level = RouterLevel.OPEN)
     public Result autoSaveArticleContent(@RequestBody ArticleDto articleDto) {
         return Result.success().data(articleService.autoSaveArticleContent(articleDto));
     }
@@ -170,7 +171,7 @@ public class ArticleController {
     @GetMapping(value = "/queryAutoSaveArticleContentByPage")
     @ApiOperation(value = "分页查询文章内容自动保存列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询文章内容自动保存列表", code = "queryAutoSaveArticleContentByPage", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "分页查询文章内容自动保存列表", code = "queryAutoSaveArticleContentByPage", level = RouterLevel.PUBLIC)
     public Result queryAutoSaveArticleContentByPage(ArticleQueryDto queryDto) {
         return Result.success().data(articleService.queryAutoSaveArticleContentByPage(queryDto));
     }
@@ -187,7 +188,7 @@ public class ArticleController {
         @ApiImplicitParam(name = "recordId", value = "保存记录id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询文章内容自动保存信息", code = "queryAutoSaveArticleContentById", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询文章内容自动保存信息", code = "queryAutoSaveArticleContentById", level = RouterLevel.PUBLIC)
     public Result queryAutoSaveArticleContentById(@RequestParam Long recordId) {
         return Result.success().data(articleService.queryAutoSaveArticleContentById(recordId));
     }
@@ -202,7 +203,7 @@ public class ArticleController {
     @PostMapping(value = "/publishArticleByTiming")
     @ApiOperation(value = "文章定时发布")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "文章定时发布", code = "publishArticleByTiming", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "文章定时发布", code = "publishArticleByTiming", level = RouterLevel.PUBLIC)
     public Result publishArticleByTiming(@RequestBody ArticleDto articleDto) {
         articleService.publishArticleByTiming(articleDto);
         return Result.success();
@@ -221,7 +222,7 @@ public class ArticleController {
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除文章", code = "moveArticleToRecycleBin", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "删除文章", code = "moveArticleToRecycleBin", level = RouterLevel.PUBLIC)
     public Result moveArticleToRecycleBin(@RequestParam Long articleId) {
         articleService.moveArticleToRecycleBin(articleId);
         return Result.success();
@@ -240,7 +241,7 @@ public class ArticleController {
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "彻底删除文章", code = "deleteArticle", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "彻底删除文章", code = "deleteArticle", level = RouterLevel.PUBLIC)
     public Result deleteArticle(@RequestParam Long articleId) {
         articleService.deleteArticle(articleId);
         return Result.success();
@@ -256,7 +257,7 @@ public class ArticleController {
     @PostMapping(value = "/batchMoveToRecycleBin")
     @ApiOperation(value = "批量删除文章")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "批量删除文章", code = "batchMoveArticleToRecycleBin", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "批量删除文章", code = "batchMoveArticleToRecycleBin", level = RouterLevel.PUBLIC)
     public Result batchDeleteArticle(@RequestBody List<Long> articleIds) {
         articleService.batchDeleteArticle(articleIds);
         return Result.success();
@@ -271,7 +272,7 @@ public class ArticleController {
     @PostMapping(value = "/clearRecycleBin")
     @ApiOperation(value = "清空回收站")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "清空回收站", code = "clearArticleRecycleBin", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "清空回收站", code = "clearArticleRecycleBin", level = RouterLevel.PUBLIC)
     public Result clearArticleRecycleBin() {
         articleService.clearArticleRecycleBin();
         return Result.success();
@@ -290,7 +291,7 @@ public class ArticleController {
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "将文章回收至草稿箱", code = "recycleToDraftBox", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "将文章回收至草稿箱", code = "recycleToDraftBox", level = RouterLevel.PUBLIC)
     public Result recycleToDraftBox(@RequestParam Long articleId) {
         articleService.recycleToDraftBox(articleId);
         return Result.success();
@@ -352,7 +353,7 @@ public class ArticleController {
     @GetMapping(value = "/queryCategoryTree")
     @ApiOperation(value = "查询文章分类列表（树）")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询文章分类列表（树）", code = "queryArticleCategoryTree", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询文章分类列表（树）", code = "queryArticleCategoryTree", level = RouterLevel.PUBLIC)
     public Result queryCategoryTreeList() {
         return Result.success().data(articleCategoryService.queryCategoryTreeList(new ArticleCategoryQueryDto()));
     }
@@ -365,7 +366,7 @@ public class ArticleController {
     @GetMapping(value = "/queryTagList")
     @ApiOperation(value = "查询文章标签列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询文章标签列表", code = "queryArticleTagList", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询文章标签列表", code = "queryArticleTagList", level = RouterLevel.PUBLIC)
     public Result queryTagList() {
         ArticleTagQueryDto queryDto = new ArticleTagQueryDto();
         queryDto.setEnabled(true);
@@ -373,14 +374,14 @@ public class ArticleController {
     }
 
     /**
-     * 查询文章默认封面，前台会使用这个接口，需要接口权限为《BaseConst.PermLevel.OPEN》
+     * 查询文章默认封面，前台会使用这个接口，需要接口权限为《RouterLevel.OPEN》
      *
      * @return ArticleImg
      */
     @GetMapping(value = "/queryArticleDefaultImg")
     @ApiOperation(value = "查询文章默认封面")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询文章默认封面", code = "queryArticleDefaultImg", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "查询文章默认封面", code = "queryArticleDefaultImg", level = RouterLevel.OPEN)
     public Result queryArticleDefaultImg() {
         return Result.success().data(articleService.queryArticleDefaultImg());
     }

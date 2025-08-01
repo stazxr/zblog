@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel("字典信息")
-public class DictDto {
+public class DictDto extends BaseDto {
     /**
      * 字典序列（黑白名单用）
      */

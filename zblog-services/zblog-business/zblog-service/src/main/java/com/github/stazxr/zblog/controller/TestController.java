@@ -1,8 +1,9 @@
 package com.github.stazxr.zblog.controller;
 
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.annotation.IgnoreResult;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.domain.entity.ArticleTag;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
@@ -82,7 +83,7 @@ public class TestController {
         @ApiImplicitParam(name = "tagId", value = "标签id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
-    @Router(name = "测试数据库的行锁", code = "testMysqlRowLock", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "测试数据库的行锁", code = "testMysqlRowLock", level = RouterLevel.OPEN)
     public ArticleTag testMysqlRowLock(@RequestParam Long tagId) {
         System.out.println("[" + tagId + "] one...");
         return articleTagService.getByIdWithRowLock(tagId);
@@ -96,7 +97,7 @@ public class TestController {
     @PostMapping(value = "/excelPoi")
     @ApiOperation(value = "测试 POI")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "测试 POI", code = "excelPoiByTest", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "测试 POI", code = "excelPoiByTest", level = RouterLevel.OPEN)
     public void testExcelPoi(HttpServletResponse response) {
         try (Workbook workbook = new XSSFWorkbook()) {
             // 创建表单

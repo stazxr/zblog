@@ -50,11 +50,9 @@
               <el-form ref="form" :model="form" :rules="rules" style="margin-top: 10px;" size="small" label-width="70px">
                 <el-form-item label="昵称" prop="nickname">
                   <el-input v-model="form.nickname" style="width: 35%" maxlength="25" show-word-limit />
-                  <span style="color: #C0C0C0;margin-left: 10px;">用户昵称不作为登录使用</span>
                 </el-form-item>
                 <el-form-item label="手机号" prop="telephone">
                   <el-input v-model="form.telephone" style="width: 35%;" />
-                  <span style="color: #C0C0C0;margin-left: 10px;">手机号不能重复</span>
                 </el-form-item>
                 <el-form-item label="性别">
                   <el-radio-group v-model.number="form.gender" style="width: 35%;">
@@ -205,7 +203,7 @@ export default {
     ])
   },
   created() {
-    this.$store.dispatch('GetUserInfo').then(() => {
+    this.$store.dispatch('RefreshUser').then(() => {
       this.form = {
         id: this.user.id,
         nickname: this.user.nickname,
@@ -260,7 +258,7 @@ export default {
         }
         this.$mapi.user.updateUserHeadImg(param).then(() => {
           this.$message.success('头像修改成功')
-          this.$store.dispatch('GetUserInfo')
+          this.$store.dispatch('RefreshUser')
           this.$refs.imgUploadRef.off()
         })
       } else {
@@ -283,7 +281,7 @@ export default {
             this.saveLoading = true
             this.$mapi.user.updateUserBaseInfo(this.form).then(() => {
               this.$message.success('修改成功')
-              this.$store.dispatch('GetUserInfo').then(() => {})
+              this.$store.dispatch('RefreshUser').then(() => {})
             }).finally(() => {
               this.saveLoading = false
             })

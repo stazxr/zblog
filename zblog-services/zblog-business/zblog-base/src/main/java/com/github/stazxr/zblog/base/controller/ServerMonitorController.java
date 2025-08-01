@@ -1,10 +1,10 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.base.service.ServerMonitorService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -50,15 +50,6 @@ public interface RoleMapper extends BaseMapper<Role> {
     Role selectByRoleCode(@Param("roleCode") String roleCode);
 
     /**
-     * 查询可以访问权限的角色列表
-     *
-     * @param permId 权限序列
-     * @param blurry 模糊查询：角色名称，角色编码
-     * @return roleList
-     */
-    List<RoleVo> selectPermRoles(@Param("permId") Long permId, @Param("blurry") String blurry);
-
-    /**
      * 查询角色对应的用户列表
      *
      * @param queryDto 查询参数

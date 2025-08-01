@@ -6,7 +6,8 @@ package com.github.stazxr.zblog.bas.exception;
  * @author SunTao
  * @since 2024-08-14
  */
-public class ExpMessageCode {
+public class
+ExpMessageCode {
     private final String code;
 
     public ExpMessageCode(String code) {

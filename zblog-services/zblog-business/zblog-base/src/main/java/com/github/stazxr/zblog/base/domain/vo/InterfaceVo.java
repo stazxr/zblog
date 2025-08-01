@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * InterfaceVo
@@ -8,12 +9,28 @@ import lombok.Data;
  * @author SunTao
  * @since 2022-08-29
  */
-@Data
+@Getter
+@Setter
 public class InterfaceVo {
     /**
-     * 权限编码
+     * 接口名称
+     */
+    private String name;
+
+    /**
+     * 接口编码
      */
     private String code;
+
+    /**
+     * 接口级别
+     */
+    private Integer level;
+
+    /**
+     * 接口状态
+     */
+    private Integer status;
 
     /**
      * 请求地址
@@ -24,14 +41,4 @@ public class InterfaceVo {
      * 请求方式
      */
     private String method;
-
-    /**
-     * 接口类型: see InterfaceType
-     */
-    private Integer type;
-
-    /**
-     * 创建时间
-     */
-    private String createTime;
 }

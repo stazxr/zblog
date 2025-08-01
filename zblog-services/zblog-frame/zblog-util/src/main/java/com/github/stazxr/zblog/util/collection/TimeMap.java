@@ -40,18 +40,40 @@ public class TimeMap<K, V> {
     }
 
     /**
+     * 将键值对存储到映射中（不会过期）。
+     *
+     * @param key        键
+     * @param value      值
+     */
+    public V put(K key, V value) {
+        return put(key, value, -1);
+    }
+
+    /**
      * 将键值对存储到映射中，并指定过期时间。
      *
      * @param key        键
      * @param value      值
      * @param expireTime 过期时间（毫秒）
      */
-    public void put(K key, V value, long expireTime) {
-        dataMap.put(key, value);
-        if (expireTime > 0) {
-            Instant expireDate = Instant.now().plus(Duration.ofMillis(expireTime));
-            expiredDateMap.put(key, expireDate);
+    public V put(K key, V value, long expireTime) {
+        if (key != null) {
+            if (value == null) {
+                // 删除
+                expiredDateMap.remove(key);
+                dataMap.remove(key);
+            } else {
+                // 新增
+                if (expireTime >= 0) {
+                    Instant expireDate = Instant.now().plus(Duration.ofMillis(expireTime));
+                    expiredDateMap.put(key, expireDate);
+                }
+                dataMap.put(key, value);
+                return value;
+            }
         }
+
+        return null;
     }
 
     /**
@@ -61,13 +83,37 @@ public class TimeMap<K, V> {
      * @return 值，如果键过期则返回 null
      */
     public V get(K key) {
-        Instant expireDate = expiredDateMap.get(key);
-        if (expireDate != null && Instant.now().isAfter(expireDate)) {
-            // 惰性删除过期的键
-            dataMap.remove(key);
-            expiredDateMap.remove(key);
+        if (key != null) {
+            Instant expireDate = expiredDateMap.get(key);
+            if (expireDate != null && Instant.now().isAfter(expireDate)) {
+                // 惰性删除过期的键
+                dataMap.remove(key);
+                expiredDateMap.remove(key);
+            }
+            return dataMap.get(key);
         }
-        return dataMap.get(key);
+
+        return null;
+    }
+
+    /**
+     * 判断是否包含键。
+     *
+     * @param key 键
+     * @return boolean，如果键存在则返回 true
+     */
+    public boolean containsKey(K key) {
+        if (key != null) {
+            Instant expireDate = expiredDateMap.get(key);
+            if (expireDate != null && Instant.now().isAfter(expireDate)) {
+                // 惰性删除过期的键
+                dataMap.remove(key);
+                expiredDateMap.remove(key);
+            }
+            return dataMap.containsKey(key);
+        }
+
+        return false;
     }
 
     /**
@@ -76,8 +122,10 @@ public class TimeMap<K, V> {
      * @param key 键
      */
     public void remove(K key) {
-        dataMap.remove(key);
-        expiredDateMap.remove(key);
+        if (key != null) {
+            dataMap.remove(key);
+            expiredDateMap.remove(key);
+        }
     }
 
     /**

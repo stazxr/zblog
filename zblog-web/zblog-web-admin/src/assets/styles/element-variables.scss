@@ -1,31 +1,33 @@
-/**
-* I think element-ui's default theme color is too light for long-term use.
-* So I modified the default color and you can modify it to your liking.
-**/
+/*
+ 你可以通过修改这个文件定制 Element UI 的默认主题样式.
+*/
 
-/* theme color */
+// 主题颜色配置, 这些颜色会影响整个 UI 中的各种元素，如按钮、标签、状态提示、表单验证等
 $--color-primary: #1890ff;
 $--color-success: #13ce66;
 $--color-warning: #FFBA00;
 $--color-danger: #ff4949;
-// $--color-info: #1E1E1E;
+$--color-info: #1E1E1E;
 
-$--button-font-weight: 400;
+// 字体粗细，默认 500
+$--button-font-weight: 500;
 
-// $--color-text-regular: #1f2d3d;
+// 设置文本颜色
+$--color-text-regular: #1f2d3d;
 
+// 边框颜色配置
 $--border-color-light: #dfe4ed;
 $--border-color-lighter: #e6ebf5;
+$--table-border: 1px solid #dfe6ec;
 
-$--table-border:1px solid#dfe6ec;
-
-/* icon font path, required */
+// 字体路径配置
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
 
+// 引入 Element UI 的默认主题
+// 通过这个导入，所有 Element UI 组件的样式会应用上面定义的主题颜色和其他配置
 @import "../../../node_modules/element-ui/packages/theme-chalk/src/index";
 
-// the :export directive is the magic sauce for webpack
-// https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
 :export {
+  // 导出主题颜色，可以在外部进行动态配置
   theme: $--color-primary;
 }

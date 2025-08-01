@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.Data;
+import com.github.stazxr.zblog.bas.mask.MaskType;
+import com.github.stazxr.zblog.bas.mask.core.FieldMask;
+import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * UserVo
@@ -13,10 +12,11 @@ import java.util.Set;
  * @author SunTao
  * @since 2022-08-29
  */
-@Data
+@Getter
+@Setter
 public class UserVo {
     /**
-     * ID
+     * 用户唯一标识
      */
     private Long id;
 
@@ -26,24 +26,47 @@ public class UserVo {
     private String username;
 
     /**
+     * 密码
+     */
+    @FieldMask(type = MaskType.PASSWORD)
+    private String password;
+
+    /**
+     * 用户类型
+     */
+    private Integer userType;
+
+    /**
+     * 用户状态
+     */
+    private Integer userStatus;
+
+    /**
+     * 如果是临时账户，需要注明过期时间
+     * 格式：{@link DateUtils#defaultPattern}
+     */
+    private String expiredTime;
+
+    /**
+     * 用户修改密码时间
+     */
+    private String changePwdTime;
+
+    /**
      * 昵称
      */
     private String nickname;
 
     /**
+     * 邮箱
+     */
+    @FieldMask(type = MaskType.EMAIL_WEAK)
+    private String email;
+
+    /**
      * 性别
      */
     private Integer gender;
-
-    /**
-     * 头像地址
-     */
-    private String headImgUrl;
-
-    /**
-     * 邮箱
-     */
-    private String email;
 
     /**
      * 签名
@@ -56,82 +79,37 @@ public class UserVo {
     private String website;
 
     /**
+     * 头像地址
+     */
+    private String headImgUrl;
+
+    /**
      * 登录时间
      */
     private String loginTime;
 
     /**
-     * 创建用户
+     * 是否有效
      */
-    private String createUser;
+    private Boolean deleted;
 
     /**
-     * 创建时间
+     * 创建用户，存储该实体的创建用户标识。
+     */
+    private Long createUser;
+
+    /**
+     * 创建时间，存储该实体的创建时间。
      */
     private String createTime;
 
     /**
-     * 修改用户
+     * 修改用户，存储最后修改该实体的用户标识。
      */
-    private String updateUser;
+    private Long updateUser;
 
     /**
-     * 修改时间
+     * 修改时间，存储该实体的最后修改时间。
      */
     private String updateTime;
-
-    /**
-     * 用户是否启用
-     */
-    private Boolean enabled;
-
-    /**
-     * 账户是否登录锁定, 登录次数失败太多则锁定
-     */
-    private Boolean locked;
-
-    /**
-     * 是否是临时账户
-     */
-    private Boolean temp;
-
-    /**
-     * 授权时间
-     */
-    private String authTime;
-
-    /**
-     * 账号过期时间
-     */
-    private String expiredTime;
-
-    /**
-     * 登录令牌
-     */
-    private String userToken;
-
-    /**
-     * 用户对应的角色序号列表
-     */
-    private List<Long> roleIds;
-
-    /**
-     * 用户对应的角色列表
-     */
-    private List<String> roleNames;
-
-    /**
-     * 评论点赞列表
-     */
-    private Set<Long> commentLikeSet;
-
-    /**
-     * 说说点赞列表
-     */
-    private Set<Long> talkLikeSet;
-
-    /**
-     * 文章点赞列表
-     */
-    private Set<Long> articleLikeSet;
 }

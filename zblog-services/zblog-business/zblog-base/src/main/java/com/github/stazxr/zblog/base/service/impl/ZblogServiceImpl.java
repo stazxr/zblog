@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
-import com.github.stazxr.zblog.base.component.security.jwt.decoder.JwtDecoder;
-import com.github.stazxr.zblog.base.component.security.jwt.storage.JwtTokenStorage;
+import com.github.stazxr.zblog.bas.security.jwt.decoder.JwtDecoder;
+import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.domain.bo.LoginUser;
 import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.ZblogService;
@@ -69,7 +69,7 @@ public class ZblogServiceImpl implements ZblogService {
                 if (audiences != null && !audiences.isEmpty()) {
                     // 根据 userId 获取当前用户的登录信息
                     Long userId = Long.parseLong(audiences.get(0));
-                    String accessToken = jwtTokenStorage.getAccessToken(userId);
+                    String accessToken = jwtTokenStorage.getAccessToken(String.valueOf(userId));
                     if (StringUtils.isNotBlank(accessToken)) {
                         // 对比 ssoToken 与 accessToken 是否一致
                         if (ssoToken.equals(accessToken)) {

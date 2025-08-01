@@ -8,6 +8,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author SunTao
  * @since 2021-07-03
  */
-public interface BaseService<T> extends IService<T> {
-    // ToDo 自定义 Service 接口
+public interface BaseService<T extends BaseEntity> extends IService<T> {
 }

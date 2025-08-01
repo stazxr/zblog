@@ -1,12 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.enums.ResultCode;
 import com.github.stazxr.zblog.core.exception.ServiceException;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -33,7 +34,7 @@ public class IdController {
     @GetMapping("/getId")
     @ApiOperation(value = "生成唯一序列")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "生成唯一序列", code = "getId", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "生成唯一序列", code = "getId", level = RouterLevel.PUBLIC)
     public Result getId() {
         try {
             return Result.success().data(SequenceUtils.getId());
@@ -55,7 +56,7 @@ public class IdController {
         @ApiImplicitParam(name = "count", value = "数量", required = true, dataTypeClass = Integer.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "批量生成序列", code = "getIds", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "批量生成序列", code = "getIds", level = RouterLevel.PUBLIC)
     public Result getIds(@RequestParam("count") Integer count) {
         Integer tmpCount = count;
         if (tmpCount == null || tmpCount == 0) {

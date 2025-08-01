@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.Data;
 
 /**
@@ -90,7 +88,6 @@ public class UserDetailVo {
 
     /**
      * 如果是临时账户，需要注明过期时间
-     * 格式：{@link DateUtils#defaultPattern}
      */
     private String expiredTime;
 
@@ -112,6 +109,5 @@ public class UserDetailVo {
     /**
      * 是否有效
      */
-    @TableLogic
     private Boolean deleted;
 }

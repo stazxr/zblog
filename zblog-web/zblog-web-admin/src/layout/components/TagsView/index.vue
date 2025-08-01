@@ -61,13 +61,34 @@ export default {
     }
   },
   mounted() {
+    console.log('11')
     this.initTags()
     this.addTags()
   },
   methods: {
-    isActive(route) {
-      return route.path === this.$route.path
+    initTags() {
+      console.log('initTags routes', this.routes)
+      const affixTags = this.affixTags = this.filterAffixTags(this.routes)
+      console.log('initTags affixTags', affixTags)
+      for (const tag of affixTags) {
+        // Must have tag name
+        if (tag.name) {
+          this.$store.dispatch('tagsView/AddVisitedView', tag)
+        }
+      }
     },
+    addTags(moveFlag = false) {
+      const { name, meta } = this.$route
+      const showTag = !(meta && meta.hideTag && meta.hideTag === true)
+      if (name && showTag) {
+        // 添加标签
+        this.$store.dispatch('tagsView/AddView', this.$route).then(_ => {
+          moveFlag && this.moveToCurrentTag()
+        })
+      }
+      return false
+    },
+
     filterAffixTags(routes, basePath = '/') {
       let tags = []
       routes.forEach(route => {
@@ -89,25 +110,8 @@ export default {
       })
       return tags
     },
-    initTags() {
-      const affixTags = this.affixTags = this.filterAffixTags(this.routes)
-      for (const tag of affixTags) {
-        // Must have tag name
-        if (tag.name) {
-          this.$store.dispatch('tagsView/AddVisitedView', tag)
-        }
-      }
-    },
-    addTags(moveFlag = false) {
-      const { name, meta } = this.$route
-      const showTag = !(meta && meta.hideTag && meta.hideTag === true)
-      if (name && showTag) {
-        // 添加标签
-        this.$store.dispatch('tagsView/AddView', this.$route).then(_ => {
-          moveFlag && this.moveToCurrentTag()
-        })
-      }
-      return false
+    isActive(route) {
+      return route.path === this.$route.path
     },
     moveToCurrentTag() {
       const tags = this.$refs.tag

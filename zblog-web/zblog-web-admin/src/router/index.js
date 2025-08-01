@@ -6,7 +6,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/token'
 import { filterAsyncRouter } from '@/utils/router'
-import perm from '@/api/base/perm'
+import menu from '@/api/base/menu'
 
 NProgress.configure({ showSpinner: false })
 
@@ -24,7 +24,7 @@ router.beforeEach((to, from, next) => {
     } else {
       // 在已登录情况下，访问其他页面
       if (store.getters.user === null) {
-        store.dispatch('GetUserInfo').then(() => {
+        store.dispatch('RefreshUser').then(() => {
           loadMenus(next, to)
         }).catch(() => {
           store.dispatch('Logout').then(() => {
@@ -64,8 +64,9 @@ router.onError(error => {
 
 export const loadMenus = (next, to) => {
   store.commit('SET_LOAD_MENUS', false)
-  perm.buildUserMenus().then(res => {
+  menu.queryUserMenuTree().then(res => {
     const data = res.data
+    console.log('menu data', data)
     const sdata = JSON.parse(JSON.stringify(data))
     const rdata = JSON.parse(JSON.stringify(data))
     const sidebarRoutes = filterAsyncRouter(sdata)

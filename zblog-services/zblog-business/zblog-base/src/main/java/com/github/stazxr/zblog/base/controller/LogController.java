@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
@@ -70,7 +71,7 @@ public class LogController {
     @GetMapping("/queryUserLog")
     @ApiOperation(value = "查询用户日志列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询用户日志列表", code = "queryUserLog", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "查询用户日志列表", code = "queryUserLog", level = RouterLevel.PUBLIC)
     public Result queryUserLog(LogQueryDto queryDto) {
         return Result.success().data(logService.queryUserLogListByPage(queryDto));
     }

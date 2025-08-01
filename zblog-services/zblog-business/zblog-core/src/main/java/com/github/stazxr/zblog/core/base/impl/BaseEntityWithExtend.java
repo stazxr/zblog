@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @ApiModel("带扩展字段的基类实体")
 public class BaseEntityWithExtend extends BaseEntity {
-    private static final long serialVersionUID = 83047176922731422L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 扩展字段，存储 JSON 字符串

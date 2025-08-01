@@ -3,7 +3,9 @@ import { setToken, removeToken } from '@/utils/token'
 
 const user = {
   state: {
+    // 登录用户信息
     user: null,
+    // 用户菜单是否已加载
     loadMenus: false
   },
   mutations: {
@@ -36,7 +38,8 @@ const user = {
         })
       })
     },
-    GetUserInfo({ commit }) {
+    // 刷新用户信息
+    RefreshUser({ commit }) {
       return new Promise((resolve, reject) => {
         communal.checkUserLoginStatus().then(res => {
           if (res.code === 200 && res.data != null) {

@@ -1,7 +1,7 @@
 .head-container {
   padding-bottom: 10px;
   .search-opts {
-    padding: 0 20px 0 0;
+    padding: 0 0 0 0; // TIPS: 取消右边距
   }
   .filter-item {
     display: inline-block;
@@ -46,6 +46,7 @@
     width: 230px !important;
   }
 }
+
 .el-avatar {
   display: inline-block;
   text-align: center;
@@ -59,6 +60,16 @@
   height: 32px;
   line-height: 32px;
   border-radius: 16px;
+}
+
+.search-opts .muses-search-form-item[btn] {
+  display: flex;
+  justify-content: flex-start;  /* 左对齐按钮 */
+  gap: 10px;  /* 按钮之间的间距 */
+}
+
+.search-opts .el-button {
+  flex: 0 0 auto;  /* 按钮大小自适应 */
 }
 
 .logo-con {
@@ -126,6 +137,12 @@
 
 .el-tabs {
   margin-bottom: 25px;
+}
+
+.el-select {
+  display: inline-block;
+  position: relative;
+  width: 100%;
 }
 
 .crud-opts {

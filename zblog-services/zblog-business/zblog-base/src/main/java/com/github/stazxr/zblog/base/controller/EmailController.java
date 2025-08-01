@@ -1,13 +1,14 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
+import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.notify.mail.MailService;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -54,7 +55,7 @@ public class EmailController {
         @ApiImplicitParam(name = "email", value = "邮箱地址", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "发送邮箱验证码", code = "sendCode", level = BaseConst.PermLevel.OPEN)
+    @Router(name = "发送邮箱验证码", code = "sendCode", level = RouterLevel.OPEN)
     public Result sendCode(@RequestParam String email) {
         Assert.isTrue(StringUtils.isBlank(email), "邮箱不能为空");
         Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");

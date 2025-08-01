@@ -1,14 +1,15 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.RouterDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.RouterVo;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.model.Result;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.Assert;
 import io.swagger.annotations.Api;
@@ -73,7 +74,7 @@ public class RouterController {
         @ApiImplicitParam(name = "code", value = "权限编码", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "根据权限编码查询路由信息", code = "router:queryRouterByCode", level = BaseConst.PermLevel.PUBLIC)
+    @Router(name = "根据权限编码查询路由信息", code = "router:queryRouterByCode", level = RouterLevel.PUBLIC)
     public Result queryRouterByCode(@RequestParam String code) {
         RouterVo routerVo = routerService.queryRouterByCode(code);
         Assert.notNull(routerVo, "根据权限编码查询路由信息失败，数据不存在");

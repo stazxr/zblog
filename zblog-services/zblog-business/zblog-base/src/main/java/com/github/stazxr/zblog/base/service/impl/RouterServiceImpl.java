@@ -5,6 +5,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.converter.DictConverter;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
@@ -20,11 +22,9 @@ import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.mapper.InterfaceMapper;
 import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RouterMapper;
-import com.github.stazxr.zblog.base.component.security.RouterBlackWhiteListCache;
 import com.github.stazxr.zblog.base.service.RouterService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
@@ -72,21 +72,12 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      * @return 访问级别
      */
     @Override
+    @Deprecated
     public int calculateInterfaceLevel(String requestUri, String requestMethod) {
         // 处理请求地址和请求方式
         final String whLabel = "?";
         requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
         requestMethod = requestMethod.toUpperCase(Locale.ROOT);
-
-        // 白名单接口允许访问
-        if (RouterBlackWhiteListCache.containsWhite(requestUri)) {
-            return BaseConst.PermLevel.OPEN;
-        }
-
-        // 黑名单接口禁止访问
-        if (RouterBlackWhiteListCache.containsBlack(requestUri)) {
-            return BaseConst.PermLevelExtend.FORBIDDEN;
-        }
 
         // 从缓存中读取接口访问级别
         BaseConst.GlobalCacheKey intLevelKey = BaseConst.GlobalCacheKey.interfaceLevel;
@@ -100,7 +91,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         String permCode = interfaceMapper.selectCodeByUriAndMethod(requestUri, requestMethod);
         if (permCode == null) {
             // 未配置 @Router 注解，接口默认登录可访问
-            return BaseConst.PermLevel.PUBLIC;
+            return RouterLevel.OPEN;
         }
 
         // 根据权限编码查询路由信息
@@ -131,24 +122,25 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
      * @return allowed roles
      */
     @Override
+    @Deprecated
     public Set<String> findRoles(String requestUri, String requestMethod) {
         // 获取访问接口访问级别，返回允许访问的角色集合,这里的目的只是为了减少查询库的次数
         int level = calculateInterfaceLevel(requestUri, requestMethod);
         Set<String> roles = new HashSet<>();
-        if (BaseConst.PermLevel.OPEN == level) {
+        if (RouterLevel.OPEN == level) {
             roles.add(OPEN);
-        } else if (BaseConst.PermLevel.PUBLIC == level) {
+        } else if (RouterLevel.PUBLIC == level) {
             roles.add(PUBLIC);
         } else if (BaseConst.PermLevelExtend.FORBIDDEN == level) {
             roles.add(FORBIDDEN);
         } else if (BaseConst.PermLevelExtend.NULL == level) {
             roles.add(NULL);
         } else {
-            // 接口访问级别为BaseConst.PermLevel.PERM，需要查询允许访问该接口的角色列表
+            // 接口访问级别为RouterLevel.PERM，需要查询允许访问该接口的角色列表
             final String whLabel = "?";
             requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
             List<Role> dbRoles = roleMapper.selectRolesByUriAndMethod(requestUri, requestMethod.toUpperCase(Locale.ROOT));
-            dbRoles = dbRoles.stream().filter(Role::getEnabled).collect(Collectors.toList());
+            dbRoles = dbRoles.stream().filter(Role::isEnabled).collect(Collectors.toList());
             if (dbRoles.isEmpty()) {
                 roles.add(NONE);
             } else {

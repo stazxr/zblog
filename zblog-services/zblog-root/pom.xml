@@ -37,6 +37,12 @@
         <url>https://github.com/stazxr/zblog</url>
     </scm>
 
+    <modules>
+        <module>../zblog-frame/zblog-util</module>
+        <module>../zblog-frame/zblog-bas</module>
+        <module>../zblog-business</module>
+    </modules>
+
     <!-- 版本号管理 -->
     <properties>
         <!-- maven properties -->

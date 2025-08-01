@@ -1,44 +1,57 @@
+// 用于清除浮动
 @mixin clearfix {
   &:after {
-    content: "";
-    display: table;
-    clear: both;
+    content: ""; // 创建一个伪元素
+    display: table; // 使伪元素成为块级元素
+    clear: both; // 清除左右浮动
   }
 }
 
+// 用于定制滚动条的样式, 主要针对 Webkit 浏览器（Chrome、Safari、Edge）
 @mixin scrollBar {
+  // 滚动条轨道的背景颜色
   &::-webkit-scrollbar-track-piece {
     background: #d3dce6;
   }
 
+  // 滚动条的宽度
   &::-webkit-scrollbar {
     width: 6px;
   }
 
+  // 滚动条滑块的颜色, 圆角配置
   &::-webkit-scrollbar-thumb {
     background: #99a9bf;
     border-radius: 20px;
   }
 }
 
+// 设置元素为相对定位，宽度和高度为 100%
 @mixin relative {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
+// 用于设置宽度为指定百分比，并且将元素的 position 设置为相对定位，使其居中
 @mixin pct($pct) {
   width: #{$pct};
   position: relative;
   margin: 0 auto;
 }
 
+// 用于绘制三角形，常用于创建箭头或指示器
+// $width: 三角形的宽度（一般是指指示器的大小）
+// $height: 三角形的高度
+// $color: 三角形的颜色
+// $direction: 三角形的方向 (up, right, down, left)
 @mixin triangle($width, $height, $color, $direction) {
-  $width: $width/2;
-  $color-border-style: $height solid $color;
-  $transparent-border-style: $width solid transparent;
-  height: 0;
-  width: 0;
+  $width: $width / 2; // 将宽度除以2，用于计算三角形的实际宽度
+  $color-border-style: $height solid $color; // 有颜色的边框
+  $transparent-border-style: $width solid transparent; // 透明的边框
+
+  height: 0; // 高度为 0，使用边框显示
+  width: 0; // 宽度为 0，使用边框显示
 
   @if $direction==up {
     border-bottom: $color-border-style;

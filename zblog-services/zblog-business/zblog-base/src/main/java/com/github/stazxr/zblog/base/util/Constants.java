@@ -15,7 +15,7 @@ public class Constants {
     /**
      * 权限树中顶层权限的ID
      */
-    public static final Long TOP_PERM_ID = 0L;
+    public static final Long TOP_PERM_ID = TOP_ID;
 
     /**
      * 权限树中顶层权限名称

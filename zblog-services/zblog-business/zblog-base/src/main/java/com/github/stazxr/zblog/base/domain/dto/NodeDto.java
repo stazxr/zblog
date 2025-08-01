@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,7 +13,9 @@ import lombok.Data;
  */
 @Data
 @ApiModel("节点信息")
-public class NodeDto {
+public class NodeDto extends BaseDto {
+    private static final long serialVersionUID = 8674278397301103032L;
+
     /**
      * 节点id
      */
