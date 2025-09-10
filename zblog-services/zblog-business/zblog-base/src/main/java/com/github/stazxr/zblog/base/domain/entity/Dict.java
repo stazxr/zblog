@@ -18,6 +18,8 @@ import lombok.Setter;
 @Setter
 @TableName("dict")
 public class Dict extends BaseEntity {
+    private static final long serialVersionUID = 5454007640493795517L;
+
     /**
      * 主键
      */

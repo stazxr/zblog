@@ -9,6 +9,8 @@ import com.github.stazxr.zblog.core.enums.ResultCode;
  * @since 2022-08-27
  */
 public class DataValidatedException extends ServiceException {
+    private static final long serialVersionUID = 1641043720556318233L;
+
     /**
      * 生成一个默认配置信息错误异常
      */

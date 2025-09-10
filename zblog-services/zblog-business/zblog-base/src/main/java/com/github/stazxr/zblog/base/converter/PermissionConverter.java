@@ -4,8 +4,7 @@ import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
 import com.github.stazxr.zblog.core.base.BaseConverter;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import org.springframework.stereotype.Component;
 
 /**
  * PermissionConverter
@@ -13,23 +12,35 @@ import org.mapstruct.ReportingPolicy;
  * @author SunTao
  * @since 2022-06-29
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface PermissionConverter extends BaseConverter<Permission, PermissionDto, PermissionVo> {
+@Component
+public class PermissionConverter implements BaseConverter<Permission, PermissionDto, PermissionVo> {
     /**
-     * 数据对象转实体对象
+     * 获取实体对象类型
      *
-     * @param dto 数据对象
-     * @return po 实体对象
+     * @return 实体对象类型
      */
     @Override
-    Permission dtoToEntity(PermissionDto dto);
+    public Class<Permission> getEntityClass() {
+        return Permission.class;
+    }
 
     /**
-     * 实体对象转视图对象
+     * 获取视图对象类型
      *
-     * @param po 实体对象
-     * @return vo 视图对象
+     * @return 视图对象类型
      */
     @Override
-    PermissionVo entityToVo(Permission po);
+    public Class<PermissionVo> getVoClass() {
+        return PermissionVo.class;
+    }
+
+    /**
+     * 获取数据对象类型
+     *
+     * @return 数据对象类型
+     */
+    @Override
+    public Class<PermissionDto> getDtoClass() {
+        return PermissionDto.class;
+    }
 }

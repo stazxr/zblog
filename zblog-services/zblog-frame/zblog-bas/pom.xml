@@ -25,6 +25,11 @@
             <artifactId>zblog-util</artifactId>
             <version>${zblog.version}</version>
         </dependency>
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
         <!-- Spring Web MVC -->
         <dependency>
             <groupId>org.springframework</groupId>

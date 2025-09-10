@@ -45,12 +45,6 @@ public class PermissionQueryDto extends PageParam {
     private Boolean enabled;
 
     /**
-     * 是否外链
-     */
-    @ApiModelProperty(name = "iFrame", value = "是否外链")
-    private Boolean iFrame;
-
-    /**
      * 是否只显示菜单
      */
     @ApiModelProperty("是否只显示菜单")

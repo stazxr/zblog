@@ -13,17 +13,18 @@
         <el-form-item label="权限类型" prop="permType">
           <el-radio-group
             v-model="formData.permType"
-            :disabled="formData.id != null && formData.id !== ''"
-            :style="isMobile ? '' : 'width: 178px;'"
+            :disabled="formData.id !== null"
+            :style="isMobile ? '' : 'width: 230px;'"
             @change="permTypeChangeEvent"
           >
-            <el-radio-button label="1">目录</el-radio-button>
-            <el-radio-button label="2">菜单</el-radio-button>
-            <el-radio-button label="3">按钮</el-radio-button>
+            <el-radio-button :label="1">目录</el-radio-button>
+            <el-radio-button :label="2">菜单</el-radio-button>
+            <el-radio-button :label="3">按钮</el-radio-button>
+            <el-radio-button :label="4">外链</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <!-- 当权限类型不为按钮的时候，显示图标 -->
-        <el-form-item v-show="formData.permType.toString() !== '3'" label="菜单图标" prop="icon">
+        <el-form-item v-show="formData.permType !== 3" label="菜单图标" prop="icon">
           <el-popover placement="bottom-start" trigger="click" :width="isMobile ? '100%' : '450'" @show="$refs.iconSelect.reset()">
             <icon-select ref="iconSelect" :style="[isMobile ? { 'width': '100%' } : { 'width': '450px' }]" @selected="iconSelectedEvent" />
             <el-input
@@ -38,29 +39,18 @@
             </el-input>
           </el-popover>
         </el-form-item>
-        <!-- 当权限类型不为按钮的时候，显示是否外链 -->
-        <el-form-item v-show="formData.permType.toString() !== '3'" label="外链菜单" prop="iFrame">
-          <el-radio-group v-model="formData.iFrame" :disabled="formData.id != null && formData.id !== ''" @change="iFrameChangeEvent">
-            <el-radio-button label="true">是</el-radio-button>
-            <el-radio-button label="false">否</el-radio-button>
-          </el-radio-group>
+        <!-- 菜单名称/按钮名称 -->
+        <el-form-item :label="formData.permType !== 3 ? '菜单名称' : '按钮名称'" prop="permName">
+          <el-input
+            v-model="formData.permName"
+            :placeholder="formData.permType !== 3 ? '菜单名称' : '按钮名称'"
+            :style="isMobile ? '' : 'width: 178px;'"
+            maxlength="20"
+            show-word-limit
+          />
         </el-form-item>
-        <!-- 当权限类型不为按钮的时候，显示是否隐藏 -->
-        <el-form-item v-show="formData.permType.toString() !== '3'" label="菜单可见" prop="hidden">
-          <el-radio-group v-model="formData.hidden">
-            <el-radio-button label="false">是</el-radio-button>
-            <el-radio-button label="true">否</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <!-- 当权限类型是菜单的时候，显示是否缓存 -->
-        <el-form-item v-show="formData.permType.toString() === '2'" label="菜单缓存" prop="cacheable">
-          <el-radio-group v-model="formData.cacheable">
-            <el-radio-button label="true">是</el-radio-button>
-            <el-radio-button label="false">否</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <!-- 当权限类型不是目录时，显示权限编码 -->
-        <el-form-item v-if="formData.permType.toString() !== '1'" label="权限编码" prop="permCode">
+        <!-- 当权限类型不是目录和外链时，显示权限编码 -->
+        <el-form-item v-if="formData.permType !== 1 && formData.permType !== 4" label="权限编码" prop="permCode">
           <el-select
             v-model="formData.permCode"
             :title="formData.permCode"
@@ -82,19 +72,41 @@
             />
           </el-select>
         </el-form-item>
-        <!-- 菜单名称/按钮名称 -->
-        <el-form-item :label="formData.permType.toString() !== '3' ? '菜单名称' : '按钮名称'" prop="permName">
+        <!-- 当权限类型不为按钮的时候，显示是否隐藏 -->
+        <el-form-item v-show="formData.permType !== 3" label="菜单可见" prop="hidden">
+          <el-select v-model="formData.hidden" :style="isMobile ? '' : 'width: 178px;'" placeholder="菜单可见">
+            <el-option v-for="item in permHiddenList" :key="item.value" :label="item.name" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <!-- 当权限类型是菜单的时候，显示是否缓存 -->
+        <el-form-item v-show="formData.permType === 2" label="菜单缓存" prop="cacheable">
+          <el-select v-model="formData.cacheable" :style="isMobile ? '' : 'width: 178px;'" placeholder="菜单缓存">
+            <el-option v-for="item in permCacheList" :key="item.value" :label="item.name" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <!-- 当权限类型是菜单时，显示组件名称 -->
+        <el-form-item v-if="formData.permType === 2" label="组件名称" prop="componentName">
           <el-input
-            v-model="formData.permName"
-            :placeholder="formData.permType.toString() !== '3' ? '' : ''"
+            v-model="formData.componentName"
             :style="isMobile ? '' : 'width: 178px;'"
-            maxlength="20"
-            show-word-limit
+            placeholder="Vue 组件的名称"
           />
         </el-form-item>
-        <!-- 当权限类型不是按钮时，显示路由地址 -->
-        <el-form-item v-if="formData.permType.toString() !== '3'" label="路由地址" prop="routerPath">
-          <el-input v-model="formData.routerPath" placeholder="路由地址" :style="isMobile ? '' : 'width: 178px;'" />
+        <!-- 当权限类型是菜单时，显示组件路径 -->
+        <el-form-item v-if="formData.permType === 2" label="组件路径" prop="componentPath">
+          <el-input
+            v-model="formData.componentPath"
+            :style="isMobile ? '' : 'width: 178px;'"
+            placeholder="组件在 views 目录下的相对路径"
+          />
+        </el-form-item>
+        <!-- 当权限类型不是按钮时，显示路由地址/外链地址 -->
+        <el-form-item v-if="formData.permType !== 3" :label="formData.permType === 4 ? '外链地址' : '路由地址'" prop="routerPath">
+          <el-input
+            v-model="formData.routerPath"
+            :placeholder="formData.permType === 4 ? '外链地址' : '路由地址'"
+            :style="isMobile ? '' : 'width: 178px;'"
+          />
         </el-form-item>
         <!-- 权限排序 -->
         <el-form-item label="权限排序" prop="sort">
@@ -106,14 +118,6 @@
             step-strictly
             controls-position="right"
           />
-        </el-form-item>
-        <!-- 当权限类型是菜单时，且不为外链，显示组件名称 -->
-        <el-form-item v-if="(formData.iFrame == null || formData.iFrame.toString() === 'false') && formData.permType.toString() === '2'" label="组件名称" prop="componentName">
-          <el-input v-model="formData.componentName" :style="isMobile ? '' : 'width: 178px;'" placeholder="前端 Vue 组件的名称" />
-        </el-form-item>
-        <!-- 当权限类型是菜单时，且不为外链，显示组件路径 -->
-        <el-form-item v-if="(formData.iFrame == null || formData.iFrame.toString() === 'false') && formData.permType.toString() === '2'" label="组件路径" prop="componentPath">
-          <el-input v-model="formData.componentPath" :style="isMobile ? '' : 'width: 178px;'" placeholder="前端 Vue 组件在 views 目录下的相对路径" />
         </el-form-item>
         <!-- 访问级别 -->
         <el-form-item label="访问级别" prop="permLevel">
@@ -135,7 +139,7 @@
             :style="isMobile ? '' : 'width: 450px;'"
             :searchable="false"
             :max-height="200"
-            placeholder="选择上级类目"
+            placeholder="无"
             no-options-text="列表为空"
             no-results-text="搜索结果为空"
           />
@@ -187,13 +191,21 @@ export default {
         { name: '启用', value: true },
         { name: '禁用', value: false }
       ],
+      permHiddenList: [
+        { name: '隐藏', value: true },
+        { name: '显示', value: false }
+      ],
+      permCacheList: [
+        { name: '是', value: true },
+        { name: '否', value: false }
+      ],
       formData: {
         id: null,
         pid: 0,
         permName: null,
         permCode: null,
         permType: 1, // 权限类型，默认目录
-        permLevel: null,
+        permLevel: 4,
         routerPath: null,
         componentName: null,
         componentPath: null,
@@ -201,36 +213,45 @@ export default {
         icon: null,
         enabled: true,
         cacheable: null,
-        iFrame: false,
-        hidden: false
+        hidden: null
       },
       formRules: {
-        permCode: [
-          { required: true, message: '请选择权限编码', trigger: 'blur' }
-        ],
+        // 固定必填
         permName: [
           { required: true, message: '请输入名称', trigger: 'blur' }
         ],
-        routerPath: [
-          { required: true, message: '请输入地址', trigger: 'blur' }
-        ],
-        componentName: [
-          { required: true, message: '请输入组件名称', trigger: 'blur' }
-        ],
-        componentPath: [
-          { required: true, message: '请输入组件地址', trigger: 'blur' }
+        permLevel: [
+          { required: true, message: '请选择访问级别', trigger: 'change' }
         ],
         sort: [
           { required: true, message: '请输入权限排序', trigger: 'blur' }
         ],
-        permLevel: [
-          { required: true, message: '请选择访问级别', trigger: 'blur' }
-        ],
         enabled: [
-          { required: true, message: '请选择权限状态', trigger: 'blur' }
+          { required: true, message: '请选择权限状态', trigger: 'change' }
         ],
-        pid: [
-          { required: true, message: '请选择上级类目', trigger: 'blur' }
+        // 按钮必填，其他非必填
+        permCode: [
+          { required: true, message: '请选择权限编码', trigger: 'change' }
+        ],
+        // 按钮非必填，其他必填
+        routerPath: [
+          { required: true, message: '请输入路由地址', trigger: 'blur' }
+        ],
+        // 菜单必填，其他非必填
+        componentName: [
+          { required: true, message: '请输入组件名称', trigger: 'blur' }
+        ],
+        // 菜单必填，其他非必填
+        componentPath: [
+          { required: true, message: '请输入组件地址', trigger: 'blur' }
+        ],
+        // 按钮非必填，其他必填
+        hidden: [
+          { required: true, message: '请选择菜单是否可见', trigger: 'change' }
+        ],
+        // 菜单必填，其他非必填
+        cacheable: [
+          { required: true, message: '请选择菜单是否缓存', trigger: 'change' }
         ]
       }
     }
@@ -240,22 +261,20 @@ export default {
       return this.$store.state.app.device === 'mobile'
     }
   },
-  watch: {
-    dataId(id) {
-      this.formData.id = id
-    }
-  },
   methods: {
     initData() {
       this.getMenus()
       this.getPermCodes()
       this.$nextTick(() => {
-        this.getPermInfo()
+        if (this.dataId != null) {
+          this.getPermInfo()
+        } else {
+          this.permTypeChangeEvent(this.formData.permType)
+        }
       })
     },
     getMenus() {
       const param = {
-        iFrame: false,
         needTop: true,
         onlyShowMenu: true
       }
@@ -277,60 +296,122 @@ export default {
       })
     },
     getPermInfo() {
-      if (this.formData.id != null && this.formData.id !== '') {
-        this.$mapi.perm.queryPermDetail({ permId: this.formData.id }).then(res => {
-          const { data } = res
-          Object.keys(this.formData).forEach(key => {
-            this.formData[key] = data[key]
-          })
-          if (this.formData.pid == null) {
-            this.formData.pid = 0
-          }
-
-          this.permTypeChangeEvent(this.formData.permType)
-          this.oldPermCode = this.formData.permCode
-        }).catch(_ => {
-          this.doClose()
+      this.$mapi.perm.queryPermDetail({ permId: this.dataId }).then(res => {
+        const { data } = res
+        Object.keys(this.formData).forEach(key => {
+          this.formData[key] = data[key]
         })
-      }
+        if (this.formData.pid == null) {
+          this.formData.pid = 0
+        }
+
+        this.permTypeChangeEvent(this.formData.permType)
+        this.oldPermCode = this.formData.permCode
+      }).catch(_ => {
+        this.doClose()
+      })
     },
     permTypeChangeEvent(permType) {
-      switch (permType.toString()) {
-        case '1':
-        case '2':
-          // 目录和菜单：权限编码非必填
+      // 清除校验结果
+      this.$refs.addOrEditForm.clearValidate()
+
+      switch (permType) {
+        case 1: // 目录
           this.formRules.permCode[0].required = false
+          this.formRules.routerPath[0].required = true
+          this.formRules.routerPath[0].message = '请输入路由地址'
+          this.formRules.componentName[0].required = false
+          this.formRules.componentPath[0].required = false
+          this.formRules.hidden[0].required = true
+          if (this.formData.hidden === null) {
+            this.formData.hidden = false
+          }
+          this.formRules.cacheable[0].required = false
+          this.formData.cacheable = null
+          break
+        case 2: // 菜单
+          this.formRules.permCode[0].required = false
+          this.formRules.routerPath[0].required = true
+          this.formRules.routerPath[0].message = '请输入路由地址'
+          this.formRules.componentName[0].required = true
+          this.formRules.componentPath[0].required = true
+          this.formRules.hidden[0].required = true
+          if (this.formData.hidden === null) {
+            this.formData.hidden = false
+          }
+          this.formRules.cacheable[0].required = true
           if (this.formData.cacheable === null) {
-            this.formData.cacheable = true // 菜单默认开启缓存
+            this.formData.cacheable = true
           }
           break
-        case '3':
-          // 按钮：权限编码必填
+        case 3: // 按钮
           this.formRules.permCode[0].required = true
+          this.formRules.routerPath[0].required = false
+          this.formRules.componentName[0].required = false
+          this.formRules.componentPath[0].required = false
+          this.formRules.hidden[0].required = false
+          this.formData.hidden = null
+          this.formRules.cacheable[0].required = false
+          this.formData.cacheable = null
           break
+        case 4: // 外链
+          this.formRules.permCode[0].required = false
+          this.formRules.routerPath[0].required = true
+          this.formRules.routerPath[0].message = '请输入外链地址'
+          this.formRules.componentName[0].required = false
+          this.formRules.componentPath[0].required = false
+          this.formRules.hidden[0].required = true
+          if (this.formData.hidden === null) {
+            this.formData.hidden = false
+          }
+          this.formRules.cacheable[0].required = false
+          this.formData.cacheable = null
+          break
+      }
+    },
+    dealEmptyData() {
+      switch (this.formData.permType) {
+        case 1: // 目录
+          this.formData.permCode = null
+          this.formData.cacheable = null
+          this.formData.componentName = null
+          this.formData.componentPath = null
+          break
+        case 2: // 菜单
+          break
+        case 3: // 按钮
+          this.formData.icon = null
+          this.formData.hidden = null
+          this.formData.cacheable = null
+          this.formData.routerPath = null
+          this.formData.componentName = null
+          this.formData.componentPath = null
+          break
+        case 4: // 外链
+          this.formData.permCode = null
+          this.formData.cacheable = null
+          this.formData.componentName = null
+          this.formData.componentPath = null
+          break
+        default:
+          throw new Error('error permType: ' + this.formData.permType)
       }
     },
     iconSelectedEvent(name) {
       this.formData.icon = name
     },
-    iFrameChangeEvent(isIFrame) {
-      isIFrame = isIFrame == null || isIFrame === '' ? this.formData.iFrame : isIFrame
-      if (isIFrame != null && isIFrame.toString() === 'true') {
-        this.formData.permCode = null
-        this.formData.componentName = null
-        this.formData.componentPath = null
-      }
-    },
     permCodeChangeEvent(code) {
       code = code == null || code === '' ? this.formData.permCode : code
       if (code == null || code === '') {
         this.formData.permName = null
-        this.formData.permLevel = null
+        this.formData.permLevel = 4
+        this.$refs.addOrEditForm.clearValidate('permName')
       } else {
         this.$mapi.perm.queryResourceByPermCode({ 'permCode': code }).then(res => {
           const { data } = res
           this.formData.permName = data['resourceName']
           this.formData.permLevel = data['resourceLevel']
+          this.$refs.addOrEditForm.validateField(['permName', 'permName'])
         }).catch(_ => {
           this.formData.permCode = null
         })
@@ -351,12 +432,11 @@ export default {
       return nodeData
     },
     submit() {
-      console.log('this.f', this.formData)
       this.dealEmptyData() // 空数据处理
       this.$refs.addOrEditForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          if (this.formData.id == null || this.formData.id === '') {
+          if (this.formData.id === null) {
             // add
             this.$mapi.perm.addPerm(this.formData).then(res => {
               this.$message.success(res.message)
@@ -376,32 +456,6 @@ export default {
         }
       })
     },
-    dealEmptyData() {
-      switch (this.formData.permType) {
-        case '1': // 目录
-          this.formData.cacheable = null // 是否缓存为 NULL
-          this.formData.permCode = null // 权限编码为 NULL
-          this.formData.componentName = null // 组件名称为 NULL
-          this.formData.componentPath = null // 组件路径为 NULL
-          break
-        case '2': // 菜单
-          if (this.formData.iFrame) {
-            this.formData.permCode = null // 外链权限编码为 NULL
-            this.formData.componentName = null // 外链组件名称为 NULL
-            this.formData.componentPath = null // 外链组件路径为 NULL
-          }
-          break
-        case '3': // 按钮
-          this.formData.icon = null // 图标为 NULL
-          this.formData.iFrame = null // 是否外链为 NULL
-          this.formData.cacheable = null // 是否缓存为 NULL
-          this.formData.hidden = null // 是否隐藏为 NULL
-          this.formData.componentName = null // 组件名称为 NULL
-          this.formData.componentPath = null // 组件路径为 NULL
-          this.formData.routerPath = null // 路由地址为 NULL
-          break
-      }
-    },
     cancel() {
       this.handleClose()
     },
@@ -419,7 +473,7 @@ export default {
         permName: null,
         permCode: null,
         permType: 1, // 权限类型，默认目录
-        permLevel: null,
+        permLevel: 4,
         routerPath: null,
         componentName: null,
         componentPath: null,
@@ -427,8 +481,7 @@ export default {
         icon: null,
         enabled: true,
         cacheable: null,
-        iFrame: false,
-        hidden: false
+        hidden: null
       }
       this.$refs.addOrEditForm.resetFields()
       this.submitLoading = false

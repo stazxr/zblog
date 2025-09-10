@@ -19,12 +19,12 @@ public class MenuVo implements Serializable {
     private static final long serialVersionUID = 1937699132190889664L;
 
     /**
-     * TODO 菜单名称
+     * 路由名称
      */
     private String name;
 
     /**
-     * TODO 菜单路径
+     * 路由路径
      */
     private String path;
 
@@ -34,20 +34,22 @@ public class MenuVo implements Serializable {
     private Boolean show;
 
     /**
-     * TODO 是否展示
+     * 是否一定展示
      */
     private Boolean alwaysShow;
 
     /**
-     * 重定向路径，"noredirect" 代表不允许重定向
+     * 是否支持重定向（跳转），"noredirect" 代表不进行重定向
+     *
+     * 前端面包屑和路由检索功能使用
      */
     private String redirect;
 
     /**
-     * TODO 组件路径
-     *  Layout
-     *  ParentView
-     *  return (resolve) => require([`@/views/${component}`], resolve)
+     * 组件路径
+     *  <li>Layout</li>
+     *  <li>ParentView</li>
+     *  <li>return (resolve) => require([`@/views/${component}`], resolve)</li>
      */
     private String component;
 

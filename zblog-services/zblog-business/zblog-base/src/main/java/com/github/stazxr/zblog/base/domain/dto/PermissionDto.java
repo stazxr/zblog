@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
-import com.github.stazxr.zblog.bas.validate.group.Create;
-import com.github.stazxr.zblog.bas.validate.group.Update;
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限ID
      */
-    @NotNull(groups = Update.class, message = "{perm.valid.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.perm.id.NotNull}")
     @ApiModelProperty("权限id")
     private Long id;
 
@@ -37,7 +37,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限名称
      */
-    @NotBlank(message = "{perm.valid.permName.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.perm.name.NotBlank}")
     @ApiModelProperty("权限名称")
     private String permName;
 
@@ -50,14 +50,14 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限类型
      */
-    @NotNull(message = "{perm.valid.permType.NotNull}")
-    @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.type.NotNull}")
+    @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮、4：外链")
     private Integer permType;
 
     /**
      * 权限访问级别
      */
-    @NotNull(message = "{perm.valid.permLevel.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.level.NotNull}")
     @ApiModelProperty("权限访问级别")
     private Integer permLevel;
 
@@ -88,7 +88,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限排序
      */
-    @NotNull(message = "{perm.valid.sort.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.sort.NotNull}")
     @ApiModelProperty(value = "权限排序", example = "99999")
     private Integer sort;
 
@@ -105,15 +105,9 @@ public class PermissionDto extends BaseDto {
     private Boolean hidden;
 
     /**
-     * 是否外链
-     */
-    @ApiModelProperty(name = "iFrame", value = "是否外链")
-    private Boolean iFrame;
-
-    /**
      * 是否启用
      */
-    @NotNull(message = "{perm.valid.enabled.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.enabled.NotNull}")
     @ApiModelProperty(value = "是否启用")
     private Boolean enabled;
 }

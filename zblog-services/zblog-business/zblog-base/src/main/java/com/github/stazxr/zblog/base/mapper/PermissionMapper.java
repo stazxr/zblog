@@ -12,7 +12,6 @@ import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 权限存储
@@ -78,30 +77,4 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * @return Resource
      */
     Resource selectResourceByPermCode(@Param("permCode") String permCode);
-
-
-
-    /**
-     * 根据组件名称查询权限信息
-     *
-     * @param componentName 组件名称
-     * @return Permission
-     */
-    Permission selectByComponentName(@Param("componentName") String componentName);
-
-    /**
-     * 查询用户的权限列表（权限编码）
-     *
-     * @param userId 用户序列
-     * @return permCodes
-     */
-    Set<String> selectUserPerms(@Param("userId") Long userId);
-
-    /**
-     * 更新 Permission 信息
-     *
-     * @param permission 权限信息
-     * @return rows
-     */
-    int updatePermission(Permission permission);
 }

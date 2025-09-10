@@ -72,6 +72,16 @@ public final class Result implements Serializable {
     /**
      * 成功响应，使用默认成功消息。
      *
+     * @param data 返回数据
+     * @return Result 实例，包含成功标识和消息
+     */
+    public static Result s(Object data) {
+        return success().data(data);
+    }
+
+    /**
+     * 成功响应，使用默认成功消息。
+     *
      * @return Result 实例，包含成功标识和消息
      */
     public static Result success() {

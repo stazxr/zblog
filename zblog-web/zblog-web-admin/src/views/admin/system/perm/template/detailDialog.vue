@@ -3,10 +3,12 @@
     <el-dialog
       title="权限详情"
       append-to-body
-      :fullscreen="device === 'mobile'"
-      :close-on-click-modal="true"
-      :before-close="handleClose"
       :visible.sync="dialogVisible"
+      :fullscreen="device === 'mobile'"
+      :destroy-on-close="true"
+      :close-on-click-modal="true"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
     >
       <el-tabs v-model="activeName" type="border-card" style="max-height: 100%; overflow-y: auto;" @tab-click="initTabData">
         <el-tab-pane label="详细信息" name="permDetail">

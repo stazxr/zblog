@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.validate;
+package com.github.stazxr.zblog.bas.validation;
 
 import javax.validation.*;
 import java.util.Set;
@@ -19,7 +19,7 @@ public class ValidatorUtil {
                 for (ConstraintViolation<T> violation : violations) {
                     sb.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("; ");
                 }
-                throw new ConstraintViolationException("参数校验失败: " + sb.toString(), violations);
+                throw new ConstraintViolationException("参数校验失败: " + sb, violations);
             }
 
         }

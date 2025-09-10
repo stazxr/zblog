@@ -69,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * 等待续签的循环刷新间隔，单位毫秒
      */
-    private static final int RENEW_WAIT_INTERVAL_MILL_SECONDS = 500;
+    private static final long RENEW_WAIT_INTERVAL_MILL_SECONDS = 500;
 
     private static final String LOGIN_USER_ID_REQ_KEY = "LOGIN_USER_ID";
 
@@ -198,7 +198,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // 续签中，等待续签操作结束
                     if (expired) {
                         int count = 0;
-                        int maxWaitCount = MAX_RENEW_WAIT_SECONDS * 1000 / RENEW_WAIT_INTERVAL_MILL_SECONDS;
+                        long maxWaitCount = MAX_RENEW_WAIT_SECONDS * 1000 / RENEW_WAIT_INTERVAL_MILL_SECONDS;
                         do {
                             ThreadUtils.sleepMillisecond(RENEW_WAIT_INTERVAL_MILL_SECONDS);
                             if (count++ > maxWaitCount) {

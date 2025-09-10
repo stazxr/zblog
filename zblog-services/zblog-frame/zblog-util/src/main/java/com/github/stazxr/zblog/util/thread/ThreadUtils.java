@@ -21,10 +21,10 @@ public class ThreadUtils {
     }
 
     public static void sleepSecond(int seconds) {
-        sleepMillisecond(1000 * seconds);
+        sleepMillisecond(1000L * seconds);
     }
 
-    public static void sleepMillisecond(int milliseconds) {
+    public static void sleepMillisecond(long milliseconds) {
         Assert.isTrue(milliseconds <= 0, "milliseconds must be greater than zero.");
         try {
             Thread.sleep(milliseconds);

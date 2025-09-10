@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.core.serializer;
+package com.github.stazxr.zblog.web.serializer;
 
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
@@ -10,7 +10,9 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 
 /**
- * 自定义序列化机制，Long 在序列化为 字符串时，如果没有超过浏览器精度，则仍然返回 Long，否则返回字符串
+ * 自定义序列化机制
+ *
+ * Long 在序列化为 String 时，如果没有超过浏览器精度，则仍然返回 Long，否则返回 String
  *
  * @author SunTao
  * @since 2022-04-18

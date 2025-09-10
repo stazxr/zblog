@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog;
 
-import com.github.stazxr.zblog.base.runner.InitBlackWhiteListRunner;
 import com.github.stazxr.zblog.log.annotation.EnableLog;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

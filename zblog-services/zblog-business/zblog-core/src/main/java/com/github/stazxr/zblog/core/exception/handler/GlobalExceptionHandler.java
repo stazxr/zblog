@@ -37,18 +37,6 @@ import java.io.IOException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
-     * 实体校验异常
-     *
-     * @param e 异常信息
-     * @throws IOException write json failed
-     */
-    @ExceptionHandler(value = DataValidatedException.class)
-    public void dataValidatedExceptionHandler(HttpServletResponse response, DataValidatedException e) throws IOException {
-        log.warn("全局捕获 -> 数据校验失败: {}", e.getMessage());
-        ResponseUtils.responseJsonWriter(response, Result.failure(e.getIdentifier(), e.getMessage()));
-    }
-
-    /**
      * 业务异常
      *
      * @param e 异常信息
@@ -65,18 +53,6 @@ public class GlobalExceptionHandler {
         }
 
         ResponseUtils.responseJsonWriter(response, Result.failure(e.getIdentifier(), e.getMessage()).data(errorMeta));
-    }
-
-    /**
-     * 规则校验不通过异常
-     *
-     * @param e 异常信息
-     * @throws IOException write json failed
-     */
-    @ExceptionHandler(value = AssertionViolatedException.class)
-    public void assertionViolatedExceptionHandler(HttpServletResponse response, AssertionViolatedException e) throws IOException {
-        log.error("全局捕获 -> 规则校验失败", e);
-        ResponseUtils.responseJsonWriter(response, Result.failure(e.getMessage()));
     }
 
     /**
@@ -103,20 +79,6 @@ public class GlobalExceptionHandler {
         ErrorMeta errorMeta = new ErrorMeta(e);
         Result result = Result.failure(ResultCode.REQUEST_METHOD_NOT_SUPPORT.message()).data(errorMeta);
         ResponseUtils.responseJsonWriter(response, result);
-    }
-
-    /**
-     * 请求数据格式不正确
-     *
-     * @param e 异常信息
-     * @throws IOException write json failed
-     */
-    @ExceptionHandler(value = ServletRequestBindingException.class)
-    public void badRequestExceptionHandler(HttpServletResponse response, ServletRequestBindingException e) throws IOException {
-        log.error("全局捕获 -> 请求数据格式不正确", e);
-        ErrorMeta errorMeta = new ErrorMeta(e);
-        Result result = Result.failure(ResultCode.BAD_REQUEST.message()).code(HttpStatus.INTERNAL_SERVER_ERROR).data(errorMeta);
-        ResponseUtils.responseJsonWriter(response, result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**

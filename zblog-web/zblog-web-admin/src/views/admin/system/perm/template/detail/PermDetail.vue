@@ -12,6 +12,7 @@
       <el-tag v-if="permInfo.permType === '1'">目录</el-tag>
       <el-tag v-else-if="permInfo.permType === '2'" type="success">菜单</el-tag>
       <el-tag v-else-if="permInfo.permType === '3'" type="info">按钮</el-tag>
+      <el-tag v-else-if="permInfo.permType === '4'" type="warning">外链</el-tag>
       <span v-else> {{ permInfo.permType }} </span>
     </el-descriptions-item>
     <el-descriptions-item label="访问级别">
@@ -26,24 +27,19 @@
       <el-tag v-else-if="permInfo.enabled === 'false'" type="warning">禁用</el-tag>
       <span v-else> - </span>
     </el-descriptions-item>
-    <el-descriptions-item label="是否外链">
-      <el-tag v-if="permInfo.iFrame === 'true'" type="info">是</el-tag>
-      <el-tag v-else-if="permInfo.iFrame === 'false'" type="info">否</el-tag>
-      <span v-else> - </span>
-    </el-descriptions-item>
     <el-descriptions-item label="是否隐藏">
-      <el-tag v-if="permInfo.hidden === 'true'" type="info">是</el-tag>
-      <el-tag v-else-if="permInfo.hidden === 'false'" type="info">否</el-tag>
+      <span v-if="permInfo.hidden === 'true'">是</span>
+      <span v-else-if="permInfo.hidden === 'false'">否</span>
       <span v-else> - </span>
     </el-descriptions-item>
     <el-descriptions-item label="是否缓存">
-      <el-tag v-if="permInfo.cacheable === 'true'" type="info">是</el-tag>
-      <el-tag v-else-if="permInfo.cacheable === 'false'" type="info">否</el-tag>
+      <span v-if="permInfo.cacheable === 'true'">是</span>
+      <span v-else-if="permInfo.cacheable === 'false'">否</span>
       <span v-else> - </span>
     </el-descriptions-item>
-    <!-- 3 -->
     <el-descriptions-item label="权限标识"> {{ permInfo.permCode }} </el-descriptions-item>
-    <el-descriptions-item label="路由地址"> {{ permInfo.routerPath }} </el-descriptions-item>
+    <!-- 3 -->
+    <el-descriptions-item label="路由地址" :span="2"> {{ permInfo.routerPath }} </el-descriptions-item>
     <el-descriptions-item label="组件名称"> {{ permInfo.componentName }} </el-descriptions-item>
     <el-descriptions-item label="组件路径"> {{ permInfo.componentPath }} </el-descriptions-item>
     <!-- 5 -->

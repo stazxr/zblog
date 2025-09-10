@@ -133,6 +133,17 @@ zblog:
     context: # 上下文配置
       tags: # 自定义标签配置
         - { tag-name: conversation-id } # conversation-id
+    i18n:
+      cache-ttl: 1800000 # 缓存刷新周期，单位毫秒
+      load-sql: SELECT code, locale, message FROM i18n_message # 从数据库加载国际化数据的 SQL 语句。
+      code-column: code # 数据库中 "code" 列名
+      message-column: message # 数据库中 "message"（消息内容）列名
+      locale-column: locale # 数据库中 "locale"（语言）列名
+      base-names: # 本地资源文件的基础名列表（无扩展名）
+        - messages/messages
+        - ValidationMessages # 用户自定义的校验消息文件
+        - ContributorValidationMessages # 允许约束定义的贡献者（Constraint Definition Contributor）提供一个自己的默认消息文件
+        - org.hibernate.validator.ValidationMessages # Hibernate Validator 内置的默认消息文件
     seq: # 序号配置
       datacenter-id: 0 # 数据中心ID
       machine-id: 0 # 机器ID

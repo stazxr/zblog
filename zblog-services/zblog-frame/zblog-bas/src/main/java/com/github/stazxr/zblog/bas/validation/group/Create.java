@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.validate.group;
+package com.github.stazxr.zblog.bas.validation.group;
 
 /**
  *

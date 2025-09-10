@@ -11,6 +11,11 @@
       "sourceType": "com.github.stazxr.zblog.bas.context.properties.HeaderProperties$Deploy"
     },
     {
+      "name": "zblog.base.i18n",
+      "type": "com.github.stazxr.zblog.bas.i18n.I18nProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.I18nProperties"
+    },
+    {
       "name": "zblog.base.seq",
       "type": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties",
       "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties"
@@ -97,6 +102,50 @@
       "type": "java.lang.Integer",
       "description": "Deployment unit.",
       "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.i18n.cacheTtl",
+      "type": "java.lang.Long",
+      "description": "缓存刷新周期，单位毫秒，默认 60 分钟.",
+      "defaultValue": 3600000
+    },
+    {
+      "name": "zblog.base.i18n.loadSql",
+      "type": "java.lang.String",
+      "description": "从数据库加载国际化数据的 SQL 语句.",
+      "defaultValue": "SELECT code, locale, message FROM i18n_message"
+    },
+    {
+      "name": "zblog.base.i18n.codeColumn",
+      "type": "java.lang.String",
+      "description": "数据库中 code 列名.",
+      "defaultValue": "code"
+    },
+    {
+      "name": "zblog.base.i18n.localeColumn",
+      "type": "java.lang.String",
+      "description": "数据库中 locale（语言）列名.",
+      "defaultValue": "locale"
+    },
+    {
+      "name": "zblog.base.i18n.messageColumn",
+      "type": "java.lang.String",
+      "description": "数据库中 message（消息内容）列名.",
+      "defaultValue": "message"
+    },
+    {
+      "name": "zblog.base.i18n.encode",
+      "type": "java.lang.String",
+      "description": "国际化文件的编码方式，默认 UTF-8.",
+      "defaultValue": "UTF-8"
+    },
+    {
+      "name": "zblog.base.i18n.basenames",
+      "type": "java.util.List<java.lang.String>",
+      "description": "本地资源文件的基础名列表（无扩展名）.",
+      "defaultValue": [
+        "messages/messages"
+      ]
     },
     {
       "name": "zblog.base.seq.datacenterId",

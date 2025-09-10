@@ -34,9 +34,9 @@
       <el-table-column :show-overflow-tooltip="true" prop="operateUser" label="操作人" />
       <el-table-column :show-overflow-tooltip="true" prop="execResult" label="请求结果" align="center">
         <template v-slot="scope">
-          <el-tag v-if="scope.row['logType'] === 3" size="small" type="danger">系统错误</el-tag>
-          <el-tag v-else-if="!scope.row['execResult']" size="small" type="warning">失败</el-tag>
-          <el-tag v-else size="small">成功</el-tag>
+          <el-tag v-if="scope.row['logType'] === 3" type="danger">系统错误</el-tag>
+          <el-tag v-else-if="!scope.row['execResult']" type="warning">失败</el-tag>
+          <el-tag v-else>成功</el-tag>
         </template>
       </el-table-column>
       <el-table-column :show-overflow-tooltip="true" prop="costTime" label="请求耗时" align="center">

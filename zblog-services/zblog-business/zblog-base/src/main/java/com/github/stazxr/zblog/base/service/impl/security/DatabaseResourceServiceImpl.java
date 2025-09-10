@@ -47,6 +47,16 @@ public class DatabaseResourceServiceImpl implements ResourceCacheService, Initia
     }
 
     /**
+     * 清除资源缓存
+     *
+     * @param cacheKey 缓存键
+     */
+    @Override
+    public void clearCache(String cacheKey) {
+        RESOURCE_MAP.remove(cacheKey);
+    }
+
+    /**
      * 清除全部缓存
      *
      * <strong>注意：</strong> 当权限修改时，需要清理缓存，防止权限不生效。

@@ -3,7 +3,6 @@ package com.github.stazxr.zblog.base.domain.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.stazxr.zblog.core.base.BaseEntity;
-import com.github.stazxr.zblog.util.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -50,10 +49,13 @@ public class Permission extends BaseEntity {
      *  权限编码为 NULL
      * </li>
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#MENU},
-     *  如果为外链, 则权限编码为 NULL, 否则为路由编码
+     *  权限编码为路由编码或 NULL
      * </li>
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN},
-     *  如果为外链, 则权限编码为 NULL, 否则为路由编码
+     *  权限编码则为路由编码
+     * </li>
+     * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#LINK},
+     *  权限编码则为 NULL
      * </li>
      *
      * @see com.github.stazxr.zblog.bas.router.Router#code() 路由(接口)配置, 配置接口的访问规则
@@ -67,16 +69,15 @@ public class Permission extends BaseEntity {
      *
      * <p>
      * 配置规则:
-     * <li>目录: 目录的上级只能是目录或 NULL, 目录的下级只能是目录或菜单</li>
+     * <li>目录: 目录的上级只能是目录或 NULL, 目录的下级只能是目录或菜单或外链</li>
      * <li>菜单: 菜单的上级只能是目录, 下级只能是按钮</li>
-     * <li>按钮: 按钮上级只能是菜单, 没有下级</li>
-     * <li>如果目录或菜单是外链, 不允许有下级</li>
-     * <li>可以理解为类似目录，文件，文本的关系</li>
+     * <li>按钮: 按钮上级只能是菜单 或 NULL, 没有下级</li>
+     * <li>外链: 外链上级只能是目录 或 NULL, 没有下级</li>
      * </p>
      *
      * @see com.github.stazxr.zblog.base.domain.enums.PermissionType
      */
-    @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮")
+    @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮、4：外链")
     private Integer permType;
 
     /**
@@ -102,6 +103,9 @@ public class Permission extends BaseEntity {
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN}:
      *  组件名称为 NULL
      * </li>
+     * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#LINK}:
+     *  组件名称为 NULL
+     * </li>
      */
     @ApiModelProperty("组件名称")
     private String componentName;
@@ -118,6 +122,9 @@ public class Permission extends BaseEntity {
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN}:
      *  组件路径为 NULL
      * </li>
+     * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#LINK}:
+     *  组件路径为 NULL
+     * </li>
      */
     @ApiModelProperty("组件路径")
     private String componentPath;
@@ -126,13 +133,16 @@ public class Permission extends BaseEntity {
      * 路由地址 eg: xxx 或 xxx:${val} (非斜杠开头)
      *
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#DIR}
-     *  访问地址中的路径（父） 或 外链地址 (if iframe)
+     *  浏览器访问地址中的路径
      * </li>
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#MENU}
-     *  访问地址中的路径（子） 或 外链地址 (if iframe)
+     *  浏览器访问地址中的路径
      * </li>
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN}
      *  前端路由地址为 NULL
+     * </li>
+     * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#LINK}
+     *  前端路由地址为外链URL
      * </li>
      */
     @ApiModelProperty("前端路由地址")
@@ -149,6 +159,9 @@ public class Permission extends BaseEntity {
      * </li>
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN}:
      *  权限图标为 NULL
+     * </li>
+     * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#LINK}:
+     *  图标名称, 跟前端一致
      * </li>
      */
     @ApiModelProperty("权限图标")
@@ -179,14 +192,6 @@ public class Permission extends BaseEntity {
     private Boolean hidden;
 
     /**
-     * 是否外链
-     *
-     * <li>菜单或按钮可以配置外部访问链接</li>
-     */
-    @ApiModelProperty(name = "iFrame", value = "是否外链")
-    private Boolean iFrame;
-
-    /**
      * 是否启用
      */
     @ApiModelProperty(value = "是否启用")
@@ -209,7 +214,7 @@ public class Permission extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPermName());
+        return Objects.hash(getId());
     }
 
     @Override
@@ -222,6 +227,6 @@ public class Permission extends BaseEntity {
         }
 
         Permission other = (Permission) obj;
-        return !StringUtils.isEmpty(permName) && permName.equalsIgnoreCase(other.getPermName());
+        return id != null && id.equals(other.getId());
     }
 }

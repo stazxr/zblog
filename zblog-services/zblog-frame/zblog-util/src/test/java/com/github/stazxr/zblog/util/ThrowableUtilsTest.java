@@ -11,12 +11,6 @@ public class ThrowableUtilsTest {
              throw new RuntimeException("Test exception");
         } catch (Exception e) {
             System.out.println(ThrowableUtils.getStackTrace(e));
-            System.out.println("========================");
-            System.out.println(ThrowableUtils.buildMessage("发生未知异常", e));
-            System.out.println("========================");
-            System.out.println(ThrowableUtils.getStackTrace(ThrowableUtils.getRootCause(e)));
-            System.out.println("========================");
-            System.out.println(ThrowableUtils.getStackTrace(ThrowableUtils.getMostSpecificCause(e)));
         }
     }
 }

@@ -314,7 +314,9 @@ export default {
       }
     }
     .input-icon {
-      height: 39px;width: 14px;margin-left: 2px;
+      // height: 39px;
+      // width: 14px;
+      margin-left: 2px;
     }
   }
   .login-tip {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Layout from '../layout/index'
+// import ParentView from '../components/ParentView/index'
 
 Vue.use(VueRouter)
 
@@ -8,25 +9,25 @@ Vue.use(VueRouter)
 export const defaultRouterMap = [
   {
     path: '/login',
-    meta: { title: '登录', noCache: true },
+    meta: { title: '登录', cache: false },
     name: 'Login',
     component: (resolve) => require(['@/views/login'], resolve),
-    hidden: true
+    show: false
   },
   {
     path: '/403',
     component: (resolve) => require(['@/views/features/403'], resolve),
-    hidden: true
+    show: false
   },
   {
     path: '/404',
     component: (resolve) => require(['@/views/features/404'], resolve),
-    hidden: true
+    show: false
   },
   {
     path: '/redirect',
     component: Layout,
-    hidden: true,
+    show: false,
     children: [
       {
         path: '/redirect/:path*',
@@ -34,12 +35,40 @@ export const defaultRouterMap = [
       }
     ]
   },
+  /*
   {
     path: '/forceUpdatePass',
     component: (resolve) => require(['@/views/features/forceUpdatePass'], resolve),
-    meta: { title: '修改密码', noCache: true },
-    hidden: true
-  },
+    meta: { title: '修改密码', cache: false },
+    show: false
+  },*/
+  /* {
+    path: '/first1',
+    component: Layout,
+    show: true,
+    alwaysShow: true,
+    redirect: 'noredirect',
+    meta: { title: '一级目录1', cache: false },
+    children: [
+      {
+        path: 'second1',
+        component: ParentView,
+        show: true,
+        alwaysShow: true,
+        redirect: 'noredirect',
+        meta: { title: '二级目录1', cache: false },
+        children: [
+          {
+            path: 'user1',
+            component: (resolve) => require(['@/views/admin/system/user'], resolve),
+            show: true,
+            name: 'User',
+            meta: { title: '用户管理2', icon: 'icon-user', hideTag: true, affix: true, cache: false }
+          }
+        ]
+      }
+    ]
+  }, */
   {
     path: '/',
     component: Layout,
@@ -49,14 +78,14 @@ export const defaultRouterMap = [
         path: 'dashboard',
         component: (resolve) => require(['@/views/admin/home'], resolve),
         name: 'Dashboard',
-        meta: { title: '首页', icon: 'home', affix: true, noCache: true }
+        meta: { title: '首页', icon: 'home', affix: true, cache: false }
       }
     ]
   },
   {
     path: '/user',
     component: Layout,
-    hidden: true,
+    show: false,
     redirect: 'noredirect',
     children: [
       {
@@ -72,11 +101,12 @@ export const defaultRouterMap = [
         meta: { title: '用户查询', hideTag: true }
       }
     ]
-  },
+  }
+  /*,
   {
     path: '/publish',
     component: Layout,
-    hidden: true,
+    show: false,
     redirect: 'noredirect',
     children: [
       {
@@ -86,20 +116,23 @@ export const defaultRouterMap = [
         meta: { title: '发布成功' }
       }
     ]
-  },
-  {
+  },*/
+  /*
+   {
     path: '/xterm',
-    meta: { title: 'WEB_SSH', noCache: true },
+    meta: { title: 'WEB_SSH', cache: false },
     name: 'XtermPage',
     component: (resolve) => require(['@/views/admin/mnt/node/xterm'], resolve),
-    hidden: true
-  }
+    show: false
+  }*/
 ]
 
 export default new VueRouter({
-  mode: 'hash',
+  mode: 'hash', // "hash" | "history" | "abstract"
   routes: defaultRouterMap,
   scrollBehavior(to, from, savedPosition) {
+    console.log('from', from)
+    console.log('to', to)
     if (savedPosition && to.meta.keepAlive) {
       return savedPosition
     } else {

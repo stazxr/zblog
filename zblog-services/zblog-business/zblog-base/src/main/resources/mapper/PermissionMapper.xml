@@ -5,7 +5,7 @@
         SELECT
             p.ID, p.PID, p.PERM_NAME, p.PERM_CODE, p.PERM_TYPE, p.PERM_LEVEL,
             p.COMPONENT_NAME, p.COMPONENT_PATH, p.ROUTER_PATH,
-            p.ICON, p.SORT, p.CACHEABLE, p.HIDDEN, p.I_FRAME, p.ENABLED
+            p.ICON, p.SORT, p.CACHEABLE, p.HIDDEN, p.ENABLED
         FROM permission p WHERE p.DELETED = 0
         <if test="blurry != null and blurry != ''">
             <bind name="blurryBind" value="'%' + blurry + '%'"/>
@@ -17,11 +17,8 @@
         <if test="enabled != null">
             AND p.ENABLED = #{enabled}
         </if>
-        <if test="iFrame != null">
-            AND p.I_FRAME = #{iFrame}
-        </if>
         <if test="onlyShowMenu != null and onlyShowMenu == true">
-            AND p.PERM_TYPE != 3
+            AND p.PERM_TYPE IN (1, 2)
         </if>
         ORDER BY p.SORT, p.PERM_NAME
     </select>
@@ -30,7 +27,7 @@
         SELECT
             p.ID, p.PID, p.PERM_NAME, p.PERM_CODE, p.PERM_TYPE, p.PERM_LEVEL,
             p.COMPONENT_NAME, p.COMPONENT_PATH, p.ROUTER_PATH, p.ICON, p.SORT,
-            p.CACHEABLE, p.HIDDEN, p.I_FRAME, p.ENABLED, p.CREATE_TIME, p.UPDATE_TIME,
+            p.CACHEABLE, p.HIDDEN, p.ENABLED, p.CREATE_TIME, p.UPDATE_TIME,
         (SELECT USERNAME FROM user u WHERE u.ID = p.CREATE_USER) AS CREATE_USERNAME,
         (SELECT USERNAME FROM user u WHERE u.ID = p.UPDATE_USER) AS UPDATE_USERNAME
         FROM permission p
@@ -99,43 +96,4 @@
     <select id="selectResourceByPermCode" resultType="com.github.stazxr.zblog.bas.router.Resource">
         SELECT * FROM resource WHERE RESOURCE_CODE = #{permCode}
     </select>
-
-
-
-
-
-
-
-
-
-    <select id="selectByComponentName" resultType="com.github.stazxr.zblog.base.domain.entity.Permission">
-        SELECT * FROM permission WHERE COMPONENT_NAME = #{componentName} AND DELETED = 0
-    </select>
-
-    <select id="selectUserPerms" resultType="java.lang.String">
-        SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND ENABLED = 1 AND PERM_CODE IS NOT NULL AND (
-            PERM_LEVEL != 3 OR ID IN (
-                SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
-                    SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
-                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
-                    )
-                )
-            )
-        )
-        UNION ALL
-        SELECT CODE FROM router WHERE DEFAULT_LEVEL != 3 AND CODE NOT IN (
-            SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND PERM_CODE IS NOT NULL
-        )
-    </select>
-
-    <update id="updatePermission">
-        UPDATE permission SET
-        PID = #{pid}, PERM_NAME = #{permName}, PERM_CODE = #{permCode}, PERM_LEVEL = #{permLevel},
-        COMPONENT_NAME = #{componentName}, COMPONENT_PATH = #{componentPath}, ROUTER_PATH = #{routerPath},
-        <if test="icon != null and icon != ''">
-            ICON = #{icon},
-        </if>
-        SORT = #{sort}, CACHEABLE = #{cache}, HIDDEN = #{hidden}, ENABLED = #{enabled}
-        WHERE ID = #{id}
-    </update>
 </mapper>

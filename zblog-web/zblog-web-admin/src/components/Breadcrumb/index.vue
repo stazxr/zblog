@@ -2,6 +2,7 @@
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
+        <!-- 禁止重定向或非最后一个的面包屑禁止点击 -->
         <span v-if="item.redirect === 'noredirect' || index === levelList.length - 1" class="no-redirect">{{ item.meta.title }}</span>
         <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
       </el-breadcrumb-item>
@@ -34,7 +35,9 @@ export default {
   methods: {
     // 获取与当前路由匹配的面包屑数据
     getBreadcrumb() {
+      console.log('this.$route', this.$route)
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
+      console.log('matched', matched)
       const first = matched[0]
 
       if (!this.isDashboard(first)) {
@@ -53,21 +56,22 @@ export default {
       }
       return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
     },
+    // 点击面包屑项时的处理方法
+    handleLink(item) {
+      console.log('items', item)
+      const { redirect, path } = item
+      if (redirect) {
+        // 如果有 redirect 属性，跳转到指定的路径
+        this.$router.push(redirect)
+      } else {
+        this.$router.push(this.pathCompile(path))
+      }
+    },
     // 处理路径中的动态参数
     pathCompile(path) {
       const { params } = this.$route
       const toPath = pathToRegexp.compile(path)
       return toPath(params)
-    },
-    // 点击面包屑项时的处理方法
-    handleLink(item) {
-      const { redirect, path } = item
-      if (redirect) {
-        // 如果有 redirect 属性，跳转到指定的路径
-        this.$router.push(redirect)
-        return
-      }
-      this.$router.push(this.pathCompile(path))
     }
   }
 }

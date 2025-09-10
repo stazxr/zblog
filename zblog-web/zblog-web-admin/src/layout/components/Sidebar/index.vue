@@ -37,10 +37,7 @@ export default {
     // 默认激活菜单项
     activeMenu() {
       const route = this.$route
-      console.log('route', route)
       const { meta, path } = route
-      console.log('meta', meta)
-      console.log('path', path)
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu

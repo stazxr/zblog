@@ -33,7 +33,7 @@ public class GlobalCache {
      * @param key   缓存的键
      * @param value 缓存的值
      */
-    public static synchronized void put(String key, String value) {
+    public static void put(String key, String value) {
         checkCacheInitialized();
         cache.put(key, value);
     }
@@ -45,7 +45,7 @@ public class GlobalCache {
      * @param value   缓存的值
      * @param timeout 失效时长，单位为毫秒
      */
-    public static synchronized void put(String key, String value, long timeout) {
+    public static void put(String key, String value, long timeout) {
         checkCacheInitialized();
         cache.put(key, value, timeout);
     }
@@ -55,7 +55,7 @@ public class GlobalCache {
      *
      * @param keys 要移除的键列表
      */
-    public static synchronized void remove(String... keys) {
+    public static void remove(String... keys) {
         checkCacheInitialized();
         if (keys != null && keys.length > 0) {
             for (String key : keys) {
@@ -70,7 +70,7 @@ public class GlobalCache {
      * @param key 缓存的键
      * @return 与键关联的值，如果键不存在则返回 {@code null}
      */
-    public static synchronized String get(String key) {
+    public static String get(String key) {
         checkCacheInitialized();
         return cache.get(key);
     }
@@ -81,7 +81,7 @@ public class GlobalCache {
      * @param key 缓存的键
      * @return 与键关联的值，如果键不存在则返回 {@code null}
      */
-    public static synchronized String getThenRemove(String key) {
+    public static String getThenRemove(String key) {
         checkCacheInitialized();
         String result = cache.get(key);
         cache.remove(key);

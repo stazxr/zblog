@@ -1,6 +1,6 @@
-package com.github.stazxr.zblog.bas.validate.annotation;
+package com.github.stazxr.zblog.bas.validation.ext.annotation;
 
-import com.github.stazxr.zblog.bas.validate.ext.PhoneValidator;
+import com.github.stazxr.zblog.bas.validation.ext.PhoneValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

@@ -2,7 +2,7 @@
   <!-- 如果菜单项的显示状态为 true，则加载菜单项 -->
   <div v-if="item.show" class="menu-wrapper">
     <!-- 判断是否只有一个显示的子菜单，并且该菜单不强制显示子菜单，且当前菜单没有 alwaysShow 属性 -->
-    <template v-if="hasOneShowingChild(item.children, item) && (!onlyOneChild.children || onlyOneChild.noShowingChildren) && !item['alwaysShow']">
+    <template v-if="hasOneShowingChild(item.children, item) && (!onlyOneChild.children || onlyOneChild.noShowingChildren) && !(item.alwaysShow === true)">
       <!-- 如果 onlyOneChild 存在 meta 信息，则显示该子菜单项 -->
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">

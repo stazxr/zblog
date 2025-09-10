@@ -41,6 +41,7 @@
     </div>
     <div class="components-container">
       <el-table
+        ref="permissionTable"
         v-loading="tableLoading"
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
@@ -67,7 +68,7 @@
           <template v-slot="scope">
             <el-tag v-if="scope.row['cacheable'] === true" type="info">是</el-tag>
             <el-tag v-else-if="scope.row['cacheable'] === false" type="info">否</el-tag>
-            <span v-else> - </span>
+            <span v-else />
           </template>
         </el-table-column>
         <el-table-column prop="permType" label="类型" align="center" width="80px">
@@ -75,6 +76,7 @@
             <el-tag v-if="scope.row['permType'] === 1">目录</el-tag>
             <el-tag v-else-if="scope.row['permType'] === 2" type="success">菜单</el-tag>
             <el-tag v-else-if="scope.row['permType'] === 3" type="info">按钮</el-tag>
+            <el-tag v-else-if="scope.row['permType'] === 4" type="warning">外链</el-tag>
             <span v-else> - </span>
           </template>
         </el-table-column>
@@ -157,6 +159,7 @@ export default {
     handleCurrentChange(row) {
       this.row = row
     },
+    // 查询
     search() {
       this.listTableData()
     },
@@ -175,49 +178,62 @@ export default {
         this.tableData = []
       }).finally(() => {
         this.tableLoading = false
+        this.row = null
+        this.$refs.permissionTable.setCurrentRow()
       })
     },
+    // 查看详情
     showDetail() {
       if (this.row === null) {
         this.$message.error('请选择要查看的权限')
         return
       }
-      this.$nextTick(() => {
-        this.detailDialogVisible = true
-        this.$refs.detailDialogRef.initData()
-      })
+      this.detailDialogVisible = true
+      this.$refs.detailDialogRef.initData()
     },
     showDetailDone() {
       this.detailDialogVisible = false
     },
-    allowDelete(row) {
-      return !row.children || !row.children.length || row.children.length === 0
-    },
+    // 新增与编辑
     addPerm() {
       this.dataId = null
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增权限'
       this.$refs.addOrEditDialogRef.initData()
     },
-    editPerm(row) {
-      this.dataId = row.id.toString()
+    editPerm() {
+      if (this.row === null) {
+        this.$message.error('请选择要编辑的权限')
+        return
+      }
+      this.dataId = this.row.id
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '编辑权限'
       this.$refs.addOrEditDialogRef.initData()
     },
-    deletePerm(row) {
-      this.$mapi.perm.deletePerm({ permId: row.id }).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
-      })
-    },
     addOrEditDone(result = false) {
-      this.editId = null
       this.addOrEditDialogTitle = ''
       this.addOrEditDialogVisible = false
       if (result) {
         this.listTableData()
       }
+    },
+    // 删除
+    deletePerm() {
+      if (this.row === null) {
+        this.$message.error('请选择要删除的权限')
+        return
+      }
+      this.$confirm('此操作将永久删除选中权限, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.perm.deletePerm({ permId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
     }
   }
 }

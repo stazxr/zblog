@@ -57,6 +57,18 @@ public class RegexUtils {
         return result;
     }
 
+    public static class Regex {
+        /**
+         * 外链正则表达式
+         */
+        public static final String LINK_REGEX = "^(https?|ftp|file)://.+$";
+
+        /**
+         * 纯字母正则表达式
+         */
+        public static final String LETTER_REGEX = "^[A-Za-z]{1,}$";
+    }
+
     public static class Const {
         /**
          * ${变量}正则表达式

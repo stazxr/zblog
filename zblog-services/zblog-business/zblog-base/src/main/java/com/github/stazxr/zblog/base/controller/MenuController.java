@@ -40,6 +40,6 @@ public class MenuController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
     @Router(name = "查询用户菜单列表（树）", code = "MENUQ001", level = RouterLevel.PUBLIC)
     public Result queryUserMenuTree() {
-        return Result.success().data(menuService.queryUserMenuTree());
+        return Result.s(menuService.queryUserMenuTree());
     }
 }

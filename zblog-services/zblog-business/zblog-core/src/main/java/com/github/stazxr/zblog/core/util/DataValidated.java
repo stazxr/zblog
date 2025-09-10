@@ -9,6 +9,7 @@ import com.github.stazxr.zblog.util.Assert;
  * @author SunTao
  * @since 2022-08-27
  */
+@Deprecated
 public class DataValidated extends Assert {
     /**
      * Assert that an object is not null

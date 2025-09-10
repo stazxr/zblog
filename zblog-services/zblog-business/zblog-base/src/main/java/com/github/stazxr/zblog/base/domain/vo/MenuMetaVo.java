@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -11,10 +11,20 @@ import java.io.Serializable;
  * @author SunTao
  * @since 2022-06-30
  */
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 public class MenuMetaVo implements Serializable {
     private static final long serialVersionUID = 3496417467290425962L;
+
+    public MenuMetaVo() {
+    }
+
+    public MenuMetaVo(String title, String icon, Boolean cache, Boolean breadcrumb) {
+        this.title = title;
+        this.icon = icon;
+        this.cache = cache;
+        this.breadcrumb = breadcrumb;
+    }
 
     /**
      * 菜单标题

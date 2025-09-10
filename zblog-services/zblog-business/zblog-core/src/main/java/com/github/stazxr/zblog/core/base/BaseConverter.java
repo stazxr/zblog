@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.core.base;
 
+import org.springframework.beans.BeanUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,21 @@ public interface BaseConverter<P extends BaseEntity, D extends BaseDto, V extend
      * @param dto 数据对象
      * @return po 实体对象
      */
-    P dtoToEntity(D dto);
+    default P dtoToEntity(D dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        try {
+            // 创建目标实例
+            P entity = getEntityClass().getDeclaredConstructor().newInstance();
+            // 属性复制
+            BeanUtils.copyProperties(dto, entity);
+            return entity;
+        } catch (Exception e) {
+            throw new RuntimeException("对象复制失败", e);
+        }
+    }
 
     /**
      * 数据对象列表转实体对象列表
@@ -47,7 +63,22 @@ public interface BaseConverter<P extends BaseEntity, D extends BaseDto, V extend
      * @param po  实体对象
      * @return vo 视图对象
      */
-    V entityToVo(P po);
+    default V entityToVo(P po) {
+        if (po == null) {
+            return null;
+        }
+
+        try {
+            // 创建目标实例
+            V vo = getVoClass().getDeclaredConstructor().newInstance();
+            // 属性复制
+            BeanUtils.copyProperties(po, vo);
+            return vo;
+        } catch (Exception e) {
+            throw new RuntimeException("对象复制失败", e);
+        }
+    }
+
 
     /**
      * 实体对象列表转视图对象列表
@@ -58,4 +89,25 @@ public interface BaseConverter<P extends BaseEntity, D extends BaseDto, V extend
     default List<V> entityToVo(List<P> poList) {
         return poList == null ? null : poList.stream().map(this::entityToVo).collect(Collectors.toList());
     }
+
+    /**
+     * 获取实体对象类型
+     *
+     * @return 实体对象类型
+     */
+    Class<P> getEntityClass();
+
+    /**
+     * 获取视图对象类型
+     *
+     * @return 视图对象类型
+     */
+    Class<V> getVoClass();
+
+    /**
+     * 获取数据对象类型
+     *
+     * @return 数据对象类型
+     */
+    Class<D> getDtoClass();
 }

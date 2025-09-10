@@ -23,7 +23,12 @@ public enum PermissionType {
     /**
      * 按钮
      */
-    BTN(3);
+    BTN(3),
+
+    /**
+     * 外链
+     */
+    LINK(4);
 
     private final Integer type;
 

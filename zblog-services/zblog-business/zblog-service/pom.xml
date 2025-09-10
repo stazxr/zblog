@@ -44,105 +44,31 @@
 
     <build>
         <plugins>
+            <!-- 让 MapStruct 和 Lombok 在编译时配合 -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
-                    <excludes>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-logging</artifactId>
-                        </exclusion>
-                        <exclude>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <!-- Lombok Processor -->
+                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                        </exclude>
-                        <exclude>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                        </exclude>
-                    </excludes>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!-- MapStruct Processor -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-<!--    <build>-->
-<!--        <finalName>zblog</finalName>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-jar-plugin</artifactId>-->
-<!--                <version>3.2.2</version>-->
-<!--                <configuration>-->
-<!--                    <archive>-->
-<!--                        &lt;!&ndash; 生成的jar中，包含pom.xml和pom.properties这两个文件 &ndash;&gt;-->
-<!--                        <addMavenDescriptor>true</addMavenDescriptor>-->
-<!--                        &lt;!&ndash; 生成MANIFEST.MF的设置 &ndash;&gt;-->
-<!--                        <manifest>-->
-<!--                            &lt;!&ndash; 打包时MANIFEST.MF文件不记录时间戳版本 &ndash;&gt;-->
-<!--                            <useUniqueVersions>false</useUniqueVersions>-->
-<!--                            &lt;!&ndash; 为依赖包添加路径, 这些路径会写在MANIFEST.MF文件的Class-Path下 &ndash;&gt;-->
-<!--                            <addClasspath>true</addClasspath>-->
-<!--                            &lt;!&ndash; 这个jar所依赖的jar包添加classPath的时候的前缀，如果这个jar本身和依赖包在同一级目录，则不需要添加 &ndash;&gt;-->
-<!--                            <classpathPrefix>libs/</classpathPrefix>-->
-<!--                            &lt;!&ndash; jar启动入口类 &ndash;&gt;-->
-<!--                            <mainClass>${mainClass}</mainClass>-->
-<!--                        </manifest>-->
-<!--                    </archive>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-dependency-plugin</artifactId>-->
-<!--                <version>3.1.2</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>copy-dependencies</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-dependencies</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <outputDirectory>-->
-<!--                                ${project.build.directory}/libs-->
-<!--                            </outputDirectory>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>com.github.ulisesbocchio</groupId>-->
-<!--                <artifactId>jasypt-maven-plugin</artifactId>-->
-<!--                <version>3.0.3</version>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <activeProfile>dev</activeProfile>
-                <desc>开发环境，开启SQL等日志信息，使用本地的链接信息</desc>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <activeProfile>test</activeProfile>
-                <desc>测试环境</desc>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <activeProfile>prod</activeProfile>
-                <desc>生产环境</desc>
-            </properties>
-        </profile>
-    </profiles>
 </project>

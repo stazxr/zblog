@@ -20,6 +20,14 @@ public interface ResourceCacheService {
     Resource findResource(String requestUri, String requestMethod);
 
     /**
+     * 清除资源缓存
+     *
+     * @param cacheKey 缓存键
+     */
+    default void clearCache(String cacheKey) {
+    }
+
+    /**
      * 清除全部缓存
      */
     default void clearCache() {

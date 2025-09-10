@@ -6,10 +6,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheService;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
+import com.github.stazxr.zblog.bas.validation.AssertException;
 import com.github.stazxr.zblog.base.converter.PermissionConverter;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
@@ -20,10 +21,10 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.exception.DataValidatedException;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +46,6 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private final PermissionMapper permissionMapper;
 
     private final PermissionConverter permissionConverter;
-
-    private final InterfaceMapper interfaceMapper;
 
     private final RolePermMapper rolePermMapper;
 
@@ -172,17 +171,17 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      * @param permissionDto 权限信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void addPermission(PermissionDto permissionDto) {
-        // 获取权限信息
+        // 获取新增权限信息
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
-        permission.setId(null);
+        // 新增时，不允许传入 PermissionId
+        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.perm.add.idIsNull"));
+        // 权限信息检查
         checkPermission(permission);
-        Assert.isTrue(permissionMapper.insert(permission) != 1, "新增失败");
-        // removeCache(permission);
-        if (!permission.getPermType().equals(PermissionType.DIR.getType())) {
-            resourceCacheService.clearCache();
-        }
+        // 新增权限
+        Assert.isTrue(permissionMapper.insert(permission) != 1, ExpMessageCode.of("result.perm.add.failed"));
+        // 删除相关缓存
+        removeCache(permission);
     }
 
     /**
@@ -191,25 +190,20 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      * @param permissionDto 权限信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void editPermission(PermissionDto permissionDto) {
-//        // 获取权限信息
-//        Permission permission = permissionConverter.dtoToEntity(permissionDto);
-//
-//        // 查询菜单信息，赋值菜单类型和是否外联，这两项不允许编辑
-//        Assert.notNull(permission.getId(), "参数【id】不能为空");
-//        Permission dbPermission = permissionMapper.selectById(permission.getId());
-//        Assert.notNull(dbPermission, "权限不存在");
-//
-//        DataValidated.isTrue(!dbPerm.getPermType().equals(permission.getPermType()), "权限类型不允许编辑");
-//        permission.setIFrame(dbPerm.getIFrame());
-//        checkPermission(permission);
-//        Assert.isTrue(permissionMapper.updatePermission(permission) != 1, "编辑失败");
-//        removeCache(permission);
-//        if (!permission.getPermType().equals(PermissionType.DIR.getType()) && dbPerm.getPermLevel().equals(permission.getPermLevel())) {
-//            // 如果修改的权限类型不是目录，并且修改了权限访问级别，则清理缓存
-//            resourceCacheService.clearCache();
-//        }
+        // 获取编辑权限信息
+        Permission permission = permissionConverter.dtoToEntity(permissionDto);
+        // 判断权限是否存在
+        Permission dbPermission = permissionMapper.selectById(permission.getId());
+        Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
+        // 权限类型不允许编辑
+        Assert.isTrue(!dbPermission.getPermType().equals(permission.getPermType()), ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
+        // 权限信息检查
+        checkPermission(permission);
+        // 编辑权限
+        Assert.isTrue(permissionMapper.updateById(permission) != 1, ExpMessageCode.of("result.perm.edit.failed"));
+        // 删除相关缓存
+        removeCache(permission);
     }
 
     /**
@@ -220,20 +214,25 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePermission(Long permId) {
-        Assert.notNull(permId, "参数【permId】不能为空");
-        Permission permission = permissionMapper.selectById(permId);
-        Assert.notNull(permission, "待删除权限不存在，权限序列为：" + permId);
+        // 判断权限是否存在
+        Permission dbPermission = permissionMapper.selectById(permId);
+        Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
 
-        Permission param = new Permission();
-        param.setPid(permId);
-        Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
-        DataValidated.isTrue(childCount > 0, "存在子节点，无法删除，请先删除子节点");
-        Assert.isTrue(permissionMapper.deleteById(permId) != 1, "删除失败");
-        rolePermMapper.deleteByPermId(permId);
-        removeCache(permission);
-        if (!permission.getPermType().equals(PermissionType.DIR.getType())) {
-            resourceCacheService.clearCache();
+        // 判断是否存在子节点
+        Integer permType = dbPermission.getPermType();
+        boolean dirOrMenu = PermissionType.DIR.getType().equals(permType) ||
+                PermissionType.MENU.getType().equals(permType);
+        if (dirOrMenu) {
+            Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
+            Assert.isTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.hasChild"));
         }
+
+        // 删除权限
+        Assert.isTrue(permissionMapper.deleteById(permId) != 1, ExpMessageCode.of("result.perm.delete.failed"));
+        rolePermMapper.deleteByPermId(permId);
+
+        // 删除相关缓存
+        removeCache(dbPermission);
     }
 
     /**
@@ -267,15 +266,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
     private void checkPermission(Permission permission) {
         // 获取上级权限信息
-        boolean parentIsFrame = false;
         int parentType = PermissionType.DIR.getType();
         if (permission.getPid() == null || Constants.TOP_PERM_ID.equals(permission.getPid())) {
             permission.setPid(null);
         } else {
             Permission parentPermission = permissionMapper.selectById(permission.getPid());
-            Assert.notNull(parentPermission, "上级权限数据不存在");
+            Assert.notNull(parentPermission, ExpMessageCode.of("valid.perm.parent.notExist"));
             parentType = parentPermission.getPermType();
-            parentIsFrame = parentPermission.getIFrame();
         }
 
         // 赋默认值
@@ -286,49 +283,94 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentName(null);
             permission.setComponentPath(null);
 
-            Assert.notNull(permission.getIFrame(), "请选择是否外链");
-            Assert.notNull(permission.getHidden(), "请选择是否可见");
-            Assert.isTrue(StringUtils.isBlank(permission.getRouterPath()), "路由地址不能为空");
-            boolean isValid = parentIsFrame || !PermissionType.DIR.getType().equals(parentType);
-            DataValidated.isTrue(isValid, "目录的上级只能是目录，且上级目录不允许为外链目录");
+            // 参数校验
+            String routerPath = permission.getRouterPath();
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
+            // TODO 待确认<路由地址正则是否优化，支持参数传递> 20250910
+            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
+            Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
+
+            // 上级信息校验，要求上级只能是目录
+            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parentError"));
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
             // 菜单
-            Assert.notNull(permission.getIFrame(), "请选择是否外链");
-            Assert.notNull(permission.getHidden(), "请选择是否可见");
-            Assert.notNull(permission.getCacheable(), "请选择是否缓存");
-            Assert.isTrue(StringUtils.isBlank(permission.getRouterPath()), "路由地址不能为空");
-            if (permission.getIFrame()) {
-                permission.setPermCode(null);
-                permission.setComponentName(null);
-                permission.setComponentPath(null);
-                String http = "http://", https = "https://";
-                String routerPath = permission.getRouterPath().toLowerCase(Locale.ROOT);
-                boolean isNulHttp = !routerPath.startsWith(http) && !routerPath.startsWith(https);
-                DataValidated.isTrue(isNulHttp, "外链必须以http://或者https://开头");
-            } else {
-                permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
-                Assert.isTrue(StringUtils.isBlank(permission.getComponentPath()), "组件路径不能为空");
-                Assert.isTrue(permission.getComponentPath().startsWith("/"), "组件路径不能以斜杠开头");
-                Assert.isTrue(StringUtils.isBlank(permission.getComponentName()), "组件名称不能为空");
-                // Permission dbPerm = permissionMapper.selectByComponentName(permission.getComponentName());
-                // DataValidated.isTrue(dbPerm != null && !dbPerm.getId().equals(permission.getId()), "组件名称已存在");
-            }
+            permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
 
-            DataValidated.isTrue(parentIsFrame || !PermissionType.DIR.getType().equals(parentType), "菜单的上级只能是目录，且上级目录不允许为外链目录");
+            // 参数校验
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
+            Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.NotNull"));
+            String routerPath = permission.getRouterPath();
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
+            // TODO 待确认<路由地址正则是否优化，支持参数传递> 20250910
+            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
+            Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
+            if (permission.getPermCode() != null) {
+                Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+            }
+            // TODO 待确认<组件名称能否重复> 20250905
+            Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.NotBlank"));
+            Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.NotBlank"));
+
+            // 上级信息校验，要求上级只能是目录或空
+            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.menu.parentError"));
+        } else if (PermissionType.LINK.getType().equals(permission.getPermType())) {
+            // 外链
+            permission.setPermCode(null);
+            permission.setCacheable(null);
+            permission.setComponentName(null);
+            permission.setComponentPath(null);
+
+            // 参数校验
+            String routerPath = permission.getRouterPath();
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.NotBlank"));
+            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.patternError"));
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
+
+            // 上级信息校验，要求上级只能是目录
+            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parentError"));
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
             // 按钮
             permission.setIcon(null);
-            permission.setIFrame(null);
             permission.setHidden(null);
             permission.setCacheable(null);
             permission.setRouterPath(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
-            DataValidated.notNull(permission.getPermCode(), "权限编码不能为空");
-            DataValidated.isTrue(parentIsFrame || !PermissionType.MENU.getType().equals(parentType), "按钮的上级只能是菜单，且上级菜单不允许为外链菜单");
+
+            // 参数校验，权限编码校验，权限编码不能重复
+            Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.NotBlank"));
+            Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+
+            // 上级信息校验，要求上级只能是菜单或目录或空
+            boolean dirOrMenu = PermissionType.DIR.getType().equals(parentType) ||
+                    PermissionType.MENU.getType().equals(parentType);
+            Assert.isTrue(!dirOrMenu, ExpMessageCode.of("valid.perm.btn.parentError"));
         } else {
-            throw new DataValidatedException("非法的权限类型：" + permission.getPermType());
+            throw new AssertException(ExpMessageCode.of("valid.perm.permType.invalid", permission.getPermType()));
         }
+    }
+
+    private boolean checkPermCodeExist(Permission permission) {
+        if (permission.getPermCode() != null) {
+            LambdaQueryWrapper<Permission> queryWrapper = queryBuild().eq(Permission::getPermCode, permission.getPermCode());
+            if (permission.getId() != null) {
+                queryWrapper.ne(Permission::getId, permission.getId());
+            }
+            return permissionMapper.exists(queryWrapper);
+        }
+        return false;
+    }
+
+    private boolean checkRouterPathExist(Permission permission) {
+        if (permission.getRouterPath() != null) {
+            LambdaQueryWrapper<Permission> queryWrapper = queryBuild().eq(Permission::getRouterPath, permission.getRouterPath());
+            if (permission.getId() != null) {
+                queryWrapper.ne(Permission::getId, permission.getId());
+            }
+            return permissionMapper.exists(queryWrapper);
+        }
+        return false;
     }
 
     private Map<Long, Set<Long>> parsePermPidGroupMap(Map<Long, List<PermissionVo>> permPidGroupMap) {
@@ -354,16 +396,20 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     }
 
     private void removeCache(Permission permission) {
-        SecurityUserCache.clean();
-        if (permission != null && StringUtils.isNotBlank(permission.getPermCode())) {
-            List<InterfaceVo> interfaces = interfaceMapper.selectInterfacesByCode(permission.getPermCode());
-            if (!interfaces.isEmpty()) {
-                interfaces.forEach(interfaceVo -> {
-                    String uriInfo = interfaceVo.getUri() + "_" + interfaceVo.getMethod();
-                    String interfaceLevelCacheKey = String.format(Constants.SysCacheKey.interfaceLevel.cacheKey(), uriInfo, Locale.ROOT);
-                    GlobalCache.remove(interfaceLevelCacheKey);
-                });
-            }
+        try {
+            // TODO 清除缓存逻辑待适配 20250911
+            SecurityUserCache.clean();
+            /* if (permission != null && StringUtils.isNotBlank(permission.getPermCode())) {
+                List<InterfaceVo> interfaces = permissionMapper.selectPermInterfaces(permission.getId());
+                if (!interfaces.isEmpty()) {
+                    interfaces.forEach(interfaceVo -> {
+                        String cacheKey = interfaceVo.getUri() + ":" + interfaceVo.getMethod();
+                        resourceCacheService.clearCache(cacheKey);
+                    });
+                }
+            } */
+        } catch (Exception e) {
+            log.error("remove cache failed", e);
         }
     }
 

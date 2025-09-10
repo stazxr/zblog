@@ -66,7 +66,7 @@ export const loadMenus = (next, to) => {
   store.commit('SET_LOAD_MENUS', false)
   menu.queryUserMenuTree().then(res => {
     const data = res.data
-    console.log('menu data', data)
+    console.log('load menu data', data)
     const sdata = JSON.parse(JSON.stringify(data))
     const rdata = JSON.parse(JSON.stringify(data))
     const sidebarRoutes = filterAsyncRouter(sdata)
