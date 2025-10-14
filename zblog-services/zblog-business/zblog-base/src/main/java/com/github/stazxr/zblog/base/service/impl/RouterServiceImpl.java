@@ -13,7 +13,6 @@ import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.RouterDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RouterQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
-import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.Router;
 import com.github.stazxr.zblog.base.domain.enums.DictType;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
@@ -49,8 +48,6 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     private final RouterMapper routerMapper;
 
     private final InterfaceMapper interfaceMapper;
-
-    private final RoleMapper roleMapper;
 
     private final DictMapper dictMapper;
 
@@ -124,31 +121,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Deprecated
     public Set<String> findRoles(String requestUri, String requestMethod) {
-        // 获取访问接口访问级别，返回允许访问的角色集合,这里的目的只是为了减少查询库的次数
-        int level = calculateInterfaceLevel(requestUri, requestMethod);
-        Set<String> roles = new HashSet<>();
-        if (RouterLevel.OPEN == level) {
-            roles.add(OPEN);
-        } else if (RouterLevel.PUBLIC == level) {
-            roles.add(PUBLIC);
-        } else if (BaseConst.PermLevelExtend.FORBIDDEN == level) {
-            roles.add(FORBIDDEN);
-        } else if (BaseConst.PermLevelExtend.NULL == level) {
-            roles.add(NULL);
-        } else {
-            // 接口访问级别为RouterLevel.PERM，需要查询允许访问该接口的角色列表
-            final String whLabel = "?";
-            requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
-            List<Role> dbRoles = roleMapper.selectRolesByUriAndMethod(requestUri, requestMethod.toUpperCase(Locale.ROOT));
-            dbRoles = dbRoles.stream().filter(Role::isEnabled).collect(Collectors.toList());
-            if (dbRoles.isEmpty()) {
-                roles.add(NONE);
-            } else {
-                // 返回授权的角色列表
-                dbRoles.forEach(role -> roles.add(role.getRoleCode()));
-            }
-        }
-        return roles;
+        return null;
     }
 
     /**

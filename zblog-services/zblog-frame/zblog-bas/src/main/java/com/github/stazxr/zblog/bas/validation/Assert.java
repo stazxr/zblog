@@ -15,9 +15,9 @@ public class Assert {
         }
     }
 
-    public static void isNull(Object object, ExpMessageCode messageCode) {
+    public static void isNull(Object object, ExpMessageCode expMessageCode) {
         if (object != null) {
-            throw new AssertException(messageCode);
+            throw new AssertException(expMessageCode);
         }
     }
 
@@ -31,9 +31,9 @@ public class Assert {
         }
     }
 
-    public static void notNull(Object object, ExpMessageCode messageCode) {
+    public static void notNull(Object object, ExpMessageCode expMessageCode) {
         if (object == null) {
-            throw new AssertException(messageCode);
+            throw new AssertException(expMessageCode);
         }
     }
 
@@ -43,9 +43,9 @@ public class Assert {
         }
     }
 
-    public static void notBlank(String str, ExpMessageCode messageCode) {
+    public static void notBlank(String str, ExpMessageCode expMessageCode) {
         if (str == null || "".equals(str.trim())) {
-            throw new AssertException(messageCode);
+            throw new AssertException(expMessageCode);
         }
     }
 
@@ -55,9 +55,9 @@ public class Assert {
         }
     }
 
-    public static void isTrue(boolean flag, ExpMessageCode messageCode) {
+    public static void isTrue(boolean flag, ExpMessageCode expMessageCode) {
         if (flag) {
-            throw new AssertException(messageCode);
+            throw new AssertException(expMessageCode);
         }
     }
 }

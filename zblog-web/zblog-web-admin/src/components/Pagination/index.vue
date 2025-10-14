@@ -30,7 +30,7 @@ export default {
     },
     limit: {
       type: Number,
-      default: 20
+      default: 10
     },
     pageSizes: {
       type: Array,
@@ -40,7 +40,7 @@ export default {
     },
     layout: {
       type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
+      default: 'total, sizes, prev, pager, next, jumper' // total, prev, pager, next, sizes
     },
     background: {
       type: Boolean,
@@ -93,7 +93,7 @@ export default {
 <style scoped>
 .pagination-container {
   background: #fff;
-  padding: 32px 16px;
+  /* padding: 32px 16px; */
 }
 .pagination-container.hidden {
   display: none;

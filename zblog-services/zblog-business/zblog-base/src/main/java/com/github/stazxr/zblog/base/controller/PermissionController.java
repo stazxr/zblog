@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
+import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -20,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 权限管理
@@ -36,17 +39,31 @@ public class PermissionController {
     private final PermissionService permissionService;
 
     /**
-     * 查询权限列表（树）
+     * 查询权限树列表
      *
      * @param queryDto 查询参数
-     * @return PermissionVoList
+     * @return List<PermissionVo>
      */
     @GetMapping(value = "/queryPermTree")
-    @ApiOperation(value = "查询权限列表（树）")
+    @ApiOperation(value = "查询权限树列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询权限列表（树）", code = "PERMQ001")
-    public Result queryPermTree(PermissionQueryDto queryDto) {
-        return Result.success().data(permissionService.queryPermTree(queryDto));
+    @Router(name = "查询权限树列表", code = "PERMQ001")
+    public List<PermissionVo> queryPermTree(PermissionQueryDto queryDto) {
+        return permissionService.queryPermTree(queryDto);
+    }
+
+    /**
+     * 查询权限树列表（公共）
+     *
+     * @param queryDto 查询参数
+     * @return List<PermissionVo>
+     */
+    @GetMapping(value = "/queryPublicPermTree")
+    @ApiOperation(value = "查询权限树列表（公共）")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询权限树列表（公共）", code = "PERMQ008", level = RouterLevel.PUBLIC)
+    public List<PermissionVo> queryPublicPermTree(PermissionQueryDto queryDto) {
+        return permissionService.queryPermTree(queryDto);
     }
 
     /**
@@ -63,7 +80,7 @@ public class PermissionController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询权限详情", code = "PERMQ002")
     public Result queryPermDetail(@RequestParam Long permId) {
-        return Result.success().data(permissionService.queryPermDetail(permId));
+        return Result.s(permissionService.queryPermDetail(permId));
     }
 
     /**
@@ -91,7 +108,7 @@ public class PermissionController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询权限角色列表", code = "PERMQ004")
     public Result pagePermRoles(PermissionQueryDto queryDto) {
-        return Result.success().data(permissionService.pagePermRoles(queryDto));
+        return Result.s(permissionService.pagePermRoles(queryDto));
     }
 
     /**
@@ -105,7 +122,7 @@ public class PermissionController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询权限日志列表", code = "PERMQ005")
     public Result pagePermLogs(PermissionQueryDto queryDto) {
-        return Result.success().data(permissionService.pagePermLogs(queryDto));
+        return Result.s(permissionService.pagePermLogs(queryDto));
     }
 
     /**
@@ -122,7 +139,7 @@ public class PermissionController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询权限编码列表", code = "PERMQ006", level = RouterLevel.PUBLIC)
     public Result queryPermCodes(@RequestParam(required = false) String searchKey) {
-        return Result.success().data(permissionService.queryPermCodes(searchKey));
+        return Result.s(permissionService.queryPermCodes(searchKey));
     }
 
     /**
@@ -139,7 +156,7 @@ public class PermissionController {
     @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
     @Router(name = "根据权限编码查询资源信息", code = "PERMQ007", level = RouterLevel.PUBLIC)
     public Result queryResourceByPermCode(@RequestParam String permCode) {
-        return Result.success().data(permissionService.queryResourceByPermCode(permCode));
+        return Result.s(permissionService.queryResourceByPermCode(permCode));
     }
 
     /**

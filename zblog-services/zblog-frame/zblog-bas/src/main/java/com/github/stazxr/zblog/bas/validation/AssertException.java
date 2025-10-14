@@ -24,9 +24,9 @@ public class AssertException extends BaseException {
     /**
      * 使用国际化消息码构造异常
      *
-     * @param messageCode 异常消息码
+     * @param expMessageCode 异常消息码
      */
-    public AssertException(ExpMessageCode messageCode) {
-        super(messageCode);
+    public AssertException(ExpMessageCode expMessageCode) {
+        super(expMessageCode);
     }
 }

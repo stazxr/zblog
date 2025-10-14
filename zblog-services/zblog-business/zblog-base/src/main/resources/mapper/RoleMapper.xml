@@ -3,14 +3,11 @@
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RoleMapper">
     <select id="selectRoleList" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
-            ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ENABLED, CREATE_USER, CREATE_TIME
-        FROM role
+            r.ID, r.ROLE_NAME, r.ROLE_CODE, r.ROLE_DESC, r.ENABLED, r.CREATE_TIME, r.UPDATE_TIME,
+            (SELECT USERNAME FROM user u WHERE u.ID = r.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT USERNAME FROM user u WHERE u.ID = r.UPDATE_USER) AS UPDATE_USERNAME
+        FROM role r
         WHERE DELETED = '0'
-        <if test="permId != null and permId != ''">
-            AND ID IN (
-                SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
-            )
-        </if>
         <if test="roleName != null and roleName != ''">
             <bind name="roleNameBind" value="'%' + roleName + '%'"/>
             AND ROLE_NAME LIKE #{roleNameBind}
@@ -22,26 +19,21 @@
         <if test="enabled != null">
             AND ENABLED = #{enabled}
         </if>
+        ORDER BY CREATE_TIME
     </select>
 
     <select id="selectRoleDetail" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
-            ID, ROLE_NAME, ROLE_CODE, `DESC`, ENABLED, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME
-        FROM role
-        WHERE DELETED = '0' AND ID = #{roleId}
-    </select>
-
-    <select id="selectByRoleName" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ROLE_NAME = #{roleName}
-    </select>
-
-    <select id="selectByRoleCode" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ROLE_CODE = #{roleCode}
+            r.ID, r.ROLE_NAME, r.ROLE_CODE, r.ROLE_DESC, r.ENABLED, r.CREATE_TIME, r.UPDATE_TIME,
+            (SELECT USERNAME FROM user u WHERE u.ID = r.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT USERNAME FROM user u WHERE u.ID = r.UPDATE_USER) AS UPDATE_USERNAME
+        FROM role r
+        WHERE r.DELETED = 0 AND r.ID = #{roleId}
     </select>
 
     <select id="selectUsersByRoleId" resultType="com.github.stazxr.zblog.base.domain.vo.UserVo">
         SELECT
-            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.LOGIN_TIME, urr.CREATE_TIME authTime, u.ENABLED, u.LOCKED, u.TEMP
+            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.LOGIN_TIME
         FROM user u
         INNER JOIN user_role_relation urr ON urr.USER_ID = u.ID
         WHERE u.DELETED = '0' AND urr.ROLE_ID = #{businessId}
@@ -53,9 +45,9 @@
             <bind name="nicknameBind" value="'%' + nickname + '%'"/>
             AND u.NICKNAME LIKE #{nicknameBind}
         </if>
-        <if test="enabled != null">
-            AND u.ENABLED = #{enabled}
-        </if>
+<!--        <if test="enabled != null">-->
+<!--            AND u.ENABLED = #{enabled}-->
+<!--        </if>-->
         <if test="loginStartTime != null and loginStartTime != ''">
             AND u.LOGIN_TIME &gt;= CONCAT(#{loginStartTime}, ' 00:00:00')
         </if>
@@ -65,19 +57,12 @@
         ORDER BY u.USERNAME, u.NICKNAME
     </select>
 
+
+
+
     <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
             SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
-        )
-    </select>
-
-    <select id="selectRolesByUriAndMethod" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID IN (
-                SELECT ID FROM permission WHERE PERM_CODE = (
-                    SELECT CODE FROM interface WHERE URI = #{uri} AND (METHOD = #{method} OR METHOD = 'ANY')
-                )
-            )
         )
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
+import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class RoleVo {
+public class RoleVo extends BaseVo {
+    private static final long serialVersionUID = -5262794053587745904L;
+
     /**
      * 角色id
      */
@@ -36,24 +39,4 @@ public class RoleVo {
      * 角色状态
      */
     private Boolean enabled;
-
-    /**
-     * 创建用户
-     */
-    private String createUser;
-
-    /**
-     * 创建时间
-     */
-    private String createTime;
-
-    /**
-     * 修改用户
-     */
-    private String updateUser;
-
-    /**
-     * 修改时间
-     */
-    private String updateTime;
 }

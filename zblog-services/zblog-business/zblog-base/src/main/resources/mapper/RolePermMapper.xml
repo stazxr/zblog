@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RolePermMapper">
+    <insert id="insertBatch">
+        INSERT INTO role_permission_relation (ROLE_ID, PERM_ID) VALUES
+        <foreach collection="list" item="i" separator=",">
+            (#{i.roleId}, #{i.permId})
+        </foreach>
+    </insert>
+
     <delete id="deleteByPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId}
     </delete>
@@ -8,6 +15,17 @@
     <delete id="deleteByRoleId">
         DELETE FROM role_permission_relation WHERE ROLE_ID = #{roleId}
     </delete>
+
+    <select id="selectPermIdsByRoleId" resultType="java.lang.Long">
+        SELECT DISTINCT PERM_ID FROM role_permission_relation WHERE ROLE_ID = #{roleId}
+    </select>
+
+
+
+
+
+
+
 
     <delete id="deleteByRoleIdAndPermId">
         DELETE FROM role_permission_relation WHERE PERM_ID = #{permId} AND ROLE_ID = #{roleId}
@@ -26,8 +44,4 @@
             </otherwise>
         </choose>
     </delete>
-
-    <select id="selectPermIdsByRoleId" resultType="java.lang.Long">
-        SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID = #{roleId}
-    </select>
 </mapper>

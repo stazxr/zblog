@@ -25,8 +25,8 @@
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
-            <el-button type="success" icon="el-icon-search" @click="search()">查询</el-button>
-            <el-button type="warning" icon="el-icon-refresh-right" @click="resetSearch()">重置</el-button>
+            <el-button type="success" @click="search()">查询</el-button>
+            <el-button type="warning" @click="resetSearch()">重置</el-button>
           </muses-search-form-item>
         </muses-search-form>
       </div>
@@ -100,12 +100,12 @@
           </template>
         </el-table-column>
         <div slot="empty">
-          <el-empty />
+          <el-empty :image="nodataImg" description=" " />
         </div>
       </el-table>
     </div>
 
-    <!-- 查看详情 -->
+    <!-- 详情 -->
     <detailDialog
       ref="detailDialogRef"
       :dialog-visible="detailDialogVisible"
@@ -126,6 +126,7 @@
 <script>
 import detailDialog from '@/views/admin/system/perm/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/perm/template/addOrEditDialog'
+import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Perm',
   components: {
@@ -135,7 +136,7 @@ export default {
   data() {
     return {
       filters: {
-        blurry: '',
+        blurry: null,
         enabled: null,
         onlyShowMenu: null
       },
@@ -145,10 +146,11 @@ export default {
         hasChildren: 'hasChildren'
       },
       tableLoading: false,
+      nodataImg: nodataImg,
       row: null,
       detailDialogVisible: false,
+      addOrEditDialogTitle: null,
       addOrEditDialogVisible: false,
-      addOrEditDialogTitle: '',
       dataId: null
     }
   },
@@ -164,9 +166,7 @@ export default {
       this.listTableData()
     },
     resetSearch() {
-      this.filters.blurry = ''
-      this.filters.enabled = null
-      this.filters.onlyShowMenu = null
+      Object.keys(this.filters).forEach(key => { this.filters[key] = null })
       this.listTableData()
     },
     listTableData() {
@@ -182,7 +182,7 @@ export default {
         this.$refs.permissionTable.setCurrentRow()
       })
     },
-    // 查看详情
+    // 详情
     showDetail() {
       if (this.row === null) {
         this.$message.error('请选择要查看的权限')
@@ -212,7 +212,7 @@ export default {
       this.$refs.addOrEditDialogRef.initData()
     },
     addOrEditDone(result = false) {
-      this.addOrEditDialogTitle = ''
+      this.addOrEditDialogTitle = null
       this.addOrEditDialogVisible = false
       if (result) {
         this.listTableData()

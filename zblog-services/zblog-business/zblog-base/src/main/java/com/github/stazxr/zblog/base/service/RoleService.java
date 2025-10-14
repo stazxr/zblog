@@ -1,11 +1,14 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
+import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
+import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
@@ -19,20 +22,12 @@ import java.util.Set;
  * @author SunTao
  * @since 2020-11-16
  */
-public interface RoleService extends SecurityRoleService {
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
-     */
-    List<RoleVo> queryRoleList(RoleQueryDto queryDto);
-
+public interface RoleService extends SecurityRoleService, IService<Role> {
     /**
      * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return roleList
+     * @return PageInfo<RoleVo>
      */
     PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto);
 
@@ -47,23 +42,16 @@ public interface RoleService extends SecurityRoleService {
     /**
      * 新增角色
      *
-     * @param role 角色
+     * @param roleDto 角色
      */
-    void addRole(Role role);
+    void addRole(RoleDto roleDto);
 
     /**
      * 编辑角色
      *
-     * @param role 角色
+     * @param roleDto 角色
      */
-    void editRole(Role role);
-
-    /**
-     * 删除角色
-     *
-     * @param roleId 角色ID
-     */
-    void deleteRole(Long roleId);
+    void editRole(RoleDto roleDto);
 
     /**
      * 角色授权
@@ -73,20 +61,38 @@ public interface RoleService extends SecurityRoleService {
     void authRole(RoleAuthDto authDto);
 
     /**
-     * 查询角色对应的权限列表
+     * 查询角色对应的权限id列表
      *
-     * @param roleId 角色序列
-     * @return permIdList
+     * @param roleId 角色id
+     * @return permIds
      */
     Set<Long> queryPermIdsByRoleId(Long roleId);
 
     /**
-     * 查询角色对应的用户列表
+     * 分页查询角色对应的用户列表
      *
      * @param queryDto 查询参数
-     * @return userList
+     * @return PageInfo<UserVo>
      */
     PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto);
+
+    /**
+     * 删除角色
+     *
+     * @param roleId 角色ID
+     */
+    void deleteRole(Long roleId);
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 查询用户角色列表（包含被禁用的角色）
@@ -109,4 +115,12 @@ public interface RoleService extends SecurityRoleService {
      * @param userRoleDto 角色 - 用户对应信息
      */
     void batchDeleteUserRole(UserRoleDto userRoleDto);
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    List<RoleVo> queryRoleList(RoleQueryDto queryDto);
 }

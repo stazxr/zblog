@@ -28,7 +28,7 @@ public class RouterParser {
     /**
      * Error Controller
      */
-    private static String errorController = "org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController";
+    private static final String errorController = "org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController";
 
     /**
      * 解析 Spring 请求映射，并返回一个资源列表，每个资源表示一个路由、HTTP 方法及其相关元数据。

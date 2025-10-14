@@ -77,6 +77,7 @@
         <oshi.version>3.9.1</oshi.version>
         <lombok.version>1.18.22</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <lombok-mapstruct.version>0.2.0</lombok-mapstruct.version>
     </properties>
 
     <!-- 版本管理 -->
@@ -268,6 +269,11 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-mapstruct-binding</artifactId>
+                <version>${lombok-mapstruct.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

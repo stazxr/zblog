@@ -67,6 +67,16 @@ public class RegexUtils {
          * 纯字母正则表达式
          */
         public static final String LETTER_REGEX = "^[A-Za-z]{1,}$";
+
+        /**
+         * 纯大写字母正则表达式
+         */
+        public static final String ROLE_CODE_REGEX = "^[A-Z1-9_]{1,}$";
+
+        /**
+         * 纯大写字母正则表达式
+         */
+        public static final String GREATER_LETTER_REGEX = "^[A-Z]{1,}$";
     }
 
     public static class Const {

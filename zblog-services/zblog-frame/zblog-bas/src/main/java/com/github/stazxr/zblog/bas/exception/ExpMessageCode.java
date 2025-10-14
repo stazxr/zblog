@@ -9,8 +9,8 @@ import org.springframework.lang.Nullable;
  * @since 2024-08-14
  */
 public class ExpMessageCode {
-    public static final ExpMessageCode PARAM_NULL = new ExpMessageCode("valid.comm.param.null");
-    public static final ExpMessageCode PARAM_BLANK = new ExpMessageCode("valid.comm.param.blank");
+    public static final ExpMessageCode PARAM_NULL = new ExpMessageCode("valid.comm.param.NotNull");
+    public static final ExpMessageCode PARAM_BLANK = new ExpMessageCode("valid.comm.param.NotBlank");
 
     /**
      * 错误码

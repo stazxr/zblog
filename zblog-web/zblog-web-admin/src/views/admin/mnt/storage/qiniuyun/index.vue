@@ -243,6 +243,6 @@ export default {
   font-size: 13px;
 }
 .head-container .el-date-editor {
-  width: 230px !important;
+  /* width: 230px !important; */
 }
 </style>

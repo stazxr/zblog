@@ -34,28 +34,15 @@ public interface RoleMapper extends BaseMapper<Role> {
     RoleVo selectRoleDetail(@Param("roleId") Long roleId);
 
     /**
-     * 根据角色名称查询角色信息
-     *
-     * @param roleName 角色名称
-     * @return Role
-     */
-    Role selectByRoleName(@Param("roleName") String roleName);
-
-    /**
-     * 根据角色编码查询角色信息
-     *
-     * @param roleCode 角色编码
-     * @return Role
-     */
-    Role selectByRoleCode(@Param("roleCode") String roleCode);
-
-    /**
      * 查询角色对应的用户列表
      *
      * @param queryDto 查询参数
-     * @return userList
+     * @return List<UserVo>
      */
     List<UserVo> selectUsersByRoleId(UserQueryDto queryDto);
+
+
+
 
     /**
      * 查询用户角色列表（包含被禁用的角色）
@@ -64,13 +51,4 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return Roles
      */
     List<Role> selectRolesByUserId(@Param("userId") Long userId);
-
-    /**
-     * 查询允许访问资源的角色列表
-     *
-     * @param uri 请求地址
-     * @param method 请求方式
-     * @return Roles
-     */
-    List<Role> selectRolesByUriAndMethod(@Param("uri") String uri, @Param("method") String method);
 }

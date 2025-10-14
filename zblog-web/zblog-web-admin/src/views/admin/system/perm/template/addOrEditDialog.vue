@@ -1,12 +1,12 @@
 <template>
   <div>
     <el-dialog
-      append-to-bodyq
+      append-to-body
       :title="dialogTitle"
+      :visible.sync="dialogVisible"
       :fullscreen="isMobile"
       :close-on-click-modal="false"
       :before-close="handleClose"
-      :visible.sync="dialogVisible"
       width="580px"
     >
       <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">

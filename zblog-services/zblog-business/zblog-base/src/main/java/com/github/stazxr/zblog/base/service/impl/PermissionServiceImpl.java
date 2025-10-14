@@ -21,7 +21,6 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
@@ -59,6 +58,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public List<PermissionVo> queryPermTree(PermissionQueryDto queryDto) {
+        // 参数检查
+        if (StringUtils.isNotBlank(queryDto.getBlurry())) {
+            queryDto.setBlurry(queryDto.getBlurry().trim());
+        }
+
         // 查询权限列表
         List<PermissionVo> permissionVos = permissionMapper.selectPermList(queryDto);
 
@@ -89,9 +93,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PermissionVo queryPermDetail(Long permId) {
-        Assert.notNull(permId, "参数【permId】不能为空");
+        Assert.notNull(permId, ExpMessageCode.of("valid.perm.id.NotNull"));
         PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
-        Assert.notNull(permissionVo, "查询权限信息失败，权限【" + permId + "】不存在");
+        Assert.notNull(permissionVo, ExpMessageCode.of("valid.perm.not.exist"));
         return permissionVo;
     }
 
@@ -104,7 +108,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PageInfo<InterfaceVo> pagePermInterfaces(PermissionQueryDto queryDto) {
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
+        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
         try (Page<InterfaceVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             List<InterfaceVo> dataList = permissionMapper.selectPermInterfaces(queryDto.getPermId());
             return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
@@ -120,7 +124,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PageInfo<RoleVo> pagePermRoles(PermissionQueryDto queryDto) {
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
+        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
         try (Page<RoleVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             List<RoleVo> dataList = permissionMapper.selectPermRoles(queryDto.getPermId(), queryDto.getBlurry());
             return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
@@ -136,7 +140,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PageInfo<LogVo> pagePermLogs(PermissionQueryDto queryDto) {
         queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), "参数【permId】不能为空");
+        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
         try (Page<LogVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             List<LogVo> dataList = permissionMapper.selectPermLogs(queryDto.getPermId(), queryDto.getBlurry());
             return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
@@ -243,7 +247,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteRolePerm(RolePermDto rolePermDto) {
-        Assert.notNull(rolePermDto.getPermId(), "参数【permId】不能为空");
+        Assert.notNull(rolePermDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
         Set<Long> roleIds = rolePermDto.getRoleIds();
         if (roleIds == null || roleIds.size() == 0) {
             return;

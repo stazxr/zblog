@@ -1,10 +1,10 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 /**
  * 用户角色关系表
@@ -15,12 +15,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("user_role_relation")
-public class UserRoleRelation extends BaseEntity {
-    /**
-     * 主键
-     */
-    @TableId
-    private Long id;
+public class UserRoleRelation implements Serializable {
+    private static final long serialVersionUID = 2721485954618944620L;
 
     /**
      * 用户序列

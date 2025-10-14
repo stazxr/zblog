@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.util.exception.AssertionViolatedException;
  * @author SunTao
  * @since 2021-11-30
  */
+@Deprecated
 public class Assert {
     /**
      * Assert that an object is not null

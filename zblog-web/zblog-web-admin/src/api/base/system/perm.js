@@ -1,10 +1,10 @@
 import qs from 'qs'
-import api from './../custom-axios'
+import api from './../../custom-axios'
 
 const permApi = '/api/perms'
 
 export default {
-  // 查询权限列表（树）
+  // 查询权限树列表
   queryPermTree: params => {
     return api.httpRequest().get(`${permApi}/queryPermTree`, params)
   },
@@ -32,7 +32,6 @@ export default {
   queryResourceByPermCode: params => {
     return api.httpRequest().get(`${permApi}/queryResourceByPermCode`, params)
   },
-
   // 新增权限
   addPerm: params => {
     return api.httpRequest().post(`${permApi}/addPerm`, params)

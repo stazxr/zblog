@@ -38,22 +38,22 @@ public abstract class BaseException extends RuntimeException {
     /**
      * 使用国际化消息码构造异常
      *
-     * @param messageCode 异常消息码
+     * @param expMessageCode 异常消息码
      */
-    public BaseException(ExpMessageCode messageCode) {
-        super(resolveMessageCode(messageCode));
-        code = messageCode.getCode();
+    public BaseException(ExpMessageCode expMessageCode) {
+        super(resolveMessageCode(expMessageCode));
+        code = expMessageCode.getCode();
     }
 
     /**
      * 使用国际化消息码及根因构造异常
      *
-     * @param messageCode 异常消息码
+     * @param expMessageCode 异常消息码
      * @param cause 根因异常
      */
-    public BaseException(ExpMessageCode messageCode, Throwable cause) {
-        super(resolveMessageCode(messageCode), cause);
-        code = messageCode.getCode();
+    public BaseException(ExpMessageCode expMessageCode, Throwable cause) {
+        super(resolveMessageCode(expMessageCode), cause);
+        code = expMessageCode.getCode();
     }
 
     /**
@@ -119,12 +119,12 @@ public abstract class BaseException extends RuntimeException {
     /**
      * 安全解析国际化消息码，保证构造异常时不会抛出异常
      */
-    private static String resolveMessageCode(ExpMessageCode messageCode) {
+    private static String resolveMessageCode(ExpMessageCode expMessageCode) {
         try {
-            return I18nUtils.getMessage(messageCode.getCode(), messageCode.getArgs());
+            return I18nUtils.getMessage(expMessageCode.getCode(), expMessageCode.getArgs());
         } catch (Exception e) {
             // 如果国际化失败，则使用 code 本身
-            return messageCode.getCode();
+            return expMessageCode.getCode();
         }
     }
 

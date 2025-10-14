@@ -6,7 +6,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/token'
 import { filterAsyncRouter } from '@/utils/router'
-import menu from '@/api/base/menu'
+import menu from '@/api/base/system/menu'
 
 NProgress.configure({ showSpinner: false })
 

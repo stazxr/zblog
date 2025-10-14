@@ -113,7 +113,7 @@ export default {
       this.getUserDetail(dataId)
     },
     getRoleList() {
-      this.$mapi.role.roleList({}).then(res => {
+      this.$mapi.role.roleList().then(res => {
         this.roleList = res.data
       }).catch(_ => {
         this.roleList = []

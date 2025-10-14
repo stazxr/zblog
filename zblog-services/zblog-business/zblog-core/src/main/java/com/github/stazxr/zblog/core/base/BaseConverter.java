@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * }
  * }</pre></p>
  *
- * 备注：如果新增的Converter在某些属性在转换失败时，会导致编译错误，项目启动失败，需排查处理
+ * <p>2025年08月01日，由于 MapStruct 的泛型支持不友好，修改为使用 BeanUtils </p>
  *
  * @param <P> po   BaseEntity 实体对象
  * @param <D> dto  BaseDto    数据对象

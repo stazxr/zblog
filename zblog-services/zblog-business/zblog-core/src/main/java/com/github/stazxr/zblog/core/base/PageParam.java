@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.core.base;
 
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.core.util.ToStringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -9,7 +11,7 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * PageParam
+ * 分页查询参数基类
  *
  * @author SunTao
  * @since 2021-12-21
@@ -39,7 +41,12 @@ public class PageParam implements Serializable {
     private Integer defaultPageSize = 10;
 
     public void checkPage() {
-        Assert.notNull(page, "参数 page 不能为空");
-        Assert.notNull(pageSize, "参数 pageSize 不能为空");
+        Assert.notNull(page, ExpMessageCode.of("valid.common.page.NotNull"));
+        Assert.notNull(pageSize, ExpMessageCode.of("valid.common.pageSize.NotNull"));
+    }
+
+    @Override
+    public String toString() {
+        return ToStringUtils.buildString(this);
     }
 }

@@ -18,6 +18,10 @@ export default {
   loginId: params => {
     return api.httpRequest().get(`/api/auth/loginId`, params)
   },
+  // 查询权限树列表（公共）
+  queryPublicPermTree: params => {
+    return api.httpRequest().get(`/api/perms/queryPublicPermTree`, params)
+  },
   // 发送邮箱验证码
   sendEmailCode: params => {
     return api.httpRequest().post(`/api/email/sendCode`, qs.stringify(params), {

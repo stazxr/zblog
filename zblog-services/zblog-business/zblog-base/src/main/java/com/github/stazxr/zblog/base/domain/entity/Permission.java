@@ -130,7 +130,7 @@ public class Permission extends BaseEntity {
     private String componentPath;
 
     /**
-     * 路由地址 eg: xxx 或 xxx:${val} (非斜杠开头)
+     * 路由地址 eg: xxx 或 xxx:${val} (非斜杠开头) TODO ${val} 待测试可行性 20250912
      *
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#DIR}
      *  浏览器访问地址中的路径

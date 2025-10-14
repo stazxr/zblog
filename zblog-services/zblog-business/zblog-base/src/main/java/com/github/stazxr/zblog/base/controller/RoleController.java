@@ -1,13 +1,18 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
+import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
-import com.github.stazxr.zblog.base.domain.entity.Role;
+import com.github.stazxr.zblog.base.domain.vo.RoleVo;
+import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -18,7 +23,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 /**
  * 角色管理
@@ -30,36 +38,22 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/roles")
-@Api(value = "RoleController", tags = { "角色控制器" })
+@Api(value = "RoleController", tags = { "角色管理" })
 public class RoleController {
     private final RoleService roleService;
-
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
-     */
-    @GetMapping(value = "/list")
-    @ApiOperation(value = "查询角色列表（公共）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色列表（公共）", code = "queryRoleList", level = RouterLevel.PUBLIC)
-    public Result queryRoleList(RoleQueryDto queryDto) {
-        return Result.success().data(roleService.queryRoleList(queryDto));
-    }
 
     /**
      * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return roleList
+     * @return PageInfo<RoleVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询角色列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询角色列表", code = "queryRoleListByPage")
-    public Result pageList(RoleQueryDto queryDto) {
-        return Result.success().data(roleService.queryRoleListByPage(queryDto));
+    @Router(name = "分页查询角色列表", code = "ROLEQ001")
+    public PageInfo<RoleVo> pageList(RoleQueryDto queryDto) {
+        return roleService.queryRoleListByPage(queryDto);
     }
 
     /**
@@ -74,42 +68,87 @@ public class RoleController {
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色详情", code = "queryRoleDetail", level = RouterLevel.PUBLIC)
-    public Result queryRoleDetail(@RequestParam Long roleId) {
-        return Result.success().data(roleService.queryRoleDetail(roleId));
+    @Router(name = "查询角色详情", code = "ROLEQ002")
+    public RoleVo queryRoleDetail(@RequestParam Long roleId) {
+        return roleService.queryRoleDetail(roleId);
     }
 
     /**
      * 新增角色
      *
-     * @param role 角色
-     * @return Result
+     * @param roleDto 角色
      */
     @Log
     @PostMapping(value = "/addRole")
     @ApiOperation(value = "新增角色")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "新增角色", code = "addRole")
-    public Result addRole(@RequestBody Role role) {
-        roleService.addRole(role);
-        return Result.success();
+    @Router(name = "新增角色", code = "ROLEA001")
+    public void addRole(@RequestBody @Validated(Create.class) RoleDto roleDto) {
+        roleService.addRole(roleDto);
     }
 
     /**
      * 编辑角色
      *
-     * @param role 角色
-     * @return Result
+     * @param roleDto 角色
      */
     @Log
     @PostMapping(value = "/editRole")
     @ApiOperation(value = "编辑角色")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "编辑角色", code = "editRole")
-    public Result editRole(@RequestBody Role role) {
-        roleService.editRole(role);
-        return Result.success();
+    @Router(name = "编辑角色", code = "ROLEU001")
+    public void editRole(@RequestBody @Validated(Update.class) RoleDto roleDto) {
+        roleService.editRole(roleDto);
     }
+
+    /**
+     * 角色授权
+     *
+     * @param authDto 授权信息
+     */
+    @Log
+    @PostMapping(value = "/authRole")
+    @ApiOperation(value = "角色授权")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "角色授权", code = "ROLEU002")
+    public void authRole(@RequestBody @Validated RoleAuthDto authDto) {
+        roleService.authRole(authDto);
+    }
+
+    /**
+     * 查询角色对应的权限id列表
+     *
+     * @param roleId 角色id
+     * @return permIds
+     */
+    @GetMapping(value = "/queryPermIdsByRoleId")
+    @ApiOperation(value = "查询角色对应的权限id列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询角色对应的权限id列表", code = "ROLEQ003", level = RouterLevel.PUBLIC)
+    public Set<Long> queryPermIdsByRoleId(@RequestParam Long roleId) {
+        return roleService.queryPermIdsByRoleId(roleId);
+    }
+
+    /**
+     * 分页查询角色对应的用户列表
+     *
+     * @param queryDto 查询参数
+     * @return PageInfo<UserVo>
+     */
+    @GetMapping(value = "/pageUsersByRoleId")
+    @ApiOperation(value = "分页查询角色对应的用户列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "分页查询角色对应的用户列表", code = "ROLEQ004")
+    public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
+        return roleService.pageUsersByRoleId(queryDto);
+    }
+
+
+
+
 
     /**
      * 删除角色
@@ -124,58 +163,12 @@ public class RoleController {
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除角色", code = "deleteRole")
-    public Result deleteRole(@RequestParam Long roleId) {
+    @Router(name = "删除角色", code = "ROLED001")
+    public void deleteRole(@RequestParam Long roleId) {
         roleService.deleteRole(roleId);
-        return Result.success();
     }
 
-    /**
-     * 角色授权（依赖权限查询接口）
-     *
-     * @param authDto 授权信息
-     * @return Result
-     */
-    @Log
-    @PostMapping(value = "/authRole")
-    @ApiOperation(value = "角色授权")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "角色授权", code = "authRole")
-    public Result authRole(@RequestBody RoleAuthDto authDto) {
-        roleService.authRole(authDto);
-        return Result.success();
-    }
 
-    /**
-     * 查询角色对应的权限列表
-     *
-     * @param roleId 角色序列
-     * @return permIdList
-     */
-    @GetMapping(value = "/queryPermIdsByRoleId")
-    @ApiOperation(value = "查询角色对应的权限列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
-    })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色对应的权限列表", code = "queryPermIdsByRoleId", level = RouterLevel.PUBLIC)
-    public Result queryPermIdsByRoleId(@RequestParam Long roleId) {
-        return Result.success().data(roleService.queryPermIdsByRoleId(roleId));
-    }
-
-    /**
-     * 查询角色对应的用户列表
-     *
-     * @param queryDto 查询参数
-     * @return userList
-     */
-    @GetMapping(value = "/pageUsersByRoleId")
-    @ApiOperation(value = "查询角色对应的用户列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色对应的用户列表", code = "pageUsersByRoleId")
-    public Result pageUsersByRoleId(UserQueryDto queryDto) {
-        return Result.success().data(roleService.pageUsersByRoleId(queryDto));
-    }
 
     /**
      * 批量新增角色用户
@@ -207,5 +200,19 @@ public class RoleController {
     public Result batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
         roleService.batchDeleteUserRole(userRoleDto);
         return Result.success();
+    }
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    @GetMapping(value = "/list")
+    @ApiOperation(value = "查询角色列表（公共）")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询角色列表（公共）", code = "ROLEQ005", level = RouterLevel.PUBLIC)
+    public Result queryRoleList(RoleQueryDto queryDto) {
+        return Result.success().data(roleService.queryRoleList(queryDto));
     }
 }

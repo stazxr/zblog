@@ -24,7 +24,7 @@ public interface PermissionService extends IService<Permission> {
      * 查询权限列表（树）
      *
      * @param queryDto 查询参数
-     * @return permsList
+     * @return PermissionVoList
      */
     List<PermissionVo> queryPermTree(PermissionQueryDto queryDto);
 

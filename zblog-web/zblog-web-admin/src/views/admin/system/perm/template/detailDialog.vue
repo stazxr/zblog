@@ -52,8 +52,7 @@ export default {
   },
   data() {
     return {
-      activeName: 'permDetail',
-      dialogMaxHeight: '70vh'
+      activeName: 'permDetail'
     }
   },
   computed: {
@@ -98,10 +97,12 @@ export default {
       }
     },
     doClose() {
+      console.log('333333')
       this.$emit('showDetailDone')
     },
     handleClose() {
       this.$confirm('确认关闭？').then(_ => {
+        console.log('222222222')
         this.doClose()
       }).catch(_ => {})
     }

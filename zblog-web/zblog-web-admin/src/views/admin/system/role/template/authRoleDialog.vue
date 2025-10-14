@@ -1,12 +1,20 @@
 <template>
   <div>
-    <el-drawer :title="dialogTitle" :visible.sync="dialogVisible" destroy-on-close :before-close="handleClose" size="40%" @opened="initData" @closed="doClose">
+    <el-drawer
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      :wrapper-closable="false"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
+      :size="isMobile ? '100%' : '40%'"
+      destroy-on-close
+    >
       <div class="demo-drawer__content">
         <el-tree
           ref="permTree"
           :data="permissions"
-          :props="defaultProps"
-          :check-strictly="checkStrictly"
+          :props="{ children: 'children', label: 'permName' }"
+          :check-strictly="true"
           show-checkbox
           node-key="id"
           default-expand-all
@@ -31,29 +39,27 @@ export default {
     dialogTitle: {
       type: String,
       default: ''
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
-      submitLoading: false,
+      roleId: null,
       permissions: [],
-      checkStrictly: true,
-      defaultProps: {
-        children: 'children',
-        label: 'permName'
-      }
+      submitLoading: false
+    }
+  },
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   methods: {
-    initData() {
+    initData(roleId) {
+      this.roleId = roleId
       this.getPermission()
     },
     getPermission() {
-      this.$mapi.perm.queryPermTree().then(res => {
+      this.$mapi.communal.queryPublicPermTree().then(res => {
         this.permissions = res.data
         this.$nextTick(() => {
           this.queryRolePerm()
@@ -63,7 +69,7 @@ export default {
       })
     },
     queryRolePerm() {
-      this.$mapi.role.queryPermIdsByRoleId({ roleId: this.dataId }).then(res => {
+      this.$mapi.role.queryPermIdsByRoleId({ roleId: this.roleId }).then(res => {
         const nodes = []
         res.data.forEach(item => {
           // 注释部分,在 checkStrictly 为 false 时,可以反显选中半选节点
@@ -115,26 +121,10 @@ export default {
         }
       }
     },
-    doClose() {
-      this.permissions = []
-      this.checkedKeys = []
-      this.submitLoading = false
-      this.$emit('authRoleDone')
-    },
-    handleClose() {
-      if (!this.submitLoading) {
-        this.$confirm('确认关闭？').then(_ => {
-          this.doClose()
-        }).catch(_ => {})
-      }
-    },
-    cancel() {
-      this.handleClose()
-    },
     submit() {
       this.$confirm('确定要提交吗？').then(_ => {
         const param = {
-          roleId: this.dataId,
+          roleId: this.roleId,
           permIds: this.$refs.permTree.getCheckedKeys().concat(this.$refs.permTree.getHalfCheckedKeys())
         }
         this.submitLoading = true
@@ -145,23 +135,27 @@ export default {
           this.submitLoading = false
         })
       })
+    },
+    cancel() {
+      this.handleClose()
+    },
+    handleClose() {
+      if (!this.submitLoading) {
+        this.$confirm('确认关闭？').then(_ => {
+          this.doClose()
+        }).catch(_ => {})
+      }
+    },
+    doClose() {
+      this.roleId = null
+      this.permissions = []
+      this.submitLoading = false
+      this.$emit('authRoleDone')
     }
   }
 }
 </script>
 
 <style scoped>
-.demo-drawer__content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.demo-drawer__footer {
-  margin-top: 10px;
-  display: flex;
-}
-.demo-drawer__footer button {
-  flex: 1;
-  margin: 5px 20px;
-}
+
 </style>

@@ -204,6 +204,6 @@ export default {
   width: 50%;
 }
 .head-container .el-date-editor {
-  width: 350px !important;
+  /* width: 230px !important; */
 }
 </style>

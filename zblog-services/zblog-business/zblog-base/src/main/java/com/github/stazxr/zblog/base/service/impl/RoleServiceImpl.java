@@ -1,11 +1,17 @@
 package com.github.stazxr.zblog.base.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
-import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
+import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.base.converter.RoleConverter;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
+import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
@@ -18,16 +24,13 @@ import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.service.RoleService;
-import com.github.stazxr.zblog.core.util.DataValidated;
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.util.RegexUtils;
+import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 
@@ -39,7 +42,7 @@ import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
  */
 @Service
 @RequiredArgsConstructor
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
     /**
      * 内置角色列表
      */
@@ -47,32 +50,34 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleMapper roleMapper;
 
+    private final RoleConverter roleConverter;
+
     private final UserRoleMapper userRoleMapper;
 
     private final RolePermMapper rolePermMapper;
 
     /**
-     * 查询角色列表
+     * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return roleList
-     */
-    @Override
-    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
-        return roleMapper.selectRoleList(queryDto);
-    }
-
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
+     * @return PageInfo<RoleVo>
      */
     @Override
     public PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto) {
+        // 参数检查
         queryDto.checkPage();
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(roleMapper.selectRoleList(queryDto));
+        if (StringUtils.isNotBlank(queryDto.getRoleName())) {
+            queryDto.setRoleName(queryDto.getRoleName().trim());
+        }
+        if (StringUtils.isNotBlank(queryDto.getRoleCode())) {
+            queryDto.setRoleCode(queryDto.getRoleCode().trim());
+        }
+
+        // 分页查询
+        try (Page<RoleVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            List<RoleVo> dataList = roleMapper.selectRoleList(queryDto);
+            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
+        }
     }
 
     /**
@@ -83,37 +88,97 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
-        Assert.notNull(roleId, "参数【roleId】不能为空");
+        Assert.notNull(roleId, ExpMessageCode.of("valid.role.id.NotNull"));
         RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
-        Assert.notNull(roleVo, "查询角色信息失败，角色【" + roleId + "】不存在");
+        Assert.notNull(roleVo, ExpMessageCode.of("valid.role.not.exist"));
         return roleVo;
     }
 
     /**
      * 新增角色
      *
-     * @param role 角色
+     * @param roleDto 角色
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void addRole(Role role) {
-        role.setId(null);
+    public void addRole(RoleDto roleDto) {
+        // 获取新增角色信息
+        Role role = roleConverter.dtoToEntity(roleDto);
+        // 新增时，不允许传入 RoleId
+        Assert.isNull(role.getId(), ExpMessageCode.of("valid.role.add.idIsNull"));
+        // 角色信息检查
         checkRole(role);
-        Assert.isTrue(roleMapper.insert(role) != 1, "新增失败");
+        // 新增角色
+        Assert.isTrue(roleMapper.insert(role) != 1, ExpMessageCode.of("result.role.add.failed"));
     }
 
     /**
      * 编辑角色
      *
-     * @param role 角色
+     * @param roleDto 角色
+     */
+    @Override
+    public void editRole(RoleDto roleDto) {
+        // 获取新增角色信息
+        Role role = roleConverter.dtoToEntity(roleDto);
+        // 判断角色是否存在
+        Role dbRole = roleMapper.selectById(role.getId());
+        Assert.notNull(dbRole, ExpMessageCode.of("valid.role.not.exist"));
+        // 角色信息检查
+        checkRole(role);
+        // 编辑角色
+        Assert.isTrue(roleMapper.updateById(role) != 1, ExpMessageCode.of("result.role.edit.failed"));
+    }
+
+    /**
+     * 角色授权
+     *
+     * @param authDto 授权信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void editRole(Role role) {
-        Assert.notNull(role.getId(), "参数【id】不能为空");
-        checkRole(role);
-        Assert.isTrue(roleMapper.updateById(role) != 1, "修改失败");
-        SecurityUserCache.clean();
+    public void authRole(RoleAuthDto authDto) {
+        Long roleId = authDto.getRoleId();
+        rolePermMapper.deleteByRoleId(roleId);
+        if (authDto.getPermIds() != null && !authDto.getPermIds().isEmpty()) {
+            List<RolePermissionRelation> rolePerms = new ArrayList<>();
+            for (Long permId : authDto.getPermIds()) {
+                RolePermissionRelation rolePerm = new RolePermissionRelation();
+                rolePerm.setRoleId(roleId);
+                rolePerm.setPermId(permId);
+                rolePerms.add(rolePerm);
+            }
+            rolePermMapper.insertBatch(rolePerms);
+        }
+    }
+
+    /**
+     * 查询角色对应的权限id列表
+     *
+     * @param roleId 角色id
+     * @return permIds
+     */
+    @Override
+    public Set<Long> queryPermIdsByRoleId(Long roleId) {
+        return rolePermMapper.selectPermIdsByRoleId(roleId);
+    }
+
+    /**
+     * 分页查询角色对应的用户列表
+     *
+     * @param queryDto 查询参数
+     * @return userList
+     */
+    @Override
+    public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
+        // 参数检查
+        queryDto.checkPage();
+        Assert.notNull(queryDto.getBusinessId(), "参数【businessId】不能为空");
+
+        // 分页查询
+        try (Page<UserVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            List<UserVo> dataList = roleMapper.selectUsersByRoleId(queryDto);
+            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
+        }
     }
 
     /**
@@ -128,59 +193,22 @@ public class RoleServiceImpl implements RoleService {
         UserQueryDto queryDto = new UserQueryDto();
         queryDto.setBusinessId(roleId);
         List<UserVo> userList = roleMapper.selectUsersByRoleId(queryDto);
-        DataValidated.isTrue(!userList.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
-        Assert.isTrue(roleMapper.deleteById(roleId) != 1, "删除失败");
+        Assert.isTrue(!userList.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
+        Assert.isTrue(roleMapper.deleteById(roleId) != 1, ExpMessageCode.of("result.role.delete.failed"));
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
         SecurityUserCache.clean();
     }
 
-    /**
-     * 角色授权
-     *
-     * @param authDto 授权信息
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void authRole(RoleAuthDto authDto) {
-        Assert.notNull(authDto.getRoleId(), "参数【roleId】不能为空");
-        rolePermMapper.deleteByRoleId(authDto.getRoleId());
-        for (Long permId : authDto.getPermIds()) {
-            RolePermissionRelation rolePerm = new RolePermissionRelation();
-            rolePerm.setId(SequenceUtils.getId());
-            rolePerm.setRoleId(authDto.getRoleId());
-            rolePerm.setPermId(permId);
-            rolePermMapper.insert(rolePerm);
-        }
 
-        SecurityUserCache.clean();
-    }
 
-    /**
-     * 查询角色对应的权限列表
-     *
-     * @param roleId 角色序列
-     * @return permIdList
-     */
-    @Override
-    public Set<Long> queryPermIdsByRoleId(Long roleId) {
-        Assert.notNull(roleId, "参数【roleId】不能为空");
-        return rolePermMapper.selectPermIdsByRoleId(roleId);
-    }
 
-    /**
-     * 查询角色对应的用户列表
-     *
-     * @param queryDto 查询参数
-     * @return userList
-     */
-    @Override
-    public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
-        Assert.notNull(queryDto.getBusinessId(), "参数【businessId】不能为空");
-        queryDto.checkPage();
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(roleMapper.selectUsersByRoleId(queryDto));
-    }
+
+
+
+
+
+
 
     /**
      * 查询用户角色列表（包含被禁用的角色）
@@ -210,7 +238,6 @@ public class RoleServiceImpl implements RoleService {
 
         for (Long userId : userIds) {
             UserRoleRelation userRole = new UserRoleRelation();
-            userRole.setId(SequenceUtils.getId());
             userRole.setUserId(userId);
             userRole.setRoleId(userRoleDto.getRoleId());
             userRoleMapper.insert(userRole);
@@ -236,22 +263,16 @@ public class RoleServiceImpl implements RoleService {
         userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
     }
 
-    private void checkRole(Role role) {
-        Assert.notNull(role.getRoleName(), "角色名称不能为空");
-        Assert.notNull(role.getRoleCode(), "角色编码不能为空");
-        Assert.notNull(role.isEnabled(), "角色状态不能为空");
 
-        // 检查角色编码是否允许使用
-        role.setRoleCode(role.getRoleCode().trim());
-        DataValidated.isTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), "该角色编码被禁止使用，请换一个");
-
-        // 检查角色名称是否存在
-        Role dbRole = roleMapper.selectByRoleName(role.getRoleName());
-        DataValidated.isTrue(dbRole != null && !dbRole.getId().equals(role.getId()), "角色名称已存在");
-
-        // 检查角色编码是否存在
-        dbRole = roleMapper.selectByRoleCode(role.getRoleCode());
-        DataValidated.isTrue(dbRole != null && !dbRole.getId().equals(role.getId()), "角色编码已存在");
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    @Override
+    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
+        return roleMapper.selectRoleList(queryDto);
     }
 
     /**
@@ -264,6 +285,45 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Set<String> selectResourceRoles(String requestUri, String requestMethod) {
+        // TODO
         return new HashSet<>();
+    }
+
+    private void checkRole(Role role) {
+        // 检查角色名称
+        role.setRoleName(role.getRoleName().trim());
+        Assert.isTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exist"));
+
+        // 检查角色编码
+        role.setRoleCode(role.getRoleCode().trim());
+        Assert.isTrue(!role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.patternError"));
+        Assert.isTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), ExpMessageCode.of("valid.role.roleCode.forbid"));
+        Assert.isTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exist"));
+    }
+
+    private boolean checkRoleNameExist(Role role) {
+        if (role.getRoleName() != null) {
+            LambdaQueryWrapper<Role> queryWrapper = queryBuild().eq(Role::getRoleName, role.getRoleName());
+            if (role.getId() != null) {
+                queryWrapper.ne(Role::getId, role.getId());
+            }
+            return roleMapper.exists(queryWrapper);
+        }
+        return false;
+    }
+
+    private boolean checkRoleCodeExist(Role role) {
+        if (role.getRoleCode() != null) {
+            LambdaQueryWrapper<Role> queryWrapper = queryBuild().eq(Role::getRoleCode, role.getRoleCode());
+            if (role.getId() != null) {
+                queryWrapper.ne(Role::getId, role.getId());
+            }
+            return roleMapper.exists(queryWrapper);
+        }
+        return false;
+    }
+
+    private LambdaQueryWrapper<Role> queryBuild() {
+        return Wrappers.lambdaQuery();
     }
 }

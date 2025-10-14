@@ -1,20 +1,29 @@
 <template>
   <div>
-    <el-dialog append-to-body :close-on-click-modal="false" :before-close="handleClose" :visible.sync="dialogVisible" :title="dialogTitle" width="520px">
-      <el-form ref="addForm" :inline="true" :model="addForm" :rules="addRules" size="small" label-width="80px">
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      :fullscreen="isMobile"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
+      append-to-body
+      width="520px"
+    >
+      <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="addForm.roleName" style="width: 380px" maxlength="25" show-word-limit />
+          <el-input v-model="formData.roleName" :style="isMobile ? '' : 'width: 380px;'" maxlength="25" show-word-limit />
         </el-form-item>
         <el-form-item label="角色编码" prop="roleCode">
-          <el-input v-model="addForm.roleCode" style="width: 380px" maxlength="25" show-word-limit />
+          <el-input v-model="formData.roleCode" :style="isMobile ? '' : 'width: 380px;'" maxlength="25" show-word-limit />
         </el-form-item>
         <el-form-item label="角色状态" prop="enabled">
-          <el-select v-model="addForm.enabled" placeholder="角色状态" style="width: 380px">
+          <el-select v-model="formData.enabled" :style="isMobile ? '' : 'width: 380px;'">
             <el-option v-for="item in roleEnabled" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input v-model="addForm.desc" type="textarea" maxlength="100" show-word-limit style="width: 380px" />
+          <el-input v-model="formData.roleDesc" :style="isMobile ? '' : 'width: 380px;'" type="textarea" maxlength="100" show-word-limit />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -35,10 +44,6 @@ export default {
     dialogTitle: {
       type: String,
       default: ''
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
@@ -48,14 +53,14 @@ export default {
         { name: '启用', value: true },
         { name: '禁用', value: false }
       ],
-      addForm: {
-        id: '',
-        roleName: '',
-        roleCode: '',
-        desc: '',
+      formData: {
+        id: null,
+        roleName: null,
+        roleCode: null,
+        roleDesc: null,
         enabled: true
       },
-      addRules: {
+      formRules: {
         roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
         ],
@@ -63,63 +68,41 @@ export default {
           { required: true, message: '请输入角色编码', trigger: 'blur' }
         ],
         enabled: [
-          { required: true, message: '请选择权限状态', trigger: 'blur' }
+          { required: true, message: '请选择角色状态', trigger: 'change' }
         ]
       }
     }
   },
-  watch: {
-    dataId(id) {
-      this.addForm.id = id
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   methods: {
-    initData() {
-      this.$nextTick(() => {
-        this.getRoleDetail()
-      })
-    },
-    getRoleDetail() {
-      if (this.addForm.id != null && this.addForm.id !== '') {
-        this.$mapi.role.queryRoleDetail({ roleId: this.addForm.id }).then(res => {
-          const { data } = res
-          Object.keys(this.addForm).forEach(key => {
-            this.addForm[key] = data[key]
-          })
-        }).catch(_ => {
-          this.doClose()
+    initData(roleId) {
+      if (roleId != null && roleId !== '') {
+        this.$nextTick(() => {
+          this.getRoleDetail(roleId)
         })
       }
     },
-    doClose(result = false) {
-      this.addForm = {
-        id: '',
-        roleName: '',
-        roleCode: '',
-        desc: '',
-        enabled: true
-      }
-      this.$refs['addForm'].resetFields()
-      this.submitLoading = false
-      this.$emit('addOrEditDone', result)
-    },
-    handleClose() {
-      if (!this.submitLoading) {
-        this.$confirm('确认关闭？').then(_ => {
-          this.doClose()
-        }).catch(_ => {})
-      }
-    },
-    cancel() {
-      this.handleClose()
+    getRoleDetail(roleId) {
+      this.$mapi.role.queryRoleDetail({ roleId }).then(res => {
+        const { data } = res
+        Object.keys(this.formData).forEach(key => {
+          this.formData[key] = data[key]
+        })
+      }).catch(_ => {
+        this.doClose()
+      })
     },
     submit() {
-      this.$refs['addForm'].validate((valid) => {
+      this.$refs.addOrEditForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          if (this.addForm.id == null || this.addForm.id === '') {
+          if (this.formData.id === null) {
             // add
-            this.$mapi.role.addRole(this.addForm).then(res => {
+            this.$mapi.role.addRole(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
@@ -127,22 +110,42 @@ export default {
             })
           } else {
             // edit
-            this.$mapi.role.editRole(this.addForm).then(res => {
+            this.$mapi.role.editRole(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
               this.submitLoading = false
             })
           }
-        } else {
-          return false
         }
       })
+    },
+    cancel() {
+      this.handleClose()
+    },
+    handleClose() {
+      if (!this.submitLoading) {
+        this.$confirm('是否确认关闭弹窗？').then(_ => {
+          this.doClose()
+        }).catch(_ => {})
+      }
+    },
+    doClose(result = false) {
+      this.formData = {
+        id: null,
+        roleName: null,
+        roleCode: null,
+        roleDesc: null,
+        enabled: true
+      }
+      this.$refs.addOrEditForm.resetFields()
+      this.submitLoading = false
+      this.$emit('addOrEditDone', result)
     }
   }
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style scoped>
 
 </style>
