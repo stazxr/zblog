@@ -2,9 +2,12 @@ package com.github.stazxr.zblog.base.domain.vo;
 
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
+import com.github.stazxr.zblog.core.base.BaseVo;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * UserVo
@@ -14,9 +17,11 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserVo {
+public class UserVo extends BaseVo {
+    private static final long serialVersionUID = -746423782527946064L;
+
     /**
-     * 用户唯一标识
+     * 用户id
      */
     private Long id;
 
@@ -24,12 +29,6 @@ public class UserVo {
      * 用户名
      */
     private String username;
-
-    /**
-     * 密码
-     */
-    @FieldMask(type = MaskType.PASSWORD)
-    private String password;
 
     /**
      * 用户类型
@@ -84,32 +83,37 @@ public class UserVo {
     private String headImgUrl;
 
     /**
-     * 登录时间
+     * 登录时间（成功）
      */
-    private String loginTime;
+    private String lastLoginTime;
 
     /**
-     * 是否有效
+     * 登录渠道, 01:移动端; 02:PC端
      */
-    private Boolean deleted;
+    private String loginChan;
 
     /**
-     * 创建用户，存储该实体的创建用户标识。
+     * 登录类型, 00:访客登录; 01:密码登录; 02:QQ登录; 99:未知
      */
-    private Long createUser;
+    private String loginType;
 
     /**
-     * 创建时间，存储该实体的创建时间。
+     * 登录地址
      */
-    private String createTime;
+    private String loginAddress;
 
     /**
-     * 修改用户，存储最后修改该实体的用户标识。
+     * 用户代理
      */
-    private Long updateUser;
+    private String userAgent;
 
     /**
-     * 修改时间，存储该实体的最后修改时间。
+     * 用户对应的角色序号列表
      */
-    private String updateTime;
+    private List<Long> roleIds;
+
+    /**
+     * 用户对应的角色列表
+     */
+    private List<String> roleNames;
 }

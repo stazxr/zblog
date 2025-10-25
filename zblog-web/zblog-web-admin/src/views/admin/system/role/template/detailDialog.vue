@@ -13,22 +13,22 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="序号"> {{ roleInfo.id }} </el-descriptions-item>
-        <el-descriptions-item label="角色名称"> {{ roleInfo.roleName }} </el-descriptions-item>
-        <el-descriptions-item label="角色编码"> {{ roleInfo.roleCode }} </el-descriptions-item>
+        <el-descriptions-item label="角色序列"> {{ dataInfo.id }} </el-descriptions-item>
+        <el-descriptions-item label="角色名称"> {{ dataInfo.roleName }} </el-descriptions-item>
+        <el-descriptions-item label="角色编码"> {{ dataInfo.roleCode }} </el-descriptions-item>
         <el-descriptions-item label="角色状态">
-          <el-tag v-if="roleInfo.enabled === 'true'">启用</el-tag>
-          <el-tag v-else-if="roleInfo.enabled === 'false'" type="warning">禁用</el-tag>
+          <el-tag v-if="dataInfo.enabled === 'true'">启用</el-tag>
+          <el-tag v-else-if="dataInfo.enabled === 'false'" type="warning">禁用</el-tag>
           <span v-else> - </span>
         </el-descriptions-item>
         <!-- 2 -->
-        <el-descriptions-item label="创建用户" :span="2"> {{ roleInfo.createUsername }} </el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2"> {{ roleInfo.createTime }} </el-descriptions-item>
+        <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
+        <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
         <!-- 3 -->
-        <el-descriptions-item label="修改用户" :span="2"> {{ roleInfo.updateUsername }} </el-descriptions-item>
-        <el-descriptions-item label="修改时间" :span="2"> {{ roleInfo.updateTime }} </el-descriptions-item>
+        <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUsername }} </el-descriptions-item>
+        <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
         <!-- 4 -->
-        <el-descriptions-item label="角色描述" :span="4"> {{ roleInfo.roleDesc }} </el-descriptions-item>
+        <el-descriptions-item label="角色描述" :span="4"> {{ dataInfo.roleDesc }} </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -44,7 +44,7 @@ export default {
   },
   data() {
     return {
-      roleInfo: {
+      dataInfo: {
         id: '',
         roleName: '',
         roleCode: '',
@@ -65,22 +65,22 @@ export default {
   methods: {
     initData(roleId) {
       this.$nextTick(() => {
-        this.getRoleDetail(roleId)
+        this.queryDetail(roleId)
       })
     },
-    getRoleDetail(roleId) {
-      this.$mapi.role.queryRoleDetail({ roleId }).then(res => {
+    queryDetail(dataId) {
+      this.$mapi.role.queryRoleDetail({ roleId: dataId }).then(res => {
         const { data } = res
-        Object.keys(this.roleInfo).forEach(key => {
-          this.roleInfo[key] = data[key] == null || data[key] === '' ? '-' : data[key].toString()
+        Object.keys(this.dataInfo).forEach(key => {
+          this.dataInfo[key] = data[key] == null || data[key] === '' ? '-' : data[key].toString()
         })
       }).catch(_ => {
         this.doClose()
       })
     },
     doClose() {
-      Object.keys(this.roleInfo).forEach(key => {
-        this.roleInfo[key] = ''
+      Object.keys(this.dataInfo).forEach(key => {
+        this.dataInfo[key] = ''
       })
       this.$emit('showDetailDone')
     },

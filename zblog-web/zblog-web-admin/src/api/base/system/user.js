@@ -1,13 +1,22 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const userApi = '/api/users'
 
 export default {
   // 分页查询用户列表
-  queryUserListByPage: params => {
-    return api.httpRequest().get(`${userApi}/queryUserListByPage`, params)
+  pageUserList: params => {
+    return api.httpRequest().get(`${userApi}/pageList`, params)
   },
+  // 分页查询用户列表（公共）
+  pageListOfPublic: params => {
+    return api.httpRequest().get(`${userApi}/pageListOfPublic`, params)
+  },
+  // 查询用户详情
+  queryUserDetail: params => {
+    return api.httpRequest().get(`${userApi}/queryUserDetail`, params)
+  },
+
   // 修改头像
   updateUserHeadImg: params => {
     return api.httpRequest().post(`${userApi}/updateUserHeadImg`, params)
@@ -27,14 +36,6 @@ export default {
   // 修改用户邮箱
   updateUserEmail: params => {
     return api.httpRequest().post(`${userApi}/updateUserEmail`, params)
-  },
-  // 分页查询用户列表（公共方法）
-  pageListOfCommon: params => {
-    return api.httpRequest().get(`${userApi}/pageListOfCommon`, params)
-  },
-  // 查询用户详情
-  queryUserDetail: params => {
-    return api.httpRequest().get(`${userApi}/queryUserDetail`, params)
   },
   // 更新用户状态
   updateUserStatus: params => {

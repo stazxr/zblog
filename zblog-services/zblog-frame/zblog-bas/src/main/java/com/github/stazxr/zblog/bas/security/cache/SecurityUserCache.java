@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.security.cache;
 
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author SunTao
  * @since 2024-11-14
  */
+@Slf4j
 public class SecurityUserCache {
     /**
      * 用户信息缓存
@@ -43,6 +45,9 @@ public class SecurityUserCache {
     public static SecurityUser put(String userId, SecurityUser securityUser) {
         if (userId != null && securityUser != null) {
             CACHE.put(userId, securityUser);
+            if (log.isDebugEnabled()) {
+                log.debug("add user cache: {}", userId);
+            }
             return securityUser;
         }
         return null;
@@ -56,6 +61,9 @@ public class SecurityUserCache {
     public static void remove(String userId) {
         if (userId != null) {
             CACHE.remove(userId);
+            if (log.isDebugEnabled()) {
+                log.debug("remove user cache: {}", userId);
+            }
         }
     }
 
@@ -65,5 +73,8 @@ public class SecurityUserCache {
     public static void clean() {
         // 清空整个缓存
         CACHE.clear();
+        if (log.isDebugEnabled()) {
+            log.debug("clear user cache");
+        }
     }
 }

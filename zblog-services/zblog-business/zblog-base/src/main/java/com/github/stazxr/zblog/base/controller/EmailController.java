@@ -58,7 +58,7 @@ public class EmailController {
     @Router(name = "发送邮箱验证码", code = "sendCode", level = RouterLevel.OPEN)
     public Result sendCode(@RequestParam String email) {
         Assert.isTrue(StringUtils.isBlank(email), "邮箱不能为空");
-        Assert.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
+        Assert.isTrue(!RegexUtils.match(email, RegexUtils.Regex.EMAIL_REGEX), "邮箱格式不正确");
 
         // 获取邮件内容
         String random = RandomUtils.sixCode();

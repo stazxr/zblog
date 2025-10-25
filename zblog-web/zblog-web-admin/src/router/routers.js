@@ -35,13 +35,12 @@ export const defaultRouterMap = [
       }
     ]
   },
-  /*
   {
     path: '/forceUpdatePass',
     component: (resolve) => require(['@/views/features/forceUpdatePass'], resolve),
     meta: { title: '修改密码', cache: false },
     show: false
-  },*/
+  },
   /* {
     path: '/first1',
     component: Layout,

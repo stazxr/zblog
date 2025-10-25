@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
-import com.github.stazxr.zblog.bas.validation.group.Update;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;

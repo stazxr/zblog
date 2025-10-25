@@ -66,7 +66,6 @@ spring:
         max-wait: ${zblog.redis.lettuce.pool.maxWait}
         # 连接池中连接的清理周期，单位为毫秒。用于定义多长时间执行一次空闲连接的检查和清理，以保持连接池的健康
         time-between-eviction-runs: ${zblog.redis.lettuce.pool.timeBetweenEvictionRuns}
-
   web:
     resources:
       add-mappings: false

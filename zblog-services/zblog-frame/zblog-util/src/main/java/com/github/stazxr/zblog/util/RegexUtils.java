@@ -77,13 +77,6 @@ public class RegexUtils {
          * 纯大写字母正则表达式
          */
         public static final String GREATER_LETTER_REGEX = "^[A-Z]{1,}$";
-    }
-
-    public static class Const {
-        /**
-         * ${变量}正则表达式
-         */
-        public static final String DOLLAR_VARIATE_REGEX = "\\$\\{[^}]+\\}";
 
         /**
          * 用户名正则表达式
@@ -105,5 +98,10 @@ public class RegexUtils {
          *  密码设置要求: 密码长度必须大于等于6位且小于等于20位，需要包含大写字母，小写字母，数字，特殊字符中的至少三种
          */
         public static final String PWD_REGEX = "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\\W_]+$)(?![a-z0-9]+$)(?![a-z\\W_]+$)(?![0-9\\W_]+$)[a-zA-Z0-9\\W_]{6,20}$";
+
+        /**
+         * ${变量}正则表达式
+         */
+        public static final String DOLLAR_VARIATE_REGEX = "\\$\\{[^}]+\\}";
     }
 }

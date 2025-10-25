@@ -32,6 +32,14 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
     PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto);
 
     /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return List<RoleVo>
+     */
+    List<RoleVo> queryRoleList(RoleQueryDto queryDto);
+
+    /**
      * 查询角色详情
      *
      * @param roleId 角色序列
@@ -115,12 +123,4 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
      * @param userRoleDto 角色 - 用户对应信息
      */
     void batchDeleteUserRole(UserRoleDto userRoleDto);
-
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
-     */
-    List<RoleVo> queryRoleList(RoleQueryDto queryDto);
 }

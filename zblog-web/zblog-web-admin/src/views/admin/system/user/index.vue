@@ -1,63 +1,77 @@
 <template>
   <div class="app-container">
     <div class="head-container">
-      <!-- 搜索栏 -->
       <div class="search-opts">
-        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="20" :item-width="120">
+        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
           <muses-search-form-item label="" prop="search-username">
-            <el-input
-              id="search-username"
-              v-model="filters.username"
-              placeholder="用户名"
-              maxlength="20"
-              style="width: 120px"
-              clearable
-              @keyup.enter.native="search"
-            />
+            <el-input id="search-username" v-model="filters.username" clearable placeholder="用户名" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-nickname">
-            <el-input
-              id="search-nickname"
-              v-model="filters.nickname"
-              placeholder="用户昵称"
-              maxlength="25"
-              style="width: 120px"
-              clearable
-              @keyup.enter.native="search"
-            />
+            <el-input id="search-nickname" v-model="filters.nickname" clearable placeholder="用户昵称" @keyup.enter.native="search" />
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-enabled">
-            <el-select id="search-enabled" v-model="filters.enabled" placeholder="用户状态" style="width: 120px" clearable>
-              <el-option label="启用" value="true" />
-              <el-option label="禁用" value="false" />
+          <muses-search-form-item label="" prop="search-email">
+            <el-input id="search-email" v-model="filters.email" clearable placeholder="邮箱" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-userType">
+            <el-select id="search-userType" v-model="filters.userType" placeholder="用户类型" clearable>
+              <el-option label="系统用户" :value="0" />
+              <el-option label="普通用户" :value="1" />
+              <el-option label="管理员用户" :value="2" />
+              <el-option label="测试用户" :value="3" />
+              <el-option label="临时用户" :value="4" />
             </el-select>
           </muses-search-form-item>
-          <muses-search-form-item btn>
-            <el-button type="success" icon="el-icon-search" @click="search()">查询</el-button>
-            <el-button type="warning" icon="el-icon-refresh-right" @click="resetSearch()">重置</el-button>
+          <muses-search-form-item label="" prop="search-userStatus">
+            <el-select id="search-userStatus" v-model="filters.userStatus" placeholder="用户状态" clearable>
+              <el-option label="正常" :value="0" />
+              <el-option label="禁用" :value="1" />
+              <el-option label="锁定" :value="2" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-loginChan">
+            <el-select id="search-loginChan" v-model="filters.loginChan" placeholder="登录渠道" clearable>
+              <el-option label="移动端" value="01" />
+              <el-option label="PC端" value="02" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-loginType">
+            <el-select id="search-loginType" v-model="filters.loginType" placeholder="登录方式" clearable>
+              <el-option label="访客" value="00" />
+              <el-option label="密码" value="01" />
+              <el-option label="QQ互信" value="02" />
+              <el-option label="未知" value="99" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-nickname">
+            <el-input id="search-nickname" v-model="filters.nickname" clearable placeholder="登录地址" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item btn btn-open-name="" btn-close-name="">
+            <el-button type="success" @click="search()">查 询</el-button>
+            <el-button type="warning" @click="resetSearch()">重 置</el-button>
           </muses-search-form-item>
         </muses-search-form>
       </div>
-      <!-- 操作栏 -->
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['addUser']" type="primary" @click="addUser()">新增</el-button>
+          <el-button v-perm="['USERQ001']" type="success" @click="addUser">新增</el-button>
+          <el-button v-perm="['USERQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['USERU001']" :disabled="row === null" type="primary" @click="editUser">编辑</el-button>
+          <el-button v-perm="['USERD001']" :disabled="row === null" type="danger" @click="deleteUser">删除</el-button>
         </span>
       </div>
     </div>
-
     <div class="components-container">
       <el-table
+        ref="userTable"
         v-loading="tableLoading"
-        element-loading-lock="true"
-        element-loading-text="数据加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.9)"
         :data="tableData"
+        :header-cell-style="{background:'#FAFAFA'}"
+        highlight-current-row
+        row-key="id"
         border
-        style="width: 100%"
+        @current-change="handleCurrentChange"
       >
-        <el-table-column prop="username" label="头像" align="center" width="60">
+        <el-table-column prop="headImgUrl" label="头像" align="center" width="70">
           <template v-slot="scope">
             <el-image :src="scope.row['headImgUrl']" :preview-src-list="[scope.row['headImgUrl']]" fit="contain" lazy class="el-avatar">
               <div slot="error">
@@ -66,119 +80,144 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" align="center" width="180" />
-        <el-table-column :show-overflow-tooltip="true" prop="nickname" label="用户昵称" align="center" width="180" />
-        <el-table-column :show-overflow-tooltip="true" prop="email" label="邮箱" align="center" width="180" />
-        <el-table-column :show-overflow-tooltip="true" prop="gender" label="性别" align="center" width="80">
+        <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="nickname" label="用户昵称" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="email" label="邮箱" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="userType" label="用户类型" align="center" width="80">
+          <template v-slot="scope">
+            <span v-if="scope.row.userType === 0">系统用户</span>
+            <span v-else-if="scope.row.userType === 1">普通用户</span>
+            <span v-else-if="scope.row.userType === 2">管理员</span>
+            <span v-else-if="scope.row.userType === 3">测试用户</span>
+            <span v-else-if="scope.row.userType === 4">临时用户</span>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="userStatus" label="用户状态" align="center" width="80">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.userStatus === 0" type="success">正常</el-tag>
+            <el-tag v-else-if="scope.row.userStatus === 1" type="danger">禁用</el-tag>
+            <el-tag v-else-if="scope.row.userStatus === 2" type="warning">锁定</el-tag>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="gender" label="用户性别" align="center" width="80">
           <template v-slot="scope">
             <span v-if="scope.row.gender === 1">男</span>
             <span v-else-if="scope.row.gender === 2">女</span>
             <span v-else>隐藏</span>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="loginTime" label="登录时间" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="enabled" label="用户状态" align="center">
+        <el-table-column :show-overflow-tooltip="true" prop="lastLoginTime" label="登录时间" align="center" width="140" />
+        <el-table-column :show-overflow-tooltip="true" prop="loginChan" label="登录渠道" align="center" width="80">
           <template v-slot="scope">
-            <el-switch
-              v-model="scope.row.enabled"
-              :disabled="!hasPerm('updateUserStatus') || user.id === scope.row.id"
-              active-color="#409EFF"
-              inactive-color="#F56C6C"
-              @change="changeEnabled(scope.row, scope.row.enabled)"
-            />
+            <span v-if="scope.row['loginChan'] === '01'">移动端</span>
+            <span v-else-if="scope.row['loginChan'] === '02'">PC端</span>
+            <span v-else>{{ scope.row['loginChan'] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200px" fixed="right">
+        <el-table-column :show-overflow-tooltip="true" prop="loginType" label="登录方式" align="center" width="80">
           <template v-slot="scope">
-            <el-button type="text" @click="showUserDetail(scope.row)">详情</el-button>
-            <el-button v-perm="['editUser']" type="text" @click="editUser(scope.row)">编辑</el-button>
-            <el-button v-perm="['deleteUser']" type="text" @confirm="deleteUser(scope.row)">删除</el-button>
+            <span v-if="scope.row['loginType'] === '00'">访客</span>
+            <span v-else-if="scope.row['loginType'] === '01'">密码</span>
+            <span v-else-if="scope.row['loginType'] === '02'">QQ互信</span>
+            <span v-else-if="scope.row['loginType'] === '99'">未知</span>
+            <span v-else>{{ scope.row['loginType'] }}</span>
           </template>
         </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="loginAddress" label="登录地址" align="center" width="80" />
+        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" />
         <div slot="empty">
-          <el-empty />
+          <el-empty :image="nodataImg" description=" " />
         </div>
       </el-table>
+      <div class="pagination-container">
+        <el-pagination
+          :total="total"
+          :current-page.sync="page"
+          :page-size.sync="pageSize"
+          :page-sizes="[10, 20, 30, 50]"
+          layout="total, prev, pager, next, sizes"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+        />
+      </div>
     </div>
 
-    <div class="pagination-container">
-      <el-pagination
-        :total="total"
-        :current-page="page"
-        :page-size="pageSize"
-        style="margin-top: 8px;"
-        layout="total, prev, pager, next, sizes"
-        @size-change="sizeChange"
-        @current-change="pageChange"
-      />
-    </div>
-
+    <!-- 详情 -->
+    <detailDialog
+      ref="detailDialogRef"
+      :dialog-visible="detailDialogVisible"
+      @showDetailDone="showDetailDone"
+    />
     <!-- 新增 / 编辑 -->
     <addOrEditDialog
       ref="addOrEditDialogRef"
-      :dialog-visible="addOrEditDialogVisible"
       :dialog-title="addOrEditDialogTitle"
+      :dialog-visible="addOrEditDialogVisible"
       @addOrEditDone="addOrEditDone"
-    />
-    <!-- 查看详情 -->
-    <showDetailDialog
-      ref="showDetailDialogRef"
-      :dialog-visible="showDetailDialogVisible"
-      @showDetailDone="showDetailDone"
     />
   </div>
 </template>
 
 <script>
+import detailDialog from '@/views/admin/system/user/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/user/template/addOrEditDialog'
-import showDetailDialog from '@/views/admin/system/user/template/showDetailDialog'
-import { mapGetters } from 'vuex'
+import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'User',
   components: {
-    addOrEditDialog,
-    showDetailDialog
+    detailDialog,
+    addOrEditDialog
   },
   data() {
     return {
       filters: {
-        username: '',
-        nickname: '',
-        enabled: ''
+        username: null,
+        nickname: null,
+        email: null,
+        userType: null,
+        userStatus: null,
+        loginChan: null,
+        loginType: null,
+        loginAddress: null
       },
       tableData: [],
       tableLoading: false,
+      nodataImg: nodataImg,
+      row: null,
       total: 0,
       page: 1,
       pageSize: 10,
-      addOrEditDialogTitle: '',
-      addOrEditDialogVisible: false,
-      showDetailDialogVisible: false,
-      enabledStatus: {
-        true: '启用',
-        false: '禁用'
-      }
+      detailDialogVisible: false,
+      addOrEditDialogTitle: null,
+      addOrEditDialogVisible: false
     }
-  },
-  computed: {
-    ...mapGetters([
-      'user'
-    ])
   },
   mounted() {
     this.listTableData()
   },
   methods: {
+    handleCurrentChange(row) {
+      this.row = row
+    },
+    // 查询
     search() {
       this.page = 1
       this.listTableData()
     },
     resetSearch() {
-      this.filters.username = ''
-      this.filters.nickname = ''
-      this.filters.enabled = ''
-
+      Object.keys(this.filters).forEach(key => { this.filters[key] = null })
       this.page = 1
+      this.listTableData()
+    },
+    handleSizeChange(size) {
+      this.page = 1
+      this.pageSize = size
+      this.listTableData()
+    },
+    handlePageChange(page) {
+      this.page = page
       this.listTableData()
     },
     listTableData() {
@@ -188,89 +227,74 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.user.queryUserListByPage(param).then(res => {
+      this.$mapi.user.pageUserList(param).then(res => {
         const { data } = res
-        this.tableData = data.list
         this.total = data.total
+        this.tableData = data.list
       }).catch(_ => {
-        this.tableData = []
         this.total = 0
+        this.tableData = []
       }).finally(() => {
         this.tableLoading = false
+        this.row = null
+        this.$refs.userTable.setCurrentRow()
       })
     },
-    changeEnabled(data, val) {
-      this.$confirm('此操作将' + this.enabledStatus[val] + '[' + data.username + '], 是否继续？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const param = {
-          id: data.id,
-          enabled: val
-        }
-        this.$mapi.user.updateUserStatus(param).then(_ => {
-          this.$message.success(this.enabledStatus[val] + '成功')
-        }).catch(() => {
-          data.enabled = !data.enabled
-        })
-      }).catch(() => {
-        data.enabled = !data.enabled
-      })
+    // 详情
+    showDetail() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的用户')
+        return
+      }
+      this.detailDialogVisible = true
+      this.$refs.detailDialogRef.initData(this.row.id)
     },
+    showDetailDone() {
+      this.detailDialogVisible = false
+    },
+    // 新增与编辑
     addUser() {
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增用户'
       this.$refs.addOrEditDialogRef.initData()
     },
-    editUser(row) {
+    editUser() {
+      if (this.row === null) {
+        this.$message.error('请选择要编辑的用户')
+        return
+      }
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '编辑用户'
-      this.$refs.addOrEditDialogRef.initData(row.id)
+      this.$refs.addOrEditDialogRef.initData(this.row.id)
     },
     addOrEditDone(result = false) {
+      this.addOrEditDialogTitle = null
       this.addOrEditDialogVisible = false
-      this.addOrEditDialogTitle = ''
       if (result) {
         this.listTableData()
       }
     },
-    showUserDetail(row) {
-      this.showDetailDialogVisible = true
-      this.$refs.showDetailDialogRef.initData(row.id)
-    },
-    showDetailDone() {
-      this.showDetailDialogVisible = false
-    },
-    deleteUser(row) {
-      this.$mapi.user.deleteUser({ userId: row.id }).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
+    // 删除
+    deleteUser() {
+      if (this.row === null) {
+        this.$message.error('请选择要删除的用户')
+        return
+      }
+      this.$confirm('此操作将永久删除用户【' + this.row.username + '】, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.user.deleteUser({ userId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
       })
-    },
-    sizeChange(size) {
-      this.page = 1
-      this.pageSize = size
-      this.listTableData()
-    },
-    pageChange(page) {
-      this.page = page
-      this.listTableData()
-    },
-    hasPerm(value) {
-      return this.checkPerm(value)
     }
   }
 }
 </script>
-<style>
-.search-opts .muses-search-form-item[btn] {
-  display: flex;
-  justify-content: flex-start;  /* 左对齐按钮 */
-  gap: 10px;  /* 按钮之间的间距 */
-}
 
-.search-opts .el-button {
-  flex: 0 0 auto;  /* 按钮大小自适应 */
-}
+<style scoped>
+
 </style>

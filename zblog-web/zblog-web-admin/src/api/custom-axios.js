@@ -61,6 +61,11 @@ instance.interceptors.request.use(config => {
   config.headers.Authorization = getToken()
   // config.headers['Content-Type'] = 'application/json;charset=UTF-8'
 
+  // 根据 User-Agent 判断客户端类型
+  const ua = navigator.userAgent.toLowerCase()
+  const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
+  config.headers['X-Client-Type'] = isMobile ? '01' : '02'
+
   // return config
   return config
 }, error => {
@@ -146,11 +151,11 @@ function responseHandler(result) {
     // success, return data
     return result
   } else if (code === 401) {
-    const identifier = result.identifier || 900001
-    if (identifier === 10008) {
+    const identifier = result.identifier || 10001
+    if (identifier === 10001) {
       Message.error(result.message || '登录失败')
       return Promise.reject(new Error(result.message || '登录失败'))
-    } else if (identifier === 10009) {
+    } else if (identifier === 10002) {
       // 密码过期，跳转到修改密码的页面
       Message.error(result.message || '请修改密码')
       return Promise.reject(new Error('' + identifier))

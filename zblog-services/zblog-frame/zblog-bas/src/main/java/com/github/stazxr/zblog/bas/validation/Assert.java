@@ -9,6 +9,30 @@ import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
  * @since 2025-08-16
  */
 public class Assert {
+    public static void isEquals(Object a, Object b, String message) {
+        if (a != null && !a.equals(b)) {
+            throw new AssertException(message);
+        }
+    }
+
+    public static void isEquals(Object a, Object b, ExpMessageCode expMessageCode) {
+        if (a != null && !a.equals(b)) {
+            throw new AssertException(expMessageCode);
+        }
+    }
+
+    public static void isNoEquals(Object a, Object b, String message) {
+        if (a != null && a.equals(b)) {
+            throw new AssertException(message);
+        }
+    }
+
+    public static void isNoEquals(Object a, Object b, ExpMessageCode expMessageCode) {
+        if (a != null && a.equals(b)) {
+            throw new AssertException(expMessageCode);
+        }
+    }
+
     public static void isNull(Object object, String message) {
         if (object != null) {
             throw new AssertException(message);
@@ -59,5 +83,51 @@ public class Assert {
         if (flag) {
             throw new AssertException(expMessageCode);
         }
+    }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param callBack callback function
+     */
+    public static void isTrue(boolean flag, CallBack callBack) {
+        if (flag) {
+            callBack.call();
+        }
+    }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param trueBack true callback function
+     * @param falseBack false callback function
+     */
+    public static void isTrue(boolean flag, CallBack trueBack, CallBack falseBack) {
+        if (flag) {
+            trueBack.call();
+        } else {
+            falseBack.call();
+        }
+    }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param trueBack true callback function
+     * @param expMessageCode false throw exception
+     */
+    public static void isTrue(boolean flag, CallBack trueBack, ExpMessageCode expMessageCode) {
+        if (flag) {
+            trueBack.call();
+        } else {
+            throw new AssertException(expMessageCode);
+        }
+    }
+
+    public interface CallBack {
+        void call();
     }
 }

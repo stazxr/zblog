@@ -15,7 +15,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("用户查询参数")
 public class UserQueryDto extends PageParam {
     private static final long serialVersionUID = -2928961627904492808L;
@@ -50,6 +49,23 @@ public class UserQueryDto extends PageParam {
     @ApiModelProperty("用户状态")
     private Integer userStatus;
 
+    /**
+     * 登录渠道, 01:移动端; 02:PC端
+     */
+    @ApiModelProperty("登录渠道")
+    private String loginChan;
+
+    /**
+     * 登录类型, 00:访客登录; 01:密码登录; 02:QQ登录; 99:未知
+     */
+    @ApiModelProperty("登录类型")
+    private String loginType;
+
+    /**
+     * 登录地址
+     */
+    @ApiModelProperty("登录地址")
+    private String loginAddress;
 
 
 

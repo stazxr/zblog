@@ -115,7 +115,7 @@
 
 <script>
 import userChooseDialog from './template/userChooseDialog'
-import showDetailDialog from '../../system/user/template/showDetailDialog'
+import showDetailDialog from '../../system/user/template/detailDialog'
 import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'UserSearch',

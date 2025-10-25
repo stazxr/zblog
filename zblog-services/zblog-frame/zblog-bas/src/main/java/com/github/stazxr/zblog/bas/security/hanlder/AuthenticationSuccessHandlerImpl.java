@@ -68,7 +68,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             SsoTokenCache.set(ssoToken);
 
             // 记录用户登录日志
-            securityUserService.updateUserLoginInfo(userId, userIp, request);
+            securityUserService.updateUserLoginInfo(securityUser.getUsername(), userIp, 1, request);
 
             // 构造登录结果并返回
             Map<String, Object> loginResult = new HashMap<>(1);

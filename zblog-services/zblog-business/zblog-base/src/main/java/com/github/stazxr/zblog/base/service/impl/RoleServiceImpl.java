@@ -81,6 +81,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return roleList
+     */
+    @Override
+    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
+        return roleMapper.selectRoleList(queryDto);
+    }
+
+    /**
      * 查询角色详情
      *
      * @param roleId 角色ID
@@ -101,7 +112,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public void addRole(RoleDto roleDto) {
-        // 获取新增角色信息
+        // 获取角色信息
         Role role = roleConverter.dtoToEntity(roleDto);
         // 新增时，不允许传入 RoleId
         Assert.isNull(role.getId(), ExpMessageCode.of("valid.role.add.idIsNull"));
@@ -118,7 +129,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public void editRole(RoleDto roleDto) {
-        // 获取新增角色信息
+        // 获取角色信息
         Role role = roleConverter.dtoToEntity(roleDto);
         // 判断角色是否存在
         Role dbRole = roleMapper.selectById(role.getId());
@@ -261,18 +272,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
         userRoleMapper.batchDeleteUserRole(userRoleDto);
         userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
-    }
-
-
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
-     */
-    @Override
-    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
-        return roleMapper.selectRoleList(queryDto);
     }
 
     /**

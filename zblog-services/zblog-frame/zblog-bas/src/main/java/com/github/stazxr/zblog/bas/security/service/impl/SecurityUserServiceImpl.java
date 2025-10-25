@@ -73,15 +73,15 @@ public class SecurityUserServiceImpl implements SecurityUserService, Initializin
     }
 
     /**
-     * 更新指定用户的登录信息。
-     * 当前实现为空，可根据实际需求扩展，例如记录最后登录时间或 IP。
+     * 更新用户的登录信息。当前实现为空，可根据实际需求扩展。
      *
-     * @param userId 用户 ID
-     * @param userIp 用户的登录 IP 地址
-     * @param request 用户的请求信息
+     * @param username 用户名
+     * @param userIp   用户的登录ip
+     * @param type     用户登录类型
+     * @param request  用户的请求信息
      */
     @Override
-    public void updateUserLoginInfo(String userId, String userIp, HttpServletRequest request) {
+    public void updateUserLoginInfo(String username, String userIp, int type, HttpServletRequest request) {
     }
 
     /**

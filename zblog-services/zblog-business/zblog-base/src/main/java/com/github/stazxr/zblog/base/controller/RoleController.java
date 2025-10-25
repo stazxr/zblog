@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,6 +55,20 @@ public class RoleController {
     @Router(name = "分页查询角色列表", code = "ROLEQ001")
     public PageInfo<RoleVo> pageList(RoleQueryDto queryDto) {
         return roleService.queryRoleListByPage(queryDto);
+    }
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryDto 查询参数
+     * @return List<RoleVo>
+     */
+    @GetMapping(value = "/list")
+    @ApiOperation(value = "查询角色列表（公共）")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询角色列表（公共）", code = "ROLEQ005", level = RouterLevel.PUBLIC)
+    public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
+        return roleService.queryRoleList(queryDto);
     }
 
     /**
@@ -154,7 +169,6 @@ public class RoleController {
      * 删除角色
      *
      * @param roleId 角色ID
-     * @return Result
      */
     @Log
     @PostMapping(value = "/deleteRole")
@@ -200,19 +214,5 @@ public class RoleController {
     public Result batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
         roleService.batchDeleteUserRole(userRoleDto);
         return Result.success();
-    }
-
-    /**
-     * 查询角色列表
-     *
-     * @param queryDto 查询参数
-     * @return roleList
-     */
-    @GetMapping(value = "/list")
-    @ApiOperation(value = "查询角色列表（公共）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色列表（公共）", code = "ROLEQ005", level = RouterLevel.PUBLIC)
-    public Result queryRoleList(RoleQueryDto queryDto) {
-        return Result.success().data(roleService.queryRoleList(queryDto));
     }
 }

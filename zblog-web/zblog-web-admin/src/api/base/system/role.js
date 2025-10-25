@@ -8,6 +8,10 @@ export default {
   pageRoleList: params => {
     return api.httpRequest().get(`${roleApi}/pageList`, params)
   },
+  // 查询角色列表（公共）
+  roleList: params => {
+    return api.httpRequest().get(`${roleApi}/list`, params)
+  },
   // 查询角色详情
   queryRoleDetail: params => {
     return api.httpRequest().get(`${roleApi}/queryRoleDetail`, params)
@@ -33,10 +37,6 @@ export default {
     return api.httpRequest().get(`${roleApi}/pageUsersByRoleId`, params)
   },
 
-  // 查询角色列表
-  roleList: params => {
-    return api.httpRequest().get(`${roleApi}/list`, params)
-  },
   // 删除角色
   deleteRole: params => {
     return api.httpRequest().post(`${roleApi}/deleteRole`, qs.stringify(params), {

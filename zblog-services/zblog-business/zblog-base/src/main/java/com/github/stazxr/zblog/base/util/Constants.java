@@ -8,6 +8,11 @@ package com.github.stazxr.zblog.base.util;
  */
 public class Constants {
     /**
+     * 超级管理员ID
+     */
+    public static final Long SUPER_USER_ID = 1L;
+
+    /**
      * 树结构的顶部序列
      */
     public static final Long TOP_ID = 0L;
@@ -21,26 +26,6 @@ public class Constants {
      * 权限树中顶层权限名称
      */
     public static final String TOP_PERM_NAME = "Z-BLOG";
-
-    /**
-     * 系统管理员
-     */
-    public static final String USER_ADMIN = "admin";
-
-    /**
-     * 测试用户
-     */
-    public static final String USER_TEST = "test";
-
-    /**
-     * 系统管理员序列
-     */
-    public static final Long USER_ADMIN_ID = 1L;
-
-    /**
-     * 测试用户序列
-     */
-    public static final Long USER_TEST_ID = 2L;
 
     /**
      * 一时的秒数
@@ -61,11 +46,6 @@ public class Constants {
      * AUTHENTICATION_PREFIX
      */
     public static final String AUTHENTICATION_PREFIX = "Bearer ";
-
-    /**
-     * 系统默认用户
-     */
-    public static final long DEFAULT_ROLE_ID = 3561010960472735744L;
 
     /**
      * 默认排序

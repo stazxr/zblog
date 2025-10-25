@@ -1,9 +1,6 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.github.stazxr.zblog.bas.security.core.SecurityRole;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.Getter;
@@ -42,6 +39,7 @@ public class Role extends SecurityRole {
     /**
      * 是否有效
      */
+    @TableLogic
     private Boolean deleted;
 
     /**

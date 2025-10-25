@@ -25,9 +25,9 @@ public class RoleConverter {
             return null;
         }
 
-        Role role = new Role();
-        BeanUtils.copyProperties(dto, role);
-        return role;
+        Role po = new Role();
+        BeanUtils.copyProperties(dto, po);
+        return po;
     }
 
     /**
@@ -41,8 +41,8 @@ public class RoleConverter {
             return null;
         }
 
-        RoleVo roleVo = new RoleVo();
-        BeanUtils.copyProperties(po, roleVo);
-        return roleVo;
+        RoleVo vo = new RoleVo();
+        BeanUtils.copyProperties(po, vo);
+        return vo;
     }
 }

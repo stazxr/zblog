@@ -3,8 +3,10 @@ package com.github.stazxr.zblog.bas.security.hanlder;
 import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.exception.LoginNumCodeException;
+import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
@@ -28,6 +30,8 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHandler {
+    private SecurityUserService securityUserService;
+
     /**
      * 处理认证失败逻辑。
      *
@@ -77,17 +81,17 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
      * @param request   当前 HTTP 请求
      */
     private void exceptionHandle(String username, AuthenticationException exception, HttpServletRequest request) {
+        String ipAddress = IpUtils.getIp(request);
         if (exception instanceof BadCredentialsException) {
             // 密码错误逻辑：记录错误次数，满足规则时锁定用户
             log.warn("用户 [{}] 输入错误的密码", username);
-            // TODO: 实现用户密码错误次数记录和锁定逻辑
+            securityUserService.updateUserLoginInfo(username, ipAddress, 2, request);
         }
 
         if (exception instanceof UsernameNotFoundException) {
             // 用户不存在逻辑：记录IP访问次数，满足规则时拉黑IP
-            String ipAddress = IpUtils.getIp(request);
             log.warn("IP [{}] 使用不存在的用户名 [{}] 尝试登录", ipAddress, username);
-            // TODO: 实现记录 IP 访问次数和拉黑逻辑
+            securityUserService.updateUserLoginInfo(username, ipAddress, 3, request);
         }
     }
 
@@ -115,6 +119,11 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
         } else {
             return "登录失败：" + exception.getMessage();
         }
+    }
+
+    @Autowired
+    public void setSecurityUserService(SecurityUserService securityUserService) {
+        this.securityUserService = securityUserService;
     }
 }
 

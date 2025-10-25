@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
-import com.github.stazxr.zblog.core.base.BaseEntity;
 import com.github.stazxr.zblog.core.util.ToStringUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.Getter;
@@ -19,8 +19,15 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@TableName("user")
 public class User extends SecurityUser {
     private static final long serialVersionUID = 4174772175234327859L;
+
+    /**
+     * 用户id
+     */
+    @TableId
+    private Long id;
 
     /**
      * 昵称
@@ -54,34 +61,44 @@ public class User extends SecurityUser {
     private String headImgUrl;
 
     /**
-     * 登录时间
+     * 登录时间（成功）
      */
-    private String loginTime;
+    private String lastLoginTime;
 
     /**
      * 是否有效
      */
+    @TableLogic
     private Boolean deleted;
 
     /**
      * 创建用户，存储该实体的创建用户标识。
      */
+    @TableField(fill = FieldFill.INSERT)
     private Long createUser;
 
     /**
      * 创建时间，存储该实体的创建时间。
      */
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
 
     /**
      * 修改用户，存储最后修改该实体的用户标识。
      */
+    @TableField(fill = FieldFill.UPDATE)
     private Long updateUser;
 
     /**
      * 修改时间，存储该实体的最后修改时间。
      */
+    @TableField(fill = FieldFill.UPDATE)
     private String updateTime;
+
+    public void setId(Long id) {
+        super.setId(id);
+        this.id = id;
+    }
 
     @Override
     public int hashCode() {

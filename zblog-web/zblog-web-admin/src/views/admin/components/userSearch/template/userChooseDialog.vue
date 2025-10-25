@@ -141,7 +141,7 @@ export default {
       }
 
       this.tableLoading = true
-      this.$mapi.user.pageListOfCommon(param).then(res => {
+      this.$mapi.user.pageListOfPublic(param).then(res => {
         const { data } = res
         this.tableData = data.list
         this.total = data.total

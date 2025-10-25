@@ -199,7 +199,7 @@ export default {
             }
           }).catch(e => {
             console.log('Login Error', e)
-            if (e.message && e.message === '10009') {
+            if (e.message && e.message === '10002') {
               // 跳转修改密码界面
               this.$router.push({ path: '/forceUpdatePass', query: { username: username }})
             } else {

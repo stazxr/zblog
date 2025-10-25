@@ -11,6 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Deprecated
 public class RouterVo {
     /**
      * 路由名称

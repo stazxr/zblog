@@ -79,15 +79,15 @@ export default {
     }
   },
   methods: {
-    initData(roleId) {
-      if (roleId != null && roleId !== '') {
+    initData(dataId) {
+      if (dataId != null && dataId !== '') {
         this.$nextTick(() => {
-          this.getRoleDetail(roleId)
+          this.getRoleDetail(dataId)
         })
       }
     },
-    getRoleDetail(roleId) {
-      this.$mapi.role.queryRoleDetail({ roleId }).then(res => {
+    getRoleDetail(dataId) {
+      this.$mapi.role.queryRoleDetail({ roleId: dataId }).then(res => {
         const { data } = res
         Object.keys(this.formData).forEach(key => {
           this.formData[key] = data[key]

@@ -1,9 +1,13 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -18,68 +22,37 @@ public class UserDto {
     /**
      * 用户id
      */
-    @ApiModelProperty("用户id")
+    @NotNull(groups = Update.class, message = "{valid.user.id.NotNull}")
+    @ApiModelProperty(value = "用户id")
     private Long id;
 
     /**
      * 用户名
      */
-    @ApiModelProperty("用户名")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.username.NotBlank}")
+    @ApiModelProperty(value = "用户名")
     private String username;
-
-    /**
-     * 用户头像
-     */
-    @ApiModelProperty("用户头像")
-    private String headImg;
-
-    /**
-     * 用户昵称
-     */
-    @ApiModelProperty("用户昵称")
-    private String nickname;
-
-    /**
-     * 手机号
-     */
-    @ApiModelProperty("手机号")
-    private String telephone;
-
-    /**
-     * 个性签名
-     */
-    @ApiModelProperty("个性签名")
-    private String signature;
-
-    /**
-     * 个人网站
-     */
-    @ApiModelProperty("个人网站")
-    private String website;
-
-    /**
-     * 用户性别
-     */
-    @ApiModelProperty("用户性别")
-    private Integer gender;
 
     /**
      * 用户邮箱
      */
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.email.NotBlank}")
     @ApiModelProperty("用户邮箱")
     private String email;
 
     /**
-     * 是否启用
+     * 用户类型
      */
-    @ApiModelProperty("是否启用")
-    private Boolean enabled;
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userType.NotNull}")
+    @ApiModelProperty("用户类型")
+    private Integer userType;
 
     /**
-     * 是否临时用户
+     * 用户状态
      */
-    @ApiModelProperty("是否临时用户")
-    private Boolean temp;
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userStatus.NotNull}")
+    @ApiModelProperty("用户状态")
+    private Integer userStatus;
 
     /**
      * 临时用户有效时间
