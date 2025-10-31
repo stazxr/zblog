@@ -1,37 +1,42 @@
 <template>
   <div>
-    <el-dialog title="字典详情" append-to-body :close-on-click-modal="true" :before-close="handleClose" :visible.sync="dialogVisible" width="600px">
+    <el-dialog
+      title="字典详情"
+      :visible.sync="dialogVisible"
+      :fullscreen="device === 'mobile'"
+      :destroy-on-close="true"
+      :close-on-click-modal="true"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
+      append-to-body
+      width="600px"
+    >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="字典序列"> {{ dataInfo.id }} </el-descriptions-item>
+        <el-descriptions-item label="序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="字典类型">
-          <span v-if="dataInfo.type === '1'">组</span>
-          <span v-else-if="dataInfo.type === '2'">项</span>
-          <span v-else> {{ dataInfo.type }} </span>
+          <span v-if="dataInfo.dictType === '1'">组</span>
+          <span v-else-if="dataInfo.dictType === '2'">项</span>
+          <span v-else> - </span>
         </el-descriptions-item>
-        <el-descriptions-item label="锁定状态">
-          <span v-if="dataInfo.locked === 'true'">禁止编辑删除</span>
-          <span v-else-if="dataInfo.locked === 'false'">允许编辑删除</span>
-          <span v-else> {{ dataInfo.locked }} </span>
-        </el-descriptions-item>
-        <el-descriptions-item label="字典状态">
+        <el-descriptions-item label="字典状态" :span="2">
           <span v-if="dataInfo.enabled === 'true'">启用</span>
           <span v-else-if="dataInfo.enabled === 'false'">禁用</span>
-          <span v-else> {{ dataInfo.enabled }} </span>
+          <span v-else> - </span>
         </el-descriptions-item>
         <!-- 2 -->
-        <el-descriptions-item label="字典名称" :span="2"> {{ dataInfo.name }} </el-descriptions-item>
-        <el-descriptions-item label="字典KEY" :span="2"> {{ dataInfo.key }} </el-descriptions-item>
+        <el-descriptions-item label="字典名称" :span="2"> {{ dataInfo.dictName }} </el-descriptions-item>
+        <el-descriptions-item label="字典KEY" :span="2"> {{ dataInfo.dictKey }} </el-descriptions-item>
         <!-- 3 -->
-        <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUser }} </el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
+        <el-descriptions-item label="字典VALUE" :span="4"> {{ dataInfo.dictValue }} </el-descriptions-item>
         <!-- 4 -->
-        <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUser }} </el-descriptions-item>
-        <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
+        <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
+        <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
         <!-- 5 -->
-        <el-descriptions-item label="字典VALUE" :span="4"> {{ dataInfo.value }} </el-descriptions-item>
+        <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUsername }} </el-descriptions-item>
+        <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
         <!-- 6 -->
-        <el-descriptions-item label="使用说明" :span="4"> {{ dataInfo.desc }} </el-descriptions-item>
+        <el-descriptions-item label="字典描述" :span="4"> {{ dataInfo.dictDesc }} </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -43,46 +48,45 @@ export default {
     dialogVisible: {
       type: Boolean,
       default: false
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
       dataInfo: {
         id: '',
-        type: '',
-        name: '',
-        key: '',
-        value: '',
-        desc: '',
+        dictType: '',
+        dictName: '',
+        dictKey: '',
+        dictValue: '',
+        dictDesc: '',
         locked: '',
         enabled: '',
-        createUser: '',
+        createUsername: '',
         createTime: '',
-        updateUser: '',
+        updateUsername: '',
         updateTime: ''
       }
     }
   },
+  computed: {
+    device() {
+      return this.$store.state.app.device
+    }
+  },
   methods: {
-    initData() {
+    initData(dataId) {
       this.$nextTick(() => {
-        this.getDictDetail()
+        this.queryDetail(dataId)
       })
     },
-    getDictDetail() {
-      this.$mapi.dict.queryDictDetail({ dictId: this.dataId }).then(res => {
+    queryDetail(dataId) {
+      this.$mapi.dict.queryDictDetail({ dictId: dataId }).then(res => {
         const { data } = res
         Object.keys(this.dataInfo).forEach(key => {
           this.dataInfo[key] = data[key] == null || data[key] === '' ? '-' : data[key].toString()
         })
       }).catch(_ => {
-        Object.keys(this.dataInfo).forEach(key => {
-          this.dataInfo[key] = '-'
-        })
+        this.doClose()
       })
     },
     doClose() {
@@ -92,9 +96,7 @@ export default {
       this.$emit('showDetailDone')
     },
     handleClose() {
-      this.$confirm('确认关闭？').then(_ => {
-        this.doClose()
-      }).catch(_ => {})
+      this.doClose()
     }
   }
 }

@@ -1,26 +1,55 @@
 <template>
   <div>
-    <el-dialog append-to-body :close-on-click-modal="false" :before-close="handleClose" :visible.sync="dialogVisible" :title="dialogTitle" width="620px">
-      <el-form ref="addForm" :inline="true" :model="addForm" :rules="addRules" size="small" label-width="100px">
-        <el-form-item label="字典名称" prop="name">
-          <el-input v-model="addForm.name" style="width: 178px" maxlength="50" show-word-limit />
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      :fullscreen="isMobile"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
+      append-to-body
+      width="580px"
+    >
+      <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="100px">
+        <el-form-item label="字典名称" prop="dictName">
+          <el-input v-model="formData.dictName" :style="isMobile ? '' : 'width: 152px;'" maxlength="50" show-word-limit />
         </el-form-item>
-        <el-form-item label="字典排序" prop="sort">
-          <el-input-number v-model.number="addForm.sort" :min="0" :max="99999" step-strictly controls-position="right" style="width: 178px" />
+        <el-form-item label="字典排序" prop="dictSort">
+          <el-input-number
+            v-model.number="formData.dictSort"
+            :style="isMobile ? '' : 'width: 152px;'"
+            :min="0"
+            :max="99999"
+            step-strictly
+            controls-position="right"
+          />
         </el-form-item>
-        <el-form-item v-if="addForm.type === 2" label="字典KEY" prop="key">
-          <el-input v-model="addForm.key" style="width: 178px" maxlength="50" show-word-limit />
+        <el-form-item v-if="formData.dictType === 2" label="字典KEY" prop="dictKey">
+          <el-input v-model="formData.dictKey" :style="isMobile ? '' : 'width: 152px;'" maxlength="50" show-word-limit />
         </el-form-item>
-        <el-form-item v-if="addForm.type === 2" label="字典状态" prop="enabled">
-          <el-select v-model="addForm.enabled" placeholder="字典状态" style="width: 178px">
-            <el-option v-for="item in enabledEnums" :key="item.value" :label="item.name" :value="item.value" />
+        <el-form-item v-if="formData.dictType === 2" label="字典状态" prop="enabled">
+          <el-select v-model="formData.enabled" :style="isMobile ? '' : 'width: 152px;'" placeholder="是否启用">
+            <el-option v-for="item in enabledList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="addForm.type === 2" label="字典VALUE" prop="value">
-          <el-input v-model="addForm.value" type="textarea" :autosize="{ minRows: 4, maxRows: 4 }" style="width: 470px" />
+        <el-form-item v-if="formData.dictType === 2" label="字典VALUE" prop="dictValue">
+          <el-input
+            v-model="formData.dictValue"
+            :style="isMobile ? '' : 'width: 420px;'"
+            type="textarea"
+            :autosize="{ minRows: 4, maxRows: 4 }"
+          />
         </el-form-item>
-        <el-form-item label="使用说明">
-          <el-input v-model="addForm.desc" type="textarea" resize="none" :autosize="{ minRows: 4, maxRows: 4 }" maxlength="100" show-word-limit style="width: 470px" />
+        <el-form-item label="字典描述" prop="dictDesc">
+          <el-input
+            v-model="formData.dictDesc"
+            :style="isMobile ? '' : 'width: 420px;'"
+            type="textarea"
+            resize="none"
+            :autosize="{ minRows: 4, maxRows: 4 }"
+            maxlength="100"
+            show-word-limit
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -41,104 +70,81 @@ export default {
     dialogTitle: {
       type: String,
       default: ''
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
       submitLoading: false,
-      enabledEnums: [
-        { name: '启用', value: true },
-        { name: '禁用', value: false }
-      ],
-      addForm: {
-        id: '',
-        pid: '',
-        name: '',
-        type: '',
-        key: '',
-        value: '',
-        desc: '',
-        sort: 99999,
-        enabled: true
+      enabledList: [],
+      formData: {
+        id: null,
+        pid: null,
+        dictName: null,
+        dictType: null,
+        dictKey: null,
+        dictValue: null,
+        dictSort: 99999,
+        dictDesc: null,
+        enabled: 'true'
       },
-      addRules: {
-        name: [
+      formRules: {
+        dictName: [
           { required: true, message: '请输入字典名称', trigger: 'blur' }
         ],
-        sort: [
+        dictSort: [
           { required: true, message: '请输入字典排序', trigger: 'blur' }
         ],
-        key: [
+        dictKey: [
           { required: true, message: '请输入字典KEY', trigger: 'blur' }
         ],
         enabled: [
-          { required: true, message: '请选择字典状态', trigger: 'blur' }
+          { required: true, message: '请选择字典状态', trigger: 'change' }
         ]
       }
     }
   },
-  watch: {
-    dataId(id) {
-      this.addForm.id = id
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   methods: {
-    initData(type, pid) {
-      this.addForm.type = type
-      this.addForm.pid = pid
-      this.$nextTick(() => {
-        this.getDictDetail()
+    initData(type, pid, dataId) {
+      if (dataId != null && dataId !== '') {
+        this.$nextTick(() => {
+          this.getDictDetail(dataId)
+        })
+      } else {
+        this.formData.pid = pid
+        this.formData.dictType = type
+      }
+      this.loadEnabledList()
+    },
+    getDictDetail(dataId) {
+      this.$mapi.dict.queryDictDetail({ dictId: dataId }).then(res => {
+        const { data } = res
+        Object.keys(this.formData).forEach(key => {
+          this.formData[key] = data[key]
+        })
+      }).catch(_ => {
+        setTimeout(() => { this.doClose() }, 500)
       })
     },
-    getDictDetail() {
-      if (this.addForm.id != null && this.addForm.id !== '') {
-        this.$mapi.dict.queryDictDetail({ dictId: this.addForm.id }).then(res => {
-          const { data } = res
-          Object.keys(this.addForm).forEach(key => {
-            this.addForm[key] = data[key]
-          })
-        }).catch(_ => {
-          setTimeout(() => { this.doClose() }, 500)
-        })
-      }
-    },
-    doClose(result = false) {
-      this.addForm = {
-        id: '',
-        pid: '',
-        name: '',
-        type: '',
-        key: '',
-        value: '',
-        desc: '',
-        sort: 99999,
-        enabled: true
-      }
-      this.$refs['addForm'].resetFields()
-      this.submitLoading = false
-      this.$emit('addOrEditDone', result)
-    },
-    handleClose() {
-      if (!this.submitLoading) {
-        this.$confirm('确认关闭？').then(_ => {
-          this.doClose()
-        }).catch(_ => {})
-      }
-    },
-    cancel() {
-      this.handleClose()
+    loadEnabledList() {
+      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+        const { data } = res
+        this.enabledList = data
+      }).catch(_ => {
+        this.enabledList = []
+      })
     },
     submit() {
-      this.$refs['addForm'].validate((valid) => {
+      this.$refs.addOrEditForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          if (this.addForm.id == null || this.addForm.id === '') {
+          if (this.formData.id === null) {
             // add
-            this.$mapi.dict.addDict(this.addForm).then(res => {
+            this.$mapi.dict.addDict(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
@@ -146,18 +152,42 @@ export default {
             })
           } else {
             // edit
-            this.$mapi.dict.editDict(this.addForm).then(res => {
+            this.$mapi.dict.editDict(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
               this.submitLoading = false
             })
           }
-        } else {
-          console.log('error submit!!')
-          return false
         }
       })
+    },
+    cancel() {
+      this.handleClose()
+    },
+    handleClose() {
+      if (!this.submitLoading) {
+        this.$confirm('是否确认关闭弹窗？').then(_ => {
+          this.doClose()
+        }).catch(_ => {})
+      }
+    },
+    doClose(result = false) {
+      const type = this.formData.dictType
+      this.formData = {
+        id: null,
+        pid: null,
+        dictName: null,
+        dictType: null,
+        dictKey: null,
+        dictValue: null,
+        dictSort: 99999,
+        dictDesc: null,
+        enabled: 'true'
+      }
+      this.$refs.addOrEditForm.resetFields()
+      this.submitLoading = false
+      this.$emit('addOrEditDone', result, type)
     }
   }
 }

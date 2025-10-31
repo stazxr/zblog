@@ -1,131 +1,141 @@
 <template>
   <div class="app-container">
     <div class="head-container">
-      <div>
-        <el-input v-model="filters.dictName" clearable size="small" placeholder="字典名称（组）" style="width: 200px;" class="filter-item" @keyup.enter.native="search" />
-        <span>
-          <el-button class="filter-item" size="small" type="success" icon="el-icon-search" @click="search">查询</el-button>
-          <el-button class="filter-item" size="small" type="warning" icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
-        </span>
+      <div class="search-opts">
+        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="160">
+          <muses-search-form-item label="" prop="search-dictName">
+            <el-input id="search-dictName" v-model="filters.dictName" clearable placeholder="字典名称（组）" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item btn btn-open-name="" btn-close-name="">
+            <el-button type="success" @click="search()">查 询</el-button>
+            <el-button type="warning" @click="resetSearch()">重 置</el-button>
+          </muses-search-form-item>
+        </muses-search-form>
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['addDict']" size="small" type="primary" @click="addDictGroup()">
-            新增组
-          </el-button>
+          <el-button v-perm="['DICTA001']" type="success" @click="addDictGroup">新增组</el-button>
+          <el-button v-perm="['DICTA001']" :disabled="row === null || row.dictType !== 1" type="success" @click="addDictItem">新增项</el-button>
+          <el-button v-perm="['DICTQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['DICTU001']" :disabled="row === null" type="primary" @click="editDict">编辑</el-button>
+          <el-button v-perm="['DICTD001']" :disabled="row === null" type="danger" @click="deleteDict">删除</el-button>
         </span>
       </div>
     </div>
-
     <div class="components-container">
-      <el-table ref="table" v-loading="tableLoading" :data="tableData" row-key="id" lazy :load="loadSubList" :tree-props="tableProps" border>
-        <el-table-column :show-overflow-tooltip="true" prop="name" label="字典名称" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="key" label="字典KEY" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="value" label="字典VALUE" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="sort" label="字典排序" align="left" width="80" />
-        <el-table-column :show-overflow-tooltip="true" prop="locked" label="锁定状态" align="center" width="120">
+      <el-table
+        ref="dictTable"
+        v-loading="tableLoading"
+        :data="tableData"
+        :tree-props="tableProps"
+        :load="queryChildList"
+        :header-cell-style="{background:'#FAFAFA'}"
+        highlight-current-row
+        row-key="id"
+        border
+        lazy
+        @current-change="handleCurrentChange"
+      >
+        <el-table-column :show-overflow-tooltip="true" prop="dictName" label="字典名称" align="left" />
+        <el-table-column :show-overflow-tooltip="true" prop="dictKey" label="字典KEY" align="left" />
+        <el-table-column :show-overflow-tooltip="true" prop="dictValue" label="字典VALUE" align="left" />
+        <el-table-column :show-overflow-tooltip="true" prop="dictDesc" label="字典描述" align="left" />
+        <el-table-column :show-overflow-tooltip="false" prop="dictSort" label="字典排序" align="center" width="120" />
+        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="字典状态" align="center" width="120">
           <template v-slot="scope">
-            <span v-if="scope.row.locked">禁止编辑删除</span>
-            <span v-else>允许编辑删除</span>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="enabled" label="状态" align="center" width="100">
-          <template v-slot="scope">
-            <el-tag v-if="scope.row.enabled" size="small">启用</el-tag>
-            <el-tag v-else size="small" type="warning">禁用</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="250px">
-          <template v-slot="scope">
-            <el-button-group>
-              <el-button type="info" size="mini" @click="showDictDetail(scope.row)">详情</el-button>
-              <el-button v-if="hasPerm(['addDict']) && scope.row.type === 1" type="primary" size="mini" @click="addDict(scope.row)">新增子项</el-button>
-              <el-button v-if="hasPerm(['editDict']) && !scope.row.locked" type="success" size="mini" @click="editDict(scope.row)">编辑</el-button>
-              <el-popconfirm v-if="hasPerm(['deleteDict']) && !scope.row.locked && !scope.row.hasChildren" title="操作不可撤销，确定删除吗？" @confirm="deleteDict(scope.row)">
-                <el-button slot="reference" type="danger" size="mini">删除</el-button>
-              </el-popconfirm>
-            </el-button-group>
+            <el-tag v-if="scope.row.enabled">启用</el-tag>
+            <el-tag v-else type="warning">禁用</el-tag>
           </template>
         </el-table-column>
         <div slot="empty">
-          <el-empty />
+          <el-empty :image="nodataImg" description=" " />
         </div>
       </el-table>
+      <div class="pagination-container">
+        <el-pagination
+          :total="total"
+          :current-page.sync="page"
+          :page-size.sync="pageSize"
+          :page-sizes="[10, 20, 30, 50]"
+          layout="total, prev, pager, next, sizes"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+        />
+      </div>
     </div>
 
-    <div class="pagination-container">
-      <el-pagination
-        :total="total"
-        :current-page="page"
-        :page-size="pageSize"
-        style="margin-top: 8px;"
-        layout="total, prev, pager, next, sizes"
-        @size-change="sizeChange"
-        @current-change="pageChange"
-      />
-    </div>
-
+    <!-- 详情 -->
+    <detailDialog
+      ref="detailDialogRef"
+      :dialog-visible="detailDialogVisible"
+      @showDetailDone="showDetailDone"
+    />
     <!-- 新增 / 编辑 -->
     <addOrEditDialog
       ref="addOrEditDialogRef"
-      :dialog-visible="addOrEditDialogVisible"
       :dialog-title="addOrEditDialogTitle"
-      :data-id="rowId"
+      :dialog-visible="addOrEditDialogVisible"
       @addOrEditDone="addOrEditDone"
-    />
-    <!-- 查看详情 -->
-    <showDetailDialog
-      ref="showDetailDialogRef"
-      :dialog-visible="showDetailDialogVisible"
-      :data-id="rowId"
-      @showDetailDone="showDetailDone"
     />
   </div>
 </template>
 
 <script>
+import detailDialog from '@/views/admin/system/dict/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/dict/template/addOrEditDialog'
-import showDetailDialog from '@/views/admin/system/dict/template/showDetailDialog'
+import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Dict',
   components: {
-    addOrEditDialog,
-    showDetailDialog
+    detailDialog,
+    addOrEditDialog
   },
   data() {
     return {
       filters: {
-        dictName: ''
+        dictName: null
       },
       tableData: [],
+      tableLoading: false,
       tableProps: {
         children: 'children',
         hasChildren: 'hasChildren'
       },
-      maps: new Map(),
-      rowId: '',
-      rowPid: '',
-      tableLoading: false,
+      nodataImg: nodataImg,
+      row: null,
       total: 0,
       page: 1,
       pageSize: 10,
-      addOrEditDialogTitle: '',
+      detailDialogVisible: false,
+      addOrEditDialogTitle: null,
       addOrEditDialogVisible: false,
-      showDetailDialogVisible: false
+      maps: new Map()
     }
   },
   mounted() {
     this.listTableData()
   },
   methods: {
+    handleCurrentChange(row) {
+      this.row = row
+    },
+    // 查询
     search() {
       this.page = 1
       this.listTableData()
     },
     resetSearch() {
-      this.filters.dictName = ''
-
+      Object.keys(this.filters).forEach(key => { this.filters[key] = null })
       this.page = 1
+      this.listTableData()
+    },
+    handleSizeChange(size) {
+      this.page = 1
+      this.pageSize = size
+      this.listTableData()
+    },
+    handlePageChange(page) {
+      this.page = page
       this.listTableData()
     },
     listTableData() {
@@ -137,25 +147,18 @@ export default {
       this.tableLoading = true
       this.$mapi.dict.pageDictList(param).then(res => {
         const { data } = res
-        this.tableData = data.list
         this.total = data.total
+        this.tableData = data.list
       }).catch(_ => {
-        this.tableData = []
         this.total = 0
+        this.tableData = []
       }).finally(() => {
         this.tableLoading = false
+        this.row = null
+        this.$refs.dictTable.setCurrentRow()
       })
     },
-    sizeChange(size) {
-      this.page = 1
-      this.pageSize = size
-      this.listTableData()
-    },
-    pageChange(page) {
-      this.page = page
-      this.listTableData()
-    },
-    loadSubList(tree, treeNode, resolve) {
+    queryChildList(tree, treeNode, resolve) {
       this.maps.set(tree.id, { tree, treeNode, resolve })
       setTimeout(() => {
         this.$mapi.dict.queryChildList({ pid: tree.id }).then(res => {
@@ -163,77 +166,82 @@ export default {
         }).catch(_ => {
           resolve([])
         })
-      }, 1)
+      }, 10)
     },
+    // 详情
+    showDetail() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的字典数据')
+        return
+      }
+      this.detailDialogVisible = true
+      this.$refs.detailDialogRef.initData(this.row.id)
+    },
+    showDetailDone() {
+      this.detailDialogVisible = false
+    },
+    // 新增与编辑
     addDictGroup() {
-      this.rowId = null
-      this.rowPid = null
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增字典组'
       this.$refs.addOrEditDialogRef.initData(1)
     },
-    addDict(row) {
-      this.rowId = null
-      this.rowPid = row.id.toString()
+    addDictItem() {
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增字典项'
-      this.$refs.addOrEditDialogRef.initData(2, row.id.toString())
+      this.$refs.addOrEditDialogRef.initData(2, this.row.id)
     },
-    editDict(row) {
-      this.rowId = row.id.toString()
-      this.rowPid = row.pid ? row.pid.toString() : row.pid
+    editDict() {
+      if (this.row === null) {
+        this.$message.error('请选择要编辑的字典数据')
+        return
+      }
       this.addOrEditDialogVisible = true
-      this.addOrEditDialogTitle = row.type === 1 ? '编辑字典组' : '编辑字典项'
-      this.$refs.addOrEditDialogRef.initData(row.type, this.rowPid)
+      this.addOrEditDialogTitle = this.row.dictType === 1 ? '编辑字典组' : '编辑字典项'
+      this.$refs.addOrEditDialogRef.initData(this.row.dictType, this.row.pid, this.row.id)
     },
-    deleteDict(row) {
-      this.$mapi.dict.deleteDict({ dictId: row.id }).then(res => {
-        this.$message.success(res.message)
-
-        if (row.pid) {
-          const { tree, treeNode, resolve } = this.maps.get(row.pid)
-          this.$set(this.$refs.table.store.states.lazyTreeNodeMap, row.pid, [])
-          this.loadSubList(tree, treeNode, resolve)
-        } else {
-          this.listTableData()
-        }
-      })
-    },
-    addOrEditDone(result = false) {
+    addOrEditDone(result = false, type) {
+      this.addOrEditDialogTitle = null
+      this.addOrEditDialogVisible = false
       if (result) {
-        const curId = this.rowId
-        if (curId && this.maps.get(curId)) {
-          const { tree, treeNode, resolve } = this.maps.get(curId)
-          this.loadSubList(tree, treeNode, resolve)
-        }
-
-        const pid = this.rowPid
-        if (pid && this.maps.get(pid)) {
-          const { tree, treeNode, resolve } = this.maps.get(pid)
-          this.loadSubList(tree, treeNode, resolve)
-        }
-
-        if (!this.maps.get(curId) && !this.maps.get(pid)) {
+        if (type === 1) {
+          // 新增组
           this.listTableData()
+        } else {
+          // 新增项
+          const curId = this.row.id
+          if (curId && this.maps.get(curId)) {
+            const { tree, treeNode, resolve } = this.maps.get(curId)
+            this.queryChildList(tree, treeNode, resolve)
+          } else {
+            this.listTableData()
+          }
         }
       }
-
-      this.rowId = null
-      this.rowPid = null
-      this.addOrEditDialogTitle = ''
-      this.addOrEditDialogVisible = false
     },
-    showDictDetail(row) {
-      this.rowId = row.id.toString()
-      this.showDetailDialogVisible = true
-      this.$refs.showDetailDialogRef.initData()
-    },
-    showDetailDone() {
-      this.rowId = null
-      this.showDetailDialogVisible = false
-    },
-    hasPerm(value) {
-      return this.checkPerm(value)
+    deleteDict() {
+      if (this.row === null) {
+        this.$message.error('请选择要删除的字典数据')
+        return
+      }
+      this.$confirm('此操作将永久删除字典【' + this.row.dictName + '】, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.dict.deleteDict({ dictId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          if (this.row.pid) {
+            const { tree, treeNode, resolve } = this.maps.get(this.row.pid)
+            this.$set(this.$refs.dictTable.store['states']['lazyTreeNodeMap'], this.row.pid, [])
+            this.queryChildList(tree, treeNode, resolve)
+            this.row = null
+            this.$refs.dictTable.setCurrentRow()
+          } else {
+            this.listTableData()
+          }
+        })
+      })
     }
   }
 }

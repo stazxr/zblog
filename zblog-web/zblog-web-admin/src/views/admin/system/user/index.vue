@@ -53,7 +53,7 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['USERQ001']" type="success" @click="addUser">新增</el-button>
+          <el-button v-perm="['USERA001']" type="success" @click="addUser">新增</el-button>
           <el-button v-perm="['USERQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
           <el-button v-perm="['USERU001']" :disabled="row === null" type="primary" @click="editUser">编辑</el-button>
           <el-button v-perm="['USERD001']" :disabled="row === null" type="danger" @click="deleteUser">删除</el-button>

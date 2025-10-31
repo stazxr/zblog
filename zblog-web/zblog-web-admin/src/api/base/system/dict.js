@@ -1,5 +1,5 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const dictApi = '/api/dict'
 
@@ -29,5 +29,13 @@ export default {
     return api.httpRequest().post(`${dictApi}/deleteDict`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
+  },
+  // 根据字典KEY查询配置信息列表
+  queryConfListByDictKey: params => {
+    return api.httpRequest().get(`${dictApi}/queryConfListByDictKey`, params)
+  },
+  // 根据字典KEY查询配置信息
+  queryDictValueByDictKey: params => {
+    return api.httpRequest().get(`${dictApi}/queryDictValueByDictKey`, params)
   }
 }

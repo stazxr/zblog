@@ -122,13 +122,13 @@
         <!-- 访问级别 -->
         <el-form-item label="访问级别" prop="permLevel">
           <el-select v-model="formData.permLevel" :style="isMobile ? '' : 'width: 178px;'" placeholder="访问级别" clearable>
-            <el-option v-for="item in permLevels" :key="item.value" :label="item.name" :value="item.value" :title="item.desc" />
+            <el-option v-for="item in permLevelList" :key="item.value" :label="item.name" :value="item.value" :title="item.desc" />
           </el-select>
         </el-form-item>
         <!-- 权限状态 -->
         <el-form-item label="权限状态" prop="enabled">
           <el-select v-model="formData.enabled" :style="isMobile ? '' : 'width: 178px;'" placeholder="是否启用">
-            <el-option v-for="item in permEnabled" :key="item.value" :label="item.name" :value="item.value" />
+            <el-option v-for="item in enabledList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="上级类目" prop="pid">
@@ -182,12 +182,12 @@ export default {
       menus: [], // 菜单树
       permCodes: [], // 权限编码列表
       oldPermCode: '', // 当编辑时，原权限的权限编码
-      permLevels: [
+      permLevelList: [
         { name: '公开', value: 1, desc: '不需要登录，可以直接访问' },
         { name: '认证', value: 2, desc: '需要登录才可以访问' },
         { name: '授权', value: 4, desc: '需要授权才可以访问' }
       ],
-      permEnabled: [
+      enabledList: [
         { name: '启用', value: true },
         { name: '禁用', value: false }
       ],
