@@ -201,7 +201,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Permission dbPermission = permissionMapper.selectById(permission.getId());
         Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
         // 权限类型不允许编辑
-        Assert.isTrue(!dbPermission.getPermType().equals(permission.getPermType()), ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
+        boolean permTypeIsSame = dbPermission.getPermType().equals(permission.getPermType());
+        Assert.isTrue(!permTypeIsSame, ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
         // 权限信息检查
         checkPermission(permission);
         // 编辑权限

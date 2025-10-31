@@ -15,7 +15,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("路由查询参数")
 public class RouterQueryDto extends PageParam {
     /**

@@ -1,76 +1,87 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
- * 字典信息
+ * DictDto
  *
  * @author SunTao
  * @since 2022-09-21
  */
-@Data
+@Getter
+@Setter
 @ApiModel("字典信息")
 public class DictDto extends BaseDto {
-    /**
-     * 字典序列（黑白名单用）
-     */
-    @ApiModelProperty(name = "dictId", value = "字典id（路由黑白名单相关接口使用）")
-    private Long dictId;
+    private static final long serialVersionUID = 517310641739041347L;
 
     /**
-     * 字典id
+     * 字典ID
      */
-    @ApiModelProperty(name = "id", value = "字典id")
+    @NotNull(groups = Update.class, message = "{valid.dict.id.NotNull}")
+    @ApiModelProperty("字典id")
     private Long id;
 
     /**
-     * 字典pid
+     * 上级字典ID
      */
-    @ApiModelProperty(name = "pid", value = "字典pid")
+    @ApiModelProperty("字典pid")
     private Long pid;
 
     /**
      * 字典名称
      */
-    @ApiModelProperty(name = "name", value = "字典名称")
-    private String name;
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.dict.dictName.NotBlank}")
+    @ApiModelProperty("字典名称")
+    private String dictName;
 
     /**
-     * 字典类型：1，组、2，项
+     * 字典类型
      */
-    @ApiModelProperty(name = "type", value = "字典类型，1：组、2：项", example = "1")
-    private Integer type;
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictType.NotNull}")
+    @ApiModelProperty("字典类型")
+    private Integer dictType;
 
     /**
      * 字典key
      */
-    @ApiModelProperty(name = "key", value = "字典key")
-    private String key;
+    @ApiModelProperty("字典key")
+    private String dictKey;
 
     /**
-     * 字典value
+     * 字典Value
      */
-    @ApiModelProperty(name = "value", value = "字典value")
-    private String value;
-
-    /**
-     * 字典描述
-     */
-    @ApiModelProperty(name = "desc", value = "字典描述")
-    private String desc;
+    @ApiModelProperty("字典value")
+    private String dictValue;
 
     /**
      * 字典排序
      */
-    @ApiModelProperty(name = "sort", value = "字典排序", example = "99999")
-    private Integer sort;
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.NotNull}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.Max99999}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.Min1}")
+    @ApiModelProperty("字典排序")
+    private Integer dictSort;
 
     /**
-     * 字典状态
+     * 字典描述
      */
-    @ApiModelProperty(name = "enabled", value = "字典状态", example = "true")
+    @ApiModelProperty("字典描述")
+    private String dictDesc;
+
+    /**
+     * 是否启用
+     */
+    @ApiModelProperty("是否启用")
     private Boolean enabled;
 }

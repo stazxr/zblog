@@ -15,4 +15,9 @@ public class NameValue {
     private String name;
 
     private Object value;
+
+    @Override
+    public String toString() {
+        return "{'name': '" + name + "', value: '" + value.toString() + "'}";
+    }
 }

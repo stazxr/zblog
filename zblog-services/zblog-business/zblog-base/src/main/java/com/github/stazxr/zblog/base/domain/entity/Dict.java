@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,56 +20,45 @@ public class Dict extends BaseEntity {
     private static final long serialVersionUID = 5454007640493795517L;
 
     /**
-     * 主键
+     * 字典ID
      */
     @TableId
     private Long id;
 
     /**
-     * 字典名称
+     * 上级字典ID
      */
-    @TableField(value = "`NAME`")
-    private String name;
-
-    /**
-     * 父ID
-     */
-    @TableField(value = "`PID`")
     private Long pid;
 
     /**
-     * 字典 key
+     * 字典名称
      */
-    @TableField(value = "`KEY`")
-    private String key;
+    private String dictName;
 
     /**
-     * 字典 value
+     * 字典类型
      */
-    @TableField(value = "`VALUE`")
-    private String value;
+    private Integer dictType;
 
     /**
-     * 类型，1：组；2：项
+     * 字典key
      */
-    @TableField(value = "`TYPE`")
-    private Integer type;
+    private String dictKey;
+
+    /**
+     * 字典Value
+     */
+    private String dictValue;
+
+    /**
+     * 字典排序
+     */
+    private Integer dictSort;
 
     /**
      * 字典描述
      */
-    @TableField(value = "`DESC`")
-    private String desc;
-
-    /**
-     * 排序
-     */
-    private Integer sort;
-
-    /**
-     * 是否锁定
-     */
-    private Boolean locked;
+    private String dictDesc;
 
     /**
      * 是否启用
@@ -78,7 +66,7 @@ public class Dict extends BaseEntity {
     private Boolean enabled;
 
     /**
-     * 是否有效
+     * 是否删除
      */
     @TableLogic
     private Boolean deleted;

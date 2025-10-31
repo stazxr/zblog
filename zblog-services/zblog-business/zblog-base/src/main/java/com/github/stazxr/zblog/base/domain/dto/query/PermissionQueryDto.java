@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * 权限查询
@@ -15,7 +14,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("权限查询参数")
 public class PermissionQueryDto extends PageParam {
     private static final long serialVersionUID = 4162110989469140333L;

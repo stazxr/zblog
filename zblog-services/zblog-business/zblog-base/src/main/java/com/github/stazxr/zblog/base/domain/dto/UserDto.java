@@ -2,9 +2,11 @@ package com.github.stazxr.zblog.base.domain.dto;
 
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,9 +18,12 @@ import java.util.List;
  * @author SunTao
  * @since 2022-07-31
  */
-@Data
+@Getter
+@Setter
 @ApiModel("用户信息")
-public class UserDto {
+public class UserDto extends BaseDto {
+    private static final long serialVersionUID = -2949645121252776835L;
+
     /**
      * 用户id
      */

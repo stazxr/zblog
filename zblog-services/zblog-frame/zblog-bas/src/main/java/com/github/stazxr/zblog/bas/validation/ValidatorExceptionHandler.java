@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.UnexpectedTypeException;
 import java.io.IOException;
 import java.util.*;
 
@@ -64,7 +65,9 @@ public class ValidatorExceptionHandler {
         ResponseUtils.responseJsonWriter(response, result);
     }
 
-    @ExceptionHandler(value = {ServletRequestBindingException.class, TypeMismatchException.class})
+    @ExceptionHandler(value = {
+        ServletRequestBindingException.class, TypeMismatchException.class, UnexpectedTypeException.class
+    })
     public void badRequestExceptionHandler(HttpServletRequest request,
             HttpServletResponse response, Exception ex) throws IOException {
         if (log.isDebugEnabled()) {

@@ -2,13 +2,13 @@ package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 字典服务层
@@ -18,18 +18,10 @@ import java.util.Map;
  */
 public interface DictService extends IService<Dict> {
     /**
-     * 根据key查找字典项列表
-     *
-     * @param key Key
-     * @return Map<name, value>，一般用于渲染select options
-     */
-    Map<String, String> selectItems(String key);
-
-    /**
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return dictList
+     * @return PageInfo<DictVo>
      */
     PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto);
 
@@ -37,7 +29,7 @@ public interface DictService extends IService<Dict> {
      * 查询字典子列表
      *
      * @param pid PID
-     * @return dictList
+     * @return List<DictVo>
      */
     List<DictVo> queryChildList(Long pid);
 
@@ -71,10 +63,18 @@ public interface DictService extends IService<Dict> {
     void deleteDict(Long dictId);
 
     /**
-     * 根据KEY查询VALUE
+     * 根据字典KEY查询配置信息列表
      *
-     * @param key 字典KEY
+     * @param dictKey 字典KEY
+     * @return List<NameValue>
+     */
+    List<NameValue> queryConfListByDictKey(String dictKey);
+
+    /**
+     * 根据字典KEY查询配置信息
+     *
+     * @param dictKey 字典KEY
      * @return VALUE
      */
-    String querySingleValue(String key);
+    String queryDictValueByDictKey(String dictKey);
 }

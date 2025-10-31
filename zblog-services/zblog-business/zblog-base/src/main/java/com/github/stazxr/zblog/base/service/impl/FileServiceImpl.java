@@ -232,26 +232,27 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
      */
     @Override
     public BaseStorageConfig getConfigInfo(Integer storageType) {
-        Assert.notNull(storageType, "参数【storageType】不能为空");
-        if (FileTypeHandler.LOCAL.getType() == storageType) {
-            // 本地存储配置从配置文件获取
-            LocalConfig config = new LocalConfig();
-            config.setDomain(zblogProperties.getFileBaseUrl());
-            config.setUploadFolder(zblogProperties.getFileUploadPath());
-            return config;
-        } else if (FileTypeHandler.ALI_YUN.getType() == storageType) {
-            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_A_LI_CONFIG);
-            AliYunConfig config = AliYunConfig.instanceFromJson(configValue);
-            config.setAccessKeySecret(decodeSecret(config.getAccessKeySecret()));
-            return config;
-        } else if (FileTypeHandler.QI_NIU_YUN.getType() == storageType) {
-            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_QI_NIU_CONFIG);
-            QiNiuYunConfig config = QiNiuYunConfig.instanceFromJson(configValue);
-            config.setSk(decodeSecret(config.getSk()));
-            return config;
-        } else {
-            throw new BadConfigurationException("不支持的存储类型：" + storageType);
-        }
+        return null;
+//        Assert.notNull(storageType, "参数【storageType】不能为空");
+//        if (FileTypeHandler.LOCAL.getType() == storageType) {
+//            // 本地存储配置从配置文件获取
+//            LocalConfig config = new LocalConfig();
+//            config.setDomain(zblogProperties.getFileBaseUrl());
+//            config.setUploadFolder(zblogProperties.getFileUploadPath());
+//            return config;
+//        } else if (FileTypeHandler.ALI_YUN.getType() == storageType) {
+//            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_A_LI_CONFIG);
+//            AliYunConfig config = AliYunConfig.instanceFromJson(configValue);
+//            config.setAccessKeySecret(decodeSecret(config.getAccessKeySecret()));
+//            return config;
+//        } else if (FileTypeHandler.QI_NIU_YUN.getType() == storageType) {
+//            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_QI_NIU_CONFIG);
+//            QiNiuYunConfig config = QiNiuYunConfig.instanceFromJson(configValue);
+//            config.setSk(decodeSecret(config.getSk()));
+//            return config;
+//        } else {
+//            throw new BadConfigurationException("不支持的存储类型：" + storageType);
+//        }
     }
 
     /**
@@ -267,11 +268,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
 
         param.remove("storageType");
         if (FileTypeHandler.LOCAL.getType() == storageType) {
-            dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_LOCAL_CONFIG, param.toJSONString());
+            // dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_LOCAL_CONFIG, param.toJSONString());
         } else if (FileTypeHandler.ALI_YUN.getType() == storageType) {
-            dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_A_LI_CONFIG, param.toJSONString());
+            // dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_A_LI_CONFIG, param.toJSONString());
         } else if (FileTypeHandler.QI_NIU_YUN.getType() == storageType) {
-            dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_QI_NIU_CONFIG, param.toJSONString());
+            // dictMapper.updateSingleValue(BaseConst.DictKey.CLOUD_STORAGE_QI_NIU_CONFIG, param.toJSONString());
         } else {
             throw new BadConfigurationException("不支持的存储类型：" + storageType);
         }
@@ -298,7 +299,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
     @Transactional(rollbackFor = Exception.class)
     public void activeStorageConfig(Integer storageType) {
         Assert.notNull(storageType, "参数【storageType】不能为空");
-        dictMapper.updateSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE, String.valueOf(storageType));
+        // dictMapper.updateSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE, String.valueOf(storageType));
     }
 
     /**
@@ -313,7 +314,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
         typeVo.setDefaultTypeName(FileTypeHandler.ofName(fileUploadType));
 
         // 激活的存储方式
-        String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE);
+        // String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.ACTIVE_UPLOAD_TYPE);
 //        if (StringUtils.isBlank(configValue) || String.valueOf(FileTypeHandler.DEFAULT.getType()).equals(configValue)) {
 //            typeVo.setActiveType(FileTypeHandler.DEFAULT.getType());
 //            typeVo.setActiveTypeName(FileTypeHandler.ofName(FileTypeHandler.DEFAULT.getType()));
@@ -332,8 +333,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
      */
     @Override
     public Set<String> getFileWhiteList() {
-        List<Dict> dicts = dictMapper.selectItems(BaseConst.DictKey.FILE_UPLOAD_WHITE_LIST);
-        return dicts.stream().map(Dict::getValue).collect(Collectors.toSet());
+//        List<Dict> dicts = dictMapper.selectItems(BaseConst.DictKey.FILE_UPLOAD_WHITE_LIST);
+//        return dicts.stream().map(Dict::getDictValue).collect(Collectors.toSet());
+        return null;
     }
 
     private String decodeSecret(String secret) {

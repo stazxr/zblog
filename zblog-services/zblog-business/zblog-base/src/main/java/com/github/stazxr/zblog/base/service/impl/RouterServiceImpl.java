@@ -204,12 +204,11 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         checkDict(dict);
 
         dict.setId(SequenceUtils.getId());
-        dict.setPid(BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) ? 2L : 3L);
-        dict.setType(DictType.ITEM.getValue());
+        dict.setPid(BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getDictKey()) ? 2L : 3L);
+        dict.setDictType(DictType.ITEM.getValue());
         dict.setEnabled(true);
-        dict.setLocked(true);
         Assert.isTrue(dictMapper.insert(dict) != 1, "新增失败");
-        removeCache(dictDto.getValue());
+        removeCache(dictDto.getDictValue());
     }
 
     /**
@@ -223,7 +222,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         Dict dict = dictConverter.dtoToEntity(dictDto);
         checkDict(dict);
         Assert.isTrue(dictMapper.updateById(dict) != 1, "编辑失败");
-        removeCache(dictDto.getValue());
+        removeCache(dictDto.getDictValue());
     }
 
     /**
@@ -234,11 +233,7 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void changeBlackOrWhiteRouterStatus(DictDto dictDto) {
-        Assert.notNull(dictDto.getDictId(), "参数【dictId】不能为空");
-        Assert.notNull(dictDto.getEnabled(), "参数【enabled】不能为空");
-        Assert.isTrue(dictMapper.updateDictStatus(dictDto.getDictId(), dictDto.getEnabled()) != 1, "修改失败");
-        Dict dict = dictMapper.selectById(dictDto.getDictId());
-        removeCache(dict.getValue());
+
     }
 
     /**
@@ -253,17 +248,17 @@ public class RouterServiceImpl extends ServiceImpl<RouterMapper, Router> impleme
         Dict dbDict = dictMapper.selectById(dictId);
         int i = dictMapper.deleteById(dictId);
         Assert.isTrue(i != 1, "删除失败");
-        removeCache(dbDict.getValue());
+        removeCache(dbDict.getDictValue());
     }
 
     private void checkDict(Dict dict) {
-        Assert.notNull(dict.getName(), "接口名称不能为空");
-        Assert.notNull(dict.getKey(), "接口类型不能为空");
-        Assert.notNull(dict.getValue(), "接口地址不能为空");
-        Assert.notNull(dict.getSort(), "接口排序不能为空");
-
-        boolean typeFlag = !BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) && !BaseConst.DictKey.ROUTER_BLACK_LIST.equals(dict.getKey());
-        Assert.isTrue(typeFlag, "接口类型不正确：" + dict.getKey());
+//        Assert.notNull(dict.getName(), "接口名称不能为空");
+//        Assert.notNull(dict.getKey(), "接口类型不能为空");
+//        Assert.notNull(dict.getValue(), "接口地址不能为空");
+//        Assert.notNull(dict.getSort(), "接口排序不能为空");
+//
+//        boolean typeFlag = !BaseConst.DictKey.ROUTER_WHITE_LIST.equals(dict.getKey()) && !BaseConst.DictKey.ROUTER_BLACK_LIST.equals(dict.getKey());
+//        Assert.isTrue(typeFlag, "接口类型不正确：" + dict.getKey());
     }
 
     private void removeCache(String url) {

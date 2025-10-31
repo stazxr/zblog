@@ -15,7 +15,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("文件查询参数")
 public class FileQueryDto extends PageParam {
     /**

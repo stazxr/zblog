@@ -14,53 +14,50 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DictVo extends BaseVo {
+    private static final long serialVersionUID = 3006167677027752347L;
+
     /**
-     * ID
+     * 字典ID
      */
     private Long id;
 
     /**
-     * PID
+     * 上级字典ID
      */
     private Long pid;
 
     /**
      * 字典名称
      */
-    private String name;
+    private String dictName;
 
     /**
-     * 字典KEY
+     * 字典类型
      */
-    private String key;
+    private Integer dictType;
 
     /**
-     * 字典VALUE
+     * 字典key
      */
-    private String value;
+    private String dictKey;
 
     /**
-     * 字典描述
+     * 字典Value
      */
-    private String desc;
-
-    /**
-     * 字典类型，1：组；2：项
-     */
-    private Integer type;
+    private String dictValue;
 
     /**
      * 字典排序
      */
-    private Integer sort;
+    private Integer dictSort;
 
     /**
-     * 是否锁定
+     * 字典描述
      */
-    private Boolean locked;
+    private String dictDesc;
 
     /**
-     * 字典状态
+     * 是否启用
      */
     private Boolean enabled;
 
@@ -75,7 +72,7 @@ public class DictVo extends BaseVo {
     private Boolean hasChildren;
 
     public Boolean getHasChildren() {
-        if (DictType.ITEM.getValue().equals(this.type)) {
+        if (DictType.ITEM.getValue().equals(this.dictType)) {
             return false;
         }
 

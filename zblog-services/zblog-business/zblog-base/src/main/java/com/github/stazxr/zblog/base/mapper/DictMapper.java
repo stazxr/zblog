@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
@@ -15,23 +16,6 @@ import java.util.List;
  * @since 2021-02-20
  */
 public interface DictMapper extends BaseMapper<Dict> {
-    /**
-     * 根据key查找字典项列表
-     *
-     * @param key Key
-     * @return 字典项列表
-     */
-    List<Dict> selectItems(@Param("dictKey") String key);
-
-    /**
-     * 修改字典状态
-     *
-     * @param dictId  字典ID
-     * @param enabled 字典状态
-     * @return 影响行数
-     */
-    int updateDictStatus(@Param("dictId") Long dictId, @Param("enabled") Boolean enabled);
-
     /**
      * 分页查询字典列表
      *
@@ -57,12 +41,12 @@ public interface DictMapper extends BaseMapper<Dict> {
     DictVo selectDictDetail(@Param("dictId") Long dictId);
 
     /**
-     * 删除字典
+     * 根据字典KEY查询配置信息列表
      *
-     * @param dictId 字典序列
-     * @param type   字典类型
+     * @param dictKey 字典KEY
+     * @return List<NameValue>
      */
-    void deleteDict(@Param("dictId") Long dictId, @Param("type") Integer type);
+    List<NameValue> selectNameValuesByDictKey(@Param("dictKey") String dictKey);
 
     /**
      * 根据KEY查询VALUE
@@ -70,13 +54,5 @@ public interface DictMapper extends BaseMapper<Dict> {
      * @param key 字典KEY
      * @return VALUE
      */
-    String selectSingleValue(@Param("key") String key);
-
-    /**
-     * 根据 KEY 修改字典值
-     *
-     * @param dictKey   KEY
-     * @param dictValue VALUE
-     */
-    void updateSingleValue(@Param("dictKey") String dictKey, @Param("dictValue") String dictValue);
+    String selectDictValueByDictKey(@Param("key") String key);
 }

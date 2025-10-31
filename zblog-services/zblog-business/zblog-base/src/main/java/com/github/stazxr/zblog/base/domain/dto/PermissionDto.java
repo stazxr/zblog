@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.domain.dto;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@ApiModel("权限信息")
 public class PermissionDto extends BaseDto {
     private static final long serialVersionUID = -7631261139679214658L;
 

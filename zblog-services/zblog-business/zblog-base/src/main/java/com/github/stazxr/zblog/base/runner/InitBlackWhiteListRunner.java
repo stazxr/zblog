@@ -58,19 +58,19 @@ public class InitBlackWhiteListRunner extends BlackWhiteListCache implements Com
 
     private void refreshRouterBlackWhiteList() {
         try {
-            Map<String, String> routerWhiteList = dictService.selectItems(BaseConst.DictKey.ROUTER_WHITE_LIST);
-            Set<String> whiteList = new LinkedHashSet<>();
-            for (String url : routerWhiteList.keySet()) {
-                whiteList.add(routerWhiteList.get(url));
-            }
-            updateWhitelist(whiteList);
-
-            Map<String, String> routerBlackList = dictService.selectItems(BaseConst.DictKey.ROUTER_BLACK_LIST);
-            Set<String> blackList = new LinkedHashSet<>();
-            for (String url : routerBlackList.keySet()) {
-                blackList.add(routerBlackList.get(url));
-            }
-            updateBlacklist(blackList);
+//            Map<String, String> routerWhiteList = dictService.selectItems(BaseConst.DictKey.ROUTER_WHITE_LIST);
+//            Set<String> whiteList = new LinkedHashSet<>();
+//            for (String url : routerWhiteList.keySet()) {
+//                whiteList.add(routerWhiteList.get(url));
+//            }
+//            updateWhitelist(whiteList);
+//
+//            Map<String, String> routerBlackList = dictService.selectItems(BaseConst.DictKey.ROUTER_BLACK_LIST);
+//            Set<String> blackList = new LinkedHashSet<>();
+//            for (String url : routerBlackList.keySet()) {
+//                blackList.add(routerBlackList.get(url));
+//            }
+//            updateBlacklist(blackList);
         } catch (Exception ex) {
             log.error("refreshRouterBlackWhiteList catch error", ex);
         }

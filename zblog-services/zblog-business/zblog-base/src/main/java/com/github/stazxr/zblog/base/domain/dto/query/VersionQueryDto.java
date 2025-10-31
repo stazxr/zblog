@@ -15,7 +15,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("版本查询参数")
 public class VersionQueryDto extends PageParam {
     /**

@@ -1,9 +1,13 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.converter.DictConverter;
+import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
@@ -11,12 +15,9 @@ import com.github.stazxr.zblog.base.domain.enums.DictType;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.core.util.DataValidated;
-import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,47 +35,35 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     private final DictConverter dictConverter;
 
     /**
-     * 根据key查找字典项列表
-     *
-     * @param key Key
-     * @return Map<name, value>，一般用于渲染select options
-     */
-    @Override
-    public Map<String, String> selectItems(String key) {
-        Assert.isTrue(StringUtils.isBlank(key), "参数【key】不能为空");
-        List<Dict> dicts = dictMapper.selectItems(key);
-
-        // return map
-        Map<String, String> options = new LinkedHashMap<>();
-        if (dicts.size() > 0) {
-            dicts.forEach(dict -> options.put(dict.getName(), dict.getValue()));
-        }
-        return options;
-    }
-
-    /**
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return dictList
+     * @return PageInfo<DictVo>
      */
     @Override
     public PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto) {
+        // 参数检查
         queryDto.checkPage();
+        if (StringUtils.isNotBlank(queryDto.getDictName())) {
+            queryDto.setDictName(queryDto.getDictName().trim());
+        }
 
-        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-        return new PageInfo<>(dictMapper.selectDictList(queryDto));
+        // 分页查询
+        try (Page<DictVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            List<DictVo> dataList = dictMapper.selectDictList(queryDto);
+            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
+        }
     }
 
     /**
      * 查询字典子列表
      *
      * @param pid PID
-     * @return dictList
+     * @return List<DictVo>
      */
     @Override
     public List<DictVo> queryChildList(Long pid) {
-        Assert.notNull(pid, "参数【pid】不能为空");
+        Assert.notNull(pid, ExpMessageCode.of("valid.dict.pid.NotNull"));
         return dictMapper.selectChildList(pid);
     }
 
@@ -86,9 +75,9 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public DictVo queryDictDetail(Long dictId) {
-        Assert.notNull(dictId, "参数【dictId】不能为空");
+        Assert.notNull(dictId, ExpMessageCode.of("valid.dict.id.NotNull"));
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
-        Assert.notNull(dictVo, "查询字典信息失败，字典【" + dictId + "】不存在");
+        Assert.notNull(dictVo, ExpMessageCode.of("valid.dict.not.exist"));
         return dictVo;
     }
 
@@ -98,12 +87,15 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @param dictDto 字典
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void addDict(DictDto dictDto) {
-        dictDto.setId(null);
+        // 获取字典信息
         Dict dict = dictConverter.dtoToEntity(dictDto);
+        // 新增时，不允许传入 DictId
+        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.dict.add.idIsNull"));
+        // 字典信息检查
         checkDict(dict);
-        Assert.isTrue(dictMapper.insert(dict) != 1, "新增失败");
+        // 新增字典
+        Assert.isTrue(dictMapper.insert(dict) != 1, ExpMessageCode.of("result.dict.add.failed"));
     }
 
     /**
@@ -112,12 +104,16 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @param dictDto 字典
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void editDict(DictDto dictDto) {
-        Assert.notNull(dictDto.getId(), "参数【id】不能为空");
+        // 获取字典信息
         Dict dict = dictConverter.dtoToEntity(dictDto);
+        // 判断字典是否存在
+        Dict dbDict = dictMapper.selectById(dict.getId());
+        Assert.notNull(dbDict, ExpMessageCode.of("valid.dict.not.exist"));
+        // 字典信息检查
         checkDict(dict);
-        Assert.isTrue(dictMapper.updateById(dict) != 1, "修改失败");
+        // 编辑字典
+        Assert.isTrue(dictMapper.updateById(dict) != 1, ExpMessageCode.of("result.dict.edit.failed"));
     }
 
     /**
@@ -126,47 +122,60 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * @param dictId 字典序列
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void deleteDict(Long dictId) {
-        DictVo dictVo = queryDictDetail(dictId);
-        DataValidated.isTrue(dictVo.getLocked(), "该字典被锁定，不允许删除");
-        DataValidated.isTrue(dictVo.getHasChildren(), "该字典存在子节点，无法被删除");
-        Assert.isTrue(dictMapper.deleteById(dictId) != 1, "删除失败");
+        // 判断字典是否存在
+        DictVo dictVo = dictMapper.selectDictDetail(dictId);
+        Assert.notNull(dictVo, ExpMessageCode.of("valid.dict.not.exist"));
+        // 存在子节点无法被删除
+        Assert.isTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.deleteWithChildren"));
+        // 删除字典
+        Assert.isTrue(dictMapper.deleteById(dictId) != 1, ExpMessageCode.of("result.dict.delete.failed"));
     }
 
     /**
-     * 根据KEY查询VALUE
+     * 根据字典KEY查询配置信息列表
      *
-     * @param key 字典KEY
+     * @param dictKey 字典KEY
+     * @return List<NameValue>
+     */
+    @Override
+    public List<NameValue> queryConfListByDictKey(String dictKey) {
+        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
+        return dictMapper.selectNameValuesByDictKey(dictKey);
+    }
+
+    /**
+     * 根据字典KEY查询配置信息
+     *
+     * @param dictKey 字典KEY
      * @return VALUE
      */
     @Override
-    public String querySingleValue(String key) {
-        Assert.isTrue(StringUtils.isBlank(key), "参数【key】不能为空");
-        return dictMapper.selectSingleValue(key);
+    public String queryDictValueByDictKey(String dictKey) {
+        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
+        return dictMapper.selectDictValueByDictKey(dictKey);
     }
 
     private void checkDict(Dict dict) {
-        if (dict.getId() != null) {
-            Dict dbDict = dictMapper.selectById(dict.getId());
-            Assert.notNull(dbDict, "字典【" + dict.getId() + "】不存在");
-            DataValidated.isTrue(dbDict.getLocked(), "该字典被锁定，不允许编辑");
-        }
+        // 字典类型校验
+        Assert.notNull(DictType.of(dict.getDictType()), ExpMessageCode.of( "valid.dict.dictType.invalid"));
 
-        dict.setLocked(Boolean.FALSE);
-        Assert.isTrue(StringUtils.isBlank(dict.getName()), "字典名称不能为空");
-        Assert.notNull(dict.getSort(), "字典排序不能为空");
-        Assert.notNull(dict.getType(), "字典类型不能为空");
-        Assert.notNull(DictType.of(dict.getType()), "字典类型不正确，取值范围[1, 2]");
-        if (DictType.GROUP.getValue().equals(dict.getType())) {
+        // 检查其他数据
+        if (DictType.GROUP.getValue().equals(dict.getDictType())) {
+            // 组
             dict.setPid(null);
-            dict.setKey(null);
-            dict.setValue(null);
+            dict.setDictKey(null);
+            dict.setDictValue(null);
             dict.setEnabled(true);
         } else {
-            Assert.notNull(dict.getPid(), "父字典不能为空");
-            Assert.isTrue(StringUtils.isBlank(dict.getKey()), "字典KEY不能为空");
-            Assert.notNull(dict.getEnabled(), "字典状态不能为空");
+            // 项
+            Assert.notNull(dict.getPid(), ExpMessageCode.of("valid.dict.pid.NotNull"));
+            Dict parentDict = dictMapper.selectById(dict.getPid());
+            Assert.notNull(parentDict, ExpMessageCode.of("valid.dict.parent.notExist"));
+            boolean parentIsGroup = DictType.GROUP.getValue().equals(parentDict.getDictType());
+            Assert.isTrue(!parentIsGroup, ExpMessageCode.of("valid.dict.parentIsNotGroup"));
+            Assert.notNull(dict.getEnabled(), ExpMessageCode.of("valid.dict.enabled.NotNull"));
+            Assert.notBlank(dict.getDictKey(), ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
         }
     }
 }
