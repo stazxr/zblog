@@ -42,8 +42,8 @@
               <el-option label="未知" value="99" />
             </el-select>
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-nickname">
-            <el-input id="search-nickname" v-model="filters.nickname" clearable placeholder="登录地址" @keyup.enter.native="search" />
+          <muses-search-form-item label="" prop="search-loginAddress">
+            <el-input id="search-nickname" v-model="filters.loginAddress" clearable placeholder="登录地址" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
             <el-button type="success" @click="search()">查 询</el-button>

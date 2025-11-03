@@ -12,7 +12,7 @@ CREATE TABLE `i18n_message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='国际化消息表';
 
 INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
--- 返回相关
+-- 返回相关 >-->
 ('result.failed', 'zh_CN', '操作失败', 'common'),
 ('result.failed', 'en_US', 'The operation was failed', 'common'),
 ('result.success', 'zh_CN', '操作成功', 'common'),
@@ -48,7 +48,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('result.dict.delete.failed', 'zh_CN', '字典删除失败', 'common'),
 ('result.dict.delete.failed', 'en_US', 'Failed to delete dict', 'common'),
 
--- 校验相关
+-- 校验相关 >-->
+-- 公共校验
 ('valid.comm.param.NotNull', 'zh_CN', '参数不能为空', 'common'),
 ('valid.comm.param.NotNull', 'en_US', 'Parameter cannot be null', 'common'),
 ('valid.comm.param.NotBlank', 'zh_CN', '参数不能为空或仅包含空白字符', 'common'),
@@ -57,6 +58,9 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.common.page.NotNull', 'en_US', 'Page number cannot be null', 'common'),
 ('valid.common.pageSize.NotNull', 'zh_CN', '分页大小不能为空', 'common'),
 ('valid.common.pageSize.NotNull', 'en_US', 'Page size cannot be null', 'common'),
+-- 资源相关
+('valid.resource.resourceLevel.configError', 'zh_CN', '路由级别配置错误', 'common'),
+('valid.resource.resourceLevel.configError', 'en_US', 'Resource resourceLevel config error', 'common'),
 -- 权限相关
 ('valid.perm.id.NotNull', 'zh_CN', '权限ID不能为空', 'common'),
 ('valid.perm.id.NotNull', 'en_US', 'Permission ID cannot be null', 'common'),

@@ -8,7 +8,7 @@ import user from '@/api/base/system/user.js'
 import role from '@/api/base/system/role.js'
 import perm from '@/api/base/system/perm.js'
 import dict from '@/api/base/system/dict.js'
-import router from '@/api/base/router.js'
+import interfaces from '@/api/base/system/interface.js'
 
 import log from '@/api/base/log.js'
 import server from '@/api/base/server.js'
@@ -31,8 +31,8 @@ import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
 export default {
-  communal, home,
-  menu, user, role, perm, dict, router,
+  communal, home, menu,
+  user, role, perm, interfaces, dict,
   log, server, version, file, node, column, category,
   tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

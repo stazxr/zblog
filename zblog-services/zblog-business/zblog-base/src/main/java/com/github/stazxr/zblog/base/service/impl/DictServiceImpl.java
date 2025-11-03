@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * 字典业务实现层
+ * 字典服务实现层
  *
  * @author SunTao
  * @since 2021-02-20
@@ -47,7 +47,6 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         if (StringUtils.isNotBlank(queryDto.getDictName())) {
             queryDto.setDictName(queryDto.getDictName().trim());
         }
-
         // 分页查询
         try (Page<DictVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             List<DictVo> dataList = dictMapper.selectDictList(queryDto);

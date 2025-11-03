@@ -3,8 +3,6 @@ import Layout from '@/layout'
 import ParentView from '@/components/ParentView'
 
 export function filterAsyncRouter(routers, lastRouter = false, type = false) {
-  console.log('111 routers', routers)
-  console.log('111 lastRouter', lastRouter)
   return routers.filter(router => {
     if (type && router.children) {
       router.children = filterChildren(router.children)

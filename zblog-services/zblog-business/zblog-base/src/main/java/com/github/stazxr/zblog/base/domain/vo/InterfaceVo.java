@@ -1,44 +1,47 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
+import com.github.stazxr.zblog.core.base.BaseVo;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * InterfaceVo
+ * 接口信息
  *
  * @author SunTao
- * @since 2022-08-29
+ * @since 2025-11-03
  */
 @Getter
 @Setter
-public class InterfaceVo {
+public class InterfaceVo extends BaseVo {
+    private static final long serialVersionUID = -6011107531417391695L;
+
     /**
      * 接口名称
      */
-    private String name;
+    private String interfaceName;
 
     /**
      * 接口编码
      */
-    private String code;
-
-    /**
-     * 接口级别
-     */
-    private Integer level;
-
-    /**
-     * 接口状态
-     */
-    private Integer status;
+    private String interfaceCode;
 
     /**
      * 请求地址
      */
-    private String uri;
+    private String interfaceUri;
 
     /**
      * 请求方式
      */
-    private String method;
+    private String interfaceMethod;
+
+    /**
+     * 接口级别
+     */
+    private Integer interfaceLevel;
+
+    /**
+     * 接口状态
+     */
+    private Integer interfaceStatus;
 }

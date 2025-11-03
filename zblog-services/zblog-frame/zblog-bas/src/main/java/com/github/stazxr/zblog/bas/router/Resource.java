@@ -2,7 +2,8 @@ package com.github.stazxr.zblog.bas.router;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.validation.Assert;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,8 +32,7 @@ public class Resource implements Serializable {
         RouterLevel.OPEN,
         RouterLevel.PUBLIC,
         RouterLevel.PERM,
-        RouterExtLevel.FORBIDDEN,
-        RouterExtLevel.NULL
+        RouterExtLevel.FORBIDDEN
     );
 
     /**
@@ -67,7 +67,7 @@ public class Resource implements Serializable {
     private int resourceLevel;
 
     public void setResourceLevel(int resourceLevel) {
-        Assert.isTrue(!ALLOWS_LEVELS.contains(resourceLevel), "路由级别配置错误: " + ALLOWS_LEVELS);
+        Assert.isTrue(!ALLOWS_LEVELS.contains(resourceLevel), ExpMessageCode.of("valid.resource.resourceLevel.configError"));
         this.resourceLevel = resourceLevel;
     }
 

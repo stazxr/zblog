@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.InterfaceMapper">
-    <delete id="clearInterface">
-        DELETE FROM interface WHERE ID > 0
-    </delete>
-
-    <select id="selectCodeByUriAndMethod" resultType="java.lang.String">
-        SELECT DISTINCT CODE FROM interface WHERE CODE IS NOT NULL AND URI = #{uri} AND METHOD IN (#{method}, '*')
-    </select>
-
-    <select id="selectPermInterfaces" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
-        SELECT
-            RESOURCE_CODE, RESOURCE_URI, RESOURCE_METHOD, RESOURCE_LEVEL
-        FROM
-            resource
+    <select id="selectInterfaceList" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT * FROM (
+            SELECT
+                r.RESOURCE_NAME AS interfaceName, r.RESOURCE_CODE AS interfaceCode,
+                r.RESOURCE_URI AS interfaceUri, r.RESOURCE_METHOD AS interfaceMethod,
+                IF(p.PERM_LEVEL IS NULL, r.RESOURCE_LEVEL, p.PERM_LEVEL) AS interfaceLevel,
+                IF(p.ENABLED IS NULL, 2, p.ENABLED) AS interfaceStatus
+            FROM resource r
+            LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = r.RESOURCE_CODE
+        ) tmp
         <where>
-            <if test="permId != null and permId != ''">
-                AND CODE IN (
-                    SELECT PERM_CODE FROM permission WHERE ID = #{permId}
-                )
+            <if test="interfaceName != null and interfaceName != ''">
+                <bind name="interfaceNameBind" value="'%' + interfaceName + '%'"/>
+                interfaceName LIKE #{interfaceNameBind}
+            </if>
+            <if test="interfaceCode != null and interfaceCode != ''">
+                <bind name="interfaceCodeBind" value="'%' + interfaceCode + '%'"/>
+                interfaceName LIKE #{interfaceCodeBind}
+            </if>
+            <if test="interfaceUri != null and interfaceUri != ''">
+                <bind name="interfaceUriBind" value="'%' + interfaceUri + '%'"/>
+                interfaceUri LIKE #{interfaceUriBind}
+            </if>
+            <if test="interfaceMethod != null and interfaceMethod != ''">
+                interfaceMethod = #{interfaceMethod}
+            </if>
+            <if test="interfaceLevel != null">
+                interfaceLevel = #{interfaceLevel}
+            </if>
+            <if test="interfaceStatus != null">
+                interfaceStatus = #{interfaceStatus}
             </if>
         </where>
-    </select>
-
-    <select id="selectInterfacesByCode" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
-        SELECT
-            CODE, URI, METHOD, TYPE, CREATE_TIME
-        FROM
-            interface
-        WHERE
-            CODE = #{code}
+        ORDER BY interfaceUri
     </select>
 </mapper>

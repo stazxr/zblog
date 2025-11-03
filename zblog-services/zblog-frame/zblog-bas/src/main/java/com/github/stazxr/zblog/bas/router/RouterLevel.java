@@ -9,7 +9,7 @@ package com.github.stazxr.zblog.bas.router;
  */
 public abstract class RouterLevel {
     /**
-     * 直接访问
+     * 公开访问
      */
     public static final int OPEN = 1;
 
