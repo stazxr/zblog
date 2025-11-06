@@ -5,10 +5,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * 用户查询
+ * 用户查询参数
  *
  * @author SunTao
  * @since 2022-09-13

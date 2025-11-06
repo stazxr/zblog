@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * 是否开启日志组件
+ * 日志组件开关
  *
  * @author SunTao
  * @since 2022-06-20

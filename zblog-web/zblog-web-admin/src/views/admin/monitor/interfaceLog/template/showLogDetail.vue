@@ -1,6 +1,14 @@
 <template>
   <div>
-    <el-drawer :with-header="false" :visible.sync="dialogVisible" destroy-on-close :before-close="handleClose" size="70%" @opened="initData" @closed="doClose">
+    <el-drawer
+      :visible.sync="dialogVisible"
+      :with-header="false"
+      :wrapper-closable="true"
+      :close-on-press-escape="true"
+      :before-close="handleClose"
+      :size="isMobile ? '100%' : '70%'"
+      destroy-on-close
+    >
       <div class="demo-drawer__content">
         <div id="codeView" v-highlight>
           <pre>
@@ -21,38 +29,38 @@ export default {
     dialogVisible: {
       type: Boolean,
       default: false
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
-      errorDetail: ''
+      errorDetail: null
+    }
+  },
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   methods: {
-    initData() {
-      this.queryLogErrorDetail()
+    initData(dataId) {
+      this.queryLogErrorDetail(dataId)
     },
-    queryLogErrorDetail() {
-      this.$mapi.log.queryLogErrorDetail({ logId: this.dataId }).then(res => {
+    queryLogErrorDetail(dataId) {
+      this.$mapi.log.queryInterfaceLogExpDetail({ logId: dataId }).then(res => {
         this.errorDetail = res.data
+      }).catch(_ => {
+        this.doClose()
       })
-    },
-    doClose() {
-      this.$emit('closeDetailDone')
-    },
-    handleClose() {
-      if (!this.submitLoading) {
-        this.$confirm('确认关闭？').then(_ => {
-          this.doClose()
-        }).catch(_ => {})
-      }
     },
     cancel() {
       this.handleClose()
+    },
+    handleClose() {
+      this.doClose()
+    },
+    doClose() {
+      this.errorDetail = null
+      this.$emit('showDetailDone')
     }
   }
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 路由查询
+ * 接口查询参数
  *
  * @author SunTao
  * @since 2022-09-16

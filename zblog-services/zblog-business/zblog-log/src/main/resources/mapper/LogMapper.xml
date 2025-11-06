@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.log.mapper.LogMapper">
-    <delete id="deleteLog">
-        DELETE FROM log WHERE LOG_TYPE = #{logType}
-    </delete>
-
     <select id="selectLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
         SELECT
             ID, LOG_TYPE, OPERATE_USER, EVENT_TIME, `DESCRIPTION`,
-            REQUEST_IP, REQUEST_URI, REQUEST_METHOD, ADDRESS, BROWSER, COST_TIME,
-            REQUEST_PARAM, EXEC_RESULT, EXEC_MESSAGE
-        FROM
-            log
-        WHERE CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (
-            SELECT CONCAT(URI, '_', METHOD) FROM log_show_flag WHERE SHOWED = 1
-        )
-        <if test="username != null and username != ''">
-            <bind name="usernameBind" value="'%' + username + '%'"/>
-            AND OPERATE_USER LIKE #{usernameBind}
-        </if>
+            REQUEST_PARAM, INTERFACE_CODE, REQUEST_IP, REQUEST_URI, REQUEST_METHOD,
+            ADDRESS, BROWSER, COST_TIME, EXEC_RESULT, EXEC_MESSAGE, CREATE_DATE
+        FROM log
+        WHERE LOG_TYPE = #{logType}
         <if test="description != null and description != ''">
             <bind name="descriptionBind" value="'%' + description + '%'"/>
             AND `DESCRIPTION` LIKE #{descriptionBind}
         </if>
-        <if test='logType != null and logType != ""'>
-            AND LOG_TYPE = #{logType}
+        <if test="interfaceCode != null and interfaceCode != ''">
+            AND INTERFACE_CODE = #{interfaceCode}
+        </if>
+        <if test="username != null and username != ''">
+            AND OPERATE_USER = #{username}
+        </if>
+        <if test="execResult != null">
+            AND EXEC_RESULT = #{execResult}
         </if>
         <if test="costTime != null and costTime != ''">
             AND COST_TIME &gt;= #{costTime, jdbcType=DOUBLE}
@@ -35,20 +30,36 @@
         <if test="eventEndTime != null and eventEndTime != ''">
             AND EVENT_TIME &lt;= #{eventEndTime}
         </if>
-        <if test="execResult != null">
-            AND EXEC_RESULT = #{execResult}
-        </if>
-        <if test="permId != null and permId != ''">
-            AND CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (
-                SELECT CONCAT(URI, '_', METHOD) FROM interface WHERE CODE = (
-                    SELECT PERM_CODE FROM permission WHERE ID = #{permId}
-                )
-            )
-        </if>
         ORDER BY EVENT_TIME DESC
     </select>
 
-    <select id="selectLogErrorDetail" resultType="java.lang.String">
+    <select id="selectLogExpDetail" resultType="java.lang.String">
         SELECT EXCEPTION_DETAIL FROM log WHERE ID = #{logId}
     </select>
+
+    <delete id="deleteLog">
+        DELETE FROM log WHERE LOG_TYPE = #{logType}
+        <if test="description != null and description != ''">
+            <bind name="descriptionBind" value="'%' + description + '%'"/>
+            AND `DESCRIPTION` LIKE #{descriptionBind}
+        </if>
+        <if test="interfaceCode != null and interfaceCode != ''">
+            AND INTERFACE_CODE = #{interfaceCode}
+        </if>
+        <if test="username != null and username != ''">
+            AND OPERATE_USER = #{username}
+        </if>
+        <if test="execResult != null">
+            AND EXEC_RESULT = #{execResult}
+        </if>
+        <if test="costTime != null and costTime != ''">
+            AND COST_TIME &gt;= #{costTime, jdbcType=DOUBLE}
+        </if>
+        <if test="eventStartTime != null and eventStartTime != ''">
+            AND EVENT_TIME &gt;= #{eventStartTime}
+        </if>
+        <if test="eventEndTime != null and eventEndTime != ''">
+            AND EVENT_TIME &lt;= #{eventEndTime}
+        </if>
+    </delete>
 </mapper>

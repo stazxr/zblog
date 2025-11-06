@@ -196,7 +196,7 @@ public class AlbumServiceImpl extends ServiceImpl<AlbumMapper, Album> implements
     @Override
     public PageInfo<AlbumPhotoVo> pageDeletePhotoList(AlbumPhotoQueryDto queryDto) {
         queryDto.checkPage();
-        queryDto.setUserId(SecurityUtils.getLoginUserId());
+        queryDto.setUserId(SecurityUtils.getLoginId());
         PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
         return new PageInfo<>(albumPhotoMapper.selectDeletePhotoList(queryDto));
     }

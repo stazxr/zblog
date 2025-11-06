@@ -17,6 +17,10 @@ export default {
     return api.httpRequest().get(`${userApi}/queryUserDetail`, params)
   },
 
+  // 查询用户操作日志记录
+  queryUserLog: params => {
+    return api.httpRequest().get(`${userApi}/pageUserLogList`, params)
+  },
   // 修改头像
   updateUserHeadImg: params => {
     return api.httpRequest().post(`${userApi}/updateUserHeadImg`, params)

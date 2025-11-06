@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.log.domain.vo;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 日志信息
@@ -8,15 +9,16 @@ import lombok.Data;
  * @author SunTao
  * @since 2022-08-07
  */
-@Data
+@Getter
+@Setter
 public class LogVo {
     /**
-     * 日志编号
+     * 日志ID
      */
     private Long id;
 
     /**
-     * 日志类型：1-操作日志；2-接口日志
+     * 日志类型
      */
     private Integer logType;
 
@@ -36,9 +38,14 @@ public class LogVo {
     private String description;
 
     /**
-     * 请求参数
+     * 操作参数
      */
     private String requestParam;
+
+    /**
+     * 接口编码
+     */
+    private String interfaceCode;
 
     /**
      * 请求IP
@@ -76,7 +83,12 @@ public class LogVo {
     private boolean execResult;
 
     /**
-     * 执行信息
+     * 执行信息（错误信息）
      */
     private String execMessage;
+
+    /**
+     * 创建日期
+     */
+    private String createDate;
 }

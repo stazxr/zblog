@@ -22,7 +22,7 @@ public class ThrowableUtils {
             throwable.printStackTrace(pw);
             return sw.toString();
         } catch (Exception e) {
-            return throwable == null ? null : throwable.toString();
+            return throwable == null ? "" : throwable.toString();
         }
     }
 }

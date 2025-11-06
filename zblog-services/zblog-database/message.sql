@@ -207,6 +207,11 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.dict.parentIsNotGroup', 'en_US', 'Parent dict type invalid', 'common'),
 ('valid.dict.deleteWithChildren', 'zh_CN', '该字典存在子节点，无法被删除', 'common'),
 ('valid.dict.deleteWithChildren', 'en_US', 'Delete dict has children', 'common'),
+-- 日志相关
+('valid.log.id.NotNull', 'zh_CN', '日志ID不能为空', 'common'),
+('valid.log.id.NotNull', 'en_US', 'Log ID cannot be null', 'common'),
+('valid.log.logType.NotNull', 'zh_CN', '日志类型不能为空', 'common'),
+('valid.log.logType.NotNull', 'en_US', 'Log logType cannot be null', 'common'),
 
 -- 错误相关
 ('error.unauthorized.access', 'zh_CN', '未授权访问', 'common'),

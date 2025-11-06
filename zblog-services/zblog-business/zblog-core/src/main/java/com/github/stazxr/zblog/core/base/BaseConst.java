@@ -20,7 +20,7 @@ public class BaseConst {
     /**
      * system userId
      */
-    public static final Long SYSTEM_USER_ID = 0L;
+    public static final Long SYSTEM_USER_ID = 1L;
 
     /**
      * 系统初始化内置字典Key

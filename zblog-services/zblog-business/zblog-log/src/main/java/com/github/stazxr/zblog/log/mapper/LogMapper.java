@@ -24,17 +24,17 @@ public interface LogMapper extends BaseMapper<Log> {
     List<LogVo> selectLogList(LogQueryDto param);
 
     /**
-     * 删除日志列表
+     * 查询日志异常堆栈
      *
-     * @param logType 日志类型
+     * @param logId 日志id
+     * @return 异常堆栈
      */
-    void deleteLog(@Param("logType") Integer logType);
+    String selectLogExpDetail(@Param("logId") Long logId);
 
     /**
-     * 查询日志堆栈详情
+     * 删除操作日志
      *
-     * @param logId 日志序号
-     * @return exceptionDetail
+     * @param queryDto 查询参数
      */
-    String selectLogErrorDetail(@Param("logId") Long logId);
+    void deleteLog(LogQueryDto queryDto);
 }

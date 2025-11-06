@@ -5,26 +5,24 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * 日志列表查询参数
+ * 日志查询参数
  *
  * @author SunTao
  * @since 2022-08-05
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("日志查询参数")
 public class LogQueryDto extends PageParam {
     private static final long serialVersionUID = -7041770535475955047L;
 
     /**
-     * 操作人
+     * 日志类型
      */
-    @ApiModelProperty(value = "操作人", notes = "模糊查询")
-    private String username;
+    @ApiModelProperty("日志类型")
+    private Integer logType;
 
     /**
      * 操作描述
@@ -33,16 +31,16 @@ public class LogQueryDto extends PageParam {
     private String description;
 
     /**
-     * 日志类型
+     * 接口编码
      */
-    @ApiModelProperty("日志类型，1：操作日志、2：接口日志、3：异常日志")
-    private Integer logType;
+    @ApiModelProperty(value = "接口编码")
+    private String interfaceCode;
 
     /**
-     * 权限id
+     * 操作人
      */
-    @ApiModelProperty("权限id")
-    private Long permId;
+    @ApiModelProperty(value = "操作人")
+    private String username;
 
     /**
      * 操作结果

@@ -1,13 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.Router;
-import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.log.service.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,46 +34,48 @@ public class LogController {
     private final LogService logService;
 
     /**
-     * 分页查询操作日志列表
-     *
-     * @param queryDto 查询参数
-     * @return logList
-     */
-    @GetMapping(value = "/queryOperateLogsByPage")
-    @ApiOperation(value = "分页查询操作日志列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询操作日志列表", code = "queryOperateLogsByPage")
-    public Result queryOperateLogsByPage(LogQueryDto queryDto) {
-        queryDto.setLogType(LogType.OPERATE.getValue());
-        return Result.success().data(logService.queryLogListByPage(queryDto));
-    }
-
-    /**
      * 分页查询接口日志列表
      *
      * @param queryDto 查询参数
-     * @return logList
+     * @return PageInfo<LogVo>
      */
-    @GetMapping(value = "/queryApiLogsByPage")
+    @GetMapping(value = "/pageInterfaceLogList")
     @ApiOperation(value = "分页查询接口日志列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询接口日志列表", code = "queryApiLogsByPage")
-    public Result queryApiLogsByPage(LogQueryDto queryDto) {
-        return Result.success().data(logService.queryLogListByPage(queryDto));
+    @Router(name = "分页查询接口日志列表", code = "LOGIQ001")
+    public PageInfo<LogVo> pageInterfaceLogList(LogQueryDto queryDto) {
+        queryDto.setLogType(LogType.INTERFACES.getValue());
+        return logService.queryLogListByPage(queryDto);
     }
 
     /**
-     * 查询用户日志列表
+     * 分页查询操作日志列表
      *
      * @param queryDto 查询参数
-     * @return userLog
+     * @return PageInfo<LogVo>
      */
-    @GetMapping("/queryUserLog")
-    @ApiOperation(value = "查询用户日志列表")
+    @GetMapping(value = "/pageOperationLogList")
+    @ApiOperation(value = "分页查询操作日志列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询用户日志列表", code = "queryUserLog", level = RouterLevel.PUBLIC)
-    public Result queryUserLog(LogQueryDto queryDto) {
-        return Result.success().data(logService.queryUserLogListByPage(queryDto));
+    @Router(name = "分页查询操作日志列表", code = "LOGOQ001")
+    public PageInfo<LogVo> pageOperationLogList(LogQueryDto queryDto) {
+        queryDto.setLogType(LogType.OPERATION.getValue());
+        return logService.queryLogListByPage(queryDto);
+    }
+
+    /**
+     * 导出接口日志
+     *
+     * @param queryDto 查询参数
+     */
+    @Log
+    @GetMapping("/exportInterfaceLog")
+    @ApiOperation(value = "导出接口日志")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "导出接口日志", code = "LOGIE001")
+    public void exportInterfaceLog(LogQueryDto queryDto, HttpServletResponse response) {
+        queryDto.setLogType(LogType.INTERFACES.getValue());
+        logService.exportLogList(queryDto, response);
     }
 
     /**
@@ -82,63 +84,78 @@ public class LogController {
      * @param queryDto 查询参数
      */
     @Log
-    @GetMapping("/exportOperateLog")
+    @GetMapping("/exportOperationLog")
     @ApiOperation(value = "导出操作日志")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "导出操作日志", code = "exportOperateLog")
-    public void exportOperateLog(LogQueryDto queryDto, HttpServletResponse response) {
-        queryDto.setLogType(LogType.OPERATE.getValue());
+    @Router(name = "导出操作日志", code = "LOGOE001")
+    public void exportOperationLog(LogQueryDto queryDto, HttpServletResponse response) {
+        queryDto.setLogType(LogType.OPERATION.getValue());
         logService.exportLogList(queryDto, response);
     }
 
     /**
-     * 导出所有的日志
+     * 查询接口日志异常堆栈
      *
-     * @param queryDto 查询参数
+     * @param logId 日志id
+     * @return exceptionDetail
      */
     @Log
-    @GetMapping("/exportAllLog")
-    @ApiOperation(value = "导出所有的日志")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "导出所有的日志", code = "exportAllLog")
-    public void exportAllLog(LogQueryDto queryDto, HttpServletResponse response) {
-        logService.exportLogList(queryDto, response);
-    }
-
-    /**
-     * 删除日志列表
-     *
-     * @param logType 日志类型
-     * @return Result
-     */
-    @Log
-    @PostMapping(value = "/deleteLog")
-    @ApiOperation(value = "删除日志列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "logType", value = "日志类型，1：操作日志、2：接口日志、3：异常日志", required = true, dataTypeClass = Integer.class)
-    })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除日志列表", code = "deleteLog")
-    public Result deleteLog(@RequestParam Integer logType) {
-        logService.deleteLog(logType);
-        return Result.success();
-    }
-
-    /**
-     * 查询日志堆栈详情
-     *
-     * @param logId 日志序列
-     * @return LogErrorDetail
-     */
-    @Log
-    @GetMapping("/queryLogErrorDetail")
-    @ApiOperation(value = "查询日志堆栈详情")
+    @GetMapping("/queryInterfaceLogExpDetail")
+    @ApiOperation(value = "查询接口日志异常堆栈")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "logId", value = "日志id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询日志堆栈详情", code = "queryLogErrorDetail")
-    public Result queryUserLog(@RequestParam Long logId) {
-        return Result.success().data(logService.queryLogErrorDetail(logId));
+    @Router(name = "查询接口日志异常堆栈", code = "LOGIQ002")
+    public String queryInterfaceLogExpDetail(@RequestParam Long logId) {
+        return logService.queryLogExpDetail(logId);
+    }
+
+    /**
+     * 查询操作日志异常堆栈
+     *
+     * @param logId 日志id
+     * @return exceptionDetail
+     */
+    @Log
+    @GetMapping("/queryOperationLogExpDetail")
+    @ApiOperation(value = "查询操作日志异常堆栈")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "logId", value = "日志id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询操作日志异常堆栈", code = "LOGOQ002")
+    public String queryOperationLogExpDetail(@RequestParam Long logId) {
+        return logService.queryLogExpDetail(logId);
+    }
+
+    /**
+     * 删除接口日志
+     *
+     * @param queryDto 查询参数
+     */
+    @Log
+    @PostMapping(value = "/deleteInterfaceLog")
+    @ApiOperation(value = "删除接口日志")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "删除接口日志", code = "LOGID001")
+    public void deleteInterfaceLog(@RequestBody LogQueryDto queryDto) {
+        queryDto.setLogType(LogType.INTERFACES.getValue());
+        logService.deleteLog(queryDto);
+    }
+
+    /**
+     * 删除操作日志
+     *
+     * @param queryDto 查询参数
+     */
+    @Log
+    @PostMapping(value = "/deleteOperationLog")
+    @ApiOperation(value = "删除操作日志")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "删除操作日志", code = "LOGOD001")
+    public void deleteOperationLog(@RequestBody LogQueryDto queryDto) {
+        queryDto.setLogType(LogType.OPERATION.getValue());
+        logService.deleteLog(queryDto);
     }
 }

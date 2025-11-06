@@ -72,6 +72,18 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取当前登录用户的用户名
+     * <p>
+     * 如果用户未登录，则返回系统用户。
+     * </p>
+     *
+     * @return 当前登录用户的用户名，或系统用户，如果未登录
+     */
+    public static String getLoginUsernameWithoutNull() {
+        return getLoginUserOptional().map(SecurityUser::getUsername).orElse("system");
+    }
+
+    /**
      * 获取当前登录用户的用户ID
      * <p>
      * 如果用户未登录，则返回 null。
@@ -79,8 +91,20 @@ public class SecurityUtils {
      *
      * @return 当前登录用户的ID，或 null 如果未登录
      */
-    public static Long getLoginUserId() {
+    public static Long getLoginId() {
         return getLoginUserOptional().map(SecurityUser::getId).orElse(null);
+    }
+
+    /**
+     * 获取当前登录用户的用户ID
+     * <p>
+     * 如果用户未登录，则返回系统用户ID。
+     * </p>
+     *
+     * @return 当前登录用户的ID，或系统用户ID，如果未登录
+     */
+    public static Long getLoginIdWithoutNull() {
+        return getLoginUserOptional().map(SecurityUser::getId).orElse(1L);
     }
 }
 

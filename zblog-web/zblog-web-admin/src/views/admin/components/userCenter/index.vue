@@ -222,13 +222,12 @@ export default {
     },
     listTableData() {
       const param = {
-        logType: 1,
         username: this.user.username,
         page: this.page,
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.log.queryUserLog(param).then(res => {
+      this.$mapi.user.queryUserLog(param).then(res => {
         const { data } = res
         this.tableData = data.list
         this.total = data.total

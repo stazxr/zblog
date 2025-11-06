@@ -13,6 +13,7 @@ import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -242,4 +243,20 @@ public class UserController {
 //        userService.updateUserPwdByEmail(forgetPwdDto);
 //        return Result.success();
 //    }
+
+
+    /**
+     * 查询用户日志列表
+     *
+     * @param queryDto 查询参数
+     * @return userLog
+     */
+    @GetMapping("/queryUserLog")
+    @ApiOperation(value = "查询用户日志列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "查询用户日志列表", code = "queryUserLog", level = RouterLevel.PUBLIC)
+    public Result queryUserLog(LogQueryDto queryDto) {
+        // return Result.success().data(logService.queryUserLogListByPage(queryDto));
+        return null;
+    }
 }

@@ -11,19 +11,14 @@ import lombok.Getter;
 @Getter
 public enum LogType {
     /**
-     * 操作日志
-     */
-    OPERATE(1),
-
-    /**
      * 接口日志
      */
-    API(2),
+    INTERFACES(1),
 
     /**
-     * 异常日志
+     * 操作日志
      */
-    ERROR(3);
+    OPERATION(2);
 
     private final int value;
 
@@ -34,13 +29,11 @@ public enum LogType {
     public static String of(Integer value) {
         switch (value) {
             case 1:
-                return "操作日志";
-            case 2:
                 return "接口日志";
-            case 3:
-                return "异常日志";
+            case 2:
+                return "操作日志";
             default:
-                return "";
+                return null;
         }
     }
 }

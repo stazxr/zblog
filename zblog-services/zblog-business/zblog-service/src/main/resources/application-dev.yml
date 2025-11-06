@@ -3,7 +3,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
-    '*': info
+    '*': debug
     com.alibaba.druid.sql: debug
     com.github.spring.security.mapper: debug
     org.springframework.security: debug

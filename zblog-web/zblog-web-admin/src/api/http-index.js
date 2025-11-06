@@ -1,22 +1,25 @@
 // communal
 import communal from '@/api/communal.js'
 import home from '@/api/home.js'
+import menu from '@/api/menu.js'
 
-// base
-import menu from '@/api/base/system/menu.js'
+// system
 import user from '@/api/base/system/user.js'
 import role from '@/api/base/system/role.js'
 import perm from '@/api/base/system/perm.js'
 import dict from '@/api/base/system/dict.js'
 import interfaces from '@/api/base/system/interface.js'
 
-import log from '@/api/base/log.js'
+// monitor
+import log from '@/api/base/monitor/log.js'
+
+// TODO
 import server from '@/api/base/server.js'
 import version from '@/api/base/version.js'
 import file from '@/api/base/file.js'
 import node from '@/api/base/node.js'
 
-// service
+// TODO service
 import column from '@/api/service/column.js'
 import category from '@/api/service/category.js'
 import tag from '@/api/service/tag.js'
@@ -33,6 +36,7 @@ import test from '@/api/service/test.js'
 export default {
   communal, home, menu,
   user, role, perm, interfaces, dict,
-  log, server, version, file, node, column, category,
+  log,
+  server, version, file, node, column, category,
   tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

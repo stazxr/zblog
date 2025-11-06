@@ -2,15 +2,14 @@ package com.github.stazxr.zblog.log.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
-import com.github.stazxr.zblog.util.net.IpUtils;
+import com.github.stazxr.zblog.core.util.ToStringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 
 /**
- * 系统日志
+ * 日志
  *
  * @author SunTao
  * @since 2021-05-16
@@ -18,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Getter
 @Setter
 @TableName("log")
-public class Log extends BaseEntity {
+public class Log implements Serializable {
     private static final long serialVersionUID = 3244794484450592745L;
 
     /**
@@ -28,7 +27,7 @@ public class Log extends BaseEntity {
     private Long id;
 
     /**
-     * 日志类型（操作日志、接口日志）
+     * 日志类型
      */
     private Integer logType;
 
@@ -51,6 +50,11 @@ public class Log extends BaseEntity {
      * 操作参数
      */
     private String requestParam;
+
+    /**
+     * 接口编码
+     */
+    private String interfaceCode;
 
     /**
      * 请求IP
@@ -88,25 +92,22 @@ public class Log extends BaseEntity {
     private boolean execResult;
 
     /**
-     * 执行信息
+     * 执行信息（错误信息）
      */
     private String execMessage;
+
+    /**
+     * 创建日期
+     */
+    private String createDate;
 
     /**
      * 异常信息
      */
     private byte[] exceptionDetail;
 
-    /**
-     * 设置请求相关信息
-     *
-     * @param request 请求信息
-     */
-    public void setRequestInfo(HttpServletRequest request) {
-        this.requestIp = IpUtils.getIp(request);
-        this.requestUri = request.getRequestURI();
-        this.requestMethod = request.getMethod();
-        this.address = IpUtils.getIpLocation(this.requestIp, IpUtils.IP_LOCATION_PRO);
-        this.browser = IpUtils.getBrowser(request);
+    @Override
+    public String toString() {
+        return ToStringUtils.buildString(this);
     }
 }
