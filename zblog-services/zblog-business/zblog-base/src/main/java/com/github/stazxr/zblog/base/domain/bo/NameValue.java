@@ -16,6 +16,22 @@ public class NameValue {
 
     private Object value;
 
+    public Object getValue() {
+        if (Boolean.TRUE.toString().equals(value) || Boolean.FALSE.toString().equals(value)) {
+            // boolean 适配
+            return Boolean.valueOf((String) value);
+        }
+        try {
+            // int 适配
+            return Integer.valueOf((String) value);
+        } catch (Exception ignored) { }
+        try {
+            // long 适配
+            return Long.valueOf((String) value);
+        } catch (Exception ignored) { }
+        return value;
+    }
+
     @Override
     public String toString() {
         return "{'name': '" + name + "', value: '" + value.toString() + "'}";

@@ -40,11 +40,24 @@
         <el-table-column :show-overflow-tooltip="true" prop="dictKey" label="字典KEY" align="left" />
         <el-table-column :show-overflow-tooltip="true" prop="dictValue" label="字典VALUE" align="left" />
         <el-table-column :show-overflow-tooltip="true" prop="dictDesc" label="字典描述" align="left" />
-        <el-table-column :show-overflow-tooltip="false" prop="dictSort" label="字典排序" align="center" width="120" />
-        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="字典状态" align="center" width="120">
+        <el-table-column :show-overflow-tooltip="true" prop="subCount" label="字典类型" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.enabled">启用</el-tag>
-            <el-tag v-else type="warning">禁用</el-tag>
+            <el-tag v-if="scope.row.dictType === 1">组</el-tag>
+            <el-tag v-else-if="scope.row.dictType === 2" type="success">项</el-tag>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="subCount" label="配置项个数" align="center" width="100">
+          <template v-slot="scope">
+            <span v-if="scope.row.dictType === 1">{{ scope.row['subCount'] }}</span>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="false" prop="dictSort" label="字典排序" align="center" width="100" />
+        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="字典状态" align="center" width="100">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.enabled" type="success">启用</el-tag>
+            <el-tag v-else type="danger">禁用</el-tag>
           </template>
         </el-table-column>
         <div slot="empty">
