@@ -25,10 +25,10 @@
             AND COST_TIME &gt;= #{costTime, jdbcType=DOUBLE}
         </if>
         <if test="eventStartTime != null and eventStartTime != ''">
-            AND EVENT_TIME &gt;= #{eventStartTime}
+            AND EVENT_TIME &gt;= STR_TO_DATE(#{eventStartTime}, '%Y-%m-%d %H:%i:%s')
         </if>
         <if test="eventEndTime != null and eventEndTime != ''">
-            AND EVENT_TIME &lt;= #{eventEndTime}
+            AND EVENT_TIME &lt;= STR_TO_DATE(#{eventEndTime}, '%Y-%m-%d %H:%i:%s')
         </if>
         ORDER BY EVENT_TIME DESC
     </select>
@@ -56,10 +56,10 @@
             AND COST_TIME &gt;= #{costTime, jdbcType=DOUBLE}
         </if>
         <if test="eventStartTime != null and eventStartTime != ''">
-            AND EVENT_TIME &gt;= #{eventStartTime}
+            AND EVENT_TIME &gt;= STR_TO_DATE(#{eventStartTime}, '%Y-%m-%d %H:%i:%s')
         </if>
         <if test="eventEndTime != null and eventEndTime != ''">
-            AND EVENT_TIME &lt;= #{eventEndTime}
+            AND EVENT_TIME &lt;= STR_TO_DATE(#{eventEndTime}, '%Y-%m-%d %H:%i:%s')
         </if>
     </delete>
 </mapper>

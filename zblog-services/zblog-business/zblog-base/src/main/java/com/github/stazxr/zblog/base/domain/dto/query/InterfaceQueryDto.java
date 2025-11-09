@@ -53,4 +53,10 @@ public class InterfaceQueryDto extends PageParam {
      */
     @ApiModelProperty(value = "接口状态")
     private Integer interfaceStatus;
+
+    /**
+     * 是否过滤局域网数据
+     */
+    @ApiModelProperty(value = "是否过滤局域网数据", notes = "默认不过滤")
+    private Boolean filterLocalData;
 }

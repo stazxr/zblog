@@ -46,6 +46,7 @@
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
         highlight-current-row
+        row-key="id"
         border
       >
         <el-table-column type="expand">
@@ -93,7 +94,7 @@
             <el-tag v-else type="danger">{{ scope.row['costTime'] }}ms</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="eventTime" label="请求时间" align="center" width="150" />
+        <el-table-column :show-overflow-tooltip="true" prop="eventTime" label="请求时间" align="center" width="160" />
         <div slot="empty">
           <el-empty :image="nodataImg" description=" " />
         </div>

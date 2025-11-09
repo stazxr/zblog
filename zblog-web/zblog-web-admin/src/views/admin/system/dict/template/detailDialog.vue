@@ -86,7 +86,7 @@ export default {
           this.dataInfo[key] = data[key] == null || data[key] === '' ? '-' : data[key].toString()
         })
       }).catch(_ => {
-        this.doClose()
+        setTimeout(() => { this.doClose() }, 500)
       })
     },
     doClose() {

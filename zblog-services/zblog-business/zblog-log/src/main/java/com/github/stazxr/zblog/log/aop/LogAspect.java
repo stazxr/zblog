@@ -16,7 +16,6 @@ import com.github.stazxr.zblog.log.service.LogService;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.ThrowableUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
-import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -30,6 +29,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -86,7 +86,7 @@ public class LogAspect {
         }
 
         // 切入日志
-        String operateTime = DateUtils.formatNow(DateUtils.YMD_HMS_PATTERN);
+        LocalDateTime operateTime = LocalDateTime.now();
         currentTime.set(System.currentTimeMillis());
         boolean executeResult = false;
         Exception exception = null;
@@ -105,7 +105,7 @@ public class LogAspect {
         }
     }
 
-    private void callSaveLog(ProceedingJoinPoint joinPoint, String operateTime, Long startTime, boolean executeResult, Exception exception) {
+    private void callSaveLog(ProceedingJoinPoint joinPoint, LocalDateTime operateTime, Long startTime, boolean executeResult, Exception exception) {
         try {
             // 获取路由信息
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -121,7 +121,7 @@ public class LogAspect {
             String username = SecurityUtils.getLoginUsernameWithoutNull();
 
             // 异步存储日志
-            CompletableFuture.runAsync(() -> {
+//            CompletableFuture.runAsync(() -> {
                 // 获取路由信息，如果接口未标注 @Router 注解，则忽略
                 Router router = method.getAnnotation(Router.class);
                 if (router == null) {
@@ -148,20 +148,19 @@ public class LogAspect {
 
                 // 日志入库
                 logService.save(log);
-            });
+//            });
         } catch (Exception e) {
             log.error("日志入库失败", e);
         }
     }
 
-    private Log initLog(HttpServletRequest request, String username, String operateTime, Long startTime, boolean executeResult, Exception exception) {
+    private Log initLog(HttpServletRequest request, String username, LocalDateTime operateTime, Long startTime, boolean executeResult, Exception exception) {
         Log log = new Log();
         log.setId(SequenceUtils.getId());
         log.setOperateUser(username);
         log.setEventTime(operateTime);
         log.setExecResult(executeResult);
         log.setCostTime(System.currentTimeMillis() - startTime);
-        log.setCreateDate(DateUtils.formatNow(DateUtils.YMD_PATTERN));
 
         // 获取请求信息
         String requestIp = IpUtils.getIp(request);

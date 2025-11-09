@@ -49,7 +49,7 @@ export default {
       this.$mapi.log.queryOperationLogExpDetail({ logId: dataId }).then(res => {
         this.errorDetail = res.data
       }).catch(_ => {
-        this.doClose()
+        setTimeout(() => { this.doClose() }, 500)
       })
     },
     cancel() {

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 日志
@@ -39,7 +41,7 @@ public class Log implements Serializable {
     /**
      * 操作时间或异常发生时间
      */
-    private String eventTime;
+    private LocalDateTime eventTime;
 
     /**
      * 操作描述
@@ -99,7 +101,7 @@ public class Log implements Serializable {
     /**
      * 创建日期
      */
-    private String createDate;
+    private LocalDate createDate;
 
     /**
      * 异常信息

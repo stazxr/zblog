@@ -32,15 +32,15 @@ public class IpCheckFilter extends OncePerRequestFilter {
         // 获取请求IP
         String requestIp = IpUtils.getIp(request);
 
-        // 检查黑名单
-        if (BlackWhiteListCache.isBlacklisted(requestIp)) {
-            handleBlacklistedIp(response, requestIp);
-            return;
-        }
-
         // 检查白名单
         if (BlackWhiteListCache.isWhitelisted(requestIp)) {
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 检查黑名单
+        if (BlackWhiteListCache.isBlacklisted(requestIp)) {
+            handleBlacklistedIp(response, requestIp);
             return;
         }
 

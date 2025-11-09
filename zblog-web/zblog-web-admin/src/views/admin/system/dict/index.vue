@@ -173,13 +173,11 @@ export default {
     },
     queryChildList(tree, treeNode, resolve) {
       this.maps.set(tree.id, { tree, treeNode, resolve })
-      setTimeout(() => {
-        this.$mapi.dict.queryChildList({ pid: tree.id }).then(res => {
-          resolve(res.data)
-        }).catch(_ => {
-          resolve([])
-        })
-      }, 10)
+      this.$mapi.dict.queryChildList({ pid: tree.id }).then(res => {
+        resolve(res.data)
+      }).catch(_ => {
+        resolve([])
+      })
     },
     // 详情
     showDetail() {
@@ -218,13 +216,13 @@ export default {
       this.addOrEditDialogVisible = false
       if (result) {
         if (type === 1) {
-          // 新增组
+          // 新增或编辑组
           this.listTableData()
         } else {
-          // 新增项
-          const curId = this.row.id
-          if (curId && this.maps.get(curId)) {
-            const { tree, treeNode, resolve } = this.maps.get(curId)
+          // 新增或编辑项
+          const curPid = this.row.pid
+          if (curPid && this.maps.get(curPid)) {
+            const { tree, treeNode, resolve } = this.maps.get(curPid)
             this.queryChildList(tree, treeNode, resolve)
           } else {
             this.listTableData()

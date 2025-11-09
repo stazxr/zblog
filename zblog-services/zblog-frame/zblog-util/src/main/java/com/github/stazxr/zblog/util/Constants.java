@@ -16,9 +16,4 @@ public class Constants {
      * 本机IP，IPV6
      */
     public static final String LOCAL_HOST_V6 = "0:0:0:0:0:0:0:1";
-
-    /**
-     * URL和参数的分隔符
-     */
-    public static final String URL_SPLIT_LABEL = "?";
 }

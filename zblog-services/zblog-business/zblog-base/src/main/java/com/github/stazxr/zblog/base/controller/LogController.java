@@ -67,6 +67,7 @@ public class LogController {
      * 导出接口日志
      *
      * @param queryDto 查询参数
+     * @param response Response
      */
     @Log
     @GetMapping("/exportInterfaceLog")
@@ -82,6 +83,7 @@ public class LogController {
      * 导出操作日志
      *
      * @param queryDto 查询参数
+     * @param response Response
      */
     @Log
     @GetMapping("/exportOperationLog")

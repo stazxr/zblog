@@ -7,11 +7,14 @@ import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import com.github.stazxr.zblog.base.service.InterfaceService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 接口管理
@@ -39,5 +42,20 @@ public class InterfaceController {
     @Router(name = "分页查询接口列表", code = "INTEQ001")
     public PageInfo<InterfaceVo> pageList(InterfaceQueryDto queryDto) {
         return interfaceService.queryInterfaceListByPage(queryDto);
+    }
+
+    /**
+     * 导出接口列表
+     *
+     * @param queryDto 查询参数
+     * @param response Response
+     */
+    @Log
+    @GetMapping("/exportInterface")
+    @ApiOperation(value = "导出接口列表")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @Router(name = "导出接口列表", code = "INTEE001")
+    public void exportInterface(InterfaceQueryDto queryDto, HttpServletResponse response) {
+        interfaceService.exportInterface(queryDto, response);
     }
 }

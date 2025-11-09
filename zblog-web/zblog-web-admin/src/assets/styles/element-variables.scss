@@ -9,6 +9,14 @@ $--color-warning: #FFBA00;
 $--color-danger: #ff4949;
 $--color-info: #1E1E1E;
 
+:root {
+  --color-primary: #1890ff;
+  --color-success: #13ce66;
+  --color-warning: #FFBA00;
+  --color-danger: #ff4949;
+  --color-info: #1E1E1E;
+}
+
 // 字体粗细，默认 500
 $--button-font-weight: 500;
 

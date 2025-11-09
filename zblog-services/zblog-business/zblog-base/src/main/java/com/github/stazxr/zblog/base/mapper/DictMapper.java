@@ -49,9 +49,9 @@ public interface DictMapper extends BaseMapper<Dict> {
     List<NameValue> selectNameValuesByDictKey(@Param("dictKey") String dictKey);
 
     /**
-     * 根据KEY查询VALUE
+     * 根据字典KEY查询配置信息
      *
-     * @param key 字典KEY
+     * @param dictKey 字典KEY
      * @return VALUE
      */
     String selectDictValueByDictKey(@Param("dictKey") String dictKey);

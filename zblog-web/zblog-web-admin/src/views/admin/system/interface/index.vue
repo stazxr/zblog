@@ -34,7 +34,9 @@
         </muses-search-form>
       </div>
       <div class="crud-opts">
-        <span class="crud-opts-left" />
+        <span class="crud-opts-left">
+          <el-button v-perm="['INTEE001']" type="primary" :loading="exportLoading" @click="exportData">导出</el-button>
+        </span>
       </div>
     </div>
     <div class="components-container">
@@ -44,14 +46,24 @@
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
         highlight-current-row
-        row-key="id"
+        row-key="interfaceCode"
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceName" label="接口名称" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" label="接口编码" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceUri" label="请求地址" align="left" />
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceMethod" label="请求方式" align="center" width="120" />
+        <el-table-column type="expand" fixed>
+          <template v-slot="props">
+            <el-form label-position="left" inline class="my-table-expand">
+              <el-form-item class="el-form-item" label="请求地址:" style="width: 100%">
+                <span>{{ props.row['interfaceUri'] }}</span>
+              </el-form-item>
+              <el-form-item class="el-form-item" label="请求方式:" style="width: 100%">
+                <span>{{ props.row['interfaceMethod'] }}</span>
+              </el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="interfaceName" fixed label="接口名称" align="left" width="200" />
+        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" fixed label="接口编码" align="center" width="120" />
         <el-table-column :show-overflow-tooltip="false" prop="interfaceLevel" label="接口级别" align="center" width="120">
           <template v-slot="scope">
             <el-tag v-if="scope.row.interfaceLevel === 1" type="warning">公开访问</el-tag>
@@ -68,6 +80,47 @@
             <el-tag v-else-if="scope.row.interfaceStatus === 2">默认</el-tag>
             <span v-else> - </span>
           </template>
+        </el-table-column>
+        <el-table-column align="center">
+          <template slot="header">
+            <span>调用统计</span><br>
+            <span>Call Statistics Metrics</span>
+          </template>
+          <el-table-column :show-overflow-tooltip="true" prop="dailyCallCount" label="DCC" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="totalCallCount" label="TCC" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="totalFailureCount" label="FCC" align="center" width="90">
+            <template v-slot="scope">
+              <span :class="{ 'text-danger': scope.row['totalFailureCount'] > 0 }">{{ scope.row['totalFailureCount'] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="callSuccessRate" label="接口成功率" align="center" width="90">
+            <template v-slot="scope">
+              <span v-if="scope.row['callSuccessRate'] == null" />
+              <span v-else :class="{ 'text-danger': scope.row['callSuccessRate'] < 99.9999 }">{{ scope.row['callSuccessRate'] }}%</span>
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column align="center">
+          <template slot="header">
+            <span>性能响应</span><br>
+            <span>Performance / Latency Metrics</span>
+          </template>
+          <el-table-column :show-overflow-tooltip="true" prop="avgResponseTime" label="ART/ms" align="center" width="90">
+            <template v-slot="scope">
+              <span :class="{ 'text-danger': scope.row['avgResponseTime'] > 100 }">{{ scope.row['avgResponseTime'] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="maxResponseTime" label="MRT/ms" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="p95ResponseTime" label="P95/ms" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="p99ResponseTime" label="P99/ms" align="center" width="90" />
+        </el-table-column>
+        <el-table-column align="center">
+          <template slot="header">
+            <span>吞吐量</span><br>
+            <span>Throughput / Load Metrics</span>
+          </template>
+          <el-table-column :show-overflow-tooltip="true" prop="maxQps" label="MaxQps" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="avgQps" label="AvgQps" align="center" width="90" />
         </el-table-column>
         <div slot="empty">
           <el-empty :image="nodataImg" description=" " />
@@ -89,6 +142,7 @@
 </template>
 
 <script>
+import { downloadFile } from '@/utils'
 import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Interface',
@@ -111,7 +165,8 @@ export default {
       row: null,
       total: 0,
       page: 1,
-      pageSize: 10
+      pageSize: 10,
+      exportLoading: false
     }
   },
   mounted() {
@@ -185,6 +240,21 @@ export default {
         this.tableLoading = false
         this.row = null
         this.$refs.interfaceTable.setCurrentRow()
+      })
+    },
+    // 导出
+    exportData() {
+      this.$confirm(`确认导出接口列表吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'primary'
+      }).then(() => {
+        this.exportLoading = true
+        this.$mapi.interfaces.exportInterface({ ... this.filters }).then(res => {
+          downloadFile(res, '接口列表.xlsx')
+        }).finally(_ => {
+          this.exportLoading = false
+        })
       })
     }
   }

@@ -183,7 +183,7 @@ export default {
         dictValue: null,
         dictSort: 99999,
         dictDesc: null,
-        enabled: 'true'
+        enabled: true
       }
       this.$refs.addOrEditForm.resetFields()
       this.submitLoading = false

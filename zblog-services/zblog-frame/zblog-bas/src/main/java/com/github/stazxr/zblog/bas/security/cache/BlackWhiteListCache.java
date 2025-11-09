@@ -53,7 +53,7 @@ public class BlackWhiteListCache {
      */
     public synchronized void updateWhitelist(Set<String> newWhitelist) {
         WHITE_LIST.clear();
-        if (newWhitelist != null) {
+        if (newWhitelist != null && !newWhitelist.isEmpty()) {
             WHITE_LIST.addAll(newWhitelist);
         }
     }
@@ -66,7 +66,7 @@ public class BlackWhiteListCache {
      */
     public synchronized void updateBlacklist(Set<String> newBlacklist) {
         BLACK_LIST.clear();
-        if (newBlacklist != null) {
+        if (newBlacklist != null && !newBlacklist.isEmpty()) {
             BLACK_LIST.addAll(newBlacklist);
         }
     }

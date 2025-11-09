@@ -201,3 +201,28 @@ aside {
 .crud-opts-left button {
   margin-bottom: 4px;
 }
+
+//table expand
+.my-table-expand {
+  font-size: 0;
+}
+.my-table-expand label {
+  width: 100px;
+  // color: #99a9bf;
+}
+.my-table-expand .el-form-item {
+  padding-left: 10px;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}
+
+// 数字选择器客户化样式
+.el-input--suffix input[type="number"].el-input__inner {
+  padding-right: 10px !important;
+}
+
+// 文本颜色扩展
+.text-danger {
+  color: var(--color-danger);
+}

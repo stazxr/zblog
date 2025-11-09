@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 字典服务层
  *
@@ -18,4 +20,12 @@ public interface InterfaceService {
      * @return PageInfo<DictVo>
      */
     PageInfo<InterfaceVo> queryInterfaceListByPage(InterfaceQueryDto queryDto);
+
+    /**
+     * 导出接口列表
+     *
+     * @param queryDto 查询参数
+     * @param response Response
+     */
+    void exportInterface(InterfaceQueryDto queryDto, HttpServletResponse response);
 }
