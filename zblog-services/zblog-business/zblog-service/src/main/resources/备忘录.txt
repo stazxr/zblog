@@ -1,0 +1,2 @@
+1、本地安装数据库时，建议设置root密码为root（部署服务器建议使用复杂密码），这样本地启动改动内容较少
+2、安装完数据库执行SQL脚本时，props > base > message > service

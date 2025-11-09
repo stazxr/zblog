@@ -1,42 +1,28 @@
-/*
- Navicat Premium Data Transfer
+SET NAMES utf8;
+SET FOREIGN_KEY_CHECKS = 0;
 
- Source Server         : 本地数据库
- Source Server Type    : MySQL
- Source Server Version : 50729
- Source Host           : localhost:3306
- Source Schema         : props
-
- Target Server Type    : MySQL
- Target Server Version : 50729
- File Encoding         : 65001
-
- Date: 23/07/2024 00:11:32
-*/
-
-CREATE DATABASE IF NOT EXISTS `props` DEFAULT CHARACTER SET utf8mb4;
+DROP DATABASE /*!32312 IF EXISTS*/ `props`;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `props` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
 
 USE `props`;
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for sys_props
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_props`;
 CREATE TABLE `sys_props`  (
-  `KEY` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'props key',
-  `VALUE` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'props value',
-  `GROUP` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'props 所属组',
-  `REMARK` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `KEY` varchar(150) NOT NULL COMMENT 'props key',
+  `VALUE` varchar(2000) NOT NULL COMMENT 'props value',
+  `GROUP` varchar(30) NOT NULL COMMENT 'props 所属组',
+  `REMARK` varchar(200) DEFAULT NULL COMMENT '备注',
   `DELETED` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否逻辑删除',
   INDEX `KEY_INDEX`(`KEY`) USING BTREE
-) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '系统配置表' ROW_FORMAT = DYNAMIC;
+) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_props
 -- ----------------------------
-INSERT INTO `sys_props` VALUES ('zblog.db.DbDriver', 'com.mysql.jdbc.Driver', 'zblog.service', '数据库驱动', 0);
+INSERT INTO `sys_props` VALUES ('zblog.db.DbDriver', 'com.mysql.cj.jdbc.Driver', 'zblog.service', '数据库驱动', 0);
 INSERT INTO `sys_props` VALUES ('zblog.db.DbUrl', 'jdbc:mysql://127.0.0.1:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai', 'zblog.service', '数据库链接', 0);
 INSERT INTO `sys_props` VALUES ('zblog.db.DbUser', 'root', 'zblog.service', '数据库用户', 0);
 INSERT INTO `sys_props` VALUES ('zblog.db.DbPass', 'root', 'zblog.service', '数据库密码', 0);

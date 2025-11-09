@@ -1,3 +1,5 @@
+USE `zblog`;
+
 DROP TABLE IF EXISTS `i18n_message`;
 CREATE TABLE `i18n_message` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
@@ -9,7 +11,7 @@ CREATE TABLE `i18n_message` (
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code_locale` (`code`, `locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='国际化消息表';
+) ENGINE=InnoDB COMMENT='国际化消息表';
 
 INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 返回相关 >-->
@@ -211,20 +213,4 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.log.id.NotNull', 'zh_CN', '日志ID不能为空', 'common'),
 ('valid.log.id.NotNull', 'en_US', 'Log ID cannot be null', 'common'),
 ('valid.log.logType.NotNull', 'zh_CN', '日志类型不能为空', 'common'),
-('valid.log.logType.NotNull', 'en_US', 'Log logType cannot be null', 'common'),
-
--- 错误相关
-('error.unauthorized.access', 'zh_CN', '未授权访问', 'common'),
-('error.unauthorized.access', 'en_US', 'Unauthorized access', 'common'),
-
--- 权限相关
-('perm.access.denied', 'zh_CN', '访问被拒绝', 'common'),
-('perm.access.denied', 'en_US', 'Access Denied', 'common'),
-
--- 界面相关
-('ui.button.save', 'zh_CN', '保存', 'UI'),
-('ui.button.save', 'en_US', 'Save', 'UI'),
-
--- 其他示例
-('sys.welcome.message', 'zh_CN', '欢迎使用系统', 'SYSTEM'),
-('sys.welcome.message', 'en_US', 'Welcome to the system', 'SYSTEM');
+('valid.log.logType.NotNull', 'en_US', 'Log logType cannot be null', 'common');
