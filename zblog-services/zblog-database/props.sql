@@ -23,7 +23,7 @@ CREATE TABLE `sys_props`  (
 -- Records of sys_props
 -- ----------------------------
 INSERT INTO `sys_props` VALUES ('zblog.db.DbDriver', 'com.mysql.cj.jdbc.Driver', 'zblog.service', '数据库驱动', 0);
-INSERT INTO `sys_props` VALUES ('zblog.db.DbUrl', 'jdbc:mysql://127.0.0.1:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai', 'zblog.service', '数据库链接', 0);
+INSERT INTO `sys_props` VALUES ('zblog.db.DbUrl', 'jdbc:mysql://127.0.0.1:3306/zblog?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai', 'zblog.service', '数据库链接', 0);
 INSERT INTO `sys_props` VALUES ('zblog.db.DbUser', 'root', 'zblog.service', '数据库用户', 0);
 INSERT INTO `sys_props` VALUES ('zblog.db.DbPass', 'root', 'zblog.service', '数据库密码', 0);
 INSERT INTO `sys_props` VALUES ('zblog.globalKey.PrivateKey', 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAIjQiAeF7xn0yKbtJe/iwuita3jRhKiK8i7cr+tlYe0no/39nG8DW78vM6hqKcae5cRwLQPdFbiqfYVRnla05EjkL0X32/bNYctRhQuxJ8vfK+czfNDV1RxVEApZ90dNW/PhBRp3bV3cZlCaBLgKwHSIL9c9+B2ttKJVgj0ji1E3AgMBAAECgYEAhmp6ewm3dATu7jGoSBq96+QV5snST9TTQ/9GRzuADoQXtn7oppjiFt/FHP3QtXd/vpOHZnhb0uaOE+GwcveeIB9a6qAq59VYKKY3OaG6farGp/j7YXKY5T3KXM+Sio03t87dm8DUM1RD6vG74kpv43FAq6wDRMh1TuLrakXiSiECQQC/X7H31UVukeRZLWQ/8CSqWsAc3CCQJHlWCf1HSqJ9YZ1jKfILN5JUMecazpMHiPqyQb+eTNhtIymy8CuRTFdVAkEAtwQt5xlhKuchIs4zMvx2YJUW/tKVmBO/nKlayTv1XXJ4LlkzBUxYf+PhJh/Q24M/wFEOfgmDEg7PWzvd0NsuWwJBAKAvMYAIe/15EHG0lN0P3SDapUOC3Z7JaOajpeUui6P3OQ3v5jGNamYe/xppHpiIB499iS6vk9iGPjkQ3ubXx6ECQFoychkCNhQ54ufPbgZDzGefMr0VtepEWVvxTy/8H9oVL0vQZEfJL5igC3eJmJqG3eV/TUAqmfFNYT5ai+CCFR8CQCXAh3WrakRNUdnlGhIpzopmsD+SFeAOD8mpIsVfTWJgoFvWIBAicSZ9dm6uP8DwwXfEjeaPnZc5bq7/cV/T7Ww=', 'zblog.service', '默认私钥', 0);
