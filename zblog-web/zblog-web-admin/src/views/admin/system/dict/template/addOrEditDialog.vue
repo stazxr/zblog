@@ -17,7 +17,7 @@
         <el-form-item label="字典排序" prop="dictSort">
           <el-input-number
             v-model.number="formData.dictSort"
-            :style="isMobile ? '' : 'width: 152px;'"
+            :style="isMobile ? 'width: 100%;' : 'width: 152px;'"
             :min="0"
             :max="99999"
             step-strictly

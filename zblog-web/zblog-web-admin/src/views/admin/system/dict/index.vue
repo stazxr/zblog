@@ -36,7 +36,7 @@
         lazy
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="dictName" label="字典名称" align="left" />
+        <el-table-column :show-overflow-tooltip="true" prop="dictName" label="字典名称" align="left" width="200" />
         <el-table-column :show-overflow-tooltip="true" prop="dictKey" label="字典KEY" align="left" />
         <el-table-column :show-overflow-tooltip="true" prop="dictValue" label="字典VALUE" align="left" />
         <el-table-column :show-overflow-tooltip="true" prop="dictDesc" label="字典描述" align="left" />

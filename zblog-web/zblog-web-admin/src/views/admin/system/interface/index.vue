@@ -50,7 +50,7 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column type="expand" fixed>
+        <el-table-column type="expand" :fixed="!isMobile">
           <template v-slot="props">
             <el-form label-position="left" inline class="my-table-expand">
               <el-form-item class="el-form-item" label="请求地址:" style="width: 100%">
@@ -62,8 +62,8 @@
             </el-form>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceName" fixed label="接口名称" align="left" width="200" />
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" fixed label="接口编码" align="center" width="120" />
+        <el-table-column :show-overflow-tooltip="true" prop="interfaceName" :fixed="!isMobile" label="接口名称" align="left" width="200" />
+        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" label="接口编码" align="center" width="120" />
         <el-table-column :show-overflow-tooltip="false" prop="interfaceLevel" label="接口级别" align="center" width="120">
           <template v-slot="scope">
             <el-tag v-if="scope.row.interfaceLevel === 1" type="warning">公开访问</el-tag>
@@ -167,6 +167,11 @@ export default {
       page: 1,
       pageSize: 10,
       exportLoading: false
+    }
+  },
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   mounted() {
