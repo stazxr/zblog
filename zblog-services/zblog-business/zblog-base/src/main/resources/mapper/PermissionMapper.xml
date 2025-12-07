@@ -34,53 +34,6 @@
         WHERE p.DELETED = 0 AND p.ID = #{permId}
     </select>
 
-    <select id="selectPermInterfaces" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
-        SELECT
-            RESOURCE_NAME AS NAME, RESOURCE_URI AS URI, RESOURCE_METHOD AS METHOD
-        FROM resource WHERE RESOURCE_CODE IN (
-            SELECT PERM_CODE FROM permission WHERE ID = #{permId} AND DELETED = 0
-        )
-    </select>
-
-    <select id="selectPermRoles" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
-        SELECT ID, ROLE_NAME, ROLE_CODE, ENABLED FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
-        )
-        <if test="blurry != null and blurry != ''">
-            <bind name="blurryBind" value="'%' + blurry + '%'"/>
-            AND (
-                ROLE_NAME LIKE #{blurryBind} OR ROLE_CODE LIKE #{blurryBind}
-            )
-        </if>
-    </select>
-
-    <select id="selectPermLogs" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
-        SELECT
-            ID, LOG_TYPE, OPERATE_USER, EVENT_TIME, `DESCRIPTION`,
-            REQUEST_IP, REQUEST_URI, REQUEST_METHOD, ADDRESS, BROWSER, COST_TIME,
-            REQUEST_PARAM, EXEC_RESULT, EXEC_MESSAGE
-        FROM log
-
-        <if test="username != null and username != ''">
-            <bind name="usernameBind" value="'%' + username + '%'"/>
-            AND OPERATE_USER LIKE #{usernameBind}
-        </if>
-        <if test='logType != null and logType != ""'>
-            AND LOG_TYPE = #{logType}
-        </if>
-        <if test="execResult != null">
-            AND EXEC_RESULT = #{execResult}
-        </if>
-        <if test="permId != null and permId != ''">
-            AND CONCAT(REQUEST_URI, '_', REQUEST_METHOD) IN (
-            SELECT CONCAT(URI, '_', METHOD) FROM res WHERE CODE = (
-                SELECT PERM_CODE FROM permission WHERE ID = #{permId} AND DELETED = 0
-            )
-            )
-        </if>
-        ORDER BY EVENT_TIME DESC
-    </select>
-
     <select id="selectPermCodes" resultType="com.github.stazxr.zblog.base.domain.vo.PermCodeVo">
         SELECT
             r.RESOURCE_NAME NAME, r.RESOURCE_CODE value, r.RESOURCE_LEVEL level,
@@ -95,5 +48,17 @@
 
     <select id="selectResourceByPermCode" resultType="com.github.stazxr.zblog.bas.router.Resource">
         SELECT * FROM resource WHERE RESOURCE_CODE = #{permCode}
+    </select>
+
+    <select id="selectRoleCodesByPermId" resultType="java.lang.String">
+        SELECT DISTINCT ROLE_CODE FROM role WHERE DELETED = 0 AND ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
+        )
+    </select>
+
+    <select id="selectUserIdsByPermId" resultType="java.lang.Long">
+        SELECT USER_ID FROM user_role_relation WHERE ROLE_ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
+        )
     </select>
 </mapper>

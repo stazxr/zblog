@@ -161,7 +161,7 @@ export default {
       return this.checkPerm(value)
     },
     loadExecResultList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'LOG_EXEC_RESULT_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOG_EXEC_RESULT_CONFIG' }).then(res => {
         const { data } = res
         this.execResultList = data
       }).catch(_ => {
@@ -251,19 +251,6 @@ export default {
 </script>
 
 <style scoped>
-.my-table-expand {
-  font-size: 0;
-}
-.my-table-expand label {
-  width: 100px;
-  color: #99a9bf;
-}
-.my-table-expand .el-form-item {
-  padding-left: 10px;
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 50%;
-}
 .head-container .search-opts .el-date-editor {
   width: 175px !important;
 }

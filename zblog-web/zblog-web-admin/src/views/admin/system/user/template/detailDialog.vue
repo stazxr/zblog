@@ -13,10 +13,10 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="序列"> {{ dataInfo.id }} </el-descriptions-item>
+        <el-descriptions-item label="用户序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="用户名"> {{ dataInfo.username }} </el-descriptions-item>
-        <el-descriptions-item label="昵称"> {{ dataInfo.nickname }} </el-descriptions-item>
-        <el-descriptions-item label="邮箱"> {{ dataInfo.email }} </el-descriptions-item>
+        <el-descriptions-item label="用户昵称"> {{ dataInfo.nickname }} </el-descriptions-item>
+        <el-descriptions-item label="用户邮箱"> {{ dataInfo.email }} </el-descriptions-item>
         <!-- 2 -->
         <el-descriptions-item label="用户类型">
           <span v-if="dataInfo.userType === '0'">系统用户</span>

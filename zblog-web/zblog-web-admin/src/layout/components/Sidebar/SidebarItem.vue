@@ -1,19 +1,27 @@
 <template>
-  <!-- 如果菜单项的显示状态为 true，则加载菜单项 -->
   <div v-if="item.show" class="menu-wrapper">
-    <!-- 判断是否只有一个显示的子菜单，并且该菜单不强制显示子菜单，且当前菜单没有 alwaysShow 属性 -->
-    <template v-if="hasOneShowingChild(item.children, item) && (!onlyOneChild.children || onlyOneChild.noShowingChildren) && !(item.alwaysShow === true)">
-      <!-- 如果 onlyOneChild 存在 meta 信息，则显示该子菜单项 -->
-      <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
-        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
-          <!-- 使用 item 组件来显示子菜单的图标和标题 -->
-          <item :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)" :title="onlyOneChild.meta.title" />
+    <!-- 情况一：只有一个可见子节点 -->
+    <template
+      v-if="item['alwaysShow'] === false &&
+        oneChildInfo.hasOne &&
+        (!oneChildInfo.child.children || oneChildInfo.child.noShowingChildren)
+      "
+    >
+      <app-link v-if="oneChildInfo.child.meta" :to="resolvePath(oneChildInfo.child.path)">
+        <el-menu-item
+          :index="resolvePath(oneChildInfo.child.path)"
+          :class="{ 'submenu-title-noDropdown': !isNest }"
+        >
+          <item
+            :icon="oneChildInfo.child.meta.icon || (item.meta && item.meta.icon)"
+            :title="oneChildInfo.child.meta.title"
+          />
         </el-menu-item>
       </app-link>
     </template>
 
-    <!-- 如果上面的条件不成立，显示一个包含子菜单的菜单项 -->
-    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+    <!-- 情况二：多个子菜单 -->
+    <el-submenu v-else :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <!-- 显示菜单项的标题和图标 -->
         <item v-if="item.meta" :icon="item.meta.icon" :title="item.meta.title" />
@@ -56,43 +64,42 @@ export default {
       default: ''
     }
   },
-  data() {
-    // 用于存储唯一子菜单项的数据
-    this.onlyOneChild = null
-    return {}
+  computed: {
+    /**
+     * 计算唯一子节点信息
+     * 绝不修改 data，从而避免无限循环
+     */
+    oneChildInfo() {
+      const children = this.item.children || []
+      const showing = []
+      let theChild = null
+
+      for (let i = 0; i < children.length; i++) {
+        if (children[i].show) {
+          showing.push(children[i])
+          theChild = children[i]
+        }
+      }
+
+      if (showing.length === 1) {
+        return { hasOne: true, child: theChild }
+      }
+
+      if (showing.length === 0) {
+        // 没子节点，则使用父节点
+        const parentAsChild = {
+          ...this.item,
+          path: '',
+          noShowingChildren: true
+        }
+        return { hasOne: true, child: parentAsChild }
+      }
+
+      // 多个子节点
+      return { hasOne: false, child: null }
+    }
   },
   methods: {
-    /**
-     * 检查当前菜单项是否只有一个可见的子菜单，并更新 onlyOneChild。
-     * @param {Array} children - 当前菜单项的子菜单数组
-     * @param {Object} parent - 当前菜单项本身
-     * @returns {Boolean} - 是否只有一个可见的子菜单
-     */
-    hasOneShowingChild(children = [], parent) {
-      const showingChildren = children.filter(item => {
-        if (item.show) {
-          // 如果子菜单项可见，将其临时设置为 onlyOneChild
-          this.onlyOneChild = item
-          return true
-        } else {
-          return false
-        }
-      })
-
-      // 如果只有一个可见的子菜单，返回 true
-      if (showingChildren.length === 1) {
-        return true
-      }
-
-      // 如果没有可见的子菜单，将父菜单作为唯一子菜单
-      if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
-        return true
-      }
-
-      this.onlyOneChild = null
-      return false
-    },
     /**
      * 解析路由路径，处理外部链接和内部链接。
      * @param {String} routePath - 路由路径
@@ -108,7 +115,7 @@ export default {
         return this.basePath
       }
       // 否则，将基础路径和路由路径合并为一个完整路径
-      return path.resolve(this.basePath, routePath)
+      return path.resolve(this.basePath || '', routePath || '')
     }
   }
 }

@@ -2,57 +2,72 @@
 import Layout from '@/layout'
 import ParentView from '@/components/ParentView'
 
-export function filterAsyncRouter(routers, lastRouter = false, type = false) {
-  return routers.filter(router => {
-    if (type && router.children) {
-      router.children = filterChildren(router.children)
+export function filterAsyncRouter(routers, parent = null, useFilter = false) {
+  return routers.map(router => {
+    const _router = { ...router } // 避免污染原对象
+
+    /** 预处理 children（仅在 useFilter 时） */
+    if (useFilter && Array.isArray(_router.children)) {
+      _router.children = filterChildren(_router.children)
     }
 
-    // set component
-    if (router.component) {
-      if (router.component === 'Layout') {
-        router.component = Layout
-      } else if (router.component === 'ParentView') {
-        router.component = ParentView
-      } else {
-        router.component = loadView(router.component)
+    /** 设置 component */
+    if (_router.component) {
+      switch (_router.component) {
+        case 'Layout':
+          _router.component = Layout
+          break
+        case 'ParentView':
+          _router.component = ParentView
+          break
+        default:
+          _router.component = loadView(_router.component)
       }
     }
 
-    if (router.children != null && router.children && router.children.length) {
-      router.children = filterAsyncRouter(router.children, router, type)
+    /** 递归处理 children */
+    if (Array.isArray(_router.children) && _router.children.length > 0) {
+      _router.children = filterAsyncRouter(_router.children, _router, useFilter)
     } else {
-      delete router['children']
-      delete router['redirect']
+      delete _router.children
+      delete _router.redirect
     }
-    return true
+
+    return _router
   })
 }
 
-function filterChildren(childrenMap, lastRouter = false) {
-  let children = []
-  childrenMap.forEach((el, index) => {
-    if (el.children && el.children.length) {
-      if (el.component === 'ParentView') {
-        el.children.forEach(c => {
-          c.path = el.path + '/' + c.path
-          if (c.children && c.children.length) {
-            children = children.concat(filterChildren(c.children, c))
-            return
-          }
-          children.push(c)
-        })
-        return
-      }
+function filterChildren(childrenMap, parent = null) {
+  const result = []
+  childrenMap.forEach(child => {
+    const item = { ...child }
+
+    // 父级 path 合并
+    if (parent && parent.path && item.path) {
+      item.path = `${parent.path}/${item.path}`
     }
-    if (lastRouter) {
-      el.path = lastRouter.path + '/' + el.path
+
+    // 如果是 ParentView，则它的 children 挂到上层
+    if (item.component === 'ParentView' && Array.isArray(item.children)) {
+      item.children.forEach(grand => {
+        const grandCopy = { ...grand }
+        grandCopy.path = `${item.path}/${grandCopy.path}`
+        if (grandCopy.children) {
+          result.push(...filterChildren(grandCopy.children, grandCopy))
+        } else {
+          result.push(grandCopy)
+        }
+      })
+    } else {
+      result.push(item)
     }
-    children = children.concat(el)
   })
-  return children
+
+  // 返回结果
+  return result
 }
 
+/** 动态加载 view */
 function loadView(view) {
-  return (resolve) => require([`@/views/${view}`], resolve)
+  return resolve => require([`@/views/${view}`], resolve)
 }

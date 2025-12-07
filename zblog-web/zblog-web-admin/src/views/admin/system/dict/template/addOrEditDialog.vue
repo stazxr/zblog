@@ -112,7 +112,7 @@ export default {
     initData(type, pid, dataId) {
       if (dataId != null && dataId !== '') {
         this.$nextTick(() => {
-          this.getDictDetail(dataId)
+          this.queryDetail(dataId)
         })
       } else {
         this.formData.pid = pid
@@ -120,7 +120,7 @@ export default {
       }
       this.loadEnabledList()
     },
-    getDictDetail(dataId) {
+    queryDetail(dataId) {
       this.$mapi.dict.queryDictDetail({ dictId: dataId }).then(res => {
         const { data } = res
         Object.keys(this.formData).forEach(key => {
@@ -131,7 +131,7 @@ export default {
       })
     },
     loadEnabledList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
         const { data } = res
         this.enabledList = data
       }).catch(_ => {

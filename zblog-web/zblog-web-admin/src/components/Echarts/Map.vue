@@ -56,8 +56,7 @@ export default {
     initChartData() {
       this.$mapi.home.getHomePanelVisitorAreaCount().then(res => {
         this.initChart(res.data)
-      }).catch(e => {
-        console.log('init map chart eor', e)
+      }).catch(_ => {
         this.initChart([])
       })
     },

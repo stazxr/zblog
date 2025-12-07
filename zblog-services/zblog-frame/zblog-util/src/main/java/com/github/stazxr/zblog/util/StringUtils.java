@@ -67,7 +67,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static boolean hasBlank(String... ss) {
         for (String s : ss) {
-            if (isEmpty(s.trim())) {
+            if (isBlank(s)) {
                 return true;
             }
         }

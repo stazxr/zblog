@@ -7,7 +7,6 @@ import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
@@ -61,7 +60,7 @@ public class PermissionController {
     @GetMapping(value = "/queryPublicPermTree")
     @ApiOperation(value = "查询权限树列表（公共）")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询权限树列表（公共）", code = "PERMQ008", level = RouterLevel.PUBLIC)
+    @Router(name = "查询权限树列表（公共）", code = "PERMQ002", level = RouterLevel.PUBLIC)
     public List<PermissionVo> queryPublicPermTree(PermissionQueryDto queryDto) {
         return permissionService.queryPermTree(queryDto);
     }
@@ -72,57 +71,16 @@ public class PermissionController {
      * @param permId 权限id
      * @return PermissionVo
      */
+    @Log
     @GetMapping(value = "/queryPermDetail")
     @ApiOperation("查询权限详情")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "permId", value = "权限id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询权限详情", code = "PERMQ002")
+    @Router(name = "查询权限详情", code = "PERMQ003")
     public Result queryPermDetail(@RequestParam Long permId) {
         return Result.s(permissionService.queryPermDetail(permId));
-    }
-
-    /**
-     * 分页查询权限接口列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<InterfaceVo>
-     */
-    @GetMapping(value = "/pagePermInterfaces")
-    @ApiOperation(value = "分页查询权限接口列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询权限接口列表", code = "PERMQ003")
-    public Result pagePermInterfaces(PermissionQueryDto queryDto) {
-        return Result.success().data(permissionService.pagePermInterfaces(queryDto));
-    }
-
-    /**
-     * 分页查询权限角色列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
-     */
-    @GetMapping(value = "/pagePermRoles")
-    @ApiOperation(value = "分页查询权限角色列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询权限角色列表", code = "PERMQ004")
-    public Result pagePermRoles(PermissionQueryDto queryDto) {
-        return Result.s(permissionService.pagePermRoles(queryDto));
-    }
-
-    /**
-     * 分页查询权限日志列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
-     */
-    @GetMapping("/pagePermLogs")
-    @ApiOperation(value = "分页查询权限日志列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询权限日志列表", code = "PERMQ005")
-    public Result pagePermLogs(PermissionQueryDto queryDto) {
-        return Result.s(permissionService.pagePermLogs(queryDto));
     }
 
     /**
@@ -137,7 +95,7 @@ public class PermissionController {
         @ApiImplicitParam(name = "searchKey", value = "权限名称或权限编码", dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询权限编码列表", code = "PERMQ006", level = RouterLevel.PUBLIC)
+    @Router(name = "查询权限编码列表", code = "PERMQ004", level = RouterLevel.PUBLIC)
     public Result queryPermCodes(@RequestParam(required = false) String searchKey) {
         return Result.s(permissionService.queryPermCodes(searchKey));
     }
@@ -154,7 +112,7 @@ public class PermissionController {
         @ApiImplicitParam(name = "permCode", value = "权限编码", dataTypeClass = String.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
-    @Router(name = "根据权限编码查询资源信息", code = "PERMQ007", level = RouterLevel.PUBLIC)
+    @Router(name = "根据权限编码查询资源信息", code = "PERMQ005", level = RouterLevel.PUBLIC)
     public Result queryResourceByPermCode(@RequestParam String permCode) {
         return Result.s(permissionService.queryResourceByPermCode(permCode));
     }
@@ -202,19 +160,5 @@ public class PermissionController {
     @Router(name = "删除权限", code = "PERMD001")
     public void deletePerm(@RequestParam Long permId) {
         permissionService.deletePermission(permId);
-    }
-
-    /**
-     * 批量删除角色权限
-     *
-     * @param rolePermDto 角色 - 权限对应信息
-     */
-    @Log
-    @PostMapping(value = "/batchDeleteRolePerm")
-    @ApiOperation(value = "批量删除角色权限")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "批量删除角色权限", code = "batchDeleteRolePerm")
-    public void batchDeleteRolePerm(@RequestBody RolePermDto rolePermDto) {
-        permissionService.batchDeleteRolePerm(rolePermDto);
     }
 }

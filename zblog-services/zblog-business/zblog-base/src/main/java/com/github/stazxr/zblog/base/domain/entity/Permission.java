@@ -35,6 +35,7 @@ public class Permission extends BaseEntity {
      * 上级权限ID
      */
     @ApiModelProperty("权限pid")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long pid;
 
     /**
@@ -62,6 +63,7 @@ public class Permission extends BaseEntity {
      * @see com.github.stazxr.zblog.bas.router.Resource#getResourceCode() 系统会将路由配置转为资源信息
      */
     @ApiModelProperty("权限编码")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String permCode;
 
     /**

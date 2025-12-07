@@ -1,58 +1,102 @@
 <template>
-  <div>
-    <el-dialog
-      title="权限详情"
-      append-to-body
-      :visible.sync="dialogVisible"
-      :fullscreen="device === 'mobile'"
-      :destroy-on-close="true"
-      :close-on-click-modal="true"
-      :close-on-press-escape="true"
-      :before-close="handleClose"
-    >
-      <el-tabs v-model="activeName" type="border-card" style="max-height: 100%; overflow-y: auto;" @tab-click="initTabData">
-        <el-tab-pane label="详细信息" name="permDetail">
-          <perm-detail ref="permDetail" />
-        </el-tab-pane>
-        <el-tab-pane label="接口列表" name="permInterfaceList">
-          <perm-interface-list ref="permInterfaceList" />
-        </el-tab-pane>
-        <el-tab-pane label="角色列表" name="roleList">
-          <role-list ref="roleList" />
-        </el-tab-pane>
-        <el-tab-pane label="操作日志" name="logList">
-          <log-list ref="logList" />
-        </el-tab-pane>
-      </el-tabs>
-    </el-dialog>
-  </div>
+  <el-dialog
+    title="权限详情"
+    :visible.sync="dialogVisible"
+    :fullscreen="device === 'mobile'"
+    :destroy-on-close="true"
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
+    :before-close="handleClose"
+    append-to-body
+    width="600px"
+  >
+    <el-descriptions direction="vertical" :column="4" border>
+      <!-- 1 -->
+      <el-descriptions-item label="权限序列" :span="1"> {{ dataInfo.id }} </el-descriptions-item>
+      <el-descriptions-item label="权限名称" :span="1">
+        <span>
+          <svg-icon v-if="dataInfo.permType === '1' || dataInfo.permType === '2'" :icon-class="dataInfo.icon" />
+          {{ dataInfo.permName }}
+        </span>
+      </el-descriptions-item>
+      <el-descriptions-item label="权限标识" :span="1"> {{ dataInfo.permCode }} </el-descriptions-item>
+      <el-descriptions-item label="权限状态" :span="1">
+        <el-tag v-if="dataInfo.enabled === 'true'">启用</el-tag>
+        <el-tag v-else-if="dataInfo.enabled === 'false'" type="warning">禁用</el-tag>
+        <span v-else> - </span>
+      </el-descriptions-item>
+      <!-- 2 -->
+      <el-descriptions-item label="权限类型" :span="1">
+        <el-tag v-if="dataInfo.permType === '1'">目录</el-tag>
+        <el-tag v-else-if="dataInfo.permType === '2'" type="success">菜单</el-tag>
+        <el-tag v-else-if="dataInfo.permType === '3'" type="info">按钮</el-tag>
+        <el-tag v-else-if="dataInfo.permType === '4'" type="warning">外链</el-tag>
+        <span v-else> {{ dataInfo.permType }} </span>
+      </el-descriptions-item>
+      <el-descriptions-item label="访问级别" :span="1">
+        <el-tag v-if="dataInfo.permLevel === '1'" type="warning">公开</el-tag>
+        <el-tag v-else-if="dataInfo.permLevel === '2'" type="success">认证</el-tag>
+        <el-tag v-else-if="dataInfo.permLevel === '4'">授权</el-tag>
+        <span v-else> {{ dataInfo.permLevel }} </span>
+      </el-descriptions-item>
+      <el-descriptions-item label="是否隐藏" :span="1">
+        <el-tag v-if="dataInfo.hidden === 'true'" type="info">是</el-tag>
+        <el-tag v-else-if="dataInfo.hidden === 'false'" type="info">否</el-tag>
+        <span v-else> - </span>
+      </el-descriptions-item>
+      <el-descriptions-item label="是否缓存" :span="1">
+        <el-tag v-if="dataInfo.cacheable === 'true'" type="info">是</el-tag>
+        <el-tag v-else-if="dataInfo.cacheable === 'false'" type="info">否</el-tag>
+        <span v-else> - </span>
+      </el-descriptions-item>
+      <!-- 3 -->
+      <el-descriptions-item label="路由地址" :span="4"> {{ dataInfo.routerPath }} </el-descriptions-item>
+      <!-- 4 -->
+      <el-descriptions-item label="组件名称" :span="2"> {{ dataInfo.componentName }} </el-descriptions-item>
+      <el-descriptions-item label="组件路径" :span="2"> {{ dataInfo.componentPath }} </el-descriptions-item>
+      <!-- 5 -->
+      <el-descriptions-item label="角色" :span="4">
+        {{ dataInfo.roleCodeList ? dataInfo.roleCodeList : '-' }}
+      </el-descriptions-item>
+      <!-- 6 -->
+      <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
+      <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
+      <!-- 7 -->
+      <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUsername }} </el-descriptions-item>
+      <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
+    </el-descriptions>
+  </el-dialog>
 </template>
 
 <script>
-import PermDetail from '@/views/admin/system/perm/template/detail/PermDetail'
-import PermInterfaceList from '@/views/admin/system/perm/template/detail/InterfaceList'
-import RoleList from '@/views/admin/system/perm/template/detail/RoleList'
-import LogList from '@/views/admin/system/perm/template/detail/LogList'
 export default {
-  components: {
-    PermDetail,
-    PermInterfaceList,
-    RoleList,
-    LogList
-  },
   props: {
     dialogVisible: {
       type: Boolean,
       default: false
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
-      activeName: 'permDetail'
+      dataInfo: {
+        id: null,
+        permName: null,
+        icon: null,
+        permType: null,
+        permLevel: null,
+        enabled: null,
+        hidden: null,
+        cacheable: null,
+        permCode: null,
+        routerPath: null,
+        componentName: null,
+        componentPath: null,
+        createUsername: null,
+        createTime: null,
+        updateUsername: null,
+        updateTime: null,
+        roleCodeList: null
+      }
     }
   },
   computed: {
@@ -60,51 +104,30 @@ export default {
       return this.$store.state.app.device
     }
   },
-  watch: {
-    dataId() {
-      this.activeName = 'permDetail'
-    }
-  },
   methods: {
-    initTabData(tab) {
-      this.initData(tab.name)
+    initData(dataId) {
+      this.$nextTick(() => {
+        this.queryDetail(dataId)
+      })
     },
-    initData(name) {
-      name = name == null || name === '' ? this.activeName : name
-      switch (name) {
-        case 'permDetail':
-          this.$nextTick(() => {
-            this.$refs['permDetail'].initData(this.dataId)
-          })
-          break
-        case 'permInterfaceList':
-          this.$nextTick(() => {
-            this.$refs['permInterfaceList'].initData(this.dataId)
-          })
-          break
-        case 'roleList':
-          this.$nextTick(() => {
-            this.$refs['roleList'].initData(this.dataId)
-          })
-          break
-        case 'logList':
-          this.$nextTick(() => {
-            this.$refs['logList'].initData(this.dataId)
-          })
-          break
-        default:
-          console.log('error tab name', name)
-      }
-    },
-    doClose() {
-      console.log('333333')
-      this.$emit('showDetailDone')
+    queryDetail(dataId) {
+      this.$mapi.perm.queryPermDetail({ permId: dataId }).then(res => {
+        const { data } = res
+        Object.keys(this.dataInfo).forEach(key => {
+          this.dataInfo[key] = data[key] == null || data[key] === '' ? '-' : data[key].toString()
+        })
+      }).catch(_ => {
+        setTimeout(() => { this.doClose() }, 500)
+      })
     },
     handleClose() {
-      this.$confirm('确认关闭？').then(_ => {
-        console.log('222222222')
-        this.doClose()
-      }).catch(_ => {})
+      this.doClose()
+    },
+    doClose() {
+      Object.keys(this.dataInfo).forEach(key => {
+        this.dataInfo[key] = null
+      })
+      this.$emit('showDetailDone')
     }
   }
 }

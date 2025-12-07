@@ -219,10 +219,10 @@ export default {
           // 新增或编辑组
           this.listTableData()
         } else {
-          // 新增或编辑项
-          const curPid = this.row.pid
-          if (curPid && this.maps.get(curPid)) {
-            const { tree, treeNode, resolve } = this.maps.get(curPid)
+          // 新增或编辑项，只有选中组的场景下才可以新增或编辑组
+          const curId = this.row.id
+          if (curId && this.maps.get(curId)) {
+            const { tree, treeNode, resolve } = this.maps.get(curId)
             this.queryChildList(tree, treeNode, resolve)
           } else {
             this.listTableData()

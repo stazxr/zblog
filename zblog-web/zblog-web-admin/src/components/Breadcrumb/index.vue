@@ -35,9 +35,7 @@ export default {
   methods: {
     // 获取与当前路由匹配的面包屑数据
     getBreadcrumb() {
-      console.log('this.$route', this.$route)
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
-      console.log('matched', matched)
       const first = matched[0]
 
       if (!this.isDashboard(first)) {
@@ -58,7 +56,6 @@ export default {
     },
     // 点击面包屑项时的处理方法
     handleLink(item) {
-      console.log('items', item)
       const { redirect, path } = item
       if (redirect) {
         // 如果有 redirect 属性，跳转到指定的路径

@@ -13,15 +13,13 @@
             />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-enabled">
-            <el-select id="search-enabled" v-model="filters.enabled" placeholder="权限状态" clearable>
-              <el-option label="启用" :value="true" />
-              <el-option label="禁用" :value="false" />
+            <el-select id="search-enabled" v-model="filters.enabled" placeholder="权限状态" clearable @change="search">
+              <el-option v-for="item in enabledList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-onlyShowMenu">
-            <el-select id="search-onlyShowMenu" v-model="filters.onlyShowMenu" placeholder="是否只显示菜单" clearable>
-              <el-option label="是" :value="true" />
-              <el-option label="否" :value="false" />
+            <el-select id="search-onlyShowMenu" v-model="filters.onlyShowMenu" placeholder="是否只显示菜单" clearable @change="search">
+              <el-option v-for="item in isOnlyShowMenuList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
@@ -33,9 +31,9 @@
       <div class="crud-opts">
         <span class="crud-opts-left">
           <el-button v-perm="['PERMA001']" type="success" @click="addPerm">新增</el-button>
-          <el-button v-perm="['PERMQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['PERMQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
           <el-button v-perm="['PERMU001']" :disabled="row === null" type="primary" @click="editPerm">编辑</el-button>
-          <el-button v-perm="['PERMD001']" :disabled="row === null" type="danger" @click="deletePerm">删除</el-button>
+          <el-button v-perm="['PERMD001']" :disabled="row === null || (row.children && row.children.length > 0)" type="danger" @click="deletePerm">删除</el-button>
         </span>
       </div>
     </div>
@@ -51,19 +49,26 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" label="菜单标题" width="200px" prop="permName">
+        <el-table-column :show-overflow-tooltip="true" label="菜单标题" width="180px" prop="permName">
           <template v-slot="scope">
             <span>
-              <svg-icon :icon-class="scope.row.icon ? scope.row.icon : ''" />
+              <svg-icon v-if="scope.row.icon != null" :icon-class="scope.row.icon ? scope.row.icon : ''" />
               {{ scope.row['permName'] }}
             </span>
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" width="100px" prop="routerPath" label="组件路径" />
-        <el-table-column :show-overflow-tooltip="true" width="150px" prop="permCode" label="权限编码" />
+        <el-table-column :show-overflow-tooltip="true" width="100px" prop="permCode" label="权限编码" />
         <el-table-column :show-overflow-tooltip="true" prop="routerPath" label="路由地址" />
         <el-table-column :show-overflow-tooltip="true" prop="componentName" label="组件名称" />
-        <el-table-column :show-overflow-tooltip="true" width="250px" prop="componentPath" label="组件路径" />
+        <el-table-column :show-overflow-tooltip="true" prop="componentPath" label="组件路径" />
+        <el-table-column prop="hidden" label="是否显示" align="center" width="80px">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row['hidden'] === true" type="info">否</el-tag>
+            <el-tag v-else-if="scope.row['hidden'] === false" type="info">是</el-tag>
+            <span v-else />
+          </template>
+        </el-table-column>
         <el-table-column prop="cacheable" label="是否缓存" align="center" width="80px">
           <template v-slot="scope">
             <el-tag v-if="scope.row['cacheable'] === true" type="info">是</el-tag>
@@ -109,7 +114,6 @@
     <detailDialog
       ref="detailDialogRef"
       :dialog-visible="detailDialogVisible"
-      :data-id="row && row.id"
       @showDetailDone="showDetailDone"
     />
     <!-- 新增 / 编辑 -->
@@ -117,7 +121,6 @@
       ref="addOrEditDialogRef"
       :dialog-visible="addOrEditDialogVisible"
       :dialog-title="addOrEditDialogTitle"
-      :data-id="dataId"
       @addOrEditDone="addOrEditDone"
     />
   </div>
@@ -140,6 +143,8 @@ export default {
         enabled: null,
         onlyShowMenu: null
       },
+      enabledList: [],
+      isOnlyShowMenuList: [],
       tableData: [],
       tableProps: {
         children: 'children',
@@ -150,16 +155,33 @@ export default {
       row: null,
       detailDialogVisible: false,
       addOrEditDialogTitle: null,
-      addOrEditDialogVisible: false,
-      dataId: null
+      addOrEditDialogVisible: false
     }
   },
   mounted() {
+    this.loadEnabledList()
+    this.loadIsOnlyShowMenuList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
+    },
+    loadEnabledList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+        const { data } = res
+        this.enabledList = data
+      }).catch(_ => {
+        this.enabledList = []
+      })
+    },
+    loadIsOnlyShowMenuList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'IS_ONLY_SHOW_MENU_CONFIG' }).then(res => {
+        const { data } = res
+        this.isOnlyShowMenuList = data
+      }).catch(_ => {
+        this.isOnlyShowMenuList = []
+      })
     },
     // 查询
     search() {
@@ -185,31 +207,29 @@ export default {
     // 详情
     showDetail() {
       if (this.row === null) {
-        this.$message.error('请选择要查看的权限')
+        this.$message.error('请选择要查看的权限数据')
         return
       }
       this.detailDialogVisible = true
-      this.$refs.detailDialogRef.initData()
+      this.$refs.detailDialogRef.initData(this.row.id)
     },
     showDetailDone() {
       this.detailDialogVisible = false
     },
     // 新增与编辑
     addPerm() {
-      this.dataId = null
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '新增权限'
       this.$refs.addOrEditDialogRef.initData()
     },
     editPerm() {
       if (this.row === null) {
-        this.$message.error('请选择要编辑的权限')
+        this.$message.error('请选择要编辑的权限数据')
         return
       }
-      this.dataId = this.row.id
       this.addOrEditDialogVisible = true
       this.addOrEditDialogTitle = '编辑权限'
-      this.$refs.addOrEditDialogRef.initData()
+      this.$refs.addOrEditDialogRef.initData(this.row.id)
     },
     addOrEditDone(result = false) {
       this.addOrEditDialogTitle = null
@@ -221,7 +241,7 @@ export default {
     // 删除
     deletePerm() {
       if (this.row === null) {
-        this.$message.error('请选择要删除的权限')
+        this.$message.error('请选择要删除的权限数据')
         return
       }
       this.$confirm('此操作将永久删除选中权限, 是否继续?', '提示', {

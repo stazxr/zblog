@@ -13,7 +13,7 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="序列"> {{ dataInfo.id }} </el-descriptions-item>
+        <el-descriptions-item label="字典序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="字典类型">
           <span v-if="dataInfo.dictType === '1'">组</span>
           <span v-else-if="dataInfo.dictType === '2'">项</span>
@@ -53,18 +53,18 @@ export default {
   data() {
     return {
       dataInfo: {
-        id: '',
-        dictType: '',
-        dictName: '',
-        dictKey: '',
-        dictValue: '',
-        dictDesc: '',
-        locked: '',
-        enabled: '',
-        createUsername: '',
-        createTime: '',
-        updateUsername: '',
-        updateTime: ''
+        id: null,
+        dictType: null,
+        dictName: null,
+        dictKey: null,
+        dictValue: null,
+        dictDesc: null,
+        locked: null,
+        enabled: null,
+        createUsername: null,
+        createTime: null,
+        updateUsername: null,
+        updateTime: null
       }
     }
   },
@@ -89,14 +89,14 @@ export default {
         setTimeout(() => { this.doClose() }, 500)
       })
     },
-    doClose() {
-      Object.keys(this.dataInfo).forEach(key => {
-        this.dataInfo[key] = ''
-      })
-      this.$emit('showDetailDone')
-    },
     handleClose() {
       this.doClose()
+    },
+    doClose() {
+      Object.keys(this.dataInfo).forEach(key => {
+        this.dataInfo[key] = null
+      })
+      this.$emit('showDetailDone')
     }
   }
 }

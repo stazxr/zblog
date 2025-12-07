@@ -48,7 +48,7 @@ public class MenuServiceImpl implements MenuService {
             permList = menuMapper.selectMenuByUserId(loginUser.getId());
         }
 
-        // 构建权限树
+        // 根据 ID, PID 构建权限树
         List<Permission> permTreeList = buildPermTree(permList);
 
         // 讲权限树转为菜单列表
@@ -67,7 +67,7 @@ public class MenuServiceImpl implements MenuService {
     private List<Permission> buildPermTree(List<Permission> permList) {
         // 按 PID 对权限进行分组
         Map<Long, List<Permission>> permPidGroupMap = permList.stream().collect(
-                Collectors.groupingBy(p -> p.getPid() == null ? Constants.TOP_PERM_ID : p.getPid())
+            Collectors.groupingBy(p -> p.getPid() == null ? Constants.TOP_PERM_ID : p.getPid())
         );
 
         // 获取根节点
@@ -118,9 +118,9 @@ public class MenuServiceImpl implements MenuService {
             // 获取子节点权限，如果存在子节点，则递归处理
             List<Permission> childrenList = perm.getChildren();
             if (CollectionUtils.isEmpty(childrenList)) {
-                addSubMenuForTopLevelMenu(menuVo, perm);;
+                menuVo.setAlwaysShow(false); // 上层目录不展示
+                addSubMenuForTopLevelMenu(menuVo, perm);
             } else {
-                menuVo.setAlwaysShow(true);
                 menuVo.setChildren(parsePermToMenu(childrenList));
             }
 
@@ -159,6 +159,10 @@ public class MenuServiceImpl implements MenuService {
 
         // 设置菜单是否显示
         menuVo.setShow(!perm.getHidden());
+        SecurityUser loginUser = SecurityUtils.getLoginUser();
+        if (UserType.ADMIN_USER.getType().equals(loginUser.getUserType())) {
+            menuVo.setShow(true);
+        }
 
         // 设置菜单组件
         menuVo.setComponent(determineComponentForMenu(perm));
@@ -197,33 +201,38 @@ public class MenuServiceImpl implements MenuService {
      * @param perm 权限对象
      */
     private void addSubMenuForTopLevelMenu(MenuVo menuVo, Permission perm) {
-        if (perm.getPid() == null) {
-            if (PermissionType.DIR.getType().equals(perm.getPermType())) {
-                // 目录
-                menuVo.setShow(false);
-            } else {
-                MenuVo subMenuVo = new MenuVo();
-                if (PermissionType.LINK.getType().equals(perm.getPermType())) {
-                    // 外链
-                    subMenuVo.setPath(perm.getRouterPath());
-                } else {
-                    // 菜单
-                    subMenuVo.setPath("index");
-                    subMenuVo.setName(menuVo.getName());
-                    subMenuVo.setComponent(menuVo.getComponent());
-                }
-
-                subMenuVo.setMeta(menuVo.getMeta());
-                menuVo.setName(null);
-                menuVo.setMeta(null);
-                menuVo.setShow(true);
-                menuVo.setComponent("Layout");
-
-                // 构建新的菜单对象
-                List<MenuVo> subMenus = new ArrayList<>();
-                subMenus.add(subMenuVo);
-                menuVo.setChildren(subMenus);
+        if (PermissionType.DIR.getType().equals(perm.getPermType())) {
+            // 目录
+            menuVo.setShow(false);
+        } else {
+            if (perm.getPid() != null) {
+                return;
             }
+
+            MenuVo subMenuVo = new MenuVo();
+            MenuMetaVo metaVo = menuVo.getMeta();
+            if (PermissionType.LINK.getType().equals(perm.getPermType())) {
+                // 外链
+                subMenuVo.setPath(perm.getRouterPath());
+            } else {
+                // 菜单
+                subMenuVo.setPath("index");
+                subMenuVo.setName(menuVo.getName());
+                subMenuVo.setComponent(perm.getComponentPath());
+            }
+
+            // 设置其他信息
+            menuVo.setComponent("Layout");
+            menuVo.setShow(true);
+            subMenuVo.setShow(true);
+            menuVo.setName(null);
+            menuVo.setMeta(null);
+            subMenuVo.setMeta(metaVo);
+
+            // 构建新的菜单对象
+            List<MenuVo> subMenus = new ArrayList<>();
+            subMenus.add(subMenuVo);
+            menuVo.setChildren(subMenus);
         }
     }
 

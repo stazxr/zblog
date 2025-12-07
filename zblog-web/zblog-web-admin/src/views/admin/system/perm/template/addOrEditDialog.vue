@@ -1,12 +1,13 @@
 <template>
   <div>
     <el-dialog
-      append-to-body
       :title="dialogTitle"
       :visible.sync="dialogVisible"
       :fullscreen="isMobile"
       :close-on-click-modal="false"
+      :close-on-press-escape="true"
       :before-close="handleClose"
+      append-to-body
       width="580px"
     >
       <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
@@ -56,7 +57,6 @@
             :title="formData.permCode"
             filterable
             clearable
-            :disabled="formData.iFrame != null && formData.iFrame.toString() === 'true'"
             :style="isMobile ? '' : 'width: 178px;'"
             placeholder="权限编码"
             @change="permCodeChangeEvent"
@@ -170,10 +170,6 @@ export default {
     dialogTitle: {
       type: String,
       default: ''
-    },
-    dataId: {
-      type: String,
-      default: ''
     }
   },
   data() {
@@ -262,12 +258,12 @@ export default {
     }
   },
   methods: {
-    initData() {
+    initData(dataId) {
       this.getMenus()
       this.getPermCodes()
       this.$nextTick(() => {
-        if (this.dataId != null) {
-          this.getPermInfo()
+        if (dataId != null && dataId !== '') {
+          this.queryDetail(dataId)
         } else {
           this.permTypeChangeEvent(this.formData.permType)
         }
@@ -295,8 +291,8 @@ export default {
         this.permCodes = []
       })
     },
-    getPermInfo() {
-      this.$mapi.perm.queryPermDetail({ permId: this.dataId }).then(res => {
+    queryDetail(dataId) {
+      this.$mapi.perm.queryPermDetail({ permId: dataId }).then(res => {
         const { data } = res
         Object.keys(this.formData).forEach(key => {
           this.formData[key] = data[key]
@@ -308,7 +304,7 @@ export default {
         this.permTypeChangeEvent(this.formData.permType)
         this.oldPermCode = this.formData.permCode
       }).catch(_ => {
-        this.doClose()
+        setTimeout(() => { this.doClose() }, 500)
       })
     },
     permTypeChangeEvent(permType) {

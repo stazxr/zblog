@@ -45,4 +45,9 @@ public class MenuMetaVo implements Serializable {
      * 是否展示面包屑
      */
     private Boolean breadcrumb;
+
+    /**
+     * 是否固定在标签栏，默认 false
+     */
+    private Boolean affix;
 }

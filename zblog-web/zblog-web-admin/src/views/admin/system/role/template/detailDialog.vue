@@ -78,14 +78,14 @@ export default {
         this.doClose()
       })
     },
+    handleClose() {
+      this.doClose()
+    },
     doClose() {
       Object.keys(this.dataInfo).forEach(key => {
         this.dataInfo[key] = ''
       })
       this.$emit('showDetailDone')
-    },
-    handleClose() {
-      this.doClose()
     }
   }
 }

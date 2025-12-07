@@ -1,17 +1,13 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.vo.*;
-import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 权限服务层
@@ -37,30 +33,6 @@ public interface PermissionService extends IService<Permission> {
     PermissionVo queryPermDetail(Long permId);
 
     /**
-     * 分页查询权限接口列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<InterfaceVo>
-     */
-    PageInfo<InterfaceVo> pagePermInterfaces(PermissionQueryDto queryDto);
-
-    /**
-     * 分页查询权限角色列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
-     */
-    PageInfo<RoleVo> pagePermRoles(PermissionQueryDto queryDto);
-
-    /**
-     * 分页查询权限日志列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
-     */
-    PageInfo<LogVo> pagePermLogs(PermissionQueryDto queryDto);
-
-    /**
      * 查询权限编码列表
      *
      * @param searchKey 查询条件
@@ -75,7 +47,6 @@ public interface PermissionService extends IService<Permission> {
      * @return Resource
      */
     Resource queryResourceByPermCode(String permCode);
-
 
     /**
      * 新增权限
@@ -97,11 +68,4 @@ public interface PermissionService extends IService<Permission> {
      * @param permId 权限序列
      */
     void deletePermission(Long permId);
-
-    /**
-     * 批量删除角色权限
-     *
-     * @param rolePermDto 角色 - 权限对应信息
-     */
-    void batchDeleteRolePerm(RolePermDto rolePermDto);
 }

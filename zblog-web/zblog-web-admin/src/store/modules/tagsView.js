@@ -8,13 +8,12 @@ const mutations = {
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.push(
       Object.assign({}, view, {
-        title: view.meta.title || 'no-name'
+        title: view.meta.title || '未定义'
       })
     )
   },
   ADD_CACHED_VIEW: (state, view) => {
-    if (state.cachedViews.includes(view.name)) return
-    if (view.meta.cache) {
+    if (!state.cachedViews.includes(view.name) && view.meta.cache) {
       state.cachedViews.push(view.name)
     }
   },

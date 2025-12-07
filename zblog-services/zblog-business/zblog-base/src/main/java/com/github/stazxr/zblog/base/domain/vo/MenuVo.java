@@ -34,7 +34,7 @@ public class MenuVo implements Serializable {
     private Boolean show;
 
     /**
-     * 是否一定展示
+     * 当目录下只有一个子菜单时，是否强制显示目录
      */
     private Boolean alwaysShow;
 

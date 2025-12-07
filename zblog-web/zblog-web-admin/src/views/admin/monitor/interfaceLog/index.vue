@@ -161,7 +161,7 @@ export default {
       return this.checkPerm(value)
     },
     loadExecResultList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'LOG_EXEC_RESULT_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOG_EXEC_RESULT_CONFIG' }).then(res => {
         const { data } = res
         this.execResultList = data
       }).catch(_ => {

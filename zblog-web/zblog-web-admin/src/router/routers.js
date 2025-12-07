@@ -36,50 +36,27 @@ export const defaultRouterMap = [
     ]
   },
   {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    show: true,
+    alwaysShow: false,
+    children: [
+      {
+        show: true,
+        path: 'dashboard',
+        component: (resolve) => require(['@/views/admin/home'], resolve),
+        name: 'Dashboard',
+        meta: { title: '首页', icon: 'icon-home', affix: true, cache: false, breadcrumb: true }
+      }
+    ]
+  },
+
+  {
     path: '/forceUpdatePass',
     component: (resolve) => require(['@/views/features/forceUpdatePass'], resolve),
     meta: { title: '修改密码', cache: false },
     show: false
-  },
-  /* {
-    path: '/first1',
-    component: Layout,
-    show: true,
-    alwaysShow: true,
-    redirect: 'noredirect',
-    meta: { title: '一级目录1', cache: false },
-    children: [
-      {
-        path: 'second1',
-        component: ParentView,
-        show: true,
-        alwaysShow: true,
-        redirect: 'noredirect',
-        meta: { title: '二级目录1', cache: false },
-        children: [
-          {
-            path: 'user1',
-            component: (resolve) => require(['@/views/admin/system/user'], resolve),
-            show: true,
-            name: 'User',
-            meta: { title: '用户管理2', icon: 'icon-user', hideTag: true, affix: true, cache: false }
-          }
-        ]
-      }
-    ]
-  }, */
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [
-      {
-        path: 'dashboard',
-        component: (resolve) => require(['@/views/admin/home'], resolve),
-        name: 'Dashboard',
-        meta: { title: '首页', icon: 'home', affix: true, cache: false }
-      }
-    ]
   },
   {
     path: '/user',
@@ -130,8 +107,6 @@ export default new VueRouter({
   mode: 'hash', // "hash" | "history" | "abstract"
   routes: defaultRouterMap,
   scrollBehavior(to, from, savedPosition) {
-    console.log('from', from)
-    console.log('to', to)
     if (savedPosition && to.meta.keepAlive) {
       return savedPosition
     } else {

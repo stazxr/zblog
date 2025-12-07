@@ -101,4 +101,9 @@ public class PermissionVo extends BaseVo {
      * 子节点列表，非懒加载用
      */
     private List<PermissionVo> children;
+
+    /**
+     * 角色编码列表
+     */
+    private List<String> roleCodeList;
 }

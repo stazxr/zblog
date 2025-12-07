@@ -3,9 +3,6 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheService;
@@ -14,14 +11,12 @@ import com.github.stazxr.zblog.bas.validation.AssertException;
 import com.github.stazxr.zblog.base.converter.PermissionConverter;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
 import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -93,58 +88,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
      */
     @Override
     public PermissionVo queryPermDetail(Long permId) {
+        // 查询权限信息
         Assert.notNull(permId, ExpMessageCode.of("valid.perm.id.NotNull"));
         PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
         Assert.notNull(permissionVo, ExpMessageCode.of("valid.perm.not.exist"));
+        // 查询角色编码列表
+        permissionVo.setRoleCodeList(permissionMapper.selectRoleCodesByPermId(permId));
         return permissionVo;
-    }
-
-    /**
-     * 分页查询权限接口列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<InterfaceVo>
-     */
-    @Override
-    public PageInfo<InterfaceVo> pagePermInterfaces(PermissionQueryDto queryDto) {
-        queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
-        try (Page<InterfaceVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<InterfaceVo> dataList = permissionMapper.selectPermInterfaces(queryDto.getPermId());
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
-    }
-
-    /**
-     * 分页查询权限角色列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
-     */
-    @Override
-    public PageInfo<RoleVo> pagePermRoles(PermissionQueryDto queryDto) {
-        queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
-        try (Page<RoleVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<RoleVo> dataList = permissionMapper.selectPermRoles(queryDto.getPermId(), queryDto.getBlurry());
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
-    }
-
-    /**
-     * 分页查询权限日志列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
-     */
-    @Override
-    public PageInfo<LogVo> pagePermLogs(PermissionQueryDto queryDto) {
-        queryDto.checkPage();
-        Assert.notNull(queryDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
-        try (Page<LogVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<LogVo> dataList = permissionMapper.selectPermLogs(queryDto.getPermId(), queryDto.getBlurry());
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
     }
 
     /**
@@ -185,7 +135,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 新增权限
         Assert.isTrue(permissionMapper.insert(permission) != 1, ExpMessageCode.of("result.perm.add.failed"));
         // 删除相关缓存
-        removeCache(permission);
+        if (StringUtils.isNotBlank(permission.getPermCode())) {
+            removeCache(permission.getId(), null, permission.getPermCode());
+        }
     }
 
     /**
@@ -208,7 +160,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 编辑权限
         Assert.isTrue(permissionMapper.updateById(permission) != 1, ExpMessageCode.of("result.perm.edit.failed"));
         // 删除相关缓存
-        removeCache(permission);
+        if (!StringUtils.hasBlank(dbPermission.getPermCode(), permission.getPermCode())) {
+            removeCache(permission.getId(), dbPermission.getPermCode(), permission.getPermCode());
+        }
     }
 
     /**
@@ -222,7 +176,6 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 判断权限是否存在
         Permission dbPermission = permissionMapper.selectById(permId);
         Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
-
         // 判断是否存在子节点
         Integer permType = dbPermission.getPermType();
         boolean dirOrMenu = PermissionType.DIR.getType().equals(permType) ||
@@ -231,30 +184,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
             Assert.isTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.hasChild"));
         }
-
         // 删除权限
         Assert.isTrue(permissionMapper.deleteById(permId) != 1, ExpMessageCode.of("result.perm.delete.failed"));
         rolePermMapper.deleteByPermId(permId);
-
         // 删除相关缓存
-        removeCache(dbPermission);
-    }
-
-    /**
-     * 批量删除角色权限
-     *
-     * @param rolePermDto 角色 - 权限对应信息
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void batchDeleteRolePerm(RolePermDto rolePermDto) {
-        Assert.notNull(rolePermDto.getPermId(), ExpMessageCode.of("valid.perm.id.NotNull"));
-        Set<Long> roleIds = rolePermDto.getRoleIds();
-        if (roleIds == null || roleIds.size() == 0) {
-            return;
+        if (StringUtils.isNotBlank(dbPermission.getPermCode())) {
+            removeCache(dbPermission.getId(), dbPermission.getPermCode(), null);
         }
-
-        rolePermMapper.batchDeleteRolePerm(rolePermDto);
     }
 
     private List<PermissionVo> putTopPerm(List<PermissionVo> permissionVos) {
@@ -287,33 +223,27 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setCacheable(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
-
             // 参数校验
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            // TODO 待确认<路由地址正则是否优化，支持参数传递> 20250910
             Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
             Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
             Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
-
             // 上级信息校验，要求上级只能是目录
             Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parentError"));
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
             // 菜单
             permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
-
             // 参数校验
             Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
             Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.NotNull"));
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            // TODO 待确认<路由地址正则是否优化，支持参数传递> 20250910
             Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
             Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
             if (permission.getPermCode() != null) {
                 Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
             }
-            // TODO 待确认<组件名称能否重复> 20250905
             Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.NotBlank"));
             Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.NotBlank"));
 
@@ -325,13 +255,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setCacheable(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
-
             // 参数校验
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.NotBlank"));
             Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.patternError"));
             Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
-
             // 上级信息校验，要求上级只能是目录
             Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parentError"));
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
@@ -342,11 +270,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setRouterPath(null);
             permission.setComponentName(null);
             permission.setComponentPath(null);
-
             // 参数校验，权限编码校验，权限编码不能重复
             Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.NotBlank"));
             Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
-
             // 上级信息校验，要求上级只能是菜单或目录或空
             boolean dirOrMenu = PermissionType.DIR.getType().equals(parentType) ||
                     PermissionType.MENU.getType().equals(parentType);
@@ -400,19 +326,26 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
     }
 
-    private void removeCache(Permission permission) {
+    private void removeCache(Long permId, String oldPermCode, String newPermCode) {
         try {
-            // TODO 清除缓存逻辑待适配 20250911
-            SecurityUserCache.clean();
-            /* if (permission != null && StringUtils.isNotBlank(permission.getPermCode())) {
-                List<InterfaceVo> interfaces = permissionMapper.selectPermInterfaces(permission.getId());
-                if (!interfaces.isEmpty()) {
-                    interfaces.forEach(interfaceVo -> {
-                        String cacheKey = interfaceVo.getUri() + ":" + interfaceVo.getMethod();
-                        resourceCacheService.clearCache(cacheKey);
-                    });
+            // 清除用户缓存的权限信息
+            List<Long> userIds = permissionMapper.selectUserIdsByPermId(permId);
+            userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
+            // 清除资源缓存信息
+            if (StringUtils.isNotBlank(oldPermCode)) {
+                Resource resource = permissionMapper.selectResourceByPermCode(oldPermCode);
+                if (resource != null) {
+                    String cacheKey = resource.getResourceUri() + ":" + resource.getResourceMethod();
+                    resourceCacheService.clearCache(cacheKey);
                 }
-            } */
+            }
+            if (StringUtils.isNotBlank(newPermCode)) {
+                Resource resource = permissionMapper.selectResourceByPermCode(newPermCode);
+                if (resource != null) {
+                    String cacheKey = resource.getResourceUri() + ":" + resource.getResourceMethod();
+                    resourceCacheService.clearCache(cacheKey);
+                }
+            }
         } catch (Exception e) {
             log.error("remove cache failed", e);
         }

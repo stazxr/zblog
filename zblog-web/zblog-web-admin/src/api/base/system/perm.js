@@ -12,18 +12,6 @@ export default {
   queryPermDetail: params => {
     return api.httpRequest().get(`${permApi}/queryPermDetail`, params)
   },
-  // 分页查询权限接口列表
-  pagePermInterfaces: params => {
-    return api.httpRequest().get(`${permApi}/pagePermInterfaces`, params)
-  },
-  // 分页查询权限角色列表
-  pagePermRoles: params => {
-    return api.httpRequest().get(`${permApi}/pagePermRoles`, params)
-  },
-  // 分页查询权限日志列表
-  pagePermLogs: params => {
-    return api.httpRequest().get(`${permApi}/pagePermLogs`, params)
-  },
   // 查询权限编码列表
   queryPermCodes: params => {
     return api.httpRequest().get(`${permApi}/queryPermCodes`, params)
@@ -45,9 +33,5 @@ export default {
     return api.httpRequest().post(`${permApi}/deletePerm`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
-  },
-  // 删除权限 - 角色关系数据
-  batchDeleteRolePerm: params => {
-    return api.httpRequest().post(`${permApi}/batchDeleteRolePerm`, params)
   }
 }

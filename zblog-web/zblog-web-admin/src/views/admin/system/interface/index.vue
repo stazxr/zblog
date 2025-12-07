@@ -180,7 +180,7 @@ export default {
       this.row = row
     },
     loadInterfaceMethodList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'REQUEST_METHOD_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'REQUEST_METHOD_CONFIG' }).then(res => {
         const { data } = res
         this.interfaceMethodList = data
       }).catch(_ => {
@@ -188,7 +188,7 @@ export default {
       })
     },
     loadInterfaceLevelList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'INTERFACE_LEVEL_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'INTERFACE_LEVEL_CONFIG' }).then(res => {
         const { data } = res
         this.interfaceLevelList = data
       }).catch(_ => {
@@ -196,7 +196,7 @@ export default {
       })
     },
     loadInterfaceStatusList() {
-      this.$mapi.dict.queryConfListByDictKey({ dictKey: 'INTERFACE_STATUS_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'INTERFACE_STATUS_CONFIG' }).then(res => {
         const { data } = res
         this.interfaceStatusList = data
       }).catch(_ => {

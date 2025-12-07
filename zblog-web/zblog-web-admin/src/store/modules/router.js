@@ -13,7 +13,6 @@ const permission = {
     },
     SET_SIDEBAR_ROUTERS: (state, routers) => {
       state.sidebarRouters = defaultRouterMap.concat(routers)
-      console.log('SET_SIDEBAR_ROUTERS', state.sidebarRouters)
     }
   },
   actions: {

@@ -13,7 +13,6 @@ const user = {
       state.user = user
     },
     SET_LOAD_MENUS: (state, loadMenus) => {
-      console.log('set loadMenus', loadMenus)
       state.loadMenus = loadMenus
     }
   },
