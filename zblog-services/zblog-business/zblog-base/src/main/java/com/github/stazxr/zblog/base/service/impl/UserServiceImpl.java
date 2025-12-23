@@ -87,7 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Assert.notBlank(userId, ExpMessageCode.of("valid.user.id.NotNull"));
         User user = userMapper.selectUserById(Long.parseLong(userId));
         Assert.notNull(user, ExpMessageCode.of("valid.user.not.exist"));
-
+        // 设置角色和权限信息
         setRoleAndPerm(user);
         return user;
     }

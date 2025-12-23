@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -9,10 +8,8 @@ import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
-import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.service.RoleService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -66,7 +63,7 @@ public class RoleController {
     @GetMapping(value = "/list")
     @ApiOperation(value = "查询角色列表（公共）")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色列表（公共）", code = "ROLEQ005", level = RouterLevel.PUBLIC)
+    @Router(name = "查询角色列表（公共）", code = "ROLEQ002", level = RouterLevel.PUBLIC)
     public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
         return roleService.queryRoleList(queryDto);
     }
@@ -77,13 +74,14 @@ public class RoleController {
      * @param roleId 角色id
      * @return RoleVo
      */
+    @Log
     @GetMapping(value = "/queryRoleDetail")
     @ApiOperation(value = "查询角色详情")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色详情", code = "ROLEQ002")
+    @Router(name = "查询角色详情", code = "ROLEQ003")
     public RoleVo queryRoleDetail(@RequestParam Long roleId) {
         return roleService.queryRoleDetail(roleId);
     }
@@ -142,28 +140,10 @@ public class RoleController {
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询角色对应的权限id列表", code = "ROLEQ003", level = RouterLevel.PUBLIC)
+    @Router(name = "查询角色对应的权限id列表", code = "ROLEQ004", level = RouterLevel.PUBLIC, remark = "适配角色授权")
     public Set<Long> queryPermIdsByRoleId(@RequestParam Long roleId) {
         return roleService.queryPermIdsByRoleId(roleId);
     }
-
-    /**
-     * 分页查询角色对应的用户列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<UserVo>
-     */
-    @GetMapping(value = "/pageUsersByRoleId")
-    @ApiOperation(value = "分页查询角色对应的用户列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询角色对应的用户列表", code = "ROLEQ004")
-    public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
-        return roleService.pageUsersByRoleId(queryDto);
-    }
-
-
-
-
 
     /**
      * 删除角色
@@ -182,37 +162,31 @@ public class RoleController {
         roleService.deleteRole(roleId);
     }
 
-
-
     /**
      * 批量新增角色用户
      *
      * @param userRoleDto 角色 - 用户对应信息
-     * @return Result
      */
     @Log
     @PostMapping(value = "/batchAddUserRole")
     @ApiOperation(value = "批量新增角色用户")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "批量新增角色用户", code = "batchAddUserRole")
-    public Result batchAddUserRole(@RequestBody UserRoleDto userRoleDto) {
+    @Router(name = "批量新增角色用户", code = "ROLEA002")
+    public void batchAddUserRole(@RequestBody UserRoleDto userRoleDto) {
         roleService.batchAddUserRole(userRoleDto);
-        return Result.success();
     }
 
     /**
      * 批量删除角色用户
      *
      * @param userRoleDto 角色 - 用户对应信息
-     * @return Result
      */
     @Log
     @PostMapping(value = "/batchDeleteUserRole")
     @ApiOperation(value = "批量删除角色用户")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "批量删除角色用户", code = "batchDeleteUserRole")
-    public Result batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
+    @Router(name = "批量删除角色用户", code = "ROLED002")
+    public void batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
         roleService.batchDeleteUserRole(userRoleDto);
-        return Result.success();
     }
 }

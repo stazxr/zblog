@@ -12,7 +12,7 @@ public class IdGeneratorTest {
         SnowflakeSequenceGenerator snowflakeSequenceGenerator = new SnowflakeSequenceGenerator(0, 1);
         IdGeneratorImpl idGenerator = new IdGeneratorImpl();
         idGenerator.setSequenceGenerator(snowflakeSequenceGenerator);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 100; i++) {
             System.out.println(idGenerator.generateId());
         }
     }

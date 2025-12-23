@@ -36,4 +36,11 @@ public @interface Router {
 	 * @return int 权限级别
 	 */
 	int level() default RouterLevel.PERM;
+
+	/**
+	 * 额外信息，只开发用，不做页面展示
+	 *
+	 * @return 接口额外信息
+	 */
+	String remark() default "";
 }

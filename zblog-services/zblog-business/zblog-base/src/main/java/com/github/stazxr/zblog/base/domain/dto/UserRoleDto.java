@@ -2,7 +2,8 @@ package com.github.stazxr.zblog.base.domain.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -12,7 +13,8 @@ import java.util.Set;
  * @author SunTao
  * @since 2022-09-13
  */
-@Data
+@Getter
+@Setter
 @ApiModel("用户角色信息")
 public class UserRoleDto {
     /**

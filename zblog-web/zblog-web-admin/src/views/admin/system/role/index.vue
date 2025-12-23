@@ -10,9 +10,8 @@
             <el-input id="search-roleCode" v-model="filters.roleCode" clearable placeholder="角色编码" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-enabled">
-            <el-select id="search-enabled" v-model="filters.enabled" placeholder="角色状态" clearable>
-              <el-option label="启用" :value="true" />
-              <el-option label="禁用" :value="false" />
+            <el-select id="search-enabled" v-model="filters.enabled" placeholder="角色状态" clearable @change="search">
+              <el-option v-for="item in enabledList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
@@ -24,8 +23,8 @@
       <div class="crud-opts">
         <span class="crud-opts-left">
           <el-button v-perm="['ROLEA001']" type="success" @click="addRole">新增</el-button>
-          <el-button v-perm="['ROLEQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['ROLEQ003']" :disabled="row === null" type="primary" @click="showRoleUser">用户</el-button>
+          <el-button v-perm="['ROLEQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button :disabled="row === null" type="primary" @click="showRoleUser">用户</el-button>
           <el-button v-perm="['ROLEU001']" :disabled="row === null" type="primary" @click="editRole">编辑</el-button>
           <el-button v-perm="['ROLEU002']" :disabled="row === null" type="warning" @click="authRole">授权</el-button>
           <el-button v-perm="['ROLED001']" :disabled="row === null" type="danger" @click="deleteRole">删除</el-button>
@@ -115,6 +114,7 @@ export default {
         roleCode: null,
         enabled: null
       },
+      enabledList: [],
       tableData: [],
       tableLoading: false,
       nodataImg: nodataImg,
@@ -130,11 +130,20 @@ export default {
     }
   },
   mounted() {
+    this.loadEnabledList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
+    },
+    loadEnabledList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+        const { data } = res
+        this.enabledList = data
+      }).catch(_ => {
+        this.enabledList = []
+      })
     },
     // 查询
     search() {

@@ -2,13 +2,12 @@ package com.github.stazxr.zblog.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
-import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 角色数据持久层
@@ -34,21 +33,11 @@ public interface RoleMapper extends BaseMapper<Role> {
     RoleVo selectRoleDetail(@Param("roleId") Long roleId);
 
     /**
-     * 查询角色对应的用户列表
+     * 获取指定资源的允许访问角色集合。
      *
-     * @param queryDto 查询参数
-     * @return List<UserVo>
+     * @param requestUri    请求的 URL 路径，表示要访问的资源地址。
+     * @param requestMethod 请求的 HTTP 方法类型（例如 GET、POST 等）
+     * @return 角色编码集合。
      */
-    List<UserVo> selectUsersByRoleId(UserQueryDto queryDto);
-
-
-
-
-    /**
-     * 查询用户角色列表（包含被禁用的角色）
-     *
-     * @param userId 用户序列
-     * @return Roles
-     */
-    List<Role> selectRolesByUserId(@Param("userId") Long userId);
+    Set<String> selectResourceRoles(@Param("requestUri") String requestUri, @Param("requestMethod") String requestMethod);
 }

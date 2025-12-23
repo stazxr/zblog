@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RoleMapper">
+    <select id="selectResourceRoles" resultType="java.lang.String">
+        SELECT DISTINCT ROLE_CODE FROM role WHERE ID IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID IN (
+                SELECT ID FROM permission WHERE PERM_CODE IN (
+                    SELECT RESOURCE_CODE FROM resource WHERE RESOURCE_CODE IS NOT NULL
+                    AND RESOURCE_URI = #{requestUri} AND RESOURCE_METHOD = #{requestMethod}
+                )
+            )
+        )
+    </select>
+
     <select id="selectRoleList" resultType="com.github.stazxr.zblog.base.domain.vo.RoleVo">
         SELECT
             r.ID, r.ROLE_NAME, r.ROLE_CODE, r.ROLE_DESC, r.ENABLED, r.CREATE_TIME, r.UPDATE_TIME,
@@ -29,40 +40,5 @@
             (SELECT USERNAME FROM user u WHERE u.ID = r.UPDATE_USER) AS UPDATE_USERNAME
         FROM role r
         WHERE r.DELETED = 0 AND r.ID = #{roleId}
-    </select>
-
-    <select id="selectUsersByRoleId" resultType="com.github.stazxr.zblog.base.domain.vo.UserVo">
-        SELECT
-            u.ID, u.USERNAME, u.NICKNAME, u.EMAIL, u.LOGIN_TIME
-        FROM user u
-        INNER JOIN user_role_relation urr ON urr.USER_ID = u.ID
-        WHERE u.DELETED = '0' AND urr.ROLE_ID = #{businessId}
-        <if test="username != null and username != ''">
-            <bind name="usernameBind" value="'%' + username + '%'"/>
-            AND u.USERNAME LIKE #{usernameBind}
-        </if>
-        <if test="nickname != null and nickname != ''">
-            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
-            AND u.NICKNAME LIKE #{nicknameBind}
-        </if>
-<!--        <if test="enabled != null">-->
-<!--            AND u.ENABLED = #{enabled}-->
-<!--        </if>-->
-        <if test="loginStartTime != null and loginStartTime != ''">
-            AND u.LOGIN_TIME &gt;= CONCAT(#{loginStartTime}, ' 00:00:00')
-        </if>
-        <if test="loginEndTime != null and loginEndTime != ''">
-            AND u.LOGIN_TIME &lt;= CONCAT(#{loginStartTime}, ' 23:59:59')
-        </if>
-        ORDER BY u.USERNAME, u.NICKNAME
-    </select>
-
-
-
-
-    <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
-        SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
-        )
     </select>
 </mapper>

@@ -5,6 +5,8 @@ import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.entity.UserRoleRelation;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 用户角色数据持久层
  *
@@ -32,4 +34,12 @@ public interface UserRoleMapper extends BaseMapper<UserRoleRelation> {
      * @param userRoleDto 角色 - 用户对应信息
      */
     void batchDeleteUserRole(UserRoleDto userRoleDto);
+
+    /**
+     * 根据roleId查询UserId列表
+     *
+     * @param roleId 角色id
+     * @return 用户id列表
+     */
+    List<Long> selectUserIdsByRoleId(@Param("roleId") Long roleId);
 }

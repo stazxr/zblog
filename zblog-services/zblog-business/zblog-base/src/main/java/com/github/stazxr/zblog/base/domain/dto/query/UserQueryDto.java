@@ -66,15 +66,17 @@ public class UserQueryDto extends PageParam {
     @ApiModelProperty("登录地址")
     private String loginAddress;
 
-
-
-
-
     /**
      * 业务id
      */
     @ApiModelProperty("业务id")
     private Long businessId;
+
+    /**
+     * 角色id
+     */
+    @ApiModelProperty("角色id")
+    private Long roleId;
 
     /**
      * 登录开始时间

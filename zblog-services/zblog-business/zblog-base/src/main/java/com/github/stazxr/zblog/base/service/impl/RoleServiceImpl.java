@@ -13,13 +13,11 @@ import com.github.stazxr.zblog.base.converter.RoleConverter;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.RolePermissionRelation;
 import com.github.stazxr.zblog.base.domain.entity.UserRoleRelation;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
-import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
@@ -174,25 +172,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     /**
-     * 分页查询角色对应的用户列表
-     *
-     * @param queryDto 查询参数
-     * @return userList
-     */
-    @Override
-    public PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto) {
-        // 参数检查
-        queryDto.checkPage();
-        Assert.notNull(queryDto.getBusinessId(), "参数【businessId】不能为空");
-
-        // 分页查询
-        try (Page<UserVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<UserVo> dataList = roleMapper.selectUsersByRoleId(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
-    }
-
-    /**
      * 删除角色
      *
      * @param roleId 角色ID
@@ -200,37 +179,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long roleId) {
-        Assert.notNull(roleId, "参数【roleId】不能为空");
-        UserQueryDto queryDto = new UserQueryDto();
-        queryDto.setBusinessId(roleId);
-        List<UserVo> userList = roleMapper.selectUsersByRoleId(queryDto);
-        Assert.isTrue(!userList.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
+        // 参数检查
+        Assert.notNull(roleId, ExpMessageCode.of("valid.role.id.NotNull"));
+        // 判断角色是否关联用户
+        List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
+        Assert.isTrue(!userIds.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
+        // 删除角色
         Assert.isTrue(roleMapper.deleteById(roleId) != 1, ExpMessageCode.of("result.role.delete.failed"));
+        // 删除角色关联信息
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
-        SecurityUserCache.clean();
-    }
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * 查询用户角色列表（包含被禁用的角色）
-     *
-     * @param userId 用户序列
-     * @return Roles
-     */
-    @Override
-    public List<Role> queryRolesByUserId(Long userId) {
-        Assert.notNull(userId, "参数【userId】不能为空");
-        return roleMapper.selectRolesByUserId(userId);
+        // 清除缓存
+        userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
     }
 
     /**
@@ -241,7 +201,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchAddUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), "参数【roleId】不能为空");
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.role.id.NotNull"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -252,7 +212,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             userRole.setUserId(userId);
             userRole.setRoleId(userRoleDto.getRoleId());
             userRoleMapper.insert(userRole);
-            SecurityUserCache.clean();
+            SecurityUserCache.remove(String.valueOf(userId));
         }
     }
 
@@ -264,7 +224,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), "参数【roleId】不能为空");
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.role.id.NotNull"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -284,8 +244,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public Set<String> selectResourceRoles(String requestUri, String requestMethod) {
-        // TODO
-        return new HashSet<>();
+        return roleMapper.selectResourceRoles(requestUri, requestMethod);
     }
 
     private void checkRole(Role role) {

@@ -22,4 +22,8 @@
             </otherwise>
         </choose>
     </delete>
+
+    <select id="selectUserIdsByRoleId" resultType="java.lang.Long">
+        SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{roleId}
+    </select>
 </mapper>

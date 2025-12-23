@@ -43,7 +43,7 @@
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginAddress">
-            <el-input id="search-nickname" v-model="filters.loginAddress" clearable placeholder="登录地址" @keyup.enter.native="search" />
+            <el-input id="search-loginAddress" v-model="filters.loginAddress" clearable placeholder="登录地址" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
             <el-button type="success" @click="search()">查 询</el-button>
@@ -80,7 +80,7 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" align="center" width="120" />
         <el-table-column :show-overflow-tooltip="true" prop="nickname" label="用户昵称" align="center" />
         <el-table-column :show-overflow-tooltip="true" prop="email" label="邮箱" align="center" />
         <el-table-column :show-overflow-tooltip="true" prop="userType" label="用户类型" align="center" width="80">
@@ -108,7 +108,6 @@
             <span v-else>隐藏</span>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="lastLoginTime" label="登录时间" align="center" width="140" />
         <el-table-column :show-overflow-tooltip="true" prop="loginChan" label="登录渠道" align="center" width="80">
           <template v-slot="scope">
             <span v-if="scope.row['loginChan'] === '01'">移动端</span>
@@ -126,7 +125,8 @@
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="loginAddress" label="登录地址" align="center" width="80" />
-        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="lastLoginTime" label="登录时间" align="center" width="140" />
+        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="140" />
         <div slot="empty">
           <el-empty :image="nodataImg" description=" " />
         </div>

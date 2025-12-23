@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.UserMapper">
+    <resultMap id="userVoListMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
+        <result property="id" column="ID" />
+        <result property="headImgUrl" column="HEAD_IMG_URL" />
+        <result property="username" column="USERNAME" />
+        <result property="nickname" column="NICKNAME" />
+        <result property="email" column="EMAIL" />
+        <result property="userType" column="USER_TYPE" />
+        <result property="userStatus" column="USER_STATUS" />
+        <result property="gender" column="GENDER" />
+        <result property="loginChan" column="LOGIN_CHAN" />
+        <result property="loginType" column="LOGIN_TYPE" />
+        <result property="loginAddress" column="LOGIN_ADDRESS" />
+        <result property="lastLoginTime" column="LAST_LOGIN_TIME" />
+        <result property="createTime" column="CREATE_TIME" />
+        <collection property="roleIds" ofType="Long">
+            <result column="ROLE_ID" />
+        </collection>
+    </resultMap>
+
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
         <result property="id" column="ID" />
         <result property="username" column="USERNAME" />
@@ -92,13 +111,15 @@
         UPDATE user SET USER_STATUS = #{status} WHERE ID = #{userId}
     </update>
 
-    <select id="selectUserList" resultType="com.github.stazxr.zblog.base.domain.vo.UserVo">
+    <select id="selectUserList" resultMap="userVoListMap">
         SELECT
-            u.ID, u.USERNAME, u.USER_TYPE, u.USER_STATUS, u.LAST_LOGIN_TIME, u.CREATE_TIME,
-            u.NICKNAME, u.EMAIL, u.HEAD_IMG_URL, u.GENDER,
-            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ull.USER_AGENT
+            u.ID, u.HEAD_IMG_URL, u.USERNAME, u.NICKNAME, u.EMAIL, u.USER_TYPE, u.USER_STATUS, u.GENDER,
+            u.LAST_LOGIN_TIME, u.CREATE_TIME, ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ur.ROLE_ID
         FROM user u
         LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.LAST_LOGIN_TIME AND ull.IS_SUCCESS = 1
+        LEFT JOIN (
+            SELECT USER_ID, ROLE_ID FROM user_role_relation
+        ) ur ON ur.USER_ID = u.ID
         WHERE u.DELETED = 0
         <if test="username != null and username != ''">
             <bind name="usernameBind" value="'%' + username + '%'"/>
@@ -127,6 +148,9 @@
         <if test="loginAddress != null and loginAddress != ''">
             <bind name="loginAddressBind" value="'%' + loginAddress + '%'"/>
             AND ull.LOGIN_ADDRESS LIKE #{loginAddressBind}
+        </if>
+        <if test="roleId != null">
+            AND u.ID IN (SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{roleId})
         </if>
         ORDER BY u.LAST_LOGIN_TIME DESC
     </select>

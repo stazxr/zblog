@@ -6,12 +6,9 @@ import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.RoleDto;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
-import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
-import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
-import com.github.stazxr.zblog.base.domain.vo.UserVo;
 
 import java.util.List;
 import java.util.Set;
@@ -77,38 +74,11 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
     Set<Long> queryPermIdsByRoleId(Long roleId);
 
     /**
-     * 分页查询角色对应的用户列表
-     *
-     * @param queryDto 查询参数
-     * @return PageInfo<UserVo>
-     */
-    PageInfo<UserVo> pageUsersByRoleId(UserQueryDto queryDto);
-
-    /**
      * 删除角色
      *
      * @param roleId 角色ID
      */
     void deleteRole(Long roleId);
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * 查询用户角色列表（包含被禁用的角色）
-     *
-     * @param userId 用户序列
-     * @return Roles
-     */
-    List<Role> queryRolesByUserId(Long userId);
 
     /**
      * 批量新增用户角色

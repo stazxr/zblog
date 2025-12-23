@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.github.stazxr.zblog.base.domain.dto.RolePermDto;
 import com.github.stazxr.zblog.base.domain.entity.RolePermissionRelation;
 import org.apache.ibatis.annotations.Param;
 
@@ -42,25 +41,4 @@ public interface RolePermMapper {
      * @return permIdList
      */
     Set<Long> selectPermIdsByRoleId(@Param("roleId") Long roleId);
-
-
-
-
-
-
-
-    /**
-     * 根据角色序列和权限序列删除中间数据
-     *
-     * @param permId 权限ID
-     * @param roleId 角色ID
-     */
-    void deleteByRoleIdAndPermId(@Param("permId") Long permId, @Param("roleId") Long roleId);
-
-    /**
-     * 批量删除角色权限
-     *
-     * @param rolePermDto 角色 - 权限对应信息
-     */
-    void batchDeleteRolePerm(RolePermDto rolePermDto);
 }
