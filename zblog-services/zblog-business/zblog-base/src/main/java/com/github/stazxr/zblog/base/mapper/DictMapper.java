@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 字典数据持久层
+ * 字典管理数据层
  *
  * @author SunTao
  * @since 2021-02-20

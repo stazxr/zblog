@@ -52,7 +52,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 用户管理 - 业务实现层
+ * 用户管理业务实现层
  *
  * @author SunTao
  * @since 2020-11-15
@@ -345,12 +345,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //    private final UserPassLogMapper userPassLogMapper;
 //
 //    private final UserTokenStorageMapper userTokenStorageMapper;
-//
-//
-//
-//
-//
-//
 //
 //    /**
 //     * 修改个人头像

@@ -1,17 +1,18 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
- * 用户密码更新日志持久化接口
+ * 用户密码记录数据层
  *
  * @author SunTao
  * @since 2022-08-03
  */
-public interface UserPassLogMapper {
+public interface UserPassLogMapper extends BaseMapper<UserPassLog> {
     /**
      * 查询用户历史密码修改记录
      *
@@ -19,13 +20,5 @@ public interface UserPassLogMapper {
      * @param count 账号
      * @return oldPassList
      */
-    List<String> selectUserOldPass(@Param("userId") Long userId, @Param("count") int count);
-
-    /**
-     * 新增用户密码修改记录
-     *
-     * @param passLog 实体信息
-     * @return if success return 1
-     */
-    int insertUserPassLog(UserPassLog passLog);
+    List<String> selectUserHistoryPass(@Param("userId") Long userId, @Param("count") int count);
 }

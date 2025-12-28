@@ -2,6 +2,7 @@
 import communal from '@/api/communal.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
+import userCenter from '@/api/base/userCenter.js'
 
 // system
 import user from '@/api/base/system/user.js'
@@ -34,7 +35,7 @@ import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
 export default {
-  communal, home, menu,
+  communal, home, menu, userCenter,
   user, role, perm, interfaces, dict,
   log,
   server, version, file, node, column, category,

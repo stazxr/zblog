@@ -6,7 +6,7 @@ import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import java.util.List;
 
 /**
- * 接口数据持久层
+ * 接口管理数据层
  *
  * @author SunTao
  * @since 2025-11-03

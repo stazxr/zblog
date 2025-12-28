@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 用户角色数据持久层
+ * 用户角色数据层
  *
  * @author SunTao
  * @since 2022-01-14

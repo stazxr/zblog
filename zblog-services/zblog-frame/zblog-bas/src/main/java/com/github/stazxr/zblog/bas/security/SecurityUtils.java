@@ -107,4 +107,3 @@ public class SecurityUtils {
         return getLoginUserOptional().map(SecurityUser::getId).orElse(1L);
     }
 }
-

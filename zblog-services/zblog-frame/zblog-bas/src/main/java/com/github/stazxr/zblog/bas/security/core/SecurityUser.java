@@ -255,7 +255,7 @@ public class SecurityUser implements UserDetails {
         if (UserType.TEMP_USER.getType().equals(getUserType())) {
             try {
                 if (StringUtils.isNotBlank(expiredTime)) {
-                    return new Date().after(DateUtils.parse(expiredTime));
+                    return new Date().before(DateUtils.parse(expiredTime));
                 }
             } catch (Exception e) {
                 log.error("check account {} is non expired catch eor", username, e);
@@ -282,23 +282,25 @@ public class SecurityUser implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        if (UserType.NORMAL_USER.getType().equals(getUserType())) {
+        if (!UserType.TEST_USER.getType().equals(getUserType())) {
             try {
                 if (StringUtils.isNotBlank(changePwdTime)) {
                     // 获取密码有效天数，校验密码是否过期
                     SecurityExtProperties properties = SpringContextUtil.getBean(SecurityExtProperties.class);
                     Date expiredDate = DateUtils.addDays(DateUtils.parse(changePwdTime), properties.getPasswordLimitedDay());
                     return !new Date().after(expiredDate);
+                } else {
+                    // 如果 changePwdTime 为空，则默认密码未过期
+                    return true;
                 }
             } catch (Exception e) {
+                // 发生异常默认用户密码未过期
                 log.error("check account {} is credentials non expired catch eor", username, e);
+                return true;
             }
-
-            // 默认用户密码是过期的
-            return false;
         }
 
-        // Do not check credential expiration except for normal users
+        // Do not check credential expiration for test users
         return true;
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 角色数据持久层
+ * 角色管理数据层
  *
  * @author SunTao
  * @since 2020-11-15

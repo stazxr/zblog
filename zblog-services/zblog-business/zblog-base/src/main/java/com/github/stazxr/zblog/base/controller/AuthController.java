@@ -15,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,9 +36,6 @@ public class AuthController {
     private final ZblogService zblogService;
 
     private final CaptchaHandler captchaHandler;
-
-    @Value("${zblog.globalKey.PublicKey}")
-    private String globalPublicKey;
 
     /**
      * 获取当前登录用户信息
@@ -85,18 +81,5 @@ public class AuthController {
     @Router(name = "检查用户的登录状态", code = "checkUserLoginStatus", level = RouterLevel.OPEN)
     public Result checkUserLoginStatus(HttpServletRequest request) {
         return Result.success().data(zblogService.checkUserLoginStatus(request));
-    }
-
-    /**
-     * 获取默认公钥
-     *
-     * @return 默认公钥
-     */
-    @GetMapping("/queryGlobalKey")
-    @ApiOperation(value = "获取默认公钥")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
-    @Router(name = "获取默认公钥", code = "queryGlobalKey", level = RouterLevel.PUBLIC)
-    public Result queryGlobalKey() {
-        return Result.success().data(globalPublicKey);
     }
 }

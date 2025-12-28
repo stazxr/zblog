@@ -2,6 +2,11 @@ import qs from 'qs'
 import api from './custom-axios'
 
 export default {
+  // 获取系统公钥
+  querySystemPublicKey: params => {
+    return api.httpRequest().get(`/api/common/querySystemPublicKey`, params)
+  },
+
   // 登录
   login: params => {
     return api.httpRequest().post(`/api/login`, params)

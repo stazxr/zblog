@@ -36,7 +36,7 @@ import static org.springframework.security.web.authentication.UsernamePasswordAu
 public class ParseLoginParamFilter extends OncePerRequestFilter {
     private SecurityExtProperties securityExtProperties;
 
-    @Value("${zblog.globalKey.PrivateKey}")
+    @Value("${zblog.security.PrivateKey}")
     private String secretKey;
 
     @Override

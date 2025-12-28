@@ -202,6 +202,13 @@
       "defaultValue": 86400000
     },
     {
+      "name": "zblog.base.security.password-history-count",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "新密码不能与最近X次密码重复，可配置 -1，关闭校验.",
+      "defaultValue": 3
+    },
+    {
       "name": "zblog.base.security.enable-additional-checks",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",

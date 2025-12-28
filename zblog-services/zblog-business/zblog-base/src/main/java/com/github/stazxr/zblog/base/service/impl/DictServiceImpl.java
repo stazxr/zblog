@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * 字典服务实现层
+ * 字典管理业务实现层
  *
  * @author SunTao
  * @since 2021-02-20

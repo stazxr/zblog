@@ -11,7 +11,7 @@ import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import java.util.List;
 
 /**
- * 字典服务层
+ * 字典管理业务层
  *
  * @author SunTao
  * @since 2021-02-20

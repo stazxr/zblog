@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 角色权限数据持久层
+ * 角色权限数据层
  *
  * @author SunTao
  * @since 2022-01-14

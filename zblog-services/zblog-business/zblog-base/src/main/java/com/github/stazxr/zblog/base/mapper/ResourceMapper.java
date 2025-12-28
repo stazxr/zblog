@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 资源数据持久层
+ * 资源管理数据层
  *
  * @author SunTao
  * @since 2025-07-06

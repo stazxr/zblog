@@ -42,7 +42,7 @@ public class MailException extends BaseException {
         String messageCode = getCode();
         String message = MailExceptionCode.of(messageCode);
         if (message != null) {
-            messageCode = "[" + messageCode + "] ".concat(message).concat(super.getMessage());
+            return message.concat(": ").concat(super.getMessage());
         }
         return messageCode;
     }

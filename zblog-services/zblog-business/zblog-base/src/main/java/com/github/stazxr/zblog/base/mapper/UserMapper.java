@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 用户数据持久层
+ * 用户管理数据层
  *
  * @author SunTao
  * @since 2020-11-15
@@ -19,7 +19,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 根据 {@code userId} 查询用户信息。
      *
-     * @param userId 用户 ID
+     * @param userId 用户序列
      * @return 用户的 {@link User} 实例
      */
     User selectUserById(@Param("userId") Long userId);
@@ -64,16 +64,6 @@ public interface UserMapper extends BaseMapper<User> {
      */
     void updateUserLoginTime(@Param("userId") Long userId, @Param("loginTime") String loginTime, @Param("errorCount") Integer errorCount);
 
-
-
-
-
-
-
-
-
-
-
     /**
      * 查询用户列表
      *
@@ -106,8 +96,19 @@ public interface UserMapper extends BaseMapper<User> {
      */
     void updateUserStatus(@Param("userId") Long userId, @Param("status") Integer status);
 
+    /**
+     * 用户密码修改
+     *
+     * @param userId         用户序列
+     * @param password       密码
+     * @param changePwdTime  密码修改时间
+     * @return 修改行数
+     */
+    int updateUserPassword(@Param("userId") Long userId, @Param("password") String password, @Param("changePwdTime") String changePwdTime);
 
-//
+
+
+
 //    /**
 //     * 根据邮箱查询用户信息
 //     *

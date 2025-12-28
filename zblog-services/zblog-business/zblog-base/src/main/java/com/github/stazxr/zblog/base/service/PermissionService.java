@@ -10,7 +10,7 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import java.util.List;
 
 /**
- * 权限服务层
+ * 权限管理业务层
  *
  * @author SunTao
  * @since 2020-11-16

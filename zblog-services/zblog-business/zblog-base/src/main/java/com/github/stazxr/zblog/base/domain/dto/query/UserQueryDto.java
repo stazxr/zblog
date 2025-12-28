@@ -67,12 +67,6 @@ public class UserQueryDto extends PageParam {
     private String loginAddress;
 
     /**
-     * 业务id
-     */
-    @ApiModelProperty("业务id")
-    private Long businessId;
-
-    /**
      * 角色id
      */
     @ApiModelProperty("角色id")
@@ -81,12 +75,14 @@ public class UserQueryDto extends PageParam {
     /**
      * 登录开始时间
      */
+    @Deprecated
     @ApiModelProperty("登录开始时间")
     private String loginStartTime;
 
     /**
      * 登录结束时间
      */
+    @Deprecated
     @ApiModelProperty("登录结束时间")
     private String loginEndTime;
 }

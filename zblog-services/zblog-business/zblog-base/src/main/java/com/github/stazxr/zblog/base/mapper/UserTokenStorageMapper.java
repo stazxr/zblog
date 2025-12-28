@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
  * @author SunTao
  * @since 2022-08-18
  */
+@Deprecated
 public interface UserTokenStorageMapper {
     /**
      * 新增用户令牌信息

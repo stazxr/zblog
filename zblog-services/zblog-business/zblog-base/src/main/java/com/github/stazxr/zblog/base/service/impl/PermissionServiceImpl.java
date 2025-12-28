@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 权限业务实现层
+ * 权限管理业务实现层
  *
  * @author SunTao
  * @since 2020-11-16

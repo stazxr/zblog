@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 菜单存储
+ * 菜单管理数据层
  *
  * @author SunTao
  * @since 2025-07-06

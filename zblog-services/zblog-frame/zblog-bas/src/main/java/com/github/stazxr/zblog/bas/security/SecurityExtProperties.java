@@ -39,8 +39,19 @@ public class SecurityExtProperties {
      */
     private long ssoTokenCacheMills = 24 * 3600 * 1000L;
 
+    /**
+     * 新密码不能与最近X次密码重复，可配置 -1，关闭校验
+     */
+    private int passwordHistoryCount = 3;
+
+    /**
+     * 登录认证是否扩展额外检查规则
+     */
     private boolean enableAdditionalChecks = false;
 
+    /**
+     * 是否隐藏用户找不到异常
+     */
     protected boolean hideUserNotFoundExceptions = true;
 
     /**
@@ -114,6 +125,14 @@ public class SecurityExtProperties {
 
     public void setSsoTokenCacheMills(long ssoTokenCacheMills) {
         this.ssoTokenCacheMills = ssoTokenCacheMills;
+    }
+
+    public int getPasswordHistoryCount() {
+        return passwordHistoryCount;
+    }
+
+    public void setPasswordHistoryCount(int passwordHistoryCount) {
+        this.passwordHistoryCount = passwordHistoryCount;
     }
 
     public boolean isEnableAdditionalChecks() {

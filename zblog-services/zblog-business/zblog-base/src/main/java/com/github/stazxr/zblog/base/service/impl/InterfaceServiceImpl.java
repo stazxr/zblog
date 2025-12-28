@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 字典服务实现层
+ * 接口管理业务实现层
  *
  * @author SunTao
  * @since 2025-11-02

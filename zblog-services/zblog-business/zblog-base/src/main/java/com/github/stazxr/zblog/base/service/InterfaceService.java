@@ -7,7 +7,7 @@ import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 字典服务层
+ * 接口管理业务层
  *
  * @author SunTao
  * @since 2025-11-02

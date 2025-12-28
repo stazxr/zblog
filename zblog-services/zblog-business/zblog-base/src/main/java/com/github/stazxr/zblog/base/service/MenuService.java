@@ -5,7 +5,7 @@ import com.github.stazxr.zblog.base.domain.vo.MenuVo;
 import java.util.List;
 
 /**
- * 菜单服务
+ * 菜单管理业务层
  *
  * @author SunTao
  * @since 2024-12-01

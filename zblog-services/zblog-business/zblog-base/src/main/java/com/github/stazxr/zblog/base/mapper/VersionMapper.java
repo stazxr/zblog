@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 版本维护持久层
+ * 版本管理数据层
  *
  * @author SunTao
  * @since 2022-10-14

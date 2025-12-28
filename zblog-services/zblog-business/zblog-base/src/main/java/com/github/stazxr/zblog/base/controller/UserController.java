@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -13,7 +12,6 @@ import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
-import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -71,6 +69,7 @@ public class UserController {
      * @param userId 用户id
      * @return UserVo
      */
+    @Log
     @GetMapping(value = "/queryUserDetail")
     @ApiOperation(value = "查询用户详情")
     @ApiImplicitParams({
@@ -125,138 +124,5 @@ public class UserController {
     @Router(name = "删除用户", code = "USERD001")
     public void deleteUser(@RequestParam Long userId) {
         userService.deleteUser(userId);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-//    /**
-//     * 修改个人头像
-//     *
-//     * @param updateDto 用户信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping("updateUserHeadImg")
-//    @ApiOperation("修改个人头像")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "修改个人头像", code = "updateUserHeadImg", level = RouterLevel.PUBLIC)
-//    public Result updateUserHeadImg(@RequestBody UserDto updateDto) {
-//        return userService.updateUserHeadImg(updateDto) ? Result.success() : Result.failure();
-//    }
-//
-//    /**
-//     * 修改个人基础信息
-//     *
-//     * @param updateDto 用户信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping("updateUserBaseInfo")
-//    @ApiOperation("修改个人基础信息")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "修改个人基础信息", code = "updateUserBaseInfo", level = RouterLevel.PUBLIC)
-//    public Result updateUserBaseInfo(@RequestBody UserDto updateDto) {
-//        return userService.updateUserBaseInfo(updateDto) ? Result.success() : Result.failure();
-//    }
-//
-//    /**
-//     * 修改个人密码
-//     *
-//     * @param passDto 用户密码信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping("updateUserPass")
-//    @ApiOperation("修改个人密码")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "修改个人密码", code = "updateUserPass", level = RouterLevel.PUBLIC)
-//    public Result updateUserPass(@RequestBody UserUpdatePassDto passDto) {
-//        return userService.updateUserPass(passDto) ? Result.success() : Result.failure();
-//    }
-//
-//    /**
-//     * 强制修改密码
-//     *
-//     * @param passDto 用户密码信息
-//     * @return Result
-//     */
-//    @PostMapping("forceUpdatePass")
-//    @ApiOperation("强制修改密码")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "强制修改密码", code = "forceUpdateUserPass", level = RouterLevel.OPEN)
-//    public Result forceUpdatePass(@RequestBody UserUpdatePassDto passDto) {
-//        userService.forceUpdatePass(passDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 修改个人邮箱
-//     *
-//     * @param emailDto 用户邮箱信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping("updateUserEmail")
-//    @ApiOperation("修改个人邮箱")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "修改个人邮箱", code = "updateUserEmail", level = RouterLevel.PUBLIC)
-//    public Result updateUserEmail(@RequestBody UserUpdateEmailDto emailDto) {
-//        return userService.updateUserEmail(emailDto) ? Result.success() : Result.failure();
-//    }
-//
-//
-//    /**
-//     * 用户注册
-//     *
-//     * @param registerDto 注册信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/register")
-//    @ApiOperation("用户注册")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "用户注册", code = "userRegister", level = RouterLevel.OPEN)
-//    public Result userRegister(@RequestBody UserRegisterDto registerDto) {
-//        userService.userRegister(registerDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 通过邮箱修改密码
-//     *
-//     * @param forgetPwdDto 密码信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/updateUserPwdByEmail")
-//    @ApiOperation("通过邮箱修改密码")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "通过邮箱修改密码", code = "updateUserPwdByEmail", level = RouterLevel.OPEN)
-//    public Result updateUserPwdByEmail(@RequestBody ForgetPwdDto forgetPwdDto) {
-//        userService.updateUserPwdByEmail(forgetPwdDto);
-//        return Result.success();
-//    }
-
-
-    /**
-     * 查询用户日志列表
-     *
-     * @param queryDto 查询参数
-     * @return userLog
-     */
-    @GetMapping("/queryUserLog")
-    @ApiOperation(value = "查询用户日志列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询用户日志列表", code = "queryUserLog", level = RouterLevel.PUBLIC)
-    public Result queryUserLog(LogQueryDto queryDto) {
-        // return Result.success().data(logService.queryUserLogListByPage(queryDto));
-        return null;
     }
 }

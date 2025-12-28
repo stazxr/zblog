@@ -33,7 +33,7 @@ import java.util.*;
 import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 
 /**
- * 角色业务实现层
+ * 角色管理业务实现层
  *
  * @author SunTao
  * @since 2020-11-16
@@ -157,6 +157,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
                 rolePerms.add(rolePerm);
             }
             rolePermMapper.insertBatch(rolePerms);
+        }
+
+        // 获取当前角色涉及的用户ID列表并清空缓存
+        for (Long userId : userRoleMapper.selectUserIdsByRoleId(roleId)) {
+            SecurityUserCache.remove(String.valueOf(userId));
         }
     }
 

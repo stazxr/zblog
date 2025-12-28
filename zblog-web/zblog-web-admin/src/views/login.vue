@@ -192,7 +192,11 @@ export default {
           this.$store.dispatch('Login', loginParam).then(change_pwd => {
             if (change_pwd) {
               this.$message.error('需要重置您的密码，请修改密码')
-              this.$router.push({ path: '/forceUpdatePass', query: { username: username }})
+              sessionStorage.setItem('force_update_pwd_user', JSON.stringify({
+                username,
+                type: '1'
+              }))
+              this.$router.push({ path: '/forceUpdatePass' })
             } else {
               this.$message.success('登录成功')
               this.$router.push({ path: this.redirect || '/' })
@@ -201,7 +205,11 @@ export default {
             console.log('Login Error', e)
             if (e.message && e.message === '10002') {
               // 跳转修改密码界面
-              this.$router.push({ path: '/forceUpdatePass', query: { username: username }})
+              sessionStorage.setItem('force_update_pwd_user', JSON.stringify({
+                username,
+                type: '2'
+              }))
+              this.$router.push({ path: '/forceUpdatePass' })
             } else {
               this.getCode()
               this.$refs.code.focus()

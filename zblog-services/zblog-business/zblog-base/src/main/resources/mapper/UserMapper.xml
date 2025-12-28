@@ -18,6 +18,7 @@
         <collection property="roleIds" ofType="Long">
             <result column="ROLE_ID" />
         </collection>
+        <!-- <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" /> -->
     </resultMap>
 
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
@@ -103,14 +104,6 @@
         WHERE ID = #{userId}
     </update>
 
-    <select id="selectUserLoginErrorCount" resultType="java.lang.Integer">
-        SELECT LOGIN_ERROR_COUNT FROM user WHERE ID = #{userId}
-    </select>
-
-    <update id="updateUserStatus">
-        UPDATE user SET USER_STATUS = #{status} WHERE ID = #{userId}
-    </update>
-
     <select id="selectUserList" resultMap="userVoListMap">
         SELECT
             u.ID, u.HEAD_IMG_URL, u.USERNAME, u.NICKNAME, u.EMAIL, u.USER_TYPE, u.USER_STATUS, u.GENDER,
@@ -172,31 +165,37 @@
         WHERE u.ID = #{userId}
     </select>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <select id="selectUserRoleIdList" resultType="java.lang.Long">
+    <!-- <select id="selectUserRoleIdList" resultType="java.lang.Long">
         SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+    </select> -->
+
+    <select id="selectUserLoginErrorCount" resultType="java.lang.Integer">
+        SELECT LOGIN_ERROR_COUNT FROM user WHERE ID = #{userId}
     </select>
+
+    <update id="updateUserStatus">
+        UPDATE user SET USER_STATUS = #{status} WHERE ID = #{userId}
+    </update>
+
+    <update id="updateUserPassword">
+        UPDATE user SET PASSWORD = #{password}, CHANGE_PWD_TIME = #{changePwdTime} WHERE ID = #{userId}
+    </update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

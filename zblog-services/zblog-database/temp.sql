@@ -142,15 +142,7 @@ CREATE TABLE `file_relation` (
                                  UNIQUE KEY `KEY_ROLE_PERM` (`FILE_ID`, `BUSINESS_ID`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文件与业务对象关联表';
 
-/*Table structure for table `user_pass_log` */
-DROP TABLE IF EXISTS `user_pass_log`;
-CREATE TABLE `user_pass_log` (
-                                 `ID` BIGINT(64) UNSIGNED NOT NULL,
-                                 `USER_ID` BIGINT(64) NOT NULL COMMENT '用户编号',
-                                 `PASSWORD` VARCHAR(60) NOT NULL COMMENT '密码',
-                                 `UPDATE_TIME` VARCHAR(20) NOT NULL COMMENT '更新时间',
-                                 PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=INNODB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户密码更新日志表';
+
 
 /*Table structure for table `user_token_storage` */
 DROP TABLE IF EXISTS `user_token_storage`;
@@ -231,32 +223,6 @@ INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, DELETED, VERSION, CREATE_
 项目开源；
 数据迁移
 ', 0, 1, 'suntao', '2023-02-21 01:42:28', '2023-02-21', '', '');
-
-/*Table structure for table `server_node` */
-DROP TABLE IF EXISTS `server_node`;
-CREATE TABLE `server_node` (
-                               `ID` BIGINT(64) UNSIGNED NOT NULL,
-                               `NAME` VARCHAR(100) NOT NULL COMMENT '节点名称',
-                               `IP` VARCHAR(100) NOT NULL COMMENT 'IP',
-                               `PORT` INT(10) NOT NULL COMMENT 'SSH 端口',
-                               `SSH_USER` VARCHAR(50) NOT NULL COMMENT '登录用户',
-                               `SSH_PWD` VARCHAR(50) NOT NULL COMMENT '登录密码',
-                               `DESC` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述信息',
-                               `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
-                               `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
-                               `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
-                               `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
-                               `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
-                               `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
-                               PRIMARY KEY (`ID`) USING BTREE,
-                               UNIQUE KEY `KEY_IP_USER` (`IP`, `SSH_USER`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='服务器节点';
-
-
-
-
-
-
 
 
 

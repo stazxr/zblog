@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 菜单服务默认实现
+ * 菜单管理业务实现层
  *
  * @author SunTao
  * @since 2024-12-01

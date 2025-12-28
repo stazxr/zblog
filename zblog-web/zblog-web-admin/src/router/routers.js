@@ -70,15 +70,14 @@ export const defaultRouterMap = [
         meta: { title: '用户查询', hideTag: true }
       }
     ]
-  }
-
-  /*
+  },
   {
     path: '/forceUpdatePass',
     component: (resolve) => require(['@/views/features/forceUpdatePass'], resolve),
     meta: { title: '修改密码', cache: false },
     show: false
-  },
+  }
+  /*
   {
     path: '/publish',
     component: Layout,

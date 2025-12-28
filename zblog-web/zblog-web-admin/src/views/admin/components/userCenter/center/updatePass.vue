@@ -65,7 +65,7 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.loading = true
-          this.$mapi.user.updateUserPass(this.form).then(() => {
+          this.$mapi.userCenter.updateUserPass(this.form).then(() => {
             this.resetForm()
             this.$message.success('密码修改成功，请重新登录')
 

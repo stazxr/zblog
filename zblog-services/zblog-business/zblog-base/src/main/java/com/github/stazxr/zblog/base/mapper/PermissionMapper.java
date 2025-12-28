@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 权限数据持久层
+ * 权限管理数据层
  *
  * @author SunTao
  * @since 2020-11-15

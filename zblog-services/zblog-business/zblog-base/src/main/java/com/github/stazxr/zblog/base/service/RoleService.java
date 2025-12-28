@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 角色服务层
+ * 角色管理业务层
  *
  * @author SunTao
  * @since 2020-11-16
