@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/logs")
-@Api(value = "LogController", tags = { "日志控制器" })
+@Api(value = "LogController", tags = { "日志管理" })
 public class LogController {
     private final LogService logService;
 

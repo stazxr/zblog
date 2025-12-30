@@ -1,3 +1,13 @@
+spring:
+  datasource:
+    druid:
+      stat-view-servlet: # http://localhost:8080/druid/index.html
+        enabled: true
+        url-pattern: /druid/*
+        # login-username: admin # 控制台登录用户
+        # login-password: adminPwd # 控制台登录密码
+        reset-enable: false # 是否可以重置统计信息
+        allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）默认为 DruidStatViewServletConfiguration.DEFAULT_ALLOW_IP
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

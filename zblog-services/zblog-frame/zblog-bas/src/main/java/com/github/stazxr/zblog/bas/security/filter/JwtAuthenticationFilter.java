@@ -103,8 +103,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (securityExtProperties.getLoginUrl().equals(request.getRequestURI()) || errorPath.equals(request.getRequestURI())) {
+        String requestURI = request.getRequestURI();
+        if (securityExtProperties.getLoginUrl().equals(requestURI) || errorPath.equals(requestURI)) {
             // 登录接口或 ERROR 接口直接访问
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (!requestURI.startsWith("/api/")) {
+            // 非系统请求不鉴权
             chain.doFilter(request, response);
             return;
         }

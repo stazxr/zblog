@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 @RestController
 @RequiredArgsConstructor
-@Api(value = "LogoutController", tags = { "注销控制器" })
+@Api(value = "LogoutController", tags = { "登出管理" })
 public class LogoutController {
     private final UserService userService;
 

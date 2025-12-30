@@ -10,45 +10,62 @@ spring:
     allow-circular-references: false # 是否允许循环依赖
   datasource:
     druid:
+      # 基本信息
       driver-class-name: ${zblog.db.DbDriver} # 数据源驱动
       url: ${zblog.db.DbUrl} # 数据库连接 URL
       username: ${zblog.db.DbUser} # 数据库用户名
       password: ${zblog.db.DbPass} # 数据库密码
-      initial-size: 5 # 连接池的初始连接数
-      min-idle: 15 # 连接池的最小连接数
-      max-active: 30 # 连接池的最大连接数
+
+      # 连接池大小配置
+      initial-size: 10 # 连接池的初始连接数, 建议 InitialSize ≥ MinIdle
+      min-idle: 10 # 连接池的最小连接数
+      max-active: 20 # 连接池的最大连接数
       max-wait: 10000 # 连接池的最大等待时间（毫秒）
+
+      # 连接有效性检查
       remove-abandoned-timeout: 180 # 连接在被视为可回收之前需要空闲的最长时间（以秒数为单位）
       time-between-eviction-runs-millis: 180000 # 空闲连接清理任务的运行间隔时间（毫秒）
       max-evictable-idle-time-millis: 900000 # 连接池的最大生存时间（毫秒）
       min-evictable-idle-time-millis: 300000 # 连接池的最小生存时间（毫秒）
       validation-query: select 1 # 检测连接是否有效
       test-on-borrow: true # 指明是否在从池中取出连接前进行检验, 如果检验失败, 则从池中去除连接并尝试取出另一个
-      test-while-idle: true # 指明连接是否被空闲连接回收器（如果有）进行检验. 如果检测失败, 则连接将被从池中去除
       test-on-return: false # 是否在归还到池中前进行检验
-      stat-view-servlet:
-        enabled: true # 启用 Druid 监控功能
-        url-pattern: /api/druid/* # 配置监控界面的 URL 映射
-        reset-enable: true # 是否可以重置统计信息
-        # login-username: admin # 控制台登录用户 bugs 20240730 登录页面访问不到
-        # login-password: admin # 控制台登录密码
-        allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）
-        deny: # 禁止访问监控界面的 IP（优先于 allow）
+      test-while-idle: true # 指明连接是否被空闲连接回收器（如果有）进行检验. 如果检测失败, 则连接将被从池中去除
+
+      # 防止泄漏
+      remove-abandoned: true # 当连接池中的某个连接被应用程序借出后长时间没有归还，Druid 会认为这个连接“被遗弃”，并自动回收
+      remove-abandoned-timeout-millis: 300000 # 指定连接被认为“被遗弃”的时间阈值，单位是毫秒。一般建议 比最大可能执行的 SQL 时长稍大，避免误回收正在执行的合法连接
+      log-abandoned: true # 打印堆栈，方便排查
+
+      # 预处理语句缓存（可提升性能）
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+
+      # Web 应用监控配置
       web-stat-filter:
         enabled: true # 启用统计和监控 Web 应用程序的请求和响应数据
         url-pattern: /api/* # 配置监控的 URL 映射
-        exclusions: '*.js,*.gif,*.jpg,*.png,*.ico,/api/druid/*' # 设置不需要统计的 URL
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*' # 设置不需要统计的 URL
+
+      # 过滤器配置（监控，防火墙，日志等）
       filter:
-        stat: # 用于 SQL 执行的统计和监控，提供 SQL 执行时间、慢查询等信息的记录
+        stat: # SQL 监控配置，用于 SQL 执行的统计和监控，提供 SQL 执行时间、慢查询等信息的记录
           enabled: true
           log-slow-sql: true # 打印慢SQL
-          slow-sql-millis: 5000 # 慢SQL阙值（单位秒）
+          slow-sql-millis: 2000 # 慢SQL阙值（单位毫秒）
           merge-sql: true # 合并 SQL 查询
-        wall: # 用于 SQL 安全控制，防止 SQL 注入和管理 SQL 执行权限
+          db-type: mysql # 数据库类型
+        slf4j: # SQL 日志配置
+          enabled: false
+        wall: # SQL防火墙配置，用于 SQL 安全控制，防止 SQL 注入和管理 SQL 执行权限
           enabled: true
           config:
+            comment-allow: false # 是否允许 SQL 注释，防止通过注释绕过防火墙
             drop-table-allow: false # 不允许删除表
+            none-base-statement-allow: false # 是否允许非基础 SQL
             multi-statement-allow: false # 指定是否允许在一个 Statement 对象中执行多个 SQL 语句
+            strict-syntax-check: true # 严格检查 SQL 语法，发现危险 SQL 就拦截
+            truncate-allow: false # 禁止 TRUNCATE TABLE
   redis:
     database: ${zblog.redis.database} # 指定 Redis 使用的数据库索引，Redis 默认有 16 个数据库，索引从 0 到 15
     host: ${zblog.redis.host} # Redis 服务器地址
@@ -73,6 +90,8 @@ spring:
       add-mappings: false
   mvc:
     throw-exception-if-no-handler-found: true
+    pathmatch:
+      matching-strategy: ant_path_matcher
   freemarker:
     check-template-location: false
   thymeleaf:
@@ -95,6 +114,8 @@ spring:
           ssl: # 465
             enable: true # 启用 SSL/TLS 加密
             required: true # 所有与 SMTP 服务器的连接是否都必须使用 SSL/TLS 加密
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
           # starttls: # 587
             # enable: true # 启用 STARTTLS 协议。如果服务器支持 STARTTLS，这将会启用加密连接
             # required: true # 强制要求使用 STARTTLS 协议。如果 SMTP 服务器不支持 STARTTLS，连接将失败
@@ -116,7 +137,7 @@ swagger:
     description: Z-BLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，仓库链接：https://github.com/stazxr/zblog
     base-package: com.github.stazxr.zblog
     server-url: https://www.suntaoblog.com
-    version: V_4.0.0
+    version: V_5.0.0
     contact:
       name: 孙涛
       email: stazxr@qq.com

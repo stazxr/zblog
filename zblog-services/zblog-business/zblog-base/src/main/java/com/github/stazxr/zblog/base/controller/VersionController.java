@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/version")
-@Api(value = "VersionController", tags = { "版本控制器" })
+@Api(value = "VersionController", tags = { "版本维护" })
 public class VersionController {
     private final VersionService versionService;
 

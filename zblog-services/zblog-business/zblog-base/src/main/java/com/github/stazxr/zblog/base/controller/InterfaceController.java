@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/interfaces")
-@Api(value = "InterfaceController", tags = { "接口控制器" })
+@Api(value = "InterfaceController", tags = { "接口管理" })
 public class InterfaceController {
     private final InterfaceService interfaceService;
 

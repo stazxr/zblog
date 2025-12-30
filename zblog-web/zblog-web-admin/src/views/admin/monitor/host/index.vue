@@ -167,7 +167,7 @@ import ECharts from 'vue-echarts'
 import 'echarts/lib/chart/line'
 import 'echarts/lib/component/polar'
 export default {
-  name: 'Server',
+  name: 'HostMonitoring',
   components: {
     'v-chart': ECharts
   },

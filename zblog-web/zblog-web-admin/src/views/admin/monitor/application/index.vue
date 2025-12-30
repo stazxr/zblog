@@ -7,7 +7,7 @@
 <script>
 import elFrame from '@/components/Iframe/index'
 export default {
-  name: 'Sql',
+  name: 'ApplicationMonitoring',
   components: {
     elFrame
   }

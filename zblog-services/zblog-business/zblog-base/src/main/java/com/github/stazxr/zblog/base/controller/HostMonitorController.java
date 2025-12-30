@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.bas.msg.Result;
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.base.domain.bo.HostData;
 import com.github.stazxr.zblog.base.service.ServerMonitorService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 服务监控
+ * 主机监控
  *
  * @author SunTao
  * @since 2021-09-05
@@ -21,22 +21,22 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/server")
-@Api(value = "ServerMonitorController", tags = { "服务监控控制器" })
-public class ServerMonitorController {
+@RequestMapping("/api/host")
+@Api(value = "HostMonitorController", tags = { "主机监控" })
+public class HostMonitorController {
 	private final ServerMonitorService serverMonitorService;
 
 	/**
-	 * 查询服务器信息
+	 * 查询主机信息
 	 *
 	 * @return ServerData
 	 */
 	@IgnoredLog
 	@GetMapping(value = "/data")
-	@ApiOperation("查询服务器信息")
+	@ApiOperation("查询主机信息")
 	@ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-	@Router(name = "查询服务器信息", code = "queryServerData")
-	public Result queryServerData() {
-		return Result.success().data(serverMonitorService.queryServerData());
+	@Router(name = "查询主机信息", code = "HOSTQ001")
+	public HostData queryServerData() {
+		return serverMonitorService.queryServerData();
 	}
 }

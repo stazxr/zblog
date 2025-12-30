@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
-import com.github.stazxr.zblog.base.domain.bo.ServerData;
+import com.github.stazxr.zblog.base.domain.bo.HostData;
 
 /**
  * 服务监控业务层
@@ -14,5 +14,5 @@ public interface ServerMonitorService {
 	 *
 	 * @return ServerInfo
 	 */
-	ServerData queryServerData();
+	HostData queryServerData();
 }

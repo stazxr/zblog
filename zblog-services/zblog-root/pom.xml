@@ -59,7 +59,7 @@
         <spring-jasypt.version>3.0.3</spring-jasypt.version>
         <spring-amqp.version>2.3.9</spring-amqp.version>
         <spring-swagger.version>3.0.0</spring-swagger.version>
-        <spring-druid.version>1.1.17</spring-druid.version>
+        <spring-druid.version>1.2.27</spring-druid.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <!-- springboot 2.5.2 - 1.3.0; springboot 2.6.3 - 1.4.1 -->
         <pagehelper.version>1.4.1</pagehelper.version>

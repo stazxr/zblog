@@ -107,8 +107,7 @@ public class SecurityResourceServiceImpl implements SecurityResourceService {
         // 查找资源信息（带有缓存）
         Resource resource = resourceCacheService.findResource(requestUri, requestMethod);
         if (resource == null) {
-            // 访问资源不存在
-            return RouterExtLevel.NULL;
+            return RouterExtLevel.OPEN;
         } else {
             return resource.getResourceLevel();
         }

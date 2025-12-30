@@ -1,0 +1,12 @@
+# 文件规则待优化
+spring:
+  datasource:
+    druid:
+      stat-view-servlet: # 生产环境关闭 druid 登录页
+        enabled: true
+        url-pattern: /druid/* # 配置监控界面的 URL 映射
+        login-username: # 控制台登录用户
+        login-password: # 控制台登录密码
+        reset-enable: false # 是否可以重置统计信息
+        allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）
+        deny: # 禁止访问监控界面的 IP（优先于 allow）

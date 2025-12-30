@@ -2,7 +2,7 @@ package com.github.stazxr.zblog.base.service.impl;
 
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
-import com.github.stazxr.zblog.base.domain.bo.ServerData;
+import com.github.stazxr.zblog.base.domain.bo.HostData;
 import com.github.stazxr.zblog.base.service.ServerMonitorService;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.net.LocalHostUtils;
@@ -41,8 +41,8 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
      * @return ServerInfo
      */
     @Override
-    public ServerData queryServerData() {
-        ServerData serverData = new ServerData();
+    public HostData queryServerData() {
+        HostData hostData = new HostData();
 
         // init SystemInfo
         SystemInfo si = new SystemInfo();
@@ -50,25 +50,25 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         HardwareAbstractionLayer hal = si.getHardware();
 
         // init serverData
-        serverData.setSys(getSysInfo(os));
-        serverData.setCpu(getCpuInfo(hal.getProcessor()));
-        serverData.setMemory(getMemoryInfo(hal.getMemory()));
-        serverData.setJvm(getJvmInfo(Runtime.getRuntime()));
-        serverData.setSwap(getSwapInfo(hal.getMemory()));
-        serverData.setSysFiles(getSysFiles(os.getFileSystem()));
-        serverData.setTime(DateUtils.formatNow("HH:mm:ss"));
-        return serverData;
+        hostData.setSys(getSysInfo(os));
+        hostData.setCpu(getCpuInfo(hal.getProcessor()));
+        hostData.setMemory(getMemoryInfo(hal.getMemory()));
+        hostData.setJvm(getJvmInfo(Runtime.getRuntime()));
+        hostData.setSwap(getSwapInfo(hal.getMemory()));
+        hostData.setSysFiles(getSysFiles(os.getFileSystem()));
+        hostData.setTime(DateUtils.formatNow("HH:mm:ss"));
+        return hostData;
     }
 
-    private List<ServerData.SysFile> getSysFiles(FileSystem fileSystem) {
-        List<ServerData.SysFile> sysFiles = new ArrayList<>();
+    private List<HostData.SysFile> getSysFiles(FileSystem fileSystem) {
+        List<HostData.SysFile> sysFiles = new ArrayList<>();
         OSFileStore[] fsArray = fileSystem.getFileStores();
         DecimalFormat df = new DecimalFormat("0.00");
         for (OSFileStore fs : fsArray) {
             long free = fs.getUsableSpace();
             long total = fs.getTotalSpace();
             long used = total - free;
-            ServerData.SysFile sysFile = new ServerData.SysFile();
+            HostData.SysFile sysFile = new HostData.SysFile();
             sysFile.setDirName(fs.getMount());
             sysFile.setSysTypeName(fs.getType());
             sysFile.setTypeName(fs.getName());
@@ -80,12 +80,12 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         }
 
         // 排序
-        sysFiles.sort(Comparator.comparing(ServerData.SysFile::getDirName));
+        sysFiles.sort(Comparator.comparing(HostData.SysFile::getDirName));
         return sysFiles;
     }
 
-    private ServerData.Swap getSwapInfo(GlobalMemory memory) {
-        ServerData.Swap swap = new ServerData.Swap();
+    private HostData.Swap getSwapInfo(GlobalMemory memory) {
+        HostData.Swap swap = new HostData.Swap();
         DecimalFormat df = new DecimalFormat("0.00");
         swap.setTotal(FormatUtil.formatBytes(memory.getSwapTotal()));
         swap.setAvailable(FormatUtil.formatBytes(memory.getSwapTotal() - memory.getSwapUsed()));
@@ -94,8 +94,8 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         return swap;
     }
 
-    private ServerData.Jvm getJvmInfo(Runtime runtime) {
-        ServerData.Jvm jvm = new ServerData.Jvm();
+    private HostData.Jvm getJvmInfo(Runtime runtime) {
+        HostData.Jvm jvm = new HostData.Jvm();
         DecimalFormat df = new DecimalFormat("0.00");
         jvm.setMax(FormatUtil.formatBytes(runtime.maxMemory()));
         jvm.setTotal(FormatUtil.formatBytes(runtime.totalMemory()));
@@ -105,8 +105,8 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         return jvm;
     }
 
-    private ServerData.Memory getMemoryInfo(GlobalMemory memory) {
-        ServerData.Memory mem = new ServerData.Memory();
+    private HostData.Memory getMemoryInfo(GlobalMemory memory) {
+        HostData.Memory mem = new HostData.Memory();
         DecimalFormat df = new DecimalFormat("0.00");
         mem.setTotal(FormatUtil.formatBytes(memory.getTotal()));
         mem.setAvailable(FormatUtil.formatBytes(memory.getAvailable()));
@@ -115,8 +115,8 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         return mem;
     }
 
-    private ServerData.Cpu getCpuInfo(CentralProcessor processor) {
-        ServerData.Cpu cpu = new ServerData.Cpu();
+    private HostData.Cpu getCpuInfo(CentralProcessor processor) {
+        HostData.Cpu cpu = new HostData.Cpu();
         cpu.setName(processor.getName());
         cpu.setPackageNum(processor.getPhysicalPackageCount());
         cpu.setCoreNum(processor.getPhysicalProcessorCount());
@@ -142,8 +142,8 @@ public class ServerMonitorServiceImpl implements ServerMonitorService {
         return cpu;
     }
 
-    private ServerData.Sys getSysInfo(OperatingSystem os) {
-        ServerData.Sys sys = new ServerData.Sys();
+    private HostData.Sys getSysInfo(OperatingSystem os) {
+        HostData.Sys sys = new HostData.Sys();
         sys.setOs(os.toString());
 
         long time = ManagementFactory.getRuntimeMXBean().getStartTime();

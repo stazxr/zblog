@@ -13,7 +13,7 @@ const api = {
     // 文件上传测试接口
     testUploadFile: createApiUrl('/api/file/testUploadFile'),
     // Druid
-    sqlApi: createApiUrl('/api/druid/index.html'),
+    sqlApi: createApiUrl('/druid/index.html'),
     // Swagger
     swaggerApi: createApiUrl('/doc.html'),
     // webSsh

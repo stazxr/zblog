@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration(proxyBeanMethods = false)
-@MapperScan(value = {"com.github.stazxr.zblog.mapper", "com.github.stazxr.zblog.*.mapper"})
+@MapperScan("com.github.stazxr.zblog.**.mapper")
 public class MyBatisPlusConfig {
     /**
      * MybatisPlusInterceptor config

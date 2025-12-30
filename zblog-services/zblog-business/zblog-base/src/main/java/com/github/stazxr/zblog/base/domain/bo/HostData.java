@@ -1,17 +1,23 @@
 package com.github.stazxr.zblog.base.domain.bo;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * 服务器信息
+ * 主机信息
  *
  * @author SunTao
  * @since 2021-09-05
  */
-@Data
-public class ServerData {
+@Getter
+@Setter
+public class HostData implements Serializable {
+    private static final long serialVersionUID = -1604581414339962607L;
+
     /**
      * 系统信息
      */
