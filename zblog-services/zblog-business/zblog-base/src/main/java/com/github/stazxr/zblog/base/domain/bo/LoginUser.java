@@ -15,6 +15,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class LoginUser implements Serializable {
+    private static final long serialVersionUID = 7908166496446814773L;
+
     /**
      * 用户id
      */

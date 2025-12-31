@@ -3,16 +3,16 @@ package com.github.stazxr.zblog.base.service;
 import com.github.stazxr.zblog.base.domain.bo.HostData;
 
 /**
- * 服务监控业务层
+ * 主机监控业务层
  *
  * @author SunTao
  * @since 2021-09-05
  */
-public interface ServerMonitorService {
+public interface HostMonitorService {
 	/**
-	 * 查询服务器信息
+	 * 查询主机信息
 	 *
-	 * @return ServerInfo
+	 * @return ServerData
 	 */
-	HostData queryServerData();
+	HostData queryHostData();
 }

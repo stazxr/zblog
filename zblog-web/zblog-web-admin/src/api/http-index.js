@@ -13,12 +13,11 @@ import interfaces from '@/api/base/system/interface.js'
 
 // monitor
 import log from '@/api/base/monitor/log.js'
+import host from '@/api/base/monitor/host.js'
 
 // TODO
-import server from '@/api/base/server.js'
 import version from '@/api/base/version.js'
 import file from '@/api/base/file.js'
-import node from '@/api/base/node.js'
 
 // TODO service
 import column from '@/api/service/column.js'
@@ -37,7 +36,7 @@ import test from '@/api/service/test.js'
 export default {
   communal, home, menu, userCenter,
   user, role, perm, interfaces, dict,
-  log,
-  server, version, file, node, column, category,
+  log, host,
+  version, file, column, category,
   tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

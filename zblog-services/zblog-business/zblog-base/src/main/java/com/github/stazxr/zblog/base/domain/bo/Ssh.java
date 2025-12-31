@@ -17,6 +17,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ApiModel("节点 SSH 信息")
 public class Ssh implements Serializable {
+    private static final long serialVersionUID = -1335022427386945259L;
+
     /**
      * 节点ip
      */

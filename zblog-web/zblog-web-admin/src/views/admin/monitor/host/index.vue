@@ -3,16 +3,10 @@
     <div v-if="show">
       <el-card class="box-card">
         <div style="color: #666;font-size: 13px;">
-          <svg-icon icon-class="system" style="margin-right: 5px" />
-          <span>
-            系统：{{ data.sys.os }}
-          </span>
-          <span>
-            IP：{{ data.sys.serverIp }}
-          </span>
-          <span>
-            项目已不间断运行：{{ data.sys.runtime }}
-          </span>
+          <svg-icon icon-class="icon-system" style="margin-right: 5px" />
+          <span> 系统: {{ data.sys.os }} </span>
+          <span> IP: {{ data.sys.serverIp }} </span>
+          <span> 项目已不间断运行: {{ data.sys.runtime }} </span>
           <i class="el-icon-refresh" style="margin-left: 40px" @click="init" />
         </div>
       </el-card>
@@ -43,7 +37,7 @@
                 <el-progress type="dashboard" :percentage="parseFloat(data.cpu.used)" />
               </div>
             </el-tooltip>
-            <div class="footer">{{ data.cpu.coreNum }}核CPU </div>
+            <div class="footer"> {{ data.cpu.coreNum }}核CPU </div>
           </el-col>
           <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6" style="margin-bottom: 10px">
             <div class="title">内存使用率</div>
@@ -125,8 +119,8 @@
               <el-table-column :show-overflow-tooltip="true" prop="free" label="可用大小" align="center" />
               <el-table-column :show-overflow-tooltip="true" prop="used" label="已用大小" align="center" />
               <el-table-column :show-overflow-tooltip="true" prop="usage" label="已用百分比" align="center">
-                <template slot-scope="scope">
-                  <span>{{ scope.row['usage'] }}%</span>
+                <template v-slot="scope">
+                  <span> {{ scope.row['usage'] }}% </span>
                 </template>
               </el-table-column>
             </el-table>
@@ -142,7 +136,7 @@
                 <span style="font-weight: bold;color: #666;font-size: 15px">CPU使用率监控</span>
               </div>
               <div>
-                <v-chart :options="cpuInfo" />
+                <v-chart :options="cpuInfo" autoresize />
               </div>
             </el-card>
           </el-col>
@@ -152,7 +146,7 @@
                 <span style="font-weight: bold;color: #666;font-size: 15px">内存使用率监控</span>
               </div>
               <div>
-                <v-chart :options="memoryInfo" />
+                <v-chart :options="memoryInfo" autoresize />
               </div>
             </el-card>
           </el-col>
@@ -279,18 +273,14 @@ export default {
   },
   created() {
     this.init()
-    this.monitor = window.setInterval(() => {
-      setTimeout(() => {
-        this.init()
-      }, 2)
-    }, 10000)
+    this.monitor = setInterval(this.init, 10000)
   },
-  destroyed() {
+  beforeDestroy() {
     clearInterval(this.monitor)
   },
   methods: {
     init() {
-      this.$mapi.server.queryServerData().then(res => {
+      this.$mapi.host.queryHostData().then(res => {
         const { data } = res
         this.data = data
         this.show = true

@@ -3,6 +3,8 @@ package com.github.stazxr.zblog.base.domain.bo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * 基于 {name: '', value: ''} 的数据格式
  *
@@ -11,7 +13,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class NameValue {
+public class NameValue implements Serializable {
+    private static final long serialVersionUID = -2230068059662445016L;
+
     private String name;
 
     private Object value;

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * QQ 登录参数
  *
@@ -16,7 +18,9 @@ import lombok.ToString;
 @Setter
 @ToString
 @ApiModel("QQ 登录参数")
-public class QqLoginParam {
+public class QqLoginParam implements Serializable {
+    private static final long serialVersionUID = 7751421980188107011L;
+
     /**
      * openId
      */

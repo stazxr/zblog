@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.base.config.HostMonitorSnapshot;
 import com.github.stazxr.zblog.base.domain.bo.HostData;
-import com.github.stazxr.zblog.base.service.ServerMonitorService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.IgnoredLog;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/host")
 @Api(value = "HostMonitorController", tags = { "主机监控" })
 public class HostMonitorController {
-	private final ServerMonitorService serverMonitorService;
+	private final HostMonitorSnapshot hostMonitorSnapshot;
 
 	/**
 	 * 查询主机信息
@@ -36,7 +36,7 @@ public class HostMonitorController {
 	@ApiOperation("查询主机信息")
 	@ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
 	@Router(name = "查询主机信息", code = "HOSTQ001")
-	public HostData queryServerData() {
-		return serverMonitorService.queryServerData();
+	public HostData queryHostData() {
+		return hostMonitorSnapshot.getSnapshot();
 	}
 }
