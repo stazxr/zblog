@@ -1,5 +1,5 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const versionApi = '/api/version'
 
@@ -8,9 +8,9 @@ export default {
   pageVersionList: params => {
     return api.httpRequest().get(`${versionApi}/pageList`, params)
   },
-  // 查询版本信息
-  queryVersionInfo: params => {
-    return api.httpRequest().get(`${versionApi}/queryVersionInfo`, params)
+  // 查询版本详情
+  queryVersionDetail: params => {
+    return api.httpRequest().get(`${versionApi}/queryVersionDetail`, params)
   },
   // 新增版本
   addVersion: params => {

@@ -74,7 +74,6 @@ public class DictController {
      * @param dictId 字典序列
      * @return DictVo
      */
-    @Log
     @GetMapping(value = "/queryDictDetail")
     @ApiOperation(value = "查询字典详情")
     @ApiImplicitParams({

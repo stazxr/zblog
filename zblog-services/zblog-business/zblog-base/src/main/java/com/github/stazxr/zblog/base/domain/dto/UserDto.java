@@ -27,7 +27,7 @@ public class UserDto extends BaseDto {
     /**
      * 用户id
      */
-    @NotNull(groups = Update.class, message = "{valid.user.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
     @ApiModelProperty(value = "用户id")
     private Long id;
 

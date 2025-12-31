@@ -9,19 +9,19 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
- * 角色授权
+ * 角色授权信息
  *
  * @author SunTao
  * @since 2022-08-30
  */
 @Getter
 @Setter
-@ApiModel("角色授权信息")
+@ApiModel("角色授权DTO")
 public class RoleAuthDto {
     /**
      * 角色id
      */
-    @NotNull(message = "{valid.role.id.NotNull}")
+    @NotNull(message = "{valid.common.id.NotNull}")
     @ApiModelProperty("角色id")
     private Long roleId;
 

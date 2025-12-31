@@ -89,9 +89,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PermissionVo queryPermDetail(Long permId) {
         // 查询权限信息
-        Assert.notNull(permId, ExpMessageCode.of("valid.perm.id.NotNull"));
+        Assert.notNull(permId, ExpMessageCode.of("valid.common.id.NotNull"));
         PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
-        Assert.notNull(permissionVo, ExpMessageCode.of("valid.perm.not.exist"));
+        Assert.notNull(permissionVo, ExpMessageCode.of("valid.common.data.notFound"));
         // 查询角色编码列表
         permissionVo.setRoleCodeList(permissionMapper.selectRoleCodesByPermId(permId));
         return permissionVo;
@@ -129,11 +129,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 获取新增权限信息
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
         // 新增时，不允许传入 PermissionId
-        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.perm.add.idIsNull"));
+        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
         // 权限信息检查
         checkPermission(permission);
         // 新增权限
-        Assert.isTrue(permissionMapper.insert(permission) != 1, ExpMessageCode.of("result.perm.add.failed"));
+        Assert.isTrue(permissionMapper.insert(permission) != 1, ExpMessageCode.of("result.common.add.failed"));
         // 删除相关缓存
         if (StringUtils.isNotBlank(permission.getPermCode())) {
             removeCache(permission.getId(), null, permission.getPermCode());
@@ -151,14 +151,14 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
         // 判断权限是否存在
         Permission dbPermission = permissionMapper.selectById(permission.getId());
-        Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
+        Assert.notNull(dbPermission, ExpMessageCode.of("valid.common.data.notFound"));
         // 权限类型不允许编辑
         boolean permTypeIsSame = dbPermission.getPermType().equals(permission.getPermType());
         Assert.isTrue(!permTypeIsSame, ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
         // 权限信息检查
         checkPermission(permission);
         // 编辑权限
-        Assert.isTrue(permissionMapper.updateById(permission) != 1, ExpMessageCode.of("result.perm.edit.failed"));
+        Assert.isTrue(permissionMapper.updateById(permission) != 1, ExpMessageCode.of("result.common.edit.failed"));
         // 删除相关缓存
         if (!StringUtils.hasBlank(dbPermission.getPermCode(), permission.getPermCode())) {
             removeCache(permission.getId(), dbPermission.getPermCode(), permission.getPermCode());
@@ -175,7 +175,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     public void deletePermission(Long permId) {
         // 判断权限是否存在
         Permission dbPermission = permissionMapper.selectById(permId);
-        Assert.notNull(dbPermission, ExpMessageCode.of("valid.perm.not.exist"));
+        Assert.notNull(dbPermission, ExpMessageCode.of("valid.common.data.notFound"));
         // 判断是否存在子节点
         Integer permType = dbPermission.getPermType();
         boolean dirOrMenu = PermissionType.DIR.getType().equals(permType) ||
@@ -185,7 +185,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             Assert.isTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.hasChild"));
         }
         // 删除权限
-        Assert.isTrue(permissionMapper.deleteById(permId) != 1, ExpMessageCode.of("result.perm.delete.failed"));
+        Assert.isTrue(permissionMapper.deleteById(permId) != 1, ExpMessageCode.of("result.common.delete.failed"));
         rolePermMapper.deleteByPermId(permId);
         // 删除相关缓存
         if (StringUtils.isNotBlank(dbPermission.getPermCode())) {

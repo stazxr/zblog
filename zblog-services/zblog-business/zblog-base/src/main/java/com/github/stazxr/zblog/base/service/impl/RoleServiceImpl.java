@@ -70,7 +70,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (StringUtils.isNotBlank(queryDto.getRoleCode())) {
             queryDto.setRoleCode(queryDto.getRoleCode().trim());
         }
-
         // 分页查询
         try (Page<RoleVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
             List<RoleVo> dataList = roleMapper.selectRoleList(queryDto);
@@ -97,9 +96,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
-        Assert.notNull(roleId, ExpMessageCode.of("valid.role.id.NotNull"));
+        Assert.notNull(roleId, ExpMessageCode.of("valid.common.id.NotNull"));
         RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
-        Assert.notNull(roleVo, ExpMessageCode.of("valid.role.not.exist"));
+        Assert.notNull(roleVo, ExpMessageCode.of("valid.common.data.notFound"));
         return roleVo;
     }
 
@@ -113,11 +112,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 获取角色信息
         Role role = roleConverter.dtoToEntity(roleDto);
         // 新增时，不允许传入 RoleId
-        Assert.isNull(role.getId(), ExpMessageCode.of("valid.role.add.idIsNull"));
+        Assert.isNull(role.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
         // 角色信息检查
         checkRole(role);
         // 新增角色
-        Assert.isTrue(roleMapper.insert(role) != 1, ExpMessageCode.of("result.role.add.failed"));
+        Assert.isTrue(roleMapper.insert(role) != 1, ExpMessageCode.of("result.common.add.failed"));
     }
 
     /**
@@ -131,11 +130,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Role role = roleConverter.dtoToEntity(roleDto);
         // 判断角色是否存在
         Role dbRole = roleMapper.selectById(role.getId());
-        Assert.notNull(dbRole, ExpMessageCode.of("valid.role.not.exist"));
+        Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
         // 角色信息检查
         checkRole(role);
         // 编辑角色
-        Assert.isTrue(roleMapper.updateById(role) != 1, ExpMessageCode.of("result.role.edit.failed"));
+        Assert.isTrue(roleMapper.updateById(role) != 1, ExpMessageCode.of("result.common.edit.failed"));
     }
 
     /**
@@ -184,13 +183,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(Long roleId) {
-        // 参数检查
-        Assert.notNull(roleId, ExpMessageCode.of("valid.role.id.NotNull"));
+        // 判断角色是否存在
+        Role dbRole = roleMapper.selectById(roleId);
+        Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
         // 判断角色是否关联用户
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
         Assert.isTrue(!userIds.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
         // 删除角色
-        Assert.isTrue(roleMapper.deleteById(roleId) != 1, ExpMessageCode.of("result.role.delete.failed"));
+        Assert.isTrue(roleMapper.deleteById(roleId) != 1, ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色关联信息
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
@@ -206,7 +206,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchAddUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.role.id.NotNull"));
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.NotNull"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -229,7 +229,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.role.id.NotNull"));
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.NotNull"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;

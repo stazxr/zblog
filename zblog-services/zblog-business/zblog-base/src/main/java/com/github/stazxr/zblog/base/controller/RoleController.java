@@ -74,7 +74,6 @@ public class RoleController {
      * @param roleId 角色id
      * @return RoleVo
      */
-    @Log
     @GetMapping(value = "/queryRoleDetail")
     @ApiOperation(value = "查询角色详情")
     @ApiImplicitParams({

@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -19,14 +21,14 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-@ApiModel("权限信息")
+@ApiModel("权限DTO")
 public class PermissionDto extends BaseDto {
     private static final long serialVersionUID = -7631261139679214658L;
 
     /**
      * 权限ID
      */
-    @NotNull(groups = Update.class, message = "{valid.perm.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
     @ApiModelProperty("权限id")
     private Long id;
 
@@ -90,7 +92,9 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.sort.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.NotNull}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
     @ApiModelProperty(value = "权限排序", example = "99999")
     private Integer sort;
 

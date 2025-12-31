@@ -1,5 +1,5 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const fileApi = '/api/file'
 

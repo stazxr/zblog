@@ -16,8 +16,8 @@ import log from '@/api/base/monitor/log.js'
 import host from '@/api/base/monitor/host.js'
 
 // TODO
-import version from '@/api/base/version.js'
-import file from '@/api/base/file.js'
+import version from '@/api/base/maintain/version.js'
+import file from '@/api/base/maintain/file.js'
 
 // TODO service
 import column from '@/api/service/column.js'
@@ -35,8 +35,12 @@ import test from '@/api/service/test.js'
 
 export default {
   communal, home, menu, userCenter,
+  // 系统管理
   user, role, perm, interfaces, dict,
+  // 系统监控
   log, host,
-  version, file, column, category,
+  // 系统运维
+  version, file,
+  column, category,
   tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

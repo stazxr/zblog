@@ -69,7 +69,6 @@ public class UserController {
      * @param userId 用户id
      * @return UserVo
      */
-    @Log
     @GetMapping(value = "/queryUserDetail")
     @ApiOperation(value = "查询用户详情")
     @ApiImplicitParams({

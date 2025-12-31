@@ -3,8 +3,6 @@ package com.github.stazxr.zblog.base.domain.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.stazxr.zblog.core.base.BaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +17,6 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@ApiModel("权限实体")
 @TableName("permission")
 public class Permission extends BaseEntity {
     private static final long serialVersionUID = 1439040306321618231L;
@@ -28,20 +25,17 @@ public class Permission extends BaseEntity {
      * 权限ID
      */
     @TableId
-    @ApiModelProperty("权限id")
     private Long id;
 
     /**
      * 上级权限ID
      */
-    @ApiModelProperty("权限pid")
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long pid;
 
     /**
      * 权限名称
      */
-    @ApiModelProperty("权限名称")
     private String permName;
 
     /**
@@ -62,7 +56,6 @@ public class Permission extends BaseEntity {
      * @see com.github.stazxr.zblog.bas.router.Router#code() 路由(接口)配置, 配置接口的访问规则
      * @see com.github.stazxr.zblog.bas.router.Resource#getResourceCode() 系统会将路由配置转为资源信息
      */
-    @ApiModelProperty("权限编码")
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String permCode;
 
@@ -79,7 +72,6 @@ public class Permission extends BaseEntity {
      *
      * @see com.github.stazxr.zblog.base.domain.enums.PermissionType
      */
-    @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮、4：外链")
     private Integer permType;
 
     /**
@@ -90,7 +82,6 @@ public class Permission extends BaseEntity {
      * @see com.github.stazxr.zblog.bas.router.Router#level()
      * @see com.github.stazxr.zblog.bas.router.Resource#getResourceLevel()
      */
-    @ApiModelProperty("权限访问级别: 1-公开权限;2-公共权限;4-受控权限;...")
     private Integer permLevel;
 
     /**
@@ -109,7 +100,6 @@ public class Permission extends BaseEntity {
      *  组件名称为 NULL
      * </li>
      */
-    @ApiModelProperty("组件名称")
     private String componentName;
 
     /**
@@ -128,7 +118,6 @@ public class Permission extends BaseEntity {
      *  组件路径为 NULL
      * </li>
      */
-    @ApiModelProperty("组件路径")
     private String componentPath;
 
     /**
@@ -147,7 +136,6 @@ public class Permission extends BaseEntity {
      *  前端路由地址为外链URL
      * </li>
      */
-    @ApiModelProperty("前端路由地址")
     private String routerPath;
 
     /**
@@ -166,13 +154,11 @@ public class Permission extends BaseEntity {
      *  图标名称, 跟前端一致
      * </li>
      */
-    @ApiModelProperty("权限图标")
     private String icon;
 
     /**
      * 权限排序，默认99999
      */
-    @ApiModelProperty(value = "权限排序", example = "99999")
     private Integer sort;
 
     /**
@@ -182,7 +168,6 @@ public class Permission extends BaseEntity {
      *  只有菜单配置 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#MENU} 才会生效
      * </li>
      */
-    @ApiModelProperty(value = "是否缓存")
     private Boolean cacheable;
 
     /**
@@ -190,20 +175,17 @@ public class Permission extends BaseEntity {
      *
      * <li>如果是 {@link com.github.stazxr.zblog.base.domain.enums.PermissionType#BTN} 则为 NULL
      */
-    @ApiModelProperty(value = "是否隐藏")
     private Boolean hidden;
 
     /**
      * 是否启用
      */
-    @ApiModelProperty(value = "是否启用")
     private Boolean enabled;
 
     /**
      * 是否删除
      */
     @TableLogic
-    @ApiModelProperty(value = "是否删除")
     private Boolean deleted;
 
     /**
@@ -211,7 +193,6 @@ public class Permission extends BaseEntity {
      */
     @JsonIgnore
     @TableField(exist = false)
-    @ApiModelProperty(hidden = true)
     private List<Permission> children;
 
     @Override

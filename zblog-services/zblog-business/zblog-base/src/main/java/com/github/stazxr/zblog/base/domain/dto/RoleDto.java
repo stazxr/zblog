@@ -12,21 +12,21 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * RoleDto
+ * 角色信息
  *
  * @author SunTao
  * @since 2025-09-13
  */
 @Getter
 @Setter
-@ApiModel("角色信息")
+@ApiModel("角色DTO")
 public class RoleDto extends BaseDto {
     private static final long serialVersionUID = 5704217272490958998L;
 
     /**
      * 角色id
      */
-    @NotNull(groups = Update.class, message = "{valid.role.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
     @ApiModelProperty(value = "角色id")
     private Long id;
 

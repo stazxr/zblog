@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import com.github.stazxr.zblog.util.time.DateUtils;
+import io.swagger.annotations.ApiModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ApiModel("用户VO")
 public class UserVo extends BaseVo {
     private static final long serialVersionUID = -746423782527946064L;
 

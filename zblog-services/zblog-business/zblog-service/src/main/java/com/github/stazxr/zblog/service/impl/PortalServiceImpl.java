@@ -741,7 +741,8 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public List<Version> queryVersionList() {
-        return versionMapper.selectVersionList(null);
+//        return versionMapper.selectVersionList(null);
+        return new ArrayList<>();
     }
 
     /**

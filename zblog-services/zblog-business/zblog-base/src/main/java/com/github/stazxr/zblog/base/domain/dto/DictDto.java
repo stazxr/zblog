@@ -21,14 +21,14 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-@ApiModel("字典信息")
+@ApiModel("字典DTO")
 public class DictDto extends BaseDto {
     private static final long serialVersionUID = 517310641739041347L;
 
     /**
      * 字典ID
      */
-    @NotNull(groups = Update.class, message = "{valid.dict.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
     @ApiModelProperty("字典id")
     private Long id;
 
@@ -67,9 +67,9 @@ public class DictDto extends BaseDto {
     /**
      * 字典排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.NotNull}")
-    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.Max99999}")
-    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.dict.dictSort.Min1}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.NotNull}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
     @ApiModelProperty("字典排序")
     private Integer dictSort;
 

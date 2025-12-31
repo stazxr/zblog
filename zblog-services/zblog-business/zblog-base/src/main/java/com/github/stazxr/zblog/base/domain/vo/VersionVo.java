@@ -1,8 +1,8 @@
-package com.github.stazxr.zblog.base.domain.entity;
+package com.github.stazxr.zblog.base.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
+import com.github.stazxr.zblog.core.base.BaseVo;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,28 +14,31 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("version")
-public class Version extends BaseEntity {
+@ApiModel("版本VO")
+public class VersionVo extends BaseVo {
     private static final long serialVersionUID = -2864645948448605939L;
 
     /**
      * 版本id
      */
-    @TableId
+    @ApiModelProperty("版本id")
     private Long id;
 
     /**
      * 版本名称
      */
+    @ApiModelProperty("版本名称")
     private String versionName;
 
     /**
-     * 修订内容
+     * 版本描述
      */
+    @ApiModelProperty("版本描述")
     private String updateContent;
 
     /**
      * 版本排序，默认99999
      */
+    @ApiModelProperty("版本排序")
     private Integer sort;
 }

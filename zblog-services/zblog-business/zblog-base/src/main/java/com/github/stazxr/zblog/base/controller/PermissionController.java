@@ -1,12 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
+import com.github.stazxr.zblog.base.domain.vo.PermCodeVo;
 import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
@@ -71,7 +72,6 @@ public class PermissionController {
      * @param permId 权限id
      * @return PermissionVo
      */
-    @Log
     @GetMapping(value = "/queryPermDetail")
     @ApiOperation("查询权限详情")
     @ApiImplicitParams({
@@ -79,8 +79,8 @@ public class PermissionController {
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询权限详情", code = "PERMQ003")
-    public Result queryPermDetail(@RequestParam Long permId) {
-        return Result.s(permissionService.queryPermDetail(permId));
+    public PermissionVo queryPermDetail(@RequestParam Long permId) {
+        return permissionService.queryPermDetail(permId);
     }
 
     /**
@@ -96,8 +96,8 @@ public class PermissionController {
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "查询权限编码列表", code = "PERMQ004", level = RouterLevel.PUBLIC)
-    public Result queryPermCodes(@RequestParam(required = false) String searchKey) {
-        return Result.s(permissionService.queryPermCodes(searchKey));
+    public List<PermCodeVo> queryPermCodes(@RequestParam(required = false) String searchKey) {
+        return permissionService.queryPermCodes(searchKey);
     }
 
     /**
@@ -113,8 +113,8 @@ public class PermissionController {
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
     @Router(name = "根据权限编码查询资源信息", code = "PERMQ005", level = RouterLevel.PUBLIC)
-    public Result queryResourceByPermCode(@RequestParam String permCode) {
-        return Result.s(permissionService.queryResourceByPermCode(permCode));
+    public Resource queryResourceByPermCode(@RequestParam String permCode) {
+        return permissionService.queryResourceByPermCode(permCode);
     }
 
     /**

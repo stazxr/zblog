@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Layout from '../layout/index'
-// import ParentView from '../components/ParentView/index'
 
 Vue.use(VueRouter)
 
@@ -92,14 +91,6 @@ export const defaultRouterMap = [
       }
     ]
   },*/
-  /*
-   {
-    path: '/xterm',
-    meta: { title: 'WEB_SSH', cache: false },
-    name: 'XtermPage',
-    component: (resolve) => require(['@/views/admin/mnt/node/xterm'], resolve),
-    show: false
-  }*/
 ]
 
 export default new VueRouter({

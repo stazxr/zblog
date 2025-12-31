@@ -84,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public SecurityUser findUserById(String userId) {
         // 根据用户ID查询用户信息
-        Assert.notBlank(userId, ExpMessageCode.of("valid.user.id.NotNull"));
+        Assert.notBlank(userId, ExpMessageCode.of("valid.common.id.NotNull"));
         User user = userMapper.selectUserById(Long.parseLong(userId));
         Assert.notNull(user, ExpMessageCode.of("valid.user.not.exist"));
         // 设置角色和权限信息
@@ -207,9 +207,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public UserVo queryUserDetail(Long userId) {
-        Assert.notNull(userId, ExpMessageCode.of("valid.user.id.NotNull"));
+        Assert.notNull(userId, ExpMessageCode.of("valid.common.id.NotNull"));
         UserVo userVo = userMapper.selectUserDetail(userId);
-        Assert.notNull(userVo, ExpMessageCode.of("valid.user.not.exist"));
+        Assert.notNull(userVo, ExpMessageCode.of("valid.common.data.notFound"));
         return userVo;
     }
 
@@ -237,7 +237,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 获取用户信息
         User user = userConverter.dtoToEntity(userDto);
         // 新增时，不允许传入 UserId
-        Assert.isNull(user.getId(), ExpMessageCode.of("valid.user.add.idIsNull"));
+        Assert.isNull(user.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
         // 普通用户无法新增管理员用户
         SecurityUser loginUser = SecurityUtils.getLoginUser();
         if (UserType.ADMIN_USER.getType().equals(user.getUserType())) {
@@ -254,7 +254,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户信息检查
         checkUser(user);
         // 新增用户
-        Assert.isTrue(userMapper.insert(user) != 1, ExpMessageCode.of("result.user.add.failed"));
+        Assert.isTrue(userMapper.insert(user) != 1, ExpMessageCode.of("result.common.add.failed"));
         // 保存角色信息
         insertUserRoleData(userId, userDto.getRoleIds());
         // 邮件通知（邮件发送失败也回滚，因为没有人知道新用户密码是多少）
@@ -274,7 +274,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = userConverter.dtoToEntity(userDto);
         // 判断用户是否存在
         User dbUser = userMapper.selectUserById(user.getId());
-        Assert.notNull(dbUser, ExpMessageCode.of("valid.user.not.exist"));
+        Assert.notNull(dbUser, ExpMessageCode.of("valid.common.data.notFound"));
         // 普通用户无法修改管理员用户
         SecurityUser loginUser = SecurityUtils.getLoginUser();
         if (UserType.ADMIN_USER.getType().equals(user.getUserType())) {
@@ -286,7 +286,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户信息检查
         checkUser(user);
         // 编辑用户
-        Assert.isTrue(userMapper.updateById(user) != 1, ExpMessageCode.of("result.user.edit.failed"));
+        Assert.isTrue(userMapper.updateById(user) != 1, ExpMessageCode.of("result.common.edit.failed"));
         // 保存角色信息
         insertUserRoleData(user.getId(), userDto.getRoleIds());
         // 清除用户缓存信息
@@ -303,7 +303,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void deleteUser(Long userId) {
         // 判断用户是否存在
         User dbUser = userMapper.selectUserById(userId);
-        Assert.notNull(dbUser, ExpMessageCode.of("valid.user.not.exist"));
+        Assert.notNull(dbUser, ExpMessageCode.of("valid.common.data.notFound"));
         // 不允许删除自己
         SecurityUser loginUser = SecurityUtils.getLoginUser();
         Assert.isNoEquals(userId, loginUser.getId(), ExpMessageCode.of("valid.user.forbidDelSelf"));
@@ -315,7 +315,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 无法删除默认管理员用户
         Assert.isTrue(Constants.SUPER_USER_ID.equals(userId), ExpMessageCode.of("valid.user.forbidDelSuperAdmin"));
         // 删除用户
-        Assert.isTrue(userMapper.deleteById(userId) != 1, ExpMessageCode.of("result.user.delete.failed"));
+        Assert.isTrue(userMapper.deleteById(userId) != 1, ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色信息
         insertUserRoleData(userId, null);
         // 清除用户缓存信息

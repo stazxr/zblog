@@ -1,10 +1,12 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.Router;
-import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.base.domain.dto.VersionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
-import com.github.stazxr.zblog.base.domain.entity.Version;
+import com.github.stazxr.zblog.base.domain.vo.VersionVo;
 import com.github.stazxr.zblog.base.service.VersionService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -15,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,70 +38,65 @@ public class VersionController {
      * 分页查询版本列表
      *
      * @param queryDto 查询参数
-     * @return versionList
+     * @return PageInfo<VersionVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation("分页查询版本列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "分页查询版本列表", code = "queryVersionListByPage")
-    public Result pageList(VersionQueryDto queryDto) {
-        return Result.success().data(versionService.queryVersionListByPage(queryDto));
+    @Router(name = "分页查询版本列表", code = "VERSQ001")
+    public PageInfo<VersionVo> pageList(VersionQueryDto queryDto) {
+        return versionService.queryVersionListByPage(queryDto);
     }
 
     /**
-     * 查询版本信息
+     * 查询版本详情
      *
      * @param versionId 版本id
-     * @return 版本信息
+     * @return VersionVo
      */
-    @GetMapping(value = "/queryVersionInfo")
-    @ApiOperation("查询版本信息")
+    @GetMapping(value = "/queryVersionDetail")
+    @ApiOperation("查询版本详情")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "versionId", value = "版本id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "查询版本信息", code = "queryVersionInfo", level = RouterLevel.PUBLIC)
-    public Result queryVersionInfo(@RequestParam Long versionId) {
-        return Result.success().data(versionService.queryVersionInfo(versionId));
+    @Router(name = "查询版本详情", code = "VERSQ002")
+    public VersionVo queryVersionDetail(@RequestParam Long versionId) {
+        return versionService.queryVersionDetail(versionId);
     }
 
     /**
      * 新增版本
      *
-     * @param version 版本
-     * @return Result
+     * @param versionDto 版本
      */
     @Log
     @PostMapping(value = "/addVersion")
     @ApiOperation("新增版本")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "新增版本", code = "addVersion")
-    public Result addVersion(@RequestBody Version version) {
-        versionService.addVersion(version);
-        return Result.success();
+    @Router(name = "新增版本", code = "VERSA001")
+    public void addVersion(@RequestBody @Validated(Create.class) VersionDto versionDto) {
+        versionService.addVersion(versionDto);
     }
 
     /**
      * 编辑版本
      *
-     * @param version 版本
-     * @return Result
+     * @param versionDto 版本
      */
     @Log
     @PostMapping(value = "/editVersion")
     @ApiOperation("编辑版本")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "编辑版本", code = "editVersion")
-    public Result editVersion(@RequestBody Version version) {
-        versionService.editVersion(version);
-        return Result.success();
+    @Router(name = "编辑版本", code = "VERSU001")
+    public void editVersion(@RequestBody @Validated(Update.class) VersionDto versionDto) {
+        versionService.editVersion(versionDto);
     }
 
     /**
      * 删除版本
      *
      * @param versionId 版本id
-     * @return Result
      */
     @Log
     @PostMapping(value = "/deleteVersion")
@@ -107,9 +105,8 @@ public class VersionController {
         @ApiImplicitParam(name = "versionId", value = "版本id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "删除版本", code = "deleteVersion")
-    public Result deleteVersion(@RequestParam Long versionId) {
+    @Router(name = "删除版本", code = "VERSD001")
+    public void deleteVersion(@RequestParam Long versionId) {
         versionService.deleteVersion(versionId);
-        return Result.success();
     }
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 版本查询
+ * 版本查询参数
  *
  * @author SunTao
  * @since 2022-10-14
@@ -17,6 +17,8 @@ import lombok.ToString;
 @Setter
 @ApiModel("版本查询参数")
 public class VersionQueryDto extends PageParam {
+    private static final long serialVersionUID = -6088730149798424641L;
+
     /**
      * 版本名称
      */

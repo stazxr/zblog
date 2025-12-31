@@ -15,7 +15,6 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.UnexpectedTypeException;
 import java.io.IOException;
@@ -35,8 +34,7 @@ public class ValidatorExceptionHandler {
     private static final String DEFAULT_LOG_PREFIX = "ValidatorExceptionHandler - ";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public void handleMethodArgumentNotValidException(HttpServletRequest request,
-            HttpServletResponse response, MethodArgumentNotValidException ex) throws IOException {
+    public void handleMethodArgumentNotValidException(HttpServletResponse response, MethodArgumentNotValidException ex) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("{} 参数校验失败: {}", DEFAULT_LOG_PREFIX, ex.getMessage());
         }
@@ -54,8 +52,7 @@ public class ValidatorExceptionHandler {
     }
 
     @ExceptionHandler(AssertException.class)
-    public void handleAssertException(HttpServletRequest request,
-            HttpServletResponse response, AssertException ex) throws IOException {
+    public void handleAssertException(HttpServletResponse response, AssertException ex) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("{} 数据校验失败: {}", DEFAULT_LOG_PREFIX, ex.getMessage());
         }
@@ -68,8 +65,7 @@ public class ValidatorExceptionHandler {
     @ExceptionHandler(value = {
         ServletRequestBindingException.class, TypeMismatchException.class, UnexpectedTypeException.class
     })
-    public void badRequestExceptionHandler(HttpServletRequest request,
-            HttpServletResponse response, Exception ex) throws IOException {
+    public void badRequestExceptionHandler(HttpServletResponse response, Exception ex) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("{} 请求参数绑定失败: {}", DEFAULT_LOG_PREFIX, ex.getMessage());
         }

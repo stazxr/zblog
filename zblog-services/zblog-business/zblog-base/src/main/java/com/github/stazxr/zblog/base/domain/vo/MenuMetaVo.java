@@ -1,18 +1,21 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 
 /**
- * 左侧菜单元数据
+ * 菜单元数据
  *
  * @author SunTao
  * @since 2022-06-30
  */
 @Getter
 @Setter
+@ApiModel("菜单元数据VO")
 public class MenuMetaVo implements Serializable {
     private static final long serialVersionUID = 3496417467290425962L;
 
@@ -29,25 +32,30 @@ public class MenuMetaVo implements Serializable {
     /**
      * 菜单标题
      */
+    @ApiModelProperty("菜单标题")
     private String title;
 
     /**
      * 菜单图标
      */
+    @ApiModelProperty("菜单图标")
     private String icon;
 
     /**
-     * 是否缓存（前端缓存）
+     * 是否开启缓存（前端缓存）
      */
+    @ApiModelProperty("是否开启缓存")
     private Boolean cache;
 
     /**
      * 是否展示面包屑
      */
+    @ApiModelProperty("是否展示面包屑")
     private Boolean breadcrumb;
 
     /**
      * 是否固定在标签栏，默认 false
      */
+    @ApiModelProperty("是否固定在标签栏")
     private Boolean affix;
 }

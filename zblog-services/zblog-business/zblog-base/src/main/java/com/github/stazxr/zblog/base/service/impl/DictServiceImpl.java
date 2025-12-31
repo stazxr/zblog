@@ -74,9 +74,9 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public DictVo queryDictDetail(Long dictId) {
-        Assert.notNull(dictId, ExpMessageCode.of("valid.dict.id.NotNull"));
+        Assert.notNull(dictId, ExpMessageCode.of("valid.common.id.NotNull"));
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
-        Assert.notNull(dictVo, ExpMessageCode.of("valid.dict.not.exist"));
+        Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
         return dictVo;
     }
 
@@ -90,11 +90,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         // 获取字典信息
         Dict dict = dictConverter.dtoToEntity(dictDto);
         // 新增时，不允许传入 DictId
-        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.dict.add.idIsNull"));
+        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
         // 字典信息检查
         checkDict(dict);
         // 新增字典
-        Assert.isTrue(dictMapper.insert(dict) != 1, ExpMessageCode.of("result.dict.add.failed"));
+        Assert.isTrue(dictMapper.insert(dict) != 1, ExpMessageCode.of("result.common.add.failed"));
     }
 
     /**
@@ -108,11 +108,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         Dict dict = dictConverter.dtoToEntity(dictDto);
         // 判断字典是否存在
         Dict dbDict = dictMapper.selectById(dict.getId());
-        Assert.notNull(dbDict, ExpMessageCode.of("valid.dict.not.exist"));
+        Assert.notNull(dbDict, ExpMessageCode.of("valid.common.data.notFound"));
         // 字典信息检查
         checkDict(dict);
         // 编辑字典
-        Assert.isTrue(dictMapper.updateById(dict) != 1, ExpMessageCode.of("result.dict.edit.failed"));
+        Assert.isTrue(dictMapper.updateById(dict) != 1, ExpMessageCode.of("result.common.edit.failed"));
     }
 
     /**
@@ -124,11 +124,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     public void deleteDict(Long dictId) {
         // 判断字典是否存在
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
-        Assert.notNull(dictVo, ExpMessageCode.of("valid.dict.not.exist"));
+        Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
         // 存在子节点无法被删除
         Assert.isTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.deleteWithChildren"));
         // 删除字典
-        Assert.isTrue(dictMapper.deleteById(dictId) != 1, ExpMessageCode.of("result.dict.delete.failed"));
+        Assert.isTrue(dictMapper.deleteById(dictId) != 1, ExpMessageCode.of("result.common.delete.failed"));
     }
 
     /**
