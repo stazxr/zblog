@@ -85,7 +85,7 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         // 版本信息检查
         checkVersion(version);
         // 新增版本
-        Assert.isTrue(versionMapper.insert(version) != 1, ExpMessageCode.of("result.common.add.failed"));
+        Assert.affectOneRow(versionMapper.insert(version), ExpMessageCode.of("result.common.add.failed"));
     }
 
     /**
@@ -103,7 +103,7 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         // 版本信息检查
         checkVersion(version);
         // 编辑版本
-        Assert.isTrue(versionMapper.updateById(version) != 1, ExpMessageCode.of("result.common.edit.failed"));
+        Assert.affectOneRow(versionMapper.updateById(version), ExpMessageCode.of("result.common.edit.failed"));
     }
 
     /**
@@ -117,12 +117,12 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         Version dbVersion = versionMapper.selectById(versionId);
         Assert.notNull(dbVersion, ExpMessageCode.of("valid.common.data.notFound"));
         // 删除版本
-        Assert.isTrue(versionMapper.deleteById(versionId) != 1, ExpMessageCode.of("result.common.delete.failed"));
+        Assert.affectOneRow(versionMapper.deleteById(versionId), ExpMessageCode.of("result.common.delete.failed"));
     }
 
     private void checkVersion(Version version) {
         // 检查版本名称是否存在
-        Assert.isTrue(checkVersionNameExist(version), ExpMessageCode.of("valid.version.versionName.exist"));
+        Assert.failIfTrue(checkVersionNameExist(version), ExpMessageCode.of("valid.version.versionName.exist"));
     }
 
     private boolean checkVersionNameExist(Version version) {

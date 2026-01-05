@@ -35,10 +35,6 @@ export default {
   queryUserLog: params => {
     return api.httpRequest().get(`${userApi}/pageUserLogList`, params)
   },
-  // 修改头像
-  updateUserHeadImg: params => {
-    return api.httpRequest().post(`${userApi}/updateUserHeadImg`, params)
-  },
   // 修改个人基础信息
   updateUserBaseInfo: params => {
     return api.httpRequest().post(`${userApi}/updateUserBaseInfo`, params)

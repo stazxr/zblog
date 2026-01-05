@@ -55,4 +55,12 @@ public interface DictMapper extends BaseMapper<Dict> {
      * @return VALUE
      */
     String selectDictValueByDictKey(@Param("dictKey") String dictKey);
+
+    /**
+     * 根据字典KEY查询配置信息列表
+     *
+     * @param dictKey 字典KEY
+     * @return VALUES
+     */
+    List<String> selectDictValuesByDictKey(@Param("dictKey") String dictKey);
 }

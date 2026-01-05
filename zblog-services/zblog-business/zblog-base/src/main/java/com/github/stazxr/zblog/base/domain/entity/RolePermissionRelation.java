@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * 角色权限关系表
+ * 角色权限
  *
  * @author SunTao
  * @since 2020-01-03

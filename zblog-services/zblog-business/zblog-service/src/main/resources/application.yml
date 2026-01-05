@@ -1,5 +1,7 @@
 server:
   port: ${SERVER_PORT:8081} # 应用端口
+  tomcat:
+    max-swallow-size: -1 # 不限制吞吐大小
 spring:
   application:
     name: zblog # 应用名称
@@ -99,9 +101,11 @@ spring:
     suffix: .ftl
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 100MB
-      location: /tmp/zblog_upload_tmp
+      enabled: true
+      max-file-size: 100MB # 单个文件最大
+      max-request-size: 100MB # 单次请求最大（多文件）
+      file-size-threshold: 2MB # 超过后写入磁盘
+      location: ${java.io.tmpdir} # 临时文件的存放目录，linux场景下某些系统 /tmp 目录很小，需要重新客户化这个参数
   mail:
     host: ${zblog.email.host} # 邮箱服务器
     port: ${zblog.email.port} # 邮箱服务器端口 25/465/587
@@ -196,8 +200,8 @@ zblog:
           subject: zblog
     file:
       model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云
-      local:
-        base-url: http://localhost:${server.port}/file/
+      local: # 本地
+        base-url: http://localhost:${server.port}/file/ # 如果生产使用本地模式上传文件，需要客户化IP地址
         file-upload-path: /home/${spring.application.name}/file/upload/
     log:
       control:
@@ -209,4 +213,3 @@ zblog:
   file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**
-  file-upload-type: 1

@@ -1,18 +1,20 @@
 <template>
-  <el-tabs v-model="activeName" style="padding-left: 8px;" @tab-click="handleClick">
-    <el-tab-pane label="本地存储" name="local">
-      <local ref="local" />
-    </el-tab-pane>
-    <el-tab-pane label="阿里云存储" name="aliYun">
-      <ali-yun ref="aliYun" />
-    </el-tab-pane>
-    <el-tab-pane label="七牛云存储" name="qiNiu">
-      <qi-niu-yun ref="qiNiu" />
-    </el-tab-pane>
-    <el-tab-pane v-if="hasPerm(['getConfigStorageType'])" label="存储配置" name="config">
-      <config ref="config" />
-    </el-tab-pane>
-  </el-tabs>
+  <div style="padding: 5px 0 0 10px">
+    <el-tabs v-model="activeName" style="padding-left: 8px;" @tab-click="handleClick">
+      <el-tab-pane label="本地存储" name="local">
+        <local ref="local" />
+      </el-tab-pane>
+      <el-tab-pane label="阿里云存储" name="aliYun">
+        <ali-yun ref="aliYun" />
+      </el-tab-pane>
+      <el-tab-pane label="七牛云存储" name="qiNiuYun">
+        <qi-niu-yun ref="qiNiuYun" />
+      </el-tab-pane>
+      <el-tab-pane v-if="hasPerm(['getConfigStorageType'])" label="存储配置" name="config">
+        <config ref="config" />
+      </el-tab-pane>
+    </el-tabs>
+  </div>
 </template>
 
 <script>
@@ -48,9 +50,9 @@ export default {
             this.$refs['aliYun'].initData()
           })
           break
-        case 'qiNiu':
+        case 'qiNiuYun':
           this.$nextTick(() => {
-            this.$refs['qiNiu'].initData()
+            this.$refs['qiNiuYun'].initData()
           })
           break
         case 'config':

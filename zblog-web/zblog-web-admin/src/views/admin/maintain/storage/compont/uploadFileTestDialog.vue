@@ -1,12 +1,19 @@
 <template>
   <div>
-    <el-dialog append-to-body :close-on-click-modal="false" :before-close="handleClose" :visible.sync="dialogVisible" title="文件上传" width="520px">
-      <el-form ref="addForm" size="small">
+    <el-dialog
+      append-to-body
+      :close-on-click-modal="false"
+      :before-close="handleClose"
+      :visible.sync="dialogVisible"
+      title="文件上传"
+      width="520px"
+    >
+      <el-form ref="addForm">
         <el-form-item>
           <el-upload
             ref="upload"
             name="file"
-            :action="$store.state.api.testUploadFile + '?type=' + type"
+            :action="$store.state.api.uploadFileTest + '?uploadType=' + uploadType"
             :headers="headers"
             :auto-upload="false"
             :limit="maxUploadSize"
@@ -22,7 +29,7 @@
           >
             <div class="custom-upload" style="width: 480px;"><i class="el-icon-upload" /> 添加文件</div>
             <div slot="tip" class="el-upload__tip">
-              可上传任意格式文件（文件大小小于等于10M），功能仅作演示用，每日零点清理手动上传的文件。
+              文件大小限制（10M），功能仅作演示用
             </div>
           </el-upload>
         </el-form-item>
@@ -51,7 +58,7 @@ export default {
   },
   data() {
     return {
-      type: null,
+      uploadType: null,
       maxUploadSize: 1,
       submitLoading: false,
       previewDialogVisible: false,
@@ -63,9 +70,9 @@ export default {
     }
   },
   methods: {
-    initData(type) {
+    initData(uploadType) {
       this.$nextTick(() => {
-        this.type = type
+        this.uploadType = uploadType
       })
     },
     doClose(result = false) {
@@ -98,20 +105,23 @@ export default {
       if (file && file.status === 'success' && file.response && file.response.code === 200) {
         const data = file.response.data
         if (data && Array.isArray(data)) {
-          const ids = []
           for (let i = 0; i < data.length; i++) {
-            ids.push(data[i].id)
+            const param = { fileId: data[i].fileId }
+            this.$mapi.file.deleteFile(param)
           }
-
-          this.$mapi.file.testDeleteFile(ids)
         }
       }
     },
     handleError(err, file, fileList) {
       try {
         this.submitLoading = false
-        this.$message.error(JSON.parse(err.message.toString()).message)
+        if (err instanceof Error) {
+          this.$message.error(JSON.parse(err.message.toString()).message)
+        } else {
+          this.$message.error(err.message)
+        }
       } catch {
+        console.log('err', err)
         this.$message.error('系统发生未知错误')
       }
     },

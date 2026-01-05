@@ -8,39 +8,41 @@
             <span>个人信息</span>
           </div>
           <div>
-            <div style="text-align: center">
+            <div class="avatar-wrapper">
               <div class="el-upload">
-                <img :src="user && user['headImgUrl'] !== '' ? user['headImgUrl'] : Avatar" title="点击上传头像" class="avatar" alt="" @click="toggleShow">
+                <img :src="avatarUrl" class="avatar" title="点击上传头像" alt="" @click="showAvatarUpload">
                 <img-upload
                   ref="imgUploadRef"
                   v-model="showImgUpload"
                   field="file"
                   :headers="headers"
                   :url="$store.state.api.fileUploadApi"
-                  :lang-ext="langExt"
-                  @crop-upload-success="cropUploadSuccess"
+                  :lang-ext="imageUploadLangExt"
+                  @crop-upload-success="avatarUploadSuccess"
                 />
               </div>
             </div>
             <ul class="user-info">
               <li>
                 <div style="height: 100%">
-                  <svg-icon icon-class="login" /> 登录账号<div class="user-right">{{ user['username'] }}</div>
+                  <svg-icon icon-class="login" /> 用户账号<div class="user-right">{{ user['username'] }}</div>
                 </div>
               </li>
               <li><svg-icon icon-class="nickname" /> 用户昵称 <div class="user-right">{{ user['nickname'] }}</div></li>
               <li><svg-icon icon-class="email" /> 用户邮箱 <div class="user-right">{{ user['email'] }}</div></li>
+              <li><svg-icon icon-class="nickname" /> 用户类型 <div class="user-right">{{ user['userType'] }}</div></li>
               <li>
                 <svg-icon icon-class="security" /> 安全设置
                 <div class="user-right">
-                  <a @click="$refs.pass.dialog = true">修改密码</a>
-                  <a @click="$refs.email.dialog = true">修改邮箱</a>
+                  <el-link @click="$refs.pass.dialog = true">修改密码</el-link>
+                  <el-link @click="$refs.email.dialog = true">修改邮箱</el-link>
                 </div>
               </li>
             </ul>
           </div>
         </el-card>
       </el-col>
+
       <!-- 右部分 -->
       <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="19">
         <!-- 用户资料 -->
@@ -142,51 +144,42 @@
         </el-card>
       </el-col>
     </el-row>
-    <updateEmail ref="email" :email="user.email" />
+    <!-- 密码修改 -->
     <updatePass ref="pass" />
+    <!-- 邮箱修改 -->
+    <updateEmail ref="email" :email="user.email" />
   </div>
 </template>
 
 <script>
-import Avatar from '@/assets/images/avatar.png'
+import DefaultAvatar from '@/assets/images/default-avatar.png'
 import updatePass from './center/updatePass'
 import updateEmail from './center/updateEmail'
 import ImgUpload from 'vue-image-crop-upload'
-import { isValidPhone } from '@/utils/validate'
 import { getToken } from '@/utils/token'
 import { mapGetters } from 'vuex'
-
 export default {
   name: 'UserCenter',
   components: { updatePass, updateEmail, ImgUpload },
   data() {
-    // 自定义验证
-    const validPhone = (rule, value, callback) => {
-      if (value && !isValidPhone(value)) {
-        callback(new Error('请输入正确的11位手机号码'))
-      } else {
-        callback()
-      }
-    }
     return {
-      activeName: 'first',
-      Avatar: Avatar,
-      showImgUpload: false,
-      langExt: {
+      DefaultAvatar: DefaultAvatar,
+      headers: {
+        // 图片上传请求头配置
+        Authorization: ''
+      },
+      imageUploadLangExt: {
         success: '上传成功!',
         fail: '图片上传失败!'
       },
-      headers: {
-        Authorization: ''
-      },
+      showImgUpload: false,
+
+      activeName: 'first',
       form: {},
       rules: {
         nickname: [
           { required: true, message: '请输入用户昵称', trigger: 'blur' },
           { min: 1, max: 25, message: '长度在 2 到 25 个字符', trigger: 'blur' }
-        ],
-        telephone: [
-          { required: false, trigger: 'blur', validator: validPhone }
         ]
       },
       saveLoading: false,
@@ -200,7 +193,10 @@ export default {
   computed: {
     ...mapGetters([
       'user'
-    ])
+    ]),
+    avatarUrl() {
+      return this.user && this.user.headImgUrl ? this.user.headImgUrl : this.DefaultAvatar
+    }
   },
   created() {
     this.$store.dispatch('RefreshUser').then(() => {
@@ -215,6 +211,41 @@ export default {
     })
   },
   methods: {
+    showAvatarUpload() {
+      this.headers.Authorization = getToken()
+      this.$refs.imgUploadRef.step = 1
+      this.showImgUpload = true
+    },
+    avatarUploadSuccess(jsonData) {
+      const { code, data, message } = jsonData
+      if (code === 200) {
+        // success
+        if (data == null || data.length !== 1) {
+          this.$message.error('上传文件列表获取失败')
+          this.$refs.imgUploadRef.loading = 3
+          this.$refs.imgUploadRef.hasError = true
+          this.$refs.imgUploadRef.errorMsg = '上传文件列表获取失败'
+          return
+        }
+        const param = {
+          userId: this.user.id,
+          fileId: data[0]['fileId'],
+          headImg: data[0]['downloadUrl']
+        }
+        this.$mapi.userCenter.updateUserHeadImg(param).then(() => {
+          this.$message.success('头像修改成功')
+          this.$store.dispatch('RefreshUser')
+          this.$refs.imgUploadRef.off()
+        }).catch(_ => {
+          this.$refs.imgUploadRef.off()
+        })
+      } else {
+        // error
+        this.$refs.imgUploadRef.loading = 3
+        this.$refs.imgUploadRef.hasError = true
+        this.$refs.imgUploadRef.errorMsg = message || '头像上传失败'
+      }
+    },
     handleClick(tab) {
       if (tab.name === 'second') {
         this.listTableData()
@@ -247,32 +278,6 @@ export default {
       this.page = page
       this.listTableData()
     },
-    cropUploadSuccess(jsonData) {
-      const { code, data, message } = jsonData
-      if (code === 200) {
-        // success
-        const param = {
-          id: this.user.id,
-          headImg: data[0]['downloadUrl']
-        }
-        this.$mapi.user.updateUserHeadImg(param).then(() => {
-          this.$message.success('头像修改成功')
-          this.$store.dispatch('RefreshUser')
-          this.$refs.imgUploadRef.off()
-        })
-      } else {
-        // error
-        this.$refs.imgUploadRef.loading = 3
-        this.$refs.imgUploadRef.hasError = true
-        this.$refs.imgUploadRef.errorMsg = message
-      }
-    },
-    toggleShow() {
-      this.headers.Authorization = getToken()
-
-      this.$refs.imgUploadRef.step = 1
-      this.showImgUpload = !this.showImgUpload
-    },
     doSubmit() {
       if (this.$refs['form']) {
         this.$refs['form'].validate((valid) => {
@@ -293,6 +298,9 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
+  .avatar-wrapper {
+    text-align: center;
+  }
   .avatar {
     width: 120px;
     height: 120px;

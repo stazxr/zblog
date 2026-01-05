@@ -1,11 +1,12 @@
 package com.github.stazxr.zblog.bas.file.autoconfigure;
 
+import com.github.stazxr.zblog.bas.file.FileHandlerEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 序号生成器配置项
+ * 文件存储配置项
  *
  * @author SunTao
  * @since 2024-10-24
@@ -15,7 +16,7 @@ public class FileProperties {
     static final String FILE_PREFIX= "zblog.base.file";
 
     /**
-     * 文件上传模式：see {@link com.github.stazxr.zblog.bas.file.FileTypeHandler}
+     * 文件上传模式：see {@link FileHandlerEnum}
      */
     private int model = 1;
 

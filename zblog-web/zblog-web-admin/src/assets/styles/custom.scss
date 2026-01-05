@@ -215,3 +215,14 @@
 .el-dialog__footer {
   margin-bottom: 100px;
 }
+
+// el-image
+.image-slot {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fa;
+  color: #c0c4cc;
+}

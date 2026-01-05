@@ -211,18 +211,20 @@ export default {
       this.addOrEditDialogTitle = this.row.dictType === 1 ? '编辑字典组' : '编辑字典项'
       this.$refs.addOrEditDialogRef.initData(this.row.dictType, this.row.pid, this.row.id)
     },
-    addOrEditDone(result = false, type) {
+    addOrEditDone(result = false, dictType, type) {
       this.addOrEditDialogTitle = null
       this.addOrEditDialogVisible = false
       if (result) {
-        if (type === 1) {
+        if (dictType === 1) {
           // 新增或编辑组
           this.listTableData()
         } else {
           // 新增或编辑项，只有选中组的场景下才可以新增或编辑组
           const curId = this.row.id
-          if (curId && this.maps.get(curId)) {
-            const { tree, treeNode, resolve } = this.maps.get(curId)
+          const curPid = this.row.pid
+          const realId = type === 'add' ? curId : type === 'edit' ? curPid : ''
+          if (realId && this.maps.get(realId)) {
+            const { tree, treeNode, resolve } = this.maps.get(realId)
             this.queryChildList(tree, treeNode, resolve)
           } else {
             this.listTableData()

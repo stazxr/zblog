@@ -6,7 +6,7 @@ const fileApi = '/api/file'
 export default {
   // 分页查询文件列表
   pageFileList: params => {
-    return api.httpRequest().get(`${fileApi}/queryFileListByPage`, params)
+    return api.httpRequest().get(`${fileApi}/pageFileList`, params)
   },
   // 下载文件
   downloadFile: params => {
@@ -14,19 +14,20 @@ export default {
   },
   // 删除文件
   deleteFile: params => {
-    return api.httpRequest().post(`${fileApi}/deleteFile`, params)
+    return api.httpRequest().post(`${fileApi}/deleteFile`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
   // 测试文件删除
-  testDeleteFile: params => {
-    return api.httpRequest().post(`${fileApi}/testDeleteFile`, params)
+  deleteFileTest: params => {
+    return api.httpRequest().post(`${fileApi}/deleteFileTest`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
+
   // 获取配置信息
   getConfigInfo: params => {
     return api.httpRequest().get(`${fileApi}/getConfigInfo`, params)
-  },
-  // 保存配置信息
-  setConfigInfo: params => {
-    return api.httpRequest().post(`${fileApi}/setConfigInfo`, params)
   },
   // 获取激活的存储类型
   getConfigStorageType: params => {

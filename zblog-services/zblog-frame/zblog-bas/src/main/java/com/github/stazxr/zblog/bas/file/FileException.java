@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.file;
 
 import com.github.stazxr.zblog.bas.exception.BaseException;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 
 /**
  * 自定义文件异常类，用于处理文件上传下载相关的错误。
@@ -28,6 +29,25 @@ public class FileException extends BaseException {
      */
     public FileException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * 使用国际化消息码构造异常
+     *
+     * @param expMessageCode 异常消息码
+     */
+    public FileException(ExpMessageCode expMessageCode) {
+        super(expMessageCode);
+    }
+
+    /**
+     * 使用国际化消息码及根因构造异常
+     *
+     * @param expMessageCode 异常消息码
+     * @param cause          根因异常
+     */
+    public FileException(ExpMessageCode expMessageCode, Throwable cause) {
+        super(expMessageCode, cause);
     }
 }
 

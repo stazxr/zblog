@@ -181,22 +181,9 @@
         UPDATE user SET PASSWORD = #{password}, CHANGE_PWD_TIME = #{changePwdTime} WHERE ID = #{userId}
     </update>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <update id="updateUserHeadImg">
+        UPDATE user SET HEAD_IMG_URL = #{headImg} WHERE ID = #{userId}
+    </update>
 
 
 

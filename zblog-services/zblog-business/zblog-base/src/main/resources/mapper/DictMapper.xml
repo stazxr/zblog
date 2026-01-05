@@ -27,8 +27,8 @@
             ID, PID, DICT_NAME, DICT_TYPE, DICT_KEY, DICT_VALUE, DICT_SORT, DICT_DESC, ENABLED,
             CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
             (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount,
-            (SELECT USERNAME FROM user u WHERE u.ID = u.CREATE_USER) AS CREATE_USERNAME,
-            (SELECT USERNAME FROM user u WHERE u.ID = u.UPDATE_USER) AS UPDATE_USERNAME
+            (SELECT USERNAME FROM user u WHERE u.ID = d.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT USERNAME FROM user u WHERE u.ID = d.UPDATE_USER) AS UPDATE_USERNAME
         FROM dict d WHERE DELETED = 0 AND ID = #{dictId}
     </select>
 
@@ -42,5 +42,9 @@
 
     <select id="selectDictValueByDictKey" resultType="java.lang.String">
         SELECT DICT_VALUE FROM dict WHERE DICT_KEY = #{dictKey} AND DICT_TYPE = 2 AND ENABLED = 1 AND DELETED = 0
+    </select>
+
+    <select id="selectDictValuesByDictKey" resultType="java.lang.String">
+        SELECT DICT_VALUE FROM dict WHERE DICT_KEY = #{dictKey} AND DICT_TYPE = 2 AND ENABLED = 1 AND DELETED = 0 ORDER BY DICT_SORT
     </select>
 </mapper>

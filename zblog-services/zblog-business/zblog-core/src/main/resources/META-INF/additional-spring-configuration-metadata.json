@@ -45,13 +45,6 @@
       "defaultValue": "http://localhost:8080/file"
     },
     {
-      "name": "zblog.file-upload-type",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "文件上传类型，默认本地上传.",
-      "defaultValue": 1
-    },
-    {
       "name": "swagger.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",

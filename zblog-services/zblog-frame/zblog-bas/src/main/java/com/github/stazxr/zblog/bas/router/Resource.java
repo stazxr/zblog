@@ -67,7 +67,7 @@ public class Resource implements Serializable {
     private int resourceLevel;
 
     public void setResourceLevel(int resourceLevel) {
-        Assert.isTrue(!ALLOWS_LEVELS.contains(resourceLevel), ExpMessageCode.of("valid.resource.resourceLevel.configError"));
+        Assert.failIfFalse(ALLOWS_LEVELS.contains(resourceLevel), ExpMessageCode.of("valid.resource.resourceLevel.configError"));
         this.resourceLevel = resourceLevel;
     }
 

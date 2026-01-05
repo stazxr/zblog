@@ -1,6 +1,6 @@
 //package com.github.stazxr.zblog.bas.file.impl;
 //
-//import com.github.stazxr.zblog.base.component.file.FileTypeHandler;
+//import com.github.stazxr.zblog.base.component.file.FileHandlerEnum;
 //import com.github.stazxr.zblog.base.component.file.model.FileInfo;
 //import com.github.stazxr.zblog.base.domain.bo.storage.QiNiuYunConfig;
 //import com.github.stazxr.zblog.base.domain.entity.File;
@@ -65,7 +65,7 @@
 //                fileInfo.setFileName(filename);
 //                fileInfo.setFilePath(config.getBucketName().concat(BUCKET_PATH_SPLIT_LABEL).concat(putRet.getKey()));
 //                fileInfo.setDownloadUrl(config.getDomain().concat("/").concat(putRet.getKey()));
-//                fileInfo.setUploadType(FileTypeHandler.QI_NIU_YUN.getType());
+//                fileInfo.setUploadType(FileHandlerEnum.QI_NIU_YUN.getType());
 //                fileInfos.add(fileInfo);
 //            }
 //            return fileInfos;

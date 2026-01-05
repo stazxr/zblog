@@ -1,6 +1,9 @@
 package com.github.stazxr.zblog.bas.file.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.InputStream;
 
 /**
  * 文件信息
@@ -8,45 +11,66 @@ import lombok.Data;
  * @author SunTao
  * @since 2022-07-29
  */
-@Data
+@Getter
+@Setter
 public class FileInfo {
+    /**
+     * 文件id
+     */
+    private Long fileId;
+
     /**
      * 文件名称
      */
-    private String fileName;
+    private String filename;
 
     /**
      * 原文件名称
      */
-    private String originalFileName;
-
-    /**
-     * 文件后缀
-     */
-    private String suffix;
+    private String originalFilename;
 
     /**
      * 文件大小
      */
-    private long size;
+    private long fileSize;
 
     /**
-     * 文件路径
+     * 文件MD5值
      */
-    private String filePath;
+    private String fileMd5;
 
     /**
-     * 下载链接
+     * 文件类型
+     */
+    private String fileType;
+
+    /**
+     * 文件后缀
+     */
+    private String fileSuffix;
+
+    /**
+     * 存储绝对路径
+     */
+    private String fileAbsolutePath;
+
+    /**
+     * 存储相对路径
+     */
+    private String fileRelativePath;
+
+    /**
+     * 下载地址
      */
     private String downloadUrl;
 
     /**
-     * MD5
-     */
-    private String md5;
-
-    /**
-     * 上传类型
+     * 上传方式
      */
     private Integer uploadType;
+
+    /**
+     * 文件字节数组
+     */
+    private InputStream inputStream;
 }

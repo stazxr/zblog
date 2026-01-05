@@ -21,7 +21,6 @@ import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.converter.CommentConverter;
 import com.github.stazxr.zblog.converter.MessageConverter;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.domain.bo.GitCalendarData;
 import com.github.stazxr.zblog.domain.dto.*;
@@ -637,28 +636,29 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public GitCalendarData queryGithubCalendarData(String username) {
-        try {
-            // 从 Redis 拿去数据
-            YwConstants.CacheKey cacheKey = YwConstants.CacheKey.githubCalendarData;
-            String key = cacheKey.cacheKey().concat(username);
-            String jsonData = GlobalCache.get(key);
-            if (jsonData != null) {
-                return JSON.parseObject(jsonData, GitCalendarData.class);
-            }
-
-            // 查询新数据
-            List<Map<String, Object>> data = GithubUtils.getGithubCalendarData(username);
-            GitCalendarData calendarData = new GitCalendarData();
-            calendarData.setGithubUser(username);
-            calendarData.setGithubUrl(GithubUtils.BASE_URL.concat("/").concat(username));
-            calendarData.initData(data);
-
-            // 缓存新数据
-            GlobalCache.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
-            return calendarData;
-        } catch (Exception e) {
-            throw new ServiceException("贡献日历数据获取超时", e);
-        }
+        return null;
+//        try {
+//            // 从 Redis 拿去数据
+//            YwConstants.CacheKey cacheKey = YwConstants.CacheKey.githubCalendarData;
+//            String key = cacheKey.cacheKey().concat(username);
+//            String jsonData = GlobalCache.get(key);
+//            if (jsonData != null) {
+//                return JSON.parseObject(jsonData, GitCalendarData.class);
+//            }
+//
+//            // 查询新数据
+//            List<Map<String, Object>> data = GithubUtils.getGithubCalendarData(username);
+//            GitCalendarData calendarData = new GitCalendarData();
+//            calendarData.setGithubUser(username);
+//            calendarData.setGithubUrl(GithubUtils.BASE_URL.concat("/").concat(username));
+//            calendarData.initData(data);
+//
+//            // 缓存新数据
+//            GlobalCache.put(key, JSON.toJSONString(calendarData), cacheKey.duration());
+//            return calendarData;
+//        } catch (Exception e) {
+//            throw new ServiceException("贡献日历数据获取超时", e);
+//        }
     }
 
     /**
@@ -988,7 +988,7 @@ public class PortalServiceImpl implements PortalService {
     }
 
     private void notice(Comment comment) {
-        throw new ServiceException("暂不支持");
+        // throw new ServiceException("暂不支持");
     }
 
     private synchronized void updateVisitorAreaCount(String area) {

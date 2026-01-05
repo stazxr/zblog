@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,8 +68,8 @@ public class TalkServiceImpl extends ServiceImpl<TalkMapper, Talk> implements Ta
         Assert.notNull(talkVo, "查询说说信息失败，说说【" + talkId + "】不存在");
 
         // 查询说说对应的图片文件列表
-        List<File> fileList = fileRelationMapper.selectByBusinessId(talkId);
-        talkVo.setImagesFileList(fileList);
+//        List<File> fileList = fileRelationMapper.selectByBusinessId(talkId);
+        talkVo.setImagesFileList(new ArrayList<>());
         return talkVo;
     }
 
@@ -91,10 +92,9 @@ public class TalkServiceImpl extends ServiceImpl<TalkMapper, Talk> implements Ta
 
         // 保存图片列表信息
         if (talkDto.getImagesList() != null && talkDto.getImagesList().size() > 0) {
-            fileRelationMapper.deleteByBusinessId(talk.getId());
+//            fileRelationMapper.deleteByBusinessId(talk.getId());
             talkDto.getImagesList().forEach(image -> {
                 FileRelation fileRelation = new FileRelation();
-                fileRelation.setId(SequenceUtils.getId());
                 fileRelation.setFileId(image.getId());
                 fileRelation.setBusinessId(talk.getId());
                 fileRelationMapper.insert(fileRelation);

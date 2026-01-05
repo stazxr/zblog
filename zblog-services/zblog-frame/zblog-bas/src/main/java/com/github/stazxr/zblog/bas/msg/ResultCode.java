@@ -33,7 +33,22 @@ public enum ResultCode {
     /**
      * 请求参数绑定失败
      */
-    REQUEST_PARAM_BIND_FAILED(40003, "{result.request.param.bind.failed}");
+    REQUEST_PARAM_BIND_FAILED(40003, "{result.request.param.bind.failed}"),
+
+    /**
+     * 系统发生了业务操作异常
+     */
+    SERVER_ERROR(50001, "{result.server.error}"),
+
+    /**
+     * 系统发生了业务操作异常
+     */
+    SERVER_BUSY(50002, "{result.server.busy}"),
+
+    /**
+     * 邮件推送失败
+     */
+    SEND_EMAIL_ERROR(50003, "{result.email.sendError}");
 
     private final Integer code;
 
@@ -52,6 +67,14 @@ public enum ResultCode {
         if (CommonUtil.isResultTemplateMessage(defaultMsg)) {
             String code = defaultMsg.substring(1, defaultMsg.length() - 1);
             return I18nUtils.getMessage(code);
+        }
+        return defaultMsg;
+    }
+
+    public String message(Object[] args) {
+        if (CommonUtil.isResultTemplateMessage(defaultMsg)) {
+            String code = defaultMsg.substring(1, defaultMsg.length() - 1);
+            return I18nUtils.getMessage(code, args);
         }
         return defaultMsg;
     }

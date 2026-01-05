@@ -58,7 +58,7 @@ public class ValidatorExceptionHandler {
         }
 
         ResultCode validateFailed = ResultCode.DATA_VALIDATE_FAILED;
-        Result result = Result.failure(validateFailed.code(), ex.getMessage()).code(HttpStatus.BAD_REQUEST);
+        Result result = Result.failure(validateFailed.code(), ex.getMessage()).code(HttpStatus.INTERNAL_SERVER_ERROR);
         ResponseUtils.responseJsonWriter(response, result);
     }
 

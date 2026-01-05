@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.bas.validation;
 
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 
+import java.util.Objects;
+
 /**
  * 参数校验工具类
  *
@@ -10,25 +12,25 @@ import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
  */
 public class Assert {
     public static void isEquals(Object a, Object b, String message) {
-        if (a != null && !a.equals(b)) {
+        if (!Objects.equals(a, b)) {
             throw new AssertException(message);
         }
     }
 
     public static void isEquals(Object a, Object b, ExpMessageCode expMessageCode) {
-        if (a != null && !a.equals(b)) {
+        if (!Objects.equals(a, b)) {
             throw new AssertException(expMessageCode);
         }
     }
 
     public static void isNoEquals(Object a, Object b, String message) {
-        if (a != null && a.equals(b)) {
+        if (Objects.equals(a, b)) {
             throw new AssertException(message);
         }
     }
 
     public static void isNoEquals(Object a, Object b, ExpMessageCode expMessageCode) {
-        if (a != null && a.equals(b)) {
+        if (Objects.equals(a, b)) {
             throw new AssertException(expMessageCode);
         }
     }
@@ -61,27 +63,67 @@ public class Assert {
         }
     }
 
+    public static void isBlank(String str, String message) {
+        if (!isBlankInternal(str)) {
+            throw new AssertException(message);
+        }
+    }
+
+    public static void isBlank(String str, ExpMessageCode expMessageCode) {
+        if (!isBlankInternal(str)) {
+            throw new AssertException(expMessageCode);
+        }
+    }
+
+    public static void notBlank(String str) {
+        notBlank(str, ExpMessageCode.PARAM_BLANK);
+    }
+
     public static void notBlank(String str, String message) {
-        if (str == null || "".equals(str.trim())) {
+        if (isBlankInternal(str)) {
             throw new AssertException(message);
         }
     }
 
     public static void notBlank(String str, ExpMessageCode expMessageCode) {
-        if (str == null || "".equals(str.trim())) {
+        if (isBlankInternal(str)) {
             throw new AssertException(expMessageCode);
         }
     }
 
-    public static void isTrue(boolean flag, String message) {
-        if (flag) {
+    public static void failIfTrue(boolean condition, String message) {
+        if (condition) {
             throw new AssertException(message);
         }
     }
 
-    public static void isTrue(boolean flag, ExpMessageCode expMessageCode) {
-        if (flag) {
-            throw new AssertException(expMessageCode);
+    public static void failIfTrue(boolean condition, ExpMessageCode code) {
+        if (condition) {
+            throw new AssertException(code);
+        }
+    }
+
+    public static void failIfFalse(boolean condition, String message) {
+        if (!condition) {
+            throw new AssertException(message);
+        }
+    }
+
+    public static void failIfFalse(boolean condition, ExpMessageCode code) {
+        if (!condition) {
+            throw new AssertException(code);
+        }
+    }
+
+    public static void affectOneRow(int rows, String message) {
+        if (rows != 1) {
+            throw new AssertException(message);
+        }
+    }
+
+    public static void affectOneRow(int rows, ExpMessageCode messageCode) {
+        if (rows != 1) {
+            throw new AssertException(messageCode);
         }
     }
 
@@ -91,7 +133,7 @@ public class Assert {
      * @param flag flag
      * @param callBack callback function
      */
-    public static void isTrue(boolean flag, CallBack callBack) {
+    public static void doIfTrue(boolean flag, CallBack callBack) {
         if (flag) {
             callBack.call();
         }
@@ -104,7 +146,7 @@ public class Assert {
      * @param trueBack true callback function
      * @param falseBack false callback function
      */
-    public static void isTrue(boolean flag, CallBack trueBack, CallBack falseBack) {
+    public static void doIfElse(boolean flag, CallBack trueBack, CallBack falseBack) {
         if (flag) {
             trueBack.call();
         } else {
@@ -117,9 +159,24 @@ public class Assert {
      *
      * @param flag flag
      * @param trueBack true callback function
+     * @param message false throw exception
+     */
+    public static void doIfTrueElseThrow(boolean flag, CallBack trueBack, String message) {
+        if (flag) {
+            trueBack.call();
+        } else {
+            throw new AssertException(message);
+        }
+    }
+
+    /**
+     * Assert flag is true
+     *
+     * @param flag flag
+     * @param trueBack true callback function
      * @param expMessageCode false throw exception
      */
-    public static void isTrue(boolean flag, CallBack trueBack, ExpMessageCode expMessageCode) {
+    public static void doIfTrueElseThrow(boolean flag, CallBack trueBack, ExpMessageCode expMessageCode) {
         if (flag) {
             trueBack.call();
         } else {
@@ -129,5 +186,9 @@ public class Assert {
 
     public interface CallBack {
         void call();
+    }
+
+    private static boolean isBlankInternal(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

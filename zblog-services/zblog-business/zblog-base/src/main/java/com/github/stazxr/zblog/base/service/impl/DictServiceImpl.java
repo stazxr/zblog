@@ -94,7 +94,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         // 字典信息检查
         checkDict(dict);
         // 新增字典
-        Assert.isTrue(dictMapper.insert(dict) != 1, ExpMessageCode.of("result.common.add.failed"));
+        Assert.affectOneRow(dictMapper.insert(dict), ExpMessageCode.of("result.common.add.failed"));
     }
 
     /**
@@ -112,7 +112,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         // 字典信息检查
         checkDict(dict);
         // 编辑字典
-        Assert.isTrue(dictMapper.updateById(dict) != 1, ExpMessageCode.of("result.common.edit.failed"));
+        Assert.affectOneRow(dictMapper.updateById(dict), ExpMessageCode.of("result.common.edit.failed"));
     }
 
     /**
@@ -126,9 +126,9 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
         Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
         // 存在子节点无法被删除
-        Assert.isTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.deleteWithChildren"));
+        Assert.failIfTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.deleteWithChildren"));
         // 删除字典
-        Assert.isTrue(dictMapper.deleteById(dictId) != 1, ExpMessageCode.of("result.common.delete.failed"));
+        Assert.affectOneRow(dictMapper.deleteById(dictId), ExpMessageCode.of("result.common.delete.failed"));
     }
 
     /**
@@ -172,7 +172,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             Dict parentDict = dictMapper.selectById(dict.getPid());
             Assert.notNull(parentDict, ExpMessageCode.of("valid.dict.parent.notExist"));
             boolean parentIsGroup = DictType.GROUP.getValue().equals(parentDict.getDictType());
-            Assert.isTrue(!parentIsGroup, ExpMessageCode.of("valid.dict.parentIsNotGroup"));
+            Assert.failIfFalse(parentIsGroup, ExpMessageCode.of("valid.dict.parentIsNotGroup"));
             Assert.notNull(dict.getEnabled(), ExpMessageCode.of("valid.dict.enabled.NotNull"));
             Assert.notBlank(dict.getDictKey(), ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
         }

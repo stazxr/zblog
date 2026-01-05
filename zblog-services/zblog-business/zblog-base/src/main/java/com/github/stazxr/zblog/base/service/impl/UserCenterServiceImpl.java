@@ -9,9 +9,14 @@ import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
+import com.github.stazxr.zblog.base.domain.entity.FileRelation;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
+import com.github.stazxr.zblog.base.domain.enums.BasUploadBusinessType;
+import com.github.stazxr.zblog.base.mapper.FileMapper;
+import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
 import com.github.stazxr.zblog.base.service.UserCenterService;
@@ -42,6 +47,10 @@ public class UserCenterServiceImpl implements UserCenterService {
     private final UserMapper userMapper;
 
     private final UserPassLogMapper userPassLogMapper;
+
+    private final FileMapper fileMapper;
+
+    private final FileRelationMapper fileRelationMapper;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -81,6 +90,31 @@ public class UserCenterServiceImpl implements UserCenterService {
         preDoUpdateUserPass(passDto);
     }
 
+    /**
+     * 修改个人头像
+     *
+     * @param headImgDto 用户头像信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserHeadImg(UserUpdateHeadImgDto headImgDto) {
+        Long userId = headImgDto.getUserId();
+        Assert.notNull(userId, ExpMessageCode.of("valid.usercenter.userId.NotNull"));
+        Long fileId = headImgDto.getFileId();
+        Assert.notNull(fileId, ExpMessageCode.of("valid.usercenter.fileId.NotNull"));
+        Assert.affectOneRow(userMapper.updateUserHeadImg(userId, headImgDto.getHeadImg()), ExpMessageCode.of("result.usercenter.headImg.failed"));
+        // 删除原头像信息（物理文件不删除，通过跑批删除）
+        fileMapper.deleteByBusinessInfo(userId, BasUploadBusinessType.HEADER_IMG);
+        fileRelationMapper.deleteByBusinessInfo(userId, BasUploadBusinessType.HEADER_IMG);
+        // 插入新的头像关联信息
+        FileRelation fileRelation = new FileRelation();
+        fileRelation.setFileId(fileId);
+        fileRelation.setBusinessId(userId);
+        fileRelation.setBusinessType(BasUploadBusinessType.HEADER_IMG);
+        fileRelationMapper.insert(fileRelation);
+        SecurityUserCache.remove(String.valueOf(userId));
+    }
+
     private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
         // 获取参数信息
         UserUpdatePassDto realPassDto;
@@ -88,7 +122,7 @@ public class UserCenterServiceImpl implements UserCenterService {
             String jsonStr = RsaUtils.decryptByPrivateKey(secretKey, passDto.get_f());
             realPassDto = JSON.parseObject(jsonStr, UserUpdatePassDto.class);
         } catch (Exception e) {
-            throw new ServiceException("error.usercenter.password.decryptExp");
+            throw new ServiceException(ExpMessageCode.of("error.usercenter.password.decryptExp"));
         }
 
         // 空校验
@@ -101,27 +135,27 @@ public class UserCenterServiceImpl implements UserCenterService {
         String confirmPass = realPassDto.getConfirmPass();
         Assert.notBlank(confirmPass, ExpMessageCode.of("valid.usercenter.confirmPass.NotBlank"));
         // 校验新密码输入是否一致
-        Assert.isTrue(!newPass.equals(confirmPass), ExpMessageCode.of("valid.usercenter.confirmPass.notMatch"));
+        Assert.failIfFalse(newPass.equals(confirmPass), ExpMessageCode.of("valid.usercenter.confirmPass.notMatch"));
         // 获取用户信息
         User user = userMapper.selectUserByUsername(username);
         Assert.notNull(user, ExpMessageCode.of("valid.usercenter.user.NotExist"));
         // 原密码是否正确
         boolean oldMatches = passwordEncoder.matches(oldPass, user.getPassword());
-        Assert.isTrue(!oldMatches, ExpMessageCode.of("valid.usercenter.oldPass.notMatch"));
+        Assert.failIfFalse(oldMatches, ExpMessageCode.of("valid.usercenter.oldPass.notMatch"));
         // 新旧密码不能一致
         boolean newMatches = passwordEncoder.matches(newPass, user.getPassword());
-        Assert.isTrue(newMatches, ExpMessageCode.of("valid.usercenter.samePassword"));
+        Assert.failIfTrue(newMatches, ExpMessageCode.of("valid.usercenter.samePassword"));
         // 密码复杂度校验
         boolean containUsername = newPass.toLowerCase(Locale.ROOT).contains(username.toLowerCase(Locale.ROOT));
-        Assert.isTrue(containUsername, ExpMessageCode.of("valid.usercenter.passwordContainUsername"));
-        Assert.isTrue(!RegexUtils.match(newPass, RegexUtils.Regex.NEW_PWD_REGEX), ExpMessageCode.of("valid.usercenter.passwordSimple"));
+        Assert.failIfTrue(containUsername, ExpMessageCode.of("valid.usercenter.passwordContainUsername"));
+        Assert.failIfFalse(RegexUtils.match(newPass, RegexUtils.Regex.NEW_PWD_REGEX), ExpMessageCode.of("valid.usercenter.passwordSimple"));
         // 密码历史校验
         int passwordHistoryCount = securityExtProperties.getPasswordHistoryCount();
         if (passwordHistoryCount > 0) {
             List<String> historyPassList = userPassLogMapper.selectUserHistoryPass(user.getId(), passwordHistoryCount);
             for (String historyPass : historyPassList) {
                 boolean historyMatches = passwordEncoder.matches(newPass, historyPass);
-                Assert.isTrue(historyMatches, ExpMessageCode.of("valid.usercenter.matchHistoryPass", passwordHistoryCount));
+                Assert.failIfTrue(historyMatches, ExpMessageCode.of("valid.usercenter.matchHistoryPass", passwordHistoryCount));
             }
         }
         // 修改密码
@@ -136,10 +170,10 @@ public class UserCenterServiceImpl implements UserCenterService {
         userPassLog.setUserId(userId);
         userPassLog.setPassword(passwordEncoder.encode(password));
         userPassLog.setChangePwdTime(changePwdTime);
-        Assert.isTrue(userPassLogMapper.insert(userPassLog) != 1, ExpMessageCode.of("result.usercenter.password.failed"));
+        Assert.affectOneRow(userPassLogMapper.insert(userPassLog), ExpMessageCode.of("result.usercenter.password.failed"));
         // 数据入库
         String newPassword = passwordEncoder.encode(password);
-        Assert.isTrue(userMapper.updateUserPassword(userId, newPassword, changePwdTime) != 1, ExpMessageCode.of("result.usercenter.password.failed"));
+        Assert.affectOneRow(userMapper.updateUserPassword(userId, newPassword, changePwdTime), ExpMessageCode.of("result.usercenter.password.failed"));
         SecurityUserCache.remove(String.valueOf(userId));
     }
 
@@ -148,25 +182,6 @@ public class UserCenterServiceImpl implements UserCenterService {
 //    private final LogMapper logMapper;
 //
 //    private final UserTokenStorageMapper userTokenStorageMapper;
-//
-//    /**
-//     * 修改个人头像
-//     *
-//     * @param updateDto 用户信息
-//     * @return boolean
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public boolean updateUserHeadImg(UserDto updateDto) {
-//        Long userId = updateDto.getId();
-//        Assert.notNull(userId, "参数【id】不能为空");
-//
-//        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
-//        wrapper.set(User::getHeadImgUrl, updateDto.getHeadImg());
-//        wrapper.eq(User::getId, userId);
-//        UserCacheHandler.remove(String.valueOf(userId));
-//        return wrapper.update();
-//    }
 //
 //    /**
 //     * 修改个人基础信息

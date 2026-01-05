@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.service.UserCenterService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
@@ -59,6 +60,19 @@ public class UserCenterController {
         userCenterService.updateUserPass(passDto);
     }
 
+    /**
+     * 修改个人头像
+     *
+     * @param headImgDto 用户头像信息
+     */
+    @Log
+    @PostMapping("updateUserHeadImg")
+    @ApiOperation("修改个人头像")
+    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @Router(name = "修改个人头像", code = "USECU003", level = RouterLevel.PUBLIC)
+    public void updateUserHeadImg(@RequestBody UserUpdateHeadImgDto headImgDto) {
+        userCenterService.updateUserHeadImg(headImgDto);
+    }
 
 
 
@@ -102,20 +116,7 @@ public class UserCenterController {
 
 
 
-//    /**
-//     * 修改个人头像
-//     *
-//     * @param updateDto 用户信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping("updateUserHeadImg")
-//    @ApiOperation("修改个人头像")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "修改个人头像", code = "updateUserHeadImg", level = RouterLevel.PUBLIC)
-//    public Result updateUserHeadImg(@RequestBody UserDto updateDto) {
-//        return userService.updateUserHeadImg(updateDto) ? Result.success() : Result.failure();
-//    }
+
 //
 //    /**
 //     * 修改个人基础信息

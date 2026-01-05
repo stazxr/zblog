@@ -6,7 +6,6 @@ import com.github.stazxr.zblog.base.domain.vo.HomePanelDataCountVo;
 import com.github.stazxr.zblog.base.domain.vo.echarts.SingleLineChartDataVo;
 import com.github.stazxr.zblog.base.mapper.ZblogMapper;
 import com.github.stazxr.zblog.base.service.HomeService;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,7 +63,7 @@ public class HomeServiceImpl implements HomeService {
                 dateCounts = zblogMapper.queryAvRangeData(xAxisData);
                 break;
             default:
-                throw new ServiceException("不支持的类型：" + type);
+                throw new RuntimeException("不支持的类型：" + type);
         }
 
         SingleLineChartDataVo singleLineChartDataVo = new SingleLineChartDataVo();

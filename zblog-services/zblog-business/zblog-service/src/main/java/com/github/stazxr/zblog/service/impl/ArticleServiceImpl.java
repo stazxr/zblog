@@ -5,16 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.file.FileHandler;
-import com.github.stazxr.zblog.bas.file.FileTypeHandler;
+import com.github.stazxr.zblog.bas.file.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
-import com.github.stazxr.zblog.bas.file.model.UploadFileType;
 import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.converter.ArticleConverter;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.core.util.DataValidated;
 import com.github.stazxr.zblog.core.util.SecurityUtils;
 import com.github.stazxr.zblog.domain.bo.ArticleCountData;
@@ -275,7 +273,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         baseMapper.invalidateArticlePublishTiming(articleDto.getId(), "重新定时发布【" + nowTime + "】");
         Long publishId = SequenceUtils.getId();
         baseMapper.insertArticlePublishTiming(publishId, articleDto.getId(), articleDto.getAutoPublishTime(), nowTime);
-        throw new ServiceException("功能已关闭，优化中");
+        // throw new ServiceException("功能已关闭，优化中");
     }
 
     /**
@@ -421,7 +419,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             Article dbInfo = baseMapper.selectOneWithDeleted(articleDto.getId());
             checkArticleIsAllowEdit(dbInfo);
         } else {
-            throw new ServiceException("无法处理的操作类型：" + articleDto.getAction());
+            // throw new ServiceException("无法处理的操作类型：" + articleDto.getAction());
         }
     }
 
@@ -477,7 +475,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 checkArticleIsAllowEdit(dbInfo);
             }
         } else {
-            throw new ServiceException("无法处理的操作类型：" + articleDto.getAction());
+            // throw new ServiceException("无法处理的操作类型：" + articleDto.getAction());
         }
 
         // 设置文章状态（对外不可见的文章无须审批）
@@ -509,11 +507,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 发布时间校验
         Date nowDate = new Date();
-        Date publishDate;
+        Date publishDate = new Date();
         try {
             publishDate = DateUtils.parseDate(articleDto.getAutoPublishTime(), "yyyy-MM-dd HH:mm");
         } catch (Exception e) {
-            throw new ServiceException("发布时间格式不正确", e);
+            // throw new ServiceException("发布时间格式不正确", e);
         }
         long delay = publishDate.getTime() - nowDate.getTime();
         Assert.isTrue(delay <= 0 || delay > Integer.MAX_VALUE, "发布时间无效");
@@ -583,7 +581,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             // 默认封面、无封面、未传参（草稿）
             if (files != null && files.size() != 0) {
                 // 删除图片
-                files.forEach(file -> fileService.deleteFile(file.getId(), null));
+                files.forEach(file -> fileService.deleteFile(file.getId()));
             }
         }
 
@@ -612,14 +610,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), null, fileInputStream);
             MultipartFile[] files = new MultipartFile[] {multipartFile};
 
-            int fileUploadType = fileService.getFileUploadType();
-            FileHandler fileHandler = FileTypeHandler.instance(fileUploadType);
+            int fileUploadType = fileService.getFileUploadModel();
+            FileHandler fileHandler = FileHandlerEnum.instance(fileUploadType);
             List<FileInfo> fileList = fileHandler.uploadFile(files);
-            List<File> insertFile = fileService.insertFile(UploadFileType.NORMAL.getType(), fileList);
-            return insertFile.get(0);
+            // List<File> insertFile = fileService.insertFile(UploadFileType.NORMAL.getType(), fileList);
+            // return insertFile.get(0);
         } catch (Exception e) {
-            throw new ServiceException("封面自动生成失败，请选择其他封面类型", e);
+            // throw new ServiceException("封面自动生成失败，请选择其他封面类型", e);
         }
+        return null;
     }
 
     private void articleTagConfig(ArticleDto articleDto) {

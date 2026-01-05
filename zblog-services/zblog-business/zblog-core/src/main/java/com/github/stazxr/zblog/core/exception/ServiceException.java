@@ -1,7 +1,8 @@
 package com.github.stazxr.zblog.core.exception;
 
 import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.core.enums.ResultCode;
+import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.msg.ResultCode;
 
 /**
  * 自定义业务异常
@@ -31,19 +32,19 @@ public class ServiceException extends BaseException {
     private Throwable throwable = null;
 
     /**
-     * 生成一个默认的业务异常信息 {@link ResultCode#SERVER_EXP}
+     * 生成一个默认的业务异常信息 {@link ResultCode#SERVER_ERROR}
      */
     public ServiceException() {
-        this(ResultCode.SERVER_EXP);
+        this(ResultCode.SERVER_ERROR);
     }
 
     /**
-     * 生成一个带有错误信息的的业务异常 {@link ResultCode#SERVER_EXP}
+     * 生成一个带有错误信息的的业务异常 {@link ResultCode#SERVER_ERROR}
      *
      * @param message 错误信息
      */
     public ServiceException(String message) {
-        this(ResultCode.SERVER_EXP, message);
+        this(ResultCode.SERVER_ERROR, message);
     }
 
     /**
@@ -59,22 +60,10 @@ public class ServiceException extends BaseException {
      * 通过 ResultCode 枚举来抛出已经归档记录的异常
      *
      * @param resultCode {@link ResultCode}
-     * @param errorMsg 错误信息
+     * @param message 错误信息
      */
-    public ServiceException(ResultCode resultCode, String errorMsg) {
-        this(resultCode.code(), errorMsg);
-    }
-
-    /**
-     * 抛出自定义异常
-     *
-     * @param code    异常标识
-     * @param message 异常信息
-     */
-    public ServiceException(Integer code, String message) {
-        super(message);
-        this.identifier = code;
-        this.message = message;
+    public ServiceException(ResultCode resultCode, String message) {
+        this(resultCode.code(), message);
     }
 
     /**
@@ -83,17 +72,7 @@ public class ServiceException extends BaseException {
      * @param cause 未知异常
      */
     public ServiceException(Throwable cause) {
-        this(ResultCode.SERVER_EXP.code(), cause.getMessage(), cause);
-    }
-
-    /**
-     * 生成一个带有错误信息的的业务异常 {@link ResultCode#SERVER_EXP}
-     *
-     * @param message 业务提示信息
-     * @param cause   异常信息
-     */
-    public ServiceException(String message, Throwable cause) {
-        this(ResultCode.SERVER_EXP.code(), message, cause);
+        this(ResultCode.SERVER_ERROR, cause);
     }
 
     /**
@@ -107,13 +86,58 @@ public class ServiceException extends BaseException {
     }
 
     /**
+     * 生成一个带有错误信息的的业务异常 {@link ResultCode#SERVER_ERROR}
+     *
+     * @param message 业务提示信息
+     * @param cause   异常信息
+     */
+    public ServiceException(String message, Throwable cause) {
+        this(ResultCode.SERVER_ERROR.code(), message, cause);
+    }
+
+    /**
+     * 使用国际化消息码构造异常
+     *
+     * @param expMessageCode 异常消息码
+     */
+    public ServiceException(ExpMessageCode expMessageCode) {
+        super(expMessageCode);
+        this.identifier = ResultCode.SERVER_ERROR.code();
+        this.message = resolveMessageCode(expMessageCode);
+    }
+
+    /**
+     * 使用国际化消息码及根因构造异常
+     *
+     * @param expMessageCode 异常消息码
+     * @param cause          根因异常
+     */
+    public ServiceException(ExpMessageCode expMessageCode, Throwable cause) {
+        super(expMessageCode, cause);
+        this.identifier = ResultCode.SERVER_ERROR.code();
+        this.message = resolveMessageCode(expMessageCode);
+    }
+
+    /**
+     * 抛出自定义异常
+     *
+     * @param code    异常标识
+     * @param message 异常信息
+     */
+    private ServiceException(Integer code, String message) {
+        super(message);
+        this.identifier = code;
+        this.message = message;
+    }
+
+    /**
      * 抛出自定义异常
      *
      * @param code    异常标识
      * @param message 异常信息
      * @param cause   异常详情
      */
-    public ServiceException(Integer code, String message, Throwable cause) {
+    private ServiceException(Integer code, String message, Throwable cause) {
         super(message, cause);
         this.identifier = code;
         this.message = message;

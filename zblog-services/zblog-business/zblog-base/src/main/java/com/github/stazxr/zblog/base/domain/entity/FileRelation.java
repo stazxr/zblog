@@ -1,13 +1,13 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
- * 文件与业务绑定关系表
+ * 逻辑文件业务关联
  *
  * @author SunTao
  * @since 2022-07-27
@@ -15,15 +15,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("file_relation")
-public class FileRelation extends BaseEntity {
-    /**
-     * 主键
-     */
-    @TableId
-    private Long id;
+public class FileRelation implements Serializable {
+    private static final long serialVersionUID = 3984919053728739970L;
 
     /**
-     * 文件ID
+     * 逻辑文件ID
      */
     private Long fileId;
 
@@ -31,4 +27,9 @@ public class FileRelation extends BaseEntity {
      * 业务ID
      */
     private Long businessId;
+
+    /**
+     * 业务类型
+     */
+    private Integer businessType;
 }

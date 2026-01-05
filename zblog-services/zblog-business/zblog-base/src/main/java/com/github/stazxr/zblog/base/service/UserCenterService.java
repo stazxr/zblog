@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 
 /**
@@ -22,6 +23,13 @@ public interface UserCenterService {
      * @param passDto 用户密码信息
      */
     void updateUserPass(UserUpdatePassDto passDto);
+
+    /**
+     * 修改个人头像
+     *
+     * @param headImgDto 用户头像信息
+     */
+    void updateUserHeadImg(UserUpdateHeadImgDto headImgDto);
 
 
 //    /**

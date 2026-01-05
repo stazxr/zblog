@@ -178,13 +178,14 @@ public class ArticleVo extends BaseVo {
     private List<ArticleVo> newestList;
 
     public List<String> getArticleImgLinkList() {
-        List<String> tmp = new ArrayList<>();
-        if (this.articleImg != null) {
-            for (File file : articleImg) {
-                tmp.add(file.getDownloadUrl());
-            }
-        }
-        return tmp;
+//        List<String> tmp = new ArrayList<>();
+//        if (this.articleImg != null) {
+//            for (File file : articleImg) {
+//                tmp.add(file.getDownloadUrl());
+//            }
+//        }
+//        return tmp;
+        return null;
     }
 
     public List<Long> getArticleTag() {

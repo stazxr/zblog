@@ -116,7 +116,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 角色信息检查
         checkRole(role);
         // 新增角色
-        Assert.isTrue(roleMapper.insert(role) != 1, ExpMessageCode.of("result.common.add.failed"));
+        Assert.affectOneRow(roleMapper.insert(role), ExpMessageCode.of("result.common.add.failed"));
     }
 
     /**
@@ -134,7 +134,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 角色信息检查
         checkRole(role);
         // 编辑角色
-        Assert.isTrue(roleMapper.updateById(role) != 1, ExpMessageCode.of("result.common.edit.failed"));
+        Assert.affectOneRow(roleMapper.updateById(role), ExpMessageCode.of("result.common.edit.failed"));
     }
 
     /**
@@ -188,9 +188,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
         // 判断角色是否关联用户
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
-        Assert.isTrue(!userIds.isEmpty(), "所选角色存在用户关联，请解除关联再试！");
+        Assert.failIfFalse(userIds.isEmpty(), ExpMessageCode.of("valid.role.delete.hasUser"));
         // 删除角色
-        Assert.isTrue(roleMapper.deleteById(roleId) != 1, ExpMessageCode.of("result.common.delete.failed"));
+        Assert.affectOneRow(roleMapper.deleteById(roleId), ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色关联信息
         userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
@@ -255,13 +255,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private void checkRole(Role role) {
         // 检查角色名称
         role.setRoleName(role.getRoleName().trim());
-        Assert.isTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exist"));
+        Assert.failIfTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exist"));
 
         // 检查角色编码
         role.setRoleCode(role.getRoleCode().trim());
-        Assert.isTrue(!role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.patternError"));
-        Assert.isTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), ExpMessageCode.of("valid.role.roleCode.forbid"));
-        Assert.isTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exist"));
+        Assert.failIfFalse(role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.patternError"));
+        Assert.failIfTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), ExpMessageCode.of("valid.role.roleCode.forbid"));
+        Assert.failIfTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exist"));
     }
 
     private boolean checkRoleNameExist(Role role) {

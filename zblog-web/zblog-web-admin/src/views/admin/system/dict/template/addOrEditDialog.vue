@@ -146,7 +146,7 @@ export default {
             // add
             this.$mapi.dict.addDict(this.formData).then(res => {
               this.$message.success(res.message)
-              this.doClose(true)
+              this.doClose(true, 'add')
             }).finally(_ => {
               this.submitLoading = false
             })
@@ -154,7 +154,7 @@ export default {
             // edit
             this.$mapi.dict.editDict(this.formData).then(res => {
               this.$message.success(res.message)
-              this.doClose(true)
+              this.doClose(true, 'edit')
             }).finally(_ => {
               this.submitLoading = false
             })
@@ -172,8 +172,8 @@ export default {
         }).catch(_ => {})
       }
     },
-    doClose(result = false) {
-      const type = this.formData.dictType
+    doClose(result = false, type = '') {
+      const dictType = this.formData.dictType
       this.formData = {
         id: null,
         pid: null,
@@ -187,7 +187,7 @@ export default {
       }
       this.$refs.addOrEditForm.resetFields()
       this.submitLoading = false
-      this.$emit('addOrEditDone', result, type)
+      this.$emit('addOrEditDone', result, dictType, type)
     }
   }
 }

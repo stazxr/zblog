@@ -54,7 +54,7 @@
 //                fileInfo.setFileName(filename);
 //                fileInfo.setFilePath(config.getBucketName().concat(BUCKET_PATH_SPLIT_LABEL).concat(filePath));
 //                fileInfo.setDownloadUrl(config.getDomain().concat("/").concat(filePath));
-//                fileInfo.setUploadType(FileTypeHandler.ALI_YUN.getType());
+//                fileInfo.setUploadType(FileHandlerEnum.ALI_YUN.getType());
 //                fileInfos.add(fileInfo);
 //            }
 //            return fileInfos;

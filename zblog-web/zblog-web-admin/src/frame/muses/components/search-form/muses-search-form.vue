@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="musesSearchForm" v-bind="$attrs" v-on="$listeners">
+  <el-form ref="musesSearchForm" class="search-form" v-bind="$attrs" v-on="$listeners">
     <slot />
   </el-form>
 </template>
@@ -147,10 +147,15 @@ export default {
   }
 }
 </script>
+
 <style lang="scss" scoped>
-.el-form {
-  // 响应式布局
+.search-form {
   display: flex;
   flex-wrap: wrap;
+
+  ::v-deep(.el-form-item--mini.el-form-item),
+  ::v-deep(.el-form-item--small.el-form-item) {
+    margin-bottom: 10px; // 自定义间距
+  }
 }
 </style>

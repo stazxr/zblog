@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * 用户角色关系表
+ * 用户角色
  *
  * @author SunTao
  * @since 2021-01-03

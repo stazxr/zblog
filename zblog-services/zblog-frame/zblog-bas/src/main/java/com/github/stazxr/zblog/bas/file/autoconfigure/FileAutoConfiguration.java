@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 序号生成器自动配置
+ * 文件存储自动配置
  *
  * @author SunTao
  * @since 2024-04-07
@@ -22,13 +22,13 @@ public class FileAutoConfiguration {
      * @param properties 文件上传下载配置信息
      * @return LocalFileHandlerService
      */
-    @Bean
+    @Bean("LocalFileHandlerService")
     @ConditionalOnProperty(name = "zblog.base.file.model", havingValue = "1")
     public FileHandler localFileHandlerService(FileProperties properties) {
         FileProperties.LocalConfig local = properties.getLocal();
         return new LocalFileHandlerService(local.getBaseUrl(), local.getFileUploadPath());
     }
-//
+
 //    /**
 //     * 本地文件存储
 //     *

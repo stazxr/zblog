@@ -10,5 +10,9 @@ export default {
   // 修改用户密码
   updateUserPass: params => {
     return api.httpRequest().post(`${userCenterApi}/updateUserPass`, params)
+  },
+  // 修改头像
+  updateUserHeadImg: params => {
+    return api.httpRequest().post(`${userCenterApi}/updateUserHeadImg`, params)
   }
 }

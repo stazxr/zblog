@@ -9,13 +9,13 @@ import user from '@/api/base/system/user.js'
 import role from '@/api/base/system/role.js'
 import perm from '@/api/base/system/perm.js'
 import dict from '@/api/base/system/dict.js'
-import interfaces from '@/api/base/system/interface.js'
 
 // monitor
 import log from '@/api/base/monitor/log.js'
 import host from '@/api/base/monitor/host.js'
+import interfaces from '@/api/base/monitor/interface.js'
 
-// TODO
+// maintain
 import version from '@/api/base/maintain/version.js'
 import file from '@/api/base/maintain/file.js'
 
@@ -36,11 +36,10 @@ import test from '@/api/service/test.js'
 export default {
   communal, home, menu, userCenter,
   // 系统管理
-  user, role, perm, interfaces, dict,
+  user, role, perm, dict,
   // 系统监控
-  log, host,
+  log, host, interfaces,
   // 系统运维
   version, file,
-  column, category,
-  tag, article, webSetting, friendLink, talk, page, album, message, comment, test
+  column, category, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

@@ -106,6 +106,15 @@ public interface UserMapper extends BaseMapper<User> {
      */
     int updateUserPassword(@Param("userId") Long userId, @Param("password") String password, @Param("changePwdTime") String changePwdTime);
 
+    /**
+     * 用户头像修改
+     *
+     * @param userId  用户序列
+     * @param headImg 用户头像
+     * @return 修改行数
+     */
+    int updateUserHeadImg(@Param("userId") Long userId, @Param("headImg") String headImg);
+
 
 
 

@@ -28,7 +28,7 @@
       <!-- 个人头像 -->
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img alt="" :src="user['headImgUrl'] ? user['headImgUrl'] : Avatar" class="user-avatar">
+          <img alt="" :src="user['headImgUrl'] ? user['headImgUrl'] : DefaultAvatar" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -55,7 +55,7 @@ import Web from '@/components/Web'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import HeaderSearch from '@/components/HeaderSearch'
-import Avatar from '@/assets/images/avatar.png'
+import DefaultAvatar from '@/assets/images/default-avatar.png'
 import { removeToken } from '@/utils/token'
 
 export default {
@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      Avatar: Avatar,
+      DefaultAvatar: DefaultAvatar,
       dialogVisible: false
     }
   },

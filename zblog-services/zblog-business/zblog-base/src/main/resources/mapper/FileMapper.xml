@@ -1,45 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileMapper">
-    <update id="deleteFileByBusinessId">
-        UPDATE file SET DELETED = 1, UPDATE_USER = #{deleteUser}, UPDATE_TIME = SYSDATE() WHERE ID IN (
-            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId}
+    <select id="selectFileList" resultType="com.github.stazxr.zblog.base.domain.vo.FileVo">
+        SELECT
+            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, f.FILENAME, f.ORIGINAL_FILENAME,
+            f.CREATE_USER, f.CREATE_TIME, fs.FILE_MD5, fs.FILE_SIZE, fs.FILE_ABSOLUTE_PATH,
+            fs.FILE_RELATIVE_PATH, fs.DOWNLOAD_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
+            (SELECT USERNAME FROM user u WHERE u.ID = f.CREATE_USER) AS CREATE_USERNAME
+        FROM file f
+        LEFT JOIN file_storage fs ON fs.ID = f.STORAGE_ID
+        LEFT JOIN file_relation fr ON fr.FILE_ID = f.ID
+        <where>
+            <if test="uploadType != null">
+                fs.UPLOAD_TYPE = #{uploadType}
+            </if>
+            <if test="filename != null and filename != ''">
+                <bind name="filenameBind" value="'%' + filename + '%'"/>
+                AND f.ORIGINAL_FILENAME LIKE #{filenameBind}
+            </if>
+            <if test="fileMd5 != null and fileMd5 != ''">
+                AND fs.FILE_MD5 = #{fileMd5}
+            </if>
+            <if test="businessType != null">
+                AND fr.BUSINESS_TYPE = #{businessType}
+            </if>
+            <if test="hasBusiness != null">
+                AND
+                <choose>
+                    <when test="hasBusiness">
+                        fr.BUSINESS_ID IS NOT NULL
+                    </when>
+                    <otherwise>
+                        fr.BUSINESS_ID IS NULL
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="createStartTime != null">
+                AND f.CREATE_TIME <![CDATA[>=]]> #{createStartTime}
+            </if>
+            <if test="createEndTime != null">
+                AND f.CREATE_TIME <![CDATA[<=]]> #{createEndTime}
+            </if>
+        </where>
+        ORDER BY f.CREATE_TIME DESC
+    </select>
+
+    <select id="selectFileDetailById" resultType="com.github.stazxr.zblog.base.domain.vo.FileVo">
+        SELECT
+            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, f.FILENAME, f.ORIGINAL_FILENAME,
+            f.CREATE_USER, f.CREATE_TIME, fs.FILE_MD5, fs.FILE_SIZE, fs.FILE_ABSOLUTE_PATH,
+            fs.FILE_RELATIVE_PATH, fs.DOWNLOAD_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
+            (SELECT USERNAME FROM user u WHERE u.ID = f.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT COUNT(1) FROM file f1 WHERE f1.STORAGE_ID = f.STORAGE_ID) AS REFERENCE_COUNT
+        FROM file f
+        LEFT JOIN file_storage fs ON fs.ID = f.STORAGE_ID
+        LEFT JOIN file_relation fr ON fr.FILE_ID = f.ID
+        WHERE f.ID = #{fileId}
+    </select>
+
+    <delete id="deleteByBusinessInfo">
+        DELETE FROM file WHERE ID IN (
+            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId} AND BUSINESS_TYPE = #{businessType}
         )
-    </update>
-
-    <update id="deleteFileByFileId">
-        UPDATE file SET DELETED = 1, UPDATE_USER = #{deleteUser}, UPDATE_TIME = SYSDATE() WHERE ID = #{fileId}
-    </update>
-
-    <select id="selectFileList" resultType="com.github.stazxr.zblog.base.domain.entity.File">
-        SELECT * FROM file WHERE DELETED = 0
-        <if test="filename != null and filename != ''">
-            <bind name="filenameBind" value="'%' + filename + '%'"/>
-            AND ORIGINAL_FILENAME LIKE #{filenameBind}
-        </if>
-        <if test='storageType != null and storageType != ""'>
-            AND STORAGE_TYPE = #{storageType}
-        </if>
-        <if test="createStartTime != null and createStartTime != ''">
-            AND CREATE_TIME &gt;= #{createStartTime}
-        </if>
-        <if test="createEndTime != null and createEndTime != ''">
-            AND CREATE_TIME &lt;= #{createEndTime}
-        </if>
-        ORDER BY CREATE_TIME DESC
-    </select>
-
-    <select id="selectFilePathListByFileId" resultType="java.lang.String">
-        SELECT FILE_PATH FROM file WHERE DELETED = 0 AND ID = #{fileId}
-    </select>
-
-    <select id="selectFilePathListByBusinessId" resultType="java.lang.String">
-        SELECT FILE_PATH FROM file WHERE DELETED = 0 AND ID IN (
-            SELECT FILE_ID FROM file_relation WHERE BUSINESS_ID = #{businessId}
-        )
-    </select>
-
-    <select id="selectByFilepath" resultType="com.github.stazxr.zblog.base.domain.entity.File">
-        SELECT * FROM file WHERE FILE_PATH = #{filepath}
-    </select>
+    </delete>
 </mapper>

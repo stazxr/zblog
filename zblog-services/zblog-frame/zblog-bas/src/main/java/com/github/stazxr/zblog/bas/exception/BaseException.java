@@ -17,6 +17,11 @@ public abstract class BaseException extends RuntimeException {
     private String code;
 
     /**
+     * 关联异常
+     */
+    private Throwable throwable = null;
+
+    /**
      * 使用自定义消息构造异常
      *
      * @param message 异常消息
@@ -33,6 +38,7 @@ public abstract class BaseException extends RuntimeException {
      */
     public BaseException(String message, Throwable cause) {
         super(message, cause);
+        this.throwable = cause;
     }
 
     /**
@@ -42,7 +48,7 @@ public abstract class BaseException extends RuntimeException {
      */
     public BaseException(ExpMessageCode expMessageCode) {
         super(resolveMessageCode(expMessageCode));
-        code = expMessageCode.getCode();
+        this.code = expMessageCode.getCode();
     }
 
     /**
@@ -53,7 +59,8 @@ public abstract class BaseException extends RuntimeException {
      */
     public BaseException(ExpMessageCode expMessageCode, Throwable cause) {
         super(resolveMessageCode(expMessageCode), cause);
-        code = expMessageCode.getCode();
+        this.code = expMessageCode.getCode();
+        this.throwable = cause;
     }
 
     /**
@@ -81,6 +88,15 @@ public abstract class BaseException extends RuntimeException {
      */
     public String getCode() {
         return code;
+    }
+
+    /**
+     * 回去关联系统
+     *
+     * @return Throwable
+     */
+    public Throwable getThrowable() {
+        return throwable;
     }
 
     /**
@@ -119,7 +135,7 @@ public abstract class BaseException extends RuntimeException {
     /**
      * 安全解析国际化消息码，保证构造异常时不会抛出异常
      */
-    private static String resolveMessageCode(ExpMessageCode expMessageCode) {
+    protected static String resolveMessageCode(ExpMessageCode expMessageCode) {
         try {
             return I18nUtils.getMessage(expMessageCode.getCode(), expMessageCode.getArgs());
         } catch (Exception e) {
@@ -154,7 +170,7 @@ public abstract class BaseException extends RuntimeException {
         if (original == null) {
             return null;
         }
-        Throwable rootCause = original;
+        Throwable rootCause = null;
         Throwable cause = original.getCause();
         while (cause != null && cause != rootCause) {
             rootCause = cause;

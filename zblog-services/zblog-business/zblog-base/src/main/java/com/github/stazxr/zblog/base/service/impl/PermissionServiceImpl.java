@@ -133,7 +133,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 权限信息检查
         checkPermission(permission);
         // 新增权限
-        Assert.isTrue(permissionMapper.insert(permission) != 1, ExpMessageCode.of("result.common.add.failed"));
+        Assert.affectOneRow(permissionMapper.insert(permission), ExpMessageCode.of("result.common.add.failed"));
         // 删除相关缓存
         if (StringUtils.isNotBlank(permission.getPermCode())) {
             removeCache(permission.getId(), null, permission.getPermCode());
@@ -154,11 +154,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Assert.notNull(dbPermission, ExpMessageCode.of("valid.common.data.notFound"));
         // 权限类型不允许编辑
         boolean permTypeIsSame = dbPermission.getPermType().equals(permission.getPermType());
-        Assert.isTrue(!permTypeIsSame, ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
+        Assert.failIfFalse(permTypeIsSame, ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
         // 权限信息检查
         checkPermission(permission);
         // 编辑权限
-        Assert.isTrue(permissionMapper.updateById(permission) != 1, ExpMessageCode.of("result.common.edit.failed"));
+        Assert.affectOneRow(permissionMapper.updateById(permission), ExpMessageCode.of("result.common.edit.failed"));
         // 删除相关缓存
         if (!StringUtils.hasBlank(dbPermission.getPermCode(), permission.getPermCode())) {
             removeCache(permission.getId(), dbPermission.getPermCode(), permission.getPermCode());
@@ -182,10 +182,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 PermissionType.MENU.getType().equals(permType);
         if (dirOrMenu) {
             Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
-            Assert.isTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.hasChild"));
+            Assert.failIfTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.hasChild"));
         }
         // 删除权限
-        Assert.isTrue(permissionMapper.deleteById(permId) != 1, ExpMessageCode.of("result.common.delete.failed"));
+        Assert.affectOneRow(permissionMapper.deleteById(permId), ExpMessageCode.of("result.common.delete.failed"));
         rolePermMapper.deleteByPermId(permId);
         // 删除相关缓存
         if (StringUtils.isNotBlank(dbPermission.getPermCode())) {
@@ -226,11 +226,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             // 参数校验
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
-            Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
+            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
             Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
             // 上级信息校验，要求上级只能是目录
-            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parentError"));
+            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parentError"));
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
             // 菜单
             permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
@@ -239,16 +239,16 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.NotNull"));
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
-            Assert.isTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
+            Assert.failIfFalse(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
+            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
             if (permission.getPermCode() != null) {
-                Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+                Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
             }
             Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.NotBlank"));
             Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.NotBlank"));
 
             // 上级信息校验，要求上级只能是目录或空
-            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.menu.parentError"));
+            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.menu.parentError"));
         } else if (PermissionType.LINK.getType().equals(permission.getPermType())) {
             // 外链
             permission.setPermCode(null);
@@ -258,10 +258,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             // 参数校验
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.NotBlank"));
-            Assert.isTrue(!routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.patternError"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.patternError"));
             Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
             // 上级信息校验，要求上级只能是目录
-            Assert.isTrue(!PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parentError"));
+            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parentError"));
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
             // 按钮
             permission.setIcon(null);
@@ -272,11 +272,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentPath(null);
             // 参数校验，权限编码校验，权限编码不能重复
             Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.NotBlank"));
-            Assert.isTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+            Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
             // 上级信息校验，要求上级只能是菜单或目录或空
             boolean dirOrMenu = PermissionType.DIR.getType().equals(parentType) ||
                     PermissionType.MENU.getType().equals(parentType);
-            Assert.isTrue(!dirOrMenu, ExpMessageCode.of("valid.perm.btn.parentError"));
+            Assert.failIfFalse(dirOrMenu, ExpMessageCode.of("valid.perm.btn.parentError"));
         } else {
             throw new AssertException(ExpMessageCode.of("valid.perm.permType.invalid", permission.getPermType()));
         }
