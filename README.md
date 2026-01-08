@@ -27,9 +27,9 @@
 
 ## 在线地址
 
-**项目链接：** [https://www.suntaoblog.com](https://www.suntaoblog.com)
+**项目链接：** [https://www.zblog.com](https://www.suntaoblog.com)
 
-**后台链接：** [https://admin.suntaoblog.com](https://admin.suntaoblog.com)
+**后台链接：** [https://admin.zblog.com](https://admin.suntaoblog.com)
 
 测试账号：test，密码：123456，可登入后台查看。
 
