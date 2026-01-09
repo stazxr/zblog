@@ -199,10 +199,29 @@ zblog:
           issuer: http://localhost:${server.port}
           subject: zblog
     file:
-      model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云
+      model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云；4-腾讯云
       local: # 本地
+        enabled: true
         base-url: http://localhost:${server.port}/file/ # 如果生产使用本地模式上传文件，需要客户化IP地址
         file-upload-path: /home/${spring.application.name}/file/upload/
+      aliyun:
+        enabled: false
+        access-key-id: your-access-key-id
+        access-key-secret: your-access-key-secret
+        endpoint: oss-cn-beijing.aliyuncs.com
+        bucket-name: your-bucket-name
+        file-upload-path: upload/
+        base-url: https://your-bucket-name.oss-cn-beijing.aliyuncs.com
+      qiniuyun: # 七牛云
+        enabled: false
+        ak: your-ak
+        sk: your-sk
+        zone: zone
+        zone-name: your-zone-name
+        file-upload-path: upload/
+        base-url: https://domaincdn.com
+      tencentyun: # 腾讯云
+        enabled: false
     log:
       control:
         enabled: true # 开启全局请求响应日志打印
@@ -210,6 +229,5 @@ zblog:
         paths:
   # TODO 待替换
   base-package: com.github.stazxr.zblog
-  file-base-url: http://localhost:${server.port}/file/
   file-upload-path: /home/${spring.application.name}/file/upload/
   file-domain: /file/**

@@ -66,4 +66,11 @@ public interface FileHandler {
             }
         }
     }
+
+    /**
+     * 获取文件上传类型
+     *
+     * @return 上传类型
+     */
+    int getFileUploadType();
 }

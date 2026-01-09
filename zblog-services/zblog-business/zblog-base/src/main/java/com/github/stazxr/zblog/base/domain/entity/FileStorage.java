@@ -76,6 +76,7 @@ public class FileStorage implements Serializable {
     }
 
     public FileStorage(FileInfo fileInfo) {
+        setId(fileInfo.getFileId());
         setFileMd5(fileInfo.getFileMd5());
         setFileSize(fileInfo.getFileSize());
         setFileAbsolutePath(fileInfo.getFileAbsolutePath());

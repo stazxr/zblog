@@ -150,7 +150,7 @@ public class FileServiceImpl implements FileService {
         String encodeFilename = URLEncoder.encode(fileVo.getOriginalFilename(), "UTF-8");
         if (isDown == null || !isDown) {
             // inline
-            response.addHeader("Content-Disposition", "inline;fileName=" + '"' + fileVo.getOriginalFilename() + '"');
+            response.addHeader("Content-Disposition", "inline;fileName=" + encodeFilename);
         } else {
             // download
             response.setContentType("application/force-download");
@@ -213,7 +213,7 @@ public class FileServiceImpl implements FileService {
         for (MultipartFile _multipartFile : multipartFiles) {
             try {
                 // 判断文件是否已经上传过存储服务器
-                String fileMd5 = Md5Utils.getMessageDigest(_multipartFile.getBytes());
+                String fileMd5 = Md5Utils.md5(_multipartFile.getInputStream());
                 FileStorage dbFileStorage = fileStorageMapper.selectFileByMd5(fileMd5);
                 UploadFileVo uploadFileVo;
                 if (dbFileStorage == null) {
@@ -293,13 +293,10 @@ public class FileServiceImpl implements FileService {
                 // 首次上传，已经获取了 FileInfo
                 Date uploadTime = new Date();
                 fileStorage = new FileStorage(fileInfo);
-                Long fileStorageId = SequenceUtils.getId();
-                fileStorage.setId(fileStorageId);
                 fileStorage.setUploadUser(user.getId());
                 fileStorage.setUploadTime(uploadTime);
                 fileStorageMapper.insert(fileStorage);
             }
-
             // 获取文件信息
             Long fileId = SequenceUtils.getId();
             String filename = String.valueOf(fileId);

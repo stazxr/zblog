@@ -3,8 +3,6 @@ package com.github.stazxr.zblog.bas.file.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.InputStream;
-
 /**
  * 文件信息
  *
@@ -15,7 +13,7 @@ import java.io.InputStream;
 @Setter
 public class FileInfo {
     /**
-     * 文件id
+     * 物理文件id
      */
     private Long fileId;
 
@@ -68,9 +66,4 @@ public class FileInfo {
      * 上传方式
      */
     private Integer uploadType;
-
-    /**
-     * 文件字节数组
-     */
-    private InputStream inputStream;
 }

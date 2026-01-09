@@ -37,5 +37,3 @@ jwt:
 cache:
   default-duration: 300
   type: redis
-zblog:
-  file-base-url: https://www.suntaoblog.com/file/

@@ -25,7 +25,7 @@ public class Md5Encryptor implements Encryptor {
     @Override
     public String encrypt(String plainText) throws EncryptorException {
         try {
-            return Md5Utils.md5Hex(plainText);
+            return Md5Utils.md5(plainText);
         } catch (Exception e) {
             throw new EncryptException("ZENC005", e);
         }

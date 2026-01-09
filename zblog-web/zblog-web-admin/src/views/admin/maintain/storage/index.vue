@@ -10,6 +10,9 @@
       <el-tab-pane label="七牛云存储" name="qiNiuYun">
         <qi-niu-yun ref="qiNiuYun" />
       </el-tab-pane>
+      <el-tab-pane label="腾讯云存储" name="tencentYun">
+        <tencent-yun ref="tencentYun" />
+      </el-tab-pane>
       <el-tab-pane v-if="hasPerm(['getConfigStorageType'])" label="存储配置" name="config">
         <config ref="config" />
       </el-tab-pane>
@@ -21,10 +24,11 @@
 import Local from './local/index'
 import AliYun from './aliyun/index'
 import QiNiuYun from './qiniuyun/index'
+import TencentYun from './tencentyun/index'
 import config from './config/index'
 export default {
   name: 'Storage',
-  components: { Local, AliYun, QiNiuYun, config },
+  components: { Local, AliYun, QiNiuYun, TencentYun, config },
   data() {
     return {
       activeName: 'local'
@@ -53,6 +57,11 @@ export default {
         case 'qiNiuYun':
           this.$nextTick(() => {
             this.$refs['qiNiuYun'].initData()
+          })
+          break
+        case 'tencentYun':
+          this.$nextTick(() => {
+            this.$refs['tencentYun'].initData()
           })
           break
         case 'config':

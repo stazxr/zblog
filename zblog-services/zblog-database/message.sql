@@ -232,8 +232,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.bas.deleteFailed', 'en_US', 'File deletion failed', 'common'),
 ('valid.file.bas.downloadFailed', 'zh_CN', '文件下载失败', 'common'),
 ('valid.file.bas.downloadFailed', 'en_US', 'File download failed', 'common'),
-('valid.file.bas.beanNotFound', 'zh_CN', '文件上传类型 {0} 对应的处理器 Bean 未找到', 'common'),
-('valid.file.bas.beanNotFound', 'en_US', 'File upload type {0} handler bean not found', 'common'),
+('valid.file.bas.beanNotFound', 'zh_CN', '功能未启用', 'common'),
+('valid.file.bas.beanNotFound', 'en_US', 'Feature is not enabled.', 'common'),
 ('valid.file.bas.typeNotSupport', 'zh_CN', '不支持的文件上传类型 {0}', 'common'),
 ('valid.file.bas.typeNotSupport', 'en_US', 'Unsupported file upload type {0}', 'common'),
 ('valid.file.upload.chooseNoneFile', 'zh_CN', '上传失败，待上传文件列表为空', 'common'),
@@ -262,6 +262,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.delete.hasReference', 'en_US', 'The file is still referenced by other records and cannot be deleted', 'common'),
 ('valid.file.delete.storageFailed', 'zh_CN', '删除物理文件记录失败，请稍后再试', 'common'),
 ('valid.file.delete.storageFailed', 'en_US', 'Failed to delete physical file record. Please try again later', 'common'),
+('valid.file.bas.bucketNotExist', 'zh_CN', '存储桶不存在，请检查桶名称或云存储配置', 'common'),
+('valid.file.bas.bucketNotExist', 'en_US', 'Storage bucket does not exist. Please check the bucket name or storage configuration.', 'common'),
 -- 异常相关 >-->
 ('error.usercenter.password.decryptExp', 'zh_CN', '参数异常，请刷新页面重试', 'common'),
 ('error.usercenter.password.decryptExp', 'en_US', 'Log ID cannot be null', 'common');

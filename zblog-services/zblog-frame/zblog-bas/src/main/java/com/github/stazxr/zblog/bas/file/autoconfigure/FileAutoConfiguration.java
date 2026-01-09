@@ -1,7 +1,9 @@
 package com.github.stazxr.zblog.bas.file.autoconfigure;
 
 import com.github.stazxr.zblog.bas.file.FileHandler;
+import com.github.stazxr.zblog.bas.file.impl.AliyunFileHandlerService;
 import com.github.stazxr.zblog.bas.file.impl.LocalFileHandlerService;
+import com.github.stazxr.zblog.bas.file.impl.QiniuyunFileHandlerService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,39 +21,36 @@ public class FileAutoConfiguration {
     /**
      * 本地文件存储
      *
-     * @param properties 文件上传下载配置信息
+     * @param properties 文件存储配置信息
      * @return LocalFileHandlerService
      */
     @Bean("LocalFileHandlerService")
-    @ConditionalOnProperty(name = "zblog.base.file.model", havingValue = "1")
+    @ConditionalOnProperty(prefix = "zblog.base.file.local", name = "enabled", havingValue = "true")
     public FileHandler localFileHandlerService(FileProperties properties) {
-        FileProperties.LocalConfig local = properties.getLocal();
-        return new LocalFileHandlerService(local.getBaseUrl(), local.getFileUploadPath());
+        return new LocalFileHandlerService(properties.getLocal());
     }
 
-//    /**
-//     * 本地文件存储
-//     *
-//     * @param properties 文件上传下载配置信息
-//     * @return LocalFileHandlerService
-//     */
-//    @Bean
-//    @ConditionalOnProperty(name = "zblog.base.file.model", havingValue = "2")
-//    public FileHandler localFileHandlerService(FileProperties properties) {
-//        FileProperties.LocalConfig local = properties.getLocal();
-//        return new LocalFileHandlerService(local.getBaseUrl(), local.getFileUploadPath());
-//    }
-//
-//    /**
-//     * 本地文件存储
-//     *
-//     * @param properties 文件上传下载配置信息
-//     * @return LocalFileHandlerService
-//     */
-//    @Bean
-//    @ConditionalOnProperty(name = "zblog.base.file.model", havingValue = "3")
-//    public FileHandler localFileHandlerService(FileProperties properties) {
-//        FileProperties.LocalConfig local = properties.getLocal();
-//        return new LocalFileHandlerService(local.getBaseUrl(), local.getFileUploadPath());
-//    }
+    /**
+     * 阿里云对象存储 OSS
+     *
+     * @param properties 文件存储配置信息
+     * @return AliyunFileHandlerService
+     */
+    @Bean("AliyunFileHandlerService")
+    @ConditionalOnProperty(prefix = "zblog.base.file.aliyun", name = "enabled", havingValue = "true")
+    public FileHandler aliyunFileHandlerService(FileProperties properties) {
+        return new AliyunFileHandlerService(properties.getAliyun());
+    }
+
+    /**
+     * 七牛云文件存储 Kodo
+     *
+     * @param properties 文件存储配置信息
+     * @return QiniuyunFileHandlerService
+     */
+    @Bean("QiniuyunFileHandlerService")
+    @ConditionalOnProperty(prefix = "zblog.base.file.qiniuyun", name = "enabled", havingValue = "true")
+    public FileHandler qiniuyunFileHandlerService(FileProperties properties) {
+        return new QiniuyunFileHandlerService(properties.getQiniuyun());
+    }
 }

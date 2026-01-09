@@ -21,12 +21,17 @@ public enum FileHandlerEnum {
     /**
      * 阿里云存储
      */
-    ALI_YUN(2, "阿里云", "AliYunFileHandlerService"),
+    ALIYUN(2, "阿里云", "AliyunFileHandlerService"),
 
     /**
      * 七牛云存储
      */
-    QI_NIU_YUN(3, "七牛云", "QiNiuYunFileHandlerService");
+    QINIUYUN(3, "七牛云", "QiniuyunFileHandlerService"),
+
+    /**
+     * 腾讯云存储
+     */
+    TENCENT_YUN(4, "腾讯云", "TencentYunFileHandlerService");
 
     private final int type;
 

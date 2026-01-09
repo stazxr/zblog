@@ -62,13 +62,18 @@
     },
     {
       "name": "zblog.base.file.aliYun",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliYunConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliYunConfig"
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig"
     },
     {
       "name": "zblog.base.file.qiNiuYun",
       "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiNiuYunConfig",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiNiuYunConfig"
+    },
+    {
+      "name": "zblog.base.file.tencentYun",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentConfig"
     }
   ],
   "properties": [
@@ -318,20 +323,68 @@
       "name": "zblog.base.file.model",
       "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties",
-      "description": "file upload model, default 1.",
+      "description": "File storage mode selector. Determines which file storage implementation is used globally.",
       "defaultValue": 1
     },
     {
-      "name": "zblog.base.file.local.baseUrl",
-      "type": "java.lang.String",
+      "name": "zblog.base.file.local.enabled",
+      "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "description": "local file upload base url."
+      "description": "Whether local file storage is enabled. When enabled, files will be stored on the local filesystem."
     },
     {
-      "name": "zblog.base.file.local.fileUploadPath",
+      "name": "zblog.base.file.local.base-url",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "description": "local file upload path."
+      "description": "Public access base URL for local files, used to construct file access links."
+    },
+    {
+      "name": "zblog.base.file.local.file-upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
+      "description": "Absolute or relative path on the local filesystem where uploaded files are stored."
+    },
+    {
+      "name": "zblog.base.file.aliyun.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "Whether Aliyun OSS file storage is enabled. Requires valid OSS credentials and bucket configuration."
+    },
+    {
+      "name": "zblog.base.file.aliyun.base-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "Public access base URL for Aliyun OSS files, usually bound to a CDN or OSS domain."
+    },
+    {
+      "name": "zblog.base.file.aliyun.file-upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "Upload path prefix inside the OSS bucket, used to organize uploaded files."
+    },
+    {
+      "name": "zblog.base.file.aliyun.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "Aliyun OSS endpoint, for example: oss-cn-hangzhou.aliyuncs.com."
+    },
+    {
+      "name": "zblog.base.file.aliyun.access-key-id",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "AccessKey ID used to authenticate requests to Aliyun OSS."
+    },
+    {
+      "name": "zblog.base.file.aliyun.access-key-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "AccessKey Secret corresponding to the AccessKey ID. Keep this value secure."
+    },
+    {
+      "name": "zblog.base.file.aliyun.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
+      "description": "Aliyun OSS bucket name where uploaded files are stored."
     }
   ],
   "hints": [
@@ -395,7 +448,8 @@
       "values": [
         { "value": 1, "description": "本地存储." },
         { "value": 2, "description": "阿里云存储." },
-        { "value": 3, "description": "七牛云存储." }
+        { "value": 3, "description": "七牛云存储." },
+        { "value": 4, "description": "腾讯云存储." }
       ]
     },
     {

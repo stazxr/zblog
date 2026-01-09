@@ -38,13 +38,6 @@
       "description": "文件上传目录."
     },
     {
-      "name": "zblog.file-base-url",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "file base url.",
-      "defaultValue": "http://localhost:8080/file"
-    },
-    {
       "name": "swagger.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",

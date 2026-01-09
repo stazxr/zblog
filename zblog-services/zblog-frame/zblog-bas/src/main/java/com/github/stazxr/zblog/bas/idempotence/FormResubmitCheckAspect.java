@@ -43,7 +43,7 @@ public class FormResubmitCheckAspect {
         String methodSignature = methodString.concat(argString);
         String loginId = Context.get(TagConstants.DEPLOY_LOGIN_ID);
         methodSignature = formResubmitCheck.global() ? methodSignature : methodSignature.concat(loginId);
-        String messageDigest = Md5Utils.getMessageDigest(methodSignature.getBytes(StandardCharsets.UTF_8));
+        String messageDigest = Md5Utils.md5(methodSignature.getBytes(StandardCharsets.UTF_8));
 
         // 规则校验
         String rk = "frc:" + messageDigest;
