@@ -50,8 +50,8 @@ public class UploadFileVo implements Serializable {
     private String fileRelativePath;
 
     /**
-     * 下载地址
+     * 访问地址
      */
-    @ApiModelProperty("下载地址")
-    private String downloadUrl;
+    @ApiModelProperty("访问地址")
+    private String fileAccessUrL;
 }

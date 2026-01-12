@@ -236,6 +236,10 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.bas.beanNotFound', 'en_US', 'Feature is not enabled.', 'common'),
 ('valid.file.bas.typeNotSupport', 'zh_CN', '不支持的文件上传类型 {0}', 'common'),
 ('valid.file.bas.typeNotSupport', 'en_US', 'Unsupported file upload type {0}', 'common'),
+('valid.file.bas.bucketNotExist', 'zh_CN', '存储桶 {0} 不存在，请检查桶名称或云存储配置', 'common'),
+('valid.file.bas.bucketNotExist', 'en_US', 'Storage bucket {0} does not exist. Please check the bucket name or storage configuration.', 'common'),
+('valid.file.common.fileNotExist', 'zh_CN', '文件不存在或已被删除', 'common'),
+('valid.file.common.fileNotExist', 'en_US', 'The file does not exist or has already been deleted', 'common'),
 ('valid.file.upload.chooseNoneFile', 'zh_CN', '上传失败，待上传文件列表为空', 'common'),
 ('valid.file.upload.chooseNoneFile', 'en_US', 'Upload failed: no files selected for upload', 'common'),
 ('valid.file.upload.switchOff', 'zh_CN', '上传失败，文件上传未启用', 'common'),
@@ -252,8 +256,6 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.upload.sizeOverMax', 'en_US', 'Upload failed: file size must not exceed {0} KB', 'common'),
 ('valid.file.upload.insertDbFailed', 'zh_CN', '上传失败，数据库异常，请稍后再试', 'common'),
 ('valid.file.upload.insertDbFailed', 'en_US', 'Upload failed due to a database error. Please try again later', 'common'),
-('valid.file.common.fileNotExist', 'zh_CN', '文件不存在或已被删除', 'common'),
-('valid.file.common.fileNotExist', 'en_US', 'The file does not exist or has already been deleted', 'common'),
 ('valid.file.delete.hasBusiness', 'zh_CN', '文件已关联业务数据，无法删除', 'common'),
 ('valid.file.delete.hasBusiness', 'en_US', 'The file is associated with business data and cannot be deleted', 'common'),
 ('valid.file.delete.logicFailed', 'zh_CN', '删除文件记录失败，请稍后再试', 'common'),
@@ -262,8 +264,6 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.delete.hasReference', 'en_US', 'The file is still referenced by other records and cannot be deleted', 'common'),
 ('valid.file.delete.storageFailed', 'zh_CN', '删除物理文件记录失败，请稍后再试', 'common'),
 ('valid.file.delete.storageFailed', 'en_US', 'Failed to delete physical file record. Please try again later', 'common'),
-('valid.file.bas.bucketNotExist', 'zh_CN', '存储桶不存在，请检查桶名称或云存储配置', 'common'),
-('valid.file.bas.bucketNotExist', 'en_US', 'Storage bucket does not exist. Please check the bucket name or storage configuration.', 'common'),
 -- 异常相关 >-->
 ('error.usercenter.password.decryptExp', 'zh_CN', '参数异常，请刷新页面重试', 'common'),
 ('error.usercenter.password.decryptExp', 'en_US', 'Log ID cannot be null', 'common');

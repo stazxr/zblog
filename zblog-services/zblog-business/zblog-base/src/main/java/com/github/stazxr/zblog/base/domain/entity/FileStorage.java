@@ -28,6 +28,11 @@ public class FileStorage implements Serializable {
     private Long id;
 
     /**
+     * 文件名（新生成的）
+     */
+    private String filename;
+
+    /**
      * 文件MD5值
      */
     private String fileMd5;
@@ -48,9 +53,9 @@ public class FileStorage implements Serializable {
     private String fileRelativePath;
 
     /**
-     * 下载地址
+     * 访问地址
      */
-    private String downloadUrl;
+    private String fileAccessUrl;
 
     /**
      * 文件类型
@@ -77,12 +82,14 @@ public class FileStorage implements Serializable {
 
     public FileStorage(FileInfo fileInfo) {
         setId(fileInfo.getFileId());
+        setFilename(fileInfo.getFilename());
         setFileMd5(fileInfo.getFileMd5());
         setFileSize(fileInfo.getFileSize());
-        setFileAbsolutePath(fileInfo.getFileAbsolutePath());
+        setFileAbsolutePath(fileInfo.getStorageLocation());
         setFileRelativePath(fileInfo.getFileRelativePath());
-        setDownloadUrl(fileInfo.getDownloadUrl());
+        setFileAccessUrl(fileInfo.getFileAccessUrl());
         setFileType(fileInfo.getFileType());
         setUploadType(fileInfo.getUploadType());
+        setUploadTime(new Date());
     }
 }

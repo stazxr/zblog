@@ -1,9 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.base.domain.bo.storage.BaseStorageConfig;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
-import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,40 +67,4 @@ public interface FileService {
      * @param fileId 文件id
      */
     void deleteFile(Long fileId);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * 获取配置信息
-     *
-     * @param storageType 存储类型
-     * @return BaseStorageConfig
-     */
-    BaseStorageConfig getConfigInfo(Integer storageType);
 }

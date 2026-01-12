@@ -4,17 +4,14 @@
       <el-tab-pane label="本地存储" name="local">
         <local ref="local" />
       </el-tab-pane>
-      <el-tab-pane label="阿里云存储" name="aliYun">
+      <el-tab-pane label="阿里云（OSS）" name="aliYun">
         <ali-yun ref="aliYun" />
       </el-tab-pane>
-      <el-tab-pane label="七牛云存储" name="qiNiuYun">
+      <el-tab-pane label="七牛云存储（Kodo）" name="qiNiuYun">
         <qi-niu-yun ref="qiNiuYun" />
       </el-tab-pane>
-      <el-tab-pane label="腾讯云存储" name="tencentYun">
+      <el-tab-pane label="腾讯云存储（COS）" name="tencentYun">
         <tencent-yun ref="tencentYun" />
-      </el-tab-pane>
-      <el-tab-pane v-if="hasPerm(['getConfigStorageType'])" label="存储配置" name="config">
-        <config ref="config" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -25,10 +22,9 @@ import Local from './local/index'
 import AliYun from './aliyun/index'
 import QiNiuYun from './qiniuyun/index'
 import TencentYun from './tencentyun/index'
-import config from './config/index'
 export default {
   name: 'Storage',
-  components: { Local, AliYun, QiNiuYun, TencentYun, config },
+  components: { Local, AliYun, QiNiuYun, TencentYun },
   data() {
     return {
       activeName: 'local'
@@ -64,17 +60,9 @@ export default {
             this.$refs['tencentYun'].initData()
           })
           break
-        case 'config':
-          this.$nextTick(() => {
-            this.$refs['config'].initData()
-          })
-          break
         default:
           console.log('error tab name', name)
       }
-    },
-    hasPerm(value) {
-      return this.checkPerm(value)
     }
   }
 }

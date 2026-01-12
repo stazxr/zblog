@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.file.FileHandler;
-import com.github.stazxr.zblog.bas.file.FileHandlerEnum;
+import com.github.stazxr.zblog.bas.file.handler.FileHandler;
+import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
@@ -41,10 +41,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 文章业务实现层
@@ -612,7 +609,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
             int fileUploadType = fileService.getFileUploadModel();
             FileHandler fileHandler = FileHandlerEnum.instance(fileUploadType);
-            List<FileInfo> fileList = fileHandler.uploadFile(files);
+            List<FileInfo> fileList = new ArrayList<>();
             // List<File> insertFile = fileService.insertFile(UploadFileType.NORMAL.getType(), fileList);
             // return insertFile.get(0);
         } catch (Exception e) {

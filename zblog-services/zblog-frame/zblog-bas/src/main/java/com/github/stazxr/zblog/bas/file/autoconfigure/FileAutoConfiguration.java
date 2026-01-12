@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.bas.file.autoconfigure;
 
-import com.github.stazxr.zblog.bas.file.FileHandler;
-import com.github.stazxr.zblog.bas.file.impl.AliyunFileHandlerService;
-import com.github.stazxr.zblog.bas.file.impl.LocalFileHandlerService;
-import com.github.stazxr.zblog.bas.file.impl.QiniuyunFileHandlerService;
+import com.github.stazxr.zblog.bas.file.handler.FileHandler;
+import com.github.stazxr.zblog.bas.file.handler.impl.AliyunOssFileHandler;
+import com.github.stazxr.zblog.bas.file.handler.impl.LocalFileHandler;
+import com.github.stazxr.zblog.bas.file.handler.impl.QiniuyunKodoFileHandler;
+import com.github.stazxr.zblog.bas.file.handler.impl.TencentyunCosFileHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -22,35 +23,47 @@ public class FileAutoConfiguration {
      * 本地文件存储
      *
      * @param properties 文件存储配置信息
-     * @return LocalFileHandlerService
+     * @return LocalFileHandler
      */
-    @Bean("LocalFileHandlerService")
+    @Bean("LocalFileHandler")
     @ConditionalOnProperty(prefix = "zblog.base.file.local", name = "enabled", havingValue = "true")
-    public FileHandler localFileHandlerService(FileProperties properties) {
-        return new LocalFileHandlerService(properties.getLocal());
+    public FileHandler localFileHandler(FileProperties properties) {
+        return new LocalFileHandler(properties.getLocal());
     }
 
     /**
      * 阿里云对象存储 OSS
      *
      * @param properties 文件存储配置信息
-     * @return AliyunFileHandlerService
+     * @return AliyunOssFileHandler
      */
-    @Bean("AliyunFileHandlerService")
-    @ConditionalOnProperty(prefix = "zblog.base.file.aliyun", name = "enabled", havingValue = "true")
-    public FileHandler aliyunFileHandlerService(FileProperties properties) {
-        return new AliyunFileHandlerService(properties.getAliyun());
+    @Bean("AliyunOssFileHandler")
+    @ConditionalOnProperty(prefix = "zblog.base.file.oss", name = "enabled", havingValue = "true")
+    public FileHandler aliyunOssFileHandler(FileProperties properties) {
+        return new AliyunOssFileHandler(properties.getOss());
     }
 
     /**
-     * 七牛云文件存储 Kodo
+     * 七牛云对象存储 Kodo
      *
      * @param properties 文件存储配置信息
-     * @return QiniuyunFileHandlerService
+     * @return QiniuyunKodoFileHandler
      */
-    @Bean("QiniuyunFileHandlerService")
-    @ConditionalOnProperty(prefix = "zblog.base.file.qiniuyun", name = "enabled", havingValue = "true")
-    public FileHandler qiniuyunFileHandlerService(FileProperties properties) {
-        return new QiniuyunFileHandlerService(properties.getQiniuyun());
+    @Bean("QiniuyunKodoFileHandler")
+    @ConditionalOnProperty(prefix = "zblog.base.file.kodo", name = "enabled", havingValue = "true")
+    public FileHandler qiniuyunKodoFileHandler(FileProperties properties) {
+        return new QiniuyunKodoFileHandler(properties.getKodo());
+    }
+
+    /**
+     * 腾讯云对象存储 COS
+     *
+     * @param properties 文件存储配置信息
+     * @return TencentyunCosFileHandler
+     */
+    @Bean("TencentyunCosFileHandler")
+    @ConditionalOnProperty(prefix = "zblog.base.file.cos", name = "enabled", havingValue = "true")
+    public FileHandler tencentyunCosFileHandler(FileProperties properties) {
+        return new TencentyunCosFileHandler(properties.getCos());
     }
 }

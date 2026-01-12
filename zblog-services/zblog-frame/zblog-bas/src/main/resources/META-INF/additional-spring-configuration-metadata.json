@@ -61,19 +61,19 @@
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig"
     },
     {
-      "name": "zblog.base.file.aliYun",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig"
+      "name": "zblog.base.file.oss",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunOssConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunOssConfig"
     },
     {
-      "name": "zblog.base.file.qiNiuYun",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiNiuYunConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiNiuYunConfig"
+      "name": "zblog.base.file.kodo",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiniuyunKodoConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiniuyunKodoConfig"
     },
     {
-      "name": "zblog.base.file.tencentYun",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentConfig"
+      "name": "zblog.base.file.cos",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig"
     }
   ],
   "properties": [
@@ -322,69 +322,138 @@
     {
       "name": "zblog.base.file.model",
       "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties",
-      "description": "File storage mode selector. Determines which file storage implementation is used globally.",
-      "defaultValue": 1
+      "defaultValue": 1,
+      "description": "文件上传模式，对应 FileHandlerEnum."
     },
     {
       "name": "zblog.base.file.local.enabled",
       "type": "java.lang.Boolean",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "description": "Whether local file storage is enabled. When enabled, files will be stored on the local filesystem."
+      "defaultValue": true,
+      "description": "是否启用本地文件存储."
     },
     {
-      "name": "zblog.base.file.local.base-url",
+      "name": "zblog.base.file.local.file-access-url",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "description": "Public access base URL for local files, used to construct file access links."
+      "defaultValue": "http://127.0.0.1:8000/file",
+      "description": "本地文件访问 URL 前缀，用于拼接文件对外访问地址."
     },
     {
-      "name": "zblog.base.file.local.file-upload-path",
+      "name": "zblog.base.file.local.storage-path-prefix",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "description": "Absolute or relative path on the local filesystem where uploaded files are stored."
+      "defaultValue": "/zblog/upload",
+      "description": "本地文件存储路径前缀（逻辑路径）."
     },
+
     {
-      "name": "zblog.base.file.aliyun.enabled",
+      "name": "zblog.base.file.oss.enabled",
       "type": "java.lang.Boolean",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "Whether Aliyun OSS file storage is enabled. Requires valid OSS credentials and bucket configuration."
+      "defaultValue": false,
+      "description": "是否启用阿里云 OSS 文件存储."
     },
     {
-      "name": "zblog.base.file.aliyun.base-url",
+      "name": "zblog.base.file.oss.file-access-url",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "Public access base URL for Aliyun OSS files, usually bound to a CDN or OSS domain."
+      "description": "阿里云 OSS 文件访问 URL 前缀."
     },
     {
-      "name": "zblog.base.file.aliyun.file-upload-path",
+      "name": "zblog.base.file.oss.storage-path-prefix",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "Upload path prefix inside the OSS bucket, used to organize uploaded files."
+      "defaultValue": "upload",
+      "description": "阿里云 OSS 文件存储路径前缀（逻辑路径）."
     },
     {
-      "name": "zblog.base.file.aliyun.endpoint",
+      "name": "zblog.base.file.oss.access-key",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "Aliyun OSS endpoint, for example: oss-cn-hangzhou.aliyuncs.com."
+      "description": "阿里云 AccessKey ID."
     },
     {
-      "name": "zblog.base.file.aliyun.access-key-id",
+      "name": "zblog.base.file.oss.secret-key",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "AccessKey ID used to authenticate requests to Aliyun OSS."
+      "description": "阿里云 AccessKey Secret."
     },
     {
-      "name": "zblog.base.file.aliyun.access-key-secret",
+      "name": "zblog.base.file.oss.endpoint",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "AccessKey Secret corresponding to the AccessKey ID. Keep this value secure."
+      "description": "阿里云 OSS Endpoint."
     },
     {
-      "name": "zblog.base.file.aliyun.bucket-name",
+      "name": "zblog.base.file.oss.bucket-name",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunConfig",
-      "description": "Aliyun OSS bucket name where uploaded files are stored."
+      "description": "阿里云 OSS 存储桶名称."
+    },
+    {
+      "name": "zblog.base.file.kodo.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "是否启用七牛云对象存储 Kodo."
+    },
+    {
+      "name": "zblog.base.file.kodo.file-access-url",
+      "type": "java.lang.String",
+      "description": "七牛云 Kodo 文件访问 URL（空间绑定域名）."
+    },
+    {
+      "name": "zblog.base.file.kodo.storage-path-prefix",
+      "type": "java.lang.String",
+      "defaultValue": "upload",
+      "description": "七牛云 Kodo 文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.kodo.access-key",
+      "type": "java.lang.String",
+      "description": "七牛云 AccessKey（AK）."
+    },
+    {
+      "name": "zblog.base.file.kodo.secret-key",
+      "type": "java.lang.String",
+      "description": "七牛云 SecretKey（SK）."
+    },
+    {
+      "name": "zblog.base.file.kodo.zone",
+      "type": "java.lang.String",
+      "description": "七牛云存储区域标识."
+    },
+    {
+      "name": "zblog.base.file.kodo.zone-name",
+      "type": "java.lang.String",
+      "description": "七牛云存储空间名称（Bucket）."
+    },
+    {
+      "name": "zblog.base.file.cos.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "是否启用腾讯云 COS 对象存储."
+    },
+    {
+      "name": "zblog.base.file.cos.file-access-url",
+      "type": "java.lang.String",
+      "description": "腾讯云 COS 文件访问 URL 前缀."
+    },
+    {
+      "name": "zblog.base.file.cos.storage-path-prefix",
+      "type": "java.lang.String",
+      "defaultValue": "upload",
+      "description": "腾讯云 COS 文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.cos.access-key",
+      "type": "java.lang.String",
+      "description": "腾讯云访问密钥 ID."
+    },
+    {
+      "name": "zblog.base.file.cos.secret-key",
+      "type": "java.lang.String",
+      "description": "腾讯云访问密钥 SecretKey."
+    },
+    {
+      "name": "zblog.base.file.cos.region",
+      "type": "java.lang.String",
+      "description": "腾讯云 COS 所在地域（Region）."
+    },
+    {
+      "name": "zblog.base.file.cos.bucket-name",
+      "type": "java.lang.String",
+      "description": "腾讯云 COS 存储桶名称."
     }
   ],
   "hints": [
@@ -457,6 +526,34 @@
       "values": [
         { "value": 0, "description": "zblog.base.log.control.paths 为允许记录日志的路径列表." },
         { "value": 1, "description": "zblog.base.log.control.paths 为禁止记录日志的路径列表." }
+      ]
+    },
+    {
+      "name": "zblog.base.file.kodo.zone",
+      "values": [
+        { "value": "huadong", "description": "华东（z0）." },
+        { "value": "huabei", "description": "华北（z1）." },
+        { "value": "huanan", "description": "华南（z2）." },
+        { "value": "beimei", "description": "北美（na0）." },
+        { "value": "xinjiapo", "description": "新加坡（as0）." }
+      ]
+    },
+    {
+      "name": "zblog.base.file.cos.region",
+      "values": [
+        { "value": "ap-beijing", "description": "北京." },
+        { "value": "ap-shanghai", "description": "上海." },
+        { "value": "ap-guangzhou", "description": "广州." },
+        { "value": "ap-chengdu", "description": "成都." },
+        { "value": "ap-chongqing", "description": "重庆." },
+        { "value": "ap-nanjing", "description": "南京." },
+        { "value": "ap-hongkong", "description": "香港." },
+        { "value": "ap-singapore", "description": "新加坡." },
+        { "value": "ap-tokyo", "description": "东京." },
+        { "value": "ap-seoul", "description": "首尔." },
+        { "value": "na-siliconvalley", "description": "美国硅谷." },
+        { "value": "na-ashburn", "description": "美国弗吉尼亚." },
+        { "value": "eu-frankfurt", "description": "德国法兰克福." }
       ]
     }
   ]

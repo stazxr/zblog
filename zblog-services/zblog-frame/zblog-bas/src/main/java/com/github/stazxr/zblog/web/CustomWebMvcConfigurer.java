@@ -3,6 +3,8 @@ package com.github.stazxr.zblog.web;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.github.stazxr.zblog.bas.file.autoconfigure.FileAutoConfiguration;
+import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
 import com.github.stazxr.zblog.bas.reqsinglepost.SingleParamHandlerMethodArgumentResolver;
 import com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration;
 import com.github.stazxr.zblog.web.serializer.LongToStringSerializer;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -30,16 +33,22 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularR
 import static com.alibaba.fastjson.serializer.SerializerFeature.WriteMapNullValue;
 
 /**
- *
+ * WebMvcConfigurer
  *
  * @author SunTao
  * @since 2025-08-13
  */
 @EnableWebMvc
 @Configuration
-@AutoConfigureAfter(ValidationAutoConfiguration.class)
+@AutoConfigureAfter({ValidationAutoConfiguration.class, FileAutoConfiguration.class})
 public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     private LocalValidatorFactoryBean validatorFactoryBean;
+
+    private FileProperties fileProperties;
+
+    private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+        "classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"
+    };
 
     /**
      * 跨域支持
@@ -125,13 +134,37 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         return validatorFactoryBean;
     }
 
+    @Override
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+        // 本地文件上传
+        String accessPath = fileProperties.getLocal().getFileAccessUrl();
+        if (!accessPath.endsWith("/")) {
+            accessPath += "/";
+        }
+        String storagePath = fileProperties.getLocal().getStoragePathPrefix();
+        if (!storagePath.endsWith("/")) {
+            storagePath += "/";
+        }
+        registry.addResourceHandler(accessPath.replaceFirst("^.+?://[^/]+", "") + "**")
+                .addResourceLocations("file:" + storagePath).setCachePeriod(3600);
+
+        // 静态资源
+        registry.addResourceHandler("/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+
+        // Swagger
+        registry.addResourceHandler("doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
     @Autowired
     public void setValidatorFactoryBean(@Nullable LocalValidatorFactoryBean validatorFactoryBean) {
         this.validatorFactoryBean = validatorFactoryBean;
     }
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+    @Autowired
+    public void setFileProperties(@NonNull FileProperties fileProperties) {
+        this.fileProperties = fileProperties;
     }
 }

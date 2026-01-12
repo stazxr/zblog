@@ -32,11 +32,6 @@ public class File implements Serializable {
     private Long storageId;
 
     /**
-     * 文件名称
-     */
-    private String filename;
-
-    /**
      * 原文件名称
      */
     private String originalFilename;

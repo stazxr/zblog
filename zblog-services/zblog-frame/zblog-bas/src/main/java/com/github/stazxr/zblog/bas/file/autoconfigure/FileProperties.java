@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.bas.file.autoconfigure;
 
-import com.github.stazxr.zblog.bas.file.FileHandlerEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,7 +15,7 @@ public class FileProperties {
     static final String FILE_PREFIX= "zblog.base.file";
 
     /**
-     * 文件上传模式：see {@link FileHandlerEnum}
+     * 文件上传模式：see {@link com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum}
      */
     private int model = 1;
 
@@ -26,19 +25,19 @@ public class FileProperties {
     private LocalConfig local = new LocalConfig();
 
     /**
-     * 阿里云配置信息
+     * 阿里云 oss 配置信息
      */
-    private AliyunConfig aliyun = new AliyunConfig();
+    private AliyunOssConfig oss = new AliyunOssConfig();
 
     /**
-     * 七牛云配置信息
+     * 七牛云 kodo 配置信息
      */
-    private QiniuYunConfig qiniuyun = new QiniuYunConfig();
+    private QiniuyunKodoConfig kodo = new QiniuyunKodoConfig();
 
     /**
-     * 腾讯云配置信息
+     * 腾讯云 cos 配置信息
      */
-    private TencentConfig tencentyun = new TencentConfig();
+    private TencentyunCosConfig cos = new TencentyunCosConfig();
 
     @Getter
     @Setter
@@ -49,44 +48,50 @@ public class FileProperties {
         private boolean enabled = true;
 
         /**
-         * 本地文件访问地址
+         * 文件访问 URL 前缀
+         * <p>用于拼接文件对外访问地址</p>
          */
-        private String baseUrl = "http://127.0.0.1:8000/file";
+        private String fileAccessUrl = "http://127.0.0.1:8000/file";
 
         /**
-         * 本地文件上传根路径
-         * <p>
-         * 文件在服务器磁盘中的存储根目录，例如：
-         * <li>/data/upload/</li>
-         * <li>D:/upload/</li>
+         * 文件存储路径前缀（逻辑路径）
+         * <p>用于生成文件在存储系统中的相对路径</p>
          */
-        private String fileUploadPath = "/zblog/upload";
+        private String storagePathPrefix = "/zblog/upload";
     }
 
     @Getter
     @Setter
-    public static class AliyunConfig {
+    public static class AliyunOssConfig {
         /**
          * 是否启用阿里云 OSS 文件存储
          */
         private boolean enabled = false;
 
         /**
-         * 阿里云 AccessKey ID
-         * <p>
-         * 用于 OSS API 身份认证
+         * 文件访问 URL 前缀
+         * <p>用于拼接文件对外访问地址</p>
          */
-        private String accessKeyId;
+        private String fileAccessUrl;
+
+        /**
+         * 文件存储路径前缀（逻辑路径）
+         * <p>用于生成文件在存储系统中的相对路径</p>
+         */
+        private String storagePathPrefix = "upload";
+
+        /**
+         * 阿里云 AccessKey ID
+         */
+        private String accessKey;
 
         /**
          * 阿里云 AccessKey Secret
-         * <p>
-         * 与 AccessKey ID 配套使用，请妥善保管
          */
-        private String accessKeySecret;
+        private String secretKey;
 
         /**
-         * OSS 服务访问 Endpoint
+         * 阿里云 Endpoint
          */
         private String endpoint;
 
@@ -94,39 +99,38 @@ public class FileProperties {
          * 桶名称
          */
         private String bucketName;
-
-        /**
-         * 文件上传路径
-         * <p>
-         * OSS 中的“目录前缀”，并非真实物理目录，不以斜杠开头！
-         */
-        private String fileUploadPath = "upload";
-
-        /**
-         * 文件访问基础地址
-         * <p>
-         * 一般为 OSS 外网访问域名或 CDN 域名
-         */
-        private String baseUrl;
     }
 
     @Getter
     @Setter
-    public static class QiniuYunConfig {
+    public static class QiniuyunKodoConfig {
         /**
          * 是否启用七牛云对象存储
          */
         private boolean enabled = false;
 
         /**
+         * 文件访问 URL 前缀，七牛云新建空间会附送一个30天的免费域名
+         * <p>
+         * 来源：登录七牛云 → 控制台 -> 对象存储Kodo → 空间管理（选择一个空间点进去） → 域名管理
+         */
+        private String fileAccessUrl;
+
+        /**
+         * 文件存储路径前缀（逻辑路径）
+         * <p>用于生成文件在存储系统中的相对路径</p>
+         */
+        private String storagePathPrefix = "upload";
+
+        /**
          * 七牛云 AccessKey（AK），来源：登录七牛云 → 个人中心 → 密钥管理 -> 新建秘钥 → AK
          */
-        private String ak;
+        private String accessKey;
 
         /**
          * 七牛云 SecretKey（SK），来源：登录七牛云 → 个人中心 → 密钥管理 -> 新建秘钥 → SK
          */
-        private String sk;
+        private String secretKey;
 
         /**
          * 七牛云存储区域，来源：登录七牛云 → 控制台 -> 对象存储Kodo → 空间管理 → 空间名称
@@ -137,24 +141,47 @@ public class FileProperties {
          * 七牛云存储空间名称，来源：登录七牛云 → 控制台 -> 对象存储Kodo → 空间管理 → 空间名称（没有的话需要新建空间）
          */
         private String zoneName;
-
-        /**
-         * 文件存储路径前缀（相对于存储空间的根路径），不以斜杠开头！
-         */
-        private String fileUploadPath = "upload";
-
-        /**
-         * 七牛云存储空间的访问域名（文件公网访问地址），七牛云新建空间会附送一个30天的免费域名
-         * <p>
-         * 来源：登录七牛云 → 控制台 -> 对象存储Kodo → 空间管理（选择一个空间点进去） → 域名管理
-         */
-        private String baseUrl;
     }
 
     @Getter
     @Setter
-    public static class TencentConfig {
+    public static class TencentyunCosConfig {
+        /**
+         * 是否启用腾讯云对象存储
+         */
+        private boolean enabled = false;
 
+        /**
+         * 文件访问 URL 前缀
+         * <p>用于拼接文件对外访问地址</p>
+         */
+        private String fileAccessUrl;
+
+        /**
+         * 文件存储路径前缀（逻辑路径）
+         * <p>用于生成文件在存储系统中的相对路径</p>
+         */
+        private String storagePathPrefix = "upload";
+
+        /**
+         * 腾讯云访问密钥 ID
+         */
+        private String accessKey;
+
+        /**
+         * 腾讯云访问密钥 Key
+         */
+        private String secretKey;
+
+        /**
+         * COS 区域
+         */
+        private String region;
+
+        /**
+         * 桶名称
+         */
+        private String bucketName;
     }
 
     public int getModel() {
@@ -173,27 +200,27 @@ public class FileProperties {
         this.local = local;
     }
 
-    public AliyunConfig getAliyun() {
-        return aliyun;
+    public AliyunOssConfig getOss() {
+        return oss;
     }
 
-    public void setAliyun(AliyunConfig aliyun) {
-        this.aliyun = aliyun;
+    public void setOss(AliyunOssConfig oss) {
+        this.oss = oss;
     }
 
-    public QiniuYunConfig getQiniuyun() {
-        return qiniuyun;
+    public QiniuyunKodoConfig getKodo() {
+        return kodo;
     }
 
-    public void setQiniuyun(QiniuYunConfig qiniuyun) {
-        this.qiniuyun = qiniuyun;
+    public void setKodo(QiniuyunKodoConfig kodo) {
+        this.kodo = kodo;
     }
 
-    public TencentConfig getTencentyun() {
-        return tencentyun;
+    public TencentyunCosConfig getCos() {
+        return cos;
     }
 
-    public void setTencentyun(TencentConfig tencentyun) {
-        this.tencentyun = tencentyun;
+    public void setCos(TencentyunCosConfig cos) {
+        this.cos = cos;
     }
 }

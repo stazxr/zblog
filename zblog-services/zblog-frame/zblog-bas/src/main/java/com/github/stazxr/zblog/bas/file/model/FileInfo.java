@@ -13,12 +13,12 @@ import lombok.Setter;
 @Setter
 public class FileInfo {
     /**
-     * 物理文件id
+     * 物理文件id（保留字段，方便后续扩展其他功能）
      */
     private Long fileId;
 
     /**
-     * 文件名称
+     * 新文件名称
      */
     private String filename;
 
@@ -43,14 +43,26 @@ public class FileInfo {
     private String fileType;
 
     /**
-     * 文件后缀
+     * 文件后缀（保留字段，目前无用）
      */
     private String fileSuffix;
 
     /**
-     * 存储绝对路径
+     * 文件在存储系统中的唯一定位标识
+     *
+     * <ul>
+     *   <li><b>本地存储</b>：文件系统中的绝对路径，如：
+     *     <pre>/home/zblog/file/upload/2026-01/06/xxx.png</pre>
+     *   </li>
+     *   <li><b>云存储（bucket:key）</b>：
+     *     <pre>zblog-2026-01:upload/2026/01/09/xxx.jpg</pre>
+     *   </li>
+     *   <li><b>云存储（key）</b>：
+     *     <pre>upload/2026/01/09/xxx.jpg</pre>
+     *   </li>
+     * </ul>
      */
-    private String fileAbsolutePath;
+    private String storageLocation;
 
     /**
      * 存储相对路径
@@ -58,9 +70,9 @@ public class FileInfo {
     private String fileRelativePath;
 
     /**
-     * 下载地址
+     * 文件访问地址
      */
-    private String downloadUrl;
+    private String fileAccessUrl;
 
     /**
      * 上传方式

@@ -10,3 +10,16 @@ spring:
         reset-enable: false # 是否可以重置统计信息
         allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）
         deny: # 禁止访问监控界面的 IP（优先于 allow）
+zblog:
+  base:
+    file:
+      local:
+        enabled: false # 生产环境关闭本地上传功能，防止恶意上传拉胯服务器磁盘
+      cos:
+        enabled: true # 启用腾讯云 COS 对象存储
+        file-access-url: https://yiyucangji-1300050745.cos.region.myqcloud.com # 腾讯云 COS 文件访问 URL 前缀
+        storage-path-prefix: upload # 腾讯云 COS 文件存储路径前缀
+        access-key: ${zblog.file.cos.accessKey} # 腾讯云访问密钥 ID，建议使用子用户
+        secret-key: ${zblog.file.cos.secretKey} # 腾讯云访问密钥 SecretKey，建议客户化到 sys_props 表中，不要硬编码在配置文件中
+        region: ap-beijing # 腾讯云 COS 所在地域
+        bucket-name: yiyucangji-1300050745 # 腾讯云 COS 存储桶名称

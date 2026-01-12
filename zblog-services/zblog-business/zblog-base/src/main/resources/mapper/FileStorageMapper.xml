@@ -3,8 +3,8 @@
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileStorageMapper">
     <select id="selectFileByMd5" resultType="com.github.stazxr.zblog.base.domain.entity.FileStorage">
         SELECT
-            ID, FILE_MD5, FILE_SIZE, FILE_ABSOLUTE_PATH, FILE_RELATIVE_PATH,
-            DOWNLOAD_URL, FILE_TYPE, UPLOAD_TYPE, UPLOAD_USER, UPLOAD_TIME
-        FROM file_storage WHERE FILE_MD5 = #{fileMd5}
+            ID, FILENAME, FILE_MD5, FILE_SIZE, FILE_ABSOLUTE_PATH, FILE_RELATIVE_PATH,
+            FILE_ACCESS_URL, FILE_TYPE, UPLOAD_TYPE, UPLOAD_USER, UPLOAD_TIME
+        FROM file_storage WHERE FILE_MD5 = #{fileMd5} AND UPLOAD_TYPE = #{fileUploadType}
     </select>
 </mapper>

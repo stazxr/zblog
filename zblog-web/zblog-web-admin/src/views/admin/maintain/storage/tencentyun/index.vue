@@ -54,18 +54,18 @@
         <el-table-column :show-overflow-tooltip="true" prop="originalFilename" label="文件名" align="center">
           <template v-slot="scope">
             <el-popover :content="scope.row['fileAbsolutePath']" placement="top-start" title="路径" width="200" trigger="hover">
-              <a slot="reference" :href="scope.row['downloadUrl']" class="filenameLinkC el-link--primary" target="_blank">
+              <a slot="reference" :href="scope.row['fileAccessUrl']" class="filenameLinkC el-link--primary" target="_blank">
                 {{ scope.row['originalFilename'] }}
               </a>
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="downloadUrl" label="预览" align="center" width="80px">
+        <el-table-column :show-overflow-tooltip="true" prop="fileAccessUrl" label="预览" align="center" width="80px">
           <template v-slot="scope">
             <el-image
               v-if="scope.row.fileType.startsWith('image/')"
-              :src="scope.row['downloadUrl']"
-              :preview-src-list="[scope.row['downloadUrl']]"
+              :src="scope.row['fileAccessUrl']"
+              :preview-src-list="[scope.row['fileAccessUrl']]"
               fit="cover"
               lazy
               style="width: 48px; height: 48px; border-radius: 4px;"
@@ -134,7 +134,7 @@ export default {
   },
   data() {
     return {
-      uploadType: 2,
+      uploadType: 4,
       filters: {
         filename: null,
         fileMd5: null,

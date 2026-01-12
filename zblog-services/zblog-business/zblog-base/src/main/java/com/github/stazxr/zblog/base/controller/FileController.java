@@ -3,7 +3,6 @@ package com.github.stazxr.zblog.base.controller;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
-import com.github.stazxr.zblog.base.domain.bo.storage.BaseStorageConfig;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
@@ -136,34 +135,5 @@ public class FileController {
     @Router(name = "测试文件删除", code = "FILED002")
     public void deleteFileTest(@RequestParam Long fileId) {
         fileService.deleteFile(fileId);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * 获取配置信息
-     *
-     * @param storageType 存储类型
-     * @return Result
-     */
-    @GetMapping("/getConfigInfo")
-    @ApiOperation(value = "获取配置信息")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "storageType", value = "上传方式，1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
-    })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "获取配置信息", code = "getStorageConfigInfo")
-    public BaseStorageConfig getConfigInfo(@RequestParam Integer storageType) {
-        return fileService.getConfigInfo(storageType);
     }
 }

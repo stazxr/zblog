@@ -3,9 +3,9 @@
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileMapper">
     <select id="selectFileList" resultType="com.github.stazxr.zblog.base.domain.vo.FileVo">
         SELECT
-            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, f.FILENAME, f.ORIGINAL_FILENAME,
+            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, fs.FILENAME, f.ORIGINAL_FILENAME,
             f.CREATE_USER, f.CREATE_TIME, fs.FILE_MD5, fs.FILE_SIZE, fs.FILE_ABSOLUTE_PATH,
-            fs.FILE_RELATIVE_PATH, fs.DOWNLOAD_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
+            fs.FILE_RELATIVE_PATH, fs.FILE_ACCESS_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
             (SELECT USERNAME FROM user u WHERE u.ID = f.CREATE_USER) AS CREATE_USERNAME
         FROM file f
         LEFT JOIN file_storage fs ON fs.ID = f.STORAGE_ID
@@ -47,9 +47,9 @@
 
     <select id="selectFileDetailById" resultType="com.github.stazxr.zblog.base.domain.vo.FileVo">
         SELECT
-            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, f.FILENAME, f.ORIGINAL_FILENAME,
+            f.ID AS FILE_ID, fs.ID AS FILE_STORAGE_ID, fs.FILENAME, f.ORIGINAL_FILENAME,
             f.CREATE_USER, f.CREATE_TIME, fs.FILE_MD5, fs.FILE_SIZE, fs.FILE_ABSOLUTE_PATH,
-            fs.FILE_RELATIVE_PATH, fs.DOWNLOAD_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
+            fs.FILE_RELATIVE_PATH, fs.FILE_ACCESS_URL, fs.FILE_TYPE, fs.UPLOAD_TYPE, fr.BUSINESS_ID, fr.BUSINESS_TYPE,
             (SELECT USERNAME FROM user u WHERE u.ID = f.CREATE_USER) AS CREATE_USERNAME,
             (SELECT COUNT(1) FROM file f1 WHERE f1.STORAGE_ID = f.STORAGE_ID) AS REFERENCE_COUNT
         FROM file f

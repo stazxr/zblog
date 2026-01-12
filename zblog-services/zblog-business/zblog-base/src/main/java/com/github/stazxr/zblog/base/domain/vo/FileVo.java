@@ -90,10 +90,10 @@ public class FileVo implements Serializable {
     private String fileRelativePath;
 
     /**
-     * 下载地址
+     * 访问地址
      */
-    @ApiModelProperty("下载地址")
-    private String downloadUrl;
+    @ApiModelProperty("访问地址")
+    private String fileAccessUrl;
 
     /**
      * 文件类型

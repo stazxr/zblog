@@ -200,34 +200,36 @@ zblog:
           subject: zblog
     file:
       model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云；4-腾讯云
-      local: # 本地
-        enabled: true
-        base-url: http://localhost:${server.port}/file/ # 如果生产使用本地模式上传文件，需要客户化IP地址
-        file-upload-path: /home/${spring.application.name}/file/upload/
-      aliyun:
-        enabled: false
-        access-key-id: your-access-key-id
-        access-key-secret: your-access-key-secret
-        endpoint: oss-cn-beijing.aliyuncs.com
-        bucket-name: your-bucket-name
-        file-upload-path: upload/
-        base-url: https://your-bucket-name.oss-cn-beijing.aliyuncs.com
-      qiniuyun: # 七牛云
-        enabled: false
-        ak: your-ak
-        sk: your-sk
-        zone: zone
-        zone-name: your-zone-name
-        file-upload-path: upload/
-        base-url: https://domaincdn.com
-      tencentyun: # 腾讯云
-        enabled: false
+      local:
+        enabled: true # 是否启用本地文件存储
+        file-access-url: http://localhost:${server.port}/file/ # 本地文件访问 URL 前缀，用于拼接文件对外访问地址
+        storage-path-prefix: /home/${spring.application.name}/upload/ # 本地文件存储路径前缀
+      oss:
+        enabled: false # 是否启用阿里云 OSS 文件存储
+        file-access-url: https://your-bucket-name.oss-cn-beijing.aliyuncs.com # 阿里云 OSS 文件访问 URL 前缀
+        storage-path-prefix: upload # 阿里云 OSS 文件存储路径前缀
+        access-key: your-access-key-id # 阿里云 AccessKey ID
+        secret-key: your-access-key-secret # 阿里云 AccessKey Secret，建议客户化到 sys_props 表中，不要硬编码在配置文件中
+        endpoint: oss-cn-beijing.aliyuncs.com # 阿里云 OSS Endpoint
+        bucket-name: your-bucket-name # 阿里云 OSS 存储桶名称
+      kodo:
+        enabled: false # 是否启用七牛云对象存储 Kodo
+        file-access-url: https://domaincdn.com # 七牛云 Kodo 文件访问 URL（空间绑定域名）
+        storage-path-prefix: upload # 七牛云 Kodo 文件存储路径前缀
+        access-key: your-access-key # 七牛云 AccessKey（AK）
+        secret-key: your-secret-key # 七牛云 SecretKey（SK），建议客户化到 sys_props 表中，不要硬编码在配置文件中
+        zone: huabei # 七牛云存储区域标识
+        zone-name: your-zone-name # 七牛云存储空间名称
+      cos:
+        enabled: false # 是否启用腾讯云 COS 对象存储
+        file-access-url: https://your-bucket-name.cos.region.myqcloud.com # 腾讯云 COS 文件访问 URL 前缀
+        storage-path-prefix: upload # 腾讯云 COS 文件存储路径前缀
+        access-key: your-access-id # 腾讯云访问密钥 ID，建议使用子用户
+        secret-key: your-secret-key # 腾讯云访问密钥 SecretKey，建议客户化到 sys_props 表中，不要硬编码在配置文件中
+        region: ap-beijing # 腾讯云 COS 所在地域
+        bucket-name: your-bucket-name # 腾讯云 COS 存储桶名称
     log:
       control:
         enabled: true # 开启全局请求响应日志打印
         model: 0 # 默认值，paths 为允许记录日志的路径列表
         paths:
-  # TODO 待替换
-  base-package: com.github.stazxr.zblog
-  file-upload-path: /home/${spring.application.name}/file/upload/
-  file-domain: /file/**

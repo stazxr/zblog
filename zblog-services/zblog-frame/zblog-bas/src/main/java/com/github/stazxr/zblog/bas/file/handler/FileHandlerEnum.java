@@ -1,7 +1,8 @@
-package com.github.stazxr.zblog.bas.file;
+package com.github.stazxr.zblog.bas.file.handler;
 
 import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.file.FileException;
 import lombok.Getter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -16,22 +17,22 @@ public enum FileHandlerEnum {
     /**
      * 本地存储
      */
-    LOCAL(1, "本地", "LocalFileHandlerService"),
+    LOCAL(1, "本地", "LocalFileHandler"),
 
     /**
-     * 阿里云存储
+     * 阿里云 OSS 存储
      */
-    ALIYUN(2, "阿里云", "AliyunFileHandlerService"),
+    ALIYUN(2, "阿里云", "AliyunOssFileHandler"),
 
     /**
-     * 七牛云存储
+     * 七牛云  存储
      */
-    QINIUYUN(3, "七牛云", "QiniuyunFileHandlerService"),
+    QINIUYUN(3, "七牛云", "QiniuyunKodoFileHandler"),
 
     /**
-     * 腾讯云存储
+     * 腾讯云 COS 存储
      */
-    TENCENT_YUN(4, "腾讯云", "TencentYunFileHandlerService");
+    TENCENTYUN(4, "腾讯云", "TencentyunCosFileHandler");
 
     private final int type;
 

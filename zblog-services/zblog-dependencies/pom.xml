@@ -60,6 +60,7 @@
         <jaxen.version>1.1.1</jaxen.version>
         <aliyun.oss.version>3.8.0</aliyun.oss.version>
         <qiniu.version>7.9.5</qiniu.version>
+        <qcloud.cos.version>5.6.221</qcloud.cos.version>
         <sensitive-word.version>0.2.0</sensitive-word.version>
         <jjwt.version>0.9.1</jjwt.version>
         <jexl3.version>3.2.1</jexl3.version>
@@ -158,17 +159,23 @@
                 <artifactId>jaxen</artifactId>
                 <version>${jaxen.version}</version>
             </dependency>
-            <!-- aliYun OSS -->
+            <!-- 阿里云对象存储 OSS SDK -->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun.oss.version}</version>
             </dependency>
-            <!-- qiNiu SDK -->
+            <!-- 七牛云对象存储 Kodo SDK -->
             <dependency>
                 <groupId>com.qiniu</groupId>
                 <artifactId>qiniu-java-sdk</artifactId>
                 <version>${qiniu.version}</version>
+            </dependency>
+            <!-- 腾讯云对象存储 COS SDK -->
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${qcloud.cos.version}</version>
             </dependency>
             <!-- Sensitive-word：敏感词/脏词过滤 -->
             <dependency>

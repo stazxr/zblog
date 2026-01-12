@@ -14,8 +14,9 @@ public interface FileStorageMapper extends BaseMapper<FileStorage> {
     /**
      * 根据 MD5 值查询物理文件存储信息
      *
-     * @param fileMd5 文件MD5
+     * @param fileMd5        文件MD5
+     * @param fileUploadType 文件上传类型
      * @return FileStorage
      */
-    FileStorage selectFileByMd5(@Param("fileMd5") String fileMd5);
+    FileStorage selectFileByMd5(@Param("fileMd5") String fileMd5, @Param("fileUploadType") int fileUploadType);
 }

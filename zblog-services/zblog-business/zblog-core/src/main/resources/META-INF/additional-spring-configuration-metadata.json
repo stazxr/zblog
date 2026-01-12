@@ -26,18 +26,6 @@
       "defaultValue": "com.github.stazxr.zblog"
     },
     {
-      "name": "zblog.file-domain",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "文件的访问地址."
-    },
-    {
-      "name": "zblog.file-upload-path",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "文件上传目录."
-    },
-    {
       "name": "swagger.enable",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",

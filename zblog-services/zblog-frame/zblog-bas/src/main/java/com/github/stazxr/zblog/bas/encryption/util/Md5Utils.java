@@ -62,7 +62,7 @@ public class Md5Utils {
         return toHex(md.digest(message.getBytes("CP1252")));
     }
 
-    private static String toHex(byte[] bytes) {
+    public static String toHex(byte[] bytes) {
         char[] chars = new char[bytes.length * 2];
         for (int i = 0; i < bytes.length; i++) {
             int v = bytes[i] & 0xFF;

@@ -3,17 +3,18 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.encryption.util.Md5Utils;
 import com.github.stazxr.zblog.bas.exception.BaseException;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.file.FileHandler;
-import com.github.stazxr.zblog.bas.file.FileHandlerEnum;
+import com.github.stazxr.zblog.bas.file.UploadContext;
+import com.github.stazxr.zblog.bas.file.UploadContextFactory;
 import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
+import com.github.stazxr.zblog.bas.file.handler.FileHandler;
+import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
+import com.github.stazxr.zblog.bas.file.path.FilePathContext;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.bas.validation.Assert;
-import com.github.stazxr.zblog.base.domain.bo.storage.BaseStorageConfig;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.domain.entity.FileStorage;
@@ -26,7 +27,6 @@ import com.github.stazxr.zblog.base.mapper.FileStorageMapper;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.io.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
@@ -159,7 +159,7 @@ public class FileServiceImpl implements FileService {
 
         // 下载文件
         FileHandler fileHandler = FileHandlerEnum.instance(fileVo.getUploadType());
-        fileHandler.downloadFile(fileVo.getFileAbsolutePath(), response);
+        fileHandler.download(fileVo.getFileAbsolutePath(), response);
     }
 
     /**
@@ -196,7 +196,7 @@ public class FileServiceImpl implements FileService {
 
             // 删除物理文件
             FileHandler fileHandler = FileHandlerEnum.instance(fileVo.getUploadType());
-            fileHandler.deleteFile(fileVo.getFileAbsolutePath());
+            fileHandler.delete(fileVo.getFileAbsolutePath());
         }
     }
 
@@ -212,30 +212,71 @@ public class FileServiceImpl implements FileService {
         List<String> uploadSuccessFileList = new ArrayList<>();
         for (MultipartFile _multipartFile : multipartFiles) {
             try {
-                // 判断文件是否已经上传过存储服务器
-                String fileMd5 = Md5Utils.md5(_multipartFile.getInputStream());
-                FileStorage dbFileStorage = fileStorageMapper.selectFileByMd5(fileMd5);
-                UploadFileVo uploadFileVo;
-                if (dbFileStorage == null) {
-                    // 首次上传
-                    uploadFileVo = firstUploadFile(fileHandler, _multipartFile, uploadSuccessFileList);
-                } else {
-                    // 非首次上传
-                    uploadFileVo = insertFileInfoToDb(null, dbFileStorage, _multipartFile);
+                try (UploadContext ctx = UploadContextFactory.from(_multipartFile, FilePathContext.empty())) {
+                    FileStorage dbFileStorage = fileStorageMapper.selectFileByMd5(ctx.getMd5(), fileUploadType);
+                    if (dbFileStorage != null) {
+                        // 复用已上传的文件
+                        uploadFileVoList.add(insertFileInfoToDb(false, dbFileStorage, ctx));
+                    } else {
+                        // 上传文件
+                        FileInfo fileInfo = fileHandler.upload(ctx);
+                        uploadSuccessFileList.add(fileInfo.getStorageLocation());
+                        FileStorage fileStorage = new FileStorage(fileInfo);
+                        uploadFileVoList.add(insertFileInfoToDb(true, fileStorage, ctx));
+                    }
                 }
-                uploadFileVoList.add(uploadFileVo);
             } catch (Exception e) {
                 // 文件信息入库失败，需要删除已上传成功的文件
-                try {
-                    fileHandler.deleteFiles(uploadSuccessFileList);
-                } catch (Exception _e) {
-                    log.error("文件删除失败：{}", uploadSuccessFileList, _e);
+                for (String storageLocation : uploadSuccessFileList) {
+                    try {
+                        fileHandler.delete(storageLocation);
+                    } catch (Exception _e) {
+                        log.error("文件删除失败：{}", storageLocation, _e);
+                    }
                 }
                 throw e;
             }
         }
 
         return uploadFileVoList;
+    }
+
+    private UploadFileVo insertFileInfoToDb(boolean firstUpload, FileStorage fileStorage, UploadContext uploadContext) {
+        // 获取当前登录用户信息，用户只有登录后才能上传图片
+        User user = SecurityUtils.getLoginUser();
+
+        try {
+            if (firstUpload) {
+                // 入库 file_storage
+                fileStorage.setUploadUser(user.getId()); // 记录上传用户
+                fileStorageMapper.insert(fileStorage);
+            }
+
+            // 入库 file
+            File file = new File();
+            file.setId(SequenceUtils.getId());
+            file.setStorageId(fileStorage.getId());
+            file.setOriginalFilename(uploadContext.getOriginalFilename());
+            file.setCreateUser(user.getId());
+            file.setCreateTime(new Date());
+            fileMapper.insert(file);
+
+            // 返回上传文件信息
+            return newUploadFileVo(fileStorage, file);
+        } catch (Exception e) {
+            throw new ServiceException(ExpMessageCode.of("valid.file.upload.insertDbFailed"), e);
+        }
+    }
+
+    private UploadFileVo newUploadFileVo(FileStorage fileStorage, File file) {
+        UploadFileVo uploadFileVo = new UploadFileVo();
+        uploadFileVo.setFileId(file.getId());
+        uploadFileVo.setOriginalFilename(file.getOriginalFilename());
+        uploadFileVo.setFilename(fileStorage.getFilename());
+        uploadFileVo.setFileAbsolutePath(fileStorage.getFileAbsolutePath());
+        uploadFileVo.setFileRelativePath(fileStorage.getFileRelativePath());
+        uploadFileVo.setFileAccessUrL(fileStorage.getFileAccessUrl());
+        return uploadFileVo;
     }
 
     private void fileUploadPreCheck(MultipartFile[] multipartFiles) {
@@ -246,16 +287,10 @@ public class FileServiceImpl implements FileService {
         if (multipartFiles != null && multipartFiles.length > 0) {
             List<String> whiteList = dictMapper.selectDictValuesByDictKey("FILE_UPLOAD_WHITE_LIST");
             for (MultipartFile multipartFile : multipartFiles) {
-                // TODO 文件类型检查
+                // 文件类型检查
                 String contentType = multipartFile.getContentType();
-                boolean isImage = contentType != null && contentType.startsWith("image/");
-                boolean isVideo = contentType != null && contentType.startsWith("video/");
-                Assert.failIfTrue(!isImage && !isVideo, ExpMessageCode.of("valid.file.upload.notSupport", contentType));
-
-                // TODO 白名单检查
-                String suffix = FileUtils.getExtensionName(multipartFile.getOriginalFilename());
-                boolean isNotWhiteList = StringUtils.isBlank(suffix) || !whiteList.contains(suffix.toLowerCase(Locale.ROOT));
-                Assert.failIfTrue(isNotWhiteList, ExpMessageCode.of("valid.file.upload.notWhiteList", suffix));
+                boolean isNotWhiteList = StringUtils.isBlank(contentType) || !whiteList.contains(contentType.toLowerCase(Locale.ROOT));
+                Assert.failIfTrue(isNotWhiteList, ExpMessageCode.of("valid.file.upload.notWhiteList", contentType));
 
                 // 图片合法性校验
                 if (contentType.startsWith("image/")) {
@@ -276,93 +311,5 @@ public class FileServiceImpl implements FileService {
                 Assert.failIfTrue(sizeInvalid, ExpMessageCode.of("valid.file.upload.sizeOverMax", multipartProperties.getMaxFileSize().toBytes()));
             }
         }
-    }
-
-    private UploadFileVo firstUploadFile(FileHandler fileHandler, MultipartFile multipartFile, List<String> filepathList) {
-        // 调用API上传文件到存储服务器
-        FileInfo fileInfo = fileHandler.uploadFile(multipartFile);
-        filepathList.add(fileInfo.getFileAbsolutePath()); // 文件上传成功
-        return insertFileInfoToDb(fileInfo, null, multipartFile);
-    }
-
-    private UploadFileVo insertFileInfoToDb(FileInfo fileInfo, FileStorage fileStorage, MultipartFile multipartFile) {
-        // 获取当前登录用户信息，用户只有登录后才能上传图片
-        User user = SecurityUtils.getLoginUser();
-        try {
-            if (fileStorage == null) {
-                // 首次上传，已经获取了 FileInfo
-                Date uploadTime = new Date();
-                fileStorage = new FileStorage(fileInfo);
-                fileStorage.setUploadUser(user.getId());
-                fileStorage.setUploadTime(uploadTime);
-                fileStorageMapper.insert(fileStorage);
-            }
-            // 获取文件信息
-            Long fileId = SequenceUtils.getId();
-            String filename = String.valueOf(fileId);
-            String originalFilename = FileUtils.verifyFilename(multipartFile.getOriginalFilename());
-            String fileSuffix = FileUtils.getExtensionName(originalFilename);
-            if (StringUtils.isNotBlank(fileSuffix)) {
-                filename = filename + "." + fileSuffix;
-            }
-            // 存储逻辑文件表
-            File file = new File();
-            file.setId(fileId);
-            file.setStorageId(fileStorage.getId());
-            file.setFilename(filename);
-            file.setOriginalFilename(originalFilename);
-            file.setCreateUser(user.getId());
-            file.setCreateTime(new Date());
-            fileMapper.insert(file);
-            // 返回文件信息
-            UploadFileVo uploadFileVo = new UploadFileVo();
-            uploadFileVo.setFileId(fileId);
-            uploadFileVo.setFilename(file.getFilename());
-            uploadFileVo.setOriginalFilename(file.getOriginalFilename());
-            uploadFileVo.setFileAbsolutePath(fileStorage.getFileAbsolutePath());
-            uploadFileVo.setFileRelativePath(fileStorage.getFileRelativePath());
-            uploadFileVo.setDownloadUrl(fileStorage.getDownloadUrl());
-            return uploadFileVo;
-        } catch (Exception e) {
-            throw new ServiceException(ExpMessageCode.of("valid.file.upload.insertDbFailed"), e);
-        }
-    }
-
-
-
-
-
-
-
-
-    /**
-     * 获取配置信息
-     *
-     * @param storageType 存储类型
-     * @return BaseStorageConfig
-     */
-    @Override
-    public BaseStorageConfig getConfigInfo(Integer storageType) {
-        return null;
-//        Assert.notNull(storageType, "参数【storageType】不能为空");
-//        if (FileHandlerEnum.LOCAL.getType() == storageType) {
-//            // 本地存储配置从配置文件获取
-//            LocalConfig config = new LocalConfig();
-//            config.setDomain(zblogProperties.getFileBaseUrl());
-//            config.setUploadFolder(zblogProperties.getFileUploadPath());
-//            return config;
-//        } else if (FileHandlerEnum.ALI_YUN.getType() == storageType) {
-//            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_A_LI_CONFIG);
-//            AliYunConfig config = AliYunConfig.instanceFromJson(configValue);
-//            config.setAccessKeySecret(decodeSecret(config.getAccessKeySecret()));
-//            return config;
-//        } else if (FileHandlerEnum.QI_NIU_YUN.getType() == storageType) {
-//            String configValue = dictMapper.selectSingleValue(BaseConst.DictKey.CLOUD_STORAGE_QI_NIU_CONFIG);
-//            QiNiuYunConfig config = QiNiuYunConfig.instanceFromJson(configValue);
-//            config.setSk(decodeSecret(config.getSk()));
-//            return config;
-//        } else {
-//            throw new BadConfigurationException("不支持的存储类型：" + storageType);
-//        }
     }
 }

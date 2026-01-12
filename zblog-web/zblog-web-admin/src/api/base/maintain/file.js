@@ -23,20 +23,5 @@ export default {
     return api.httpRequest().post(`${fileApi}/deleteFileTest`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
-  },
-
-  // 获取配置信息
-  getConfigInfo: params => {
-    return api.httpRequest().get(`${fileApi}/getConfigInfo`, params)
-  },
-  // 获取激活的存储类型
-  getConfigStorageType: params => {
-    return api.httpRequest().get(`${fileApi}/getConfigStorageType`, params)
-  },
-  // 激活存储配置
-  activeStorageConfig: params => {
-    return api.httpRequest().post(`${fileApi}/activeStorageConfig`, qs.stringify(params), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
   }
 }
