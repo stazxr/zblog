@@ -29,22 +29,5 @@ export default {
     return api.httpRequest().post(`${userApi}/deleteUser`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
-  },
-
-  // 查询用户操作日志记录
-  queryUserLog: params => {
-    return api.httpRequest().get(`${userApi}/pageUserLogList`, params)
-  },
-  // 修改个人基础信息
-  updateUserBaseInfo: params => {
-    return api.httpRequest().post(`${userApi}/updateUserBaseInfo`, params)
-  },
-  // 修改用户邮箱
-  updateUserEmail: params => {
-    return api.httpRequest().post(`${userApi}/updateUserEmail`, params)
-  },
-  // 更新用户状态
-  updateUserStatus: params => {
-    return api.httpRequest().post(`${userApi}/updateUserStatus`, params)
   }
 }

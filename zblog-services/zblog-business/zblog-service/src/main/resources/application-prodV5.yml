@@ -23,3 +23,9 @@ zblog:
         secret-key: ${zblog.file.cos.secretKey} # 腾讯云访问密钥 SecretKey，建议客户化到 sys_props 表中，不要硬编码在配置文件中
         region: ap-beijing # 腾讯云 COS 所在地域
         bucket-name: yiyucangji-1300050745 # 腾讯云 COS 存储桶名称
+    mail:
+      from:
+        name: 一隅藏记 # 发件人
+  website:
+    name: 一隅藏记 # 站点名称
+    url: https://www.yiyucangji.com # 站点地址

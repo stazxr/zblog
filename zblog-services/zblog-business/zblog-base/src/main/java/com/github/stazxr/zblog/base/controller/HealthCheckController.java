@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-10-19
  */
 @RestController
-@Api(value = "HealthCheckController", tags = { "健康检查控制器" })
+@Api(value = "HealthCheckController", tags = { "健康检查" })
 public class HealthCheckController {
     /**
      * 健康检查
      *
-     * @return Result.success
+     * @return true
      */
-    @GetMapping("/healthCheck")
+    @GetMapping("/api/healthCheck")
     @ApiOperation(value = "健康检查", notes = "服务心跳，不做业务逻辑")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-    @Router(name = "健康检查", code = "healthCheck", level = RouterLevel.OPEN)
+    @Router(name = "健康检查", code = "HEALQ001", level = RouterLevel.OPEN)
     public boolean healthCheck() {
         return true;
     }

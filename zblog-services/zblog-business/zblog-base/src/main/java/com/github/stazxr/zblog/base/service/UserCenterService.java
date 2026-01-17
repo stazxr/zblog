@@ -1,7 +1,12 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 /**
  * 用户中心管理业务层
@@ -31,81 +36,25 @@ public interface UserCenterService {
      */
     void updateUserHeadImg(UserUpdateHeadImgDto headImgDto);
 
+    /**
+     * 修改个人邮箱
+     *
+     * @param emailDto 用户邮箱信息
+     */
+    void updateUserEmail(UserUpdateEmailDto emailDto);
 
-//    /**
-//     * 根据用户名查询用户信息
-//     *
-//     * @param username 用户名
-//     * @return User
-//     */
-//    User queryUserByUsername(String username);
-//
-//    /**
-//     * 修改个人头像
-//     *
-//     * @param updateDto 用户信息
-//     * @return boolean
-//     */
-//    boolean updateUserHeadImg(UserDto updateDto);
-//
-//    /**
-//     * 修改个人基础信息
-//     *
-//     * @param updateDto 用户信息
-//     * @return boolean
-//     */
-//    boolean updateUserBaseInfo(UserDto updateDto);
-//
-//    /**
-//     * 修改个人邮箱
-//     *
-//     * @param emailDto 用户邮箱信息
-//     * @return boolean
-//     */
-//    boolean updateUserEmail(UserUpdateEmailDto emailDto);
-//
-//    /**
-//     * 修改用户的登录信息
-//     *
-//     * @param request 请求信息
-//     * @param userId 用户编号
-//     */
-//    void updateUserLoginInfo(HttpServletRequest request, Long userId);
-//
-//    /**
-//     * 记录用户令牌信息
-//     *
-//     * @param tokenStorage token
-//     * @param flag 1: 登录；2：续签
-//     */
-//    void storageUserToken(UserTokenStorage tokenStorage, int flag);
-//
-//    /**
-//     * 查询用户持久化的令牌信息
-//     *
-//     * @param userId 用户序列
-//     * @return UserTokenStorage
-//     */
-//    UserTokenStorage queryUserStorageToken(Long userId);
-//
-//    /**
-//     * 清除用户持久化的令牌信息
-//     *
-//     * @param userId 用户序列
-//     */
-//    void clearUserStorageToken(Long userId);
-//
-//    /**
-//     * 用户注册
-//     *
-//     * @param registerDto 注册信息
-//     */
-//    void userRegister(UserRegisterDto registerDto);
-//
-//    /**
-//     * 通过邮箱修改密码
-//     *
-//     * @param forgetPwdDto 密码信息
-//     */
-//    void updateUserPwdByEmail(ForgetPwdDto forgetPwdDto);
+    /**
+     * 修改个人信息
+     *
+     * @param selfDto 用户个人信息
+     */
+    void updateUserSelfInfo(UserUpdateSelfDto selfDto);
+
+    /**
+     * 分页查询用户操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return PageInfo<LogVo>
+     */
+    PageInfo<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto);
 }

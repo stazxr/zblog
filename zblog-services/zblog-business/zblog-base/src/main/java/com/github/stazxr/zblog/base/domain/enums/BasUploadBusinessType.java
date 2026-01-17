@@ -6,7 +6,7 @@ package com.github.stazxr.zblog.base.domain.enums;
  * @author SunTao
  * @since 2026-01-04
  */
-public class BasUploadBusinessType {
+public final class BasUploadBusinessType {
     /**
      * 头像上传
      */

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -16,7 +17,9 @@ import java.util.Set;
 @Getter
 @Setter
 @ApiModel("用户角色信息")
-public class UserRoleDto {
+public class UserRoleDto implements Serializable {
+    private static final long serialVersionUID = -3943305525359380834L;
+
     /**
      * 角色id
      */

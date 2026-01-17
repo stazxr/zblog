@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -17,7 +18,9 @@ import java.util.Set;
 @Getter
 @Setter
 @ApiModel("角色授权DTO")
-public class RoleAuthDto {
+public class RoleAuthDto implements Serializable {
+    private static final long serialVersionUID = -277112550492354876L;
+
     /**
      * 角色id
      */

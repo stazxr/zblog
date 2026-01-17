@@ -66,10 +66,7 @@ public class ValidatorExceptionHandler {
         ServletRequestBindingException.class, TypeMismatchException.class, UnexpectedTypeException.class
     })
     public void badRequestExceptionHandler(HttpServletResponse response, Exception ex) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug("{} 请求参数绑定失败: {}", DEFAULT_LOG_PREFIX, ex.getMessage());
-        }
-
+        log.error("{} 请求参数绑定失败", DEFAULT_LOG_PREFIX, ex);
         ResultCode paramBindFailed = ResultCode.REQUEST_PARAM_BIND_FAILED;
         Result result = Result.failure(paramBindFailed.code(), paramBindFailed.message()).code(HttpStatus.BAD_REQUEST);
         ResponseUtils.responseJsonWriter(response, result);

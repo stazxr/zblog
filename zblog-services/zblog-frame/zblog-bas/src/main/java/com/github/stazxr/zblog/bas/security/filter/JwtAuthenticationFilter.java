@@ -21,7 +21,7 @@ import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.bas.security.service.SecurityTokenService;
 import com.github.stazxr.zblog.bas.security.sso.SsoToken;
 import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
-import com.github.stazxr.zblog.util.Assert;
+import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
@@ -198,7 +198,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 checkTokenIsAllowedRenew(claimsSet, expired, refreshToken, username);
 
                 // 检查当前用户是进行续签操作还是等待操作
-                Assert.isTrue(checkRequestDoOrWait(userId, username), () -> {
+                Assert.doIfElse(checkRequestDoOrWait(userId, username), () -> {
                     // 续签操作
                     renewToken(request, response, jwtToken, userId, username, claimsSet);
                 }, () -> {

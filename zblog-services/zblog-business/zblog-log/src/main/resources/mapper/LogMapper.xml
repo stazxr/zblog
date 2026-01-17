@@ -3,7 +3,7 @@
 <mapper namespace="com.github.stazxr.zblog.log.mapper.LogMapper">
     <select id="selectLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
         SELECT
-            ID, LOG_TYPE, OPERATE_USER, EVENT_TIME, `DESCRIPTION`,
+            ID, LOG_TYPE, OPERATE_USER, DATE_FORMAT(EVENT_TIME, '%Y-%m-%d %H:%i:%s') AS EVENT_TIME, `DESCRIPTION`,
             REQUEST_PARAM, INTERFACE_CODE, REQUEST_IP, REQUEST_URI, REQUEST_METHOD,
             ADDRESS, BROWSER, COST_TIME, EXEC_RESULT, EXEC_MESSAGE, CREATE_DATE
         FROM log

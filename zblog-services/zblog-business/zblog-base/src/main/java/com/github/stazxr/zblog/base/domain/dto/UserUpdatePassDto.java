@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * 用户密码修改信息
  *
@@ -14,7 +16,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel("用户密码修改信息")
-public class UserUpdatePassDto {
+public class UserUpdatePassDto implements Serializable {
+    private static final long serialVersionUID = 4310961030985312848L;
+
     /**
      * 用户名
      */

@@ -3,20 +3,20 @@ package com.github.stazxr.zblog.bas.notify.mail.impl;
 import com.github.stazxr.zblog.bas.notify.mail.MailException;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.notify.mail.MailService;
+import com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +28,13 @@ import java.util.Map;
  * @since 2020-11-14
  */
 @Slf4j
-@Component
 public class MailServiceImpl implements MailService {
-    @Value("${spring.mail.username}")
-    private String from;
+    private final MailFromProperties fromProperties;
 
     private final JavaMailSender javaMailSender;
 
-    public MailServiceImpl(JavaMailSender javaMailSender) {
+    public MailServiceImpl(MailFromProperties fromProperties, JavaMailSender javaMailSender) {
+        this.fromProperties = fromProperties;
         this.javaMailSender = javaMailSender;
     }
 
@@ -50,7 +49,7 @@ public class MailServiceImpl implements MailService {
     public void sendSimpleMail(MailReceiver receive, String subject, String content) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setFrom(from);
+            mailMessage.setFrom(fromProperties.getAddress());
             mailMessage.setTo(receive.to());
             if (StringUtils.isNotBlank(receive.cc())) {
                 mailMessage.setCc(receive.cc());
@@ -163,8 +162,8 @@ public class MailServiceImpl implements MailService {
      * @param helper  MimeMessageHelper
      * @throws MessagingException e
      */
-    private void setReceive(MailReceiver receive, MimeMessageHelper helper) throws MessagingException {
-        helper.setFrom(from);
+    private void setReceive(MailReceiver receive, MimeMessageHelper helper) throws MessagingException, UnsupportedEncodingException {
+        helper.setFrom(fromProperties.getAddress(), fromProperties.getName());
         helper.setTo(InternetAddress.parse(receive.to()));
         if (StringUtils.isNotBlank(receive.cc())) {
             helper.setCc(InternetAddress.parse(receive.cc()));

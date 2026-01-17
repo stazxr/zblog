@@ -61,9 +61,15 @@ public class User extends SecurityUser {
     private String headImgUrl;
 
     /**
-     * 登录时间（成功）
+     * 上次登录时间（成功）
      */
     private String lastLoginTime;
+
+    /**
+     * 上次登录地点（成功）
+     */
+    @TableField(exist = false)
+    private String lastLoginAddress;
 
     /**
      * 是否有效

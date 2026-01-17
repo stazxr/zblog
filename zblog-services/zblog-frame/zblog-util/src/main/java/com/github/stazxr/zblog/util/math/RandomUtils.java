@@ -10,11 +10,11 @@ import java.util.Random;
  */
 public class RandomUtils {
     /**
-     * 生成六位随机验证码
+     * 生成六位随机数字验证码
      *
-     * @return 六位随机验证码
+     * @return 六位随机数字验证码
      */
-    public static String sixCode() {
+    public static String sixNumberCode() {
         Random random = new Random();
         int min = 100000;
         int max = 999999;

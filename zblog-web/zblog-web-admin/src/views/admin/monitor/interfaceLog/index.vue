@@ -252,6 +252,6 @@ export default {
 
 <style scoped>
 .head-container .search-opts .el-date-editor {
-  width: 175px !important;
+  width: 170px !important;
 }
 </style>

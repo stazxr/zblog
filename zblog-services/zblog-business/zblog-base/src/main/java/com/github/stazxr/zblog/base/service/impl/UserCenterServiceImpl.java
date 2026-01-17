@@ -1,26 +1,38 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.encryption.util.RsaUtils;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.notify.mail.MailService;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
+import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.FileRelation;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
 import com.github.stazxr.zblog.base.domain.enums.BasUploadBusinessType;
+import com.github.stazxr.zblog.base.domain.enums.Gender;
+import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.mapper.UserMapper;
 import com.github.stazxr.zblog.base.mapper.UserPassLogMapper;
 import com.github.stazxr.zblog.base.service.UserCenterService;
 import com.github.stazxr.zblog.core.exception.ServiceException;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +41,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.TemplateEngine;
 
 import java.util.List;
 import java.util.Locale;
@@ -56,10 +67,6 @@ public class UserCenterServiceImpl implements UserCenterService {
 
     private final SecurityExtProperties securityExtProperties;
 
-    private final MailService mailService;
-
-    private final TemplateEngine templateEngine;
-
     @Value("${zblog.security.PrivateKey}")
     private String secretKey;
 
@@ -71,8 +78,16 @@ public class UserCenterServiceImpl implements UserCenterService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void forceUpdatePass(UserUpdatePassDto passDto) {
+        // 获取参数信息
+        UserUpdatePassDto realPassDto;
+        try {
+            String jsonStr = RsaUtils.decryptByPrivateKey(secretKey, passDto.get_f());
+            realPassDto = JSON.parseObject(jsonStr, UserUpdatePassDto.class);
+        } catch (Exception e) {
+            throw new ServiceException(ExpMessageCode.of("error.usercenter.password.decryptExp"));
+        }
         // 修改密码
-        preDoUpdateUserPass(passDto);
+        preDoUpdateUserPass(realPassDto);
     }
 
     /**
@@ -83,11 +98,19 @@ public class UserCenterServiceImpl implements UserCenterService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserPass(UserUpdatePassDto passDto) {
+        // 获取参数信息
+        UserUpdatePassDto realPassDto;
+        try {
+            String jsonStr = RsaUtils.decryptByPrivateKey(secretKey, passDto.get_f());
+            realPassDto = JSON.parseObject(jsonStr, UserUpdatePassDto.class);
+        } catch (Exception e) {
+            throw new ServiceException(ExpMessageCode.of("error.usercenter.password.decryptExp"));
+        }
         // 获取当前登录用户信息
         User loginUser = SecurityUtils.getLoginUser();
-        passDto.setUsername(loginUser.getUsername());
+        realPassDto.setUsername(loginUser.getUsername());
         // 修改密码
-        preDoUpdateUserPass(passDto);
+        preDoUpdateUserPass(realPassDto);
     }
 
     /**
@@ -99,10 +122,10 @@ public class UserCenterServiceImpl implements UserCenterService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserHeadImg(UserUpdateHeadImgDto headImgDto) {
         Long userId = headImgDto.getUserId();
-        Assert.notNull(userId, ExpMessageCode.of("valid.usercenter.userId.NotNull"));
         Long fileId = headImgDto.getFileId();
-        Assert.notNull(fileId, ExpMessageCode.of("valid.usercenter.fileId.NotNull"));
-        Assert.affectOneRow(userMapper.updateUserHeadImg(userId, headImgDto.getHeadImg()), ExpMessageCode.of("result.usercenter.headImg.failed"));
+        FileVo fileVo = fileMapper.selectFileDetailById(fileId);
+        Assert.notNull(fileVo, ExpMessageCode.of(""));
+        Assert.affectOneRow(userMapper.updateUserHeadImg(userId, fileVo.getFileAccessUrl()), ExpMessageCode.of("result.usercenter.updateHeadImgFailed"));
         // 删除原头像信息（物理文件不删除，通过跑批删除）
         fileMapper.deleteByBusinessInfo(userId, BasUploadBusinessType.HEADER_IMG);
         fileRelationMapper.deleteByBusinessInfo(userId, BasUploadBusinessType.HEADER_IMG);
@@ -115,24 +138,74 @@ public class UserCenterServiceImpl implements UserCenterService {
         SecurityUserCache.remove(String.valueOf(userId));
     }
 
-    private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
-        // 获取参数信息
-        UserUpdatePassDto realPassDto;
-        try {
-            String jsonStr = RsaUtils.decryptByPrivateKey(secretKey, passDto.get_f());
-            realPassDto = JSON.parseObject(jsonStr, UserUpdatePassDto.class);
-        } catch (Exception e) {
-            throw new ServiceException(ExpMessageCode.of("error.usercenter.password.decryptExp"));
-        }
+    /**
+     * 修改个人邮箱
+     *
+     * @param emailDto 用户邮箱信息
+     */
+    @Override
+    public void updateUserEmail(UserUpdateEmailDto emailDto) {
+        // 校验邮箱验证码
+        String cacheCode = GlobalCache.get(emailDto.getUuid());
+        Assert.notBlank(cacheCode, ExpMessageCode.of("valid.usercenter.updemail.codeExpired"));
+        Assert.failIfFalse(emailDto.getCode().equals(cacheCode), ExpMessageCode.of("valid.usercenter.updemail.codeInvalid"));
+        // 邮箱校验：相同校验 -> 格式校验 -> 存在性校验
+        User loginUser = SecurityUtils.getLoginUser();
+        boolean isSameOldEmail = emailDto.getEmail().equals(loginUser.getEmail());
+        Assert.failIfTrue(isSameOldEmail, ExpMessageCode.of("valid.usercenter.updemail.sameOldEmail"));
+        boolean emailValid = RegexUtils.match(emailDto.getEmail(), RegexUtils.Regex.EMAIL_REGEX);
+        Assert.failIfFalse(emailValid, ExpMessageCode.of("valid.usercenter.updemail.emailPatternError"));
+        Assert.failIfTrue(checkEmailExist(loginUser.getId(), emailDto.getEmail()), ExpMessageCode.of("valid.role.roleCode.exist"));
+        // 数据入库
+        Assert.affectOneRow(userMapper.updateUserEmail(loginUser.getId(), emailDto.getEmail()), ExpMessageCode.of("result.usercenter.updateEmailFailed"));
+        SecurityUserCache.remove(String.valueOf(loginUser.getId()));
+    }
 
+    /**
+     * 修改个人信息
+     *
+     * @param selfDto 用户个人信息
+     */
+    @Override
+    public void updateUserSelfInfo(UserUpdateSelfDto selfDto) {
+        // 参数校验
+        Integer gender = selfDto.getGender();
+        Assert.notNull(Gender.of(gender), ExpMessageCode.of("valid.usercenter.updeself.genderInvalid"));
+        Assert.failIfTrue(checkNicknameExist(selfDto.getUserId(), selfDto.getNickname()), ExpMessageCode.of("valid.usercenter.updeself.nicknameExist"));
+        // 数据入库
+        Assert.affectOneRow(userMapper.updateUserSelf(selfDto), ExpMessageCode.of("result.usercenter.updateInfoFailed"));
+        SecurityUserCache.remove(String.valueOf(selfDto.getUserId()));
+    }
+
+    /**
+     * 分页查询用户操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return PageInfo<LogVo>
+     */
+    @Override
+    public PageInfo<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto) {
+        // 设置用户信息
+        SecurityUser loginUser = SecurityUtils.getLoginUser();
+        queryDto.setUsername(loginUser.getUsername());
+        // 参数检查
+        queryDto.checkPage();
+        // 分页查询
+        try (Page<LogVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
+            List<LogVo> dataList = userMapper.selectUserLogList(queryDto);
+            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
+        }
+    }
+
+    private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
         // 空校验
-        String username = realPassDto.getUsername();
+        String username = passDto.getUsername();
         Assert.notBlank(username, ExpMessageCode.of("valid.usercenter.username.NotBlank"));
-        String oldPass = realPassDto.getOldPass();
+        String oldPass = passDto.getOldPass();
         Assert.notBlank(oldPass, ExpMessageCode.of("valid.usercenter.oldPass.NotBlank"));
-        String newPass = realPassDto.getNewPass();
+        String newPass = passDto.getNewPass();
         Assert.notBlank(newPass, ExpMessageCode.of("valid.usercenter.newPass.NotBlank"));
-        String confirmPass = realPassDto.getConfirmPass();
+        String confirmPass = passDto.getConfirmPass();
         Assert.notBlank(confirmPass, ExpMessageCode.of("valid.usercenter.confirmPass.NotBlank"));
         // 校验新密码输入是否一致
         Assert.failIfFalse(newPass.equals(confirmPass), ExpMessageCode.of("valid.usercenter.confirmPass.notMatch"));
@@ -170,262 +243,26 @@ public class UserCenterServiceImpl implements UserCenterService {
         userPassLog.setUserId(userId);
         userPassLog.setPassword(passwordEncoder.encode(password));
         userPassLog.setChangePwdTime(changePwdTime);
-        Assert.affectOneRow(userPassLogMapper.insert(userPassLog), ExpMessageCode.of("result.usercenter.password.failed"));
+        Assert.affectOneRow(userPassLogMapper.insert(userPassLog), ExpMessageCode.of("result.usercenter.updatePasswordFailed"));
         // 数据入库
         String newPassword = passwordEncoder.encode(password);
-        Assert.affectOneRow(userMapper.updateUserPassword(userId, newPassword, changePwdTime), ExpMessageCode.of("result.usercenter.password.failed"));
+        Assert.affectOneRow(userMapper.updateUserPassword(userId, newPassword, changePwdTime), ExpMessageCode.of("result.usercenter.updatePasswordFailed"));
         SecurityUserCache.remove(String.valueOf(userId));
     }
 
+    private boolean checkEmailExist(Long userId, String email) {
+        LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getEmail, email);
+        queryWrapper.ne(User::getId, userId);
+        return userMapper.exists(queryWrapper);
+    }
 
+    private boolean checkNicknameExist(Long userId, String nickname) {
+        LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getNickname, nickname);
+        queryWrapper.ne(User::getId, userId);
+        return userMapper.exists(queryWrapper);
+    }
 
-//    private final LogMapper logMapper;
-//
-//    private final UserTokenStorageMapper userTokenStorageMapper;
-//
-//    /**
-//     * 修改个人基础信息
-//     *
-//     * @param updateDto 用户信息
-//     * @return boolean
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public boolean updateUserBaseInfo(UserDto updateDto) {
-//        Long userId = updateDto.getId();
-//        Assert.notNull(userId, "用户编码不能为空");
-//
-//        Integer gender = updateDto.getGender();
-//        Assert.notNull(Gender.of(gender), "用户性别参数错误");
-//
-//        String telephone = updateDto.getTelephone();
-//        DataValidated.isTrue(StringUtils.isNotBlank(telephone) && !RegexUtils.match(telephone, RegexUtils.Const.PHONE_REGEX), "手机号格式不正确");
-//
-//        // 检查昵称是否存在
-//        User dbUser = userMapper.selectByNickname(updateDto.getNickname());
-//        DataValidated.isTrue(dbUser != null && !dbUser.getId().equals(userId), "昵称已存在");
-//
-//        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
-//        wrapper.set(User::getGender, gender);
-//        wrapper.set(User::getNickname, updateDto.getNickname());
-//        wrapper.set(User::getSignature, updateDto.getSignature());
-//        wrapper.set(User::getWebsite, updateDto.getWebsite());
-//        wrapper.set(User::getTelephone, telephone);
-//        wrapper.eq(User::getId, userId);
-//        UserCacheHandler.remove(String.valueOf(userId));
-//        return wrapper.update();
-//    }
-//
-//    /**
-//     * 修改个人邮箱
-//     *
-//     * @param emailDto 用户邮箱信息
-//     * @return boolean
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public boolean updateUserEmail(UserUpdateEmailDto emailDto) {
-//        // 非空校验
-//        String password = emailDto.getPass();
-//        Assert.isTrue(StringUtils.isBlank(password), "修改失败，用户密码不能为空");
-//        String email = emailDto.getEmail();
-//        Assert.isTrue(StringUtils.isBlank(email), "新邮箱不能为空");
-//        String code = emailDto.getCode();
-//        Assert.isTrue(StringUtils.isBlank(code), "邮箱验证码不能为空");
-//
-//        // 获取用户信息
-//        User user = queryUserByUsername(SecurityUtils.getLoginUsername());
-//        Assert.notNull(user, "修改失败，用户不存在");
-//
-//        // 校验用户密码
-//        DataValidated.isTrue(!passwordEncoder.matches(password, user.getPassword()), "密码不正确");
-//
-//        // 校验验证码
-//        String cacheCode = (String) GlobalCache.get(emailDto.getUuid());
-//        DataValidated.isTrue(!code.equalsIgnoreCase(cacheCode), "验证码不正确");
-//
-//        // 邮箱校验：相同校验 -> 格式校验 -> 存在性校验
-//        Long userId = user.getId();
-//        DataValidated.isTrue(email.equals(user.getEmail()), "新邮箱不能与旧邮箱相同");
-//        DataValidated.isTrue(!RegexUtils.match(email, RegexUtils.Const.EMAIL_REGEX), "邮箱格式不正确");
-//        DataValidated.isTrue(userMapper.exists(queryBuild().eq(User::getEmail, email).ne(User::getId, userId)), "邮箱已存在");
-//
-//        // 数据入库
-//        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
-//        wrapper.set(User::getEmail, email);
-//        wrapper.eq(User::getId, userId);
-//        Assert.isTrue(!wrapper.update(), "修改失败");
-//        UserCacheHandler.remove(String.valueOf(userId));
-//        return true;
-//    }
-//
-//    /**
-//     * 修改用户的登录信息
-//     *
-//     * @param request 请求信息
-//     * @param userId  用户编号
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void updateUserLoginInfo(HttpServletRequest request, Long userId) {
-//        // 获取登录用户信息
-//        String username = SecurityUtils.getLoginUsername();
-//        String dateTime = DateUtils.formatNow();
-//
-//        // 插入登录日志
-//        Log loginLog = new Log();
-//        loginLog.setId(SequenceUtils.getId());
-//        loginLog.setLogType(LogType.OPERATE.getValue());
-//        loginLog.setDescription("用户登录");
-//        loginLog.setCostTime(null);
-//        loginLog.setOperateUser(username);
-//        loginLog.setEventTime(DateUtils.formatNow());
-//        loginLog.setRequestInfo(request);
-//        loginLog.setExecResult(true);
-//        loginLog.setExecMessage("登录成功");
-//        Assert.isTrue(logMapper.insert(loginLog) != 1, "插入登录日志失败");
-//
-//        // 数据入库
-//        LambdaUpdateChainWrapper<User> wrapper = new LambdaUpdateChainWrapper<>(userMapper);
-//        wrapper.set(User::getLoginTime, dateTime);
-//        wrapper.eq(User::getUsername, username);
-//        Assert.isTrue(!wrapper.update(), "更新用户登录信息失败");
-//        UserCacheHandler.remove(String.valueOf(userId));
-//    }
-//
-//    /**
-//     * 记录用户令牌信息
-//     *
-//     * @param tokenStorage token
-//     * @param flag 1: 登录；2：续签
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void storageUserToken(UserTokenStorage tokenStorage, int flag) {
-//        int rowNum;
-//        if (1 == flag) {
-//            tokenStorage.setCreateTime(DateUtils.formatNow());
-//            userTokenStorageMapper.deleteUserTokenStorage(tokenStorage.getUserId());
-//            rowNum = userTokenStorageMapper.insertUserTokenStorage(tokenStorage);
-//        } else {
-//            tokenStorage.setUpdateTime(DateUtils.formatNow());
-//            rowNum = userTokenStorageMapper.updateUserTokenStorage(tokenStorage);
-//        }
-//
-//        Assert.isTrue(rowNum != 1, "持久化用户令牌信息失败");
-//    }
-//
-//    /**
-//     * 查询用户持久化的令牌信息
-//     *
-//     * @param userId 用户序列
-//     * @return UserTokenStorage
-//     */
-//    @Override
-//    public UserTokenStorage queryUserStorageToken(Long userId) {
-//        return userTokenStorageMapper.selectUserTokenStorageByUserId(userId);
-//    }
-//
-//    /**
-//     * 清除用户持久化的令牌信息
-//     *
-//     * @param userId 用户序列
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void clearUserStorageToken(Long userId) {
-//        userTokenStorageMapper.deleteUserTokenStorage(userId);
-//    }
-//
-//    /**
-//     * 用户注册
-//     *
-//     * @param registerDto 注册信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void userRegister(UserRegisterDto registerDto) {
-//        // 验空
-//        Assert.isTrue(StringUtils.isBlank(registerDto.getUsername()), "用户名不能为空");
-//        Assert.isTrue(StringUtils.isBlank(registerDto.getEmail()), "邮箱不能为空");
-//        Assert.isTrue(StringUtils.isBlank(registerDto.getCode()), "邮箱验证码不能为空");
-//
-//        // 邮箱验证码校验
-//        String uuid = registerDto.getUuid();
-//        Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
-//        String cacheCode = (String) GlobalCache.get(uuid);
-//        DataValidated.isTrue(!registerDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
-//
-//        // 密码复杂度校验
-//        String password = registerDto.getPassword().trim();
-//        Assert.isTrue(StringUtils.isBlank(password), "密码不能为空");
-//        DataValidated.isTrue(password.contains(registerDto.getUsername()), "密码不能包含用户名");
-//        DataValidated.isTrue(!RegexUtils.match(password, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
-//
-//        // 设置用户信息，新增用户
-//        User user = new User();
-//        Long userId = SequenceUtils.getId();
-//        user.setId(userId);
-//        user.setUsername(registerDto.getUsername().trim());
-//        user.setNickname("用户" + userId);
-//        user.setPassword(passwordEncoder.encode(password));
-//        user.setEmail(registerDto.getEmail().trim());
-//        user.setGender(Gender.HIDE.getType());
-//        user.setEnabled(true);
-//        user.setTemp(false);
-//        user.setAdmin(false);
-//        user.setBuildIn(false);
-//        user.setLocked(false);
-//        user.setChangePwd(false);
-//        checkUser(user);
-//        Assert.isTrue(userMapper.insert(user) != 1, "新增失败");
-//
-//        // 保存用户 - 角色信息
-//        List<Long> roleIds = new ArrayList<>();
-//        roleIds.add(Constants.DEFAULT_ROLE_ID);
-//        insertUserRoleData(userId, roleIds);
-//    }
-//
-//    /**
-//     * 通过邮箱修改密码
-//     *
-//     * @param forgetPwdDto 密码信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void updateUserPwdByEmail(ForgetPwdDto forgetPwdDto) {
-//        // 验空
-//        Assert.isTrue(StringUtils.isBlank(forgetPwdDto.getEmail()), "邮箱不能为空");
-//        Assert.isTrue(StringUtils.isBlank(forgetPwdDto.getCode()), "邮箱验证码不能为空");
-//
-//        // 通过邮箱查询用户信息
-//        User user = userMapper.selectByEmail(forgetPwdDto.getEmail());
-//        DataValidated.notNull(user, "邮箱未注册");
-//
-//        // 邮箱验证码校验
-//        String uuid = forgetPwdDto.getUuid();
-//        Assert.isTrue(StringUtils.isBlank(uuid), "验证码错误");
-//        String cacheCode = (String) GlobalCache.get(uuid);
-//        DataValidated.isTrue(!forgetPwdDto.getCode().equalsIgnoreCase(cacheCode), "验证码不正确");
-//
-//        // 密码校验
-//        String password = forgetPwdDto.getPassword().trim();
-//
-//        try {
-//            // 对密码进行解密
-//            Resource resource = new ClassPathResource("pri.key");
-//            String priKeyBase64 = FileUtils.readFileFromStream(resource.getInputStream());
-//            password = RsaUtils.decryptByPrivateKey(priKeyBase64, password);
-//        } catch (Exception e) {
-//            throw new ServiceException("密码解析失败，请联系管理员", e);
-//        }
-//
-//        // 密码复杂度校验
-//        Assert.isTrue(StringUtils.isBlank(password), "密码不能为空");
-//        DataValidated.isTrue(password.contains(user.getUsername()), "密码不能包含用户名");
-//        DataValidated.isTrue(!RegexUtils.match(password, RegexUtils.Const.PWD_REGEX), "密码复杂度太低");
-//
-//        // 修改密码
-//        doUpdateUserPass(user.getId(), password);
-//    }
+    private LambdaQueryWrapper<User> queryBuild() {
+        return Wrappers.lambdaQuery();
+    }
 }

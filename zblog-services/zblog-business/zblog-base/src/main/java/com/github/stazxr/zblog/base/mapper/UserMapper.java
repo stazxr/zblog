@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
+import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -115,31 +118,28 @@ public interface UserMapper extends BaseMapper<User> {
      */
     int updateUserHeadImg(@Param("userId") Long userId, @Param("headImg") String headImg);
 
+    /**
+     * 用户邮箱修改
+     *
+     * @param userId  用户序列
+     * @param email  用户邮箱
+     * @return 修改行数
+     */
+    int updateUserEmail(@Param("userId") Long userId, @Param("email") String email);
 
+    /**
+     * 用户信息修改
+     *
+     * @param selfDto 用户个人信息
+     * @return 修改行数
+     */
+    int updateUserSelf(@Param("u") UserUpdateSelfDto selfDto);
 
-
-//    /**
-//     * 根据邮箱查询用户信息
-//     *
-//     * @param email 邮箱
-//     * @return User
-//     */
-//    User selectByEmail(@Param("email") String email);
-//
-//    /**
-//     * 根据昵称查询用户信息
-//     *
-//     * @param nickname 昵称
-//     * @return User
-//     */
-//    User selectByNickname(@Param("nickname") String nickname);
-//
-//    /**
-//     * 根据用户名或邮箱查询登录用户信息
-//     *
-//     * @param username 用户名或邮箱
-//     * @param isEmail  是否是邮箱查询
-//     * @return User
-//     */
-//    User selectLoginUserByUsernameOrEmail(@Param("username") String username, @Param("isEmail") boolean isEmail);
+    /**
+     * 查询用户操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return List<LogVo>
+     */
+    List<LogVo> selectUserLogList(UserLogQueryDto queryDto);
 }

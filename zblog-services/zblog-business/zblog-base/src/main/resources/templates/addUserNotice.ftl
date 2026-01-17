@@ -15,7 +15,7 @@
         <div class="foot-hr hr" style="z-index: 111; width: 800px; margin: 100px auto 0; border-top: 1px solid #DA251D;"></div>
         <div style="text-align: center; font-size: 12px; padding: 20px 0; font-family: Microsoft YaHei, serif;">
             Copyright &copy;[[${year}]]
-            <a style="color: #999;" href="https://www.suntaoblog.com/" target="_blank">Z-BLOG</a> 后台管理系统 All Rights Reserved.
+            <a style="color: #999;" href="https://www.yiyucangji.com/" target="_blank">一隅藏记</a> 后台管理系统 All Rights Reserved.
         </div>
     </div>
 </div>

@@ -74,6 +74,11 @@
       "name": "zblog.base.file.cos",
       "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig"
+    },
+    {
+      "name": "zblog.base.mail.from",
+      "type": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties"
     }
   ],
   "properties": [
@@ -454,6 +459,19 @@
       "name": "zblog.base.file.cos.bucket-name",
       "type": "java.lang.String",
       "description": "腾讯云 COS 存储桶名称."
+    },
+    {
+      "name": "zblog.base.mail.from.address",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "发件地址，务必与配置的邮件发送人保持一致."
+    },
+    {
+      "name": "zblog.base.mail.from.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "发件人.",
+      "defaultValue": "Z-BLOG"
     }
   ],
   "hints": [

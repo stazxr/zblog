@@ -16,7 +16,8 @@ CREATE TABLE `sys_props`  (
   `GROUP` varchar(30) NOT NULL COMMENT 'props 所属组',
   `REMARK` varchar(200) DEFAULT NULL COMMENT '备注',
   `DELETED` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否逻辑删除',
-  INDEX `KEY_INDEX`(`KEY`) USING BTREE
+  INDEX `KEY_INDEX`(`KEY`) USING BTREE,
+  UNIQUE KEY `UK_IDX_PROPS` (`KEY`, `GROUP`)
 ) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -32,7 +33,7 @@ INSERT INTO `sys_props` VALUES ('zblog.email.host', 'smtp.qq.com', 'zblog.servic
 INSERT INTO `sys_props` VALUES ('zblog.email.port', '465', 'zblog.service', '邮箱服务器端口', 0);
 INSERT INTO `sys_props` VALUES ('zblog.email.username', 'zblog@qq.com', 'zblog.service', '邮箱用户', 0);
 INSERT INTO `sys_props` VALUES ('zblog.email.password', '', 'zblog.service', '邮箱授权码（非登录密码）', 0);
-INSERT INTO `sys_props` VALUES ('zblog.email.subject', 'ZBLOG', 'zblog.service', '邮箱发送主体（名称不规范可能导致邮件发送到对方的垃圾箱中）', 0);
+INSERT INTO `sys_props` VALUES ('zblog.email.from', 'Z-BLOG', 'zblog.service', '邮箱发件人（名称不规范可能导致邮件发送到对方的垃圾箱中）', 0);
 INSERT INTO `sys_props` VALUES ('zblog.redis.database', '0', 'zblog.service', '指定 Redis 使用的数据库索引，Redis 默认有 16 个数据库，索引从 0 到 15', 0);
 INSERT INTO `sys_props` VALUES ('zblog.redis.host', '127.0.0.1', 'zblog.service', 'Redis 服务器地址', 0);
 INSERT INTO `sys_props` VALUES ('zblog.redis.port', '6379', 'zblog.service', 'Redis 服务器的端口号', 0);

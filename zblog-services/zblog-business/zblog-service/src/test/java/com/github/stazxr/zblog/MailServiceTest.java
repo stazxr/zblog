@@ -26,6 +26,7 @@ import java.util.Map;
     "jasypt.encryptor.password=stazxr",
 })
 @Disabled
+@Deprecated
 public class MailServiceTest {
     @Autowired
     private MailService mailService;

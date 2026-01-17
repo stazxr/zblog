@@ -52,11 +52,24 @@
     </resultMap>
 
     <select id="selectUserById" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT * FROM user WHERE ID = #{userId} AND DELETED = 0
+        SELECT
+            u.*, ull.LOGIN_ADDRESS AS LAST_LOGIN_ADDRESS, ull.LOGIN_TIME AS LAST_LOGIN_TIME
+        FROM user u
+        LEFT JOIN (
+            SELECT USER_ID, LOGIN_ADDRESS, LOGIN_TIME FROM user_login_log
+            WHERE USER_ID = #{userId} AND IS_SUCCESS = 1 ORDER BY LOGIN_TIME DESC
+            LIMIT 1 OFFSET 1
+        ) ull ON u.ID = ull.USER_ID
+        WHERE u.ID = #{userId} AND u.DELETED = 0
     </select>
 
     <select id="selectUserByUsername" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT * FROM user WHERE USERNAME = #{username} AND DELETED = 0
+        SELECT
+            u.*, ull.LOGIN_ADDRESS AS LAST_LOGIN_ADDRESS, ull.LOGIN_TIME AS LAST_LOGIN_TIME
+        FROM user u
+        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.IS_SUCCESS = 1
+        WHERE u.USERNAME = #{username} AND u.DELETED = 0
+        ORDER BY ull.LOGIN_TIME DESC LIMIT 1 OFFSET 1
     </select>
 
     <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
@@ -173,6 +186,27 @@
         SELECT LOGIN_ERROR_COUNT FROM user WHERE ID = #{userId}
     </select>
 
+    <select id="selectUserLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
+        SELECT
+            ID, DATE_FORMAT(EVENT_TIME, '%Y-%m-%d %H:%i:%s') AS EVENT_TIME, `DESCRIPTION`, ADDRESS, EXEC_RESULT, EXEC_MESSAGE
+        FROM log
+        WHERE OPERATE_USER = #{username} AND LOG_TYPE = 2
+        <if test="description != null and description != ''">
+            <bind name="descriptionBind" value="'%' + description + '%'"/>
+            AND `DESCRIPTION` LIKE #{descriptionBind}
+        </if>
+        <if test="execResult != null">
+            AND EXEC_RESULT = #{execResult}
+        </if>
+        <if test="eventStartTime != null and eventStartTime != ''">
+            AND EVENT_TIME &gt;= STR_TO_DATE(#{eventStartTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="eventEndTime != null and eventEndTime != ''">
+            AND EVENT_TIME &lt;= STR_TO_DATE(#{eventEndTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        ORDER BY EVENT_TIME DESC
+    </select>
+
     <update id="updateUserStatus">
         UPDATE user SET USER_STATUS = #{status} WHERE ID = #{userId}
     </update>
@@ -185,27 +219,13 @@
         UPDATE user SET HEAD_IMG_URL = #{headImg} WHERE ID = #{userId}
     </update>
 
+    <update id="updateUserEmail">
+        UPDATE user SET EMAIL = #{email} WHERE ID = #{userId}
+    </update>
 
-
-
-    <select id="selectByEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT * FROM user WHERE EMAIL = #{email} AND DELETED = 0
-    </select>
-
-    <select id="selectByNickname" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT * FROM user WHERE NICKNAME = #{nickname} AND DELETED = 0
-    </select>
-
-    <select id="selectLoginUserByUsernameOrEmail" resultType="com.github.stazxr.zblog.base.domain.entity.User">
-        SELECT
-            ID, NICKNAME, HEAD_IMG_URL, GENDER, WEBSITE, SIGNATURE, EMAIL, `PASSWORD`
-        FROM user
-        WHERE DELETED = 0
-        <if test="isEmail == true">
-            AND EMAIL = #{username}
-        </if>
-        <if test="isEmail == false">
-            AND USERNAME = #{username}
-        </if>
-    </select>
+    <update id="updateUserSelf">
+        UPDATE user SET
+            NICKNAME = #{u.nickname}, GENDER = #{u.gender}, WEBSITE = #{u.website}, SIGNATURE = #{u.signature}
+        WHERE ID = #{u.userId}
+    </update>
 </mapper>

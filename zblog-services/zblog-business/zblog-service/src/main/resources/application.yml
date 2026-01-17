@@ -233,3 +233,10 @@ zblog:
         enabled: true # 开启全局请求响应日志打印
         model: 0 # 默认值，paths 为允许记录日志的路径列表
         paths:
+    mail:
+      from:
+        address: ${spring.mail.username} # 发件地址，务必与配置的邮件发送人保持一致
+        name: Z-BLOG # 发件人
+  website:
+    name: Z-BLOG # 站点名称
+    url: http://127.0.0.1:31945 # 站点地址

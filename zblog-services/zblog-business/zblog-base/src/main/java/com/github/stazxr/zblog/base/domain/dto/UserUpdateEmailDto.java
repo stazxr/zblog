@@ -2,44 +2,42 @@ package com.github.stazxr.zblog.base.domain.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 /**
- * 用户邮箱修改参数
+ * 用户邮箱修改信息
  *
  * @author SunTao
  * @since 2022-08-04
  */
-@Data
-@ApiModel("用户邮箱修改参数")
-public class UserUpdateEmailDto {
-    /**
-     * 用户名
-     */
-    @ApiModelProperty("用户名")
-    private String username;
-
-    /**
-     * 密码
-     */
-    @ApiModelProperty("密码")
-    private String pass;
+@Getter
+@Setter
+@ApiModel("用户邮箱修改信息")
+public class UserUpdateEmailDto implements Serializable {
+    private static final long serialVersionUID = 3383905751403264518L;
 
     /**
      * 邮箱
      */
+    @NotBlank(message = "{valid.usercenter.updemail.emailNotBlank}")
     @ApiModelProperty("邮箱")
     private String email;
 
     /**
      * 邮箱验证码
      */
+    @NotBlank(message = "{valid.usercenter.updemail.codeNotBlank}")
     @ApiModelProperty("邮箱验证码")
     private String code;
 
     /**
      * 缓存标识
      */
+    @NotBlank(message = "{valid.usercenter.updemail.uuidNotBlank}")
     @ApiModelProperty("缓存标识")
     private String uuid;
 }

@@ -25,7 +25,7 @@ public class Constants {
     /**
      * 权限树中顶层权限名称
      */
-    public static final String TOP_PERM_NAME = "Z-BLOG";
+    public static final String TOP_PERM_NAME = "顶级菜单";
 
     /**
      * 一时的秒数
@@ -107,6 +107,7 @@ public class Constants {
      * @author SunTao
      * @since 2020-11-14
      */
+    @Deprecated
     public enum SysCacheKey {
         /**
          * 缓存接口访问级别

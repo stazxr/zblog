@@ -6,6 +6,12 @@ export default {
   querySystemPublicKey: params => {
     return api.httpRequest().get(`/api/common/querySystemPublicKey`, params)
   },
+  // 发送邮箱验证码
+  sendEmailCode: params => {
+    return api.httpRequest().post(`/api/common/sendEmailCode`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
+  },
 
   // 登录
   login: params => {
@@ -42,11 +48,5 @@ export default {
   // 根据字典KEY查询配置信息
   queryDictValueByDictKey: params => {
     return api.httpRequest().get(`/api/dict/queryDictValueByDictKey`, params)
-  },
-  // 发送邮箱验证码
-  sendEmailCode: params => {
-    return api.httpRequest().post(`/api/email/sendCode`, qs.stringify(params), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
   }
 }

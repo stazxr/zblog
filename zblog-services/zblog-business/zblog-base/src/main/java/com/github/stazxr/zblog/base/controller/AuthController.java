@@ -60,12 +60,12 @@ public class AuthController {
     @ApiOperation(value = "获取登录验证码")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "获取登录验证码", code = "loginCode", level = RouterLevel.OPEN)
-    public Result loginCode() {
+    public Map<String, Object> loginCode() {
         Map<String, Object> data = new HashMap<>(2);
         Captcha captcha = captchaHandler.createCaptcha("loginCode");
         data.put("img", captcha.getBase64());
         data.put(ValidateLoginCodeFilter.DEFAULT_CACHE_KEY, captcha.getCaptchaId());
-        return Result.success().data(data);
+        return data;
     }
 
     /**

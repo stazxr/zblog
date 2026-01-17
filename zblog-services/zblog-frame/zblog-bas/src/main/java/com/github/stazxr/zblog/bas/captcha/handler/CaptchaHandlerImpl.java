@@ -51,6 +51,8 @@ public class CaptchaHandlerImpl implements CaptchaHandler {
     @Override
     public boolean verifyCaptcha(String captchaId, String text) {
         String captchaText = getCaptchaText(captchaId);
-        return captchaText != null && captchaText.equals(text);
+        boolean result = captchaText != null && captchaText.equals(text);
+        CaptchaCache.remove(captchaId); // 验证完成移除缓存
+        return result;
     }
 }
