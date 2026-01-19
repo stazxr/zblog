@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
@@ -46,9 +46,9 @@ public interface UserCenterService {
     /**
      * 修改个人信息
      *
-     * @param selfDto 用户个人信息
+     * @param profileDto 用户个人信息
      */
-    void updateUserSelfInfo(UserUpdateSelfDto selfDto);
+    void updateUserProfileInfo(UserUpdateProfileDto profileDto);
 
     /**
      * 分页查询用户操作日志列表

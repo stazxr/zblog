@@ -20,8 +20,8 @@ export default {
     return api.httpRequest().post(`${userCenterApi}/updateUserEmail`, params)
   },
   // 修改个人信息
-  updateUserSelfInfo: params => {
-    return api.httpRequest().post(`${userCenterApi}/updateUserSelfInfo`, params)
+  updateUserProfileInfo: params => {
+    return api.httpRequest().post(`${userCenterApi}/updateUserProfileInfo`, params)
   },
   // 分页查询用户操作日志列表
   pageUserLogList: params => {

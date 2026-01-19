@@ -7,7 +7,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.msg.ResultCode;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
@@ -424,7 +423,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             variables.put("password", password);
             mailTemplateSender.send(receiver, emailCode, variables);
         } catch (Exception e) {
-            throw new ServiceException(ResultCode.SEND_EMAIL_ERROR, e);
+            throw new ServiceException(ExpMessageCode.of("error.email.sendError"), e);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
@@ -137,7 +137,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param updateTime 修改时间
      * @return 修改行数
      */
-    int updateUserSelf(@Param("u") UserUpdateSelfDto selfDto, @Param("updateUser") Long updateUser, @Param("updateTime") String updateTime);
+    int updateUserSelf(@Param("u") UserUpdateProfileDto selfDto, @Param("updateUser") Long updateUser, @Param("updateTime") String updateTime);
 
     /**
      * 查询用户操作日志列表

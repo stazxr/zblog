@@ -18,27 +18,27 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ApiModel("用户个人修改信息")
-public class UserUpdateSelfDto implements Serializable {
+public class UserUpdateProfileDto implements Serializable {
     private static final long serialVersionUID = 3383905751403264518L;
 
     /**
      * 用户id
      */
-    @NotNull(message = "{valid.usercenter.updeself.userIdNotNull}")
+    @NotNull(message = "{valid.usercenter.userId.required}")
     @ApiModelProperty("用户id")
     private Long userId;
 
     /**
      * 用户昵称
      */
-    @NotBlank(message = "{valid.usercenter.updeself.nicknameNotBlank}")
+    @NotBlank(message = "{valid.usercenter.profile.nickname.required}")
     @ApiModelProperty("用户昵称")
     private String nickname;
 
     /**
      * 用户性别
      */
-    @NotNull(message = "{valid.usercenter.updeself.genderNotNull}")
+    @NotNull(message = "{valid.usercenter.profile.gender.required}")
     @ApiModelProperty("用户性别")
     private Integer gender;
 

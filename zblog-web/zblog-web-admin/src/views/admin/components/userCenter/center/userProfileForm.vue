@@ -72,7 +72,7 @@ export default {
       this.$refs.userProfileForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          this.$mapi.userCenter.updateUserSelfInfo(this.formData).then(() => {
+          this.$mapi.userCenter.updateUserProfileInfo(this.formData).then(() => {
             this.$message.success('修改成功')
             this.$store.dispatch('RefreshUser').then(() => {})
           }).finally(() => {

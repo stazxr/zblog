@@ -6,7 +6,7 @@ import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateSelfDto;
+import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.service.UserCenterService;
 import com.github.stazxr.zblog.core.annotation.ApiVersion;
@@ -93,15 +93,15 @@ public class UserCenterController {
     /**
      * 修改个人信息
      *
-     * @param selfDto 用户个人信息
+     * @param profileDto 用户个人信息
      */
     @Log
-    @PostMapping("updateUserSelfInfo")
+    @PostMapping("updateUserProfileInfo")
     @ApiOperation("修改个人信息")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "修改个人信息", code = "USECU005", level = RouterLevel.PUBLIC)
-    public void updateUserSelfInfo(@RequestBody @Validated UserUpdateSelfDto selfDto) {
-        userCenterService.updateUserSelfInfo(selfDto);
+    public void updateUserProfileInfo(@RequestBody @Validated UserUpdateProfileDto profileDto) {
+        userCenterService.updateUserProfileInfo(profileDto);
     }
 
     /**
