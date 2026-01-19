@@ -60,6 +60,7 @@
       :page-size.sync="pageSize"
       :page-sizes="[10, 20, 30, 50]"
       layout="total, prev, pager, next, sizes"
+      style="margin-top: 10px;"
       @size-change="handleSizeChange"
       @current-change="handlePageChange"
     />
@@ -142,6 +143,6 @@ export default {
 
 <style scoped>
 .el-date-editor {
-  width: 173px !important;
+  width: 166px !important;
 }
 </style>

@@ -96,7 +96,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
-        Assert.notNull(roleId, ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(roleId, ExpMessageCode.of("valid.common.id.required"));
         RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
         Assert.notNull(roleVo, ExpMessageCode.of("valid.common.data.notFound"));
         return roleVo;
@@ -112,7 +112,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 获取角色信息
         Role role = roleConverter.dtoToEntity(roleDto);
         // 新增时，不允许传入 RoleId
-        Assert.isNull(role.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
+        Assert.isNull(role.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
         // 角色信息检查
         checkRole(role);
         // 新增角色
@@ -192,7 +192,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 删除角色
         Assert.affectOneRow(roleMapper.deleteById(roleId), ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色关联信息
-        userRoleMapper.deleteByRoleId(roleId);
         rolePermMapper.deleteByRoleId(roleId);
         // 清除缓存
         userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
@@ -206,7 +205,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchAddUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.required"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -216,6 +215,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             UserRoleRelation userRole = new UserRoleRelation();
             userRole.setUserId(userId);
             userRole.setRoleId(userRoleDto.getRoleId());
+            userRole.setDeleted(Boolean.FALSE);
             userRoleMapper.insert(userRole);
             SecurityUserCache.remove(String.valueOf(userId));
         }
@@ -229,7 +229,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.required"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;

@@ -14,32 +14,22 @@
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userType">
             <el-select id="search-userType" v-model="filters.userType" placeholder="用户类型" clearable>
-              <el-option label="系统用户" :value="0" />
-              <el-option label="普通用户" :value="1" />
-              <el-option label="管理员用户" :value="2" />
-              <el-option label="测试用户" :value="3" />
-              <el-option label="临时用户" :value="4" />
+              <el-option v-for="item in userTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userStatus">
             <el-select id="search-userStatus" v-model="filters.userStatus" placeholder="用户状态" clearable>
-              <el-option label="正常" :value="0" />
-              <el-option label="禁用" :value="1" />
-              <el-option label="锁定" :value="2" />
+              <el-option v-for="item in userStatusList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginChan">
             <el-select id="search-loginChan" v-model="filters.loginChan" placeholder="登录渠道" clearable>
-              <el-option label="移动端" value="01" />
-              <el-option label="PC端" value="02" />
+              <el-option v-for="item in loginChanList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginType">
             <el-select id="search-loginType" v-model="filters.loginType" placeholder="登录方式" clearable>
-              <el-option label="访客" value="00" />
-              <el-option label="密码" value="01" />
-              <el-option label="QQ互信" value="02" />
-              <el-option label="未知" value="99" />
+              <el-option v-for="item in loginTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginAddress">
@@ -55,8 +45,13 @@
         <span class="crud-opts-left">
           <el-button v-perm="['USERA001']" type="success" @click="addUser">新增</el-button>
           <el-button v-perm="['USERQ003']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['USERU001']" :disabled="row === null" type="primary" @click="editUser">编辑</el-button>
-          <el-button v-perm="['USERD001']" :disabled="row === null" type="danger" @click="deleteUser">删除</el-button>
+          <el-button v-perm="['USERU001']" :disabled="row === null || editOrDeleteDisabled" type="primary" @click="editUser">编辑</el-button>
+          <el-button
+            v-perm="['USERD001']"
+            :disabled="row === null || editOrDeleteDisabled || row.id === user.id"
+            type="danger"
+            @click="deleteUser"
+          >删除</el-button>
         </span>
       </div>
     </div>
@@ -125,7 +120,7 @@
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="loginAddress" label="登录地址" align="center" width="80" />
-        <el-table-column :show-overflow-tooltip="true" prop="lastLoginTime" label="登录时间" align="center" width="140" />
+        <el-table-column :show-overflow-tooltip="true" prop="successLoginTime" label="登录时间" align="center" width="140" />
         <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="140" />
         <div slot="empty">
           <el-empty :image="nodataImg" description=" " />
@@ -164,6 +159,7 @@
 import detailDialog from '@/views/admin/system/user/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/user/template/addOrEditDialog'
 import nodataImg from '@/assets/images/nodata.png'
+import { mapGetters } from 'vuex'
 export default {
   name: 'User',
   components: {
@@ -182,6 +178,10 @@ export default {
         loginType: null,
         loginAddress: null
       },
+      userTypeList: [],
+      userStatusList: [],
+      loginChanList: [],
+      loginTypeList: [],
       tableData: [],
       tableLoading: false,
       nodataImg: nodataImg,
@@ -189,17 +189,77 @@ export default {
       total: 0,
       page: 1,
       pageSize: 10,
+      editOrDeleteDisabled: true,
       detailDialogVisible: false,
       addOrEditDialogTitle: null,
       addOrEditDialogVisible: false
     }
   },
+  computed: {
+    ...mapGetters([
+      'user'
+    ])
+  },
   mounted() {
+    this.loadUserTypeList()
+    this.loadUserStatusList()
+    this.loadLoginChanList()
+    this.loadLoginTypeList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
+      if (this.row != null && this.user != null) {
+        const userType = this.user.userType
+        const chooseUserType = this.row.userType
+        if (userType === 2) {
+          this.editOrDeleteDisabled = false
+        } else if (userType === 1) {
+          // 普通用户 > 普通用户,测试用户,临时用户
+          this.editOrDeleteDisabled = chooseUserType === 0 || chooseUserType === 2
+        } else if (userType === 3) {
+          // 测试用户 > 测试用户
+          this.editOrDeleteDisabled = chooseUserType !== 3
+        } else if (userType === 4) {
+          // 临时用户 > 临时用户
+          this.editOrDeleteDisabled = chooseUserType !== 4
+        }
+      } else {
+        this.editOrDeleteDisabled = true
+      }
+    },
+    loadUserTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.userTypeList = data
+      }).catch(_ => {
+        this.userTypeList = []
+      })
+    },
+    loadUserStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_STATUS_CONFIG' }).then(res => {
+        const { data } = res
+        this.userStatusList = data
+      }).catch(_ => {
+        this.userStatusList = []
+      })
+    },
+    loadLoginChanList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOGIN_CHAN_CONFIG' }).then(res => {
+        const { data } = res
+        this.loginChanList = data
+      }).catch(_ => {
+        this.loginChanList = []
+      })
+    },
+    loadLoginTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOGIN_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.loginTypeList = data
+      }).catch(_ => {
+        this.loginTypeList = []
+      })
     },
     // 查询
     search() {

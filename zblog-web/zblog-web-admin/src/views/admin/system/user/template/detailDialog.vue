@@ -13,11 +13,8 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="用户序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="用户名"> {{ dataInfo.username }} </el-descriptions-item>
         <el-descriptions-item label="用户昵称"> {{ dataInfo.nickname }} </el-descriptions-item>
-        <el-descriptions-item label="用户邮箱"> {{ dataInfo.email }} </el-descriptions-item>
-        <!-- 2 -->
         <el-descriptions-item label="用户类型">
           <span v-if="dataInfo.userType === '0'">系统用户</span>
           <span v-else-if="dataInfo.userType === '1'">普通用户</span>
@@ -32,15 +29,17 @@
           <span v-else-if="dataInfo.userStatus === '2'" style="color: yellow;">锁定</span>
           <span v-else> - </span>
         </el-descriptions-item>
+        <!-- 2 -->
+        <el-descriptions-item label="用户邮箱"> {{ dataInfo.email }} </el-descriptions-item>
         <el-descriptions-item label="用户性别">
           <span v-if="dataInfo.gender === '1'">男</span>
           <span v-else-if="dataInfo.gender === '2'">女</span>
           <span v-else-if="dataInfo.gender === '3'">隐藏</span>
           <span v-else> - </span>
         </el-descriptions-item>
-        <el-descriptions-item label="过期时间"> {{ dataInfo.expiredTime }} </el-descriptions-item>
+        <el-descriptions-item label="用户序列" :span="2"> {{ dataInfo.id }} </el-descriptions-item>
         <!-- 3 -->
-        <el-descriptions-item label="登录时间"> {{ dataInfo.lastLoginTime }} </el-descriptions-item>
+        <el-descriptions-item label="登录时间"> {{ dataInfo.successLoginTime }} </el-descriptions-item>
         <el-descriptions-item label="登录渠道">
           <span v-if="dataInfo.loginChan === '01'">移动端</span>
           <span v-else-if="dataInfo.loginChan === '02'">PC端</span>
@@ -63,12 +62,18 @@
           {{ dataInfo.roleNames ? dataInfo.roleNames : '-' }}
         </el-descriptions-item>
         <!-- 6 -->
+        <el-descriptions-item label="修改密码时间" :span="2"> {{ dataInfo.changePasswordTime }} </el-descriptions-item>
+        <el-descriptions-item label="密码过期时间" :span="2"> {{ dataInfo.passwordExpireTime }} </el-descriptions-item>
+        <!-- 7 -->
+        <el-descriptions-item label="账户过期时间" :span="2"> {{ dataInfo.expireTime }} </el-descriptions-item>
+        <el-descriptions-item label="锁定过期时间" :span="2"> {{ dataInfo.lockedExpireTime }} </el-descriptions-item>
+        <!-- 8 -->
         <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
         <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
-        <!-- 7 -->
+        <!-- 9 -->
         <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUsername }} </el-descriptions-item>
         <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
-        <!-- 8 -->
+        <!-- 10 -->
         <el-descriptions-item label="个人网站" :span="4"> {{ dataInfo.website }} </el-descriptions-item>
         <el-descriptions-item label="个性签名" :span="4"> {{ dataInfo.signature }} </el-descriptions-item>
       </el-descriptions>
@@ -91,15 +96,17 @@ export default {
         username: '',
         userType: '',
         userStatus: '',
-        expiredTime: '',
-        changePwdTime: '',
+        expireTime: '',
+        lockedExpireTime: '',
+        changePasswordTime: '',
+        passwordExpireTime: '',
         nickname: '',
         email: '',
         gender: '',
         signature: '',
         website: '',
         headImgUrl: '',
-        lastLoginTime: '',
+        successLoginTime: '',
         loginChan: '',
         loginType: '',
         loginAddress: '',

@@ -107,17 +107,17 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
         } else if (exception instanceof UsernameNotFoundException) {
             return "用户不存在";
         } else if (exception instanceof LockedException) {
-            return "用户已被锁定";
+            return "用户已锁定";
         } else if (exception instanceof DisabledException) {
-            return "用户已被禁用";
+            return "用户已禁用";
         } else if (exception instanceof AccountExpiredException) {
-            return "用户账号已过期";
+            return "用户已过期";
         } else if (exception instanceof BadCredentialsException) {
             return "密码错误";
         } else if (exception instanceof CredentialsExpiredException) {
             return "密码已过期，请修改密码";
         } else {
-            return "登录失败：" + exception.getMessage();
+            return exception.getMessage();
         }
     }
 

@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.bas.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
  * Spring Security 扩展配置
  *
@@ -53,6 +55,11 @@ public class SecurityExtProperties {
      * 是否隐藏用户找不到异常
      */
     protected boolean hideUserNotFoundExceptions = true;
+
+    /**
+     * 用户登录失败锁定配置
+     */
+    private UserLockConfig lockConfig = new UserLockConfig();
 
     /**
      * 获取登录 URL。
@@ -149,5 +156,41 @@ public class SecurityExtProperties {
 
     public void setHideUserNotFoundExceptions(boolean hideUserNotFoundExceptions) {
         this.hideUserNotFoundExceptions = hideUserNotFoundExceptions;
+    }
+
+    public UserLockConfig getLockConfig() {
+        return lockConfig;
+    }
+
+    public void setLockConfig(UserLockConfig lockConfig) {
+        this.lockConfig = lockConfig;
+    }
+
+    public static class UserLockConfig {
+        /**
+         * 允许最大失败次数
+         */
+        private int maxFailCount = 5;
+
+        /**
+         * 锁定时长
+         */
+        private Duration lockDuration = Duration.ofMinutes(30);
+
+        public int getMaxFailCount() {
+            return maxFailCount;
+        }
+
+        public void setMaxFailCount(int maxFailCount) {
+            this.maxFailCount = maxFailCount;
+        }
+
+        public Duration getLockDuration() {
+            return lockDuration;
+        }
+
+        public void setLockDuration(Duration lockDuration) {
+            this.lockDuration = lockDuration;
+        }
     }
 }

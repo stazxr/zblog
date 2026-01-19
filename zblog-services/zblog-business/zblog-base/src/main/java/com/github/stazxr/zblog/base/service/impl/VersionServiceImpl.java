@@ -65,7 +65,7 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
      */
     @Override
     public VersionVo queryVersionDetail(Long versionId) {
-        Assert.notNull(versionId, ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(versionId, ExpMessageCode.of("valid.common.id.required"));
         VersionVo versionVo = versionMapper.selectVersionDetail(versionId);
         Assert.notNull(versionVo, ExpMessageCode.of("valid.common.data.notFound"));
         return versionVo;
@@ -81,7 +81,7 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         // 获取版本信息
         Version version = versionConverter.dtoToEntity(versionDto);
         // 新增时，不允许传入 VersionId
-        Assert.isNull(version.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
+        Assert.isNull(version.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
         // 版本信息检查
         checkVersion(version);
         // 新增版本

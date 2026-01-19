@@ -17,7 +17,7 @@
       <el-input v-model="formData.signature" type="textarea" rows="4" maxlength="100" show-word-limit :style="isMobile ? '' : 'width: 35%;'" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" :loading="submitLoading" @click="submit">保存配置</el-button>
+      <el-button type="primary" :loading="submitLoading" :style="isMobile ? 'width: 100%;' : 'width: 35%;'" @click="submit">保存配置</el-button>
     </el-form-item>
   </el-form>
 </template>

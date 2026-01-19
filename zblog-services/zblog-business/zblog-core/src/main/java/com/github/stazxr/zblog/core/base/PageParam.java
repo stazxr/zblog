@@ -41,8 +41,8 @@ public class PageParam implements Serializable {
     private Integer defaultPageSize = 10;
 
     public void checkPage() {
-        Assert.notNull(page, ExpMessageCode.of("valid.common.page.NotNull"));
-        Assert.notNull(pageSize, ExpMessageCode.of("valid.common.pageSize.NotNull"));
+        Assert.notNull(page, ExpMessageCode.of("valid.common.page.required"));
+        Assert.notNull(pageSize, ExpMessageCode.of("valid.common.pageSize.required"));
     }
 
     @Override

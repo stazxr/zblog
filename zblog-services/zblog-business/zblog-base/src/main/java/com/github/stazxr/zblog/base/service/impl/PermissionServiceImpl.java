@@ -89,7 +89,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PermissionVo queryPermDetail(Long permId) {
         // 查询权限信息
-        Assert.notNull(permId, ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(permId, ExpMessageCode.of("valid.common.id.required"));
         PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
         Assert.notNull(permissionVo, ExpMessageCode.of("valid.common.data.notFound"));
         // 查询角色编码列表
@@ -129,7 +129,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 获取新增权限信息
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
         // 新增时，不允许传入 PermissionId
-        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
+        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
         // 权限信息检查
         checkPermission(permission);
         // 新增权限
@@ -239,7 +239,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.NotNull"));
             String routerPath = permission.getRouterPath();
             Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            Assert.failIfFalse(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
             Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
             if (permission.getPermCode() != null) {
                 Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));

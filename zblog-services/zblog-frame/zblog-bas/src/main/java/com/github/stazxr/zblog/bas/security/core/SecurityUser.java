@@ -1,25 +1,16 @@
 package com.github.stazxr.zblog.bas.security.core;
 
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
-import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import com.github.stazxr.zblog.util.StringUtils;
-import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
 import java.util.List;
 
 /**
  * SecurityUser 类实现了 Spring Security 的 UserDetails 接口，表示认证系统中的用户信息。
  * <p>
  * 此类包含用户的基本信息（如用户名、密码、用户类型和状态），以及用户的权限角色列表。
- * 同时，实现了用户账户和凭据的状态检查。
- * </p>
- * <p>
- * 使用 {@code @FieldMask} 注解来对敏感字段（如密码）进行掩码处理。
  * </p>
  *
  * @author SunTao
@@ -58,17 +49,6 @@ public class SecurityUser implements UserDetails {
      * @see com.github.stazxr.zblog.bas.security.core.UserStatus
      */
     private Integer userStatus;
-
-    /**
-     * 如果是临时账户，需要注明过期时间
-     * 格式：{@link DateUtils#defaultPattern}
-     */
-    private String expiredTime;
-
-    /**
-     * 用户修改密码时间
-     */
-    private String changePwdTime;
 
     /**
      * 角色列表
@@ -173,42 +153,6 @@ public class SecurityUser implements UserDetails {
     }
 
     /**
-     * 获取用户过期时间
-     *
-     * @return 用户过期时间
-     */
-    public String getExpiredTime() {
-        return expiredTime;
-    }
-
-    /**
-     * 设置用户过期时间
-     *
-     * @param expiredTime 用户过期时间
-     */
-    public void setExpiredTime(String expiredTime) {
-        this.expiredTime = expiredTime;
-    }
-
-    /**
-     * 获取用户密码修改时间
-     *
-     * @return 用户密码修改时间
-     */
-    public String getChangePwdTime() {
-        return changePwdTime;
-    }
-
-    /**
-     * 设置用户密码修改时间
-     *
-     * @param changePwdTime 用户密码修改时间
-     */
-    public void setChangePwdTime(String changePwdTime) {
-        this.changePwdTime = changePwdTime;
-    }
-
-    /**
      * 获取用户的角色列表
      *
      * @return 用户的角色列表
@@ -252,16 +196,7 @@ public class SecurityUser implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        if (UserType.TEMP_USER.getType().equals(getUserType())) {
-            try {
-                if (StringUtils.isNotBlank(expiredTime)) {
-                    return new Date().before(DateUtils.parse(expiredTime));
-                }
-            } catch (Exception e) {
-                log.error("check account {} is non expired catch eor", username, e);
-            }
-            return false;
-        }
+        // 默认未过期
         return true;
     }
 
@@ -282,25 +217,7 @@ public class SecurityUser implements UserDetails {
      */
     @Override
     public boolean isCredentialsNonExpired() {
-        if (!UserType.TEST_USER.getType().equals(getUserType())) {
-            try {
-                if (StringUtils.isNotBlank(changePwdTime)) {
-                    // 获取密码有效天数，校验密码是否过期
-                    SecurityExtProperties properties = SpringContextUtil.getBean(SecurityExtProperties.class);
-                    Date expiredDate = DateUtils.addDays(DateUtils.parse(changePwdTime), properties.getPasswordLimitedDay());
-                    return !new Date().after(expiredDate);
-                } else {
-                    // 如果 changePwdTime 为空，则默认密码未过期
-                    return true;
-                }
-            } catch (Exception e) {
-                // 发生异常默认用户密码未过期
-                log.error("check account {} is credentials non expired catch eor", username, e);
-                return true;
-            }
-        }
-
-        // Do not check credential expiration for test users
+        // 默认未过期
         return true;
     }
 

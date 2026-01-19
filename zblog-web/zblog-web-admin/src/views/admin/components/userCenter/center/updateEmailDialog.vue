@@ -83,7 +83,7 @@ export default {
         const _this = this
         this.codeLoading = true
         this.buttonName = '验证码发送中'
-        this.$mapi.communal.sendEmailCode({ email: this.formData.email }).then(res => {
+        this.$mapi.communal.sendEmailCode({ email: this.formData.email, scene: '修改邮箱' }).then(res => {
           this.formData.uuid = res.data
           this.$message.success('发送成功，验证码有效期5分钟')
           this.codeLoading = false

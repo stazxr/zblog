@@ -24,7 +24,7 @@ public class RoleAuthDto implements Serializable {
     /**
      * 角色id
      */
-    @NotNull(message = "{valid.common.id.NotNull}")
+    @NotNull(message = "{valid.common.id.required}")
     @ApiModelProperty("角色id")
     private Long roleId;
 

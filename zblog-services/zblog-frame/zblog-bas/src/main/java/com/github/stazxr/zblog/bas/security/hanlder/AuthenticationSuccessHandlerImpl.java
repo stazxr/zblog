@@ -10,7 +10,6 @@ import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.bas.security.service.SecurityTokenService;
 import com.github.stazxr.zblog.bas.security.sso.SsoToken;
 import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
-import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,10 +73,6 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             // 构造登录结果并返回
             Map<String, Object> loginResult = new HashMap<>(1);
             loginResult.put("access_token", SecurityConstant.AUTHENTICATION_PREFIX.concat(token));
-            if (StringUtils.isBlank(securityUser.getChangePwdTime())) {
-                // 首次登录需要修改密码
-                loginResult.put("change_pwd", true);
-            }
             ResponseUtils.responseJsonWriter(response, Result.success("登录成功").data(loginResult));
         } catch (Exception e) {
             log.error("处理认证成功逻辑时发生异常：{}", e.getMessage(), e);

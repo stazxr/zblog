@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,4 +28,10 @@ public class UserRoleRelation implements Serializable {
      * 角色序列
      */
     private Long roleId;
+
+    /**
+     * 是否有效
+     */
+    @TableLogic
+    private Boolean deleted;
 }

@@ -10,6 +10,7 @@ import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -59,13 +60,21 @@ public interface UserMapper extends BaseMapper<User> {
     List<String> selectMd5PermCodesByUserId(@Param("userId") Long userId);
 
     /**
-     * 更新用户登录时间
+     * 更新用户登录信息-成功
      *
      * @param userId     用户id
      * @param loginTime  登录时间
-     * @param errorCount 登录失败次数
      */
-    void updateUserLoginTime(@Param("userId") Long userId, @Param("loginTime") String loginTime, @Param("errorCount") Integer errorCount);
+    void updateLoginInfoWhenSuccess(@Param("userId") Long userId, @Param("loginTime") LocalDateTime loginTime);
+
+    /**
+     * 更新用户登录信息-失败
+     *
+     * @param userId           用户id
+     * @param maxFailCount     登录失败阙值
+     * @param lockedExpireTime 锁定到期时间
+     */
+    void updateLoginInfoWhenFailed(@Param("userId") Long userId, @Param("maxFailCount") int maxFailCount, @Param("lockedExpireTime") LocalDateTime lockedExpireTime);
 
     /**
      * 查询用户列表
@@ -84,14 +93,6 @@ public interface UserMapper extends BaseMapper<User> {
     UserVo selectUserDetail(@Param("userId") Long userId);
 
     /**
-     * 查询用户登录失败次数
-     *
-     * @param userId 用户序列
-     * @return 登录失败次数
-     */
-    int selectUserLoginErrorCount(@Param("userId") Long userId);
-
-    /**
      * 修改用户状态
      *
      * @param userId 用户序列
@@ -102,12 +103,13 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 用户密码修改
      *
-     * @param userId         用户序列
-     * @param password       密码
-     * @param changePwdTime  密码修改时间
+     * @param userId              用户序列
+     * @param password            密码
+     * @param changePasswordTime  密码修改时间
      * @return 修改行数
      */
-    int updateUserPassword(@Param("userId") Long userId, @Param("password") String password, @Param("changePwdTime") String changePwdTime);
+    int updateUserPassword(@Param("userId") Long userId, @Param("password") String password,
+        @Param("changePasswordTime") LocalDateTime changePasswordTime, @Param("passwordExpireTime") LocalDateTime passwordExpireTime);
 
     /**
      * 用户头像修改
@@ -130,10 +132,12 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 用户信息修改
      *
-     * @param selfDto 用户个人信息
+     * @param selfDto    用户个人信息
+     * @param updateUser 修改用户
+     * @param updateTime 修改时间
      * @return 修改行数
      */
-    int updateUserSelf(@Param("u") UserUpdateSelfDto selfDto);
+    int updateUserSelf(@Param("u") UserUpdateSelfDto selfDto, @Param("updateUser") Long updateUser, @Param("updateTime") String updateTime);
 
     /**
      * 查询用户操作日志列表

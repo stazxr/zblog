@@ -46,12 +46,17 @@ public class UserVo extends BaseVo {
      * 如果是临时账户，需要注明过期时间
      * 格式：{@link DateUtils#defaultPattern}
      */
-    private String expiredTime;
+    private String expireTime;
 
     /**
      * 用户修改密码时间
      */
-    private String changePwdTime;
+    private String changePasswordTime;
+
+    /**
+     * 密码到期时间
+     */
+    private String passwordExpireTime;
 
     /**
      * 昵称
@@ -85,9 +90,14 @@ public class UserVo extends BaseVo {
     private String headImgUrl;
 
     /**
-     * 登录时间（成功）
+     * 成功登录时间
      */
-    private String lastLoginTime;
+    private String successLoginTime;
+
+    /**
+     * 用户锁定到期时间
+     */
+    private String lockedExpireTime;
 
     /**
      * 登录渠道, 01:移动端; 02:PC端

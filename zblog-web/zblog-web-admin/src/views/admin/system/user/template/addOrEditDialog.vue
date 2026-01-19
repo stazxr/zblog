@@ -22,8 +22,8 @@
             <el-option v-for="item in userTypeList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-show="formData.userType === 4" label="到期时间" prop="expiredTime">
-          <el-date-picker v-model="formData.expiredTime" :style="isMobile ? '' : 'width: 380px;'" type="datetime" placeholder="选择用户到期时间" value-format="yyyy-MM-dd HH:mm:ss" />
+        <el-form-item v-show="formData.userType === 4" label="到期时间" prop="expireTime">
+          <el-date-picker v-model="formData.expireTime" :style="isMobile ? '' : 'width: 380px;'" type="datetime" placeholder="选择用户到期时间" value-format="yyyy-MM-dd HH:mm:ss" />
         </el-form-item>
         <el-form-item label="用户状态" prop="userStatus">
           <el-select v-model="formData.userStatus" :style="isMobile ? '' : 'width: 380px;'">
@@ -46,6 +46,7 @@
 
 <script>
 import { validUsername, validEmail } from '@/utils/validate'
+import { mapGetters } from 'vuex'
 export default {
   props: {
     dialogVisible: {
@@ -79,25 +80,19 @@ export default {
     return {
       roleList: [],
       submitLoading: false,
-      userTypeList: [
-        { name: '系统用户', value: 0 },
-        { name: '普通用户', value: 1 },
-        { name: '管理员用户', value: 2 },
-        { name: '测试用户', value: 3 },
-        { name: '临时用户', value: 4 }
-      ],
+      userTypeList: [],
       userStatusList: [
+        /* { name: '锁定', value: 2 }, */
         { name: '正常', value: 0 },
-        { name: '禁用', value: 1 },
-        { name: '锁定', value: 2 }
+        { name: '禁用', value: 1 }
       ],
       formData: {
         id: null,
         username: null,
         email: null,
-        userType: 1,
+        userType: null,
         userStatus: 0,
-        expiredTime: null,
+        expireTime: null,
         roleIds: []
       },
       formRules: {
@@ -113,7 +108,7 @@ export default {
         userStatus: [
           { required: true, message: '请选择用户状态', trigger: 'change' }
         ],
-        expiredTime: [
+        expireTime: [
           { required: false, message: '请选择用户到期时间', trigger: 'blur' }
         ]
       }
@@ -122,11 +117,15 @@ export default {
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
-    }
+    },
+    ...mapGetters([
+      'user'
+    ])
   },
   methods: {
     initData(dataId) {
       this.getRoleList()
+      this.getUserTypeList()
       if (dataId != null && dataId !== '') {
         this.$nextTick(() => {
           this.getUserDetail(dataId)
@@ -140,6 +139,41 @@ export default {
         this.roleList = []
       })
     },
+    getUserTypeList() {
+      // 测试用户 > 测试用户
+      if (this.user != null) {
+        const userType = this.user.userType
+        if (userType === 2) {
+          // 管理员 > 管理员,普通用户,测试用户,临时用户
+          this.userTypeList = [
+            { name: '系统用户', value: 0 },
+            { name: '普通用户', value: 1 },
+            { name: '管理员', value: 2 },
+            { name: '测试用户', value: 3 },
+            { name: '临时用户', value: 4 }
+          ]
+        } else if (userType === 1) {
+          // 普通用户 > 普通用户,测试用户,临时用户
+          this.userTypeList = [
+            { name: '普通用户', value: 1 },
+            { name: '测试用户', value: 3 },
+            { name: '临时用户', value: 4 }
+          ]
+        } else if (userType === 3) {
+          // 测试用户 > 测试用户
+          this.userTypeList = [
+            { name: '测试用户', value: 3 }
+          ]
+        } else if (userType === 4) {
+          // 临时用户 > 临时用户
+          this.userTypeList = [
+            { name: '临时用户', value: 4 }
+          ]
+        }
+      } else {
+        this.userTypeList = []
+      }
+    },
     getUserDetail(dataId) {
       this.$mapi.user.queryUserDetail({ userId: dataId }).then(res => {
         const { data } = res
@@ -152,10 +186,10 @@ export default {
     },
     userTypeChangeEvent(userType) {
       if (userType === 4) {
-        this.formRules.expiredTime[0].required = true
+        this.formRules.expireTime[0].required = true
       } else {
-        this.formData.expiredTime = null
-        this.formRules.expiredTime[0].required = false
+        this.formData.expireTime = null
+        this.formRules.expireTime[0].required = false
       }
     },
     submit() {
@@ -197,9 +231,9 @@ export default {
         id: null,
         username: null,
         email: null,
-        userType: 1,
+        userType: null,
         userStatus: 0,
-        expiredTime: null,
+        expireTime: null,
         roleIds: []
       }
       this.$refs.addOrEditForm.resetFields()

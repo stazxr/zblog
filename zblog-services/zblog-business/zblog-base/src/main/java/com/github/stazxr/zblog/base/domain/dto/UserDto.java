@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -27,43 +29,44 @@ public class UserDto extends BaseDto {
     /**
      * 用户id
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
     @ApiModelProperty(value = "用户id")
     private Long id;
 
     /**
      * 用户名
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.username.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.username.required}")
     @ApiModelProperty(value = "用户名")
     private String username;
 
     /**
      * 用户邮箱
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.email.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.email.required}")
     @ApiModelProperty("用户邮箱")
     private String email;
 
     /**
      * 用户类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userType.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userType.required}")
     @ApiModelProperty("用户类型")
     private Integer userType;
 
     /**
      * 用户状态
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userStatus.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userStatus.required}")
     @ApiModelProperty("用户状态")
     private Integer userStatus;
 
     /**
-     * 临时用户有效时间
+     * 临时用户账户过期时间
      */
-    @ApiModelProperty("临时用户有效时间")
-    private String expiredTime;
+    @ApiModelProperty("临时用户账户过期时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime expireTime;
 
     /**
      * 角色id列表

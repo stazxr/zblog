@@ -95,7 +95,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      */
     @Override
     public String queryLogExpDetail(Long logId) {
-        Assert.notNull(logId, ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(logId, ExpMessageCode.of("valid.common.id.required"));
         return logMapper.selectLogExpDetail(logId);
     }
 

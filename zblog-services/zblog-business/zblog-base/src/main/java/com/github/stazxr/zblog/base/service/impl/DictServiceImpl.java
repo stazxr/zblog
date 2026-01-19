@@ -74,7 +74,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public DictVo queryDictDetail(Long dictId) {
-        Assert.notNull(dictId, ExpMessageCode.of("valid.common.id.NotNull"));
+        Assert.notNull(dictId, ExpMessageCode.of("valid.common.id.required"));
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
         Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
         return dictVo;
@@ -90,7 +90,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         // 获取字典信息
         Dict dict = dictConverter.dtoToEntity(dictDto);
         // 新增时，不允许传入 DictId
-        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.common.addWithIdError"));
+        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
         // 字典信息检查
         checkDict(dict);
         // 新增字典

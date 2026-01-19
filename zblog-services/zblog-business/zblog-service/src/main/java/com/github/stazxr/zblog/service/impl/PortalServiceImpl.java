@@ -849,7 +849,7 @@ public class PortalServiceImpl implements PortalService {
             newUser.setPassword(passwordEncoder.encode(UuidUtils.gen8BitUuidStr()));
             newUser.setGender(Gender.HIDE.getType());
             newUser.setHeadImgUrl(userInfo.getString("figureurl_qq_2"));
-            newUser.setLastLoginTime(DateUtils.formatNow());
+//            newUser.setLastLoginTime(DateUtils.formatNow());
 //            newUser.setChangePwd(false);
 //            newUser.setLocked(false);
 //            newUser.setTemp(false);
@@ -863,7 +863,7 @@ public class PortalServiceImpl implements PortalService {
         } else {
             // 用户已存在，查询用户信息
             User user = userMapper.selectUserById(userId);
-            user.setLastLoginTime(DateUtils.formatNow());
+//            user.setLastLoginTime(DateUtils.formatNow());
 //            userMapper.updateById(user);
             return parseTokenUser(user, request);
         }

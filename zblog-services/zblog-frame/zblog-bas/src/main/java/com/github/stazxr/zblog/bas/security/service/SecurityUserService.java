@@ -23,12 +23,12 @@ public interface SecurityUserService {
     SecurityUser findUserById(String userId);
 
     /**
-     * 根据用户名 {@code username} 查询用户信息。
+     * 根据用户名 {@code username} 登录并返回登录用户信息。
      *
      * @param username 用户名
      * @return 用户的 {@link SecurityUser} 实例
      */
-    SecurityUser findUserByUsername(String username);
+    SecurityUser loginWithUsername(String username);
 
     /**
      * 更新用户的登录信息。

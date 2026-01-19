@@ -13,7 +13,7 @@
         <result property="loginChan" column="LOGIN_CHAN" />
         <result property="loginType" column="LOGIN_TYPE" />
         <result property="loginAddress" column="LOGIN_ADDRESS" />
-        <result property="lastLoginTime" column="LAST_LOGIN_TIME" />
+        <result property="successLoginTime" column="SUCCESS_LOGIN_TIME" />
         <result property="createTime" column="CREATE_TIME" />
         <collection property="roleIds" ofType="Long">
             <result column="ROLE_ID" />
@@ -26,15 +26,17 @@
         <result property="username" column="USERNAME" />
         <result property="userType" column="USER_TYPE" />
         <result property="userStatus" column="USER_STATUS" />
-        <result property="expiredTime" column="EXPIRED_TIME" />
-        <result property="changePwdTime" column="EXPIRED_TIME" />
+        <result property="expireTime" column="EXPIRE_TIME" />
+        <result property="changePasswordTime" column="CHANGE_PASSWORD_TIME" />
+        <result property="passwordExpireTime" column="PASSWORD_EXPIRE_TIME" />
         <result property="nickname" column="NICKNAME" />
         <result property="email" column="EMAIL" />
         <result property="gender" column="GENDER" />
         <result property="signature" column="SIGNATURE" />
         <result property="website" column="WEBSITE" />
         <result property="headImgUrl" column="HEAD_IMG_URL" />
-        <result property="lastLoginTime" column="LAST_LOGIN_TIME" />
+        <result property="successLoginTime" column="SUCCESS_LOGIN_TIME" />
+        <result property="lockedExpireTime" column="LOCKED_EXPIRE_TIME" />
         <result property="loginChan" column="LOGIN_CHAN" />
         <result property="loginType" column="LOGIN_TYPE" />
         <result property="loginAddress" column="LOGIN_ADDRESS" />
@@ -67,14 +69,20 @@
         SELECT
             u.*, ull.LOGIN_ADDRESS AS LAST_LOGIN_ADDRESS, ull.LOGIN_TIME AS LAST_LOGIN_TIME
         FROM user u
-        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.IS_SUCCESS = 1
+        LEFT JOIN (
+            SELECT USER_ID, LOGIN_ADDRESS, LOGIN_TIME FROM (
+                SELECT USER_ID, LOGIN_ADDRESS, LOGIN_TIME,
+                ROW_NUMBER() OVER (PARTITION BY USER_ID ORDER BY LOGIN_TIME DESC) AS rn
+                FROM user_login_log
+                WHERE IS_SUCCESS = 1
+            ) t WHERE rn = 2 -- 第二条成功登录记录，即上一次登录
+        ) ull ON u.ID = ull.USER_ID
         WHERE u.USERNAME = #{username} AND u.DELETED = 0
-        ORDER BY ull.LOGIN_TIME DESC LIMIT 1 OFFSET 1
     </select>
 
     <select id="selectRolesByUserId" resultType="com.github.stazxr.zblog.base.domain.entity.Role">
         SELECT * FROM role WHERE DELETED = 0 AND ID IN (
-            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId} AND DELETED = 0
         )
     </select>
 
@@ -87,7 +95,7 @@
             PERM_LEVEL IN (1, 2) OR ID IN (
                 SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
                     SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
-                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                        SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId} AND DELETED = 0
                     )
                 )
             )
@@ -98,33 +106,36 @@
         )
     </select>
 
-    <update id="updateUserLoginTime">
+    <update id="updateLoginInfoWhenSuccess">
+        UPDATE user SET
+            SUCCESS_LOGIN_TIME = #{loginTime}, LOGIN_ERROR_COUNT = 0, LOCKED_EXPIRE_TIME = NULL, USER_STATUS = 0
+        WHERE ID = #{userId}
+    </update>
+
+    <update id="updateLoginInfoWhenFailed">
         UPDATE user
         <set>
-            <if test="loginTime != null and loginTime != ''">
-                LAST_LOGIN_TIME = #{loginTime},
+            LOGIN_ERROR_COUNT = LOGIN_ERROR_COUNT + 1
+            <if test="maxFailCount >= 0">
+                , USER_STATUS = CASE WHEN LOGIN_ERROR_COUNT + 1 >= #{maxFailCount} THEN 2 ELSE USER_STATUS END,
+                LOCKED_EXPIRE_TIME = CASE WHEN LOGIN_ERROR_COUNT + 1 >= #{maxFailCount} THEN #{lockedExpireTime} ELSE LOCKED_EXPIRE_TIME END
             </if>
-            LOGIN_ERROR_COUNT =
-            <choose>
-                <when test="errorCount != null">
-                    #{errorCount}
-                </when>
-                <otherwise>
-                    LOGIN_ERROR_COUNT + 1
-                </otherwise>
-            </choose>
         </set>
         WHERE ID = #{userId}
+        <if test="maxFailCount >= 0">
+            AND USER_STATUS != 2
+        </if>
     </update>
 
     <select id="selectUserList" resultMap="userVoListMap">
         SELECT
             u.ID, u.HEAD_IMG_URL, u.USERNAME, u.NICKNAME, u.EMAIL, u.USER_TYPE, u.USER_STATUS, u.GENDER,
-            u.LAST_LOGIN_TIME, u.CREATE_TIME, ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ur.ROLE_ID
+            DATE_FORMAT(u.SUCCESS_LOGIN_TIME, '%Y-%m-%d %H:%i:%s') AS SUCCESS_LOGIN_TIME, u.CREATE_TIME,
+            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ur.ROLE_ID
         FROM user u
-        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.LAST_LOGIN_TIME AND ull.IS_SUCCESS = 1
+        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.SUCCESS_LOGIN_TIME AND ull.IS_SUCCESS = 1
         LEFT JOIN (
-            SELECT USER_ID, ROLE_ID FROM user_role_relation
+            SELECT USER_ID, ROLE_ID FROM user_role_relation WHERE DELETED = 0
         ) ur ON ur.USER_ID = u.ID
         WHERE u.DELETED = 0
         <if test="username != null and username != ''">
@@ -156,35 +167,36 @@
             AND ull.LOGIN_ADDRESS LIKE #{loginAddressBind}
         </if>
         <if test="roleId != null">
-            AND u.ID IN (SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{roleId})
+            AND u.ID IN (SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{roleId} AND DELETED = 0)
         </if>
-        ORDER BY u.LAST_LOGIN_TIME DESC
+        ORDER BY u.SUCCESS_LOGIN_TIME DESC
     </select>
 
     <select id="selectUserDetail" resultMap="userVoDetailMap">
         SELECT
-            u.ID, u.USERNAME, u.USER_TYPE, u.USER_STATUS, u.EXPIRED_TIME, u.CHANGE_PWD_TIME,
-            u.NICKNAME, u.EMAIL, u.GENDER, u.SIGNATURE, u.WEBSITE, u.HEAD_IMG_URL,
-            u.LAST_LOGIN_TIME, ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ull.USER_AGENT,
+            u.ID, u.USERNAME, u.USER_TYPE, u.USER_STATUS, u.NICKNAME,
+            u.EMAIL, u.GENDER, u.SIGNATURE, u.WEBSITE, u.HEAD_IMG_URL,
             ur.ROLE_ID, r.ROLE_NAME, u.CREATE_TIME, u.UPDATE_TIME,
+            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ull.USER_AGENT,
+            DATE_FORMAT(u.EXPIRE_TIME, '%Y-%m-%d %H:%i:%s') AS EXPIRE_TIME,
+            DATE_FORMAT(u.CHANGE_PASSWORD_TIME, '%Y-%m-%d %H:%i:%s') AS CHANGE_PASSWORD_TIME,
+            DATE_FORMAT(u.PASSWORD_EXPIRE_TIME, '%Y-%m-%d %H:%i:%s') AS PASSWORD_EXPIRE_TIME,
+            DATE_FORMAT(u.LOCKED_EXPIRE_TIME, '%Y-%m-%d %H:%i:%s') AS LOCKED_EXPIRE_TIME,
+            DATE_FORMAT(u.SUCCESS_LOGIN_TIME, '%Y-%m-%d %H:%i:%s') AS SUCCESS_LOGIN_TIME,
             (SELECT USERNAME FROM user u WHERE u.ID = u.CREATE_USER) AS CREATE_USERNAME,
             (SELECT USERNAME FROM user u WHERE u.ID = u.UPDATE_USER) AS UPDATE_USERNAME
         FROM user u
-        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.LAST_LOGIN_TIME AND ull.IS_SUCCESS = 1
+        LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.SUCCESS_LOGIN_TIME AND ull.IS_SUCCESS = 1
         LEFT JOIN (
-            SELECT USER_ID, ROLE_ID FROM user_role_relation
+            SELECT USER_ID, ROLE_ID FROM user_role_relation WHERE DELETED = 0
         ) ur ON ur.USER_ID = u.ID
         LEFT JOIN role r ON r.ID = ur.ROLE_ID
         WHERE u.ID = #{userId}
     </select>
 
     <!-- <select id="selectUserRoleIdList" resultType="java.lang.Long">
-        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID}
+        SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID} AND urr.DELETED = 0
     </select> -->
-
-    <select id="selectUserLoginErrorCount" resultType="java.lang.Integer">
-        SELECT LOGIN_ERROR_COUNT FROM user WHERE ID = #{userId}
-    </select>
 
     <select id="selectUserLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
         SELECT
@@ -212,7 +224,9 @@
     </update>
 
     <update id="updateUserPassword">
-        UPDATE user SET PASSWORD = #{password}, CHANGE_PWD_TIME = #{changePwdTime} WHERE ID = #{userId}
+        UPDATE user SET
+            PASSWORD = #{password}, CHANGE_PASSWORD_TIME = #{changePasswordTime}, PASSWORD_EXPIRE_TIME = #{passwordExpireTime}
+        WHERE ID = #{userId}
     </update>
 
     <update id="updateUserHeadImg">
@@ -225,7 +239,8 @@
 
     <update id="updateUserSelf">
         UPDATE user SET
-            NICKNAME = #{u.nickname}, GENDER = #{u.gender}, WEBSITE = #{u.website}, SIGNATURE = #{u.signature}
+            NICKNAME = #{u.nickname}, GENDER = #{u.gender}, WEBSITE = #{u.website}, SIGNATURE = #{u.signature},
+            UPDATE_USER = #{updateUser}, UPDATE_TIME = #{updateTime}
         WHERE ID = #{u.userId}
     </update>
 </mapper>

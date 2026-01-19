@@ -28,7 +28,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限ID
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
     @ApiModelProperty("权限id")
     private Long id;
 
@@ -92,7 +92,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.required}")
     @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
     @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
     @ApiModelProperty(value = "权限排序", example = "99999")

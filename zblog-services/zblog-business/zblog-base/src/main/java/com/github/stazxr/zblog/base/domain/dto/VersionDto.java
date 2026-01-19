@@ -28,7 +28,7 @@ public class VersionDto extends BaseDto {
     /**
      * 版本id
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
     @ApiModelProperty("版本id")
     private Long id;
 
@@ -49,7 +49,7 @@ public class VersionDto extends BaseDto {
     /**
      * 版本排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.required}")
     @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
     @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
     @ApiModelProperty("版本排序")

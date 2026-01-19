@@ -58,13 +58,13 @@ public class SecurityUserServiceImpl implements SecurityUserService, Initializin
     }
 
     /**
-     * 根据用户名 {@code username} 查询用户信息。
+     * 根据用户名 {@code username} 登录并返回登录用户信息。
      *
      * @param username 用户名
      * @return 用户的 {@link SecurityUser} 实例
      */
     @Override
-    public SecurityUser findUserByUsername(String username) {
+    public SecurityUser loginWithUsername(String username) {
         SecurityProperties.User user = securityProperties.getUser();
         if (user.getName().equals(username)) {
             return createSecurityUser();

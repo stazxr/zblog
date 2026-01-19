@@ -183,7 +183,7 @@ zblog:
       resource-roles-cache-mills: 1800000 # 资源与角色关联关系的缓存时长, 单位毫秒
       password-history-count: 1 # 新密码不能与最近X次密码重复，可配置 -1，关闭校验
       enable-additional-checks: false # 登录认证是否扩展额外检查规则
-      hide-user-not-found-exceptions: false # 设置为 true, 用户不存在时，报错用户找不到，否则报错密码错误
+      hide-user-not-found-exceptions: false # TODO 待验证 设置为 true, 用户不存在时，报错用户找不到，否则报错密码错误
       jwt:
         access-token-duration: 1200
         refresh-token-duration: 2400

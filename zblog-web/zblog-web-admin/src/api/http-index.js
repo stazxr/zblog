@@ -2,7 +2,7 @@
 import communal from '@/api/communal.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
-import userCenter from '@/api/base/userCenter.js'
+import userCenter from '@/api/userCenter.js'
 
 // system
 import user from '@/api/base/system/user.js'

@@ -19,7 +19,7 @@ public @interface FormResubmitCheck {
      *
      * @return String
      */
-    String value() default "重复操作，请稍后再试";
+    String value() default "系统繁忙，请稍后再试";
 
     /**
      * 是否全局校验（false 校验时会携带用户信息）

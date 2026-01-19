@@ -1,4 +1,4 @@
-import api from '../custom-axios'
+import api from './custom-axios'
 
 const userCenterApi = '/api/user/center'
 

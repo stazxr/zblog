@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * 用户登录日志
  *
@@ -29,7 +31,7 @@ public class UserLoginLog {
     /**
      * 登录时间
      */
-    private String loginTime;
+    private LocalDateTime loginTime;
 
     /**
      * 登录渠道, 01:移动端; 02:PC端

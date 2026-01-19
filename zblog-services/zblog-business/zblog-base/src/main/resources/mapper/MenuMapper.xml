@@ -11,7 +11,7 @@
                 PERM_LEVEL = 4 AND ID IN (
                     SELECT PERM_ID FROM role_permission_relation WHERE ROLE_ID IN (
                         SELECT ID FROM role WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (
-                            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId}
+                            SELECT ROLE_ID FROM user_role_relation WHERE USER_ID = #{userId} AND DELETED = 0
                         )
                     )
                 )

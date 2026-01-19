@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * 用户密码更新记录
  *
@@ -34,5 +36,5 @@ public class UserPassLog {
     /**
      * 密码修改时间
      */
-    private String changePwdTime;
+    private LocalDateTime changePasswordTime;
 }

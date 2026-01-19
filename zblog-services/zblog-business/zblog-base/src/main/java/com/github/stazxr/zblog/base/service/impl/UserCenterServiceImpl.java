@@ -42,6 +42,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -173,7 +174,10 @@ public class UserCenterServiceImpl implements UserCenterService {
         Assert.notNull(Gender.of(gender), ExpMessageCode.of("valid.usercenter.updeself.genderInvalid"));
         Assert.failIfTrue(checkNicknameExist(selfDto.getUserId(), selfDto.getNickname()), ExpMessageCode.of("valid.usercenter.updeself.nicknameExist"));
         // 数据入库
-        Assert.affectOneRow(userMapper.updateUserSelf(selfDto), ExpMessageCode.of("result.usercenter.updateInfoFailed"));
+        SecurityUser loginUser = SecurityUtils.getLoginUser();
+        String updateTime = DateUtils.formatNow(DateUtils.YMD_HMS_PATTERN);
+        int updateRows = userMapper.updateUserSelf(selfDto, loginUser.getId(), updateTime);
+        Assert.affectOneRow(updateRows, ExpMessageCode.of("result.usercenter.updateInfoFailed"));
         SecurityUserCache.remove(String.valueOf(selfDto.getUserId()));
     }
 
@@ -237,16 +241,19 @@ public class UserCenterServiceImpl implements UserCenterService {
 
     private void doUpdateUserPass(Long userId, String password) {
         // 记录用户密码修改记录
-        String changePwdTime = DateUtils.formatNow(DateUtils.YMD_HMS_PATTERN);
+        LocalDateTime changePasswordTime = LocalDateTime.now();
         UserPassLog userPassLog = new UserPassLog();
         userPassLog.setId(SequenceUtils.getId());
         userPassLog.setUserId(userId);
         userPassLog.setPassword(passwordEncoder.encode(password));
-        userPassLog.setChangePwdTime(changePwdTime);
+        userPassLog.setChangePasswordTime(changePasswordTime);
         Assert.affectOneRow(userPassLogMapper.insert(userPassLog), ExpMessageCode.of("result.usercenter.updatePasswordFailed"));
         // 数据入库
         String newPassword = passwordEncoder.encode(password);
-        Assert.affectOneRow(userMapper.updateUserPassword(userId, newPassword, changePwdTime), ExpMessageCode.of("result.usercenter.updatePasswordFailed"));
+        int passwordLimitedDay = securityExtProperties.getPasswordLimitedDay();
+        LocalDateTime passwordExpireTime = changePasswordTime.plusDays(passwordLimitedDay);
+        int updateRows = userMapper.updateUserPassword(userId, newPassword, changePasswordTime, passwordExpireTime);
+        Assert.affectOneRow(updateRows, ExpMessageCode.of("result.usercenter.updatePasswordFailed"));
         SecurityUserCache.remove(String.valueOf(userId));
     }
 

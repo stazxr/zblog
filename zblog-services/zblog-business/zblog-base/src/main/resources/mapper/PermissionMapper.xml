@@ -59,6 +59,6 @@
     <select id="selectUserIdsByPermId" resultType="java.lang.Long">
         SELECT USER_ID FROM user_role_relation WHERE ROLE_ID IN (
             SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID = #{permId}
-        )
+        ) AND DELETED = 0
     </select>
 </mapper>

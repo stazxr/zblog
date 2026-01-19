@@ -26,7 +26,7 @@ public class RoleDto extends BaseDto {
     /**
      * 角色id
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.NotNull}")
+    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
     @ApiModelProperty(value = "角色id")
     private Long id;
 

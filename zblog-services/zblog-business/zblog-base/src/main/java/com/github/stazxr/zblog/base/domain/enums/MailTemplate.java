@@ -7,7 +7,9 @@ package com.github.stazxr.zblog.base.domain.enums;
  * @since 2026-01-16
  */
 public enum MailTemplate {
-    EMAIL_CODE("mail/code", "邮箱验证码");
+    EMAIL_CODE("mail/emailCode", "邮箱验证码"),
+
+    ADD_USER_NOTICE("mail/addUserNotice", "用户创建通知");
 
     private final String contentTemplate;
 

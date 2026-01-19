@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, InitializingB
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SecurityUser securityUser = securityUserService.findUserByUsername(username);
+        SecurityUser securityUser = securityUserService.loginWithUsername(username);
         if (securityUser == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
