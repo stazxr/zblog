@@ -25,7 +25,7 @@ CREATE TABLE `user` (
   `USERNAME` VARCHAR(20) NOT NULL COMMENT '用户名，可用于登录',
   `PASSWORD` VARCHAR(60) DEFAULT NULL COMMENT '登录密码',
   `USER_TYPE` TINYINT NOT NULL COMMENT '用户类型: 0-系统用户;1-普通用户;2-管理员用户;3-测试用户;4-临时用户',
-  `USER_STATUS` TINYINT NOT NULL COMMENT '用户状态: 0-正常;1-禁用;2-锁定;3-首次登录需要修改密码',
+  `USER_STATUS` TINYINT NOT NULL COMMENT '用户状态: 0-正常;1-禁用;2-锁定',
   `NICKNAME` VARCHAR(25) NOT NULL COMMENT '昵称',
   `EMAIL` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
   `GENDER` TINYINT NOT NULL DEFAULT 3 COMMENT '性别: 1-男;2-女;3-隐藏',
@@ -43,7 +43,9 @@ CREATE TABLE `user` (
   `CREATE_TIME` CHAR(19) NOT NULL COMMENT '创建时间',
   `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
   `UPDATE_TIME` CHAR(19) DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`ID`) USING BTREE
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `uk_user_username` (`USERNAME`),
+  UNIQUE KEY `uk_user_nickname` (`NICKNAME`)
 ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC COMMENT='用户表';
 
 CREATE INDEX idx_user_username_deleted ON user(`USERNAME`, `DELETED`);
@@ -105,9 +107,7 @@ CREATE TABLE `role` (
   `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
   `UPDATE_TIME` CHAR(19) DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`ID`) USING BTREE,
-  INDEX ROLE_CODE_INDEX (`ROLE_CODE`),
-  INDEX ROLE_ENABLED_INDEX (`ENABLED`),
-  INDEX ROLE_DELETED_INDEX (`DELETED`)
+  UNIQUE KEY `uk_role_roleCode` (`ROLE_CODE`)
 ) ENGINE=INNODB ROW_FORMAT=DYNAMIC COMMENT='角色表';
 
 /*Data for the table `role` */
@@ -123,14 +123,15 @@ DROP TABLE IF EXISTS `user_role_relation`;
 CREATE TABLE `user_role_relation` (
   `USER_ID` BIGINT NOT NULL COMMENT '用户编号',
   `ROLE_ID` BIGINT NOT NULL COMMENT '角色编号',
-  `DELETED` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除'
+  `DELETED` TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除',
+  UNIQUE KEY `uk_urr_user_role` (`USER_ID`, `ROLE_ID`)
 ) ENGINE=INNODB ROW_FORMAT=DYNAMIC COMMENT='用户角色关联表';
 
-ALTER TABLE user_role_relation ADD UNIQUE KEY uk_urr_user_role (USER_ID, ROLE_ID);
-CREATE INDEX idx_urr_user_del_role ON user_role_relation (USER_ID, DELETED, ROLE_ID);
-CREATE INDEX idx_urr_role_del_user ON user_role_relation (ROLE_ID, DELETED, USER_ID);
+CREATE INDEX idx_urr_user_del_role ON user_role_relation (`USER_ID`, `DELETED`, `ROLE_ID`);
+CREATE INDEX idx_urr_role_del_user ON user_role_relation (`ROLE_ID`, `DELETED`, `USER_ID`);
 
 /*Data for the table `user_role_relation` */
+INSERT INTO `zblog`.`user_role_relation` (`USER_ID`, `ROLE_ID`, `DELETED`) VALUES (3, 3561010960472735746, 0);
 
 /*Table structure for table `permission` */
 DROP TABLE IF EXISTS `permission`;

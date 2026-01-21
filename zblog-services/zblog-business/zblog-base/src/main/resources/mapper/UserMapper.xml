@@ -55,7 +55,8 @@
 
     <select id="selectUserById" resultType="com.github.stazxr.zblog.base.domain.entity.User">
         SELECT
-            u.*, ull.LOGIN_ADDRESS AS LAST_LOGIN_ADDRESS, ull.LOGIN_TIME AS LAST_LOGIN_TIME
+            u.*, ull.LOGIN_ADDRESS AS LAST_LOGIN_ADDRESS,
+            ull.LOGIN_TIME AS LAST_LOGIN_TIME
         FROM user u
         LEFT JOIN (
             SELECT USER_ID, LOGIN_ADDRESS, LOGIN_TIME FROM user_login_log
@@ -117,8 +118,8 @@
         <set>
             LOGIN_ERROR_COUNT = LOGIN_ERROR_COUNT + 1
             <if test="maxFailCount >= 0">
-                , USER_STATUS = CASE WHEN LOGIN_ERROR_COUNT + 1 >= #{maxFailCount} THEN 2 ELSE USER_STATUS END,
-                LOCKED_EXPIRE_TIME = CASE WHEN LOGIN_ERROR_COUNT + 1 >= #{maxFailCount} THEN #{lockedExpireTime} ELSE LOCKED_EXPIRE_TIME END
+                , USER_STATUS = CASE WHEN LOGIN_ERROR_COUNT + 1 > #{maxFailCount} THEN 2 ELSE USER_STATUS END,
+                LOCKED_EXPIRE_TIME = CASE WHEN LOGIN_ERROR_COUNT + 1 > #{maxFailCount} THEN #{lockedExpireTime} ELSE LOCKED_EXPIRE_TIME END
             </if>
         </set>
         WHERE ID = #{userId}
@@ -138,36 +139,36 @@
             SELECT USER_ID, ROLE_ID FROM user_role_relation WHERE DELETED = 0
         ) ur ON ur.USER_ID = u.ID
         WHERE u.DELETED = 0
-        <if test="username != null and username != ''">
-            <bind name="usernameBind" value="'%' + username + '%'"/>
+        <if test="query.username != null and query.username != ''">
+            <bind name="usernameBind" value="'%' + query.username + '%'"/>
             AND u.USERNAME LIKE #{usernameBind}
         </if>
-        <if test="nickname != null and nickname != ''">
-            <bind name="nicknameBind" value="'%' + nickname + '%'"/>
+        <if test="query.nickname != null and query.nickname != ''">
+            <bind name="nicknameBind" value="'%' + query.nickname + '%'"/>
             AND u.NICKNAME LIKE #{nicknameBind}
         </if>
-        <if test="email != null and email != ''">
-            <bind name="emailBind" value="'%' + email + '%'"/>
+        <if test="query.email != null and query.email != ''">
+            <bind name="emailBind" value="'%' + query.email + '%'"/>
             AND u.EMAIL LIKE #{emailBind}
         </if>
-        <if test="userType != null">
-            AND u.USER_TYPE = #{userType}
+        <if test="query.userType != null">
+            AND u.USER_TYPE = #{query.userType}
         </if>
-        <if test="userStatus != null">
-            AND u.USER_STATUS = #{userStatus}
+        <if test="query.userStatus != null">
+            AND u.USER_STATUS = #{query.userStatus}
         </if>
-        <if test="loginChan != null and loginChan != ''">
-            AND ull.LOGIN_CHAN = #{loginChan}
+        <if test="query.loginChan != null and query.loginChan != ''">
+            AND ull.LOGIN_CHAN = #{query.loginChan}
         </if>
-        <if test="loginType != null and loginType != ''">
-            AND ull.LOGIN_TYPE = #{loginType}
+        <if test="query.loginType != null and query.loginType != ''">
+            AND ull.LOGIN_TYPE = #{query.loginType}
         </if>
-        <if test="loginAddress != null and loginAddress != ''">
-            <bind name="loginAddressBind" value="'%' + loginAddress + '%'"/>
+        <if test="query.loginAddress != null and query.loginAddress != ''">
+            <bind name="loginAddressBind" value="'%' + query.loginAddress + '%'"/>
             AND ull.LOGIN_ADDRESS LIKE #{loginAddressBind}
         </if>
-        <if test="roleId != null">
-            AND u.ID IN (SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{roleId} AND DELETED = 0)
+        <if test="query.roleId != null">
+            AND u.ID IN (SELECT USER_ID FROM user_role_relation WHERE ROLE_ID = #{query.roleId} AND DELETED = 0)
         </if>
         ORDER BY u.SUCCESS_LOGIN_TIME DESC
     </select>
@@ -202,19 +203,19 @@
         SELECT
             ID, DATE_FORMAT(EVENT_TIME, '%Y-%m-%d %H:%i:%s') AS EVENT_TIME, `DESCRIPTION`, ADDRESS, EXEC_RESULT, EXEC_MESSAGE
         FROM log
-        WHERE OPERATE_USER = #{username} AND LOG_TYPE = 2
-        <if test="description != null and description != ''">
-            <bind name="descriptionBind" value="'%' + description + '%'"/>
+        WHERE OPERATE_USER = #{query.username} AND LOG_TYPE = 2
+        <if test="query.description != null and query.description != ''">
+            <bind name="descriptionBind" value="'%' + query.description + '%'"/>
             AND `DESCRIPTION` LIKE #{descriptionBind}
         </if>
-        <if test="execResult != null">
-            AND EXEC_RESULT = #{execResult}
+        <if test="query.execResult != null">
+            AND EXEC_RESULT = #{query.execResult}
         </if>
-        <if test="eventStartTime != null and eventStartTime != ''">
-            AND EVENT_TIME &gt;= STR_TO_DATE(#{eventStartTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.eventStartTime != null and query.eventStartTime != ''">
+            AND EVENT_TIME &gt;= STR_TO_DATE(#{query.eventStartTime}, '%Y-%m-%d %H:%i:%s')
         </if>
-        <if test="eventEndTime != null and eventEndTime != ''">
-            AND EVENT_TIME &lt;= STR_TO_DATE(#{eventEndTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.eventEndTime != null and query.eventEndTime != ''">
+            AND EVENT_TIME &lt;= STR_TO_DATE(#{query.eventEndTime}, '%Y-%m-%d %H:%i:%s')
         </if>
         ORDER BY EVENT_TIME DESC
     </select>

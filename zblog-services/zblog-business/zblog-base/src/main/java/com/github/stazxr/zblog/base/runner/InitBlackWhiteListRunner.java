@@ -4,7 +4,6 @@ import com.github.stazxr.zblog.bas.security.cache.BlackWhiteListCache;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -72,7 +71,7 @@ public class InitBlackWhiteListRunner extends BlackWhiteListCache
      * @param event the event to respond to
      */
     @Override
-    public void onApplicationEvent(@NotNull ApplicationStartedEvent event) {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
         // 开启刷新黑白名单任务
         start();
     }

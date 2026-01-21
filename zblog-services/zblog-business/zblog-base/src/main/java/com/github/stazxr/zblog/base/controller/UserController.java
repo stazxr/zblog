@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -39,27 +39,27 @@ public class UserController {
      * 分页查询用户列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<UserVo>
+     * @return IPage<UserVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询用户列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询用户列表", code = "USERQ001")
-    public PageInfo<UserVo> pageList(UserQueryDto queryDto) {
+    public IPage<UserVo> pageList(UserQueryDto queryDto) {
         return userService.queryUserListByPage(queryDto);
     }
 
     /**
-         * 分页查询用户列表（公共）
+     * 分页查询用户列表（公共）
      *
      * @param queryDto 查询参数
-     * @return PageInfo<UserVo>
+     * @return IPage<UserVo>
      */
     @GetMapping(value = "/pageListOfPublic")
     @ApiOperation(value = "分页查询用户列表（公共）")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询用户列表（公共）", code = "USERQ002", level = RouterLevel.PUBLIC)
-    public PageInfo<UserVo> pageListOfPublic(UserQueryDto queryDto) {
+    public IPage<UserVo> pageListOfPublic(UserQueryDto queryDto) {
         return userService.queryUserListByPage(queryDto);
     }
 

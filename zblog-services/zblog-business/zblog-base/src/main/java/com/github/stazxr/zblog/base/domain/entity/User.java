@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
@@ -97,6 +98,7 @@ public class User extends SecurityUser {
      * 上次登录时间
      */
     @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime lastLoginTime;
 
     /**
@@ -190,6 +192,21 @@ public class User extends SecurityUser {
             return lockedExpireTime == null || LocalDateTime.now().isAfter(lockedExpireTime);
         }
         // 用户未锁定
+        return true;
+    }
+
+    /**
+     * 检查用户账户是否启用
+     *
+     * @return 如果账户已启用，则返回 true；否则返回 false
+     */
+    @Override
+    public boolean isEnabled() {
+        if (isAccountNonLocked()) {
+            // 用户未锁定
+            return !UserStatus.FORBID.getStatus().equals(getUserStatus());
+        }
+        // 用户已锁定
         return true;
     }
 

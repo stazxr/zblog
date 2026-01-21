@@ -19,16 +19,16 @@
             (SELECT USERNAME FROM user u WHERE u.ID = r.UPDATE_USER) AS UPDATE_USERNAME
         FROM role r
         WHERE DELETED = '0'
-        <if test="roleName != null and roleName != ''">
-            <bind name="roleNameBind" value="'%' + roleName + '%'"/>
+        <if test="query.roleName != null and query.roleName != ''">
+            <bind name="roleNameBind" value="'%' + query.roleName + '%'"/>
             AND ROLE_NAME LIKE #{roleNameBind}
         </if>
-        <if test="roleCode != null and roleCode != ''">
-            <bind name="roleCodeBind" value="'%' + roleCode + '%'"/>
+        <if test="query.roleCode != null and query.roleCode != ''">
+            <bind name="roleCodeBind" value="'%' + query.roleCode + '%'"/>
             AND ROLE_CODE LIKE #{roleCodeBind}
         </if>
-        <if test="enabled != null">
-            AND ENABLED = #{enabled}
+        <if test="query.enabled != null">
+            AND ENABLED = #{query.enabled}
         </if>
         ORDER BY CREATE_TIME
     </select>

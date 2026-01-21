@@ -1,12 +1,16 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -19,10 +23,11 @@ public interface RoleMapper extends BaseMapper<Role> {
     /**
      * 查询角色列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
-     * @return roleList
+     * @return IPage<RoleVo>
      */
-    List<RoleVo> selectRoleList(RoleQueryDto queryDto);
+    IPage<RoleVo> selectRoleList(@Param("page") Page<RoleVo> page, @Param("query") RoleQueryDto queryDto);
 
     /**
      * 查询角色详情
@@ -40,4 +45,13 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return 角色编码集合。
      */
     Set<String> selectResourceRoles(@Param("requestUri") String requestUri, @Param("requestMethod") String requestMethod);
+
+    /**
+     * 判断是否存在，忽略逻辑删除
+     *
+     * @param queryWrapper 查询条件
+     * @return boolean
+     */
+    @Select("SELECT IF(EXISTS (SELECT 1 FROM role ${ew.customSqlSegment}), 1, 0)")
+    boolean existsIgnoreDeleted(@Param(Constants.WRAPPER) LambdaQueryWrapper<Role> queryWrapper);
 }

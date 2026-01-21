@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
@@ -108,13 +109,13 @@ public class UserCenterController {
      * 分页查询用户操作日志列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
+     * @return IPage<LogVo>
      */
     @GetMapping("/pageUserLogList")
     @ApiOperation(value = "分页查询用户操作日志列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询用户操作日志列表", code = "pageUserLogList", level = RouterLevel.PUBLIC)
-    public PageInfo<LogVo> pageUserLogList(UserLogQueryDto queryDto) {
+    public IPage<LogVo> pageUserLogList(UserLogQueryDto queryDto) {
         return userCenterService.queryUserLogListByPage(queryDto);
     }
 }

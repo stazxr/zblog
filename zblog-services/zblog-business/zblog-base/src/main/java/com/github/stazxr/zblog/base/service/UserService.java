@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.base.domain.dto.UserDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
@@ -19,9 +19,9 @@ public interface UserService extends SecurityUserService, IService<User> {
      * 分页查询用户列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<UserVo>
+     * @return IPage<UserVo>
      */
-    PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto);
+    IPage<UserVo> queryUserListByPage(UserQueryDto queryDto);
 
     /**
      * 查询用户详情

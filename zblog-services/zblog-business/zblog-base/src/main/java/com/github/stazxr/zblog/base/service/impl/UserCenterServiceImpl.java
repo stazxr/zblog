@@ -2,10 +2,9 @@ package com.github.stazxr.zblog.base.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.encryption.util.RsaUtils;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
@@ -155,7 +154,7 @@ public class UserCenterServiceImpl implements UserCenterService {
         boolean isSameOldEmail = emailDto.getEmail().equals(loginUser.getEmail());
         Assert.failIfTrue(isSameOldEmail, ExpMessageCode.of("valid.usercenter.email.sameAsCurrent"));
         boolean emailValid = RegexUtils.match(emailDto.getEmail(), RegexUtils.Regex.EMAIL_REGEX);
-        Assert.failIfFalse(emailValid, ExpMessageCode.of("valid.usercenter.email.patternError"));
+        Assert.failIfFalse(emailValid, ExpMessageCode.of("valid.usercenter.email.pattern"));
         Assert.failIfTrue(checkEmailExist(loginUser.getId(), emailDto.getEmail()), ExpMessageCode.of("valid.usercenter.email.exists"));
         // 数据入库
         Assert.affectOneRow(userMapper.updateUserEmail(loginUser.getId(), emailDto.getEmail()), ExpMessageCode.of("result.usercenter.email.failed"));
@@ -185,20 +184,18 @@ public class UserCenterServiceImpl implements UserCenterService {
      * 分页查询用户操作日志列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
+     * @return IPage<LogVo>
      */
     @Override
-    public PageInfo<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto) {
+    public IPage<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto) {
         // 设置用户信息
         SecurityUser loginUser = SecurityUtils.getLoginUser();
         queryDto.setUsername(loginUser.getUsername());
         // 参数检查
         queryDto.checkPage();
         // 分页查询
-        try (Page<LogVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<LogVo> dataList = userMapper.selectUserLogList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<LogVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return userMapper.selectUserLogList(page, queryDto);
     }
 
     private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
@@ -268,7 +265,7 @@ public class UserCenterServiceImpl implements UserCenterService {
         // 全局不能重复
         LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getNickname, nickname);
         queryWrapper.ne(User::getId, userId);
-        return userMapper.exists(queryWrapper);
+        return userMapper.existsIgnoreDeleted(queryWrapper);
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

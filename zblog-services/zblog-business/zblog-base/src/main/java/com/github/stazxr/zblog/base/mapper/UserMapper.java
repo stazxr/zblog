@@ -1,14 +1,19 @@
 package com.github.stazxr.zblog.base.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
+import com.github.stazxr.zblog.core.base.BaseMapper;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,10 +84,11 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 查询用户列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
-     * @return List<UserVo>
+     * @return IPage<UserVo>
      */
-    List<UserVo> selectUserList(UserQueryDto queryDto);
+    IPage<UserVo> selectUserList(@Param("page") Page<UserVo> page, @Param("query") UserQueryDto queryDto);
 
     /**
      * 查询用户详情
@@ -142,8 +148,18 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 查询用户操作日志列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
-     * @return List<LogVo>
+     * @return IPage<LogVo>
      */
-    List<LogVo> selectUserLogList(UserLogQueryDto queryDto);
+    IPage<LogVo> selectUserLogList(@Param("page") Page<LogVo> page, @Param("query") UserLogQueryDto queryDto);
+
+    /**
+     * 判断是否存在，忽略逻辑删除
+     *
+     * @param queryWrapper 查询条件
+     * @return boolean
+     */
+    @Select("SELECT IF(EXISTS (SELECT 1 FROM user ${ew.customSqlSegment}), 1, 0)")
+    boolean existsIgnoreDeleted(@Param(Constants.WRAPPER) LambdaQueryWrapper<User> queryWrapper);
 }

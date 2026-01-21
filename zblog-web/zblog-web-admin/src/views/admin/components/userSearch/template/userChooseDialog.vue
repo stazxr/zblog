@@ -171,11 +171,11 @@ export default {
       this.tableLoading = true
       this.$mapi.user.pageListOfPublic(param).then(res => {
         const { data } = res
-        this.tableData = data.list
         this.total = data.total
+        this.tableData = data.records
       }).catch(_ => {
-        this.tableData = []
         this.total = 0
+        this.tableData = []
       }).finally(() => {
         this.tableLoading = false
       })

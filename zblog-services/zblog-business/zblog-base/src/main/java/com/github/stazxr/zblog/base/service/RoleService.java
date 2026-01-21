@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.RoleDto;
@@ -24,9 +24,9 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
      * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
+     * @return IPage<RoleVo>
      */
-    PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto);
+    IPage<RoleVo> queryRoleListByPage(RoleQueryDto queryDto);
 
     /**
      * 查询角色列表

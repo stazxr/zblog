@@ -33,14 +33,14 @@ public class RoleDto extends BaseDto {
     /**
      * 角色名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.role.roleName.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.role.roleName.required}")
     @ApiModelProperty(value = "角色名称")
     private String roleName;
 
     /**
      * 角色编码
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.role.roleCode.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.role.roleCode.required}")
     @ApiModelProperty(value = "角色编码")
     private String roleCode;
 
@@ -53,7 +53,7 @@ public class RoleDto extends BaseDto {
     /**
      * 角色状态
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.role.enabled.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.role.enabled.required}")
     @ApiModelProperty(value = "角色状态")
     private Boolean enabled;
 }

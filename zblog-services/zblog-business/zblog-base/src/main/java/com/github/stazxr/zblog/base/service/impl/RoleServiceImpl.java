@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.validation.Assert;
@@ -58,10 +57,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
+     * @return IPage<RoleVo>
      */
     @Override
-    public PageInfo<RoleVo> queryRoleListByPage(RoleQueryDto queryDto) {
+    public IPage<RoleVo> queryRoleListByPage(RoleQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         if (StringUtils.isNotBlank(queryDto.getRoleName())) {
@@ -71,10 +70,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             queryDto.setRoleCode(queryDto.getRoleCode().trim());
         }
         // 分页查询
-        try (Page<RoleVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<RoleVo> dataList = roleMapper.selectRoleList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<RoleVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return roleMapper.selectRoleList(page, queryDto);
     }
 
     /**
@@ -85,7 +82,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
-        return roleMapper.selectRoleList(queryDto);
+        Page<RoleVo> page = new Page<>(1, Integer.MAX_VALUE);
+        page.setSearchCount(false);
+        return roleMapper.selectRoleList(page, queryDto).getRecords();
     }
 
     /**
@@ -188,7 +187,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
         // 判断角色是否关联用户
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
-        Assert.failIfFalse(userIds.isEmpty(), ExpMessageCode.of("valid.role.delete.hasUser"));
+        Assert.failIfFalse(userIds.isEmpty(), ExpMessageCode.of("valid.role.delete.relatedUser"));
         // 删除角色
         Assert.affectOneRow(roleMapper.deleteById(roleId), ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色关联信息
@@ -255,13 +254,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private void checkRole(Role role) {
         // 检查角色名称
         role.setRoleName(role.getRoleName().trim());
-        Assert.failIfTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exist"));
+        Assert.failIfTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exists"));
 
         // 检查角色编码
         role.setRoleCode(role.getRoleCode().trim());
-        Assert.failIfFalse(role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.patternError"));
+        Assert.failIfFalse(role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.pattern"));
         Assert.failIfTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), ExpMessageCode.of("valid.role.roleCode.forbid"));
-        Assert.failIfTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exist"));
+        Assert.failIfTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exists"));
     }
 
     private boolean checkRoleNameExist(Role role) {
@@ -281,7 +280,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             if (role.getId() != null) {
                 queryWrapper.ne(Role::getId, role.getId());
             }
-            return roleMapper.exists(queryWrapper);
+            return roleMapper.existsIgnoreDeleted(queryWrapper);
         }
         return false;
     }

@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
@@ -186,7 +185,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return PageInfo<UserVo>
      */
     @Override
-    public PageInfo<UserVo> queryUserListByPage(UserQueryDto queryDto) {
+    public IPage<UserVo> queryUserListByPage(UserQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         if (StringUtils.isNotBlank(queryDto.getUsername())) {
@@ -201,12 +200,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (StringUtils.isNotBlank(queryDto.getLoginAddress())) {
             queryDto.setLoginAddress(queryDto.getLoginAddress().trim());
         }
-
         // 分页查询
-        try (Page<UserVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<UserVo> dataList = userMapper.selectUserList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<UserVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return userMapper.selectUserList(page, queryDto);
     }
 
     /**
@@ -361,18 +357,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
     }
 
-    private boolean checkUsernameExist(User user) {
-        // 用户名全局唯一，不允许重复
-        if (user.getUsername() != null) {
-            LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getUsername, user.getUsername());
-            if (user.getId() != null) {
-                queryWrapper.ne(User::getId, user.getId());
-            }
-            return userMapper.exists(queryWrapper);
-        }
-        return false;
-    }
-
     private boolean checkEmailExist(User user) {
         if (user.getEmail() != null) {
             LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getEmail, user.getEmail());
@@ -385,6 +369,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return false;
     }
 
+    private boolean checkUsernameExist(User user) {
+        // 用户名全局唯一，不允许重复
+        if (user.getUsername() != null) {
+            LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getUsername, user.getUsername());
+            if (user.getId() != null) {
+                queryWrapper.ne(User::getId, user.getId());
+            }
+            return userMapper.existsIgnoreDeleted(queryWrapper);
+        }
+        return false;
+    }
+
     private boolean checkNicknameExist(User user) {
         // 昵称全局唯一，不允许重复
         if (user.getNickname() != null) {
@@ -392,7 +388,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (user.getId() != null) {
                 queryWrapper.ne(User::getId, user.getId());
             }
-            return userMapper.exists(queryWrapper);
+            return userMapper.existsIgnoreDeleted(queryWrapper);
         }
         return false;
     }

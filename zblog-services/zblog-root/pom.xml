@@ -60,9 +60,6 @@
         <spring-amqp.version>2.3.9</spring-amqp.version>
         <spring-swagger.version>3.0.0</spring-swagger.version>
         <spring-druid.version>1.2.27</spring-druid.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
-        <!-- springboot 2.5.2 - 1.3.0; springboot 2.6.3 - 1.4.1 -->
-        <pagehelper.version>1.4.1</pagehelper.version>
         <!-- third party properties -->
         <lombok.version>1.18.22</lombok.version>
         <hutool.version>5.8.18</hutool.version>

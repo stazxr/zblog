@@ -36,7 +36,6 @@ export default {
   pageUsersByRoleId: params => {
     return api.httpRequest().get(`${roleApi}/pageUsersByRoleId`, params)
   },
-
   // 删除角色
   deleteRole: params => {
     return api.httpRequest().post(`${roleApi}/deleteRole`, qs.stringify(params), {

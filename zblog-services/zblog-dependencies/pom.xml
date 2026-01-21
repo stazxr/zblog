@@ -71,9 +71,10 @@
         <spring-knife4j.version>3.0.3</spring-knife4j.version>
         <mysql.version>8.0.33</mysql.version>
         <spring-druid.version>1.2.27</spring-druid.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mybatis.version>3.5.15</mybatis.version>
         <!-- springboot 2.5.2 - 1.3.0; springboot 2.6.3 - 1.4.1 -->
-        <pagehelper.version>1.4.1</pagehelper.version>
+        <pagehelper.version>1.4.2</pagehelper.version>
         <nimbus-jose-jwt.version>9.10</nimbus-jose-jwt.version>
         <oshi.version>3.9.1</oshi.version>
         <lombok.version>1.18.22</lombok.version>
@@ -245,6 +246,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- Mybatis-Plus -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
             <!-- Page Helper -->
             <dependency>

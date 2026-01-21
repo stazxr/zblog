@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -44,13 +44,13 @@ public class RoleController {
      * 分页查询角色列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<RoleVo>
+     * @return Page<RoleVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询角色列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询角色列表", code = "ROLEQ001")
-    public PageInfo<RoleVo> pageList(RoleQueryDto queryDto) {
+    public IPage<RoleVo> pageList(RoleQueryDto queryDto) {
         return roleService.queryRoleListByPage(queryDto);
     }
 

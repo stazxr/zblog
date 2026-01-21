@@ -249,7 +249,7 @@ export default {
         this.$mapi.user.pageListOfPublic(param).then(res => {
           const { data } = res
           this.total = data.total
-          this.tableData = data.list
+          this.tableData = data.records
         }).catch(_ => {
           this.total = 0
           this.tableData = []

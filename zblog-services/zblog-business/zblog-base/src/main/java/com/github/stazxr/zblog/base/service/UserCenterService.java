@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
@@ -54,7 +55,7 @@ public interface UserCenterService {
      * 分页查询用户操作日志列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
+     * @return IPage<LogVo>
      */
-    PageInfo<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto);
+    IPage<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto);
 }
