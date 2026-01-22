@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
@@ -41,13 +41,13 @@ public class DictController {
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<DictVo>
+     * @return IPage<DictVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询字典列表")
     @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
     @Router(name = "分页查询字典列表", code = "DICTQ001")
-    public PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto) {
+    public IPage<DictVo> queryDictListByPage(DictQueryDto queryDto) {
         return dictService.queryDictListByPage(queryDto);
     }
 

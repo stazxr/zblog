@@ -41,14 +41,14 @@ public class DictDto extends BaseDto {
     /**
      * 字典名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.dict.dictName.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.dict.dictName.required}")
     @ApiModelProperty("字典名称")
     private String dictName;
 
     /**
      * 字典类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictType.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictType.required}")
     @ApiModelProperty("字典类型")
     private Integer dictType;
 

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
@@ -21,9 +21,9 @@ public interface DictService extends IService<Dict> {
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<DictVo>
+     * @return IPage<DictVo>
      */
-    PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto);
+    IPage<DictVo> queryDictListByPage(DictQueryDto queryDto);
 
     /**
      * 查询字典子列表

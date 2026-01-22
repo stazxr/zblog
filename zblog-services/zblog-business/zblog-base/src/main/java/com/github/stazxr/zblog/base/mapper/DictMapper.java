@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
@@ -19,16 +21,17 @@ public interface DictMapper extends BaseMapper<Dict> {
     /**
      * 分页查询字典列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
-     * @return dictList
+     * @return IPage<DictVo>
      */
-    List<DictVo> selectDictList(DictQueryDto queryDto);
+    IPage<DictVo> selectDictList(@Param("page") Page<DictVo> page, @Param("query") DictQueryDto queryDto);
 
     /**
      * 查询字典子列表
      *
      * @param pid PID
-     * @return dictList
+     * @return List<DictVo>
      */
     List<DictVo> selectChildList(@Param("pid") Long pid);
 

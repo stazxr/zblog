@@ -21,7 +21,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * 查询权限列表
      *
      * @param queryDto 查询参数
-     * @return PermissionVoList
+     * @return List<PermissionVo>
      */
     List<PermissionVo> selectPermList(PermissionQueryDto queryDto);
 
@@ -37,7 +37,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * 查询权限编码列表
      *
      * @param searchKey 查询条件
-     * @return PermCodeVoList
+     * @return List<PermCodeVo>
      */
     List<PermCodeVo> selectPermCodes(@Param("searchKey") String searchKey);
 
@@ -53,7 +53,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * 根据权限id查询角色编码列表
      *
      * @param permId 权限id
-     * @return 角色编码列表
+     * @return List<String> 角色编码列表
      */
     List<String> selectRoleCodesByPermId(@Param("permId") Long permId);
 
@@ -61,7 +61,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
      * 根据权限id查询用户id列表
      *
      * @param permId 权限id
-     * @return 用户id列表
+     * @return List<Long> 用户id列表
      */
     List<Long> selectUserIdsByPermId(@Param("permId") Long permId);
 }

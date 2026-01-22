@@ -43,7 +43,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
     public PageInfo<LogVo> queryLogListByPage(LogQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
-        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.NotNull"));
+        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.required"));
         checkCommonParam(queryDto);
         // 分页查询
         try (Page<LogVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
@@ -61,7 +61,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
     @Override
     public void exportLogList(LogQueryDto queryDto, HttpServletResponse response) {
         // 参数检查
-        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.NotNull"));
+        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.required"));
         checkCommonParam(queryDto);
         // 查询并遍历数据
         List<LogVo> dataList = logMapper.selectLogList(queryDto);
@@ -106,7 +106,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
      */
     @Override
     public void deleteLog(LogQueryDto queryDto) {
-        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.NotNull"));
+        Assert.notNull(queryDto.getLogType(), ExpMessageCode.of("valid.log.logType.required"));
         checkCommonParam(queryDto);
         logMapper.deleteLog(queryDto);
     }

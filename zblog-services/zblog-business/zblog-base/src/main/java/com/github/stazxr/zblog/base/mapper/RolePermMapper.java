@@ -52,7 +52,7 @@ public interface RolePermMapper {
      * 查询角色对应的权限序号列表
      *
      * @param roleId 角色ID
-     * @return permIdList
+     * @return Set<Long> permIdList
      */
     Set<Long> selectPermIdsByRoleId(@Param("roleId") Long roleId);
 }

@@ -42,7 +42,7 @@ public interface RoleMapper extends BaseMapper<Role> {
      *
      * @param requestUri    请求的 URL 路径，表示要访问的资源地址。
      * @param requestMethod 请求的 HTTP 方法类型（例如 GET、POST 等）
-     * @return 角色编码集合。
+     * @return Set<String> 角色编码集合。
      */
     Set<String> selectResourceRoles(@Param("requestUri") String requestUri, @Param("requestMethod") String requestMethod);
 

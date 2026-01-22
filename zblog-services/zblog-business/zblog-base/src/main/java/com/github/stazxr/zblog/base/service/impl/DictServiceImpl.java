@@ -1,9 +1,8 @@
 package com.github.stazxr.zblog.base.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.converter.DictConverter;
@@ -38,20 +37,18 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<DictVo>
+     * @return IPage<DictVo>
      */
     @Override
-    public PageInfo<DictVo> queryDictListByPage(DictQueryDto queryDto) {
+    public IPage<DictVo> queryDictListByPage(DictQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         if (StringUtils.isNotBlank(queryDto.getDictName())) {
             queryDto.setDictName(queryDto.getDictName().trim());
         }
         // 分页查询
-        try (Page<DictVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<DictVo> dataList = dictMapper.selectDictList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<DictVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return dictMapper.selectDictList(page, queryDto);
     }
 
     /**
@@ -62,7 +59,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public List<DictVo> queryChildList(Long pid) {
-        Assert.notNull(pid, ExpMessageCode.of("valid.dict.pid.NotNull"));
+        Assert.notNull(pid, ExpMessageCode.of("valid.dict.pid.required"));
         return dictMapper.selectChildList(pid);
     }
 
@@ -126,7 +123,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
         Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
         // 存在子节点无法被删除
-        Assert.failIfTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.deleteWithChildren"));
+        Assert.failIfTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.delete.withChildren"));
         // 删除字典
         Assert.affectOneRow(dictMapper.deleteById(dictId), ExpMessageCode.of("result.common.delete.failed"));
     }
@@ -139,7 +136,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public List<NameValue> queryConfListByDictKey(String dictKey) {
-        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
+        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.required"));
         return dictMapper.selectNameValuesByDictKey(dictKey);
     }
 
@@ -151,7 +148,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public String queryDictValueByDictKey(String dictKey) {
-        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
+        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.required"));
         return dictMapper.selectDictValueByDictKey(dictKey);
     }
 
@@ -168,13 +165,13 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dict.setEnabled(true);
         } else {
             // 项
-            Assert.notNull(dict.getPid(), ExpMessageCode.of("valid.dict.pid.NotNull"));
+            Assert.notNull(dict.getPid(), ExpMessageCode.of("valid.dict.pid.required"));
             Dict parentDict = dictMapper.selectById(dict.getPid());
             Assert.notNull(parentDict, ExpMessageCode.of("valid.dict.parent.notExist"));
             boolean parentIsGroup = DictType.GROUP.getValue().equals(parentDict.getDictType());
-            Assert.failIfFalse(parentIsGroup, ExpMessageCode.of("valid.dict.parentIsNotGroup"));
-            Assert.notNull(dict.getEnabled(), ExpMessageCode.of("valid.dict.enabled.NotNull"));
-            Assert.notBlank(dict.getDictKey(), ExpMessageCode.of("valid.dict.dictKey.NotBlank"));
+            Assert.failIfFalse(parentIsGroup, ExpMessageCode.of("valid.dict.parent.type"));
+            Assert.notNull(dict.getEnabled(), ExpMessageCode.of("valid.dict.enabled.required"));
+            Assert.notBlank(dict.getDictKey(), ExpMessageCode.of("valid.dict.dictKey.required"));
         }
     }
 }

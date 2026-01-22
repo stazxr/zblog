@@ -29,7 +29,7 @@ public interface UserMapper extends BaseMapper<User> {
      * 根据 {@code userId} 查询用户信息。
      *
      * @param userId 用户序列
-     * @return 用户的 {@link User} 实例
+     * @return User
      */
     User selectUserById(@Param("userId") Long userId);
 
@@ -45,14 +45,14 @@ public interface UserMapper extends BaseMapper<User> {
      * 根据 {@code userId} 查询用户角色信息。
      *
      * @param userId 用户 ID
-     * @return 用户角色列表
+     * @return List<Role> 用户角色列表
      */
     List<Role> selectRolesByUserId(@Param("userId") Long userId);
 
     /**
      * 查询所有的权限编码信息。
      *
-     * @return 权限编码列表
+     * @return List<String> 权限编码列表
      */
     List<String> selectAllMd5PermCodes();
 
@@ -60,7 +60,7 @@ public interface UserMapper extends BaseMapper<User> {
      * 根据 {@code userId} 查询用户权限信息。
      *
      * @param userId 用户 ID
-     * @return 用户权限列表
+     * @return List<String> 用户权限列表
      */
     List<String> selectMd5PermCodesByUserId(@Param("userId") Long userId);
 

@@ -7,8 +7,8 @@
             (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount
         FROM dict d
         WHERE DELETED = 0 AND DICT_TYPE = 1
-        <if test="dictName != null and dictName != ''">
-            <bind name="dictNameBind" value="'%' + dictName + '%'"/>
+        <if test="query.dictName != null and query.dictName != ''">
+            <bind name="dictNameBind" value="'%' + query.dictName + '%'"/>
             AND d.DICT_NAME LIKE #{dictNameBind}
         </if>
         ORDER BY DICT_SORT, DICT_NAME
