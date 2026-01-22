@@ -3,8 +3,8 @@
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RoleMapper">
     <select id="selectResourceRoles" resultType="java.lang.String">
         SELECT DISTINCT ROLE_CODE FROM role WHERE ID IN (
-            SELECT ROLE_ID FROM role_permission_relation WHERE PERM_ID IN (
-                SELECT ID FROM permission WHERE PERM_CODE IN (
+            SELECT ROLE_ID FROM role_permission_relation WHERE DELETED = 0 AND PERM_ID IN (
+                SELECT ID FROM permission p WHERE p.DELETED = 0 AND p.PERM_CODE IN (
                     SELECT RESOURCE_CODE FROM resource WHERE RESOURCE_CODE IS NOT NULL
                     AND RESOURCE_URI = #{requestUri} AND RESOURCE_METHOD = #{requestMethod}
                 )

@@ -32,10 +32,6 @@ export default {
   queryPermIdsByRoleId: params => {
     return api.httpRequest().get(`${roleApi}/queryPermIdsByRoleId`, params)
   },
-  // 分页查询角色对应的用户列表
-  pageUsersByRoleId: params => {
-    return api.httpRequest().get(`${roleApi}/pageUsersByRoleId`, params)
-  },
   // 删除角色
   deleteRole: params => {
     return api.httpRequest().post(`${roleApi}/deleteRole`, qs.stringify(params), {

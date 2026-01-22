@@ -2,21 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.RolePermMapper">
     <insert id="insertBatch">
-        INSERT INTO role_permission_relation (ROLE_ID, PERM_ID) VALUES
+        INSERT INTO role_permission_relation (ROLE_ID, PERM_ID, DELETED) VALUES
         <foreach collection="list" item="i" separator=",">
-            (#{i.roleId}, #{i.permId})
+            (#{i.roleId}, #{i.permId}, #{i.deleted})
         </foreach>
     </insert>
 
-    <delete id="deleteByPermId">
-        DELETE FROM role_permission_relation WHERE PERM_ID = #{permId}
+    <delete id="deleteByPermIdSoft">
+        UPDATE role_permission_relation SET DELETED = 1 WHERE PERM_ID = #{permId} AND DELETED = 0
     </delete>
 
-    <delete id="deleteByRoleId">
-        DELETE FROM role_permission_relation WHERE ROLE_ID = #{roleId}
+    <delete id="deleteByPermIdHard">
+        DELETE FROM role_permission_relation WHERE PERM_ID = #{permId} AND DELETED = 0
+    </delete>
+
+    <delete id="deleteByRoleIdSoft">
+        UPDATE role_permission_relation SET DELETED = 1 WHERE ROLE_ID = #{roleId} AND DELETED = 0
+    </delete>
+
+    <delete id="deleteByRoleIdHard">
+        DELETE FROM role_permission_relation WHERE ROLE_ID = #{roleId} AND DELETED = 0
     </delete>
 
     <select id="selectPermIdsByRoleId" resultType="java.lang.Long">
-        SELECT DISTINCT PERM_ID FROM role_permission_relation WHERE ROLE_ID = #{roleId}
+        SELECT DISTINCT PERM_ID FROM role_permission_relation WHERE DELETED = 0 AND ROLE_ID = #{roleId}
     </select>
 </mapper>

@@ -4,7 +4,6 @@
       title="用户选择"
       :visible.sync="dialogVisible"
       :fullscreen="device === 'mobile'"
-      :destroy-on-close="true"
       :close-on-click-modal="false"
       :close-on-press-escape="true"
       :before-close="handleClose"
@@ -12,7 +11,7 @@
       width="800px"
     >
       <div class="head-container">
-        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
+        <muses-search-form ref="userChooseSearchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
           <muses-search-form-item label="" prop="search-username">
             <el-input id="search-username" v-model="filters.username" clearable placeholder="用户名" @keyup.enter.native="search" />
           </muses-search-form-item>
@@ -20,20 +19,18 @@
             <el-input id="search-nickname" v-model="filters.nickname" clearable placeholder="用户昵称" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userType">
-            <el-select id="search-userType" v-model="filters.userType" placeholder="用户类型" clearable @change="search">
-              <el-option label="系统用户" :value="0" />
-              <el-option label="普通用户" :value="1" />
-              <el-option label="管理员用户" :value="2" />
-              <el-option label="测试用户" :value="3" />
-              <el-option label="临时用户" :value="4" />
+            <el-select id="search-userType" v-model="filters.userType" placeholder="用户类型" clearable>
+              <el-option v-for="item in userTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userStatus">
-            <el-select id="search-userStatus" v-model="filters.userStatus" placeholder="用户状态" clearable @change="search">
-              <el-option label="正常" :value="0" />
-              <el-option label="禁用" :value="1" />
-              <el-option label="锁定" :value="2" />
+            <el-select id="search-userStatus" v-model="filters.userStatus" placeholder="用户状态" clearable>
+              <el-option v-for="item in userStatusList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item btn btn-open-name="" btn-close-name="">
+            <el-button type="success" @click="search()">查 询</el-button>
+            <el-button type="warning" @click="resetSearch()">重 置</el-button>
           </muses-search-form-item>
         </muses-search-form>
       </div>
@@ -42,7 +39,7 @@
           <el-table-column type="selection" :selectable="selectable" width="55" />
           <el-table-column :show-overflow-tooltip="true" prop="username" label="用户名" align="center" />
           <el-table-column :show-overflow-tooltip="true" prop="nickname" label="用户昵称" align="center" />
-          <el-table-column :show-overflow-tooltip="true" prop="lastLoginTime" label="登录时间" align="center" />
+          <el-table-column :show-overflow-tooltip="true" prop="successLoginTime" label="登录时间" align="center" />
           <el-table-column :show-overflow-tooltip="true" prop="userType" label="用户类型" align="center" width="80">
             <template v-slot="scope">
               <span v-if="scope.row.userType === 0">系统用户</span>
@@ -75,10 +72,8 @@
         />
       </div>
       <div slot="footer" class="dialog-footer" style="text-align: center">
-        <el-button size="small" type="primary" :loading="submitLoading" @click="submit">确 认</el-button>
-        <el-button size="small" type="info" @click="cancel">取 消</el-button>
-        <el-button size="small" type="success" @click="search">查 询</el-button>
-        <el-button size="small" type="warning" @click="resetSearch">重 置</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="submit">确 认</el-button>
+        <el-button type="info" @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -103,11 +98,13 @@ export default {
   data() {
     return {
       filters: {
-        username: '',
-        nickname: '',
+        username: null,
+        nickname: null,
         userType: null,
         userStatus: null
       },
+      userTypeList: [],
+      userStatusList: [],
       selectRows: [],
       tableData: [],
       tableLoading: false,
@@ -122,13 +119,30 @@ export default {
       return this.$store.state.app.device
     }
   },
+  created() {
+    this.initData()
+  },
   methods: {
     initData() {
-      this.tableData = []
-      this.selectRows = []
-      this.tableLoading = false
-      this.submitLoading = false
+      this.loadUserTypeList()
+      this.loadUserStatusList()
       this.listTableData()
+    },
+    loadUserTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.userTypeList = data
+      }).catch(_ => {
+        this.userTypeList = []
+      })
+    },
+    loadUserStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_STATUS_CONFIG' }).then(res => {
+        const { data } = res
+        this.userStatusList = data
+      }).catch(_ => {
+        this.userStatusList = []
+      })
     },
     // 查询
     search() {
@@ -194,6 +208,8 @@ export default {
       Object.keys(this.filters).forEach(key => { this.filters[key] = null })
       this.page = 1
       this.pageSize = 10
+      this.userTypeList = []
+      this.userStatusList = []
       this.tableData = []
       this.selectRows = []
       this.tableLoading = false

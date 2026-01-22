@@ -148,6 +148,7 @@
 
     <!-- 新增用户 -->
     <userChooseDialog
+      v-if="userChooseDialogVisible"
       ref="userChooseDialogRef"
       :dialog-visible="userChooseDialogVisible"
       :type="type"
@@ -267,7 +268,6 @@ export default {
     // 新增用户关联关系
     addUserRelation() {
       this.userChooseDialogVisible = true
-      this.$refs.userChooseDialogRef.initData()
     },
     userChooseDown(result, data) {
       if (result && (data.length && data.length > 0)) {

@@ -21,18 +21,32 @@ public interface RolePermMapper {
     void insertBatch(@Param("list") List<RolePermissionRelation> rolePerms);
 
     /**
-     * 根据权限序列删除中间数据
+     * 根据权限序列删除中间数据（软删除）
      *
      * @param permId 权限ID
      */
-    void deleteByPermId(@Param("permId") Long permId);
+    void deleteByPermIdSoft(@Param("permId") Long permId);
 
     /**
-     * 根据角色序列删除中间数据
+     * 根据权限序列删除中间数据（硬删除）
+     *
+     * @param permId 权限ID
+     */
+    void deleteByPermIdHard(@Param("permId") Long permId);
+
+    /**
+     * 根据角色序列删除中间数据（软删除）
      *
      * @param roleId 角色ID
      */
-    void deleteByRoleId(@Param("roleId") Long roleId);
+    void deleteByRoleIdSoft(@Param("roleId") Long roleId);
+
+    /**
+     * 根据角色序列删除中间数据（硬删除）
+     *
+     * @param roleId 角色ID
+     */
+    void deleteByRoleIdHard(@Param("roleId") Long roleId);
 
     /**
      * 查询角色对应的权限序号列表

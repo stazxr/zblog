@@ -2,19 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.UserRoleMapper">
     <delete id="deleteByRoleIdSoft">
-        UPDATE user_role_relation SET DELETED = 1 WHERE ROLE_ID = #{roleId}
+        UPDATE user_role_relation SET DELETED = 1 WHERE ROLE_ID = #{roleId} AND DELETED = 0
     </delete>
 
     <delete id="deleteByRoleIdHard">
-        DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId}
+        DELETE FROM user_role_relation WHERE ROLE_ID = #{roleId} AND DELETED = 0
     </delete>
 
     <delete id="deleteByUserIdSoft">
-        UPDATE user_role_relation SET DELETED = 1 WHERE USER_ID = #{userId}
+        UPDATE user_role_relation SET DELETED = 1 WHERE USER_ID = #{userId} AND DELETED = 0
     </delete>
 
     <delete id="deleteByUserIdHard">
-        DELETE FROM user_role_relation WHERE USER_ID = #{userId}
+        DELETE FROM user_role_relation WHERE USER_ID = #{userId} AND DELETED = 0
     </delete>
 
     <delete id="batchDeleteUserRole">

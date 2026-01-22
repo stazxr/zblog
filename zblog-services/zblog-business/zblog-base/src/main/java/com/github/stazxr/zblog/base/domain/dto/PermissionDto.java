@@ -41,7 +41,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.perm.name.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.perm.name.required}")
     @ApiModelProperty("权限名称")
     private String permName;
 
@@ -54,14 +54,14 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.type.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.type.required}")
     @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮、4：外链")
     private Integer permType;
 
     /**
      * 权限访问级别
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.level.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.level.required}")
     @ApiModelProperty("权限访问级别")
     private Integer permLevel;
 
@@ -113,7 +113,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 是否启用
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.enabled.NotNull}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.enabled.required}")
     @ApiModelProperty(value = "是否启用")
     private Boolean enabled;
 }

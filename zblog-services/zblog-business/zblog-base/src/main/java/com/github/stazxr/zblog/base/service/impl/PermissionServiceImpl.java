@@ -186,7 +186,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
         // 删除权限
         Assert.affectOneRow(permissionMapper.deleteById(permId), ExpMessageCode.of("result.common.delete.failed"));
-        rolePermMapper.deleteByPermId(permId);
+        rolePermMapper.deleteByPermIdSoft(permId);
         // 删除相关缓存
         if (StringUtils.isNotBlank(dbPermission.getPermCode())) {
             removeCache(dbPermission.getId(), dbPermission.getPermCode(), null);
@@ -225,27 +225,27 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentPath(null);
             // 参数校验
             String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
-            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.required"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.pattern"));
+            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exists"));
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
             // 上级信息校验，要求上级只能是目录
             Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parentError"));
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
             // 菜单
             permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
             // 参数校验
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
-            Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.NotNull"));
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
+            Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.required"));
             String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.NotBlank"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.patternError"));
-            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exist"));
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.required"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.pattern"));
+            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exists"));
             if (permission.getPermCode() != null) {
-                Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+                Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exists"));
             }
-            Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.NotBlank"));
-            Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.NotBlank"));
+            Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.required"));
+            Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.required"));
 
             // 上级信息校验，要求上级只能是目录或空
             Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.menu.parentError"));
@@ -257,9 +257,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentPath(null);
             // 参数校验
             String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.NotBlank"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.patternError"));
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.NotNull"));
+            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.required"));
+            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.pattern"));
+            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
             // 上级信息校验，要求上级只能是目录
             Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parentError"));
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
@@ -271,8 +271,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentName(null);
             permission.setComponentPath(null);
             // 参数校验，权限编码校验，权限编码不能重复
-            Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.NotBlank"));
-            Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exist"));
+            Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.required"));
+            Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exists"));
             // 上级信息校验，要求上级只能是菜单或目录或空
             boolean dirOrMenu = PermissionType.DIR.getType().equals(parentType) ||
                     PermissionType.MENU.getType().equals(parentType);

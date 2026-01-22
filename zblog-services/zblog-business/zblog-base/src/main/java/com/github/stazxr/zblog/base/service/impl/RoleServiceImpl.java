@@ -145,13 +145,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Transactional(rollbackFor = Exception.class)
     public void authRole(RoleAuthDto authDto) {
         Long roleId = authDto.getRoleId();
-        rolePermMapper.deleteByRoleId(roleId);
+        rolePermMapper.deleteByRoleIdHard(roleId);
         if (authDto.getPermIds() != null && !authDto.getPermIds().isEmpty()) {
             List<RolePermissionRelation> rolePerms = new ArrayList<>();
             for (Long permId : authDto.getPermIds()) {
                 RolePermissionRelation rolePerm = new RolePermissionRelation();
                 rolePerm.setRoleId(roleId);
                 rolePerm.setPermId(permId);
+                rolePerm.setDeleted(Boolean.FALSE);
                 rolePerms.add(rolePerm);
             }
             rolePermMapper.insertBatch(rolePerms);
@@ -191,7 +192,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 删除角色
         Assert.affectOneRow(roleMapper.deleteById(roleId), ExpMessageCode.of("result.common.delete.failed"));
         // 删除角色关联信息
-        rolePermMapper.deleteByRoleId(roleId);
+        rolePermMapper.deleteByRoleIdSoft(roleId);
         // 清除缓存
         userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
     }

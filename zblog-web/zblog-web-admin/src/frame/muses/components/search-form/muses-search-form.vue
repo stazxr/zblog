@@ -73,7 +73,7 @@ export default {
           }
         })
 
-        // 未隐藏的最后一个表单项显示按钮
+        // 未隐藏的最后一个表单项显示按钮 TODO BUGS 当没有配置 btn 搜索表单不显示
         lastDom.componentInstance.isShowBtn = true
       }
     }
