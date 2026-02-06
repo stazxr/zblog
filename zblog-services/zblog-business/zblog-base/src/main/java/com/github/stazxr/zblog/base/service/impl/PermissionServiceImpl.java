@@ -3,21 +3,21 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheService;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
-import com.github.stazxr.zblog.bas.validation.AssertException;
 import com.github.stazxr.zblog.base.converter.PermissionConverter;
 import com.github.stazxr.zblog.base.domain.dto.PermissionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Permission;
 import com.github.stazxr.zblog.base.domain.enums.PermissionType;
+import com.github.stazxr.zblog.base.domain.error.PermErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
@@ -89,9 +89,8 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     @Override
     public PermissionVo queryPermDetail(Long permId) {
         // 查询权限信息
-        Assert.notNull(permId, ExpMessageCode.of("valid.common.id.required"));
         PermissionVo permissionVo = permissionMapper.selectPermDetail(permId);
-        Assert.notNull(permissionVo, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(permissionVo, BaseErrorCode.ECOREA001);
         // 查询角色编码列表
         permissionVo.setRoleCodeList(permissionMapper.selectRoleCodesByPermId(permId));
         return permissionVo;
@@ -129,11 +128,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         // 获取新增权限信息
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
         // 新增时，不允许传入 PermissionId
-        Assert.isNull(permission.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
+        ThrowUtils.when(permission.getId() != null).system(BaseErrorCode.SCOREB001);
         // 权限信息检查
         checkPermission(permission);
         // 新增权限
-        Assert.affectOneRow(permissionMapper.insert(permission), ExpMessageCode.of("result.common.add.failed"));
+        ThrowUtils.when(!save(permission)).system(BaseErrorCode.SCOREA001);
         // 删除相关缓存
         if (StringUtils.isNotBlank(permission.getPermCode())) {
             removeCache(permission.getId(), null, permission.getPermCode());
@@ -151,14 +150,14 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         Permission permission = permissionConverter.dtoToEntity(permissionDto);
         // 判断权限是否存在
         Permission dbPermission = permissionMapper.selectById(permission.getId());
-        Assert.notNull(dbPermission, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dbPermission, BaseErrorCode.ECOREA001);
         // 权限类型不允许编辑
         boolean permTypeIsSame = dbPermission.getPermType().equals(permission.getPermType());
-        Assert.failIfFalse(permTypeIsSame, ExpMessageCode.of("valid.perm.permType.notAllowedEdit"));
+        ThrowUtils.throwIf(!permTypeIsSame, PermErrorCode.EPERMA016);
         // 权限信息检查
         checkPermission(permission);
         // 编辑权限
-        Assert.affectOneRow(permissionMapper.updateById(permission), ExpMessageCode.of("result.common.edit.failed"));
+        ThrowUtils.when(!updateById(permission)).system(BaseErrorCode.SCOREA002);
         // 删除相关缓存
         if (!StringUtils.hasBlank(dbPermission.getPermCode(), permission.getPermCode())) {
             removeCache(permission.getId(), dbPermission.getPermCode(), permission.getPermCode());
@@ -175,17 +174,17 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     public void deletePermission(Long permId) {
         // 判断权限是否存在
         Permission dbPermission = permissionMapper.selectById(permId);
-        Assert.notNull(dbPermission, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dbPermission, BaseErrorCode.ECOREA001);
         // 判断是否存在子节点
         Integer permType = dbPermission.getPermType();
         boolean dirOrMenu = PermissionType.DIR.getType().equals(permType) ||
                 PermissionType.MENU.getType().equals(permType);
         if (dirOrMenu) {
             Long childCount = permissionMapper.selectCount(queryBuild().eq(Permission::getPid, permId));
-            Assert.failIfTrue(childCount > 0, ExpMessageCode.of("valid.perm.delete.withChildren"));
+            ThrowUtils.throwIf(childCount > 0, PermErrorCode.EPERMA017);
         }
         // 删除权限
-        Assert.affectOneRow(permissionMapper.deleteById(permId), ExpMessageCode.of("result.common.delete.failed"));
+        ThrowUtils.when(!removeById(permId)).system(BaseErrorCode.SCOREA003);
         rolePermMapper.deleteByPermIdSoft(permId);
         // 删除相关缓存
         if (StringUtils.isNotBlank(dbPermission.getPermCode())) {
@@ -212,7 +211,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setPid(null);
         } else {
             Permission parentPermission = permissionMapper.selectById(permission.getPid());
-            Assert.notNull(parentPermission, ExpMessageCode.of("valid.perm.parent.notExist"));
+            ThrowUtils.throwIfNull(parentPermission, PermErrorCode.EPERMA015);
             parentType = parentPermission.getPermType();
         }
 
@@ -225,30 +224,30 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentPath(null);
             // 参数校验
             String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.required"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.pattern"));
-            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exists"));
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
+            ThrowUtils.throwIfBlank(routerPath, PermErrorCode.EPERMA002);
+            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), PermErrorCode.EPERMA003);
+            ThrowUtils.throwIf(checkRouterPathExist(permission), PermErrorCode.EPERMA004);
+            ThrowUtils.throwIfNull(permission.getHidden(), PermErrorCode.EPERMA000);
             // 上级信息校验，要求上级只能是目录
-            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.dir.parent"));
+            ThrowUtils.throwIf(!PermissionType.DIR.getType().equals(parentType), PermErrorCode.EPERMA011);
         } else if (PermissionType.MENU.getType().equals(permission.getPermType())) {
             // 菜单
             permission.setPermCode(StringUtils.isBlank(permission.getPermCode()) ? null : permission.getPermCode());
             // 参数校验
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
-            Assert.notNull(permission.getCacheable(), ExpMessageCode.of("valid.perm.cacheable.required"));
-            String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.routerPath.required"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LETTER_REGEX), ExpMessageCode.of("valid.perm.routerPath.pattern"));
-            Assert.failIfTrue(checkRouterPathExist(permission), ExpMessageCode.of("valid.perm.routerPath.exists"));
-            if (permission.getPermCode() != null) {
-                Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exists"));
-            }
-            Assert.notBlank(permission.getComponentName(), ExpMessageCode.of("valid.perm.componentName.required"));
-            Assert.notBlank(permission.getComponentPath(), ExpMessageCode.of("valid.perm.componentPath.required"));
+            ThrowUtils.throwIfNull(permission.getHidden(), PermErrorCode.EPERMA000);
+            ThrowUtils.throwIfNull(permission.getCacheable(), PermErrorCode.EPERMA001);
 
+            String routerPath = permission.getRouterPath();
+            ThrowUtils.throwIfBlank(routerPath, PermErrorCode.EPERMA002);
+            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), PermErrorCode.EPERMA003);
+            ThrowUtils.throwIf(checkRouterPathExist(permission), PermErrorCode.EPERMA004);
+            if (permission.getPermCode() != null) {
+                ThrowUtils.throwIf(checkPermCodeExist(permission), PermErrorCode.EPERMA008);
+            }
+            ThrowUtils.throwIfBlank(permission.getComponentName(), PermErrorCode.EPERMA009);
+            ThrowUtils.throwIfBlank(permission.getComponentPath(), PermErrorCode.EPERMA010);
             // 上级信息校验，要求上级只能是目录或空
-            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.menu.parent"));
+            ThrowUtils.throwIf(!PermissionType.DIR.getType().equals(parentType), PermErrorCode.EPERMA013);
         } else if (PermissionType.LINK.getType().equals(permission.getPermType())) {
             // 外链
             permission.setPermCode(null);
@@ -257,11 +256,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentPath(null);
             // 参数校验
             String routerPath = permission.getRouterPath();
-            Assert.notBlank(routerPath, ExpMessageCode.of("valid.perm.linkPath.required"));
-            Assert.failIfFalse(routerPath.matches(RegexUtils.Regex.LINK_REGEX), ExpMessageCode.of("valid.perm.linkPath.pattern"));
-            Assert.notNull(permission.getHidden(), ExpMessageCode.of("valid.perm.hidden.required"));
+            ThrowUtils.throwIfBlank(routerPath, PermErrorCode.EPERMA005);
+            ThrowUtils.throwIf(routerPath.matches(RegexUtils.Regex.LINK_REGEX), PermErrorCode.EPERMA006);
+            ThrowUtils.throwIfNull(permission.getHidden(), PermErrorCode.EPERMA000);
             // 上级信息校验，要求上级只能是目录
-            Assert.failIfFalse(PermissionType.DIR.getType().equals(parentType), ExpMessageCode.of("valid.perm.link.parent"));
+            ThrowUtils.throwIf(!PermissionType.DIR.getType().equals(parentType), PermErrorCode.EPERMA012);
         } else if (PermissionType.BTN.getType().equals(permission.getPermType())) {
             // 按钮
             permission.setIcon(null);
@@ -271,14 +270,14 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             permission.setComponentName(null);
             permission.setComponentPath(null);
             // 参数校验，权限编码校验，权限编码不能重复
-            Assert.notBlank(permission.getPermCode(), ExpMessageCode.of("valid.perm.permCode.required"));
-            Assert.failIfTrue(checkPermCodeExist(permission), ExpMessageCode.of("valid.perm.permCode.exists"));
+            ThrowUtils.throwIfBlank(permission.getPermCode(), PermErrorCode.EPERMA007);
+            ThrowUtils.throwIf(checkPermCodeExist(permission), PermErrorCode.EPERMA008);
             // 上级信息校验，要求上级只能是菜单或目录或空
             boolean dirOrMenu = PermissionType.DIR.getType().equals(parentType) ||
                     PermissionType.MENU.getType().equals(parentType);
-            Assert.failIfFalse(dirOrMenu, ExpMessageCode.of("valid.perm.btn.parent"));
+            ThrowUtils.throwIf(!dirOrMenu, PermErrorCode.EPERMA014);
         } else {
-            throw new AssertException(ExpMessageCode.of("valid.perm.permType.invalid", permission.getPermType()));
+            ThrowUtils.system(BaseErrorCode.SCOREB002);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.core.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         if (getFieldValByName(CREATE_USER, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_USER, Long.class, SecurityUtils.getLoginIdNoEor());
+            this.strictInsertFill(metaObject, CREATE_USER, Long.class, SecurityUtils.getLoginIdWithoutNull());
         }
 
         if (getFieldValByName(CREATE_TIME, metaObject) == null) {
@@ -55,7 +55,7 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         if (getFieldValByName(UPDATE_USER, metaObject) == null) {
-            this.strictUpdateFill(metaObject, UPDATE_USER, Long.class, SecurityUtils.getLoginIdNoEor());
+            this.strictUpdateFill(metaObject, UPDATE_USER, Long.class, SecurityUtils.getLoginIdWithoutNull());
         }
 
         if (getFieldValByName(UPDATE_TIME, metaObject) == null) {

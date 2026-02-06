@@ -23,6 +23,11 @@ public enum CaptchaType {
     Arithmetic,
 
     /**
+     * 算术验证码（5.0新增）
+     */
+    ArithmeticNew,
+
+    /**
      * 英文与数字动态验证码
      */
     Gif,
@@ -36,7 +41,7 @@ public enum CaptchaType {
         try {
             return CaptchaType.valueOf(type);
         } catch (Exception e) {
-            throw new CaptchaException("No support captcha type: " + type);
+            return CaptchaType.Default;
         }
     }
 }

@@ -2,10 +2,10 @@ package com.github.stazxr.zblog.bas.context.filter;
 
 import com.github.stazxr.zblog.bas.context.Context;
 import com.github.stazxr.zblog.bas.context.ContextHelper;
-import com.github.stazxr.zblog.bas.context.properties.ContextProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -13,50 +13,64 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Servlet filter that manages application-specific context.
- * Clears the context after request processing completes.
+ *
+ * <p>
+ * 1. 创建线程上下文 CoreContext 并根据请求 header 填充上下文变量。
+ * 2. 请求处理完成后自动清理上下文。
+ * 3. OPTIONS 请求直接跳过。
+ * </p>
  *
  * @author SunTao
  * @since 2024-07-02
  */
-@Slf4j
-@Component
 public class ContextFilter extends OncePerRequestFilter {
-    private ContextProperties contextProperties;
+    private static final Logger log = LoggerFactory.getLogger(ContextFilter.class);
 
-    /**
-     * Set the ContextProperties instance.
-     *
-     * @param contextProperties The ContextProperties instance to set
-     */
-    @Autowired
-    public void setContextProperties(ContextProperties contextProperties) {
+    /** 配置的上下文属性 */
+    private final ContextProperties contextProperties;
+
+    /** 允许的 header 名称集合（小写） */
+    private final Set<String> allowedHeaderSet = new HashSet<>();
+
+    public ContextFilter(ContextProperties contextProperties) {
         this.contextProperties = contextProperties;
+        initAllowedHeaders();
     }
 
     /**
-     * Core method of the filter. Sets up context on request entry and cleans up after request processing.
+     * 核心过滤方法。
      *
-     * @param request  HttpServletRequest representing the client request
-     * @param response HttpServletResponse representing the server response
-     * @param filterChain FilterChain for invoking the next filter or target resource
-     * @throws ServletException in case of a servlet exception
-     * @throws IOException in case of an I/O error
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param filterChain FilterChain
+     * @throws ServletException Servlet 异常
+     * @throws IOException IO 异常
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
-            final String options = "OPTIONS";
-            if (!options.equals(request.getMethod())) {
-                ContextHelper.createContext(request, contextProperties);
-                Context.print();
-            }
+            ContextHelper.createContext(request, allowedHeaderSet);
+            Context.print();
             filterChain.doFilter(request, response);
         } finally {
             ContextHelper.clearContext();
+        }
+    }
+
+    private void initAllowedHeaders() {
+        if (contextProperties != null && contextProperties.getTagNames() != null) {
+            allowedHeaderSet.addAll(contextProperties.getTagNames()
+                    .stream()
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toSet()));
+            log.info("ContextFilter allowed headers initialized: {}", allowedHeaderSet);
         }
     }
 }

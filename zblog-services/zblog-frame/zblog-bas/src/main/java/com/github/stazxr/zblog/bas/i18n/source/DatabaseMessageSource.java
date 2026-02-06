@@ -1,10 +1,10 @@
 package com.github.stazxr.zblog.bas.i18n.source;
 
-import com.github.stazxr.zblog.bas.i18n.I18nProperties;
+import com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,9 +25,13 @@ import java.util.Properties;
  * @author SunTao
  * @since 2025-08-10
  */
-@Slf4j
 public class DatabaseMessageSource extends AbstractMessageSource implements Runnable {
-    private final Map<String, Properties> messageCache = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(DatabaseMessageSource.class);
+
+    /**
+     * 国际化缓存，Key: locale.toLanguageTag(), Value: Properties(code -> message)
+     */
+    private volatile Map<String, Properties> messageCache = new ConcurrentHashMap<>();
 
     private final DataSource dataSource;
 
@@ -75,14 +79,15 @@ public class DatabaseMessageSource extends AbstractMessageSource implements Runn
                 // 数据健壮性检查
                 if (code == null || locale == null || message == null) {
                     log.warn("[i18n] 检测到无效国际化记录，已跳过: code={}, locale={}, message={}", code, locale, message);
-                    return;
+                    continue;
                 }
 
                 Properties props = newMessageCache.computeIfAbsent(locale, k -> new Properties());
                 props.setProperty(code, message);
             }
-            messageCache.clear();
-            messageCache.putAll(newMessageCache);
+
+            // 原子替换缓存
+            messageCache = newMessageCache;
 
             if (log.isDebugEnabled()) {
                 for (String locale : messageCache.keySet()) {
@@ -94,14 +99,13 @@ public class DatabaseMessageSource extends AbstractMessageSource implements Runn
         }
     }
 
-    @Nullable
     @Override
-    protected MessageFormat resolveCode(@NonNull String code, @NonNull Locale locale) {
-        if (!messageCache.containsKey(locale.toString())) {
+    protected MessageFormat resolveCode(@NonNull String code, Locale locale) {
+        Properties properties = messageCache.get(locale.toLanguageTag());
+        if (properties == null) {
             return null;
         }
-
-        String message = messageCache.get(locale.toString()).getProperty(code);
+        String message = properties.getProperty(code);
         return message != null ? new MessageFormat(message, locale) : null;
     }
 
@@ -114,4 +118,3 @@ public class DatabaseMessageSource extends AbstractMessageSource implements Runn
         log.info("[i18n] DatabaseMessageSource 已停止刷新线程");
     }
 }
-

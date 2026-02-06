@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -9,7 +10,6 @@ import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.UserVo;
 import com.github.stazxr.zblog.base.service.UserService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -43,7 +43,7 @@ public class UserController {
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询用户列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询用户列表", code = "USERQ001")
     public IPage<UserVo> pageList(UserQueryDto queryDto) {
         return userService.queryUserListByPage(queryDto);
@@ -57,7 +57,7 @@ public class UserController {
      */
     @GetMapping(value = "/pageListOfPublic")
     @ApiOperation(value = "分页查询用户列表（公共）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询用户列表（公共）", code = "USERQ002", level = RouterLevel.PUBLIC)
     public IPage<UserVo> pageListOfPublic(UserQueryDto queryDto) {
         return userService.queryUserListByPage(queryDto);
@@ -74,7 +74,7 @@ public class UserController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询用户详情", code = "USERQ003")
     public UserVo queryUserDetail(@RequestParam Long userId) {
         return userService.queryUserDetail(userId);
@@ -88,7 +88,7 @@ public class UserController {
     @Log
     @PostMapping(value = "/addUser")
     @ApiOperation(value = "新增用户")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "新增用户", code = "USERA001")
     public void addUser(@RequestBody @Validated(Create.class) UserDto userDto) {
         userService.addUser(userDto);
@@ -102,7 +102,7 @@ public class UserController {
     @Log
     @PostMapping(value = "/editUser")
     @ApiOperation(value = "编辑用户")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "编辑用户", code = "USERU001")
     public void editUser(@RequestBody @Validated(Update.class) UserDto userDto) {
         userService.editUser(userDto);
@@ -119,7 +119,7 @@ public class UserController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除用户", code = "USERD001")
     public void deleteUser(@RequestParam Long userId) {
         userService.deleteUser(userId);

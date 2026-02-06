@@ -3,32 +3,37 @@
 <mapper namespace="com.github.stazxr.zblog.log.mapper.LogMapper">
     <select id="selectLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
         SELECT
-            ID, LOG_TYPE, OPERATE_USER, DATE_FORMAT(EVENT_TIME, '%Y-%m-%d %H:%i:%s') AS EVENT_TIME, `DESCRIPTION`,
+            ID, TRACE_ID, LOG_TYPE, OPERATE_USER, DATE_FORMAT(EVENT_TIME, '%Y-%m-%d %H:%i:%s') AS EVENT_TIME, `DESCRIPTION`,
             REQUEST_PARAM, INTERFACE_CODE, REQUEST_IP, REQUEST_URI, REQUEST_METHOD,
-            ADDRESS, BROWSER, COST_TIME, EXEC_RESULT, EXEC_MESSAGE, CREATE_DATE
+            ADDRESS, BROWSER, BROWSER_VERSION, PLATFORM,
+            COST_TIME, EXEC_RESULT, EXEC_MESSAGE, ERROR_CODE,
+            DATE_FORMAT(CREATE_DATE, '%Y-%m-%d') AS CREATE_DATE
         FROM log
-        WHERE LOG_TYPE = #{logType}
-        <if test="description != null and description != ''">
-            <bind name="descriptionBind" value="'%' + description + '%'"/>
+        WHERE LOG_TYPE = #{query.logType}
+        <if test="query.description != null and query.description != ''">
+            <bind name="descriptionBind" value="'%' + query.description + '%'"/>
             AND `DESCRIPTION` LIKE #{descriptionBind}
         </if>
-        <if test="interfaceCode != null and interfaceCode != ''">
-            AND INTERFACE_CODE = #{interfaceCode}
+        <if test="query.interfaceCode != null and query.interfaceCode != ''">
+            AND INTERFACE_CODE = #{query.interfaceCode}
         </if>
-        <if test="username != null and username != ''">
-            AND OPERATE_USER = #{username}
+        <if test="query.traceId != null and query.traceId != ''">
+            AND TRACE_ID = #{query.traceId}
         </if>
-        <if test="execResult != null">
-            AND EXEC_RESULT = #{execResult}
+        <if test="query.username != null and query.username != ''">
+            AND OPERATE_USER = #{query.username}
         </if>
-        <if test="costTime != null and costTime != ''">
-            AND COST_TIME &gt;= #{costTime, jdbcType=DOUBLE}
+        <if test="query.execResult != null">
+            AND EXEC_RESULT = #{query.execResult}
         </if>
-        <if test="eventStartTime != null and eventStartTime != ''">
-            AND EVENT_TIME &gt;= STR_TO_DATE(#{eventStartTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.costTime != null and query.costTime != ''">
+            AND COST_TIME &gt;= #{query.costTime, jdbcType=DOUBLE}
         </if>
-        <if test="eventEndTime != null and eventEndTime != ''">
-            AND EVENT_TIME &lt;= STR_TO_DATE(#{eventEndTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.eventStartTime != null">
+            AND `EVENT_TIME` <![CDATA[>=]]> #{query.eventStartTime, jdbcType=TIMESTAMP}
+        </if>
+        <if test="query.eventEndTime != null">
+            AND `EVENT_TIME` <![CDATA[<=]]> #{query.eventEndTime, jdbcType=TIMESTAMP}
         </if>
         ORDER BY EVENT_TIME DESC
     </select>
@@ -45,6 +50,9 @@
         </if>
         <if test="interfaceCode != null and interfaceCode != ''">
             AND INTERFACE_CODE = #{interfaceCode}
+        </if>
+        <if test="traceId != null and traceId != ''">
+            AND TRACE_ID = #{traceId}
         </if>
         <if test="username != null and username != ''">
             AND OPERATE_USER = #{username}

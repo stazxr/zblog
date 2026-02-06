@@ -9,7 +9,7 @@ spring:
     include: dev
   main:
     allow-bean-definition-overriding: false # 是否允许覆盖BEAN
-    allow-circular-references: false # 是否允许循环依赖
+    allow-circular-references: false # 是否允许循环依赖，不建议开启
   datasource:
     druid:
       # 基本信息
@@ -148,56 +148,64 @@ swagger:
       url: https://www.suntaoblog.com
 zblog:
   base:
-    header: # 请求头配置
-      sys-code: ST # 系统编码
-      app-code: ZBLOG # 应用编码
-      deploy:
-        deploy-area: bj # 部署地域
-        deploy-center: j # 部署机房
-        deploy-unit: 0 # 部署单元
-        deploy-ip: # 部署IP
-    context: # 上下文配置
-      tags: # 自定义标签配置
-        - { tag-name: conversation-id } # conversation-id
+    # 线程池配置
+    thread-pool:
+      core-size: 2 # 核心线程数
+      max-size: 4 # 最大线程数
+      queue-capacity: 20 # 任务队列容量
+      keep-alive-seconds: 180 # 线程空闲存活时间（秒）
+      thread-name-prefix: zblog- # 线程名称前缀
+      wait-for-tasks-to-complete-on-shutdown: true # 应用关闭时是否等待线程池中的任务执行完成
+      monitor-enabled: true # 是否开启线程池监控日志.
+      monitor-interval: 10000 # 线程池监控日志打印间隔（毫秒）.
+    # 全局缓存配置
+    cache:
+      type: memory # 全局缓存类型，支持 memory 或 redis
+    # 全局异常配置
+    exception:
+      error-code-config:
+        check: true # 是否开启错误码格式检查
+        scan-package: com.github.stazxr.zblog # 错误码扫描的起始包
+    # 国际化配置
     i18n:
-      cache-ttl: 1800000 # 缓存刷新周期，单位毫秒
-      load-sql: SELECT code, locale, message FROM i18n_message # 从数据库加载国际化数据的 SQL 语句。
+      cache-ttl: 300000 # 国际化消息缓存刷新周期，单位毫秒
+      load-sql: SELECT code, message, locale FROM i18n_message # 从数据库加载国际化数据的 SQL 语句。
       code-column: code # 数据库中 "code" 列名
       message-column: message # 数据库中 "message"（消息内容）列名
       locale-column: locale # 数据库中 "locale"（语言）列名
-      base-names: # 本地资源文件的基础名列表（无扩展名）
+      basenames: # 本地资源文件的基础名列表（无扩展名）
         - messages/messages
         - ValidationMessages # 用户自定义的校验消息文件
         - ContributorValidationMessages # 允许约束定义的贡献者（Constraint Definition Contributor）提供一个自己的默认消息文件
         - org.hibernate.validator.ValidationMessages # Hibernate Validator 内置的默认消息文件
-    seq: # 序号配置
-      datacenter-id: 0 # 数据中心ID
-      machine-id: 0 # 机器ID
-    cache:
-      type: memory # 全局缓存类型
-    security: # 安全配置
-      login-url: /api/login # 登录 URL
-      logout-url: /api/logout # 注销 URL
-      password-limited-day: 90 # 密码有效天数，默认 90 天
-      sso-token-cache-mills: 86400000 # SSO 令牌缓存时长, 单位毫秒, 默认 3 天
-      resource-roles-cache-mills: 1800000 # 资源与角色关联关系的缓存时长, 单位毫秒
-      password-history-count: 1 # 新密码不能与最近X次密码重复，可配置 -1，关闭校验
-      enable-additional-checks: false # 登录认证是否扩展额外检查规则
-      hide-user-not-found-exceptions: false # TODO 待验证 设置为 true, 用户不存在时，报错用户找不到，否则报错密码错误
-      jwt:
-        access-token-duration: 1200
-        refresh-token-duration: 2400
-        refresh-min-duration: 300
-        allowed-renew-token: true
-        max-version: 10
-        algorithm: RS256
-        cert-info:
-          alias: zblog
-          key-password: 123456
-          cert-location: zblog.jks
-        claims:
-          issuer: http://localhost:${server.port}
-          subject: zblog
+    # 邮件通知配置
+    mail:
+      from:
+        address: ${spring.mail.username} # 发件地址，务必与配置的邮件发送人保持一致
+        name: Z-BLOG # 发件人
+    # 序号配置
+    sequence:
+      datacenter-id: 0 # 数据中心id
+      machine-id: 0 # 机器id
+    # 上下文配置
+    header:
+      sys-code: ST # 系统编码
+      app-code: Z-BLOG # 应用编码
+      deploy:
+        deploy-area: beijing # 部署地域
+        deploy-center: '3' # 部署机房（可用区）
+        deploy-unit: 0 # 部署单元
+        deploy-ip: # 部署IP（为空会自动获取）
+    context:
+      tags: # 自定义标签配置
+        - { tag-name: token } # token
+    # 日志打印配置
+    log:
+      control:
+        enabled: true # 开启全局请求响应日志打印
+        model: 1 # 模式: 1-白名单模式；2-黑名单模式
+        paths:
+    # 文件存储配置
     file:
       model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云；4-腾讯云
       local:
@@ -228,15 +236,45 @@ zblog:
         secret-key: your-secret-key # 腾讯云访问密钥 SecretKey，建议客户化到 sys_props 表中，不要硬编码在配置文件中
         region: ap-beijing # 腾讯云 COS 所在地域
         bucket-name: your-bucket-name # 腾讯云 COS 存储桶名称
-    log:
-      control:
-        enabled: true # 开启全局请求响应日志打印
-        model: 0 # 默认值，paths 为允许记录日志的路径列表
-        paths:
-    mail:
-      from:
-        address: ${spring.mail.username} # 发件地址，务必与配置的邮件发送人保持一致
-        name: Z-BLOG # 发件人
+    # 统一响应配置
+    rest:
+      error-path: /error # 错误路径
+      not-package-uris: # 不进行统一包装的 URI 列表
+        - /swagger-resources
+        - /v3/api-docs
+        - /v2/api-docs
+
+    # TODO 安全配置
+    security:
+      login-url: /api/login # 登录 URL
+      logout-url: /api/logout # 注销 URL
+      password-limited-day: 90 # 密码有效天数，默认 90 天
+      sso-token-cache-mills: 86400000 # SSO 令牌缓存时长, 单位毫秒, 默认 3 天
+      resource-roles-cache-mills: 1800000 # 资源与角色关联关系的缓存时长, 单位毫秒
+      password-history-count: 1 # 新密码不能与最近X次密码重复，可配置 -1，关闭校验
+      enable-additional-checks: false # 登录认证是否扩展额外检查规则
+      hide-user-not-found-exceptions: false # TODO 待验证 设置为 true, 用户不存在时，报错用户找不到，否则报错密码错误
+      jwt:
+        access-token-duration: 1200
+        refresh-token-duration: 2400
+        refresh-min-duration: 300
+        allowed-renew-token: true
+        max-version: 10
+        algorithm: RS256
+        cert-info:
+          alias: zblog
+          key-password: 123456
+          cert-location: zblog.jks
+        claims:
+          issuer: http://localhost:${server.port}
+          subject: zblog
   website:
     name: Z-BLOG # 站点名称
     url: http://127.0.0.1:31945 # 站点地址
+  aop-log:
+    enabled: true # 是否启用切面日志
+    async: true # 是否开启异步日志写入
+    recordParam: true # 是否记录接口请求参数
+    recordResult: false # 是否记录接口返回值，建议关闭以避免日志过大
+    max-param-length: 5000 # 记录的最大参数长度，超过部分将被截断
+    max-result-length: 5000 # 记录的最大返回长度，超过部分将被截断

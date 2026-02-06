@@ -33,7 +33,7 @@ public class NameValue implements Serializable {
             // long 适配
             return Long.valueOf((String) value);
         } catch (Exception ignored) { }
-        return value;
+        return String.valueOf(value);
     }
 
     @Override

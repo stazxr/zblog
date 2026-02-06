@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.stazxr.zblog.bas.captcha.CaptchaConfig;
-import com.github.stazxr.zblog.bas.captcha.CaptchaException;
 import com.github.stazxr.zblog.bas.captcha.factory.CacheCaptchaFactory;
 import com.github.stazxr.zblog.bas.captcha.factory.CaptchaFactory;
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
@@ -55,7 +54,7 @@ public class CaptchaLoadAutoConfigure {
 
             return new CacheCaptchaFactory(captchaConfigMap);
         } catch (Exception e) {
-            throw new CaptchaException("Load captcha from file catch error", e);
+            throw new IllegalStateException("Load captcha from file catch error", e);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
@@ -8,7 +9,6 @@ import com.github.stazxr.zblog.base.domain.dto.VersionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.VersionVo;
 import com.github.stazxr.zblog.base.service.VersionService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -42,7 +42,7 @@ public class VersionController {
      */
     @GetMapping(value = "/pageList")
     @ApiOperation("分页查询版本列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询版本列表", code = "VERSQ001")
     public PageInfo<VersionVo> pageList(VersionQueryDto queryDto) {
         return versionService.queryVersionListByPage(queryDto);
@@ -59,7 +59,7 @@ public class VersionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "versionId", value = "版本id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询版本详情", code = "VERSQ002")
     public VersionVo queryVersionDetail(@RequestParam Long versionId) {
         return versionService.queryVersionDetail(versionId);
@@ -73,7 +73,7 @@ public class VersionController {
     @Log
     @PostMapping(value = "/addVersion")
     @ApiOperation("新增版本")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "新增版本", code = "VERSA001")
     public void addVersion(@RequestBody @Validated(Create.class) VersionDto versionDto) {
         versionService.addVersion(versionDto);
@@ -87,7 +87,7 @@ public class VersionController {
     @Log
     @PostMapping(value = "/editVersion")
     @ApiOperation("编辑版本")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "编辑版本", code = "VERSU001")
     public void editVersion(@RequestBody @Validated(Update.class) VersionDto versionDto) {
         versionService.editVersion(versionDto);
@@ -104,7 +104,7 @@ public class VersionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "versionId", value = "版本id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除版本", code = "VERSD001")
     public void deleteVersion(@RequestParam Long versionId) {
         versionService.deleteVersion(versionId);

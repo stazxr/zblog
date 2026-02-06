@@ -1,11 +1,14 @@
 package com.github.stazxr.zblog.bas.log.advice;
 
 import com.github.stazxr.zblog.bas.log.cache.LogPathCacheManager;
-import com.github.stazxr.zblog.bas.log.context.LogControlSerNoContext;
-import com.github.stazxr.zblog.bas.log.properties.LogControlProperties;
-import com.github.stazxr.zblog.bas.mask.MaskUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.stazxr.zblog.bas.log.context.LogTraceContext;
+import com.github.stazxr.zblog.bas.log.util.LogUtil;
+import com.github.stazxr.zblog.bas.order.FilterOrder;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.util.net.IpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
@@ -18,79 +21,63 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Response body advice for controlling and logging outgoing responses.
- * This advice handles masking sensitive data based on configured paths.
+ * 响应日志打印.
  *
  * @author SunTao
  * @since 2024-05-16
  */
-@Slf4j
 @RestControllerAdvice
 public class ResLogControlAdvice implements ResponseBodyAdvice<Object>, Ordered {
-    private HttpServletRequest httpServletRequest;
+    private final Logger log = LoggerFactory.getLogger("___flowLog___");
 
-    private LogControlProperties logControlProperties;
+    private final HttpServletRequest request;
 
-    private LogPathCacheManager logPathCacheManager;
+    private final LogPathCacheManager logManager;
 
-    /**
-     * Checks if the advice supports processing based on configuration.
-     */
-    @Override
-    public boolean supports(MethodParameter returnType, Class converterType) {
-        return logControlProperties.isEnabled();
+    public ResLogControlAdvice(HttpServletRequest request, LogPathCacheManager logManager) {
+        this.request = request;
+        this.logManager = logManager;
     }
 
-    /**
-     * Executes actions before writing the response body, logging the masked response.
-     */
     @Override
-    public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public boolean supports(MethodParameter parameter, Class converterType) {
+        return parameter.hasMethodAnnotation(Router.class);
+    }
+
+    @Override
+    public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType selectedContentType,
+            Class selectedConverterType, ServerHttpRequest req, ServerHttpResponse res) {
         try {
-            if (logPathCacheManager.enabledLog(httpServletRequest.getServletPath())) {
-                String simpleName = returnType.getContainingClass().getSimpleName();
-                String methodName = returnType.getMethod() == null ? "" : returnType.getMethod().getName();
-                String serNo = LogControlSerNoContext.exist() ? "[" + LogControlSerNoContext.get() + "]" : "";
-                log.info("{}.{}{} response body is: {}", simpleName, methodName, serNo, MaskUtil.toMaskString(body));
+            String path = request.getServletPath();
+            if (logManager.enabledLog(path)) {
+                String traceId = LogTraceContext.getTraceId();
+                String apiCode = LogUtil.getApiCode(returnType);
+                String apiVersion = LogUtil.getApiVersion(returnType);
+                String ipAddr = IpUtils.getIp(request);
+                long costTime = System.currentTimeMillis() - LogTraceContext.getStartTime();
+                String success = "SUCCESS";
+                String errorCode = "";
+                if (body instanceof Result) {
+                    Result<?> result = (Result<?>) body;
+                    success = result.isSuccess() ? "SUCCESS" : "FAIL";
+                    errorCode = result.getErrorCode() == null ? "" : result.getErrorCode();
+                }
+
+                if ("SUCCESS".equals(success)) {
+                    log.info("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, success, errorCode, costTime);
+                } else {
+                    log.error("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, success, errorCode, costTime);
+                }
             }
         } catch (Exception e) {
-            log.error("Error logging response body", e);
-        } finally {
-            LogControlSerNoContext.clear();
+            log.error("响应日志打印失败", e);
         }
 
         return body;
     }
 
-    /**
-     * Sets the HttpServletRequest instance via dependency injection.
-     */
-    @Autowired
-    public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = httpServletRequest;
-    }
-
-    /**
-     * Sets the LogControlProperties instance via dependency injection.
-     */
-    @Autowired
-    public void setLogControlProperties(LogControlProperties logControlProperties) {
-        this.logControlProperties = logControlProperties;
-    }
-
-    /**
-     * Sets the LogControlPathCacheManager instance via dependency injection.
-     */
-    @Autowired
-    public void setLogControlPathCacheManager(LogPathCacheManager logPathCacheManager) {
-        this.logPathCacheManager = logPathCacheManager;
-    }
-
-    /**
-     * Specifies the order in which this advice is applied.
-     */
     @Override
     public int getOrder() {
-        return 999;
+        return FilterOrder.RES_LOG;
     }
 }

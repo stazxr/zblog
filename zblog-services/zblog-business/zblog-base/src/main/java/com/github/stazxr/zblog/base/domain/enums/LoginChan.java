@@ -13,12 +13,12 @@ public enum LoginChan {
     /**
      * 移动端
      */
-    MOBILE("01"),
+    MOBILE("LC01"),
 
     /**
      * PC端
      */
-    PC("02");
+    PC("LC02");
 
     private final String chan;
 

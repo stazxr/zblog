@@ -11,16 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
  */
 public interface BaseMapper<E> extends com.baomidou.mybatisplus.core.mapper.BaseMapper<E> {
     /**
-     * 根据 ID 修改
-     *
-     * @param entity 实体对象
-     */
-    @Override
-    default int updateById(E entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * 根据 whereEntity 条件，更新记录
      *
      * @param entity        实体对象 (set 条件值,可以为 null)
@@ -28,6 +18,6 @@ public interface BaseMapper<E> extends com.baomidou.mybatisplus.core.mapper.Base
      */
     @Override
     default int update(E entity, Wrapper<E> updateWrapper) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported");
     }
 }

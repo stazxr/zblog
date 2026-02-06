@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.log.mdc;
 
-import com.github.stazxr.zblog.bas.context.util.EnvironmentHelper;
+import com.github.stazxr.zblog.bas.context.util.HeaderContextHolder;
 import org.slf4j.MDC;
 
 /**
@@ -16,9 +16,9 @@ public class LogMdcUtil {
      * Initializes the MDC.
      */
     public static void initMdc() {
-        MDC.put("sysCode", EnvironmentHelper.getSysCode());
-        MDC.put("appCode", EnvironmentHelper.getAppCode());
-        MDC.put("deployCode", EnvironmentHelper.getDeployCode());
+        MDC.put("sysCode", HeaderContextHolder.getSysCode());
+        MDC.put("appCode", HeaderContextHolder.getAppCode());
+        MDC.put("deployCode", HeaderContextHolder.getDeployCode());
     }
 
     /**

@@ -82,7 +82,7 @@ public class IpUtils {
      * @param request The HTTP request
      * @return The browser information
      */
-    public static String getBrowser(HttpServletRequest request) {
+    public static String getUserAgent(HttpServletRequest request) {
         return request.getHeader("User-Agent");
     }
 

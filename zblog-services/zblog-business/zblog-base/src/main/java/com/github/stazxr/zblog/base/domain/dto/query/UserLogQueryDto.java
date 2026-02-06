@@ -5,7 +5,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 
 /**
  * 用户操作日志查询
@@ -41,11 +43,13 @@ public class UserLogQueryDto extends PageParam {
      * 操作开始时间
      */
     @ApiModelProperty(value = "操作开始时间", example = "2023-02-16 00:00:00")
-    private String eventStartTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventStartTime;
 
     /**
      * 操作结束时间
      */
     @ApiModelProperty(value = "操作结束时间", example = "2023-02-16 23:59:59")
-    private String eventEndTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventEndTime;
 }

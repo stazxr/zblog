@@ -19,7 +19,7 @@
     </description>
 
     <dependencies>
-        <!-- ZBLOG 工具模块 -->
+        <!-- Z-BLOG Util -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-util</artifactId>
@@ -129,6 +129,16 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
+        </dependency>
+        <!-- Reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <!-- TransmittableThreadLocal -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
         </dependency>
     </dependencies>
 </project>

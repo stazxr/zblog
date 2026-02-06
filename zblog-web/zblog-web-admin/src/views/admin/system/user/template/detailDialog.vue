@@ -37,22 +37,25 @@
           <span v-else-if="dataInfo.gender === '3'">隐藏</span>
           <span v-else> - </span>
         </el-descriptions-item>
-        <el-descriptions-item label="用户序列" :span="2"> {{ dataInfo.id }} </el-descriptions-item>
-        <!-- 3 -->
-        <el-descriptions-item label="登录时间"> {{ dataInfo.successLoginTime }} </el-descriptions-item>
+        <el-descriptions-item label="用户序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="登录渠道">
-          <span v-if="dataInfo.loginChan === '01'">移动端</span>
-          <span v-else-if="dataInfo.loginChan === '02'">PC端</span>
-          <span v-else> - </span>
+          <span v-if="dataInfo.loginChan === 'LC01'">移动端</span>
+          <span v-else-if="dataInfo.loginChan === 'LC02'">PC端</span>
+          <span v-else> {{ dataInfo.loginChan }} </span>
         </el-descriptions-item>
+        <!-- 3 -->
+        <el-descriptions-item label="登录时间（成功）"> {{ dataInfo.successLoginTime }} </el-descriptions-item>
+        <el-descriptions-item label="登录平台"> {{ dataInfo.loginPlatform }} </el-descriptions-item>
         <el-descriptions-item label="登录方式">
-          <span v-if="dataInfo.loginType === '00'">访客</span>
-          <span v-else-if="dataInfo.loginType === '01'">密码</span>
-          <span v-else-if="dataInfo.loginType === '02'">QQ互信</span>
-          <span v-else-if="dataInfo.loginType === '99'">未知</span>
-          <span v-else> - </span>
+          <span v-if="dataInfo.loginType === 'LT00'">访客</span>
+          <span v-else-if="dataInfo.loginType === 'LT01'">密码</span>
+          <span v-else-if="dataInfo.loginType === 'LT02'">QQ互信</span>
+          <span v-else-if="dataInfo.loginType === 'LT99'">未知</span>
+          <span v-else> {{ dataInfo.loginType }} </span>
         </el-descriptions-item>
         <el-descriptions-item label="登录地址"> {{ dataInfo.loginAddress }} </el-descriptions-item>
+        <el-descriptions-item v-show="false" label="浏览器" :span="2"> {{ dataInfo.loginBrowser }} </el-descriptions-item>
+        <el-descriptions-item v-show="false" label="浏览器版本" :span="2"> {{ dataInfo.loginBrowserVersion }} </el-descriptions-item>
         <!-- 4 -->
         <el-descriptions-item label="用户代理" :span="4">
           {{ dataInfo.userAgent }}
@@ -108,6 +111,9 @@ export default {
         headImgUrl: '',
         successLoginTime: '',
         loginChan: '',
+        loginBrowser: '',
+        loginBrowserVersion: '',
+        loginPlatform: '',
         loginType: '',
         loginAddress: '',
         userAgent: '',

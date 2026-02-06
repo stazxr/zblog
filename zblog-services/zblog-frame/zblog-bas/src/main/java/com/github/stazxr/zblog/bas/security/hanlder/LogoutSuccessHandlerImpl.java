@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.hanlder;
 
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

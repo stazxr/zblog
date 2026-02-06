@@ -28,7 +28,7 @@ public class VersionDto extends BaseDto {
     /**
      * 版本id
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("版本id")
     private Long id;
 
@@ -49,9 +49,9 @@ public class VersionDto extends BaseDto {
     /**
      * 版本排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.required}")
-    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
-    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PARAM_SORT_REQUIRED}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MIN1}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MAX99999}")
     @ApiModelProperty("版本排序")
     private Integer sort;
 }

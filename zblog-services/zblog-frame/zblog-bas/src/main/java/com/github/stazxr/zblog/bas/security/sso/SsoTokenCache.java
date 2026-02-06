@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.security.sso;
 
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.util.Assert;
 import com.github.stazxr.zblog.util.collection.TimeMap;
@@ -43,7 +43,7 @@ public class SsoTokenCache {
         Assert.notBlank(ssoToken.getUserIp(), "User IP must not be null");
 
         // 获取缓存时间配置
-        SecurityExtProperties properties = SpringContextUtil.getBean(SecurityExtProperties.class);
+        SecurityExtProperties properties = SpringContextHolder.getBean(SecurityExtProperties.class);
         long cacheTime = properties.getSsoTokenCacheMills();
 
         // 将令牌存入缓存

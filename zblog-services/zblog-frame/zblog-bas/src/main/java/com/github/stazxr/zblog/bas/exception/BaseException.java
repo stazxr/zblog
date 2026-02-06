@@ -1,181 +1,93 @@
 package com.github.stazxr.zblog.bas.exception;
 
-import com.github.stazxr.zblog.bas.i18n.I18nUtils;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
+import com.github.stazxr.zblog.bas.exception.support.MessageSupportLoader;
 
 /**
- * 异常基类
+ * 异常体系基类
+ *
+ * <p>作为系统中所有自定义异常的根类，提供以下能力：</p>
+ * <ul>
+ *   <li>统一的错误码（ErrorCode）模型</li>
+ *   <li>基于 SPI 的国际化消息解析能力</li>
+ *   <li>兼容“错误码异常”和“原始消息异常”两种使用方式</li>
+ * </ul>
  *
  * @author SunTao
- * @since 2022-03-09
+ * @since 2026-01-25
  */
 public abstract class BaseException extends RuntimeException {
-    private static final long serialVersionUID = 8442431512167536240L;
+    private static final long serialVersionUID = 5277461682828360566L;
 
     /**
      * 错误码
      */
-    private String code;
+    private final ErrorCode errorCode;
 
     /**
-     * 关联异常
+     * 国际化参数
      */
-    private Throwable throwable = null;
+    private final Object[] args;
 
     /**
-     * 使用自定义消息构造异常
-     *
-     * @param message 异常消息
+     * 原始消息
      */
-    public BaseException(String message) {
+    private final String rawMessage;
+
+    /**
+     * 标准错误码异常（推荐）
+     */
+    protected BaseException(ErrorCode errorCode, Object... args) {
+        super(errorCode.getCode());
+        this.errorCode = errorCode;
+        this.args = (args == null ? new Object[0] : args);
+        this.rawMessage = null;
+    }
+
+    /**
+     * 自定义消息异常（兜底 / 技术异常）
+     */
+    protected BaseException(String message) {
         super(message);
+        this.errorCode = null;
+        this.args = null;
+        this.rawMessage = message;
     }
 
     /**
-     * 使用自定义消息及根因构造异常
-     *
-     * @param message 异常消息
-     * @param cause 根因异常
+     * 自定义消息 + cause
      */
-    public BaseException(String message, Throwable cause) {
+    protected BaseException(String message, Throwable cause) {
         super(message, cause);
-        this.throwable = cause;
+        this.errorCode = null;
+        this.args = null;
+        this.rawMessage = message;
     }
 
     /**
-     * 使用国际化消息码构造异常
-     *
-     * @param expMessageCode 异常消息码
-     */
-    public BaseException(ExpMessageCode expMessageCode) {
-        super(resolveMessageCode(expMessageCode));
-        this.code = expMessageCode.getCode();
-    }
-
-    /**
-     * 使用国际化消息码及根因构造异常
-     *
-     * @param expMessageCode 异常消息码
-     * @param cause 根因异常
-     */
-    public BaseException(ExpMessageCode expMessageCode, Throwable cause) {
-        super(resolveMessageCode(expMessageCode), cause);
-        this.code = expMessageCode.getCode();
-        this.throwable = cause;
-    }
-
-    /**
-     * 获取原始消息
-     *
-     * @return 原始异常消息
-     */
-    public String getRawMessage() {
-        return super.getMessage();
-    }
-
-    /**
-     * 获取异常信息
-     *
-     * @return 异常信息
-     */
-    public String getMessage() {
-        return buildMessage(super.getMessage(), this.getCause());
-    }
-
-    /**
-     * 获取异常码
-     *
-     * @return 错误码
+     * 返回错误码
      */
     public String getCode() {
-        return code;
+        return errorCode != null ? errorCode.getCode() : null;
     }
 
     /**
-     * 回去关联系统
+     * 返回异常信息
+     */
+    @Override
+    public String getMessage() {
+        if (hasErrorCode()) {
+            return MessageSupportLoader.getMessage(errorCode.getI18nKey(), args);
+        }
+        return rawMessage;
+    }
+
+    /**
+     * 判断当前异常是否携带错误码
      *
-     * @return Throwable
+     * @return true：标准错误码异常；false：原始消息异常
      */
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    /**
-     * 获取异常链中最底层的根因异常
-     *
-     * @return 根因异常，如果不存在返回 null
-     */
-    public Throwable getRootCause() {
-        return getRootCause(this);
-    }
-
-    /**
-     * 判断异常链中是否包含指定类型的异常
-     *
-     * @param exType 异常类型
-     * @return 如果异常链中包含指定类型返回 true，否则返回 false
-     */
-    public boolean contains(Class<?> exType) {
-        if (exType == null) {
-            return false;
-        }
-
-        Throwable cause = this;
-        while (cause != null) {
-            if (exType.isInstance(cause)) {
-                return true;
-            }
-            if (cause.getCause() == cause) {
-                break;
-            }
-            cause = cause.getCause();
-        }
-        return false;
-    }
-
-    /**
-     * 安全解析国际化消息码，保证构造异常时不会抛出异常
-     */
-    protected static String resolveMessageCode(ExpMessageCode expMessageCode) {
-        try {
-            return I18nUtils.getMessage(expMessageCode.getCode(), expMessageCode.getArgs());
-        } catch (Exception e) {
-            // 如果国际化失败，则使用 code 本身
-            return expMessageCode.getCode();
-        }
-    }
-
-    /**
-     * 构建消息，包含嵌套异常信息
-     */
-    private static String buildMessage(String message, Throwable cause) {
-        if (message == null && cause == null) {
-            return null;
-        }
-
-        if (message == null) {
-            return cause.getMessage();
-        }
-
-        if (cause == null) {
-            return message;
-        }
-
-        return message + "; nested exception is " + cause;
-    }
-
-    /**
-     * 获取异常链中的根因异常
-     */
-    private static Throwable getRootCause(Throwable original) {
-        if (original == null) {
-            return null;
-        }
-        Throwable rootCause = null;
-        Throwable cause = original.getCause();
-        while (cause != null && cause != rootCause) {
-            rootCause = cause;
-            cause = cause.getCause();
-        }
-        return rootCause;
+    public boolean hasErrorCode() {
+        return errorCode != null;
     }
 }

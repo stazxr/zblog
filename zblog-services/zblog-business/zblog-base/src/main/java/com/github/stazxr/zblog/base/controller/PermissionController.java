@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
@@ -10,7 +11,6 @@ import com.github.stazxr.zblog.base.domain.dto.query.PermissionQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.PermCodeVo;
 import com.github.stazxr.zblog.base.domain.vo.PermissionVo;
 import com.github.stazxr.zblog.base.service.PermissionService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -46,7 +46,7 @@ public class PermissionController {
      */
     @GetMapping(value = "/queryPermTree")
     @ApiOperation(value = "查询权限树列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询权限树列表", code = "PERMQ001")
     public List<PermissionVo> queryPermTree(PermissionQueryDto queryDto) {
         return permissionService.queryPermTree(queryDto);
@@ -60,7 +60,7 @@ public class PermissionController {
      */
     @GetMapping(value = "/queryPublicPermTree")
     @ApiOperation(value = "查询权限树列表（公共）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询权限树列表（公共）", code = "PERMQ002", level = RouterLevel.PUBLIC)
     public List<PermissionVo> queryPublicPermTree(PermissionQueryDto queryDto) {
         return permissionService.queryPermTree(queryDto);
@@ -77,7 +77,7 @@ public class PermissionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "permId", value = "权限id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询权限详情", code = "PERMQ003")
     public PermissionVo queryPermDetail(@RequestParam Long permId) {
         return permissionService.queryPermDetail(permId);
@@ -94,7 +94,7 @@ public class PermissionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "searchKey", value = "权限名称或权限编码", dataTypeClass = String.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询权限编码列表", code = "PERMQ004", level = RouterLevel.PUBLIC)
     public List<PermCodeVo> queryPermCodes(@RequestParam(required = false) String searchKey) {
         return permissionService.queryPermCodes(searchKey);
@@ -111,7 +111,7 @@ public class PermissionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "permCode", value = "权限编码", dataTypeClass = String.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "根据权限编码查询资源信息", code = "PERMQ005", level = RouterLevel.PUBLIC)
     public Resource queryResourceByPermCode(@RequestParam String permCode) {
         return permissionService.queryResourceByPermCode(permCode);
@@ -125,7 +125,7 @@ public class PermissionController {
     @Log
     @PostMapping(value = "/addPerm")
     @ApiOperation(value = "新增权限")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "新增权限", code = "PERMA001")
     public void addPerm(@RequestBody @Validated(Create.class) PermissionDto permissionDto) {
         permissionService.addPermission(permissionDto);
@@ -139,7 +139,7 @@ public class PermissionController {
     @Log
     @PostMapping(value = "/editPerm")
     @ApiOperation(value = "编辑权限")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "编辑权限", code = "PERMU001")
     public void editPerm(@RequestBody @Validated(Update.class) PermissionDto permissionDto) {
         permissionService.editPermission(permissionDto);
@@ -156,7 +156,7 @@ public class PermissionController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "permId", value = "权限id", dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除权限", code = "PERMD001")
     public void deletePerm(@RequestParam Long permId) {
         permissionService.deletePermission(permId);

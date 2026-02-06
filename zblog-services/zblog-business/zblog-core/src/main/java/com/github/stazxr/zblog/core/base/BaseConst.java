@@ -147,22 +147,22 @@ public class BaseConst {
         /**
          * V_4.0.0
          */
-        public static final String V_4_0_0 = "V_4.0.0";
+        public static final String V_4_0_0 = "v4";
 
         /**
          * V_4.1.0
          */
-        public static final String V_4_1_0 = "V_4.1.0";
+        public static final String V_4_1_0 = "v4_1";
 
         /**
          * V_4.2.0
          */
-        public static final String V_4_2_0 = "V_4.2.0";
+        public static final String V_4_2_0 = "v4_2";
 
         /**
          * V_5.0.0
          */
-        public static final String V_5_0_0 = "V_5.0.0";
+        public static final String V_5_0_0 = "v5";
     }
 
     /**

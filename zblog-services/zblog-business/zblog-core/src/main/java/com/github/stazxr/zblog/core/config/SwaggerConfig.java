@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.core.config;
 
 import com.alibaba.fastjson.JSON;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
@@ -20,7 +20,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -88,7 +87,7 @@ public class SwaggerConfig {
                 if (input.isAnnotatedWith(ApiVersion.class)) {
                     Optional<ApiVersion> annotation = input.findAnnotation(ApiVersion.class);
                     if (annotation.isPresent()) {
-                        return Arrays.asList(annotation.get().group()).contains(version);
+                        return annotation.get().value().equals(version);
                     }
                 }
                 return false;

@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.bas.captcha;
 
 import com.github.stazxr.zblog.bas.exception.BaseException;
+import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
  * 自定义验证码异常类，用于处理与验证码相关的错误。
@@ -12,26 +14,28 @@ import com.github.stazxr.zblog.bas.exception.BaseException;
  * @author SunTao
  * @since 2024-08-20
  */
-public class CaptchaException extends BaseException {
+public class CaptchaException extends SystemException {
     private static final long serialVersionUID = -4486935430351080923L;
 
     /**
-     * 使用指定的详细消息构造一个新的 CaptchaException 实例。
+     * 构造技术异常
      *
-     * @param message 详细消息
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
      */
-    public CaptchaException(String message) {
-        super(message);
+    public CaptchaException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
     }
 
     /**
-     * 使用指定的详细消息和原因构造一个新的 CaptchaException 实例。
+     * 构造基于错误码的技术异常，并指定 cause
      *
-     * @param message 详细消息
-     * @param cause 引起此异常的原因，允许为 null，表示原因不存在或未知
+     * @param errorCode 错误码定义
+     * @param cause     原始异常
+     * @param args      国际化消息参数
      */
-    public CaptchaException(String message, Throwable cause) {
-        super(message, cause);
+    public CaptchaException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, cause, args);
     }
 }
 

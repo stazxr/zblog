@@ -2,8 +2,9 @@ package com.github.stazxr.zblog.core.util;
 
 import com.github.stazxr.zblog.bas.mask.MaskUtil;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 
@@ -15,8 +16,9 @@ import java.lang.reflect.Field;
  * @author SunTao
  * @since 2024-10-31
  */
-@Slf4j
 public class ToStringUtils {
+    private static final Logger log = LoggerFactory.getLogger(ToStringUtils.class);
+
     /**
      * 将给定对象转换为字符串
      *

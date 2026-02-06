@@ -17,11 +17,17 @@
     </description>
 
     <dependencies>
-        <!-- Zblog Core -->
+        <!-- Z-BLOG Core -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-core</artifactId>
             <version>${zblog.version}</version>
+        </dependency>
+        <!-- Springboot Configuration -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

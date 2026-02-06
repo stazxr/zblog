@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.exception.handler;
 
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -43,7 +43,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         log.warn("用户 [{}] 尝试访问 [{}] 被拒绝：{}", username, requestUri, accessDeniedException.getMessage());
 
         // 返回结果
-        Result result = Result.failure("您没有权限访问该资源").code(HttpStatus.FORBIDDEN).data(requestUri);
+        Result result = Result.failure("您没有权限访问该资源").code(HttpStatus.FORBIDDEN.value()).data(requestUri);
         ResponseUtils.responseJsonWriter(response, result);
     }
 }

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.exception.handler;
 
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.TokenError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,7 +41,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         logAuthenticationError(errorMsg, authException);
 
         // 返回结果
-        Result result = Result.failure(noticeMsg).data(errorMsg).code(HttpStatus.UNAUTHORIZED);
+        Result result = Result.failure(noticeMsg).data(errorMsg).code(HttpStatus.UNAUTHORIZED.value());
         ResponseUtils.responseJsonWriter(response, result);
     }
 

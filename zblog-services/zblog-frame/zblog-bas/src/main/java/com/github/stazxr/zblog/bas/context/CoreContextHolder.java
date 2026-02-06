@@ -1,75 +1,72 @@
 package com.github.stazxr.zblog.bas.context;
 
+import com.alibaba.ttl.TransmittableThreadLocal;
 import com.github.stazxr.zblog.bas.context.constant.TagConstants;
 import com.github.stazxr.zblog.bas.context.entity.ContextTag;
-import com.github.stazxr.zblog.bas.context.properties.ContextProperties;
-import com.github.stazxr.zblog.bas.context.properties.HeaderProperties;
-import com.github.stazxr.zblog.bas.context.util.EnvironmentHelper;
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
+import com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties;
+import com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties;
+import com.github.stazxr.zblog.bas.context.util.HeaderContextHolder;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 
 /**
- * Manages a thread-local instance of {@link CoreContext}.
- * Provides methods to get, set, and remove the context for the current thread.
- * Uses {@link ThreadLocal} for thread safety.
+ * Thread-local holder for CoreContext instances.
+ *
+ * <p>
+ * Ensures each thread has its own CoreContext instance.
+ * Automatically injects system-level tags on creation.
+ * </p>
  *
  * @author SunTao
  * @since 2024-07-02
  */
 class CoreContextHolder {
-    private static final ThreadLocal<CoreContext> CONTEXT = new ThreadLocal<>();
+    private static final TransmittableThreadLocal<CoreContext> CONTEXT = new TransmittableThreadLocal<>();
 
-    /**
-     * Retrieves the current thread's {@link CoreContext} instance.
-     * Creates a new instance if none exists for the current thread.
-     *
-     * @return The current thread's {@link CoreContext} instance
-     */
+    /** 初始化 CoreContext */
+    public static void init() {
+        CoreContext coreContext = CONTEXT.get();
+        if (coreContext == null) {
+            ContextProperties contextProperties = SpringContextHolder.getBean(ContextProperties.class);
+            coreContext = new CoreContext(contextProperties);
+            addSystemTags(coreContext);
+            CONTEXT.set(coreContext);
+        }
+    }
+
+    /** 获取 CoreContext */
     public static CoreContext get() {
         CoreContext coreContext = CONTEXT.get();
         if (coreContext == null) {
-            ContextProperties contextProperties = SpringContextUtil.getBean(ContextProperties.class);
-            coreContext = new CoreContext(contextProperties);
-            addSystemTags(coreContext);
-            // Set the context for the current thread
-            set(coreContext);
+            init();
         }
-        return coreContext;
+        return CONTEXT.get();
     }
 
-    /**
-     * Sets the {@link CoreContext} instance for the current thread.
-     *
-     * @param coreContext The {@link CoreContext} instance to set
-     */
-    public static void set(CoreContext coreContext) {
-        CONTEXT.set(coreContext);
+    /** 复制 CoreContext */
+    public static CoreContext copy() {
+        return CONTEXT.get().copy();
     }
 
-    /**
-     * Removes the {@link CoreContext} instance for the current thread.
-     */
-    public static void remove() {
+    /** 清理 CoreContext */
+    public static void clear() {
+        CoreContext coreContext = CONTEXT.get();
+        if (coreContext != null) {
+            coreContext.clear();
+        }
         CONTEXT.remove();
     }
 
-    /**
-     * Adds system-related tags to the given {@link CoreContext}.
-     *
-     * @param coreContext The {@link CoreContext} to add tags to
-     */
+    /** Inject system-level tags into CoreContext */
     private static void addSystemTags(CoreContext coreContext) {
-        String sysCode = EnvironmentHelper.getSysCode();
-        coreContext.put(new ContextTag(TagConstants.SYS_CODE_TAG, sysCode));
+        HeaderProperties headerProperties = SpringContextHolder.getBean(HeaderProperties.class);
 
-        String appCode = EnvironmentHelper.getAppCode();
-        coreContext.put(new ContextTag(TagConstants.APP_CODE_TAG, appCode));
-
-        String deployCode = EnvironmentHelper.getDeployCode();
+        coreContext.put(new ContextTag(TagConstants.SYS_CODE_TAG, HeaderContextHolder.getSysCode()));
+        coreContext.put(new ContextTag(TagConstants.APP_CODE_TAG, HeaderContextHolder.getAppCode()));
+        String deployCode = HeaderContextHolder.getDeployCode();
         if (deployCode != null) {
             coreContext.put(new ContextTag(TagConstants.DEPLOY_CODE_TAG, deployCode));
         }
 
-        HeaderProperties headerProperties = SpringContextUtil.getBean(HeaderProperties.class);
         HeaderProperties.Deploy deploy = headerProperties.getDeploy();
         coreContext.put(new ContextTag(TagConstants.DEPLOY_AREA_TAG, deploy.getDeployArea()));
         coreContext.put(new ContextTag(TagConstants.DEPLOY_CENTER_TAG, deploy.getDeployCenter()));

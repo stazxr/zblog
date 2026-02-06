@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -11,7 +12,6 @@ import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import com.github.stazxr.zblog.base.service.RoleService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -48,7 +48,7 @@ public class RoleController {
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询角色列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询角色列表", code = "ROLEQ001")
     public IPage<RoleVo> pageList(RoleQueryDto queryDto) {
         return roleService.queryRoleListByPage(queryDto);
@@ -62,7 +62,7 @@ public class RoleController {
      */
     @GetMapping(value = "/list")
     @ApiOperation(value = "查询角色列表（公共）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询角色列表（公共）", code = "ROLEQ002", level = RouterLevel.PUBLIC)
     public List<RoleVo> queryRoleList(RoleQueryDto queryDto) {
         return roleService.queryRoleList(queryDto);
@@ -79,7 +79,7 @@ public class RoleController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询角色详情", code = "ROLEQ003")
     public RoleVo queryRoleDetail(@RequestParam Long roleId) {
         return roleService.queryRoleDetail(roleId);
@@ -93,7 +93,7 @@ public class RoleController {
     @Log
     @PostMapping(value = "/addRole")
     @ApiOperation(value = "新增角色")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "新增角色", code = "ROLEA001")
     public void addRole(@RequestBody @Validated(Create.class) RoleDto roleDto) {
         roleService.addRole(roleDto);
@@ -107,7 +107,7 @@ public class RoleController {
     @Log
     @PostMapping(value = "/editRole")
     @ApiOperation(value = "编辑角色")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "编辑角色", code = "ROLEU001")
     public void editRole(@RequestBody @Validated(Update.class) RoleDto roleDto) {
         roleService.editRole(roleDto);
@@ -121,7 +121,7 @@ public class RoleController {
     @Log
     @PostMapping(value = "/authRole")
     @ApiOperation(value = "角色授权")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "角色授权", code = "ROLEU002")
     public void authRole(@RequestBody @Validated RoleAuthDto authDto) {
         roleService.authRole(authDto);
@@ -138,7 +138,7 @@ public class RoleController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询角色对应的权限id列表", code = "ROLEQ004", level = RouterLevel.PUBLIC, remark = "适配角色授权")
     public Set<Long> queryPermIdsByRoleId(@RequestParam Long roleId) {
         return roleService.queryPermIdsByRoleId(roleId);
@@ -155,7 +155,7 @@ public class RoleController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "roleId", value = "角色id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除角色", code = "ROLED001")
     public void deleteRole(@RequestParam Long roleId) {
         roleService.deleteRole(roleId);
@@ -169,9 +169,9 @@ public class RoleController {
     @Log
     @PostMapping(value = "/batchAddUserRole")
     @ApiOperation(value = "批量新增角色用户")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "批量新增角色用户", code = "ROLEA002")
-    public void batchAddUserRole(@RequestBody UserRoleDto userRoleDto) {
+    public void batchAddUserRole(@RequestBody @Validated UserRoleDto userRoleDto) {
         roleService.batchAddUserRole(userRoleDto);
     }
 
@@ -183,9 +183,9 @@ public class RoleController {
     @Log
     @PostMapping(value = "/batchDeleteUserRole")
     @ApiOperation(value = "批量删除角色用户")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "批量删除角色用户", code = "ROLED002")
-    public void batchDeleteUserRole(@RequestBody UserRoleDto userRoleDto) {
+    public void batchDeleteUserRole(@RequestBody @Validated UserRoleDto userRoleDto) {
         roleService.batchDeleteUserRole(userRoleDto);
     }
 }

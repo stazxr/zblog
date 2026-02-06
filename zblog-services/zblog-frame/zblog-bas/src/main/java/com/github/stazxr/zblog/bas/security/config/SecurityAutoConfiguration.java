@@ -266,8 +266,6 @@ public class SecurityAutoConfiguration {
 
         private final AccessDeniedHandler accessDeniedHandler;
 
-        private final CorsFilter corsFilter;
-
         private final IpCheckFilter ipCheckFilter;
 
         private final ValidateLoginCodeFilter validateLoginCodeFilter;
@@ -324,7 +322,6 @@ public class SecurityAutoConfiguration {
             // 配置过滤器链，see: FilterOrderRegistration
             http.addFilterBefore(ipCheckFilter, LogoutFilter.class);
             http.addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
-            http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
             http.addFilterBefore(parseLoginParamFilter, UsernamePasswordAuthenticationFilter.class);
             http.addFilterAfter(validateLoginCodeFilter, ParseLoginParamFilter.class);
             http.addFilterAt(userPassAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

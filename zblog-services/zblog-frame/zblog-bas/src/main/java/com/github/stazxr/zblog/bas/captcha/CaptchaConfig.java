@@ -48,6 +48,10 @@ public class CaptchaConfig {
      */
     private int fontSize = 28;
 
+    public void setDuration(int duration) {
+        this.duration = Math.max(duration, 0);
+    }
+
     @Override
     public String toString() {
         return JSON.toJSONString(this);

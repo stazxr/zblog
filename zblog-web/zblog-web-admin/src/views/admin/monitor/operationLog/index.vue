@@ -3,6 +3,9 @@
     <div class="head-container">
       <div class="search-opts">
         <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="160">
+          <muses-search-form-item label="" prop="search-traceId">
+            <el-input id="search-traceId" v-model="filters.traceId" clearable placeholder="流水号" @keyup.enter.native="search" />
+          </muses-search-form-item>
           <muses-search-form-item label="" prop="search-description">
             <el-input id="search-description" v-model="filters.description" clearable placeholder="操作描述" @keyup.enter.native="search" />
           </muses-search-form-item>
@@ -16,7 +19,7 @@
             <el-input id="search-costTime" v-model="filters.costTime" type="number" clearable placeholder="请求耗时" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-execResult">
-            <el-select id="search-execResult" v-model="filters.execResult" placeholder="操作结果" clearable>
+            <el-select id="search-execResult" v-model="filters.execResult" placeholder="操作结果" clearable @change="search">
               <el-option v-for="item in execResultList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
@@ -55,10 +58,16 @@
               <el-form-item class="el-form-item" label="日志序号:" style="width: 100%">
                 <span>{{ props.row['id'] }}</span>
               </el-form-item>
-              <el-form-item class="el-form-item" label="日志类型:" style="width: 100%">
+              <el-form-item class="el-form-item" label="流水号:" style="width: 100%">
+                <span>{{ props.row['traceId'] }}</span>
+              </el-form-item>
+              <!-- <el-form-item class="el-form-item" label="日志类型:" style="width: 100%">
                 <span v-if="props.row['logType'] === 1">接口日志</span>
                 <span v-else-if="props.row['logType'] === 2">操作日志</span>
                 <span v-else> - </span>
+              </el-form-item> -->
+              <el-form-item class="el-form-item" label="请求IP:" style="width: 100%">
+                <span>{{ props.row['requestIp'] }}</span>
               </el-form-item>
               <el-form-item class="el-form-item" label="请求接口:" style="width: 100%">
                 <span>[{{ props.row['requestMethod'] }}] {{ props.row['requestUri'] }}</span>
@@ -73,19 +82,24 @@
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="description" label="操作描述" align="left" width="200" />
-        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" label="接口编码" align="left" width="120" />
+        <el-table-column :show-overflow-tooltip="true" prop="interfaceCode" label="接口编码" align="center" width="100" />
         <el-table-column :show-overflow-tooltip="true" prop="operateUser" label="操作用户" align="center" width="120" />
-        <el-table-column :show-overflow-tooltip="true" prop="requestIp" label="请求IP" align="center" width="120" />
         <el-table-column :show-overflow-tooltip="true" prop="address" label="请求来源" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="browser" label="浏览器" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="platform" label="操作系统" align="center" width="100" />
+        <el-table-column :show-overflow-tooltip="true" prop="browser" label="浏览器" align="center" width="140">
+          <template v-slot="scope">
+            {{ scope.row.browser }} {{ scope.row.browserVersion }}
+          </template>
+        </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="execResult" label="请求结果" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row['execResult']" type="success">成功</el-tag>
-            <el-link v-else type="danger" :disabled="!hasPerm('LOGOQ002')" @click="showDetail(scope.row.id)">
+            <el-link v-else type="danger" :disabled="!hasPerm('LOGIQ002')" @click="showDetail(scope.row.id)">
               失败<i class="el-icon-view el-icon--right" />
             </el-link>
           </template>
         </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="errorCode" label="错误码" align="center" width="100" />
         <el-table-column :show-overflow-tooltip="true" prop="costTime" label="请求耗时" align="center" width="100">
           <template v-slot="scope">
             <span v-if="scope.row['costTime'] === null"> - </span>
@@ -132,6 +146,7 @@ export default {
   data() {
     return {
       filters: {
+        traceId: null,
         description: null,
         interfaceCode: null,
         username: null,
@@ -197,7 +212,7 @@ export default {
       this.$mapi.log.pageOperationLogList(param).then(res => {
         const { data } = res
         this.total = data.total
-        this.tableData = data.list
+        this.tableData = data.records
       }).catch(_ => {
         this.total = 0
         this.tableData = []
@@ -252,6 +267,6 @@ export default {
 
 <style scoped>
 .head-container .search-opts .el-date-editor {
-  width: 170px !important;
+  width: 175px !important;
 }
 </style>

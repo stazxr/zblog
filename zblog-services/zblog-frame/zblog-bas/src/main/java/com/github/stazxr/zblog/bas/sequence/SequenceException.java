@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.sequence;
 
-import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
  * 序号异常
@@ -9,30 +9,27 @@ import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
  * @author SunTao
  * @since 2024-08-10
  */
-public class SequenceException extends BaseException {
+public class SequenceException extends SystemException {
     private static final long serialVersionUID = -2147223112586046182L;
 
-    public SequenceException(String message) {
-        super(new ExpMessageCode(message));
-    }
-
-    public SequenceException(String message, Throwable cause) {
-        super(new ExpMessageCode(message), cause);
+    /**
+     * 构造技术异常
+     *
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
+     */
+    public SequenceException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
     }
 
     /**
-     * Returns the detail message string of this throwable.
+     * 构造基于错误码的技术异常，并指定 cause
      *
-     * @return the detail message string of this {@code Throwable} instance
-     * (which may be {@code null}).
+     * @param errorCode 错误码定义
+     * @param cause     原始异常
+     * @param args      国际化消息参数
      */
-    @Override
-    public String getMessage() {
-        String messageCode = getCode();
-        String message = StatusCode.of(messageCode);
-        if (message != null) {
-            messageCode = "[" + messageCode + "] ".concat(message).concat(super.getMessage());
-        }
-        return messageCode;
+    public SequenceException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, cause, args);
     }
 }

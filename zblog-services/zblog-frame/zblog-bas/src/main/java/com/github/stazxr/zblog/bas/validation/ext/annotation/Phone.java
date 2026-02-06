@@ -7,7 +7,7 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 /**
- *
+ * 手机号校验注解
  *
  * @author SunTao
  * @since 2025-08-01

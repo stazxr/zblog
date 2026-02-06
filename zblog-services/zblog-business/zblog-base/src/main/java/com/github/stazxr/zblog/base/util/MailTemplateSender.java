@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.util;
 
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.notify.mail.MailException;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.notify.mail.MailService;
 import com.github.stazxr.zblog.base.domain.enums.MailTemplate;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.core.config.properties.WebsiteProperties;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -49,8 +49,12 @@ public class MailTemplateSender {
             // 发送邮件
             String html = templateEngine.process("mail/layout", ctx);
             mailService.sendHtmlMail(receiver, template.getSubject(), html);
+        } catch (MailException e) {
+            // 邮件服务器故障
+            throw e;
         } catch (Exception e) {
-            throw new ServiceException(ExpMessageCode.of("error.email.sendError"), e);
+            // 邮件发送失败
+            throw new MailException(BaseErrorCode.SCOREA004, e);
         }
     }
 }

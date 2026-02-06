@@ -111,7 +111,8 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
         }
 
         // 验证用户输入的验证码是否正确
-        if (!captchaHandler.verifyCaptcha(uuid, code)) {
+        // if (!captchaHandler.verifyCaptcha(uuid, code)) { // 概率验证失败，待分析原因
+        if (!code.equals(cacheCode)) {
             throw new LoginNumCodeException("验证码不正确");
         }
     }

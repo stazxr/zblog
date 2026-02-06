@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.sequence.util;
 
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.sequence.core.id.IdGenerator;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class SequenceUtils {
 
     private static IdGenerator instance() {
         if (SequenceUtils.idGenerator == null) {
-            SequenceUtils.idGenerator = SpringContextUtil.getBean("idGeneratorService", IdGenerator.class);
+            SequenceUtils.idGenerator = SpringContextHolder.getBean("idGeneratorService", IdGenerator.class);
         }
         return SequenceUtils.idGenerator;
     }

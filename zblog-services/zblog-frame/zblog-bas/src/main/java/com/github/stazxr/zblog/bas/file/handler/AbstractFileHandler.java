@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.file.handler;
 
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.file.FileErrorCode;
 import com.github.stazxr.zblog.bas.file.FileException;
 import com.github.stazxr.zblog.bas.file.UploadContext;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
@@ -87,7 +88,7 @@ public abstract class AbstractFileHandler implements FileHandler {
             }
             return fileInfo;
         } catch (Exception e) {
-            throw new FileException(ExpMessageCode.of("valid.file.bas.uploadFailed"), e);
+            throw new FileException(FileErrorCode.SFILEA001, e);
         }
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractFileHandler implements FileHandler {
             }
             deleteImpl(storageLocation);
         } catch (Exception e) {
-            throw new FileException(ExpMessageCode.of("valid.file.bas.deleteFailed"), e);
+            throw new FileException(FileErrorCode.SFILEA003, e);
         }
     }
 
@@ -139,7 +140,7 @@ public abstract class AbstractFileHandler implements FileHandler {
         try (InputStream inputStream = getFileStream(storageLocation)) {
             StreamUtils.copy(inputStream, response.getOutputStream());
         } catch (Exception e) {
-            throw new FileException(ExpMessageCode.of("valid.file.bas.downloadFailed"), e);
+            throw new FileException(FileErrorCode.SFILEA002, e);
         }
     }
 

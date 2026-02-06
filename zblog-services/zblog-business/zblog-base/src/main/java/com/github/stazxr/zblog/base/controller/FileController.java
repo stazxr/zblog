@@ -1,13 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.base.service.FileService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -44,7 +44,7 @@ public class FileController {
      */
     @GetMapping(value = "/pageFileList")
     @ApiOperation(value = "分页查询文件列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询文件列表", code = "FILEQ001")
     public PageInfo<FileVo> queryFileListByPage(FileQueryDto queryDto) {
         return fileService.queryFileListByPage(queryDto);
@@ -61,7 +61,7 @@ public class FileController {
     @Log
     @PostMapping("/uploadFile")
     @ApiOperation(value = "文件上传", notes = "只需要认证")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "文件上传", code = "FILEA001", level = RouterLevel.PUBLIC)
     public List<UploadFileVo> uploadFile(@RequestPart(value = "files", required = false) MultipartFile[] multipartFiles,
             @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws Exception {
@@ -82,7 +82,7 @@ public class FileController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "uploadType", value = "上传方式，1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "测试文件上传", code = "FILEA002")
     public UploadFileVo uploadFileTest(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Integer uploadType) throws Exception {
         return fileService.uploadFileTest(multipartFile, uploadType);
@@ -103,7 +103,7 @@ public class FileController {
         @ApiImplicitParam(name = "fileId", value = "文件id", required = true, dataTypeClass = Long.class),
         @ApiImplicitParam(name = "isDown", value = "是否强制下载", required = true, dataTypeClass = Boolean.class, example = "false")
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "下载文件", code = "FILEQ003", level = RouterLevel.OPEN)
     public void downloadFile(@RequestParam Long fileId, Boolean isDown, HttpServletResponse response) throws Exception {
         fileService.downloadFile(fileId, isDown, response);
@@ -117,7 +117,7 @@ public class FileController {
     @Log
     @PostMapping("/deleteFile")
     @ApiOperation(value = "删除文件", notes = "只需要认证")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除文件", code = "FILED001", level = RouterLevel.PUBLIC)
     public void deleteFile(@RequestParam Long fileId) {
         fileService.deleteFile(fileId);
@@ -131,7 +131,7 @@ public class FileController {
     @Log
     @PostMapping("/deleteFileTest")
     @ApiOperation(value = "测试文件删除")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "测试文件删除", code = "FILED002")
     public void deleteFileTest(@RequestParam Long fileId) {
         fileService.deleteFile(fileId);

@@ -34,10 +34,9 @@ public interface SecurityUserService {
      * 更新用户的登录信息。
      *
      * @param username 用户名
-     * @param userIp   用户的登录ip
      * @param type     用户登录类型
      * @param request  用户的请求信息
      */
-    void updateUserLoginInfo(String username, String userIp, int type, HttpServletRequest request);
+    void updateUserLoginInfo(String username, int type, HttpServletRequest request);
 }
 

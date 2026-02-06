@@ -1,30 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO">
-    <Plugins>
-        <Plugin package="com.github.stazxr.zblog.bas.log.slf4j"/>
-    </Plugins>
+<Configuration status="WARN" monitorInterval="30" includeLocation="true">
+    <Properties>
+        <!-- 应用信息 -->
+        <Property name="APP_NAME">zblog</Property>
+        <Property name="LOG_PATH">/home/zblog/appLogs</Property>
+
+        <!-- 滚动策略 -->
+        <Property name="LOG_MAX_HISTORY">30</Property>
+        <Property name="LOG_INTERVAL">1</Property>
+        <Property name="MAX_FILE_SIZE">10MB</Property>
+        <Property name="LOG_DELETE_INTERVAL">7d</Property>
+
+        <!-- 控制台日志 -->
+        <Property name="CONSOLE_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS}|%-5level|%thread|%logger{36}:%L - %msg%n
+        </Property>
+
+        <!-- 请求/响应日志 -->
+        <Property name="FLOW_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS}|%X{sysCode}|%X{appCode}|%X{deployCode}|%msg%n
+        </Property>
+    </Properties>
 
     <Appenders>
-        <!-- 控制台输出的 Appender -->
+        <!-- 控制台 -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
         </Console>
 
-        <!-- 文件输出的 Appender -->
-        <File name="File" fileName="logs/zblog.log">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <!-- 使用自定义的 MDC 过滤器 -->
-            <Filters>
-                <LogMdcFilter enabled="true" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </File>
+        <!-- 请求响应日志 -->
+        <RollingFile name="FlowFile"
+                     fileName="${LOG_PATH}/flowLog/${APP_NAME}-flow.log"
+                     filePattern="${LOG_PATH}/flowLog/${APP_NAME}-flow.%d{yyyy-MM-dd}-%i.log">
+
+            <PatternLayout pattern="${FLOW_PATTERN}"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="${LOG_INTERVAL}" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOG_PATH}/flowLog" maxDepth="2">
+                    <IfLastModified age="${LOG_DELETE_INTERVAL}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- 普通应用日志 -->
+        <RollingFile name="AppFile"
+                     fileName="${LOG_PATH}/${APP_NAME}.log"
+                     filePattern="${LOG_PATH}/archived/${APP_NAME}-%d{yyyy-MM-dd}-%i.log">
+
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+
+            <DefaultRolloverStrategy max="${LOG_MAX_HISTORY}"/>
+        </RollingFile>
+
+        <!-- 线程池监控日志 -->
+        <RollingFile name="ThreadMonitorFile"
+                     fileName="${LOG_PATH}/monitorLog/${APP_NAME}-threadMonitorLog.log"
+                     filePattern="${LOG_PATH}/monitorLog/archived/${APP_NAME}-threadMonitorLog-%d{yyyy-MM-dd}-%i.log">
+
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} - %msg%n"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+
+            <DefaultRolloverStrategy max="${LOG_MAX_HISTORY}"/>
+        </RollingFile>
+
+        <!-- 线程池错误日志 -->
+        <RollingFile name="ThreadErrorMonitorFile"
+                     fileName="${LOG_PATH}/monitorLog/${APP_NAME}-threadErrorMonitorLog.log"
+                     filePattern="${LOG_PATH}/monitorLog/archived/${APP_NAME}-threadErrorMonitorLog-%d{yyyy-MM-dd}-%i.log">
+
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} - %msg%n"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+
+            <DefaultRolloverStrategy max="${LOG_MAX_HISTORY}"/>
+        </RollingFile>
+
     </Appenders>
 
     <Loggers>
-        <!-- 根日志记录器，定义全局日志级别 -->
+
+        <!-- 请求响应日志 -->
+        <Logger name="___flowLog___" level="INFO" additivity="false">
+            <AppenderRef ref="FlowFile"/>
+        </Logger>
+
+        <!-- 线程池监控 -->
+        <Logger name="resource.monitor.threadpool" level="INFO" additivity="false">
+            <AppenderRef ref="ThreadMonitorFile"/>
+        </Logger>
+
+        <!-- 线程池错误 -->
+        <Logger name="resource.monitor.threadpool.error" level="ERROR" additivity="false">
+            <AppenderRef ref="ThreadErrorMonitorFile"/>
+        </Logger>
+
+        <!-- 上下文 DEBUG -->
+        <Logger name="com.github.stazxr.zblog.bas.context.Context" level="DEBUG"/>
+
+        <!-- Spring 日志 -->
+        <Logger name="org.springframework" level="INFO"/>
+        <Logger name="com" level="INFO"/>
+
+        <!-- ⭐ 默认 Root Logger（新增标准出口） -->
         <Root level="INFO">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="AppFile"/>
         </Root>
     </Loggers>
 </Configuration>

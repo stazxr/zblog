@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.file.handler;
 
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
+import com.github.stazxr.zblog.bas.file.FileErrorCode;
 import com.github.stazxr.zblog.bas.file.FileException;
 import lombok.Getter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -50,13 +50,13 @@ public enum FileHandlerEnum {
         for (FileHandlerEnum fileHandlerEnum : values()) {
             if (fileHandlerEnum.type == fileUploadType) {
                 try {
-                    return SpringContextUtil.getBean(fileHandlerEnum.beanName, FileHandler.class);
+                    return SpringContextHolder.getBean(fileHandlerEnum.beanName, FileHandler.class);
                 } catch (NoSuchBeanDefinitionException e) {
-                    throw new FileException(ExpMessageCode.of("valid.file.bas.beanNotFound", fileHandlerEnum.beanName));
+                    throw new FileException(FileErrorCode.EFILEA000, fileHandlerEnum.beanName);
                 }
             }
         }
 
-        throw new FileException(ExpMessageCode.of("valid.file.bas.typeNotSupport", fileUploadType));
+        throw new FileException(FileErrorCode.SFILEA000, fileUploadType);
     }
 }

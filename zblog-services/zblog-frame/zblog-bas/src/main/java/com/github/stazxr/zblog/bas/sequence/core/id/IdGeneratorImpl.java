@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.bas.sequence.core.id;
 
+import com.github.stazxr.zblog.bas.sequence.SequenceErrorCode;
 import com.github.stazxr.zblog.bas.sequence.SequenceException;
 import com.github.stazxr.zblog.bas.sequence.SequenceGenerator;
 import com.github.stazxr.zblog.bas.sequence.SequenceGeneratorAware;
@@ -31,7 +32,7 @@ public class IdGeneratorImpl implements SequenceGeneratorAware, IdGenerator {
     @Override
     public String generateId() {
         if (sequenceGenerator == null) {
-            throw new SequenceException("ZSEQ002");
+            throw new SequenceException(SequenceErrorCode.SSEQGA001);
         }
         return sequenceGenerator.nextId();
     }

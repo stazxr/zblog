@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.bas.encryption;
 
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
+
 /**
  * 加密异常
  *
@@ -10,21 +12,23 @@ public class EncryptException extends EncryptorException {
     private static final long serialVersionUID = 3706959942870244319L;
 
     /**
-     * 构造一个新的 EncryptException 实例。
+     * 构造技术异常
      *
-     * @param message 错误信息
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
      */
-    public EncryptException(String message) {
-        super(message);
+    public EncryptException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
     }
 
     /**
-     * 构造一个新的 EncryptException 实例。
+     * 构造基于错误码的技术异常，并指定 cause
      *
-     * @param message 错误信息
-     * @param cause   原因
+     * @param errorCode 错误码定义
+     * @param cause     原始异常
+     * @param args      国际化消息参数
      */
-    public EncryptException(String message, Throwable cause) {
-        super(message, cause);
+    public EncryptException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, cause, args);
     }
 }

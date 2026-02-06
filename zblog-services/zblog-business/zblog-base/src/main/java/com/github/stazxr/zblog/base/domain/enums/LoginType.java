@@ -13,22 +13,22 @@ public enum LoginType {
     /**
      * 访客
      */
-    GUEST("00"),
+    GUEST("LT00"),
 
     /**
      * 密码
      */
-    PASSWORD("01"),
+    PASSWORD("LT01"),
 
     /**
      * QQ互信
      */
-    QQ("02"),
+    QQ("LT02"),
 
     /**
      * 未知
      */
-    UNKNOWN("99");
+    UNKNOWN("LT99");
 
     private final String type;
 

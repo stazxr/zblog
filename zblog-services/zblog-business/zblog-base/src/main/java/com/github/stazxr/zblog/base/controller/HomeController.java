@@ -1,76 +1,76 @@
-package com.github.stazxr.zblog.base.controller;
-
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.router.Router;
-import com.github.stazxr.zblog.bas.router.RouterLevel;
-import com.github.stazxr.zblog.base.service.HomeService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.base.BaseConst;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-/**
- * 面板管理
- *
- * @author SunTao
- * @since 2022-07-19
- */
-@Slf4j
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/home")
-@Api(value = "HomeController", tags = { "主页控制器" })
-public class HomeController {
-    private final HomeService homeService;
-
-    /**
-     * 获取首页面板的统计数据
-     *
-     * @return HomePanelDataCountVo
-     */
-    @GetMapping("/getHomePanelDataCount")
-    @ApiOperation(value = "获取面板统计数据")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "获取首页面板的统计数据", code = "getHomePanelDataCount", level = RouterLevel.PUBLIC)
-    public Result getHomePanelDataCount() {
-        return Result.success().data(homeService.getHomePanelDataCount());
-    }
-
-    /**
-     * 获取首页面板的统计数据
-     *
-     * @param type 图表类型
-     * @return SingleLineChartDataVo
-     */
-    @GetMapping("/getHomePanelDetailDataByType")
-    @ApiOperation(value = "获取面板折现图表数据")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "图表类型：pv、uv、uu、av", required = true, dataTypeClass = String.class)
-    })
-    @Router(name = "获取首页面板的折现图表数据", code = "getHomePanelDetailDataByType", level = RouterLevel.PUBLIC)
-    public Result getHomePanelDetailDataByType(@RequestParam String type) {
-        return Result.success().data(homeService.getHomePanelDetailDataByType(type));
-    }
-
-    /**
-     * 获取首页面板的访客地域数据
-     *
-     * @return NameValue
-     */
-    @GetMapping("/getHomePanelVisitorAreaCount")
-    @ApiOperation(value = "获取首页面板的访客地域数据")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
-    @Router(name = "获取首页面板的访客地域数据", code = "getHomePanelVisitorAreaCount", level = RouterLevel.PUBLIC)
-    public Result getHomePanelVisitorAreaCount() {
-        return Result.success().data(homeService.getHomePanelVisitorAreaCount());
-    }
-}
+//package com.github.stazxr.zblog.base.controller;
+//
+//import com.github.stazxr.zblog.bas.rest.Result;
+//import com.github.stazxr.zblog.bas.router.Router;
+//import com.github.stazxr.zblog.bas.router.RouterLevel;
+//import com.github.stazxr.zblog.base.service.HomeService;
+//import com.github.stazxr.zblog.core.annotation.ApiVersion;
+//import com.github.stazxr.zblog.core.base.BaseConst;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiImplicitParam;
+//import io.swagger.annotations.ApiImplicitParams;
+//import io.swagger.annotations.ApiOperation;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RestController;
+//
+///**
+// * 面板管理
+// *
+// * @author SunTao
+// * @since 2022-07-19
+// */
+//@Slf4j
+//@RestController
+//@RequiredArgsConstructor
+//@RequestMapping("/api/home")
+//@Api(value = "HomeController", tags = { "主页控制器" })
+//public class HomeController {
+//    private final HomeService homeService;
+//
+//    /**
+//     * 获取首页面板的统计数据
+//     *
+//     * @return HomePanelDataCountVo
+//     */
+//    @GetMapping("/getHomePanelDataCount")
+//    @ApiOperation(value = "获取面板统计数据")
+//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+//    @Router(name = "获取首页面板的统计数据", code = "getHomePanelDataCount", level = RouterLevel.PUBLIC)
+//    public Result getHomePanelDataCount() {
+//        return Result.success().data(homeService.getHomePanelDataCount());
+//    }
+//
+//    /**
+//     * 获取首页面板的统计数据
+//     *
+//     * @param type 图表类型
+//     * @return SingleLineChartDataVo
+//     */
+//    @GetMapping("/getHomePanelDetailDataByType")
+//    @ApiOperation(value = "获取面板折现图表数据")
+//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+//    @ApiImplicitParams({
+//        @ApiImplicitParam(name = "type", value = "图表类型：pv、uv、uu、av", required = true, dataTypeClass = String.class)
+//    })
+//    @Router(name = "获取首页面板的折现图表数据", code = "getHomePanelDetailDataByType", level = RouterLevel.PUBLIC)
+//    public Result getHomePanelDetailDataByType(@RequestParam String type) {
+//        return Result.success().data(homeService.getHomePanelDetailDataByType(type));
+//    }
+//
+//    /**
+//     * 获取首页面板的访客地域数据
+//     *
+//     * @return NameValue
+//     */
+//    @GetMapping("/getHomePanelVisitorAreaCount")
+//    @ApiOperation(value = "获取首页面板的访客地域数据")
+//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_1_0 })
+//    @Router(name = "获取首页面板的访客地域数据", code = "getHomePanelVisitorAreaCount", level = RouterLevel.PUBLIC)
+//    public Result getHomePanelVisitorAreaCount() {
+//        return Result.success().data(homeService.getHomePanelVisitorAreaCount());
+//    }
+//}

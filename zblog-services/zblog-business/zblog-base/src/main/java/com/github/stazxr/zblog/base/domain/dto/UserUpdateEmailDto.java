@@ -23,21 +23,21 @@ public class UserUpdateEmailDto implements Serializable {
     /**
      * 邮箱
      */
-    @NotBlank(message = "{valid.usercenter.email.email.required}")
+    @NotBlank(message = "{USERCENTER_EMAIL_REQUIRED}")
     @ApiModelProperty("邮箱")
     private String email;
 
     /**
      * 邮箱验证码
      */
-    @NotBlank(message = "{valid.usercenter.email.code.required}")
+    @NotBlank(message = "{USERCENTER_EMAIL_CODE_REQUIRED}")
     @ApiModelProperty("邮箱验证码")
     private String code;
 
     /**
      * 缓存标识
      */
-    @NotBlank(message = "{valid.usercenter.email.uuid.required}")
+    @NotBlank(message = "{USERCENTER_EMAIL_UUID_REQUIRED}")
     @ApiModelProperty("缓存标识")
     private String uuid;
 }

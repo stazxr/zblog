@@ -11,6 +11,7 @@
         <result property="userStatus" column="USER_STATUS" />
         <result property="gender" column="GENDER" />
         <result property="loginChan" column="LOGIN_CHAN" />
+        <result property="loginPlatform" column="LOGIN_PLATFORM" />
         <result property="loginType" column="LOGIN_TYPE" />
         <result property="loginAddress" column="LOGIN_ADDRESS" />
         <result property="successLoginTime" column="SUCCESS_LOGIN_TIME" />
@@ -132,7 +133,7 @@
         SELECT
             u.ID, u.HEAD_IMG_URL, u.USERNAME, u.NICKNAME, u.EMAIL, u.USER_TYPE, u.USER_STATUS, u.GENDER,
             DATE_FORMAT(u.SUCCESS_LOGIN_TIME, '%Y-%m-%d %H:%i:%s') AS SUCCESS_LOGIN_TIME, u.CREATE_TIME,
-            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ur.ROLE_ID
+            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_PLATFORM, ull.LOGIN_ADDRESS, ur.ROLE_ID
         FROM user u
         LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.SUCCESS_LOGIN_TIME AND ull.IS_SUCCESS = 1
         LEFT JOIN (
@@ -178,7 +179,7 @@
             u.ID, u.USERNAME, u.USER_TYPE, u.USER_STATUS, u.NICKNAME,
             u.EMAIL, u.GENDER, u.SIGNATURE, u.WEBSITE, u.HEAD_IMG_URL,
             ur.ROLE_ID, r.ROLE_NAME, u.CREATE_TIME, u.UPDATE_TIME,
-            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_ADDRESS, ull.USER_AGENT,
+            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_PLATFORM, ull.LOGIN_BROWSER, ull.LOGIN_BROWSER_VERSION, ull.LOGIN_ADDRESS, ull.USER_AGENT,
             DATE_FORMAT(u.EXPIRE_TIME, '%Y-%m-%d %H:%i:%s') AS EXPIRE_TIME,
             DATE_FORMAT(u.CHANGE_PASSWORD_TIME, '%Y-%m-%d %H:%i:%s') AS CHANGE_PASSWORD_TIME,
             DATE_FORMAT(u.PASSWORD_EXPIRE_TIME, '%Y-%m-%d %H:%i:%s') AS PASSWORD_EXPIRE_TIME,
@@ -209,13 +210,13 @@
             AND `DESCRIPTION` LIKE #{descriptionBind}
         </if>
         <if test="query.execResult != null">
-            AND EXEC_RESULT = #{query.execResult}
+            AND `EXEC_RESULT` = #{query.execResult}
         </if>
-        <if test="query.eventStartTime != null and query.eventStartTime != ''">
-            AND EVENT_TIME &gt;= STR_TO_DATE(#{query.eventStartTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.eventStartTime != null">
+            AND `EVENT_TIME` <![CDATA[>=]]> #{query.eventStartTime, jdbcType=TIMESTAMP}
         </if>
-        <if test="query.eventEndTime != null and query.eventEndTime != ''">
-            AND EVENT_TIME &lt;= STR_TO_DATE(#{query.eventEndTime}, '%Y-%m-%d %H:%i:%s')
+        <if test="query.eventEndTime != null">
+            AND `EVENT_TIME` <![CDATA[<=]]> #{query.eventEndTime, jdbcType=TIMESTAMP}
         </if>
         ORDER BY EVENT_TIME DESC
     </select>

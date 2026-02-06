@@ -1,11 +1,6 @@
 {
   "groups": [
     {
-      "name": "zblog",
-      "type": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties"
-    },
-    {
       "name": "swagger",
       "type": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties",
       "sourceType": "com.github.stazxr.zblog.core.config.properties.SwaggerConfigProperties"
@@ -18,13 +13,6 @@
     }
   ],
   "properties": [
-    {
-      "name": "zblog.base-package",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.core.config.properties.ZblogProperties",
-      "description": "basePackage.",
-      "defaultValue": "com.github.stazxr.zblog"
-    },
     {
       "name": "swagger.enable",
       "type": "java.lang.Boolean",

@@ -4,6 +4,8 @@ import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.util.Assert;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 该类实现了 {@link JwtTokenStorage} 接口，提供了对访问令牌（accessToken）和刷新令牌（refreshToken）进行存储、获取、过期处理的功能。
  * 该实现基于缓存 {@link GlobalCache} 存储 JWT。
@@ -39,7 +41,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(accessToken, "JwtTokenStorage put 'accessToken' is null");
         String utkCacheKey = String.format(ATK_TOKEN_CACHE_KEY, uid);
-        GlobalCache.put(utkCacheKey, accessToken, duration);
+        GlobalCache.put(utkCacheKey, accessToken, duration, TimeUnit.SECONDS);
         return getAccessToken(uid);
     }
 
@@ -60,7 +62,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
         Assert.notNull(uid, "JwtTokenStorage put 'uid' is null");
         Assert.notNull(refreshToken, "JwtTokenStorage put 'refreshToken' is null");
         String rtkCacheKey = String.format(RTK_TOKEN_CACHE_KEY, uid);
-        GlobalCache.put(rtkCacheKey, refreshToken, duration);
+        GlobalCache.put(rtkCacheKey, refreshToken, duration, TimeUnit.SECONDS);
         return getRefreshToken(uid);
     }
 

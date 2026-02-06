@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.bas.encryption.rsa;
 
 import com.github.stazxr.zblog.bas.encryption.DecryptException;
 import com.github.stazxr.zblog.bas.encryption.EncryptException;
+import com.github.stazxr.zblog.bas.encryption.EncryptionErrorCode;
 import com.github.stazxr.zblog.bas.encryption.Encryptor;
 import com.github.stazxr.zblog.bas.encryption.util.RsaUtils;
 
@@ -34,7 +35,7 @@ public class RsaEncryptor2 implements Encryptor {
             privateKey = rsaKeyPair.getPrivateKey();
             publicKey = rsaKeyPair.getPublicKey();
         } catch (Exception e) {
-            throw new EncryptException("ZENC001", e);
+            throw new EncryptException(EncryptionErrorCode.SENCYA000, e);
         }
     }
 
@@ -51,7 +52,7 @@ public class RsaEncryptor2 implements Encryptor {
             // 使用公钥加密明文
             return RsaUtils.encryptByPublicKey(publicKey, plainText);
         } catch (Exception e) {
-            throw new EncryptException("ZENC002", e);
+            throw new EncryptException(EncryptionErrorCode.SENCYA000, e);
         }
     }
 
@@ -68,7 +69,7 @@ public class RsaEncryptor2 implements Encryptor {
             // 使用私钥解密密文
             return RsaUtils.decryptByPrivateKey(privateKey, cipherText);
         } catch (Exception e) {
-            throw new DecryptException("ZENC003", e);
+            throw new DecryptException(EncryptionErrorCode.SENCYA000, e);
         }
     }
 

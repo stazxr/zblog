@@ -42,10 +42,8 @@ public abstract class AbstractNameCaptchaFactory implements CaptchaFactory {
             try {
                 // build Captcha
                 return buildCaptcha(captchaConfig);
-            } catch (CaptchaException e) {
-                throw e;
             } catch (Exception e) {
-                throw new CaptchaException("Create captcha catch unknown error", e);
+                throw new CaptchaException(CaptchaErrorCode.SCAPTA000, e);
             }
         }
 
@@ -75,7 +73,7 @@ public abstract class AbstractNameCaptchaFactory implements CaptchaFactory {
             captchaConfig.setCaptchaType(CaptchaType.Default.name());
         }
         if (captchaConfig.getDuration() < 0) {
-            throw new CaptchaException("Captcha duration must greater than or equal to 0");
+            captchaConfig.setDuration(0); // 兜底
         }
     }
 }

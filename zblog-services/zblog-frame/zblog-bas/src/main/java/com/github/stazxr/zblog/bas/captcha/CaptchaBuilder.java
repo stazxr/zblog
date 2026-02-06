@@ -43,6 +43,10 @@ public class CaptchaBuilder {
                     captcha = new FixedArithmeticCaptcha(captchaConfig.getWidth(), captchaConfig.getHeight());
                     captcha.setLen(captchaConfig.getLength());
                     break;
+                case ArithmeticNew:
+                    captcha = new FixedArithmeticCaptchaNew(captchaConfig.getWidth(), captchaConfig.getHeight());
+                    captcha.setLen(captchaConfig.getLength());
+                    break;
                 case Gif:
                     captcha = new GifCaptcha(captchaConfig.getWidth(), captchaConfig.getHeight());
                     captcha.setLen(captchaConfig.getLength());
@@ -95,5 +99,27 @@ public class CaptchaBuilder {
             return chars.toCharArray();
         }
     }
-}
 
+    static class FixedArithmeticCaptchaNew extends FixedArithmeticCaptcha {
+        public FixedArithmeticCaptchaNew(int width, int height) {
+            super(width, height);
+        }
+
+        @Override
+        protected char[] alphas() {
+            // 生成随机数字和运算符
+            int n1 = num(1, 10), n2 = num(1, 10);
+            int opt = num(2);
+
+            // 计算结果
+            int res = new int[]{n1 + n2, n1 - n2, n1 * n2}[opt];
+
+            // 转换为字符运算符
+            char optChar = "+x".charAt(opt);
+
+            this.setArithmeticString(String.format("%s%c%s=?", n1, optChar, n2));
+            this.chars = String.valueOf(res);
+            return chars.toCharArray();
+        }
+    }
+}

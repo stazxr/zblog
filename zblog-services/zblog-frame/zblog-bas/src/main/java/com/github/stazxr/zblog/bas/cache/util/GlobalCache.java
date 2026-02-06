@@ -2,98 +2,86 @@ package com.github.stazxr.zblog.bas.cache.util;
 
 import com.github.stazxr.zblog.bas.cache.Cache;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 /**
- * 全局缓存助手类，用于对缓存进行操作。
- * <p>
- * 通过静态方法提供对缓存的基本操作，包括放入、获取、删除缓存项。
- * 需要确保在使用前已正确配置和初始化缓存。
- * </p>
+ * 全局缓存工具类。
  *
  * @author SunTao
  * @since 2024-08-22
  */
-public class GlobalCache {
-    private static Cache<String, String> cache;
+public final class GlobalCache {
+    /**
+     * 全局缓存实例（必须在应用启动时初始化）
+     */
+    private static Cache<String, Object> CACHE;
+
+    private GlobalCache() {
+        // 工具类禁止实例化
+    }
 
     /**
-     * 设置缓存实例
-     *
-     * @param cache 缓存实例
+     * 初始化全局缓存，只能初始化一次
      */
-    public synchronized static void setCache(Cache<String, String> cache) {
-        if (GlobalCache.cache == null) {
-            // 只能在项目启动时设置一次
-            GlobalCache.cache = cache;
+    public static synchronized void init(Cache<String, Object> cache) {
+        if (CACHE != null) {
+            return; // 已初始化，不覆盖
+        }
+        if (cache == null) {
+            throw new IllegalArgumentException("Cache instance cannot be null");
+        }
+        CACHE = cache;
+    }
+
+    private static void checkInitialized() {
+        if (CACHE == null) {
+            throw new IllegalStateException("GlobalCache not initialized. Please call GlobalCache.init(...) at startup.");
         }
     }
 
-    /**
-     * 将对象放入缓存中，使用默认的失效时长。
-     *
-     * @param key   缓存的键
-     * @param value 缓存的值
-     */
-    public static void put(String key, String value) {
-        checkCacheInitialized();
-        cache.put(key, value);
+    public static void put(String key, Object value) {
+        checkInitialized();
+        CACHE.put(key, value, -1, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * 将对象放入缓存中，使用指定的失效时长。
-     *
-     * @param key     缓存的键
-     * @param value   缓存的值
-     * @param timeout 失效时长，单位为毫秒
-     */
-    public static void put(String key, String value, long timeout) {
-        checkCacheInitialized();
-        cache.put(key, value, timeout);
+    public static void put(String key, Object value, long timeout, TimeUnit unit) {
+        checkInitialized();
+        CACHE.put(key, value, timeout, unit);
     }
 
-    /**
-     * 从缓存中移除指定的键。
-     *
-     * @param keys 要移除的键列表
-     */
+    @SuppressWarnings("unchecked")
+    public static <T> T get(String key) {
+        checkInitialized();
+        return (T) CACHE.get(key);
+    }
+
     public static void remove(String... keys) {
-        checkCacheInitialized();
-        if (keys != null && keys.length > 0) {
+        checkInitialized();
+        if (keys != null) {
             for (String key : keys) {
-                cache.remove(key);
+                CACHE.remove(key);
             }
         }
     }
 
-    /**
-     * 从缓存中获取指定的值。
-     *
-     * @param key 缓存的键
-     * @return 与键关联的值，如果键不存在则返回 {@code null}
-     */
-    public static String get(String key) {
-        checkCacheInitialized();
-        return cache.get(key);
+    public static Boolean setIfAbsent(String key, Object value, long timeout, TimeUnit unit) {
+        checkInitialized();
+        return CACHE.setIfAbsent(key, value, timeout, unit);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getOrLoad(String key, Supplier<T> loader, long timeout, TimeUnit unit) {
+        checkInitialized();
+        return (T) CACHE.getOrLoad(key, (Supplier<Object>) loader, timeout, unit);
     }
 
     /**
-     * 从缓存中获取指定的值并同时将其移除。
-     *
-     * @param key 缓存的键
-     * @return 与键关联的值，如果键不存在则返回 {@code null}
+     * TTL 随机抖动，避免雪崩
      */
-    public static String getThenRemove(String key) {
-        checkCacheInitialized();
-        String result = cache.get(key);
-        cache.remove(key);
-        return result;
-    }
-
-    /**
-     * 检查缓存是否已初始化，如果未初始化则抛出异常。
-     */
-    private static void checkCacheInitialized() {
-        if (cache == null) {
-            throw new IllegalStateException("Cache not initialized. Please configure and initialize cache.");
-        }
+    public static long jitter(long timeout) {
+        long delta = Math.max(1, timeout / 10);
+        return timeout + ThreadLocalRandom.current().nextLong(delta);
     }
 }

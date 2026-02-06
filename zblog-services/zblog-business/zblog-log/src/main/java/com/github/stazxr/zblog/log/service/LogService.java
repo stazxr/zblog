@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.log.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.log.domain.dto.LogQueryDto;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
@@ -19,9 +19,9 @@ public interface LogService extends IService<Log> {
      * 分页查询日志列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<LogVo>
+     * @return IPage<LogVo>
      */
-    PageInfo<LogVo> queryLogListByPage(LogQueryDto queryDto);
+    IPage<LogVo> queryLogListByPage(LogQueryDto queryDto);
 
     /**
      * 导出日志列表

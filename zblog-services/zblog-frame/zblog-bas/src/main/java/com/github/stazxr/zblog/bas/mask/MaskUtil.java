@@ -25,6 +25,9 @@ public class MaskUtil {
      */
     public static String toMaskString(Object data) {
         try {
+            if (data == null) {
+                return "";
+            }
             return JSON.toJSONString(data, MASK_FILTER);
         } catch (Exception e) {
             log.error(MASK_LOG_LABEL, e);

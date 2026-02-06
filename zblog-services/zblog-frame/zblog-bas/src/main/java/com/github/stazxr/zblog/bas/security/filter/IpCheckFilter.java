@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.filter;
 
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.cache.BlackWhiteListCache;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.springframework.http.HttpStatus;

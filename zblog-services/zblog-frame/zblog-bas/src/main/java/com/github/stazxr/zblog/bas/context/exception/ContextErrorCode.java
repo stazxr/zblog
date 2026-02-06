@@ -10,12 +10,7 @@ public enum ContextErrorCode {
     /**
      * Loading default context tags error.
      */
-    ZCXT001("ZCXT001", "Loading default context tags error"),
-
-    /**
-     * Muses context properties are null while creating Muses context.
-     */
-    ZCXT002("ZCXT002", "ContextProperties are null while creating Context");
+    ZCXT001("ZCXT001", "Loading default context tags error");
 
     private final String code;
     private final String message;

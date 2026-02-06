@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.util.thread;
 
-import com.github.stazxr.zblog.util.Assert;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread工具类
@@ -9,8 +9,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author SunTao
  * @since 2022-02-05
  */
-@Slf4j
 public class ThreadUtils {
+    private static final Logger log = LoggerFactory.getLogger(ThreadUtils.class);
+
     /**
      * 休眠*分钟
      *
@@ -25,8 +26,8 @@ public class ThreadUtils {
     }
 
     public static void sleepMillisecond(long milliseconds) {
-        Assert.isTrue(milliseconds <= 0, "milliseconds must be greater than zero.");
         try {
+            milliseconds = milliseconds < 0 ? 0 : milliseconds;
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             log.error("thread sleep catch interrupted eor", e);

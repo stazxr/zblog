@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.bas.file.autoconfigure;
 
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.file.handler.FileHandler;
 import com.github.stazxr.zblog.bas.file.handler.impl.AliyunOssFileHandler;
 import com.github.stazxr.zblog.bas.file.handler.impl.LocalFileHandler;

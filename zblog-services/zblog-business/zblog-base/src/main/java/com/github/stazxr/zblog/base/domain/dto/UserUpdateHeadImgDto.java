@@ -23,14 +23,14 @@ public class UserUpdateHeadImgDto implements Serializable {
     /**
      * 用户id
      */
-    @NotNull(message = "{valid.usercenter.userId.required}")
+    @NotNull(message = "{TECH_PARAM_INVALID2}")
     @ApiModelProperty("用户id")
     private Long userId;
 
     /**
      * 文件id
      */
-    @NotNull(message = "{valid.usercenter.image.fileId.required}")
+    @NotNull(message = "{USERCENTER_IMAGE_REQUIRED}")
     @ApiModelProperty("文件id")
     private Long fileId;
 }

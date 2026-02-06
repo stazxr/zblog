@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.converter.VersionConverter;
 import com.github.stazxr.zblog.base.domain.dto.VersionDto;
@@ -15,6 +16,7 @@ import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.vo.VersionVo;
 import com.github.stazxr.zblog.base.mapper.VersionMapper;
 import com.github.stazxr.zblog.base.service.VersionService;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,10 +67,8 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
      */
     @Override
     public VersionVo queryVersionDetail(Long versionId) {
-        Assert.notNull(versionId, ExpMessageCode.of("valid.common.id.required"));
         VersionVo versionVo = versionMapper.selectVersionDetail(versionId);
-        Assert.notNull(versionVo, ExpMessageCode.of("valid.common.data.notFound"));
-        return versionVo;
+        return ThrowUtils.requireNonNull(versionVo, BaseErrorCode.ECOREA001);
     }
 
     /**
@@ -81,11 +81,11 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         // 获取版本信息
         Version version = versionConverter.dtoToEntity(versionDto);
         // 新增时，不允许传入 VersionId
-        Assert.isNull(version.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
+        ThrowUtils.when(version.getId() != null).system(BaseErrorCode.SCOREB001);
         // 版本信息检查
         checkVersion(version);
         // 新增版本
-        Assert.affectOneRow(versionMapper.insert(version), ExpMessageCode.of("result.common.add.failed"));
+        ThrowUtils.when(!save(version)).system(BaseErrorCode.SCOREA001);
     }
 
     /**
@@ -99,11 +99,11 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
         Version version = versionConverter.dtoToEntity(versionDto);
         // 判断版本是否存在
         Version dbVersion = versionMapper.selectById(version.getId());
-        Assert.notNull(dbVersion, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.requireNonNull(dbVersion, BaseErrorCode.ECOREA001);
         // 版本信息检查
         checkVersion(version);
         // 编辑版本
-        Assert.affectOneRow(versionMapper.updateById(version), ExpMessageCode.of("result.common.edit.failed"));
+        ThrowUtils.when(!updateById(version)).system(BaseErrorCode.SCOREA002);
     }
 
     /**
@@ -115,9 +115,9 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
     public void deleteVersion(Long versionId) {
         // 判断版本是否存在
         Version dbVersion = versionMapper.selectById(versionId);
-        Assert.notNull(dbVersion, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.requireNonNull(dbVersion, BaseErrorCode.ECOREA001);
         // 删除版本
-        Assert.affectOneRow(versionMapper.deleteById(versionId), ExpMessageCode.of("result.common.delete.failed"));
+        ThrowUtils.when(!removeById(versionId)).system(BaseErrorCode.SCOREA003);
     }
 
     private void checkVersion(Version version) {

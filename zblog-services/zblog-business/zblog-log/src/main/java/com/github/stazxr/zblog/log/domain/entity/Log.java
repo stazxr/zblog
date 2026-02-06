@@ -29,6 +29,11 @@ public class Log implements Serializable {
     private Long id;
 
     /**
+     * TraceId
+     */
+    private String traceId;
+
+    /**
      * 日志类型
      */
     private Integer logType;
@@ -52,6 +57,11 @@ public class Log implements Serializable {
      * 操作参数
      */
     private String requestParam;
+
+    /**
+     * 返回结果
+     */
+    private String requestResult;
 
     /**
      * 接口编码
@@ -84,6 +94,21 @@ public class Log implements Serializable {
     private String browser;
 
     /**
+     * 浏览器版本
+     */
+    private String browserVersion;
+
+    /**
+     * 平台
+     */
+    private String platform;
+
+    /**
+     * 用户代理
+     */
+    private String userAgent;
+
+    /**
      * 请求耗时
      */
     private Long costTime;
@@ -99,6 +124,11 @@ public class Log implements Serializable {
     private String execMessage;
 
     /**
+     * 错误码
+     */
+    private String errorCode;
+
+    /**
      * 创建日期
      */
     private LocalDate createDate;
@@ -106,7 +136,7 @@ public class Log implements Serializable {
     /**
      * 异常信息
      */
-    private byte[] exceptionDetail;
+    private String exceptionDetail;
 
     @Override
     public String toString() {

@@ -1,120 +1,68 @@
 package com.github.stazxr.zblog.bas.log.advice;
 
 import com.github.stazxr.zblog.bas.log.cache.LogPathCacheManager;
-import com.github.stazxr.zblog.bas.log.context.LogControlSerNoContext;
-import com.github.stazxr.zblog.bas.log.properties.LogControlProperties;
-import com.github.stazxr.zblog.bas.mask.MaskUtil;
-import com.github.stazxr.zblog.util.UuidUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
+import com.github.stazxr.zblog.bas.log.context.LogTraceContext;
+import com.github.stazxr.zblog.bas.order.FilterOrder;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.util.net.IpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
+import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Type;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Request body advice for controlling and logging incoming requests.
- * This advice handles masking sensitive data based on configured paths.
+ * 请求日志打印.
  *
  * @author SunTao
- * @since 2024-05-16
+ * @since 2026-02-03
  */
-@Slf4j
-@RestControllerAdvice
-public class ReqLogControlAdvice implements RequestBodyAdvice, Ordered {
-    private HttpServletRequest httpServletRequest;
+@Component
+public class ReqLogControlAdvice implements HandlerInterceptor, Ordered {
+    private static final Logger log = LoggerFactory.getLogger("___flowLog___");
 
-    private LogControlProperties logControlProperties;
+    private final LogPathCacheManager logManager;
 
-    private LogPathCacheManager logPathCacheManager;
-
-    /**
-     * Checks if the advice supports processing based on configuration.
-     */
-    @Override
-    public boolean supports(MethodParameter methodParameter, Type targetType,
-            Class<? extends HttpMessageConverter<?>> converterType) {
-        return logControlProperties.isEnabled();
+    public ReqLogControlAdvice(LogPathCacheManager logManager) {
+        this.logManager = logManager;
     }
 
-    /**
-     * Executes actions before reading the request body, setting a unique serial number context.
-     */
     @Override
-    public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter,
-            Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
-            LogControlSerNoContext.set(UuidUtils.gen16BitUuidStr());
-        } catch (Exception e) {
-            log.error("Error set control logging seral no", e);
-        }
-        return inputMessage;
-    }
+            String path = request.getServletPath();
+            if (logManager.enabledLog(path)) {
+                if (!(handler instanceof HandlerMethod)) {
+                    return true;
+                }
 
-    /**
-     * Logs the masked request body after it has been read.
-     */
-    @Override
-    public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
-            Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        try {
-            if (logPathCacheManager.enabledLog(httpServletRequest.getServletPath())) {
-                String className = parameter.getContainingClass().getSimpleName();
-                String methodName = parameter.getMethod() == null ? "" : parameter.getMethod().getName();
-                String serNo = LogControlSerNoContext.exist() ? "[" + LogControlSerNoContext.get() + "]" : "";
-                log.info("{}.{}{} request param is: {}", className, methodName, serNo, MaskUtil.toMaskString(body));
+                HandlerMethod method = (HandlerMethod) handler;
+                Router router = method.getMethodAnnotation(Router.class);
+                if (router == null) {
+                    return true;
+                }
+
+                ApiVersion version = method.getMethodAnnotation(ApiVersion.class);
+                String traceId = LogTraceContext.getTraceId();
+                String apiCode = router.code();
+                String apiVersion = version == null ? "" : version.value();
+                String ipAddr = IpUtils.getIp(request);
+                log.info("REQ|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr);
             }
         } catch (Exception e) {
-            log.error("Error logging request parameters", e);
+            log.error("请求日志打印失败", e);
         }
 
-        return body;
+        return true;
     }
 
-    /**
-     * Handles cases where the request body is empty.
-     */
-    @Override
-    public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage,
-            MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return body;
-    }
-
-    /**
-     * Sets the HttpServletRequest instance via dependency injection.
-     */
-    @Autowired
-    public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = httpServletRequest;
-    }
-
-    /**
-     * Sets the LogControlProperties instance via dependency injection.
-     */
-    @Autowired
-    public void setLogControlProperties(LogControlProperties logControlProperties) {
-        this.logControlProperties = logControlProperties;
-    }
-
-    /**
-     * Sets the LogControlPathCacheManager instance via dependency injection.
-     */
-    @Autowired
-    public void setLogControlPathCacheManager(LogPathCacheManager logPathCacheManager) {
-        this.logPathCacheManager = logPathCacheManager;
-    }
-
-    /**
-     * Specifies the order in which this advice is applied.
-     */
     @Override
     public int getOrder() {
-        return 999;
+        return FilterOrder.REQ_LOG;
     }
 }

@@ -6,7 +6,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- *
+ * 手机号校验规则
  *
  * @author SunTao
  * @since 2025-08-01

@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
-import com.github.stazxr.zblog.bas.idempotence.FormResubmitCheck;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
@@ -10,7 +10,6 @@ import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.domain.enums.CacheKey;
 import com.github.stazxr.zblog.base.domain.enums.MailTemplate;
 import com.github.stazxr.zblog.base.util.MailTemplateSender;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.math.RandomUtils;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 公共管理
@@ -51,7 +51,7 @@ public class CommonController {
      */
     @GetMapping("/querySystemPublicKey")
     @ApiOperation(value = "获取系统公钥")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "获取系统公钥", code = "COMMQ001", level = RouterLevel.PUBLIC)
     public String querySystemPublicKey() {
         return systemPublicKey;
@@ -68,9 +68,9 @@ public class CommonController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "email", value = "邮箱", required = true, dataTypeClass = String.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "发送邮箱验证码", code = "COMMQ002", level = RouterLevel.OPEN)
-    @FormResubmitCheck(timeout = 30, value = "系统繁忙，请稍后再试")
+    // @FormResubmitCheck(timeout = 30, value = "系统繁忙，请稍后再试")
     public String sendCode(@RequestParam String email, @RequestParam String scene) {
         Assert.notBlank(email, "邮箱不能为空");
         Assert.failIfFalse(RegexUtils.match(email, RegexUtils.Regex.EMAIL_REGEX), "邮箱格式不正确");
@@ -88,7 +88,7 @@ public class CommonController {
         // 缓存验证码
         CacheKey emailCodeCache = CacheKey.EMAIL_CODE;
         String emailCodeCacheKey = String.format(emailCodeCache.getKey(), SequenceUtils.getId(), Locale.ROOT);
-        GlobalCache.put(emailCodeCacheKey, random, emailCodeCache.getTtl());
+        GlobalCache.put(emailCodeCacheKey, random, emailCodeCache.getTtl(), TimeUnit.MILLISECONDS);
         return emailCodeCacheKey;
     }
 }

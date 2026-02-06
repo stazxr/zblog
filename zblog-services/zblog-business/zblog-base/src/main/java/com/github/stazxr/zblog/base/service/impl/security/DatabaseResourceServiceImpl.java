@@ -7,8 +7,8 @@ import com.github.stazxr.zblog.base.mapper.ResourceMapper;
 import com.github.stazxr.zblog.util.collection.ArrayUtils;
 import com.github.stazxr.zblog.util.collection.TimeMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DatabaseResourceServiceImpl implements ResourceCacheService, InitializingBean {
+public class DatabaseResourceServiceImpl implements ResourceCacheService, CommandLineRunner {
     private static final TimeMap<String, Resource> RESOURCE_MAP = new TimeMap<>("ResourceCacheCheckThread");
 
     private ResourceMapper resourceMapper;
@@ -66,11 +66,19 @@ public class DatabaseResourceServiceImpl implements ResourceCacheService, Initia
         RESOURCE_MAP.clear();
     }
 
+    @Autowired
+    public void setResourceMapper(ResourceMapper resourceMapper) {
+        this.resourceMapper = resourceMapper;
+    }
+
     /**
-     * 初始化资源信息
+     * Callback used to run the bean.
+     *
+     * @param args incoming main method arguments
+     * @throws Exception on error
      */
     @Override
-    public void afterPropertiesSet() {
+    public void run(String... args) {
         try {
             final int batchSize = 50;
             List<Resource> resources = RouterParser.execute();
@@ -83,10 +91,5 @@ public class DatabaseResourceServiceImpl implements ResourceCacheService, Initia
             log.error("Loaded Resources Failed", e);
             System.exit(1);
         }
-    }
-
-    @Autowired
-    public void setResourceMapper(ResourceMapper resourceMapper) {
-        this.resourceMapper = resourceMapper;
     }
 }

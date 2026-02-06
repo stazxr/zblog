@@ -1,9 +1,6 @@
 package com.github.stazxr.zblog.bas.encryption.md5;
 
-import com.github.stazxr.zblog.bas.encryption.DecryptException;
-import com.github.stazxr.zblog.bas.encryption.EncryptException;
-import com.github.stazxr.zblog.bas.encryption.Encryptor;
-import com.github.stazxr.zblog.bas.encryption.EncryptorException;
+import com.github.stazxr.zblog.bas.encryption.*;
 import com.github.stazxr.zblog.bas.encryption.util.Md5Utils;
 
 /**
@@ -27,7 +24,7 @@ public class Md5Encryptor implements Encryptor {
         try {
             return Md5Utils.md5(plainText);
         } catch (Exception e) {
-            throw new EncryptException("ZENC005", e);
+            throw new EncryptException(EncryptionErrorCode.SENCYA000, e);
         }
     }
 
@@ -40,6 +37,6 @@ public class Md5Encryptor implements Encryptor {
      */
     @Override
     public String decrypt(String cipherText) throws DecryptException {
-        throw new DecryptException("ZENC006");
+        throw new UnsupportedOperationException("Unsupported");
     }
 }

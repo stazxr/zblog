@@ -22,7 +22,7 @@
               <el-option v-for="item in userStatusList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-loginChan">
+          <muses-search-form-item v-show="false" label="" prop="search-loginChan">
             <el-select id="search-loginChan" v-model="filters.loginChan" placeholder="登录渠道" clearable>
               <el-option v-for="item in loginChanList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
@@ -96,26 +96,13 @@
             <span v-else />
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="gender" label="用户性别" align="center" width="80">
-          <template v-slot="scope">
-            <span v-if="scope.row.gender === 1">男</span>
-            <span v-else-if="scope.row.gender === 2">女</span>
-            <span v-else>隐藏</span>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="loginChan" label="登录渠道" align="center" width="80">
-          <template v-slot="scope">
-            <span v-if="scope.row['loginChan'] === '01'">移动端</span>
-            <span v-else-if="scope.row['loginChan'] === '02'">PC端</span>
-            <span v-else>{{ scope.row['loginChan'] }}</span>
-          </template>
-        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="loginPlatform" label="登录平台" align="center" width="80" />
         <el-table-column :show-overflow-tooltip="true" prop="loginType" label="登录方式" align="center" width="80">
           <template v-slot="scope">
-            <span v-if="scope.row['loginType'] === '00'">访客</span>
-            <span v-else-if="scope.row['loginType'] === '01'">密码</span>
-            <span v-else-if="scope.row['loginType'] === '02'">QQ互信</span>
-            <span v-else-if="scope.row['loginType'] === '99'">未知</span>
+            <span v-if="scope.row['loginType'] === 'LT00'">访客</span>
+            <span v-else-if="scope.row['loginType'] === 'LT01'">密码</span>
+            <span v-else-if="scope.row['loginType'] === 'LT02'">QQ互信</span>
+            <span v-else-if="scope.row['loginType'] === 'LT99'">未知</span>
             <span v-else>{{ scope.row['loginType'] }}</span>
           </template>
         </el-table-column>
@@ -203,7 +190,7 @@ export default {
   mounted() {
     this.loadUserTypeList()
     this.loadUserStatusList()
-    this.loadLoginChanList()
+    // this.loadLoginChanList()
     this.loadLoginTypeList()
     this.listTableData()
   },

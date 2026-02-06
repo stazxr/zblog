@@ -71,18 +71,4 @@ public class UserQueryDto extends PageParam {
      */
     @ApiModelProperty("角色id")
     private Long roleId;
-
-    /**
-     * 登录开始时间
-     */
-    @Deprecated
-    @ApiModelProperty("登录开始时间")
-    private String loginStartTime;
-
-    /**
-     * 登录结束时间
-     */
-    @Deprecated
-    @ApiModelProperty("登录结束时间")
-    private String loginEndTime;
 }

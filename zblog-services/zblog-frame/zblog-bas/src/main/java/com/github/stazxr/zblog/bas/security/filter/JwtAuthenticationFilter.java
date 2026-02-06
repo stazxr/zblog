@@ -1,9 +1,13 @@
 package com.github.stazxr.zblog.bas.security.filter;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
+import com.github.stazxr.zblog.bas.context.Context;
+import com.github.stazxr.zblog.bas.context.constant.TagConstants;
+import com.github.stazxr.zblog.bas.context.entity.ContextTag;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.security.SecurityConstant;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.authz.metadata.SecurityResourceService;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
@@ -47,6 +51,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * jwt认证拦截器，用于拦截请求，提取jwt认证
@@ -266,6 +271,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        // 登录用户id
+        String loginId = String.valueOf(SecurityUtils.getLoginId());
+        Context.put(new ContextTag(TagConstants.LOGIN_ID_TAG, loginId));
     }
 
     private void renewToken(HttpServletRequest request, HttpServletResponse response, String jwtToken, String userId, String username, JWTClaimsSet claimsSet) {
@@ -280,7 +289,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // cache previous token
             int preTokenExpiredTime = getPreTokenFreeTime(jwtToken);
             String preTknCacheKey = String.format(Locale.ROOT, JwtConstants.PTK_TOKEN_CACHE_KEY, userId);
-            GlobalCache.put(preTknCacheKey, jwtToken, preTokenExpiredTime);
+            GlobalCache.put(preTknCacheKey, jwtToken, preTokenExpiredTime, TimeUnit.SECONDS);
 
             // set token
             response.addHeader(JwtConstants.NEW_TOKEN_HEADER, AUTHENTICATION_PREFIX.concat(newToken));

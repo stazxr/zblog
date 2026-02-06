@@ -1,47 +1,35 @@
 package com.github.stazxr.zblog.bas.encryption;
 
-import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
- * 加解密过程中的异常基类
+ * 加解密过程中的异常基类。
  *
  * @author SunTao
  * @since 2024-07-25
  */
-public class EncryptorException extends BaseException {
+public class EncryptorException extends SystemException {
     private static final long serialVersionUID = 7808497479350394417L;
 
     /**
-     * 构造一个新的 EncryptorException 实例。
-     * @param message 错误信息
-     */
-    public EncryptorException(String message) {
-        super(new ExpMessageCode(message));
-    }
-
-    /**
-     * 构造一个新的 EncryptorException 实例。
-     * @param message 错误信息
-     * @param cause 原因
-     */
-    public EncryptorException(String message, Throwable cause) {
-        super(new ExpMessageCode(message), cause);
-    }
-
-    /**
-     * Returns the detail message string of this throwable.
+     * 构造技术异常
      *
-     * @return the detail message string of this {@code Throwable} instance
-     * (which may be {@code null}).
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
      */
-    @Override
-    public String getMessage() {
-        String messageCode = getCode();
-        String message = StatusCode.of(messageCode);
-        if (message != null) {
-            messageCode = "[" + messageCode + "] ".concat(message).concat(super.getMessage());
-        }
-        return messageCode;
+    public EncryptorException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
+    }
+
+    /**
+     * 构造基于错误码的技术异常，并指定 cause
+     *
+     * @param errorCode 错误码定义
+     * @param cause     原始异常
+     * @param args      国际化消息参数
+     */
+    public EncryptorException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, cause, args);
     }
 }

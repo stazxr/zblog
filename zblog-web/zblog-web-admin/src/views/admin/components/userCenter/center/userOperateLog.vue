@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="160">
+      <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="165">
         <muses-search-form-item label="" prop="search-description">
           <el-input id="search-description" v-model="filters.description" clearable placeholder="操作描述" @keyup.enter.native="search" />
         </muses-search-form-item>
@@ -79,8 +79,8 @@ export default {
         eventStartTime: null,
         eventEndTime: null
       },
-      tableData: [],
       execResultList: [],
+      tableData: [],
       tableLoading: false,
       nodataImg: nodataImg,
       total: 0,

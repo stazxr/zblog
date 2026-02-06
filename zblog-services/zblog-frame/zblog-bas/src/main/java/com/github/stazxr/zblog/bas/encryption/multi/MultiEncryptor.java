@@ -1,9 +1,6 @@
 package com.github.stazxr.zblog.bas.encryption.multi;
 
-import com.github.stazxr.zblog.bas.encryption.DecryptException;
-import com.github.stazxr.zblog.bas.encryption.Encryptor;
-import com.github.stazxr.zblog.bas.encryption.EncryptorContext;
-import com.github.stazxr.zblog.bas.encryption.EncryptorException;
+import com.github.stazxr.zblog.bas.encryption.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -61,7 +58,7 @@ public class MultiEncryptor implements Encryptor {
         // 从映射表中获取加解密器实例
         Encryptor encryptor = ENCRYPTOR_MAP.get(encryptorName);
         if (encryptor == null) {
-            throw new DecryptException("ZENC004");
+            throw new DecryptException(EncryptionErrorCode.SENCYA000);
         }
         return encryptor;
     }

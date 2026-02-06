@@ -11,6 +11,10 @@ export default {
   pageOperationLogList: params => {
     return api.httpRequest().get(`${logApi}/pageOperationLogList`, params)
   },
+  // 分页查询登录日志列表
+  pageUserLoginLogList: params => {
+    return api.httpRequest().get(`${logApi}/pageUserLoginLogList`, params)
+  },
   // 导出接口日志
   exportInterfaceLog: params => {
     return api.httpRequest().get(`${logApi}/exportInterfaceLog`, params, { responseType: 'blob' })
@@ -18,6 +22,10 @@ export default {
   // 导出操作日志
   exportOperationLog: params => {
     return api.httpRequest().get(`${logApi}/exportOperationLog`, params, { responseType: 'blob' })
+  },
+  // 导出登录日志
+  exportUserLoginLog: params => {
+    return api.httpRequest().get(`${logApi}/exportUserLoginLog`, params, { responseType: 'blob' })
   },
   // 查询接口日志异常堆栈
   queryInterfaceLogExpDetail: params => {

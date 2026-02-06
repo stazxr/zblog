@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.service.impl;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
@@ -111,13 +111,13 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
         if (jwtTokenStorage == null || securityTokenService == null) {
             synchronized (SecurityLogoutServiceImpl.class) {
                 if (jwtTokenStorage == null) {
-                    jwtTokenStorage = SpringContextUtil.getBean(JwtTokenStorage.class);
+                    jwtTokenStorage = SpringContextHolder.getBean(JwtTokenStorage.class);
                     if (jwtTokenStorage == null) {
                         throw new RuntimeException("未找到 JwtTokenStorage Bean");
                     }
                 }
                 if (securityTokenService == null) {
-                    securityTokenService = SpringContextUtil.getBean(SecurityTokenService.class);
+                    securityTokenService = SpringContextHolder.getBean(SecurityTokenService.class);
                     if (securityTokenService == null) {
                         throw new RuntimeException("未找到 SecurityTokenService Bean");
                     }

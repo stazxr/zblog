@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 import com.github.stazxr.zblog.base.service.InterfaceService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -38,7 +38,7 @@ public class InterfaceController {
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询接口列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "分页查询接口列表", code = "INTEQ001")
     public PageInfo<InterfaceVo> pageList(InterfaceQueryDto queryDto) {
         return interfaceService.queryInterfaceListByPage(queryDto);
@@ -53,7 +53,7 @@ public class InterfaceController {
     @Log
     @GetMapping("/exportInterface")
     @ApiOperation(value = "导出接口列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "导出接口列表", code = "INTEE001")
     public void exportInterface(InterfaceQueryDto queryDto, HttpServletResponse response) {
         interfaceService.exportInterface(queryDto, response);

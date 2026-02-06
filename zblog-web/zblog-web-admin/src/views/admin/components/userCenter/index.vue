@@ -81,10 +81,13 @@
         <!-- 用户资料 -->
         <el-card class="box-card">
           <el-tabs v-model="activeTabName" @tab-click="handleTabClick">
-            <el-tab-pane label="用户资料" name="first">
+            <el-tab-pane label="用户资料" name="userProfile">
               <user-profile-form ref="userProfileFormRef" style="margin-top: 10px;" />
             </el-tab-pane>
-            <el-tab-pane label="操作日志" name="second">
+            <el-tab-pane label="登录日志" name="userLoginLog">
+              <user-login-log ref="userLoginLogRef" style="margin-top: 10px;" />
+            </el-tab-pane>
+            <el-tab-pane label="操作日志" name="userOperateLog">
               <user-operate-log ref="userOperateLogRef" style="margin-top: 10px;" />
             </el-tab-pane>
           </el-tabs>
@@ -102,14 +105,15 @@
 import DefaultAvatar from '@/assets/images/default-avatar.png'
 import updatePassDialog from './center/updatePassDialog'
 import updateEmailDialog from './center/updateEmailDialog'
-import userProfileForm from './center/userProfileForm.vue'
-import userOperateLog from './center/userOperateLog.vue'
+import userProfileForm from './center/userProfileForm'
+import userOperateLog from './center/userOperateLog'
+import userLoginLog from './center/userLoginLog'
 import ImgUpload from 'vue-image-crop-upload'
 import { getToken } from '@/utils/token'
 import { mapGetters } from 'vuex'
 export default {
   name: 'UserCenter',
-  components: { updatePassDialog, updateEmailDialog, userProfileForm, userOperateLog, ImgUpload },
+  components: { updatePassDialog, updateEmailDialog, userProfileForm, userOperateLog, userLoginLog, ImgUpload },
   data() {
     return {
       DefaultAvatar: DefaultAvatar,
@@ -122,7 +126,7 @@ export default {
         fail: '图片上传失败!'
       },
       showImgUpload: false,
-      activeTabName: 'first'
+      activeTabName: 'userProfile'
     }
   },
   computed: {
@@ -183,7 +187,9 @@ export default {
     },
     // 标签页切换
     handleTabClick(tab) {
-      if (tab.name === 'second') {
+      if (tab.name === 'userLoginLog') {
+        this.$refs.userLoginLogRef.listTableData()
+      } else if (tab.name === 'userOperateLog') {
         this.$refs.userOperateLogRef.listTableData()
       }
     }

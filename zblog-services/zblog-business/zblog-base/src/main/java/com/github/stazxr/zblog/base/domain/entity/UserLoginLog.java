@@ -54,6 +54,21 @@ public class UserLoginLog {
     private String loginAddress;
 
     /**
+     * 浏览器
+     */
+    private String loginBrowser;
+
+    /**
+     * 浏览器版本
+     */
+    private String loginBrowserVersion;
+
+    /**
+     * 登录平台
+     */
+    private String loginPlatform;
+
+    /**
      * 用户代理
      */
     private String userAgent;

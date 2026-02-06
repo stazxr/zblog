@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog;
 
 import com.github.stazxr.zblog.log.annotation.EnableLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * 前后端分离个人博客开源项目 - zblog.
@@ -15,10 +16,17 @@ import org.springframework.cache.annotation.EnableCaching;
  * @version 5.0.0
  */
 @EnableLog
-@EnableCaching
 @SpringBootApplication
 public class Application {
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
+
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        try {
+            SpringApplication.run(Application.class, args);
+            log.info("Application start successfully...");
+        } catch (Exception e) {
+            log.error("Application start failed...");
+        }
+
     }
 }

@@ -175,7 +175,7 @@ public class SecurityExtProperties {
         /**
          * 锁定时长
          */
-        private Duration lockDuration = Duration.ofMinutes(30);
+        private Duration lockDuration = Duration.ofMinutes(5);
 
         public int getMaxFailCount() {
             return maxFailCount;

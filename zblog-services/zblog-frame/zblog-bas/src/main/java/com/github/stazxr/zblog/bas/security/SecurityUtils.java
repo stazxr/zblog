@@ -80,7 +80,7 @@ public class SecurityUtils {
      * @return 当前登录用户的用户名，或系统用户，如果未登录
      */
     public static String getLoginUsernameWithoutNull() {
-        return getLoginUserOptional().map(SecurityUser::getUsername).orElse("system");
+        return getLoginUserOptional().map(SecurityUser::getUsername).orElse("anonymous");
     }
 
     /**

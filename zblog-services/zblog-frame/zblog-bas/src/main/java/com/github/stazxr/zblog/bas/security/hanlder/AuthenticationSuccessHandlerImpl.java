@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.security.hanlder;
 
-import com.github.stazxr.zblog.bas.msg.Result;
-import com.github.stazxr.zblog.bas.msg.util.ResponseUtils;
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.SecurityConstant;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.core.SecurityToken;
@@ -68,7 +68,8 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             SsoTokenCache.set(ssoToken);
 
             // 记录用户登录日志
-            securityUserService.updateUserLoginInfo(securityUser.getUsername(), userIp, 1, request);
+            int loginType = 1; // 登录成功
+            securityUserService.updateUserLoginInfo(securityUser.getUsername(), loginType, request);
 
             // 构造登录结果并返回
             Map<String, Object> loginResult = new HashMap<>(1);

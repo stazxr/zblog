@@ -29,35 +29,35 @@ public class UserDto extends BaseDto {
     /**
      * 用户id
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty(value = "用户id")
     private Long id;
 
     /**
      * 用户名
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.username.required}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{USER_USERNAME_REQUIRED}")
     @ApiModelProperty(value = "用户名")
     private String username;
 
     /**
      * 用户邮箱
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.user.email.required}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{USER_EMAIL_REQUIRED}")
     @ApiModelProperty("用户邮箱")
     private String email;
 
     /**
      * 用户类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userType.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{USER_USERTYPE_REQUIRED}")
     @ApiModelProperty("用户类型")
     private Integer userType;
 
     /**
      * 用户状态
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.user.userStatus.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{USER_USERSTATUS_REQUIRED}")
     @ApiModelProperty("用户状态")
     private Integer userStatus;
 

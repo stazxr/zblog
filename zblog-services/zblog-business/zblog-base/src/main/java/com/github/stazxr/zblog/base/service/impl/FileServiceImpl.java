@@ -5,9 +5,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.exception.BaseException;
 import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.SystemException;
 import com.github.stazxr.zblog.bas.file.UploadContext;
 import com.github.stazxr.zblog.bas.file.UploadContextFactory;
-import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.file.handler.FileHandler;
 import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
@@ -25,7 +26,6 @@ import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileStorageMapper;
 import com.github.stazxr.zblog.base.service.FileService;
-import com.github.stazxr.zblog.core.exception.ServiceException;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -264,7 +264,7 @@ public class FileServiceImpl implements FileService {
             // 返回上传文件信息
             return newUploadFileVo(fileStorage, file);
         } catch (Exception e) {
-            throw new ServiceException(ExpMessageCode.of("valid.file.upload.insertDbFailed"), e);
+            throw new SystemException(ExpMessageCode.of("valid.file.upload.insertDbFailed").getCode(), e);
         }
     }
 
@@ -302,7 +302,7 @@ public class FileServiceImpl implements FileService {
                     } catch (BaseException e) {
                         throw e;
                     } catch (Exception e) {
-                        throw new ServiceException(ExpMessageCode.of("valid.file.upload.imageInvalid"));
+                        throw new SystemException(ExpMessageCode.of("valid.file.upload.imageInvalid").getCode());
                     }
                 }
 

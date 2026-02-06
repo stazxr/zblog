@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.file;
 
-import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
  * 自定义文件异常类，用于处理文件上传下载相关的错误。
@@ -9,45 +9,27 @@ import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
  * @author SunTao
  * @since 2024-10-24
  */
-public class FileException extends BaseException {
+public class FileException extends SystemException {
     private static final long serialVersionUID = -3311095449947924617L;
 
     /**
-     * 使用指定的详细消息构造一个新的 FileException 实例。
+     * 构造技术异常（带国际化参数）
      *
-     * @param message 详细消息
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
      */
-    public FileException(String message) {
-        super(message);
+    public FileException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
     }
 
     /**
-     * 使用指定的详细消息和原因构造一个新的 FileException 实例。
+     * 构造基于错误码的技术异常，并指定 cause
      *
-     * @param message 详细消息
-     * @param cause 引起此异常的原因，允许为 null，表示原因不存在或未知
+     * @param errorCode 错误码定义
+     * @param cause     原始异常
+     * @param args      国际化消息参数
      */
-    public FileException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * 使用国际化消息码构造异常
-     *
-     * @param expMessageCode 异常消息码
-     */
-    public FileException(ExpMessageCode expMessageCode) {
-        super(expMessageCode);
-    }
-
-    /**
-     * 使用国际化消息码及根因构造异常
-     *
-     * @param expMessageCode 异常消息码
-     * @param cause          根因异常
-     */
-    public FileException(ExpMessageCode expMessageCode, Throwable cause) {
-        super(expMessageCode, cause);
+    public FileException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, cause, args);
     }
 }
-

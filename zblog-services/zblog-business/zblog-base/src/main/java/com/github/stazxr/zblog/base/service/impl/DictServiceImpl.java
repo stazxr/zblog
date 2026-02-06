@@ -3,17 +3,18 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.base.converter.DictConverter;
 import com.github.stazxr.zblog.base.domain.bo.NameValue;
 import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Dict;
 import com.github.stazxr.zblog.base.domain.enums.DictType;
+import com.github.stazxr.zblog.base.domain.error.DictErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.service.DictService;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,6 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public List<DictVo> queryChildList(Long pid) {
-        Assert.notNull(pid, ExpMessageCode.of("valid.dict.pid.required"));
         return dictMapper.selectChildList(pid);
     }
 
@@ -71,10 +71,8 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public DictVo queryDictDetail(Long dictId) {
-        Assert.notNull(dictId, ExpMessageCode.of("valid.common.id.required"));
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
-        Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
-        return dictVo;
+        return ThrowUtils.requireNonNull(dictVo, BaseErrorCode.ECOREA001);
     }
 
     /**
@@ -87,11 +85,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         // 获取字典信息
         Dict dict = dictConverter.dtoToEntity(dictDto);
         // 新增时，不允许传入 DictId
-        Assert.isNull(dict.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
+        ThrowUtils.when(dict.getId() != null).system(BaseErrorCode.SCOREB001);
         // 字典信息检查
         checkDict(dict);
         // 新增字典
-        Assert.affectOneRow(dictMapper.insert(dict), ExpMessageCode.of("result.common.add.failed"));
+        ThrowUtils.when(!save(dict)).system(BaseErrorCode.SCOREA001);
     }
 
     /**
@@ -105,11 +103,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         Dict dict = dictConverter.dtoToEntity(dictDto);
         // 判断字典是否存在
         Dict dbDict = dictMapper.selectById(dict.getId());
-        Assert.notNull(dbDict, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dbDict, BaseErrorCode.ECOREA001);
         // 字典信息检查
         checkDict(dict);
         // 编辑字典
-        Assert.affectOneRow(dictMapper.updateById(dict), ExpMessageCode.of("result.common.edit.failed"));
+        ThrowUtils.when(!updateById(dict)).system(BaseErrorCode.SCOREA002);
     }
 
     /**
@@ -121,11 +119,11 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     public void deleteDict(Long dictId) {
         // 判断字典是否存在
         DictVo dictVo = dictMapper.selectDictDetail(dictId);
-        Assert.notNull(dictVo, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dictVo, BaseErrorCode.ECOREA001);
         // 存在子节点无法被删除
-        Assert.failIfTrue(dictVo.getHasChildren(), ExpMessageCode.of("valid.dict.delete.withChildren"));
+        ThrowUtils.throwIf(dictVo.getHasChildren(), DictErrorCode.EDICTA004);
         // 删除字典
-        Assert.affectOneRow(dictMapper.deleteById(dictId), ExpMessageCode.of("result.common.delete.failed"));
+        ThrowUtils.when(!removeById(dictId)).system(BaseErrorCode.SCOREA003);
     }
 
     /**
@@ -136,7 +134,6 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public List<NameValue> queryConfListByDictKey(String dictKey) {
-        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.required"));
         return dictMapper.selectNameValuesByDictKey(dictKey);
     }
 
@@ -148,13 +145,12 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
      */
     @Override
     public String queryDictValueByDictKey(String dictKey) {
-        Assert.notBlank(dictKey, ExpMessageCode.of("valid.dict.dictKey.required"));
         return dictMapper.selectDictValueByDictKey(dictKey);
     }
 
     private void checkDict(Dict dict) {
         // 字典类型校验
-        Assert.notNull(DictType.of(dict.getDictType()), ExpMessageCode.of( "valid.dict.dictType.invalid"));
+        ThrowUtils.when(DictType.of(dict.getDictType()) == null).system(BaseErrorCode.SCOREB002);
 
         // 检查其他数据
         if (DictType.GROUP.getValue().equals(dict.getDictType())) {
@@ -165,13 +161,13 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             dict.setEnabled(true);
         } else {
             // 项
-            Assert.notNull(dict.getPid(), ExpMessageCode.of("valid.dict.pid.required"));
+            ThrowUtils.when(dict.getPid() == null).system(BaseErrorCode.SCOREB000);
             Dict parentDict = dictMapper.selectById(dict.getPid());
-            Assert.notNull(parentDict, ExpMessageCode.of("valid.dict.parent.notExist"));
+            ThrowUtils.throwIfNull(parentDict, DictErrorCode.EDICTA002);
             boolean parentIsGroup = DictType.GROUP.getValue().equals(parentDict.getDictType());
-            Assert.failIfFalse(parentIsGroup, ExpMessageCode.of("valid.dict.parent.type"));
-            Assert.notNull(dict.getEnabled(), ExpMessageCode.of("valid.dict.enabled.required"));
-            Assert.notBlank(dict.getDictKey(), ExpMessageCode.of("valid.dict.dictKey.required"));
+            ThrowUtils.throwIf(!parentIsGroup, DictErrorCode.EDICTA003);
+            ThrowUtils.throwIfNull(dict.getEnabled(), DictErrorCode.EDICTA001);
+            ThrowUtils.throwIfBlank(dict.getDictKey(), DictErrorCode.EDICTA000);
         }
     }
 }

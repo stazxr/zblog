@@ -5,9 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
-import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.converter.RoleConverter;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
 import com.github.stazxr.zblog.base.domain.dto.RoleDto;
@@ -16,11 +15,13 @@ import com.github.stazxr.zblog.base.domain.dto.UserRoleDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.entity.RolePermissionRelation;
 import com.github.stazxr.zblog.base.domain.entity.UserRoleRelation;
+import com.github.stazxr.zblog.base.domain.error.RoleErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.service.RoleService;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -95,10 +96,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public RoleVo queryRoleDetail(Long roleId) {
-        Assert.notNull(roleId, ExpMessageCode.of("valid.common.id.required"));
         RoleVo roleVo = roleMapper.selectRoleDetail(roleId);
-        Assert.notNull(roleVo, ExpMessageCode.of("valid.common.data.notFound"));
-        return roleVo;
+        return ThrowUtils.requireNonNull(roleVo, BaseErrorCode.ECOREA001);
     }
 
     /**
@@ -111,11 +110,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 获取角色信息
         Role role = roleConverter.dtoToEntity(roleDto);
         // 新增时，不允许传入 RoleId
-        Assert.isNull(role.getId(), ExpMessageCode.of("valid.common.add.idNotAllowed"));
+        ThrowUtils.when(role.getId() != null).system(BaseErrorCode.SCOREB001);
         // 角色信息检查
         checkRole(role);
         // 新增角色
-        Assert.affectOneRow(roleMapper.insert(role), ExpMessageCode.of("result.common.add.failed"));
+        ThrowUtils.when(!save(role)).system(BaseErrorCode.SCOREA001);
     }
 
     /**
@@ -129,11 +128,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         Role role = roleConverter.dtoToEntity(roleDto);
         // 判断角色是否存在
         Role dbRole = roleMapper.selectById(role.getId());
-        Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dbRole, BaseErrorCode.ECOREA001);
         // 角色信息检查
         checkRole(role);
         // 编辑角色
-        Assert.affectOneRow(roleMapper.updateById(role), ExpMessageCode.of("result.common.edit.failed"));
+        ThrowUtils.when(!updateById(role)).system(BaseErrorCode.SCOREA002);
     }
 
     /**
@@ -185,12 +184,12 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     public void deleteRole(Long roleId) {
         // 判断角色是否存在
         Role dbRole = roleMapper.selectById(roleId);
-        Assert.notNull(dbRole, ExpMessageCode.of("valid.common.data.notFound"));
+        ThrowUtils.throwIfNull(dbRole, BaseErrorCode.ECOREA001);
         // 判断角色是否关联用户
         List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(roleId);
-        Assert.failIfFalse(userIds.isEmpty(), ExpMessageCode.of("valid.role.delete.relatedUser"));
+        ThrowUtils.when(!userIds.isEmpty()).service(RoleErrorCode.EROLEA004);
         // 删除角色
-        Assert.affectOneRow(roleMapper.deleteById(roleId), ExpMessageCode.of("result.common.delete.failed"));
+        ThrowUtils.when(!removeById(roleId)).system(BaseErrorCode.SCOREA003);
         // 删除角色关联信息
         rolePermMapper.deleteByRoleIdSoft(roleId);
         // 清除缓存
@@ -205,7 +204,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchAddUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.required"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -229,7 +227,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteUserRole(UserRoleDto userRoleDto) {
-        Assert.notNull(userRoleDto.getRoleId(), ExpMessageCode.of("valid.common.id.required"));
         Set<Long> userIds = userRoleDto.getUserIds();
         if (userIds == null || userIds.size() == 0) {
             return;
@@ -255,13 +252,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private void checkRole(Role role) {
         // 检查角色名称
         role.setRoleName(role.getRoleName().trim());
-        Assert.failIfTrue(checkRoleNameExist(role), ExpMessageCode.of("valid.role.roleName.exists"));
+        ThrowUtils.when(checkRoleNameExist(role)).service(RoleErrorCode.EROLEA000);
 
         // 检查角色编码
-        role.setRoleCode(role.getRoleCode().trim());
-        Assert.failIfFalse(role.getRoleCode().matches(RegexUtils.Regex.ROLE_CODE_REGEX), ExpMessageCode.of("valid.role.roleCode.pattern"));
-        Assert.failIfTrue(Arrays.asList(INNER_ROLES).contains(role.getRoleCode()), ExpMessageCode.of("valid.role.roleCode.forbid"));
-        Assert.failIfTrue(checkRoleCodeExist(role), ExpMessageCode.of("valid.role.roleCode.exists"));
+        String roleCode = role.getRoleCode().trim();
+        role.setRoleCode(roleCode);
+        ThrowUtils.throwIf(!roleCode.matches(RegexUtils.Regex.ROLE_CODE_REGEX), RoleErrorCode.EROLEA002);
+        ThrowUtils.throwIf(Arrays.asList(INNER_ROLES).contains(roleCode), RoleErrorCode.EROLEA003);
+        ThrowUtils.throwIf(checkRoleCodeExist(role), RoleErrorCode.EROLEA001);
     }
 
     private boolean checkRoleNameExist(Role role) {

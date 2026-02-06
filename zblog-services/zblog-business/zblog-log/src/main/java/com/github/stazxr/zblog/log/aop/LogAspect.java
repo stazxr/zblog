@@ -1,26 +1,27 @@
 package com.github.stazxr.zblog.log.aop;
 
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.alibaba.fastjson.JSON;
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
 import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.msg.ResultCode;
-import com.github.stazxr.zblog.bas.reqsinglepost.RequestPostSingleParam;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import com.github.stazxr.zblog.log.annotation.IgnoredLog;
-import com.github.stazxr.zblog.log.annotation.properties.LogProperties;
+import com.github.stazxr.zblog.log.annotation.IgnoreLog;
+import com.github.stazxr.zblog.log.autoconfigure.properties.LogProperties;
 import com.github.stazxr.zblog.log.domain.entity.Log;
 import com.github.stazxr.zblog.log.domain.enums.LogType;
 import com.github.stazxr.zblog.log.service.LogService;
+import com.github.stazxr.zblog.log.service.impl.AsyncLogService;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.ThrowableUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -29,9 +30,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 切面日志
@@ -39,148 +40,171 @@ import java.util.concurrent.CompletableFuture;
  * @author SunTao
  * @since 2021-05-16
  */
-@Slf4j
 @Aspect
-@Component
 public class LogAspect {
+    private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
+
     private final LogService logService;
 
-    private boolean enabledLog;
+    private final AsyncLogService asyncLogService;
 
-    ThreadLocal<Long> currentTime = new ThreadLocal<>();
+    private final LogProperties logProperties;
 
-    private static final String[] IGNORED_PARAM = {"HttpServletResponse", "HttpServletRequest", "MultipartFile", "MultipartFile[]"};
+    private static final String[] IGNORED_PARAMS = {"HttpServletResponse", "HttpServletRequest", "MultipartFile", "MultipartFile[]"};
 
-    private static final int MAX_PARAM_LENGTH = 65535;
-
-    public LogAspect(LogService logService) {
+    public LogAspect(LogService logService, AsyncLogService asyncLogService, LogProperties logProperties) {
         this.logService = logService;
-
-        try {
-            LogProperties logProperties = SpringContextUtil.getBean(LogProperties.class);
-            enabledLog = logProperties.isEnabled();
-            log.info("日志组件为{}状态...", enabledLog ? "开启" : "关闭");
-        } catch (Exception e) {
-            log.warn("日志组件未开启，如果需要开启日志组件，请开启 @EnableLog");
-            enabledLog = false;
-        }
+        this.asyncLogService = asyncLogService;
+        this.logProperties = logProperties;
+        log.info("日志组件已启用...");
     }
 
     /**
-     * 配置接口的切入点，扫描所有controller包下的异常信息
+     * 配置接口的切入点
      */
     @Pointcut("execution(public * com.github.stazxr.zblog..*Controller.*(..))")
     public void controllerPointCut() {
     }
 
     /**
-     * 配置 @Log 注解的环绕通知，记录操作日志
+     * 记录日志
      *
      * @param joinPoint join point for advice
      */
     @Around("controllerPointCut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (!enabledLog) {
-            // 未开启组件日志
-            return joinPoint.proceed();
-        }
-
-        // 切入日志
-        LocalDateTime operateTime = LocalDateTime.now();
-        currentTime.set(System.currentTimeMillis());
-        boolean executeResult = false;
+        LocalDateTime eventTime = LocalDateTime.now();
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        Object result = null;
         Exception exception = null;
+
         try {
-            // 执行业务逻辑
-            Object result = joinPoint.proceed();
-            executeResult = true;
-            return result;
+            Object o = joinPoint.proceed();
+            success = true;
+            result = o;
+            return o;
         } catch (Exception e) {
             exception = e;
             throw e;
         } finally {
-            Long startTime = currentTime.get();
-            callSaveLog(joinPoint, operateTime, startTime, executeResult, exception);
-            currentTime.remove();
+            if (logProperties.isEnabled()) {
+                // 只有在开关开启的情况下才记录切面日志
+                long costTime = System.currentTimeMillis() - startTime;
+                saveLog(joinPoint, result, eventTime, costTime, success, exception);
+            }
         }
     }
 
-    private void callSaveLog(ProceedingJoinPoint joinPoint, LocalDateTime operateTime, Long startTime, boolean executeResult, Exception exception) {
+    /**
+     * 保存切面日志
+     */
+    private void saveLog(ProceedingJoinPoint joinPoint, Object result, LocalDateTime eventTime, long costTime, boolean success, Exception exception) {
         try {
-            // 获取路由信息
+            // 获取方法签名
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
             Method method = signature.getMethod();
 
-            // 是否忽略日志
-            if (method.isAnnotationPresent(IgnoredLog.class)) {
+            // 是否忽略切面日志
+            if (method.isAnnotationPresent(IgnoreLog.class)) {
                 return;
             }
 
-            // 获取用户和请求信息
+            // 获取路由信息，如果接口未标注 @Router 注解，则不记录日志
+            Router router = method.getAnnotation(Router.class);
+            if (router == null) {
+                return;
+            }
+
+            // 获取请求信息和用户信息
             HttpServletRequest request = getHttpServletRequest();
-            String username = SecurityUtils.getLoginUsernameWithoutNull();
+            String username = getLoginUser();
 
-            // 异步存储日志
-//            CompletableFuture.runAsync(() -> {
-                // 获取路由信息，如果接口未标注 @Router 注解，则忽略
-                Router router = method.getAnnotation(Router.class);
-                if (router == null) {
-                    return;
+            // 获取日志描述信息
+            LogType logType = LogType.INTERFACES;
+            String description = router.name();
+            com.github.stazxr.zblog.log.annotation.Log operationLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
+            if (operationLog != null) {
+                logType = LogType.OPERATION;
+                if (StringUtils.isNotBlank(operationLog.value())) {
+                    description = operationLog.value();
                 }
+            }
 
-                // 初始化日志信息
-                Log log = initLog(request, username, operateTime, startTime, executeResult, exception);
-                log.setInterfaceCode(router.code());
+            // 初始化日志
+            Log log = initLog(request, success, exception);
+            log.setLogType(logType.getValue());
+            log.setDescription(description);
+            log.setInterfaceCode(router.code());
+            log.setOperateUser(username);
+            log.setEventTime(eventTime);
+            log.setCostTime(costTime);
 
-                // 设置日志类型
-                com.github.stazxr.zblog.log.annotation.Log operationLog = method.getAnnotation(com.github.stazxr.zblog.log.annotation.Log.class);
-                if (operationLog != null) {
-                    log.setLogType(LogType.OPERATION.getValue());
-                    log.setDescription(StringUtils.isBlank(operationLog.value()) ? router.name() : operationLog.value());
-                } else {
-                    log.setLogType(LogType.INTERFACES.getValue());
-                    log.setDescription(router.name());
+            // 参数信息
+            if (logProperties.isRecordParam()) {
+                String param = getParameter(method, joinPoint.getArgs());
+                int maxLen = logProperties.getMaxParamLength();
+                if (param.length() > maxLen) {
+                    param = param.substring(0, maxLen - 6) + "......";
                 }
+                log.setRequestParam(param);
+            }
 
-                // 设置参数信息
-                String parameter = getParameter(method, joinPoint.getArgs());
-                log.setRequestParam(parameter.length() > MAX_PARAM_LENGTH ? parameter.substring(0, MAX_PARAM_LENGTH - 7).concat("......") : parameter);
+            // 返回结果
+            if (logProperties.isRecordResult()) {
+                String resultJson = JSON.toJSONString(result);
+                int maxLen = logProperties.getMaxResultLength();
+                if (resultJson.length() > maxLen) {
+                    resultJson = resultJson.substring(0, maxLen - 6) + "......";
+                }
+                log.setRequestResult(resultJson);
+            }
 
-                // 日志入库
+            // 记录日志
+            if (logProperties.isAsync()) {
+                asyncLogService.saveAsync(log);
+            } else {
                 logService.save(log);
-//            });
+            }
         } catch (Exception e) {
-            log.error("日志入库失败", e);
+            log.error("切面日志记录失败", e);
         }
     }
 
-    private Log initLog(HttpServletRequest request, String username, LocalDateTime operateTime, Long startTime, boolean executeResult, Exception exception) {
+    private Log initLog(HttpServletRequest request, boolean success, Exception exception) {
         Log log = new Log();
         log.setId(SequenceUtils.getId());
-        log.setOperateUser(username);
-        log.setEventTime(operateTime);
-        log.setExecResult(executeResult);
-        log.setCostTime(System.currentTimeMillis() - startTime);
+        log.setTraceId(MDC.get("traceId"));
+        log.setExecResult(success);
+        log.setCreateDate(LocalDate.now());
 
         // 获取请求信息
+        String ua = IpUtils.getUserAgent(request);
+        UserAgent userAgent = UserAgentUtil.parse(ua);
         String requestIp = IpUtils.getIp(request);
+
         log.setRequestIp(requestIp);
         log.setRequestUri(request.getRequestURI());
         log.setRequestMethod(request.getMethod().toUpperCase(Locale.ROOT));
         log.setAddress(IpUtils.getIpLocation(requestIp, IpUtils.IP_LOCATION_PRO));
-        log.setBrowser(IpUtils.getBrowser(request));
+
+        log.setUserAgent(ua);
+        log.setBrowser(userAgent.getBrowser().getName());
+        log.setBrowserVersion(userAgent.getVersion());
+        log.setPlatform(userAgent.getPlatform().getName());
 
         // 设置返回信息和异常信息
         if (exception != null) {
             if (exception instanceof BaseException) {
-                log.setExecMessage(exception.getMessage());
+                BaseException be = (BaseException) exception;
+                log.setExecMessage(be.getMessage());
+                log.setErrorCode(be.getCode());
             } else {
-                String errorMessage = exception.getMessage() == null ? exception.getClass().getSimpleName() : exception.getMessage();
-                log.setExecMessage("系统发生未知错误：".concat(errorMessage));
+                log.setExecMessage("系统异常：" + exception.getMessage());
             }
-            log.setExceptionDetail(ThrowableUtils.getStackTrace(exception).getBytes());
+            log.setExceptionDetail(ThrowableUtils.getStackTrace(exception));
         } else {
-            log.setExecMessage(executeResult ? ResultCode.SUCCESS.message() : ResultCode.FAILED.message());
+            log.setExecMessage(success ? "操作成功" : "操作失败");
         }
 
         return log;
@@ -189,32 +213,50 @@ public class LogAspect {
     private String getParameter(Method method, Object[] args) {
         List<Object> argList = new ArrayList<>();
         Parameter[] parameters = method.getParameters();
+
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            String paramTypeName = parameter.getType().getSimpleName();
-            if (Arrays.asList(IGNORED_PARAM).contains(paramTypeName)) {
-                // 不记录HttpServletResponse、HttpServletRequest参数信息
+            if (Arrays.asList(IGNORED_PARAMS).contains(parameter.getType().getSimpleName())) {
+                continue;
+            }
+
+            Object arg = args[i];
+            if (arg == null) {
                 continue;
             }
 
             RequestBody requestBody = parameter.getAnnotation(RequestBody.class);
-            RequestPostSingleParam singleParam = parameter.getAnnotation(RequestPostSingleParam.class);
             RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
             if (requestBody != null) {
-                argList.add(args[i]);
-            } else if (singleParam != null) {
-                argList.add(args[i]);
-            } else if (requestParam != null) {
-                Map<String, Object> map = new HashMap<>(4);
-                String key = StringUtils.isEmpty(requestParam.value()) ? parameter.getName() : requestParam.value();
-                map.put(key, args[i]);
-                argList.add(map);
+                argList.add(arg);
             } else {
-                argList.add(args[i]);
+                Map<String, Object> map = new HashMap<>(4);
+                String key = requestParam != null ? requestParam.value() : parameter.getName();
+                if (StringUtils.isEmpty(key)) {
+                    key = parameter.getName();
+                }
+                map.put(key, arg);
+                argList.add(map);
             }
         }
 
-        return argList.isEmpty() ? "" : argList.size() == 1 ? JSON.toJSONString(argList.get(0)) : JSON.toJSONString(argList);
+        if (argList.isEmpty()) {
+            return "";
+        }
+
+        if (argList.size() == 1) {
+            return JSON.toJSONString(argList.get(0));
+        }
+
+        return JSON.toJSONString(argList);
+    }
+
+    private String getLoginUser() {
+        try {
+            return SecurityUtils.getLoginUsernameWithoutNull();
+        } catch (Exception e) {
+            return "anonymous";
+        }
     }
 
     private HttpServletRequest getHttpServletRequest() {

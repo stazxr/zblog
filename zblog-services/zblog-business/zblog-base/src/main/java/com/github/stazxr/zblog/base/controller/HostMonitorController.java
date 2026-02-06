@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.base.config.HostMonitorSnapshot;
 import com.github.stazxr.zblog.base.domain.bo.HostData;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.log.annotation.IgnoredLog;
+import com.github.stazxr.zblog.log.annotation.IgnoreLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +31,10 @@ public class HostMonitorController {
 	 *
 	 * @return ServerData
 	 */
-	@IgnoredLog
+	@IgnoreLog
 	@GetMapping(value = "/data")
 	@ApiOperation("查询主机信息")
-	@ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+	@ApiVersion(BaseConst.ApiVersion.V_4_0_0)
 	@Router(name = "查询主机信息", code = "HOSTQ001")
 	public HostData queryHostData() {
 		return hostMonitorSnapshot.getSnapshot();

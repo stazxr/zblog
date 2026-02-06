@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
@@ -9,7 +10,6 @@ import com.github.stazxr.zblog.base.domain.dto.DictDto;
 import com.github.stazxr.zblog.base.domain.dto.query.DictQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.DictVo;
 import com.github.stazxr.zblog.base.service.DictService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -45,7 +45,7 @@ public class DictController {
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询字典列表")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询字典列表", code = "DICTQ001")
     public IPage<DictVo> queryDictListByPage(DictQueryDto queryDto) {
         return dictService.queryDictListByPage(queryDto);
@@ -62,7 +62,7 @@ public class DictController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pid", value = "字典pid", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询字典子列表", code = "DICTQ002")
     public List<DictVo> queryChildList(@RequestParam Long pid) {
         return dictService.queryChildList(pid);
@@ -79,7 +79,7 @@ public class DictController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "查询字典详情", code = "DICTQ003")
     public DictVo queryDictDetail(@RequestParam Long dictId) {
         return dictService.queryDictDetail(dictId);
@@ -93,7 +93,7 @@ public class DictController {
     @Log
     @PostMapping(value = "/addDict")
     @ApiOperation(value = "新增字典")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "新增字典", code = "DICTA001")
     public void addDict(@RequestBody @Validated(Create.class) DictDto dictDto) {
         dictService.addDict(dictDto);
@@ -107,7 +107,7 @@ public class DictController {
     @Log
     @PostMapping(value = "/editDict")
     @ApiOperation(value = "编辑字典")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "编辑字典", code = "DICTU001")
     public void editDict(@RequestBody @Validated(Update.class) DictDto dictDto) {
         dictService.editDict(dictDto);
@@ -124,7 +124,7 @@ public class DictController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "dictId", value = "字典id", required = true, dataTypeClass = Long.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "删除字典", code = "DICTD001")
     public void deleteDict(@RequestParam Long dictId) {
         dictService.deleteDict(dictId);
@@ -141,7 +141,7 @@ public class DictController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "dictKey", value = "字典key", required = true, dataTypeClass = String.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "根据字典KEY查询配置信息列表", code = "DICTQ004")
     public List<NameValue> queryConfListByDictKey(@RequestParam String dictKey) {
         return dictService.queryConfListByDictKey(dictKey);
@@ -158,7 +158,7 @@ public class DictController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "dictKey", value = "字典key", required = true, dataTypeClass = String.class)
     })
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "根据字典KEY查询配置信息", code = "DICTQ005")
     public String queryDictValueByDictKey(@RequestParam String dictKey) {
         return dictService.queryDictValueByDictKey(dictKey);

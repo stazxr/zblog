@@ -62,9 +62,9 @@ instance.interceptors.request.use(config => {
   // config.headers['Content-Type'] = 'application/json;charset=UTF-8'
 
   // 根据 User-Agent 判断客户端类型
-  const ua = navigator.userAgent.toLowerCase()
-  const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
-  config.headers['X-Client-Type'] = isMobile ? '01' : '02'
+  // const ua = navigator.userAgent.toLowerCase()
+  // const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
+  // config.headers['X-Client-Type'] = isMobile ? '01' : '02'
 
   // return config
   return config
@@ -78,6 +78,7 @@ instance.interceptors.response.use(response => {
   // data formatter: {code: 200, message, '操作成功', data: {}, identifier: 1} => code maybe [200, 401, 403, 404, 500...]
   // data maybe really data, eg: data => 后端直接返回了数据，没有封装为上述格式
   // return Promise.reject(new Error(res.msg || 'Error'))
+  console.log('response', response)
   if (response.status === 200 && response.data) {
     // refresh Token
     if (response.headers['new-token'] !== undefined && response.headers['new-token'] !== '') {
@@ -90,11 +91,9 @@ instance.interceptors.response.use(response => {
   }
 }, error => {
   // 统一异常处理，一般不会出现401|403|404，后端将其作为业务异常处理了
+  console.log('error', error)
   let errorMsg
-  console.log('axios error', error)
   const { response, request } = error
-  console.log('response error', response)
-  console.log('request error', request)
   if (response) {
     // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
     switch (response.status) {
@@ -146,10 +145,16 @@ function logout(expired) {
 }
 
 function responseHandler(result) {
-  const code = result.code || 200
+  const { code, success, message } = result
   if (code === 200) {
-    // success, return data
-    return result
+    if (success) {
+      // 业务成功
+      return result
+    } else {
+      // 业务失败
+      Message.error(message || '操作失败')
+      return Promise.reject(new Error(message || '操作失败'))
+    }
   } else if (code === 401) {
     const identifier = result.identifier || 10001
     if (identifier === 10001) {

@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.base.domain.dto.query;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.stazxr.zblog.core.base.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -55,7 +55,7 @@ public class FileQueryDto extends PageParam {
      * 上传开始时间
      */
     @ApiModelProperty(value = "上传开始时间", example = "2023-02-16 00:00:00")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createStartTime;
 
 
@@ -63,6 +63,6 @@ public class FileQueryDto extends PageParam {
      * 上传结束时间
      */
     @ApiModelProperty(value = "上传结束时间", example = "2023-02-16 23:59:59")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createEndTime;
 }

@@ -1,15 +1,16 @@
 package com.github.stazxr.zblog.bas.notify.mail.impl;
 
+import com.github.stazxr.zblog.bas.notify.mail.MailErrorCode;
 import com.github.stazxr.zblog.bas.notify.mail.MailException;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.notify.mail.MailService;
 import com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties;
 import com.github.stazxr.zblog.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -27,8 +28,9 @@ import java.util.Map;
  * @author SunTao
  * @since 2020-11-14
  */
-@Slf4j
 public class MailServiceImpl implements MailService {
+    private static final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
+
     private final MailFromProperties fromProperties;
 
     private final JavaMailSender javaMailSender;
@@ -48,22 +50,15 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendSimpleMail(MailReceiver receive, String subject, String content) {
         try {
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setFrom(fromProperties.getAddress());
-            mailMessage.setTo(receive.to());
-            if (StringUtils.isNotBlank(receive.cc())) {
-                mailMessage.setCc(receive.cc());
-            }
-            if (StringUtils.isNotBlank(receive.bcc())) {
-                mailMessage.setBcc(receive.bcc());
-            }
-
-            mailMessage.setSubject(subject);
-            mailMessage.setText(content);
-            javaMailSender.send(mailMessage);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            setReceive(receive, helper);
+            helper.setSubject(subject);
+            helper.setText(content, false); // false 表示纯文本邮件
+            javaMailSender.send(message);
             log.info("send simple email success");
         } catch (Exception e) {
-            throw new MailException("ZNTFM01", e);
+            throw new MailException(MailErrorCode.SMAILA000, e);
         }
     }
 
@@ -85,7 +80,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send html email success");
         } catch (Exception e) {
-            throw new MailException("ZNTFM02", e);
+            throw new MailException(MailErrorCode.SMAILA000, e);
         }
     }
 
@@ -117,7 +112,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send image email success");
         } catch (Exception e) {
-            throw new MailException("ZNTFM03", e);
+            throw new MailException(MailErrorCode.SMAILA000, e);
         }
     }
 
@@ -151,7 +146,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(message);
             log.info("send attachment email success");
         } catch (Exception e) {
-            throw new MailException("ZNTFM04", e);
+            throw new MailException(MailErrorCode.SMAILA000, e);
         }
     }
 

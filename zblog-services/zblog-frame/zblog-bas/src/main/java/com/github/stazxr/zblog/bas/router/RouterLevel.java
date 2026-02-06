@@ -16,11 +16,10 @@ public abstract class RouterLevel {
     /**
      * 登录访问
      */
-    public static final int PUBLIC = 1 << 1;
+    public static final int PUBLIC = 2;
 
     /**
      * 授权访问
      */
-    public static final int PERM = 1 << 2;
+    public static final int PERM = 4;
 }
-

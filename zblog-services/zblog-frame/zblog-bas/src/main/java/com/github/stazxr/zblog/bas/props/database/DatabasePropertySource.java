@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.bas.props.database;
 
-import com.github.stazxr.zblog.bas.props.PropertySourceLoadException;
 import com.github.stazxr.zblog.bas.props.datasource.PropsDriverManagerDataSource;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -17,8 +17,9 @@ import java.util.Properties;
  * @author SunTao
  * @since 2024-07-22
  */
-@Slf4j
 public class DatabasePropertySource extends PropertySource<Map<String, String>> {
+    private static final Logger log = LoggerFactory.getLogger(DatabasePropertySource.class);
+
     /**
      * 配置信息
      */
@@ -47,7 +48,7 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(PROPS_FILE)) {
             config.load(is);
         } catch (Exception e) {
-            throw new PropertySourceLoadException("Load config file catch exception[file=" + PROPS_FILE + "]", e);
+            throw new IllegalStateException("Load config file catch exception[file=" + PROPS_FILE + "]", e);
         }
     }
 
@@ -92,7 +93,7 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
             }
             return properties;
         } catch (Exception e) {
-            throw new PropertySourceLoadException("Load properties from database catch exception", e);
+            throw new IllegalStateException("Load properties from database catch exception", e);
         }
     }
 }

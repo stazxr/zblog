@@ -7,6 +7,8 @@ import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
+import com.github.stazxr.zblog.base.domain.dto.query.UserLoginLogQueryDto;
+import com.github.stazxr.zblog.base.domain.vo.UserLoginLogVo;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 /**
@@ -58,4 +60,12 @@ public interface UserCenterService {
      * @return IPage<LogVo>
      */
     IPage<LogVo> queryUserLogListByPage(UserLogQueryDto queryDto);
+
+    /**
+     * 分页查询用户登录日志列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<UserLoginLogVo>
+     */
+    IPage<UserLoginLogVo> pageUserLoginLogList(UserLoginLogQueryDto queryDto);
 }

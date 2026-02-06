@@ -24,21 +24,21 @@ public class UserUpdateProfileDto implements Serializable {
     /**
      * 用户id
      */
-    @NotNull(message = "{valid.usercenter.userId.required}")
+    @NotNull(message = "{TECH_PARAM_INVALID2}")
     @ApiModelProperty("用户id")
     private Long userId;
 
     /**
      * 用户昵称
      */
-    @NotBlank(message = "{valid.usercenter.profile.nickname.required}")
+    @NotBlank(message = "{USERCENTER_PROFILE_NICKNAME_REQUIRED}")
     @ApiModelProperty("用户昵称")
     private String nickname;
 
     /**
      * 用户性别
      */
-    @NotNull(message = "{valid.usercenter.profile.gender.required}")
+    @NotNull(message = "{USERCENTER_PROFILE_GENDER_REQUIRED}")
     @ApiModelProperty("用户性别")
     private Integer gender;
 

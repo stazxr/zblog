@@ -4,13 +4,12 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.github.stazxr.zblog.bas.file.autoconfigure.FileAutoConfiguration;
-import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
-import com.github.stazxr.zblog.bas.reqsinglepost.SingleParamHandlerMethodArgumentResolver;
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
+import com.github.stazxr.zblog.bas.log.advice.ReqLogControlAdvice;
 import com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration;
 import com.github.stazxr.zblog.web.serializer.LongToStringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -18,14 +17,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +31,12 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.WriteMapNullValu
 
 /**
  * WebMvcConfigurer
+ *
+ * "@EnableWebMvc" 会导致：
+ * 默认 CORS 配置失效
+ * 默认 MessageConverter 失效
+ * 自动配置关闭
+ * WebMvcAutoConfiguration 失效
  *
  * @author SunTao
  * @since 2025-08-13
@@ -44,29 +47,15 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.WriteMapNullValu
 public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     private LocalValidatorFactoryBean validatorFactoryBean;
 
+    @Resource
     private FileProperties fileProperties;
+
+    @Resource
+    private ReqLogControlAdvice reqLogControlAdvice;
 
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
         "classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"
     };
-
-    /**
-     * 跨域支持
-     *
-     * @return CorsFilter
-     */
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addExposedHeader("new-token");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
     /**
      * 配置使用 fastjson 进行 json 解析
@@ -124,12 +113,6 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new SingleParamHandlerMethodArgumentResolver());
-        WebMvcConfigurer.super.addArgumentResolvers(resolvers);
-    }
-
-    @Override
     public Validator getValidator() {
         return validatorFactoryBean;
     }
@@ -158,13 +141,13 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-    @Autowired
-    public void setValidatorFactoryBean(@Nullable LocalValidatorFactoryBean validatorFactoryBean) {
-        this.validatorFactoryBean = validatorFactoryBean;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(reqLogControlAdvice).addPathPatterns("/**");
     }
 
     @Autowired
-    public void setFileProperties(@NonNull FileProperties fileProperties) {
-        this.fileProperties = fileProperties;
+    public void setValidatorFactoryBean(@Nullable LocalValidatorFactoryBean validatorFactoryBean) {
+        this.validatorFactoryBean = validatorFactoryBean;
     }
 }

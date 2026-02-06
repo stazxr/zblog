@@ -1,7 +1,8 @@
 package com.github.stazxr.zblog.bas.validation;
 
-import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
+import com.github.stazxr.zblog.bas.exception.ServiceException;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCodeUtils;
 
 /**
  * 参数校验异常
@@ -9,24 +10,26 @@ import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
  * @author SunTao
  * @since 2025-08-16
  */
-public class AssertException extends BaseException {
+public class AssertException extends ServiceException {
     private static final long serialVersionUID = 4326907104671228501L;
 
     /**
-     * 使用自定义消息构造异常
+     * 构造业务异常
      *
-     * @param message 异常消息
+     * @param message   错误信息
+     * @param args      消息参数
      */
-    public AssertException(String message) {
-        super(message);
+    public AssertException(String message, Object... args) {
+        super(ErrorCodeUtils.of(ValidationErrorCode.EVALIA001.getCode(), message), args);
     }
 
     /**
-     * 使用国际化消息码构造异常
+     * 构造业务异常（带国际化参数）
      *
-     * @param expMessageCode 异常消息码
+     * @param errorCode 错误码定义
+     * @param args      国际化消息参数
      */
-    public AssertException(ExpMessageCode expMessageCode) {
-        super(expMessageCode);
+    public AssertException(ErrorCode errorCode, Object... args) {
+        super(errorCode, args);
     }
 }

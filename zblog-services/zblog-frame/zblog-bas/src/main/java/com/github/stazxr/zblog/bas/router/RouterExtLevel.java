@@ -11,10 +11,10 @@ public class RouterExtLevel extends RouterLevel {
     /**
      * 禁止访问
      */
-    public static final int FORBIDDEN = 1 << 3;
+    public static final int FORBIDDEN = 8;
 
     /**
      * 404
      */
-    public static final int NULL = 1 << 4;
+    public static final int NULL = 16;
 }

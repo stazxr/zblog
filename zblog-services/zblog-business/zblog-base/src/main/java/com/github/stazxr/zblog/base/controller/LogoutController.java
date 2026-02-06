@@ -1,14 +1,13 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.rest.IgnoreResult;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.base.service.UserService;
 import com.github.stazxr.zblog.base.util.Constants;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
-import com.github.stazxr.zblog.core.annotation.IgnoreResult;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -43,7 +42,7 @@ public class LogoutController {
     @IgnoreResult
     @PostMapping("/api/logout")
     @ApiOperation(value = "用户注销")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "用户注销", code = "logout", level = RouterLevel.PUBLIC)
     public void logout() {
     }
@@ -54,9 +53,9 @@ public class LogoutController {
     @Log
     @PostMapping("/api/logout/custom")
     @ApiOperation(value = "自定义用户注销")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_2_0)
     @Router(name = "自定义用户注销", code = "customLogout", level = RouterLevel.OPEN)
-    public Result customLogout(@RequestParam Long userId, HttpServletRequest request) {
+    public void customLogout(@RequestParam Long userId, HttpServletRequest request) {
         // 注销 token
         // TODO userService.clearUserStorageToken(userId);
 
@@ -65,6 +64,5 @@ public class LogoutController {
         String preTknCacheKey = String.format(Constants.SysCacheKey.preTkn.cacheKey(), userId, Locale.ROOT);
         String ssoTknCacheKey = String.format(Constants.SysCacheKey.ssoTkn.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
         GlobalCache.remove(preTknCacheKey, ssoTknCacheKey);
-        return Result.success();
     }
 }

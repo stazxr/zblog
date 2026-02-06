@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.bas.sequence.core.snowflake;
 
+import com.github.stazxr.zblog.bas.sequence.SequenceErrorCode;
 import com.github.stazxr.zblog.bas.sequence.SequenceException;
 import com.github.stazxr.zblog.bas.sequence.core.BaseWorkSequenceGenerator;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.concurrent.locks.Lock;
@@ -29,8 +31,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author SunTao
  * @since 2021-12-19
  */
-@Slf4j
 public class SnowflakeSequenceGenerator extends BaseWorkSequenceGenerator {
+    private static final Logger log = LoggerFactory.getLogger(SnowflakeSequenceGenerator.class);
+
     /**
      * 开始时间戳
      */
@@ -150,7 +153,7 @@ public class SnowflakeSequenceGenerator extends BaseWorkSequenceGenerator {
             currentTime = timeMillsGen();
             if (currentTime < lastTime) {
                 // 时钟被回拨，直接拒绝服务
-                throw new SequenceException("ZSEQ001");
+                throw new SequenceException(SequenceErrorCode.SSEQGA000);
             }
 
             if (currentTime == lastTime) {

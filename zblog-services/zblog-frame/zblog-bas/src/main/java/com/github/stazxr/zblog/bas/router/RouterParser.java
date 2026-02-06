@@ -1,7 +1,8 @@
 package com.github.stazxr.zblog.bas.router;
 
-import com.github.stazxr.zblog.bas.context.util.SpringContextUtil;
-import lombok.extern.slf4j.Slf4j;
+import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
@@ -18,8 +19,9 @@ import java.util.stream.Collectors;
  * @author SunTao
  * @since 2024-11-24
  */
-@Slf4j
 public class RouterParser {
+    private static final Logger log = LoggerFactory.getLogger(RouterParser.class);
+
     /**
      * ANY Method
      */
@@ -39,7 +41,7 @@ public class RouterParser {
         List<Resource> resources = new ArrayList<>();
 
         // 从 Spring 容器中获取 RequestMappingHandlerMapping bean
-        RequestMappingHandlerMapping requestMapping = SpringContextUtil.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping requestMapping = SpringContextHolder.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
 
         // 获取所有的请求处理方法
         Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMapping.getHandlerMethods();
@@ -85,10 +87,10 @@ public class RouterParser {
                         resource.setResourceCode(router.code());
                         resource.setResourceLevel(router.level());
                     } else {
-                        // 如果没有 Router 注解，设置默认值，默认资源允许登录访问
+                        // 如果没有 Router 注解，设置默认值，默认资源允许公开访问
                         resource.setResourceName(null);
                         resource.setResourceCode(null);
-                        resource.setResourceLevel(RouterLevel.PUBLIC);
+                        resource.setResourceLevel(RouterLevel.OPEN);
                     }
 
                     resources.add(resource);
@@ -160,7 +162,7 @@ public class RouterParser {
             .collect(Collectors.groupingBy(Resource::getResourceCode, Collectors.counting()))
             .forEach((code, count) -> {
                 if (count > 1) {
-                    throw new RuntimeException("资源编码重复: " + code);
+                    throw new IllegalStateException("资源编码重复: " + code);
                 }
             });
     }

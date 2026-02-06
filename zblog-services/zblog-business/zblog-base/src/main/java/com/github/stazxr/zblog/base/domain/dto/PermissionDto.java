@@ -28,7 +28,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限ID
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("权限id")
     private Long id;
 
@@ -41,7 +41,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.perm.name.required}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{PERM_NAME_REQUIRED}")
     @ApiModelProperty("权限名称")
     private String permName;
 
@@ -54,14 +54,14 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.type.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PERM_TYPE_REQUIRED}")
     @ApiModelProperty("权限类型，1：目录、2：菜单、3：按钮、4：外链")
     private Integer permType;
 
     /**
      * 权限访问级别
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.level.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PERM_LEVEL_REQUIRED}")
     @ApiModelProperty("权限访问级别")
     private Integer permLevel;
 
@@ -92,9 +92,9 @@ public class PermissionDto extends BaseDto {
     /**
      * 权限排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.required}")
-    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
-    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PARAM_SORT_REQUIRED}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MIN1}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MAX99999}")
     @ApiModelProperty(value = "权限排序", example = "99999")
     private Integer sort;
 
@@ -113,7 +113,7 @@ public class PermissionDto extends BaseDto {
     /**
      * 是否启用
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.perm.enabled.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PERM_ENABLED_REQUIRED}")
     @ApiModelProperty(value = "是否启用")
     private Boolean enabled;
 }

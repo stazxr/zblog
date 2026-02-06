@@ -28,7 +28,7 @@ public class DictDto extends BaseDto {
     /**
      * 字典ID
      */
-    @NotNull(groups = Update.class, message = "{valid.common.id.required}")
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("字典id")
     private Long id;
 
@@ -41,14 +41,14 @@ public class DictDto extends BaseDto {
     /**
      * 字典名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.dict.dictName.required}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{DICT_DICTNAME_REQUIRED}")
     @ApiModelProperty("字典名称")
     private String dictName;
 
     /**
      * 字典类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.dict.dictType.required}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("字典类型")
     private Integer dictType;
 
@@ -67,9 +67,9 @@ public class DictDto extends BaseDto {
     /**
      * 字典排序
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{valid.common.sort.required}")
-    @Min(value = 1, groups = {Create.class, Update.class}, message = "{valid.common.sort.Min1}")
-    @Max(value =99999, groups = {Create.class, Update.class}, message = "{valid.common.sort.Max99999}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{PARAM_SORT_REQUIRED}")
+    @Min(value = 1, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MIN1}")
+    @Max(value =99999, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MAX99999}")
     @ApiModelProperty("字典排序")
     private Integer dictSort;
 

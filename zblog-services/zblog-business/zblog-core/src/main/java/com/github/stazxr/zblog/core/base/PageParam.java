@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.core.base;
 
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.validation.Assert;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.core.util.ToStringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -41,8 +40,9 @@ public class PageParam implements Serializable {
     private Integer defaultPageSize = 10;
 
     public void checkPage() {
-        Assert.notNull(page, ExpMessageCode.of("valid.common.page.required"));
-        Assert.notNull(pageSize, ExpMessageCode.of("valid.common.pageSize.required"));
+        if (page == null || pageSize == null) {
+            ThrowUtils.system(BaseErrorCode.SCOREB000);
+        }
     }
 
     @Override

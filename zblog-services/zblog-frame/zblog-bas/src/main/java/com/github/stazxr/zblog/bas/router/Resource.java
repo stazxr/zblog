@@ -2,8 +2,6 @@ package com.github.stazxr.zblog.bas.router;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.validation.Assert;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -67,7 +65,9 @@ public class Resource implements Serializable {
     private int resourceLevel;
 
     public void setResourceLevel(int resourceLevel) {
-        Assert.failIfFalse(ALLOWS_LEVELS.contains(resourceLevel), ExpMessageCode.of("valid.resource.resourceLevel.configError"));
+        if (!ALLOWS_LEVELS.contains(resourceLevel)) {
+            throw new IllegalArgumentException("Invalid resourceLevel: " + resourceLevel);
+        }
         this.resourceLevel = resourceLevel;
     }
 

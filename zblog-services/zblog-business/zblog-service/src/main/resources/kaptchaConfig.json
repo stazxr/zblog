@@ -2,8 +2,8 @@
   {
     "name": "loginCode",
     "properties": {
-      "captchaType": "Arithmetic",
-      "duration": 60,
+      "captchaType": "ArithmeticNew",
+      "duration": 120,
       "length": 2,
       "width": 111,
       "height": 32

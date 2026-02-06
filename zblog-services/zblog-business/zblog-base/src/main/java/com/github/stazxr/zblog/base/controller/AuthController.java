@@ -2,15 +2,16 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.captcha.Captcha;
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.ValidateLoginCodeFilter;
+import com.github.stazxr.zblog.base.domain.bo.LoginUser;
+import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.service.ZblogService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.core.util.SecurityUtils;
-import com.github.stazxr.zblog.log.annotation.IgnoredLog;
+import com.github.stazxr.zblog.log.annotation.IgnoreLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +43,13 @@ public class AuthController {
      *
      * @return login username
      */
-    @IgnoredLog
+    @IgnoreLog
     @GetMapping("/loginId")
     @ApiOperation(value = "获取当前登录用户信息")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "获取当前登录用户信息", code = "loginId", level = RouterLevel.PUBLIC)
-    public Result currentUserDetail() {
-        return Result.success().data(SecurityUtils.getLoginUser());
+    public User currentUserDetail() {
+        return SecurityUtils.getLoginUser();
     }
 
     /**
@@ -58,7 +59,7 @@ public class AuthController {
      */
     @GetMapping("/loginCode")
     @ApiOperation(value = "获取登录验证码")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "获取登录验证码", code = "loginCode", level = RouterLevel.OPEN)
     public Map<String, Object> loginCode() {
         Map<String, Object> data = new HashMap<>(2);
@@ -72,14 +73,14 @@ public class AuthController {
      * 检查用户的登录状态
      *
      * @param request 请求信息
-     * @return userId
+     * @return LoginUser
      */
-    @IgnoredLog
+    @IgnoreLog
     @PostMapping("/checkUserLoginStatus")
     @ApiOperation(value = "检查用户的登录状态")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_4_2_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_4_2_0)
     @Router(name = "检查用户的登录状态", code = "checkUserLoginStatus", level = RouterLevel.OPEN)
-    public Result checkUserLoginStatus(HttpServletRequest request) {
-        return Result.success().data(zblogService.checkUserLoginStatus(request));
+    public LoginUser checkUserLoginStatus(HttpServletRequest request) {
+        return zblogService.checkUserLoginStatus(request);
     }
 }

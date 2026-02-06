@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.file.handler.impl;
 
-import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.model.StorageLocation;

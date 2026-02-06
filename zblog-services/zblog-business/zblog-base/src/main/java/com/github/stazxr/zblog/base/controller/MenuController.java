@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.stazxr.zblog.bas.msg.Result;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.vo.MenuVo;
 import com.github.stazxr.zblog.base.service.MenuService;
-import com.github.stazxr.zblog.core.annotation.ApiVersion;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,9 +36,9 @@ public class MenuController {
      */
     @GetMapping(value = "/queryUserMenuTree")
     @ApiOperation(value = "查询用户菜单列表（树）")
-    @ApiVersion(group = { BaseConst.ApiVersion.V_5_0_0 })
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "查询用户菜单列表（树）", code = "MENUQ001", level = RouterLevel.PUBLIC)
-    public Result queryUserMenuTree() {
-        return Result.s(menuService.queryUserMenuTree());
+    public List<MenuVo> queryUserMenuTree() {
+        return menuService.queryUserMenuTree();
     }
 }

@@ -76,12 +76,11 @@ public class SecurityUserServiceImpl implements SecurityUserService, Initializin
      * 更新用户的登录信息。当前实现为空，可根据实际需求扩展。
      *
      * @param username 用户名
-     * @param userIp   用户的登录ip
      * @param type     用户登录类型
      * @param request  用户的请求信息
      */
     @Override
-    public void updateUserLoginInfo(String username, String userIp, int type, HttpServletRequest request) {
+    public void updateUserLoginInfo(String username, int type, HttpServletRequest request) {
     }
 
     /**

@@ -1,81 +1,95 @@
 package com.github.stazxr.zblog.bas.log.cache;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Cache for controlling logging based on request paths.
- * This class manages inclusion and exclusion of paths for.
+ * 日志路径缓存工具类.
  *
  * @author SunTao
  * @since 2024-05-19
  */
-@Slf4j
 public class LogPathCache {
-    /**
-     * Map of paths that are included for logging.
-     */
-    private static final Map<String, Date> PATH_INCLUDE_MAP = new ConcurrentHashMap<>(16);
+
+    private static final Logger log = LoggerFactory.getLogger(LogPathCache.class);
 
     /**
-     * Map of paths that are excluded from logging.
+     * 最大缓存数量，防止OOM
      */
-    private static final Map<String, Date> PATH_EXCLUDE_MAP = new ConcurrentHashMap<>(16);
+    private static final int MAX_CACHE_SIZE = 1024;
 
+    /**
+     * 允许打印日志路径缓存
+     */
+    private static final Map<String, Boolean> INCLUDE_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 禁止打印日志路径缓存
+     */
+    private static final Map<String, Boolean> EXCLUDE_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * Spring路径匹配器
+     */
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     /**
-     * Determines if logging is allowed for the given path, considering exclusion list.
-     *
-     * @param path   Request path
-     * @param model  the log model
-     * @param paths  List of paths to enabled/exclude from logging
-     * @return boolean true if logging is allowed, false otherwise
+     * 判断是否允许打印日志（带缓存）
      */
     public static boolean allowedLogWithCache(String path, int model, List<String> paths) {
-        if (PATH_EXCLUDE_MAP.containsKey(path)) {
+        // 命中排除缓存
+        if (EXCLUDE_CACHE.containsKey(path)) {
             return false;
         }
 
-        if (PATH_INCLUDE_MAP.containsKey(path)) {
+        // 命中允许缓存
+        if (INCLUDE_CACHE.containsKey(path)) {
             return true;
         }
 
-        for (String path0 : paths) {
-            if (PATH_MATCHER.match(path0, path)) {
-                if (model == 0) {
-                    PATH_INCLUDE_MAP.put(path, new Date());
-                    log.debug("log control path cache in include map: {}", path);
-                    return true;
-                } else {
-                    PATH_EXCLUDE_MAP.put(path, new Date());
-                    log.debug("log control path cache in exclude map: {}", path);
-                    return false;
-                }
+        boolean matched = false;
+        for (String pattern : paths) {
+            if (PATH_MATCHER.match(pattern, path)) {
+                matched = true;
+                break;
             }
         }
 
+        boolean allowed;
         if (model == 0) {
-            PATH_EXCLUDE_MAP.put(path, new Date());
-            log.debug("log control path cache in exclude map: {}", path);
-            return false;
+            // model = 0 → 白名单模式
+            allowed = matched;
         } else {
-            PATH_INCLUDE_MAP.put(path, new Date());
-            log.debug("log control path cache in include map: {}", path);
-            return true;
+            // model = 1 → 黑名单模式
+            allowed = !matched;
         }
+
+        cacheResult(path, allowed);
+        return allowed;
     }
 
     /**
-     * Clears the path cache.
+     * 缓存结果并限制大小
+     */
+    private static void cacheResult(String path, boolean allowed) {
+        Map<String, Boolean> target = allowed ? INCLUDE_CACHE : EXCLUDE_CACHE;
+        if (target.size() > MAX_CACHE_SIZE) {
+            log.debug("日志路径缓存已满，清空缓存");
+            clearCache();
+        }
+        target.put(path, Boolean.TRUE);
+    }
+
+    /**
+     * 清空缓存
      */
     public static void clearCache() {
-        PATH_INCLUDE_MAP.clear();
-        PATH_EXCLUDE_MAP.clear();
+        INCLUDE_CACHE.clear();
+        EXCLUDE_CACHE.clear();
     }
 }

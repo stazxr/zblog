@@ -12,6 +12,8 @@ spring:
         deny: # 禁止访问监控界面的 IP（优先于 allow）
 zblog:
   base:
+    cache:
+      type: redis # 全局缓存类型
     file:
       local:
         enabled: false # 生产环境关闭本地上传功能，防止恶意上传拉胯服务器磁盘

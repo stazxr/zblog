@@ -1,30 +1,110 @@
 {
   "groups": [
     {
-      "name": "zblog.base.header",
-      "type": "com.github.stazxr.zblog.bas.context.properties.HeaderProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.context.properties.HeaderProperties"
-    },
-    {
-      "name": "zblog.base.header.deploy",
-      "type": "com.github.stazxr.zblog.bas.context.properties.HeaderProperties$Deploy",
-      "sourceType": "com.github.stazxr.zblog.bas.context.properties.HeaderProperties$Deploy"
-    },
-    {
-      "name": "zblog.base.i18n",
-      "type": "com.github.stazxr.zblog.bas.i18n.I18nProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.i18n.I18nProperties"
-    },
-    {
-      "name": "zblog.base.seq",
-      "type": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties"
+      "name": "zblog.base.thread-pool",
+      "type": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "线程池配置项."
     },
     {
       "name": "zblog.base.cache",
-      "type": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.GlobalCacheConfigProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.GlobalCacheConfigProperties"
+      "type": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.CacheConfigProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.CacheConfigProperties",
+      "description": "缓存配置项."
     },
+    {
+      "name": "zblog.base.exception",
+      "type": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties",
+      "description": "异常配置项."
+    },
+    {
+      "name": "zblog.base.exception.error-code-config",
+      "type": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties$ErrorCodeConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties",
+      "description": "错误码配置项."
+    },
+    {
+      "name": "zblog.base.i18n",
+      "type": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
+      "description": "国际化配置项."
+    },
+    {
+      "name": "zblog.base.mail.from",
+      "type": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "邮箱配置项."
+    },
+    {
+      "name": "zblog.base.sequence",
+      "type": "com.github.stazxr.zblog.bas.sequence.autoconfigure.properties.SequenceProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.properties.SequenceProperties",
+      "description": "序号配置项."
+    },
+    {
+      "name": "zblog.base.header",
+      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "description": "上下文核心配置项."
+    },
+    {
+      "name": "zblog.base.header.deploy",
+      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "description": "部署单元配置项."
+    },
+    {
+      "name": "zblog.base.context",
+      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
+      "description": "上下文配置项."
+    },
+    {
+      "name": "zblog.base.log.control",
+      "type": "com.github.stazxr.zblog.bas.log.autoconfigure.properties.LogControlProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.log.autoconfigure.properties.LogControlProperties",
+      "description": "日志控制配置."
+    },
+    {
+      "name": "zblog.base.file",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties",
+      "description": "文件存储配置项."
+    },
+    {
+      "name": "zblog.base.file.local",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$LocalConfig",
+      "description": "本地存储配置项."
+    },
+    {
+      "name": "zblog.base.file.oss",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云存储配置项."
+    },
+    {
+      "name": "zblog.base.file.kodo",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云存储配置项."
+    },
+    {
+      "name": "zblog.base.file.cos",
+      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "description": "腾讯云存储配置项."
+    },
+    {
+      "name": "zblog.base.rest",
+      "type": "com.github.stazxr.zblog.bas.rest.autoconfigure.properties.RestProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.rest.autoconfigure.properties.RestProperties",
+      "description": "统一响应配置项."
+    },
+
+
+
     {
       "name": "zblog.base.security",
       "type": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
@@ -44,138 +124,406 @@
       "name": "zblog.base.security.jwt.claims",
       "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
-    },
-    {
-      "name": "zblog.base.log.control",
-      "type": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties"
-    },
-    {
-      "name": "zblog.base.file",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties"
-    },
-    {
-      "name": "zblog.base.file.local",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$LocalConfig"
-    },
-    {
-      "name": "zblog.base.file.oss",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunOssConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$AliyunOssConfig"
-    },
-    {
-      "name": "zblog.base.file.kodo",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiniuyunKodoConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$QiniuyunKodoConfig"
-    },
-    {
-      "name": "zblog.base.file.cos",
-      "type": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig",
-      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties$TencentyunCosConfig"
-    },
-    {
-      "name": "zblog.base.mail.from",
-      "type": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties"
     }
   ],
   "properties": [
     {
-      "name": "zblog.base.header.sysCode",
-      "type": "java.lang.String",
-      "description": "Caller system code."
-    },
-    {
-      "name": "zblog.base.header.appCode",
-      "type": "java.lang.String",
-      "description": "Caller application code."
-    },
-    {
-      "name": "zblog.base.header.deploy.deployArea",
-      "type": "java.lang.String",
-      "description": "Deployment region."
-    },
-    {
-      "name": "zblog.base.header.deploy.deployCenter",
-      "type": "java.lang.String",
-      "description": "Deployment center/room."
-    },
-    {
-      "name": "zblog.base.header.deploy.deployIp",
-      "type": "java.lang.String",
-      "description": "Deployment server address."
-    },
-    {
-      "name": "zblog.base.header.deploy.deployUnit",
+      "name": "zblog.base.thread-pool.core-size",
       "type": "java.lang.Integer",
-      "description": "Deployment unit.",
-      "defaultValue": 0
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "核心线程数。线程池在空闲时仍然保持存活的线程数量，一般建议根据服务器 CPU 核心数进行合理配置.",
+      "defaultValue": 1
     },
     {
-      "name": "zblog.base.i18n.cacheTtl",
+      "name": "zblog.base.thread-pool.max-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "最大线程数。当任务队列已满且核心线程全部占用时，线程池允许创建的最大线程数量.",
+      "defaultValue": 2
+    },
+    {
+      "name": "zblog.base.thread-pool.queue-capacity",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "任务队列容量。用于缓存尚未被执行的任务，队列过大会导致任务等待时间过长.",
+      "defaultValue": 20
+    },
+    {
+      "name": "zblog.base.thread-pool.keep-alive-seconds",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "线程空闲存活时间（秒）。当线程数超过核心线程数时，多余线程在空闲达到该时间后会被回收.",
+      "defaultValue": 60
+    },
+    {
+      "name": "zblog.base.thread-pool.thread-name-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "线程名称前缀。便于日志排查和线程定位，建议设置具有业务含义的前缀.",
+      "defaultValue": "zblog-"
+    },
+    {
+      "name": "zblog.base.thread-pool.wait-for-tasks-to-complete-on-shutdown",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "应用关闭时是否等待线程池中的任务执行完成。true: 优雅关闭，等待任务完成后再退出；false: 立即关闭，可能中断正在执行的任务.",
+      "defaultValue": true
+    },
+    {
+      "name": "zblog.base.thread-pool.monitor-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "是否开启线程池监控日志.",
+      "defaultValue": true
+    },
+    {
+      "name": "zblog.base.thread-pool.monitor-interval",
       "type": "java.lang.Long",
-      "description": "缓存刷新周期，单位毫秒，默认 60 分钟.",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "线程池监控日志打印间隔（毫秒）.",
+      "defaultValue": 10000
+    },
+    {
+      "name": "zblog.base.cache.type",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.CacheConfigProperties",
+      "description": "全局缓存类型，支持 memory 或 redis.",
+      "defaultValue": "memory",
+      "enumValues": [
+        "memory",
+        "redis"
+      ]
+    },
+    {
+      "name": "zblog.base.exception.error-code-config.check",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties$ErrorCodeConfig",
+      "defaultValue": true,
+      "description": "是否开启错误码格式检查，默认 true."
+    },
+    {
+      "name": "zblog.base.exception.error-code-config.scan-package",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.exception.autoconfigure.properties.ExceptionProperties$ErrorCodeConfig",
+      "defaultValue": "com.github.stazxr.zblog",
+      "description": "错误码扫描的起始包，默认 'com.github.stazxr.zblog'."
+    },
+    {
+      "name": "zblog.base.i18n.cache-ttl",
+      "type": "java.lang.Long",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
+      "description": "缓存刷新周期，单位毫秒，默认 60 分钟，最小 5 分钟.",
       "defaultValue": 3600000
     },
     {
-      "name": "zblog.base.i18n.loadSql",
+      "name": "zblog.base.i18n.load-sql",
       "type": "java.lang.String",
-      "description": "从数据库加载国际化数据的 SQL 语句.",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
+      "description": "从数据库加载国际化数据的 SQL 语句，必须包含 code, locale, message 三列.",
       "defaultValue": "SELECT code, locale, message FROM i18n_message"
     },
     {
-      "name": "zblog.base.i18n.codeColumn",
+      "name": "zblog.base.i18n.code-column",
       "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
       "description": "数据库中 code 列名.",
       "defaultValue": "code"
     },
     {
-      "name": "zblog.base.i18n.localeColumn",
+      "name": "zblog.base.i18n.locale-column",
       "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
       "description": "数据库中 locale（语言）列名.",
       "defaultValue": "locale"
     },
     {
-      "name": "zblog.base.i18n.messageColumn",
+      "name": "zblog.base.i18n.message-column",
       "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
       "description": "数据库中 message（消息内容）列名.",
       "defaultValue": "message"
     },
     {
       "name": "zblog.base.i18n.encode",
       "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
       "description": "国际化文件的编码方式，默认 UTF-8.",
       "defaultValue": "UTF-8"
     },
     {
       "name": "zblog.base.i18n.basenames",
       "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.bas.i18n.autoconfigure.properties.I18nProperties",
       "description": "本地资源文件的基础名列表（无扩展名）.",
-      "defaultValue": [
-        "messages/messages"
-      ]
+      "defaultValue": "[\"messages/messages\"]"
     },
     {
-      "name": "zblog.base.seq.datacenterId",
-      "type": "java.lang.Short",
-      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties",
-      "description": "数据中心ID."
-    },
-    {
-      "name": "zblog.base.seq.machineId",
-      "type": "java.lang.Short",
-      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorProperties",
-      "description": "机器ID."
-    },
-    {
-      "name": "zblog.base.cache.type",
+      "name": "zblog.base.mail.from.address",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.cache.autoconfigure.properties.GlobalCacheConfigProperties",
-      "description": "系统缓存类型.",
-      "defaultValue": "memory"
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "发件地址，务必与配置的邮件发送人保持一致."
     },
+    {
+      "name": "zblog.base.mail.from.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "发件人.",
+      "defaultValue": "Z-BLOG"
+    },
+    {
+      "name": "zblog.base.sequence.datacenterId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.properties.SequenceProperties",
+      "description": "数据中心id.",
+      "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.sequence.machineId",
+      "type": "java.lang.Short",
+      "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.properties.SequenceProperties",
+      "description": "机器id.",
+      "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.header.sysCode",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "description": "系统编码."
+    },
+    {
+      "name": "zblog.base.header.appCode",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "description": "应用编码."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployArea",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "description": "部署地域."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployCenter",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "description": "部署中心."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployIp",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "description": "部署IP."
+    },
+    {
+      "name": "zblog.base.header.deploy.deployUnit",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "description": "部署单元.",
+      "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.context.tags",
+      "type": "java.util.List<com.github.stazxr.zblog.bas.context.entity.ContextTag>",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
+      "description": "扩展标签配置.",
+      "defaultValue": "[]"
+    },
+    {
+      "name": "zblog.base.log.control.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.log.autoconfigure.properties.LogControlProperties",
+      "description": "是否开启请求响应日志打印.",
+      "defaultValue": false
+    },
+    {
+      "name": "zblog.base.log.control.model",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.log.autoconfigure.properties.LogControlProperties",
+      "description": "模式: 0 = 白名单模式（paths为允许日志路径）; 1 = 黑名单模式（paths为禁止日志路径）.",
+      "defaultValue": 1
+    },
+    {
+      "name": "zblog.base.log.control.paths",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.bas.log.autoconfigure.properties.LogControlProperties",
+      "description": "路径列表配置."
+    },
+    {
+      "name": "zblog.base.file.model",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties",
+      "defaultValue": 1,
+      "description": "文件上传模式."
+    },
+    {
+      "name": "zblog.base.file.local.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$LocalConfig",
+      "defaultValue": true,
+      "description": "是否启用本地文件存储."
+    },
+    {
+      "name": "zblog.base.file.local.file-access-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$LocalConfig",
+      "defaultValue": "http://127.0.0.1:8000/file",
+      "description": "本地文件访问 URL 前缀，用于拼接文件对外访问地址."
+    },
+    {
+      "name": "zblog.base.file.local.storage-path-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$LocalConfig",
+      "defaultValue": "/zblog/upload",
+      "description": "本地文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.oss.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "defaultValue": false,
+      "description": "是否启用阿里云 OSS 文件存储."
+    },
+    {
+      "name": "zblog.base.file.oss.file-access-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云 OSS 文件访问 URL 前缀."
+    },
+    {
+      "name": "zblog.base.file.oss.storage-path-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "defaultValue": "upload",
+      "description": "阿里云 OSS 文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.oss.access-key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云 AccessKey ID."
+    },
+    {
+      "name": "zblog.base.file.oss.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云 AccessKey Secret."
+    },
+    {
+      "name": "zblog.base.file.oss.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云 OSS Endpoint."
+    },
+    {
+      "name": "zblog.base.file.oss.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$AliyunOssConfig",
+      "description": "阿里云 OSS 存储桶名称."
+    },
+    {
+      "name": "zblog.base.file.kodo.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "defaultValue": false,
+      "description": "是否启用七牛云对象存储 Kodo."
+    },
+    {
+      "name": "zblog.base.file.kodo.file-access-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云 Kodo 文件访问 URL（空间绑定域名）."
+    },
+    {
+      "name": "zblog.base.file.kodo.storage-path-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "defaultValue": "upload",
+      "description": "七牛云 Kodo 文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.kodo.access-key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云 AccessKey（AK）."
+    },
+    {
+      "name": "zblog.base.file.kodo.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云 SecretKey（SK）."
+    },
+    {
+      "name": "zblog.base.file.kodo.zone",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云存储区域标识."
+    },
+    {
+      "name": "zblog.base.file.kodo.zone-name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$QiniuyunKodoConfig",
+      "description": "七牛云存储空间名称（Bucket）."
+    },
+    {
+      "name": "zblog.base.file.cos.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "defaultValue": false,
+      "description": "是否启用腾讯云 COS 对象存储."
+    },
+    {
+      "name": "zblog.base.file.cos.file-access-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "description": "腾讯云 COS 文件访问 URL 前缀."
+    },
+    {
+      "name": "zblog.base.file.cos.storage-path-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "defaultValue": "upload",
+      "description": "腾讯云 COS 文件存储路径前缀（逻辑路径）."
+    },
+    {
+      "name": "zblog.base.file.cos.access-key",
+      "type": "java.lang.String",
+      "description": "腾讯云访问密钥 ID."
+    },
+    {
+      "name": "zblog.base.file.cos.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "description": "腾讯云访问密钥 SecretKey."
+    },
+    {
+      "name": "zblog.base.file.cos.region",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "description": "腾讯云 COS 所在地域（Region）."
+    },
+    {
+      "name": "zblog.base.file.cos.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
+      "description": "腾讯云 COS 存储桶名称."
+    },
+    {
+      "name": "zblog.base.rest.error-path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.rest.autoconfigure.properties.RestProperties",
+      "description": "错误路径，当访问 /error 时会触发统一错误处理.",
+      "defaultValue": "/error"
+    },
+    {
+      "name": "zblog.base.rest.not-package-uris",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.bas.rest.autoconfigure.properties.RestProperties",
+      "description": "不进行统一包装的 URI 列表，例如第三方回调或 Swagger 文档.",
+      "defaultValue": "[]"
+    },
+
+
+
     {
       "name": "zblog.base.security.login-url",
       "type": "java.lang.String",
@@ -303,175 +651,6 @@
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
       "description": "JWT 面向的用户."
-    },
-    {
-      "name": "zblog.base.log.control.enabled",
-      "type": "java.lang.Boolean",
-      "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
-      "description": "Flag to enable or disable request and response logging. Default is false (logging disabled).",
-      "defaultValue": false
-    },
-    {
-      "name": "zblog.base.log.control.model",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
-      "description": "The control log model.",
-      "defaultValue": 0
-    },
-    {
-      "name": "zblog.base.log.control.paths",
-      "type": "java.util.List",
-      "sourceType": "com.github.stazxr.zblog.bas.log.properties.LogControlProperties",
-      "description": "List of paths for which logging should be enabled/disabled."
-    },
-    {
-      "name": "zblog.base.file.model",
-      "type": "java.lang.Integer",
-      "defaultValue": 1,
-      "description": "文件上传模式，对应 FileHandlerEnum."
-    },
-    {
-      "name": "zblog.base.file.local.enabled",
-      "type": "java.lang.Boolean",
-      "defaultValue": true,
-      "description": "是否启用本地文件存储."
-    },
-    {
-      "name": "zblog.base.file.local.file-access-url",
-      "type": "java.lang.String",
-      "defaultValue": "http://127.0.0.1:8000/file",
-      "description": "本地文件访问 URL 前缀，用于拼接文件对外访问地址."
-    },
-    {
-      "name": "zblog.base.file.local.storage-path-prefix",
-      "type": "java.lang.String",
-      "defaultValue": "/zblog/upload",
-      "description": "本地文件存储路径前缀（逻辑路径）."
-    },
-
-    {
-      "name": "zblog.base.file.oss.enabled",
-      "type": "java.lang.Boolean",
-      "defaultValue": false,
-      "description": "是否启用阿里云 OSS 文件存储."
-    },
-    {
-      "name": "zblog.base.file.oss.file-access-url",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 文件访问 URL 前缀."
-    },
-    {
-      "name": "zblog.base.file.oss.storage-path-prefix",
-      "type": "java.lang.String",
-      "defaultValue": "upload",
-      "description": "阿里云 OSS 文件存储路径前缀（逻辑路径）."
-    },
-    {
-      "name": "zblog.base.file.oss.access-key",
-      "type": "java.lang.String",
-      "description": "阿里云 AccessKey ID."
-    },
-    {
-      "name": "zblog.base.file.oss.secret-key",
-      "type": "java.lang.String",
-      "description": "阿里云 AccessKey Secret."
-    },
-    {
-      "name": "zblog.base.file.oss.endpoint",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS Endpoint."
-    },
-    {
-      "name": "zblog.base.file.oss.bucket-name",
-      "type": "java.lang.String",
-      "description": "阿里云 OSS 存储桶名称."
-    },
-    {
-      "name": "zblog.base.file.kodo.enabled",
-      "type": "java.lang.Boolean",
-      "defaultValue": false,
-      "description": "是否启用七牛云对象存储 Kodo."
-    },
-    {
-      "name": "zblog.base.file.kodo.file-access-url",
-      "type": "java.lang.String",
-      "description": "七牛云 Kodo 文件访问 URL（空间绑定域名）."
-    },
-    {
-      "name": "zblog.base.file.kodo.storage-path-prefix",
-      "type": "java.lang.String",
-      "defaultValue": "upload",
-      "description": "七牛云 Kodo 文件存储路径前缀（逻辑路径）."
-    },
-    {
-      "name": "zblog.base.file.kodo.access-key",
-      "type": "java.lang.String",
-      "description": "七牛云 AccessKey（AK）."
-    },
-    {
-      "name": "zblog.base.file.kodo.secret-key",
-      "type": "java.lang.String",
-      "description": "七牛云 SecretKey（SK）."
-    },
-    {
-      "name": "zblog.base.file.kodo.zone",
-      "type": "java.lang.String",
-      "description": "七牛云存储区域标识."
-    },
-    {
-      "name": "zblog.base.file.kodo.zone-name",
-      "type": "java.lang.String",
-      "description": "七牛云存储空间名称（Bucket）."
-    },
-    {
-      "name": "zblog.base.file.cos.enabled",
-      "type": "java.lang.Boolean",
-      "defaultValue": false,
-      "description": "是否启用腾讯云 COS 对象存储."
-    },
-    {
-      "name": "zblog.base.file.cos.file-access-url",
-      "type": "java.lang.String",
-      "description": "腾讯云 COS 文件访问 URL 前缀."
-    },
-    {
-      "name": "zblog.base.file.cos.storage-path-prefix",
-      "type": "java.lang.String",
-      "defaultValue": "upload",
-      "description": "腾讯云 COS 文件存储路径前缀（逻辑路径）."
-    },
-    {
-      "name": "zblog.base.file.cos.access-key",
-      "type": "java.lang.String",
-      "description": "腾讯云访问密钥 ID."
-    },
-    {
-      "name": "zblog.base.file.cos.secret-key",
-      "type": "java.lang.String",
-      "description": "腾讯云访问密钥 SecretKey."
-    },
-    {
-      "name": "zblog.base.file.cos.region",
-      "type": "java.lang.String",
-      "description": "腾讯云 COS 所在地域（Region）."
-    },
-    {
-      "name": "zblog.base.file.cos.bucket-name",
-      "type": "java.lang.String",
-      "description": "腾讯云 COS 存储桶名称."
-    },
-    {
-      "name": "zblog.base.mail.from.address",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
-      "description": "发件地址，务必与配置的邮件发送人保持一致."
-    },
-    {
-      "name": "zblog.base.mail.from.name",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
-      "description": "发件人.",
-      "defaultValue": "Z-BLOG"
     }
   ],
   "hints": [
@@ -499,35 +678,10 @@
       ]
     },
     {
-      "name": "zblog.base.cache.type",
+      "name": "zblog.base.log.control.model",
       "values": [
-        {
-          "value": "memory",
-          "description": "内存缓存."
-        },
-        {
-          "value": "redis",
-          "description": "Redis缓存."
-        }
-      ]
-    },
-    {
-      "name": "zblog.base.security.jwt.algorithm",
-      "values": [
-        { "value": "RS256", "description": "RS256, default." },
-        { "value": "ES256", "description": "ES256." },
-        { "value": "HS256", "description": "HS256." },
-        { "value": "HS384", "description": "HS384." },
-        { "value": "HS512", "description": "HS512." },
-        { "value": "RS384", "description": "RS384." },
-        { "value": "RS512", "description": "RS512." },
-        { "value": "ES256K", "description": "ES256K." },
-        { "value": "ES384", "description": "ES384." },
-        { "value": "ES512", "description": "ES512." },
-        { "value": "PS256", "description": "PS256." },
-        { "value": "PS384", "description": "PS384." },
-        { "value": "PS512", "description": "PS512." },
-        { "value": "EdDSA", "description": "EdDSA." }
+        { "value": 0, "description": "白名单模式, zblog.base.log.control.paths 为允许记录日志的路径列表." },
+        { "value": 1, "description": "黑名单模式, zblog.base.log.control.paths 为禁止记录日志的路径列表." }
       ]
     },
     {
@@ -537,13 +691,6 @@
         { "value": 2, "description": "阿里云存储." },
         { "value": 3, "description": "七牛云存储." },
         { "value": 4, "description": "腾讯云存储." }
-      ]
-    },
-    {
-      "name": "zblog.base.log.control.model",
-      "values": [
-        { "value": 0, "description": "zblog.base.log.control.paths 为允许记录日志的路径列表." },
-        { "value": 1, "description": "zblog.base.log.control.paths 为禁止记录日志的路径列表." }
       ]
     },
     {
@@ -572,6 +719,25 @@
         { "value": "na-siliconvalley", "description": "美国硅谷." },
         { "value": "na-ashburn", "description": "美国弗吉尼亚." },
         { "value": "eu-frankfurt", "description": "德国法兰克福." }
+      ]
+    },
+    {
+      "name": "zblog.base.security.jwt.algorithm",
+      "values": [
+        { "value": "RS256", "description": "RS256, default." },
+        { "value": "ES256", "description": "ES256." },
+        { "value": "HS256", "description": "HS256." },
+        { "value": "HS384", "description": "HS384." },
+        { "value": "HS512", "description": "HS512." },
+        { "value": "RS384", "description": "RS384." },
+        { "value": "RS512", "description": "RS512." },
+        { "value": "ES256K", "description": "ES256K." },
+        { "value": "ES384", "description": "ES384." },
+        { "value": "ES512", "description": "ES512." },
+        { "value": "PS256", "description": "PS256." },
+        { "value": "PS384", "description": "PS384." },
+        { "value": "PS512", "description": "PS512." },
+        { "value": "EdDSA", "description": "EdDSA." }
       ]
     }
   ]

@@ -26,5 +26,9 @@ export default {
   // 分页查询用户操作日志列表
   pageUserLogList: params => {
     return api.httpRequest().get(`${userCenterApi}/pageUserLogList`, params)
+  },
+  // 分页查询用户登录日志列表
+  pageUserLoginLogList: params => {
+    return api.httpRequest().get(`${userCenterApi}/pageUserLoginLogList`, params)
   }
 }

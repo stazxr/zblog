@@ -17,32 +17,22 @@
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userType">
             <el-select id="search-userType" v-model="filters.userType" placeholder="用户类型" clearable>
-              <el-option label="系统用户" :value="0" />
-              <el-option label="普通用户" :value="1" />
-              <el-option label="管理员用户" :value="2" />
-              <el-option label="测试用户" :value="3" />
-              <el-option label="临时用户" :value="4" />
+              <el-option v-for="item in userTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-userStatus">
             <el-select id="search-userStatus" v-model="filters.userStatus" placeholder="用户状态" clearable>
-              <el-option label="正常" :value="0" />
-              <el-option label="禁用" :value="1" />
-              <el-option label="锁定" :value="2" />
+              <el-option v-for="item in userStatusList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-loginChan">
+          <muses-search-form-item v-show="false" label="" prop="search-loginChan">
             <el-select id="search-loginChan" v-model="filters.loginChan" placeholder="登录渠道" clearable>
-              <el-option label="移动端" value="01" />
-              <el-option label="PC端" value="02" />
+              <el-option v-for="item in loginChanList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginType">
             <el-select id="search-loginType" v-model="filters.loginType" placeholder="登录方式" clearable>
-              <el-option label="访客" value="00" />
-              <el-option label="密码" value="01" />
-              <el-option label="QQ互信" value="02" />
-              <el-option label="未知" value="99" />
+              <el-option v-for="item in loginTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-loginAddress">
@@ -110,19 +100,13 @@
             <span v-else>隐藏</span>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="loginChan" label="登录渠道" align="center" width="80">
-          <template v-slot="scope">
-            <span v-if="scope.row['loginChan'] === '01'">移动端</span>
-            <span v-else-if="scope.row['loginChan'] === '02'">PC端</span>
-            <span v-else>{{ scope.row['loginChan'] }}</span>
-          </template>
-        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="loginPlatform" label="登录平台" align="center" width="80" />
         <el-table-column :show-overflow-tooltip="true" prop="loginType" label="登录方式" align="center" width="80">
           <template v-slot="scope">
-            <span v-if="scope.row['loginType'] === '00'">访客</span>
-            <span v-else-if="scope.row['loginType'] === '01'">密码</span>
-            <span v-else-if="scope.row['loginType'] === '02'">QQ互信</span>
-            <span v-else-if="scope.row['loginType'] === '99'">未知</span>
+            <span v-if="scope.row['loginType'] === 'LT00'">访客</span>
+            <span v-else-if="scope.row['loginType'] === 'LT01'">密码</span>
+            <span v-else-if="scope.row['loginType'] === 'LT02'">QQ互信</span>
+            <span v-else-if="scope.row['loginType'] === 'LT99'">未知</span>
             <span v-else>{{ scope.row['loginType'] }}</span>
           </template>
         </el-table-column>
@@ -182,6 +166,10 @@ export default {
         loginType: null,
         loginAddress: null
       },
+      userTypeList: [],
+      userStatusList: [],
+      loginChanList: [],
+      loginTypeList: [],
       tableData: [],
       tableTitle: null,
       tableLoading: false,
@@ -190,7 +178,6 @@ export default {
       total: 0,
       page: 1,
       pageSize: 10,
-
       deleteLoading: false,
       userChooseDialogVisible: false
     }
@@ -209,6 +196,10 @@ export default {
   mounted() {
     this.type = this.$route.query.type
     this.dataId = this.$route.query.businessId
+    this.loadUserTypeList()
+    this.loadUserStatusList()
+    // this.loadLoginChanList()
+    this.loadLoginTypeList()
     this.listTableData()
   },
   methods: {
@@ -217,6 +208,38 @@ export default {
     },
     handleSelectionChange(val) {
       this.selectRows = val
+    },
+    loadUserTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.userTypeList = data
+      }).catch(_ => {
+        this.userTypeList = []
+      })
+    },
+    loadUserStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'USER_STATUS_CONFIG' }).then(res => {
+        const { data } = res
+        this.userStatusList = data
+      }).catch(_ => {
+        this.userStatusList = []
+      })
+    },
+    loadLoginChanList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOGIN_CHAN_CONFIG' }).then(res => {
+        const { data } = res
+        this.loginChanList = data
+      }).catch(_ => {
+        this.loginChanList = []
+      })
+    },
+    loadLoginTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOGIN_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.loginTypeList = data
+      }).catch(_ => {
+        this.loginTypeList = []
+      })
     },
     // 查询
     search() {

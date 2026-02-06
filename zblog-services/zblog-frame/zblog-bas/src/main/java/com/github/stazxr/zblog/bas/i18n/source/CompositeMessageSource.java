@@ -1,11 +1,11 @@
 package com.github.stazxr.zblog.bas.i18n.source;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.util.Locale;
 
@@ -21,8 +21,9 @@ import java.util.Locale;
  * @author SunTao
  * @since 2025-08-10
  */
-@Slf4j
 public class CompositeMessageSource implements MessageSource {
+    private static final Logger log = LoggerFactory.getLogger(CompositeMessageSource.class);
+
     /**
      * 主数据源（通常是 DB）
      */
@@ -33,8 +34,7 @@ public class CompositeMessageSource implements MessageSource {
      */
     private MessageSource fallbackMessageSource;
 
-    public CompositeMessageSource(@NonNull MessageSource primaryMessageSource,
-                                  @NonNull MessageSource fallbackMessageSource) {
+    public CompositeMessageSource(MessageSource primaryMessageSource, MessageSource fallbackMessageSource) {
         setPrimaryMessageSource(primaryMessageSource);
         setFallbackMessageSource(fallbackMessageSource);
     }
@@ -49,32 +49,59 @@ public class CompositeMessageSource implements MessageSource {
      * @return 国际化消息文本
      */
     @Override
-    public String getMessage(@NonNull String code,
-                             @Nullable Object[] args,
-                             @Nullable String defaultMessage,
-                             @NonNull Locale locale) {
-        String message = primaryMessageSource.getMessage(code, args, null, locale);
-        if (message != null) {
-            return message;
+    public String getMessage(@NonNull String code, Object[] args, String defaultMessage, @NonNull Locale locale) {
+        try {
+            // 先查主数据源
+            return primaryMessageSource.getMessage(code, args, locale);
+        } catch (NoSuchMessageException ignored) {
+        } catch (Exception e) {
+            log.error("[i18n] 主消息源异常: code={}, locale={}", code, locale, e);
         }
-        return fallbackMessageSource.getMessage(code, args, defaultMessage, locale);
+
+        try {
+            // 再查 fallback
+            return fallbackMessageSource.getMessage(code, args, locale);
+        } catch (NoSuchMessageException ignored) {
+        } catch (Exception e) {
+            log.error("[i18n] 备消息源异常: code={}, locale={}", code, locale, e);
+        }
+
+        // 兜底
+        return defaultMessage != null ? defaultMessage : code;
     }
 
     /**
      * 获取国际化消息（不带默认值版本）
      *
-     * @throws org.springframework.context.NoSuchMessageException 如果找不到消息
+     * @param code           消息编码
+     * @param args           占位符参数
+     * @param locale         区域
+     * @return 国际化消息文本
+     * @throws NoSuchMessageException 消息未配置
      */
     @NonNull
     @Override
-    public String getMessage(@NonNull String code,
-                             @Nullable Object[] args,
-                             @NonNull Locale locale) {
+    public String getMessage(@NonNull String code, Object[] args, @NonNull Locale locale) throws NoSuchMessageException {
         try {
+            // 先查主数据源
             return primaryMessageSource.getMessage(code, args, locale);
-        } catch (NoSuchMessageException e) {
-            return fallbackMessageSource.getMessage(code, args, locale);
+        } catch (NoSuchMessageException ignored) {
+        } catch (Exception e) {
+            log.error("[i18n] 主消息源异常: code={}, locale={}", code, locale, e);
         }
+
+        try {
+            // 再查 fallback
+            return fallbackMessageSource.getMessage(code, args, locale);
+        } catch (NoSuchMessageException e) {
+            // 没有 key 抛出异常
+            throw e;
+        } catch (Exception e) {
+            log.error("[i18n] 备消息源异常: code={}, locale={}", code, locale, e);
+        }
+
+        // 异常返回 code
+        return code;
     }
 
     /**
@@ -82,13 +109,15 @@ public class CompositeMessageSource implements MessageSource {
      *
      * @throws org.springframework.context.NoSuchMessageException 如果找不到消息
      */
-    @Override
     @NonNull
-    public String getMessage(@NonNull MessageSourceResolvable resolvable,
-                             @NonNull Locale locale) {
+    @Override
+    public String getMessage(@NonNull MessageSourceResolvable resolvable, @NonNull Locale locale) {
         try {
             return primaryMessageSource.getMessage(resolvable, locale);
         } catch (NoSuchMessageException e) {
+            return fallbackMessageSource.getMessage(resolvable, locale);
+        } catch (Exception e) {
+            log.error("[i18n] 获取主消息源失败: resolvable={}, locale={}, error={}", resolvable, locale, e.getMessage(), e);
             return fallbackMessageSource.getMessage(resolvable, locale);
         }
     }

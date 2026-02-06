@@ -4,7 +4,22 @@ com.github.stazxr.zblog.bas.props.database.DatabasePropertySourceInitializer
 
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.stazxr.zblog.bas.context.config.ContextConfig,\
-com.github.stazxr.zblog.bas.log.config.LogConfiguration,\
+com.github.stazxr.zblog.bas.cors.CorsFilterAutoConfiguration,\
+com.github.stazxr.zblog.bas.thread.autoconfigure.ThreadPoolAutoConfiguration,\
+com.github.stazxr.zblog.bas.cache.autoconfigure.RedisAutoConfiguration,\
+com.github.stazxr.zblog.bas.cache.autoconfigure.CacheAutoConfiguration,\
+com.github.stazxr.zblog.bas.exception.autoconfigure.ErrorCodeCheckerAutoConfiguration,\
+com.github.stazxr.zblog.bas.exception.autoconfigure.ExceptionAutoConfiguration,\
+com.github.stazxr.zblog.bas.i18n.autoconfigure.I18nAutoConfiguration,\
+com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration,\
+com.github.stazxr.zblog.bas.notify.mail.autoconfigure.MailAutoConfiguration,\
+com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceAutoConfiguration,\
 com.github.stazxr.zblog.bas.captcha.autoconfigure.CaptchaLoadAutoConfigure,\
-com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceGeneratorAutoConfiguration
+com.github.stazxr.zblog.bas.context.autoconfigure.HeaderAutoConfiguration,\
+com.github.stazxr.zblog.bas.context.autoconfigure.ContextAutoConfiguration,\
+com.github.stazxr.zblog.bas.context.autoconfigure.ContextFilterAutoConfiguration,\
+com.github.stazxr.zblog.bas.context.autoconfigure.SpringContextAutoConfiguration,\
+com.github.stazxr.zblog.bas.log.autoconfigure.LogAutoConfiguration,\
+com.github.stazxr.zblog.bas.log.autoconfigure.LogContextFilterAutoConfiguration,\
+com.github.stazxr.zblog.bas.file.autoconfigure.FileAutoConfiguration,\
+com.github.stazxr.zblog.bas.rest.autoconfigure.RestAutoConfiguration

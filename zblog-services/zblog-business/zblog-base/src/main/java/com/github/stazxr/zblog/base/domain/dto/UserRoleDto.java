@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ public class UserRoleDto implements Serializable {
     /**
      * 角色id
      */
+    @NotNull(message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("角色id")
     private Long roleId;
 

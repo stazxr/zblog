@@ -1,4 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.UserLoginLogMapper">
+    <select id="selectUserLoginLogList" resultType="com.github.stazxr.zblog.base.domain.vo.UserLoginLogVo">
+        SELECT
+            u.USERNAME, LOGIN_TIME, LOGIN_CHAN, LOGIN_TYPE, LOGIN_IP, LOGIN_ADDRESS, LOGIN_BROWSER, LOGIN_BROWSER_VERSION, LOGIN_PLATFORM, USER_AGENT, IS_SUCCESS, REMARK
+        FROM user_login_log ull
+        LEFT JOIN user u ON ull.USER_ID = u.ID
+        <where>
+            <if test="query.username != null and query.username != ''">
+                u.USERNAME = #{query.username}
+            </if>
+            <if test="query.loginResult != null">
+                AND ull.IS_SUCCESS = #{query.loginResult}
+            </if>
+            <if test="query.loginType != null and query.loginType != ''">
+                AND ull.LOGIN_TYPE = #{query.loginType}
+            </if>
+            <if test="query.loginAddress != null and query.loginAddress != ''">
+                <bind name="loginAddressBind" value="'%' + query.loginAddress + '%'"/>
+                AND ull.LOGIN_ADDRESS LIKE #{loginAddressBind}
+            </if>
+            <if test="query.loginIp != null and query.loginIp != ''">
+                AND ull.LOGIN_IP = #{query.loginIp}
+            </if>
+            <if test="query.loginStartTime != null">
+                AND ull.LOGIN_TIME <![CDATA[>=]]> #{query.loginStartTime, jdbcType=TIMESTAMP}
+            </if>
+            <if test="query.loginEndTime != null">
+                AND ull.LOGIN_TIME <![CDATA[>=]]> #{query.loginEndTime, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        ORDER BY LOGIN_TIME DESC
+    </select>
 </mapper>

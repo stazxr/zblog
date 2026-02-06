@@ -19,7 +19,7 @@ public class Assert {
 
     public static void isEquals(Object a, Object b, ExpMessageCode expMessageCode) {
         if (!Objects.equals(a, b)) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -31,7 +31,7 @@ public class Assert {
 
     public static void isNoEquals(Object a, Object b, ExpMessageCode expMessageCode) {
         if (Objects.equals(a, b)) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -43,7 +43,7 @@ public class Assert {
 
     public static void isNull(Object object, ExpMessageCode expMessageCode) {
         if (object != null) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -59,7 +59,7 @@ public class Assert {
 
     public static void notNull(Object object, ExpMessageCode expMessageCode) {
         if (object == null) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -71,7 +71,7 @@ public class Assert {
 
     public static void isBlank(String str, ExpMessageCode expMessageCode) {
         if (!isBlankInternal(str)) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -87,7 +87,7 @@ public class Assert {
 
     public static void notBlank(String str, ExpMessageCode expMessageCode) {
         if (isBlankInternal(str)) {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -97,9 +97,9 @@ public class Assert {
         }
     }
 
-    public static void failIfTrue(boolean condition, ExpMessageCode code) {
+    public static void failIfTrue(boolean condition, ExpMessageCode expMessageCode) {
         if (condition) {
-            throw new AssertException(code);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -109,9 +109,9 @@ public class Assert {
         }
     }
 
-    public static void failIfFalse(boolean condition, ExpMessageCode code) {
+    public static void failIfFalse(boolean condition, ExpMessageCode expMessageCode) {
         if (!condition) {
-            throw new AssertException(code);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -121,9 +121,9 @@ public class Assert {
         }
     }
 
-    public static void affectOneRow(int rows, ExpMessageCode messageCode) {
+    public static void affectOneRow(int rows, ExpMessageCode expMessageCode) {
         if (rows != 1) {
-            throw new AssertException(messageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -180,7 +180,7 @@ public class Assert {
         if (flag) {
             trueBack.call();
         } else {
-            throw new AssertException(expMessageCode);
+            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 

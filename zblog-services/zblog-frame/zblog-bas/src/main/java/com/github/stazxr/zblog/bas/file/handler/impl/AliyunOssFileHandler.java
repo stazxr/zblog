@@ -3,9 +3,7 @@ package com.github.stazxr.zblog.bas.file.handler.impl;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.OSSObject;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-import com.github.stazxr.zblog.bas.file.FileException;
-import com.github.stazxr.zblog.bas.file.autoconfigure.FileProperties;
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.model.StorageLocation;
@@ -44,11 +42,6 @@ public class AliyunOssFileHandler extends CloudFileHandler {
 
         // 创建 OSS 客户端
         ossClient = new OSSClientBuilder().build(config.getEndpoint(), config.getAccessKey(), config.getSecretKey());
-
-        // 检查桶是否存在
-        if (!ossClient.doesBucketExist(config.getBucketName())) {
-            throw new FileException(ExpMessageCode.of("valid.file.bas.bucketNotExist", config.getBucketName()));
-        }
     }
 
     /**
@@ -80,10 +73,9 @@ public class AliyunOssFileHandler extends CloudFileHandler {
      *
      * @param storageLocation 解析后的存储信息
      * @return 文件输入流
-     * @throws IOException IO 异常
      */
     @Override
-    protected InputStream getCloudFileStream(StorageLocation storageLocation) throws IOException {
+    protected InputStream getCloudFileStream(StorageLocation storageLocation) {
         String bucketName = resolveBucket(storageLocation);
         String key = storageLocation.getKey();
 
