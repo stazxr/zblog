@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.InterfaceVo;
 
@@ -17,9 +17,9 @@ public interface InterfaceService {
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<DictVo>
+     * @return IPage<InterfaceVo>
      */
-    PageInfo<InterfaceVo> queryInterfaceListByPage(InterfaceQueryDto queryDto);
+    IPage<InterfaceVo> queryInterfaceListByPage(InterfaceQueryDto queryDto);
 
     /**
      * 导出接口列表

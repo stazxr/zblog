@@ -87,7 +87,12 @@ instance.interceptors.response.use(response => {
     }
 
     const result = response.data
-    return responseHandler(result)
+    const responseType = response.config.responseType
+    if (responseType === 'json') {
+      return responseHandler(result)
+    } else {
+      return result
+    }
   }
 }, error => {
   // 统一异常处理，一般不会出现401|403|404，后端将其作为业务异常处理了

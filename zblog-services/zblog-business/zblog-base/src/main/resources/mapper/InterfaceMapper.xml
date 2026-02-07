@@ -7,7 +7,7 @@
             tmp.interfaceLevel, tmp.interfaceStatus,
             tmp.dailyCallCount, tmp.totalCallCount, tmp.totalFailureCount, tmp.callSuccessRate,
             tmp.avgResponseTime, tmp.maxResponseTime, tmp.p95ResponseTime, tmp.p99ResponseTime,
-            tmp.maxQps, tmp.avgQps
+            tmp.historyMaxQps, tmp.todayMaxQps, tmp.todayAvgQps
         FROM (
             SELECT
                 r.RESOURCE_NAME AS interfaceName, r.RESOURCE_CODE AS interfaceCode,
@@ -32,7 +32,7 @@
                         SELECT COST_TIME, CUME_DIST() OVER (ORDER BY COST_TIME) AS cum_dist
                         FROM log l2
                         WHERE l2.INTERFACE_CODE = r.RESOURCE_CODE
-                        <if test="filterLocalData != null and filterLocalData == true">
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
                             AND l2.ADDRESS != '局域网'
                         </if>
                     ) t WHERE cum_dist >= 0.95 ORDER BY COST_TIME LIMIT 1
@@ -43,54 +43,170 @@
                         SELECT COST_TIME, CUME_DIST() OVER (ORDER BY COST_TIME) AS cum_dist
                         FROM log l2
                         WHERE l2.INTERFACE_CODE = r.RESOURCE_CODE
-                        <if test="filterLocalData != null and filterLocalData == true">
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
                             AND l2.ADDRESS != '局域网'
                         </if>
-                    ) t WHERE cum_dist >= 0.95 ORDER BY COST_TIME LIMIT 1
+                    ) t WHERE cum_dist >= 0.99 ORDER BY COST_TIME LIMIT 1
                 ) AS p99ResponseTime,
-                -- 峰值 QPS（统计当天每秒请求数的最大值）
+                -- 历史峰值 QPS
+                (
+                    SELECT MAX(sec_count) FROM (
+                        SELECT COUNT(*) sec_count FROM log l2
+                        WHERE l2.INTERFACE_CODE = r.RESOURCE_CODE
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
+                            AND l2.ADDRESS != '局域网'
+                        </if>
+                        GROUP BY FLOOR(UNIX_TIMESTAMP(l2.EVENT_TIME))
+                    ) qps_sub
+                ) AS historyMaxQps,
+                -- 今日峰值 QPS（统计每秒请求数的最大值）
                 (
                     SELECT MAX(sec_count) FROM (
                         SELECT COUNT(*) AS sec_count FROM log l2
                         WHERE l2.INTERFACE_CODE = r.RESOURCE_CODE AND l2.CREATE_DATE = CURRENT_DATE
-                        <if test="filterLocalData != null and filterLocalData == true">
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
                             AND l2.ADDRESS != '局域网'
                         </if>
-                        GROUP BY DATE_FORMAT(l2.EVENT_TIME, '%Y-%m-%d %H:%i:%s')
+                        GROUP BY FLOOR(UNIX_TIMESTAMP(l2.EVENT_TIME))
                     ) qps_sub
-                ) AS maxQps,
-                -- 平均 QPS（当天总请求数 / 86400秒）
-                IF(SUM(IF(l.CREATE_DATE = CURRENT_DATE, 1, 0)) = 0, NULL, ROUND(SUM(IF(l.CREATE_DATE = CURRENT_DATE, 1, 0)) / 86400, 4)) AS avgQps
+                ) AS todayMaxQps,
+                -- 今日平均 QPS（当天总请求数 / 当天秒数）
+                ROUND(
+                    SUM(IF(l.CREATE_DATE = CURRENT_DATE, 1, 0)) / NULLIF(TIME_TO_SEC(NOW()), 0), 4
+                ) AS todayAvgQps
             FROM resource r
             LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = r.RESOURCE_CODE
             LEFT JOIN log l ON l.INTERFACE_CODE = r.RESOURCE_CODE
-            <if test="filterLocalData != null and filterLocalData == true">
+            <if test="query.filterLocalData != null and query.filterLocalData == true">
                 AND l.ADDRESS != '局域网'
             </if>
             WHERE r.RESOURCE_CODE IS NOT NULL
-            <if test="interfaceName != null and interfaceName != ''">
-                <bind name="interfaceNameBind" value="'%' + interfaceName + '%'"/>
+            <if test="query.interfaceName != null and query.interfaceName != ''">
+                <bind name="interfaceNameBind" value="'%' + query.interfaceName + '%'"/>
                 AND r.RESOURCE_NAME LIKE #{interfaceNameBind}
             </if>
-            <if test="interfaceCode != null and interfaceCode != ''">
-                <bind name="interfaceCodeBind" value="'%' + interfaceCode + '%'"/>
+            <if test="query.interfaceCode != null and query.interfaceCode != ''">
+                <bind name="interfaceCodeBind" value="'%' + query.interfaceCode + '%'"/>
                 AND r.RESOURCE_CODE LIKE #{interfaceCodeBind}
             </if>
-            <if test="interfaceUri != null and interfaceUri != ''">
-                <bind name="interfaceUriBind" value="'%' + interfaceUri + '%'"/>
+            <if test="query.interfaceUri != null and query.interfaceUri != ''">
+                <bind name="interfaceUriBind" value="'%' + query.interfaceUri + '%'"/>
                 AND r.RESOURCE_URI LIKE #{interfaceUriBind}
             </if>
-            <if test="interfaceMethod != null and interfaceMethod != ''">
-                AND r.RESOURCE_METHOD = #{interfaceMethod}
+            <if test="query.interfaceMethod != null and query.interfaceMethod != ''">
+                AND r.RESOURCE_METHOD = #{query.interfaceMethod}
             </if>
-            <if test="interfaceLevel != null">
-                AND (IF(p.PERM_LEVEL IS NULL, r.RESOURCE_LEVEL, p.PERM_LEVEL) = #{interfaceLevel})
+            <if test="query.interfaceLevel != null">
+                AND (IF(p.PERM_LEVEL IS NULL, r.RESOURCE_LEVEL, p.PERM_LEVEL) = #{query.interfaceLevel})
             </if>
-            <if test="interfaceStatus != null">
-                AND (IF(p.ENABLED IS NULL, 2, p.ENABLED) = #{interfaceStatus})
+            <if test="query.interfaceStatus != null">
+                AND (IF(p.ENABLED IS NULL, 2, p.ENABLED) = #{query.interfaceStatus})
             </if>
             GROUP BY r.RESOURCE_CODE, r.RESOURCE_NAME, r.RESOURCE_URI,
             r.RESOURCE_METHOD, r.RESOURCE_LEVEL, p.PERM_LEVEL, p.ENABLED
+        ) tmp
+        ORDER BY tmp.dailyCallCount DESC, tmp.totalCallCount DESC, tmp.interfaceCode
+    </select>
+
+    <select id="selectInterfaceListV2" resultType="com.github.stazxr.zblog.base.domain.vo.InterfaceVo">
+        SELECT
+            tmp.interfaceName,
+            tmp.interfaceCode,
+            tmp.interfaceUri,
+            tmp.interfaceMethod,
+            tmp.interfaceLevel,
+            tmp.interfaceStatus,
+            tmp.dailyCallCount,
+            tmp.totalCallCount,
+            tmp.totalFailureCount,
+            tmp.callSuccessRate,
+            tmp.avgResponseTime,
+            tmp.maxResponseTime,
+            tmp.historyMaxQps,
+            tmp.todayMaxQps,
+            tmp.todayAvgQps
+        FROM (
+            SELECT
+                r.RESOURCE_NAME AS interfaceName,
+                r.RESOURCE_CODE AS interfaceCode,
+                r.RESOURCE_URI AS interfaceUri,
+                r.RESOURCE_METHOD AS interfaceMethod,
+                IF(p.PERM_LEVEL IS NULL, r.RESOURCE_LEVEL, p.PERM_LEVEL) AS interfaceLevel,
+                IF(p.ENABLED IS NULL, 2, p.ENABLED) AS interfaceStatus,
+
+                IFNULL(ls.dailyCallCount, 0) AS dailyCallCount,
+                IFNULL(ls.totalCallCount, 0) AS totalCallCount,
+                IFNULL(ls.totalFailureCount, 0) AS totalFailureCount,
+                IF(ls.totalCallCount = 0, NULL, ROUND(ls.successCount / ls.totalCallCount * 100, 4)) AS callSuccessRate,
+
+                ls.avgResponseTime,
+                ls.maxResponseTime,
+
+                (
+                    SELECT MAX(sec_count) FROM (
+                        SELECT COUNT(*) AS sec_count FROM log lhist
+                        WHERE lhist.INTERFACE_CODE = r.RESOURCE_CODE
+                        AND lhist.CREATE_DATE >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
+                            AND lhist.ADDRESS != '局域网'
+                        </if>
+                        GROUP BY FLOOR(UNIX_TIMESTAMP(lhist.EVENT_TIME))
+                    ) hx
+                ) AS historyMaxQps,
+
+                (
+                    SELECT MAX(sec_count) FROM (
+                        SELECT COUNT(*) AS sec_count FROM log ltoday
+                        WHERE ltoday.INTERFACE_CODE = r.RESOURCE_CODE
+                        AND ltoday.CREATE_DATE = CURRENT_DATE
+                        <if test="query.filterLocalData != null and query.filterLocalData == true">
+                            AND ltoday.ADDRESS != '局域网'
+                        </if>
+                        GROUP BY FLOOR(UNIX_TIMESTAMP(ltoday.EVENT_TIME))
+                    ) ty
+                ) AS todayMaxQps,
+
+                ROUND(ls.dailyCallCount / NULLIF(TIME_TO_SEC(NOW()), 0), 4) AS todayAvgQps
+
+            FROM resource r
+            LEFT JOIN permission p ON p.DELETED = 0 AND p.PERM_CODE = r.RESOURCE_CODE
+            LEFT JOIN (
+                SELECT
+                    INTERFACE_CODE,
+                    COUNT(*) totalCallCount,
+                    SUM(EXEC_RESULT = 0) totalFailureCount,
+                    SUM(EXEC_RESULT = 1) successCount,
+                    AVG(COST_TIME) avgResponseTime,
+                    MAX(COST_TIME) maxResponseTime,
+                    SUM(CREATE_DATE = CURRENT_DATE) dailyCallCount
+                FROM log
+                <if test="query.filterLocalData != null and query.filterLocalData == true">
+                    WHERE ADDRESS != '局域网'
+                </if>
+                GROUP BY INTERFACE_CODE
+            ) ls ON ls.INTERFACE_CODE = r.RESOURCE_CODE
+            WHERE r.RESOURCE_CODE IS NOT NULL
+            <if test="query.interfaceName != null and query.interfaceName != ''">
+                <bind name="interfaceNameBind" value="'%' + query.interfaceName + '%'"/>
+                AND r.RESOURCE_NAME LIKE #{interfaceNameBind}
+            </if>
+            <if test="query.interfaceCode != null and query.interfaceCode != ''">
+                <bind name="interfaceCodeBind" value="'%' + query.interfaceCode + '%'"/>
+                AND r.RESOURCE_CODE LIKE #{interfaceCodeBind}
+            </if>
+            <if test="query.interfaceUri != null and query.interfaceUri != ''">
+                <bind name="interfaceUriBind" value="'%' + query.interfaceUri + '%'"/>
+                AND r.RESOURCE_URI LIKE #{interfaceUriBind}
+            </if>
+            <if test="query.interfaceMethod != null and query.interfaceMethod != ''">
+                AND r.RESOURCE_METHOD = #{query.interfaceMethod}
+            </if>
+            <if test="query.interfaceLevel != null">
+                AND (IF(p.PERM_LEVEL IS NULL, r.RESOURCE_LEVEL, p.PERM_LEVEL) = #{query.interfaceLevel})
+            </if>
+            <if test="query.interfaceStatus != null">
+                AND IF(p.ENABLED IS NULL, 2, p.ENABLED) = #{query.interfaceStatus}
+            </if>
         ) tmp
         ORDER BY tmp.dailyCallCount DESC, tmp.totalCallCount DESC, tmp.interfaceCode
     </select>

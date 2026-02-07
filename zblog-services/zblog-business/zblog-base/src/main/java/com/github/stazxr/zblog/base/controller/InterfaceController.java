@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
@@ -34,13 +35,13 @@ public class InterfaceController {
      * 分页查询接口列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<InterfaceVo>
+     * @return IPage<InterfaceVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation(value = "分页查询接口列表")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "分页查询接口列表", code = "INTEQ001")
-    public PageInfo<InterfaceVo> pageList(InterfaceQueryDto queryDto) {
+    public IPage<InterfaceVo> pageList(InterfaceQueryDto queryDto) {
         return interfaceService.queryInterfaceListByPage(queryDto);
     }
 

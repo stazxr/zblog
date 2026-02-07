@@ -1,8 +1,7 @@
 package com.github.stazxr.zblog.base.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.bas.router.RouterExtLevel;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;
@@ -38,18 +37,16 @@ public class InterfaceServiceImpl implements InterfaceService {
      * 分页查询字典列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<DictVo>
+     * @return IPage<InterfaceVo>
      */
     @Override
-    public PageInfo<InterfaceVo> queryInterfaceListByPage(InterfaceQueryDto queryDto) {
+    public IPage<InterfaceVo> queryInterfaceListByPage(InterfaceQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         checkCommonParam(queryDto);
         // 分页查询
-        try (Page<InterfaceVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<InterfaceVo> dataList = interfaceMapper.selectInterfaceList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<InterfaceVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return interfaceMapper.selectInterfaceListV2(page, queryDto);
     }
 
     /**
@@ -63,9 +60,10 @@ public class InterfaceServiceImpl implements InterfaceService {
         // 参数检查
         checkCommonParam(queryDto);
         // 查询并遍历数据
-        List<InterfaceVo> dataList = interfaceMapper.selectInterfaceList(queryDto);
+        Page<InterfaceVo> page = new Page<>(1, Integer.MAX_VALUE);
+        IPage<InterfaceVo> dataList = interfaceMapper.selectInterfaceListV2(page, queryDto);
         List<Map<String, Object>> data = new ArrayList<>();
-        for (InterfaceVo vo : dataList) {
+        for (InterfaceVo vo : dataList.getRecords()) {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("接口名称", vo.getInterfaceName());
             item.put("接口编码", vo.getInterfaceCode());
@@ -79,10 +77,9 @@ public class InterfaceServiceImpl implements InterfaceService {
             item.put("调用成功率", vo.getCallSuccessRate());
             item.put("平均响应时间（单位：毫秒）", vo.getAvgResponseTime());
             item.put("最大响应时间（单位：毫秒）", vo.getMaxResponseTime());
-            item.put("P95 响应时间", vo.getP95ResponseTime());
-            item.put("P99 响应时间", vo.getP99ResponseTime());
-            item.put("峰值 QPS", vo.getMaxQps());
-            item.put("平均 QPS", vo.getAvgQps());
+            item.put("历史峰值 QPS", vo.getHistoryMaxQps());
+            item.put("当天巅峰 QPS", vo.getTodayMaxQps());
+            item.put("当天平均 QPS", vo.getTodayAvgQps());
             data.add(item);
         }
         // 导出数据

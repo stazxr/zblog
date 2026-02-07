@@ -86,9 +86,35 @@
             <span>调用统计</span><br>
             <span>Call Statistics Metrics</span>
           </template>
-          <el-table-column :show-overflow-tooltip="true" prop="dailyCallCount" label="DCC" align="center" width="90" />
-          <el-table-column :show-overflow-tooltip="true" prop="totalCallCount" label="TCC" align="center" width="90" />
-          <el-table-column :show-overflow-tooltip="true" prop="totalFailureCount" label="FCC" align="center" width="90">
+          <el-table-column :show-overflow-tooltip="true" prop="dailyCallCount" align="center" width="90">
+            <template slot="header">
+              <span>
+                DCC
+                <el-tooltip content="当天调用次数" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="totalCallCount" align="center" width="90">
+            <template slot="header">
+              <span>
+                TCC
+                <el-tooltip content="累计调用次数" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="totalFailureCount" align="center" width="90">
+            <template slot="header">
+              <span>
+                FCC
+                <el-tooltip content="失败请求次数" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
             <template v-slot="scope">
               <span :class="{ 'text-danger': scope.row['totalFailureCount'] > 0 }">{{ scope.row['totalFailureCount'] }}</span>
             </template>
@@ -105,22 +131,65 @@
             <span>性能响应</span><br>
             <span>Performance / Latency Metrics</span>
           </template>
-          <el-table-column :show-overflow-tooltip="true" prop="avgResponseTime" label="ART/ms" align="center" width="90">
+          <el-table-column :show-overflow-tooltip="true" prop="avgResponseTime" align="center" width="100">
+            <template slot="header">
+              <span>
+                ART/ms
+                <el-tooltip content="平均响应时间" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
             <template v-slot="scope">
               <span :class="{ 'text-danger': scope.row['avgResponseTime'] > 100 }">{{ scope.row['avgResponseTime'] }}</span>
             </template>
           </el-table-column>
-          <el-table-column :show-overflow-tooltip="true" prop="maxResponseTime" label="MRT/ms" align="center" width="90" />
-          <el-table-column :show-overflow-tooltip="true" prop="p95ResponseTime" label="P95/ms" align="center" width="90" />
-          <el-table-column :show-overflow-tooltip="true" prop="p99ResponseTime" label="P99/ms" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="maxResponseTime" align="center" width="100">
+            <template slot="header">
+              <span>
+                MRT/ms
+                <el-tooltip content="最大响应时间" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
         </el-table-column>
         <el-table-column align="center">
           <template slot="header">
             <span>吞吐量</span><br>
             <span>Throughput / Load Metrics</span>
           </template>
-          <el-table-column :show-overflow-tooltip="true" prop="maxQps" label="MaxQps" align="center" width="90" />
-          <el-table-column :show-overflow-tooltip="true" prop="avgQps" label="AvgQps" align="center" width="90" />
+          <el-table-column :show-overflow-tooltip="true" prop="historyMaxQps" align="center" width="90">
+            <template slot="header">
+              <span>
+                HMQ
+                <el-tooltip content="最近 30 天的历史峰值 QPS（每秒最大请求数）" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="todayMaxQps" align="center" width="90">
+            <template slot="header">
+              <span>
+                TMQ
+                <el-tooltip content="当天峰值 QPS（每秒最大请求数）" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :show-overflow-tooltip="true" prop="todayAvgQps" align="center" width="90">
+            <template slot="header">
+              <span>
+                TAQ
+                <el-tooltip content="当天平均 QPS（每秒平均请求数）" placement="top">
+                  <i class="el-icon-question ml-4 cursor-pointer" />
+                </el-tooltip>
+              </span>
+            </template>
+          </el-table-column>
         </el-table-column>
         <div slot="empty">
           <el-empty :image="nodataImg" description=" " />
@@ -237,7 +306,7 @@ export default {
       this.$mapi.interfaces.pageInterfaceList(param).then(res => {
         const { data } = res
         this.total = data.total
-        this.tableData = data.list
+        this.tableData = data.records
       }).catch(_ => {
         this.total = 0
         this.tableData = []

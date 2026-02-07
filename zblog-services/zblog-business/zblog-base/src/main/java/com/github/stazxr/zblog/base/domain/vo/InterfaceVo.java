@@ -103,14 +103,20 @@ public class InterfaceVo extends BaseVo {
     private Double p99ResponseTime;
 
     /**
-     * 峰值 QPS（每秒最大请求数）
+     * 历史峰值 QPS（最近 30 天）
      */
-    @ApiModelProperty("峰值 QPS（每秒最大请求数）")
-    private Double maxQps;
+    @ApiModelProperty("最近 30 天的历史峰值 QPS（每秒最大请求数）")
+    private Double historyMaxQps;
 
     /**
-     * 平均 QPS（每秒平均请求数）
+     * 当天峰值 QPS（每秒最大请求数）
      */
-    @ApiModelProperty("平均 QPS（每秒平均请求数）")
-    private Double avgQps;
+    @ApiModelProperty("当天峰值 QPS（每秒最大请求数）")
+    private Double todayMaxQps;
+
+    /**
+     * 当天平均 QPS（每秒平均请求数）
+     */
+    @ApiModelProperty("当天平均 QPS（每秒平均请求数）")
+    private Double todayAvgQps;
 }
