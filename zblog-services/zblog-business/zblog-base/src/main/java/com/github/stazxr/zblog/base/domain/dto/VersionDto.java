@@ -35,14 +35,14 @@ public class VersionDto extends BaseDto {
     /**
      * 版本名称
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.version.versionName.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{VERSION_VERSIONNAME_REQUIRED}")
     @ApiModelProperty("版本名称")
     private String versionName;
 
     /**
      * 版本描述
      */
-    @NotBlank(groups = {Create.class, Update.class}, message = "{valid.version.updateContent.NotBlank}")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{VERSION_UPDATECONTENT_REQUIRED}")
     @ApiModelProperty("版本描述")
     private String updateContent;
 

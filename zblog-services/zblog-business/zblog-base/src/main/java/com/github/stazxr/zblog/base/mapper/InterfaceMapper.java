@@ -18,7 +18,7 @@ public interface InterfaceMapper {
      *
      * @param page     分页参数
      * @param queryDto 查询参数
-     * @return IPage<RoleVo>
+     * @return IPage<InterfaceVo>
      */
     IPage<InterfaceVo> selectInterfaceList(@Param("page") Page<InterfaceVo> page, @Param("query") InterfaceQueryDto queryDto);
 

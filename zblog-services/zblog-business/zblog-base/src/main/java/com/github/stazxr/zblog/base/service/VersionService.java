@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.base.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.VersionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Version;
@@ -18,9 +18,9 @@ public interface VersionService extends IService<Version> {
      * 分页查询版本列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<VersionVo>
+     * @return IPage<VersionVo>
      */
-    PageInfo<VersionVo> queryVersionListByPage(VersionQueryDto queryDto);
+    IPage<VersionVo> queryVersionListByPage(VersionQueryDto queryDto);
 
     /**
      * 查询版本详情

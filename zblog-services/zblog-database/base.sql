@@ -394,7 +394,7 @@ DROP TABLE IF EXISTS `version`;
 CREATE TABLE `version` (
   `ID` BIGINT UNSIGNED NOT NULL,
   `VERSION_NAME` VARCHAR(30) NOT NULL COMMENT '版本名称',
-  `UPDATE_CONTENT` TEXT NOT NULL COMMENT '版本描述',
+  `UPDATE_CONTENT` TEXT NOT NULL COMMENT '版本详细描述（支持HTML）',
   `SORT` INT(11) NOT NULL DEFAULT 99999 COMMENT '排序字段',
   `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
   `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
@@ -405,60 +405,24 @@ CREATE TABLE `version` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='版本表';
 
 /*Data for the table `version` */
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (1, '1.0.0', '基础功能上线（单体版）', 1, 1, 1, '2021-03-21 04:54:39', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (2, '1.1.0', '功能优化
-新增版本刷新管理模块
-个人中心功能开发
-切换阿里云存储', 2, 1, 1, '2021-03-24 01:47:09', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3, '1.1.1', 'footer展示优化
-草稿保存Bug修复
-评论数展示异常Bug修复', 3, 1, 1, '2021-03-25 01:03:13', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (4, '1.1.2', '前台博客展示页面优化，新增管理端主题管理功能，用户可根据喜好自定义页面显示内容', 4, 1, 1, '2021-03-25 01:58:09', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (5, '1.1.3', '优化CKEditor，增加字体选择，字号选择，PDF导出，自动保存的功能', 5, 1, 1, '2021-04-04 06:17:37', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (6, '1.1.3.update1', '设置字典列宽，
-设置前端博客展示的字体大小', 6, 1, 1, '2021-05-10 23:49:54', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (7, '1.1.3.update2', '修改网站协议，增加SSL认证，使用HTTPS协议', 7, 1, 1, '2021-05-11 02:21:37', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (8, '1.1.3.update3', '主题管理功能下线，删除base主题', 8, 1, 1, '2021-05-11 02:21:52', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (9, '2.0.0', '第一个正式版本
-相对V1版本进行了前端模板的变更；
-新增了日志监控功能；
-新增了全局异常处理功能；
-集成了slf4j插件；
-后端整体代码优化；
-修复若干Bug;
-后端排版优化；', 9, 1, 1, '2021-05-25 02:43:21', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (10, '3.0.0', '后端整体功能优化；
-后端管理系统页面用 layuiadmin1.7_std进行优化；
-CKEditor4升级为CKEditor5；
-部署服务器与数据库服务器分离；
-集成Redis，增加缓存机制；
-删除在线用户统计功能；
-SSL修改，采用阿里云SSL。', 10, 1, 1, '2021-08-07 20:05:36', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (11, '3.1.0', '增加自动生成文章略缩图的功能；
-Web端页面展示优化;
-解决热门文章数配置丢失的问题', 11, 1, 1, '2021-08-11 05:35:33', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (12, '3.1.1', '集成二维码自动生成工具；
-集成飞鸽快信API；
-新增OMS消息自动推送功能；
-解决查询字典列表失败的Bug', 12, 1, 1, '2021-08-19 18:13:15', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (13, '3.1.2', '修改文章内容图片展示方式，关闭自动生成机制', 13, 1, 1, '2021-06-10 00:02:58', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (14, '3.2.0', '优化：
-1、首页排版优化，抽取公共模板；
-2、服务器监控功能开发；
-3、移除OMS相关的代码；
-4、字典管理功能优化；
-5、新增网站主题管理的功能，支持动态修改网站的前端主题
-Bug修复：
-1、解决字典子表编辑删除按钮点击无效的问题
-', 14, 1, 1, '2022-06-20 16:03:51', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (15, '4.0.0', '前后端分离改造；
-项目开源；
-数据迁移
-', 15, 1, 1, '2023-02-21 01:42:28', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (16, '4.1.0', '解决若干BUG；
-优化弹幕墙弹幕信息，敏感词屏蔽；
-相册及说说页面排版优化', 16, 1, 1, '2023-04-22 02:12:14', null, null);
-INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (17, '4.2.0', '重构项目目录结构，抽离并复用公共模块（序号生成，消息推送，文件上传等），提升整体可维护性', 17, 1, 1, '2023-07-12 20:21:15', null, null);
+INSERT INTO version (ID, VERSION_NAME, UPDATE_CONTENT, SORT, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES
+(1, '1.0.0', '基础功能上线（单体版）\n- 项目首个版本上线，实现基础功能模块。', 1, 1, 1, '2021-03-21 04:54:39', NULL, NULL),
+(2, '1.1.0', '功能优化与模块扩展\n- 新增版本刷新管理模块\n- 开发个人中心功能\n- 支持切换阿里云存储', 2, 1, 1, '2021-03-24 01:47:09', NULL, NULL),
+(3, '1.1.1', '界面与功能修复\n- 优化 Footer 展示\n- 修复草稿保存相关 Bug\n- 修复评论数异常显示问题', 3, 1, 1, '2021-03-25 01:03:13', NULL, NULL),
+(4, '1.1.2', '前端与后台优化\n- 优化前台博客展示页面\n- 新增管理端主题管理功能，用户可自定义页面显示内容', 4, 1, 1, '2021-03-25 01:58:09', NULL, NULL),
+(5, '1.1.3', '功能增强\n- 优化 CKEditor 编辑器\n- 增加字体选择与字号选择功能\n- 支持 PDF 导出\n- 实现自动保存功能', 5, 1, 1, '2021-04-04 06:17:37', NULL, NULL),
+(6, '1.1.3.update1', '界面微调\n- 设置字典列宽\n- 调整前端博客展示字体大小', 6, 1, 1, '2021-05-10 23:49:54', NULL, NULL),
+(7, '1.1.3.update2', '安全与协议更新\n- 修改网站协议\n- 增加 SSL 认证\n- 切换为 HTTPS 协议', 7, 1, 1, '2021-05-11 02:21:37', NULL, NULL),
+(8, '1.1.3.update3', '主题管理调整\n- 下线主题管理功能\n- 删除 base 主题', 8, 1, 1, '2021-05-11 02:21:52', NULL, NULL),
+(9, '2.0.0', '第一个正式版本\n- 前端模板相对于 V1 版本进行全面更新\n- 新增日志监控功能\n- 引入全局异常处理机制\n- 集成 SLF4J 插件\n- 后端整体优化与排版调整\n- 修复若干 Bug', 9, 1, 1, '2021-05-25 02:43:21', NULL, NULL),
+(10, '3.0.0', '后端功能优化与系统升级\n- 后端功能整体优化\n- 管理系统页面使用 layuiadmin1.7_std 优化\n- CKEditor4 升级至 CKEditor5\n- 部署服务器与数据库服务器分离\n- 集成 Redis 缓存机制\n- 删除在线用户统计功能\n- SSL 协议更新，采用阿里云 SSL', 10, 1, 1, '2021-08-07 20:05:36', NULL, NULL),
+(11, '3.1.0', '文章功能与界面优化\n- 新增自动生成文章缩略图功能\n- Web 页面展示优化\n- 修复热门文章数量配置丢失问题', 11, 1, 1, '2021-08-11 05:35:33', NULL, NULL),
+(12, '3.1.1', '工具集成与消息推送\n- 集成二维码自动生成工具\n- 集成飞鸽快信 API\n- 新增 OMS 消息自动推送功能\n- 修复查询字典列表失败问题', 12, 1, 1, '2021-08-19 18:13:15', NULL, NULL),
+(13, '3.1.2', '文章展示优化\n- 修改文章内容图片展示方式\n- 关闭自动生成机制', 13, 1, 1, '2021-06-10 00:02:58', NULL, NULL),
+(14, '3.2.0', '功能优化与 Bug 修复\n- 首页排版优化，抽取公共模板\n- 开发服务器监控功能\n- 移除 OMS 相关代码\n- 优化字典管理功能\n- 新增网站主题管理功能，支持动态修改前端主题\n- 修复字典子表编辑删除按钮无效问题', 14, 1, 1, '2022-06-20 16:03:51', NULL, NULL),
+(15, '4.0.0', '前后端分离改造与开源\n- 完成前后端分离改造\n- 项目开源\n- 数据迁移', 15, 1, 1, '2023-02-21 01:42:28', NULL, NULL),
+(16, '4.1.0', '性能优化与界面优化\n- 修复若干 Bug\n- 优化弹幕墙弹幕信息显示，屏蔽敏感词\n- 相册及说说页面排版优化', 16, 1, 1, '2023-04-22 02:12:14', NULL, NULL),
+(17, '4.2.0', '架构重构与模块复用\n- 重构项目目录结构\n- 抽离并复用公共模块（序号生成、消息推送、文件上传等）\n- 提升整体可维护性', 17, 1, 1, '2023-07-12 20:21:15', NULL, NULL);
 
 /*Table structure for table `file_storage` */
 DROP TABLE IF EXISTS `file_storage`;

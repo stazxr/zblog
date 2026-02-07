@@ -211,12 +211,12 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('DICT_DELETE_WITH_CHILDREN', 'zh-CN', '该字典存在子节点，无法被删除', 'common'),
 ('DICT_DELETE_WITH_CHILDREN', 'en-US', 'Cannot delete dict with child nodes', 'common'),
 -- 版本相关
-('valid.version.versionName.NotBlank', 'zh-CN', '版本名称不能为空', 'common'),
-('valid.version.versionName.NotBlank', 'en-US', 'Version name cannot be blank', 'common'),
-('valid.version.updateContent.NotBlank', 'zh-CN', '修订内容不能为空', 'common'),
-('valid.version.updateContent.NotBlank', 'en-US', 'Update content cannot be blank', 'common'),
-('valid.version.versionName.exist', 'zh-CN', '版本名称已存在', 'common'),
-('valid.version.versionName.exist', 'en-US', 'Version name already exists', 'common'),
+('VERSION_VERSIONNAME_REQUIRED', 'zh-CN', '版本名称不能为空', 'common'),
+('VERSION_VERSIONNAME_REQUIRED', 'en-US', 'Version name cannot be blank', 'common'),
+('VERSION_UPDATECONTENT_REQUIRED', 'zh-CN', '修订内容不能为空', 'common'),
+('VERSION_UPDATECONTENT_REQUIRED', 'en-US', 'Update content cannot be blank', 'common'),
+('VERSION_VERSIONNAME_EXISTS', 'zh-CN', '版本已存在', 'common'),
+('VERSION_VERSIONNAME_EXISTS', 'en-US', 'Version already exists', 'common'),
 -- 存储相关
 ('valid.file.common.fileNotExist', 'zh-CN', '文件不存在或已被删除', 'common'),
 ('valid.file.common.fileNotExist', 'en-US', 'The file does not exist or has already been deleted', 'common'),
@@ -243,4 +243,4 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('valid.file.delete.hasReference', 'zh-CN', '文件仍被其他业务引用，无法删除', 'common'),
 ('valid.file.delete.hasReference', 'en-US', 'The file is still referenced by other records and cannot be deleted', 'common'),
 ('valid.file.delete.storageFailed', 'zh-CN', '删除物理文件记录失败，请稍后再试', 'common'),
-('valid.file.delete.storageFailed', 'en-US', 'Failed to delete physical file record. Please try again later', 'common'),
+('valid.file.delete.storageFailed', 'en-US', 'Failed to delete physical file record. Please try again later', 'common');

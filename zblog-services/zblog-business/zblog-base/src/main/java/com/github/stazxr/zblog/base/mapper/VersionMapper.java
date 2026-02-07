@@ -1,12 +1,12 @@
 package com.github.stazxr.zblog.base.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Version;
 import com.github.stazxr.zblog.base.domain.vo.VersionVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * 版本维护数据层
@@ -18,10 +18,11 @@ public interface VersionMapper extends BaseMapper<Version> {
     /**
      * 查询版本列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
-     * @return versionList
+     * @return IPage<VersionVo>
      */
-    List<VersionVo> selectVersionList(VersionQueryDto queryDto);
+    IPage<VersionVo> selectVersionList(@Param("page") Page<VersionVo> page, @Param("query") VersionQueryDto queryDto);
 
     /**
      * 查询版本详情

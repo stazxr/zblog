@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;

@@ -8,12 +8,12 @@
             (SELECT USERNAME FROM user u WHERE u.ID = v.UPDATE_USER) AS UPDATE_USERNAME
         FROM version v
         <where>
-            <if test="versionName != null and versionName != ''">
-                <bind name="versionNameBind" value="'%' + versionName + '%'"/>
+            <if test="query.versionName != null and query.versionName != ''">
+                <bind name="versionNameBind" value="'%' + query.versionName + '%'"/>
                 VERSION_NAME LIKE #{versionNameBind}
             </if>
-            <if test="updateContent != null and updateContent != ''">
-                <bind name="updateContentBind" value="'%' + updateContent + '%'"/>
+            <if test="query.updateContent != null and query.updateContent != ''">
+                <bind name="updateContentBind" value="'%' + query.updateContent + '%'"/>
                 UPDATE_CONTENT LIKE #{updateContentBind}
             </if>
         </where>

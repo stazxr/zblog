@@ -1,18 +1,16 @@
 package com.github.stazxr.zblog.base.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
-import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.converter.VersionConverter;
 import com.github.stazxr.zblog.base.domain.dto.VersionDto;
 import com.github.stazxr.zblog.base.domain.dto.query.VersionQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Version;
+import com.github.stazxr.zblog.base.domain.error.VersionErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.VersionVo;
 import com.github.stazxr.zblog.base.mapper.VersionMapper;
 import com.github.stazxr.zblog.base.service.VersionService;
@@ -20,8 +18,6 @@ import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 版本维护业务实现层
@@ -40,10 +36,10 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
      * 分页查询版本列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<VersionVo>
+     * @return IPage<VersionVo>
      */
     @Override
-    public PageInfo<VersionVo> queryVersionListByPage(VersionQueryDto queryDto) {
+    public IPage<VersionVo> queryVersionListByPage(VersionQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         if (StringUtils.isNotBlank(queryDto.getVersionName())) {
@@ -53,10 +49,8 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
             queryDto.setUpdateContent(queryDto.getUpdateContent().trim());
         }
         // 分页查询
-        try (Page<VersionVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<VersionVo> dataList = versionMapper.selectVersionList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
+        Page<VersionVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return versionMapper.selectVersionList(page, queryDto);
     }
 
     /**
@@ -122,7 +116,7 @@ public class VersionServiceImpl extends ServiceImpl<VersionMapper, Version> impl
 
     private void checkVersion(Version version) {
         // 检查版本名称是否存在
-        Assert.failIfTrue(checkVersionNameExist(version), ExpMessageCode.of("valid.version.versionName.exist"));
+        ThrowUtils.throwIf(checkVersionNameExist(version), VersionErrorCode.EVERSA000);
     }
 
     private boolean checkVersionNameExist(Version version) {

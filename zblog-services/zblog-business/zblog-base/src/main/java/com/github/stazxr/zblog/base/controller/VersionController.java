@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
@@ -38,13 +38,13 @@ public class VersionController {
      * 分页查询版本列表
      *
      * @param queryDto 查询参数
-     * @return PageInfo<VersionVo>
+     * @return IPage<VersionVo>
      */
     @GetMapping(value = "/pageList")
     @ApiOperation("分页查询版本列表")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询版本列表", code = "VERSQ001")
-    public PageInfo<VersionVo> pageList(VersionQueryDto queryDto) {
+    public IPage<VersionVo> pageList(VersionQueryDto queryDto) {
         return versionService.queryVersionListByPage(queryDto);
     }
 
