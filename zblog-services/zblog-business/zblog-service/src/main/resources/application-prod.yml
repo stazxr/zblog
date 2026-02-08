@@ -1,39 +1,50 @@
-# TODO 文件规则待优化
+# 文件规则待优化
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://47.109.187.143:3306/zblog?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-      username: ENC(VxYvhJGhVJV64cgn6Uxn0w==)
-      password: ENC(pQhIZ+hXq87nposdNpQVJx3RU0sW7/wm)
-  redis:
-    host: ENC(OkgoWjp68cUCJ0Fi1EoCoXM65WLmc0Vc)
-    port: ENC(LoWe9Gu+B7ML/c7YmYWxZg==)
-    client-type: lettuce
-    password: ENC(8aUFig2UTMrubh5geq+IxeNKvHlWXvM6)
-    connect-timeout: 5000
-    database: ${REDIS_DB:0}
-jwt:
-  # Token 有效时长，单位秒
-  access-token-duration: 7200
-  # R-Token 有效时长，单位秒
-  refresh-token-duration: 86400
-  # 可续签的时间范围，单位秒，当 Token 剩余有效时间小于等于该值，则允许续签
-  refresh-min-duration: 1800
-  # 是否允许续签
-  allowed-renew-token: true
-  # 允许的续签次数
-  max-version: 10
-  # 签名类型
-  algorithm: RS256
-  # 证书信息
-  cert-info:
-    alias: suntaoblogcom
-    key-password: ENC(kUfidmIYBnle2iOXS1MSqQvzU+VOhCXQ)
-    cert-location: suntaoblogcom.jks
-  # Token 基础信息
-  claims:
-    issuer: https://www.suntaoblog.com
-    subject: Login
-cache:
-  default-duration: 300
-  type: redis
+      stat-view-servlet: # 生产环境关闭 druid 登录页
+        enabled: true
+        url-pattern: /druid/* # 配置监控界面的 URL 映射
+        login-username: # 控制台登录用户
+        login-password: # 控制台登录密码
+        reset-enable: false # 是否可以重置统计信息
+        allow: # 允许访问监控界面的 IP（可以配置多个 IP，用逗号分隔）
+        deny: # 禁止访问监控界面的 IP（优先于 allow）
+zblog:
+  base:
+    cache:
+      type: redis # 全局缓存类型
+    # 邮件通知配置
+    mail:
+      from:
+        address: ${spring.mail.username} # 发件地址，务必与配置的邮件发送人保持一致
+        name: 一隅藏记 # 发件人
+    # 序号配置
+    sequence:
+      datacenter-id: 0 # 数据中心id
+      machine-id: ${zblog.base.header.deploy.deploy-unit} # 机器id
+    # 上下文配置
+    header:
+      sys-code: ST # 系统编码
+      app-code: yiyucangji # 应用编码
+      deploy:
+        deploy-area: beijing # 部署地域
+        deploy-center: '3' # 部署机房（可用区）
+        deploy-unit: 0 # 部署单元
+        deploy-ip: # 部署IP（为空会自动获取）
+    # 文件存储配置
+    file:
+      model: 1 # 文件上传模式：1-本地；2-阿里云；3-七牛云；4-腾讯云
+      local:
+        enabled: false # 生产环境关闭本地上传功能，防止恶意上传拉胯服务器磁盘
+      cos:
+        enabled: true # 启用腾讯云 COS 对象存储
+        file-access-url: ${zblog.file.cos.fileAccessUrl} # 腾讯云 COS 文件访问 URL 前缀
+        storage-path-prefix: ${zblog.file.cos.storagePathPrefix} # 腾讯云 COS 文件存储路径前缀
+        access-key: ${zblog.file.cos.accessKey} # 腾讯云访问密钥 ID，建议使用子用户
+        secret-key: ${zblog.file.cos.secretKey} # 腾讯云访问密钥 SecretKey，建议客户化到 sys_props 表中，不要硬编码在配置文件中
+        region: ${zblog.file.cos.region} # 腾讯云 COS 所在地域
+        bucket-name: ${zblog.file.cos.bucketName} # 腾讯云 COS 存储桶名称
+  website:
+    name: 一隅藏记 # 站点名称
+    url: https://www.yiyucangji.com # 站点地址

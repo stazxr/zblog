@@ -44,5 +44,11 @@ INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxIdle', '10', 'zblog
 INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxActive', '10', 'zblog.service', '连接池中允许的最大活动连接数，如果活动连接数超过此值，将会有新的连接请求被阻塞或抛出异常', 0);
 INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.maxWait', '30000ms', 'zblog.service', '从连接池中获取连接时的最大等待时间，单位为毫秒。如果超过此时间仍未获取到连接，将会抛出异常', 0);
 INSERT INTO `sys_props` VALUES ('zblog.redis.lettuce.pool.timeBetweenEvictionRuns', '-1ms', 'zblog.service', '连接池中连接的清理周期，单位为毫秒。用于定义多长时间执行一次空闲连接的检查和清理，以保持连接池的健康', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.fileAccessUrl', '', 'zblog.service', '腾讯云 COS 文件访问 URL 前缀', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.storagePathPrefix', '', 'zblog.service', '腾讯云 COS 文件存储路径前缀', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.accessKey', '', 'zblog.service', '腾讯云访问密钥 ID', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.secretKey', '', 'zblog.service', '腾讯云访问密钥 SecretKey', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.region', '', 'zblog.service', '腾讯云 COS 所在地域', 0);
+INSERT INTO `sys_props` VALUES ('zblog.file.cos.bucketName', '', 'zblog.service', '腾讯云 COS 存储桶名称', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

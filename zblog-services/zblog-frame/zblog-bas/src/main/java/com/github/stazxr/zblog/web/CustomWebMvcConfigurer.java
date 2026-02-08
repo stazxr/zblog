@@ -8,6 +8,8 @@ import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.log.advice.ReqLogControlAdvice;
 import com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration;
 import com.github.stazxr.zblog.web.serializer.LongToStringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +47,8 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.WriteMapNullValu
 @Configuration
 @AutoConfigureAfter({ValidationAutoConfiguration.class, FileAutoConfiguration.class})
 public class CustomWebMvcConfigurer implements WebMvcConfigurer {
+    private static final Logger log = LoggerFactory.getLogger(CustomWebMvcConfigurer.class);
+
     private LocalValidatorFactoryBean validatorFactoryBean;
 
     @Resource
@@ -128,8 +132,10 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         if (!storagePath.endsWith("/")) {
             storagePath += "/";
         }
-        registry.addResourceHandler(accessPath.replaceFirst("^.+?://[^/]+", "") + "**")
-                .addResourceLocations("file:" + storagePath).setCachePeriod(3600);
+        String fileUrlPathPrefix = accessPath.replaceFirst("^.+?://[^/]+", "") + "**";
+        String fileLocalPathPrefix = "file:" + storagePath;
+        log.info("本地存储配置为>>> {} -> {}", fileLocalPathPrefix, fileUrlPathPrefix);
+        registry.addResourceHandler(fileUrlPathPrefix).addResourceLocations(fileLocalPathPrefix).setCachePeriod(3600);
 
         // 静态资源
         registry.addResourceHandler("/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);

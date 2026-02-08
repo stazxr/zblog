@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.controller;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
@@ -15,7 +15,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +27,6 @@ import java.util.*;
  * @author SunTao
  * @since 2022-07-27
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/file")
@@ -40,13 +38,13 @@ public class FileController {
      * 分页查询文件列表
      *
      * @param queryDto 查询参数
-     * @return fileList
+     * @return IPage<FileVo>
      */
     @GetMapping(value = "/pageFileList")
     @ApiOperation(value = "分页查询文件列表")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "分页查询文件列表", code = "FILEQ001")
-    public PageInfo<FileVo> queryFileListByPage(FileQueryDto queryDto) {
+    public IPage<FileVo> queryFileListByPage(FileQueryDto queryDto) {
         return fileService.queryFileListByPage(queryDto);
     }
 

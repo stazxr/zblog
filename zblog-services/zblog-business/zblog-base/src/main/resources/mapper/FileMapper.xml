@@ -11,23 +11,23 @@
         LEFT JOIN file_storage fs ON fs.ID = f.STORAGE_ID
         LEFT JOIN file_relation fr ON fr.FILE_ID = f.ID
         <where>
-            <if test="uploadType != null">
-                fs.UPLOAD_TYPE = #{uploadType}
+            <if test="query.uploadType != null">
+                fs.UPLOAD_TYPE = #{query.uploadType}
             </if>
-            <if test="filename != null and filename != ''">
-                <bind name="filenameBind" value="'%' + filename + '%'"/>
+            <if test="query.filename != null and query.filename != ''">
+                <bind name="filenameBind" value="'%' + query.filename + '%'"/>
                 AND f.ORIGINAL_FILENAME LIKE #{filenameBind}
             </if>
-            <if test="fileMd5 != null and fileMd5 != ''">
-                AND fs.FILE_MD5 = #{fileMd5}
+            <if test="query.fileMd5 != null and query.fileMd5 != ''">
+                AND fs.FILE_MD5 = #{query.fileMd5}
             </if>
-            <if test="businessType != null">
-                AND fr.BUSINESS_TYPE = #{businessType}
+            <if test="query.businessType != null">
+                AND fr.BUSINESS_TYPE = #{query.businessType}
             </if>
-            <if test="hasBusiness != null">
+            <if test="query.hasBusiness != null">
                 AND
                 <choose>
-                    <when test="hasBusiness">
+                    <when test="query.hasBusiness">
                         fr.BUSINESS_ID IS NOT NULL
                     </when>
                     <otherwise>
@@ -35,11 +35,11 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="createStartTime != null">
-                AND f.CREATE_TIME <![CDATA[>=]]> #{createStartTime}
+            <if test="query.createStartTime != null">
+                AND f.CREATE_TIME <![CDATA[>=]]> #{query.createStartTime}
             </if>
-            <if test="createEndTime != null">
-                AND f.CREATE_TIME <![CDATA[<=]]> #{createEndTime}
+            <if test="query.createEndTime != null">
+                AND f.CREATE_TIME <![CDATA[<=]]> #{query.createEndTime}
             </if>
         </where>
         ORDER BY f.CREATE_TIME DESC

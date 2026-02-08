@@ -1,11 +1,10 @@
 package com.github.stazxr.zblog.base.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.bas.exception.BaseException;
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
 import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.file.UploadContext;
 import com.github.stazxr.zblog.bas.file.UploadContextFactory;
 import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
@@ -15,20 +14,22 @@ import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.path.FilePathContext;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import com.github.stazxr.zblog.bas.validation.Assert;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.base.domain.entity.FileStorage;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.error.FileErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.base.mapper.DictMapper;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileStorageMapper;
 import com.github.stazxr.zblog.base.service.FileService;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,10 +47,11 @@ import java.util.*;
  * @author SunTao
  * @since 2022-07-27
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
+    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
+
     private final FileMapper fileMapper;
 
     private final FileStorageMapper fileStorageMapper;
@@ -64,27 +66,15 @@ public class FileServiceImpl implements FileService {
      * 分页查询文件列表
      *
      * @param queryDto 查询参数
-     * @return FileList
+     * @return IPage<FileVo>
      */
     @Override
-    public PageInfo<FileVo> queryFileListByPage(FileQueryDto queryDto) {
+    public IPage<FileVo> queryFileListByPage(FileQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
         // 分页查询
-        try (Page<FileVo> page = PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize())) {
-            List<FileVo> dataList = fileMapper.selectFileList(queryDto);
-            return page.doSelectPageInfo(() -> new PageInfo<>(dataList));
-        }
-    }
-
-    /**
-     * 获取文件上传模式
-     *
-     * @return 文件上传模式
-     */
-    @Override
-    public int getFileUploadModel() {
-        return fileProperties.getModel();
+        Page<FileVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return fileMapper.selectFileList(page, queryDto);
     }
 
     /**
@@ -100,8 +90,8 @@ public class FileServiceImpl implements FileService {
     public List<UploadFileVo> uploadFile(MultipartFile multipartFile, MultipartFile[] multipartFiles) throws Exception {
         // 检查是否选择上传文件
         boolean hasNoFileFlag = (multipartFiles == null || multipartFiles.length < 1) && multipartFile == null;
-        Assert.failIfTrue(hasNoFileFlag, ExpMessageCode.of("valid.file.upload.chooseNoneFile"));
-        if (multipartFiles == null || multipartFiles.length < 1) {
+        ThrowUtils.throwIf(hasNoFileFlag, FileErrorCode.EFILEB001);
+        if (multipartFiles == null || multipartFiles.length == 0) {
             multipartFiles = new MultipartFile[] { multipartFile };
         }
 
@@ -124,7 +114,7 @@ public class FileServiceImpl implements FileService {
     @Transactional(rollbackFor = Exception.class)
     public UploadFileVo uploadFileTest(MultipartFile multipartFile, Integer uploadType) throws Exception {
         // 检查是否选择上传文件
-        Assert.notNull(multipartFile, ExpMessageCode.of("valid.file.upload.chooseNoneFile"));
+        ThrowUtils.throwIfNull(multipartFile, FileErrorCode.EFILEB001);
 
         // 上传文件
         MultipartFile[] multipartFiles = new MultipartFile[] { multipartFile };
@@ -144,7 +134,7 @@ public class FileServiceImpl implements FileService {
     public void downloadFile(Long fileId, Boolean isDown, HttpServletResponse response) throws Exception {
         // 获取文件信息
         FileVo fileVo = fileMapper.selectFileDetailById(fileId);
-        Assert.notNull(fileVo, ExpMessageCode.of("valid.file.common.fileNotExist"));
+        ThrowUtils.throwIfNull(fileVo, FileErrorCode.EFILEB000);
 
         // 设置响应头
         String encodeFilename = URLEncoder.encode(fileVo.getOriginalFilename(), "UTF-8");
@@ -179,20 +169,20 @@ public class FileServiceImpl implements FileService {
     public void deleteFile(Long fileId) {
         // 获取文件信息
         FileVo fileVo = fileMapper.selectFileDetailById(fileId);
-        Assert.notNull(fileVo, ExpMessageCode.of("valid.file.common.fileNotExist"));
+        ThrowUtils.throwIfNull(fileVo, FileErrorCode.EFILEB000);
 
         // 判断文件是否关联业务
-        Assert.isNull(fileVo.getBusinessId(), ExpMessageCode.of("valid.file.delete.hasBusiness"));
+        ThrowUtils.throwIf(fileVo.getBusinessId() != null, FileErrorCode.EFILEB007);
 
         // 删除逻辑文件
-        Assert.affectOneRow(fileMapper.deleteById(fileId), ExpMessageCode.of("valid.file.delete.logicFailed"));
+        ThrowUtils.when(fileMapper.deleteById(fileId) != 1).system(BaseErrorCode.SCOREA003);
 
         // 判断是否需要删除物理文件
         Integer referenceCount = fileVo.getReferenceCount();
         boolean hasReference = referenceCount == null || --referenceCount > 0;
         if (!hasReference) {
             // 删除物理文件表数据
-            Assert.affectOneRow(fileStorageMapper.deleteById(fileVo.getFileStorageId()), ExpMessageCode.of("valid.file.delete.storageFailed"));
+            ThrowUtils.when(fileStorageMapper.deleteById(fileVo.getFileStorageId()) != 1).system(BaseErrorCode.SCOREA003);
 
             // 删除物理文件
             FileHandler fileHandler = FileHandlerEnum.instance(fileVo.getUploadType());
@@ -264,7 +254,7 @@ public class FileServiceImpl implements FileService {
             // 返回上传文件信息
             return newUploadFileVo(fileStorage, file);
         } catch (Exception e) {
-            throw new SystemException(ExpMessageCode.of("valid.file.upload.insertDbFailed").getCode(), e);
+            throw new SystemException(FileErrorCode.SFILEB001, e);
         }
     }
 
@@ -282,7 +272,7 @@ public class FileServiceImpl implements FileService {
     private void fileUploadPreCheck(MultipartFile[] multipartFiles) {
         // 开关检查
         boolean enabled = multipartProperties.getEnabled();
-        Assert.failIfFalse(enabled, ExpMessageCode.of("valid.file.upload.switchOff"));
+        ThrowUtils.throwIf(!enabled, FileErrorCode.EFILEB002);
         // 上传文件检查
         if (multipartFiles != null && multipartFiles.length > 0) {
             List<String> whiteList = dictMapper.selectDictValuesByDictKey("FILE_UPLOAD_WHITE_LIST");
@@ -290,25 +280,24 @@ public class FileServiceImpl implements FileService {
                 // 文件类型检查
                 String contentType = multipartFile.getContentType();
                 boolean isNotWhiteList = StringUtils.isBlank(contentType) || !whiteList.contains(contentType.toLowerCase(Locale.ROOT));
-                Assert.failIfTrue(isNotWhiteList, ExpMessageCode.of("valid.file.upload.notWhiteList", contentType));
-
+                ThrowUtils.throwIf(isNotWhiteList, FileErrorCode.EFILEB003, contentType);
                 // 图片合法性校验
                 if (contentType.startsWith("image/")) {
                     try {
                         BufferedImage image = ImageIO.read(multipartFile.getInputStream());
-                        Assert.notNull(image, ExpMessageCode.of("valid.file.upload.imageInvalid"));
-                        boolean imageSizeValid = image.getWidth() <= 4000 && image.getHeight() <= 4000;
-                        Assert.failIfFalse(imageSizeValid, ExpMessageCode.of("valid.file.upload.imageRadioMax"));
+                        ThrowUtils.throwIfNull(image, FileErrorCode.EFILEB004);
+                        /* FIX: 不检验文件分辨率 boolean imageSizeValid = image.getWidth() <= 4000 && image.getHeight() <= 4000;
+                        ThrowUtils.throwIf(!imageSizeValid, FileErrorCode.EFILEB005); */
                     } catch (BaseException e) {
                         throw e;
                     } catch (Exception e) {
-                        throw new SystemException(ExpMessageCode.of("valid.file.upload.imageInvalid").getCode());
+                        ThrowUtils.service(FileErrorCode.EFILEB004, e);
                     }
                 }
-
                 // 文件大小检查
-                boolean sizeInvalid = multipartFile.getSize() > multipartProperties.getMaxFileSize().toBytes();
-                Assert.failIfTrue(sizeInvalid, ExpMessageCode.of("valid.file.upload.sizeOverMax", multipartProperties.getMaxFileSize().toBytes()));
+                long maxFileSize = multipartProperties.getMaxFileSize().toBytes();
+                boolean sizeInvalid = multipartFile.getSize() > maxFileSize;
+                ThrowUtils.throwIf(sizeInvalid, FileErrorCode.EFILEB006, maxFileSize);
             }
         }
     }

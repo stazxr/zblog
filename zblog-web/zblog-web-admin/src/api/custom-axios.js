@@ -89,7 +89,7 @@ instance.interceptors.response.use(response => {
     const result = response.data
     const responseType = response.config.responseType
     if (responseType === 'json') {
-      return responseHandler(result)
+      return responseJsonHandler(result)
     } else {
       return result
     }
@@ -149,7 +149,7 @@ function logout(expired) {
   location.reload()
 }
 
-function responseHandler(result) {
+function responseJsonHandler(result) {
   const { code, success, message } = result
   if (code === 200) {
     if (success) {

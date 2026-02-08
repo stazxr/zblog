@@ -9,9 +9,7 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-02-07
  */
 public enum VersionErrorCode implements ErrorCode {
-    /**
-     * 版本已存在
-     */
+    /** 版本已存在 */
     EVERSA000("VERSION_VERSIONNAME_EXISTS");
 
     private final String i18nKey;

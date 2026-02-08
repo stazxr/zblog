@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.base.domain.dto.query.FileQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
@@ -20,16 +20,9 @@ public interface FileService {
      * 分页查询文件列表
      *
      * @param queryDto 查询参数
-     * @return FileList
+     * @return IPage<FileVo>
      */
-    PageInfo<FileVo> queryFileListByPage(FileQueryDto queryDto);
-
-    /**
-     * 获取文件上传模式
-     *
-     * @return FileHandlerEnum.type
-     */
-    int getFileUploadModel();
+    IPage<FileVo> queryFileListByPage(FileQueryDto queryDto);
 
     /**
      * 文件上传，支持单文件，多文件上传

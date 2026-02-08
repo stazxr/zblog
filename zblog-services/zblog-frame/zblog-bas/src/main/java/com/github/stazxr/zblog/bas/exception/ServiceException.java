@@ -34,4 +34,16 @@ public class ServiceException extends BaseException {
     public ServiceException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
+
+    /**
+     * 构造业务异常（带国际化参数）
+     *
+     * @param errorCode 错误码定义
+     * @param cause     异常信息
+     * @param args      国际化消息参数
+     */
+    public ServiceException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(errorCode, args);
+        initCause(cause);
+    }
 }

@@ -13,7 +13,7 @@
     <artifactId>zblog-log</artifactId>
     <packaging>jar</packaging>
     <description>
-        ZBLOG 框架的日志组件，基于切面实现，可以记录用户的操作日志和异常日志信息，可以通过 @EnableLog 注解来开启功能
+        ZBLOG 框架的日志组件，基于切面实现，可以记录用户的日志信息，可以通过 @EnableLog 注解来开启功能
     </description>
 
     <dependencies>

@@ -53,3 +53,4 @@ package-lock.json
 yarn.lock
 
 ### online data ###
+props_no_commit.sql

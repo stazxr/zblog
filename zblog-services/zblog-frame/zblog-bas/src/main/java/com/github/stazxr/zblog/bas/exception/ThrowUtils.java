@@ -136,12 +136,21 @@ public final class ThrowUtils {
         throw new ServiceException(code, args);
     }
 
-    public static void system(ErrorCode code, Object... args) {
-        throw new SystemException(code, args);
+
+    public static void service(ErrorCode code, Throwable cause, Object... args) {
+        throw new ServiceException(code, cause, args);
     }
 
     public static void system(String message) {
         throw new SystemException(message);
+    }
+
+    public static void system(ErrorCode code, Object... args) {
+        throw new SystemException(code, args);
+    }
+
+    public static void system(ErrorCode code, Throwable cause, Object... args) {
+        throw new SystemException(code, cause, args);
     }
 
     public static void system(String message, Throwable cause) {

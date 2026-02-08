@@ -54,7 +54,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="originalFilename" label="文件名" align="center">
           <template v-slot="scope">
             <el-popover :content="scope.row['fileAbsolutePath']" placement="top-start" title="路径" width="200" trigger="hover">
-              <a slot="reference" :href="scope.row['fileAccessUrl']" class="filenameLinkC el-link--primary" target="_blank">
+              <a slot="reference" href="#" class="filenameLinkC el-link--primary">
                 {{ scope.row['originalFilename'] }}
               </a>
             </el-popover>
@@ -191,11 +191,11 @@ export default {
       this.tableLoading = true
       this.$mapi.file.pageFileList(param).then(res => {
         const { data } = res
-        this.tableData = data.list
         this.total = data.total
+        this.tableData = data.records
       }).catch(_ => {
-        this.tableData = []
         this.total = 0
+        this.tableData = []
       }).finally(() => {
         this.tableLoading = false
         this.row = null
@@ -244,6 +244,10 @@ export default {
           this.listTableData()
         })
       })
+    },
+    previewUrl(url) {
+      if (!url) return url
+      return url + '?response-content-disposition=inline'
     }
   }
 }

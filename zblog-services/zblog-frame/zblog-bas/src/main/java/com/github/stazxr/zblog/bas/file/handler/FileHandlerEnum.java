@@ -52,7 +52,7 @@ public enum FileHandlerEnum {
                 try {
                     return SpringContextHolder.getBean(fileHandlerEnum.beanName, FileHandler.class);
                 } catch (NoSuchBeanDefinitionException e) {
-                    throw new FileException(FileErrorCode.EFILEA000, fileHandlerEnum.beanName);
+                    throw new FileException(FileErrorCode.EFILEA000, fileHandlerEnum.name);
                 }
             }
         }
