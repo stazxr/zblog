@@ -1,11 +1,15 @@
 package com.github.stazxr.zblog.util.collection;
 
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.thread.ThreadUtils;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * 一个带有过期时间功能的映射类。
@@ -97,6 +101,26 @@ public class TimeMap<K, V> {
     }
 
     /**
+     * 模糊查询缓存池
+     *
+     * @param pattern 扫描关键字
+     * @return 缓存池
+     */
+    public Map<K, V> scanKey(String pattern) {
+        Map<K, V> result = new HashMap<>();
+        if (StringUtils.isNotBlank(pattern)) {
+            String regex = pattern.replace("*", ".*");
+            Pattern p = Pattern.compile(regex);
+            dataMap.forEach((k, v) -> {
+                if (p.matcher(k.toString()).matches()) {
+                    result.put(k, v);
+                }
+            });
+        }
+        return result;
+    }
+
+    /**
      * 判断是否包含键。
      *
      * @param key 键
@@ -114,6 +138,31 @@ public class TimeMap<K, V> {
         }
 
         return false;
+    }
+
+    /**
+     * 获取过期时间 TTL
+     *
+     * @param key 键
+     * @return TTL
+     */
+    public Long getExpire(K key) {
+        boolean contain1 = dataMap.containsKey(key);
+        Instant expireAt = expiredDateMap.get(key);
+        if (contain1) {
+            if (expireAt == null) {
+                return -1L;
+            }
+            long ttlSeconds = Duration.between(Instant.now(), expireAt).getSeconds();
+            // TTL 小于等于 0 表示已经过期
+            if (ttlSeconds <= 0) {
+                return -1L;
+            } else {
+                return ttlSeconds;
+            }
+        } else {
+            return -2L;
+        }
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.github.stazxr.zblog.bas.cache.util;
 
 import com.github.stazxr.zblog.bas.cache.Cache;
+import com.github.stazxr.zblog.bas.cache.CacheInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -64,6 +68,24 @@ public final class GlobalCache {
                 CACHE.remove(key);
             }
         }
+    }
+
+    public static List<CacheInfo> scan(String pattern) {
+        checkInitialized();
+        List<CacheInfo> cacheInfoList = new ArrayList<>();
+        Map<String, Object> dataList = CACHE.scan(pattern);
+        if (dataList != null && dataList.size() > 0) {
+            String simpleName = CACHE.getClass().getSimpleName();
+            for (String key : dataList.keySet()) {
+                CacheInfo cacheInfo = new CacheInfo();
+                cacheInfo.setKey(key);
+                cacheInfo.setValue(dataList.get(key));
+                cacheInfo.setTtl(CACHE.getTtl(key));
+                cacheInfo.setCachePool(simpleName);
+                cacheInfoList.add(cacheInfo);
+            }
+        }
+        return cacheInfoList;
     }
 
     public static Boolean setIfAbsent(String key, Object value, long timeout, TimeUnit unit) {

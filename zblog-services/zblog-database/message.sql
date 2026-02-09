@@ -44,11 +44,6 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('PARAM_SORT_MIN1', 'zh-CN', '排序值不能小于 1，请重新输入', 'common'),
 ('PARAM_SORT_MIN1', 'en-US', 'Sort value cannot be less than 1. please enter again', 'common'),
 -- 校验相关 >-->
--- 公共校验
-('valid.comm.param.NotNull', 'zh-CN', '必要参数未提供，请检查输入', 'common'),
-('valid.comm.param.NotNull', 'en-US', 'Required parameter missing, please check your input', 'common'),
-('valid.comm.param.NotBlank', 'zh-CN', '必要参数未提供或为空，请检查输入', 'common'),
-('valid.comm.param.NotBlank', 'en-US', 'Required parameter missing or blank, please check your input', 'common'),
 -- 用户相关
 ('USER_NOT_EXISTS', 'zh-CN', '用户不存在', 'common'),
 ('USER_NOT_EXISTS', 'en-US', 'User does not exist', 'common'),

@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.bas.cache.memory;
 import com.github.stazxr.zblog.bas.cache.BaseCache;
 import com.github.stazxr.zblog.util.collection.TimeMap;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -33,6 +34,17 @@ public class MemoryCache<K, V> extends BaseCache<K, V> {
     @Override
     public V get(K key) {
         return cacheMap.get(key);
+    }
+
+    /**
+     * 模糊查询缓存池数据
+     *
+     * @param pattern 查询参数
+     * @return 缓存池
+     */
+    @Override
+    public Map<K, V> scan(String pattern) {
+        return cacheMap.scanKey(pattern);
     }
 
     /**
@@ -153,6 +165,22 @@ public class MemoryCache<K, V> extends BaseCache<K, V> {
 
             return value;
         }
+    }
+
+    /**
+     * 获取TTL
+     *
+     * @param key 键
+     * @return TTL
+     * | 返回值 | 含义      |
+     * | --- | ------- |
+     * | >0  | 剩余时间    |
+     * | -1  | 永不过期    |
+     * | -2  | key 不存在 |
+     */
+    @Override
+    public Long getTtl(K key) {
+        return cacheMap.getExpire(key);
     }
 
     private Object getLock(K key) {

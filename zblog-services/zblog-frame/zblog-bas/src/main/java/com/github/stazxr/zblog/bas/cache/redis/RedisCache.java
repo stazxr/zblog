@@ -1,11 +1,18 @@
 package com.github.stazxr.zblog.bas.cache.redis;
 
 import com.github.stazxr.zblog.bas.cache.BaseCache;
+import com.github.stazxr.zblog.bas.exception.SystemException;
+import com.github.stazxr.zblog.util.StringUtils;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -59,6 +66,38 @@ public class RedisCache<K, V> extends BaseCache<K, V> {
     public V get(K key) {
         Object value = redisTemplate.opsForValue().get(buildKey(key));
         return NULL_VALUE.equals(value) ? null : (V) value;
+    }
+
+    /**
+     * 模糊查询缓存池数据
+     *
+     * @param pattern 查询参数，如 rl:*
+     * @return 缓存池数据
+     */
+    @Override
+    @SuppressWarnings("all")
+    public Map<K, V> scan(String pattern) {
+        Map<K, V> result = new HashMap<>();
+        if (StringUtils.isBlank(pattern)) {
+            return result;
+        }
+
+        ScanOptions options = ScanOptions.scanOptions().match(pattern).count(1000).build();
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            try (Cursor<byte[]> cursor = connection.scan(options)) {
+                while (cursor.hasNext()) {
+                    byte[] keyBytes = cursor.next();
+                    K key = (K) redisTemplate.getStringSerializer().deserialize(keyBytes);
+                    V value = (V) redisTemplate.opsForValue().get(key);
+                    result.put(key, value);
+                }
+            } catch (Exception e) {
+                throw new SystemException("Redis scan error", e);
+            }
+            return null;
+        });
+
+        return result;
     }
 
     /**
@@ -179,6 +218,22 @@ public class RedisCache<K, V> extends BaseCache<K, V> {
                 redisTemplate.execute(UNLOCK_SCRIPT, Collections.singletonList(lockKey), lockValue);
             }
         }
+    }
+
+    /**
+     * 获取TTL
+     *
+     * @param key 键
+     * @return TTL
+     * | 返回值 | 含义      |
+     * | --- | ------- |
+     * | >0  | 剩余时间    |
+     * | -1  | 永不过期    |
+     * | -2  | key 不存在 |
+     */
+    @Override
+    public Long getTtl(K key) {
+        return redisTemplate.getExpire(buildKey(key));
     }
 
     /**

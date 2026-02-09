@@ -18,6 +18,7 @@ import interfaces from '@/api/base/monitor/interface.js'
 // maintain
 import version from '@/api/base/maintain/version.js'
 import file from '@/api/base/maintain/file.js'
+import cache from '@/api/base/maintain/cache.js'
 
 // TODO service
 import column from '@/api/service/column.js'
@@ -40,6 +41,6 @@ export default {
   // 系统监控
   log, host, interfaces,
   // 系统运维
-  version, file,
+  version, file, cache,
   column, category, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

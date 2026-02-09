@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.bas.cache;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -20,6 +21,14 @@ public interface Cache<K, V> {
 	 * @return 缓存值，不存在返回 null
 	 */
 	V get(K key);
+
+	/**
+	 * 模糊查询缓存池数据
+	 *
+	 * @param pattern 查询参数
+	 * @return 缓存池
+	 */
+	Map<K, V> scan(String pattern);
 
 	/**
 	 * 放入缓存
@@ -125,4 +134,17 @@ public interface Cache<K, V> {
 	 * @return 缓存中的值或加载得到的值；若加载结果为空则返回 {@code null}
 	 */
 	V getOrLoad(K key, Supplier<V> loader, long timeout, TimeUnit unit);
+
+	/**
+	 * 获取TTL
+	 *
+	 * @param key 键
+	 * @return TTL
+	 * | 返回值 | 含义      |
+	 * | --- | ------- |
+	 * | >0  | 剩余时间    |
+	 * | -1  | 永不过期    |
+	 * | -2  | key 不存在 |
+	 */
+	Long getTtl(K key);
 }
