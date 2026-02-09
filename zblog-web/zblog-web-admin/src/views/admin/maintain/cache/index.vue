@@ -39,7 +39,7 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="key" label="缓存KEY" width="20 0" />
+        <el-table-column :show-overflow-tooltip="true" prop="key" label="缓存KEY" width="200" />
         <el-table-column :show-overflow-tooltip="true" prop="value" label="缓存VALUE">
           <template v-slot="scope">
             <span>
