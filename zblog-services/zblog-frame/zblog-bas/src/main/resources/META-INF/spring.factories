@@ -11,6 +11,7 @@ com.github.stazxr.zblog.bas.cache.autoconfigure.CacheAutoConfiguration,\
 com.github.stazxr.zblog.bas.exception.autoconfigure.ErrorCodeCheckerAutoConfiguration,\
 com.github.stazxr.zblog.bas.exception.autoconfigure.ExceptionAutoConfiguration,\
 com.github.stazxr.zblog.bas.i18n.autoconfigure.I18nAutoConfiguration,\
+com.github.stazxr.zblog.bas.ratelimit.autoconfigure.RateLimitAutoConfiguration,\
 com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration,\
 com.github.stazxr.zblog.bas.notify.mail.autoconfigure.MailAutoConfiguration,\
 com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceAutoConfiguration,\

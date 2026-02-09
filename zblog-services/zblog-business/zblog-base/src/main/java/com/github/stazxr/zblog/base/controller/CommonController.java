@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
+import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
@@ -70,7 +71,7 @@ public class CommonController {
     })
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "发送邮箱验证码", code = "COMMQ002", level = RouterLevel.OPEN)
-    // @FormResubmitCheck(timeout = 30, value = "系统繁忙，请稍后再试")
+    @RateLimit(time = 60, enableIp = true)
     public String sendCode(@RequestParam String email, @RequestParam String scene) {
         Assert.notBlank(email, "邮箱不能为空");
         Assert.failIfFalse(RegexUtils.match(email, RegexUtils.Regex.EMAIL_REGEX), "邮箱格式不正确");

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.base.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.base.domain.dto.query.InterfaceQueryDto;
@@ -55,6 +56,7 @@ public class InterfaceController {
     @ApiOperation(value = "导出接口列表")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "导出接口列表", code = "INTEE001")
+    @RateLimit(time = 10, enableApi = true, message = "系统繁忙，请10秒后再试")
     public void exportInterface(InterfaceQueryDto queryDto, HttpServletResponse response) {
         interfaceService.exportInterface(queryDto, response);
     }

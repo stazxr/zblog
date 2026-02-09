@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.bas.validation;
 
-import com.github.stazxr.zblog.bas.exception.ExpMessageCode;
-
 import java.util.Objects;
 
 /**
@@ -17,21 +15,9 @@ public class Assert {
         }
     }
 
-    public static void isEquals(Object a, Object b, ExpMessageCode expMessageCode) {
-        if (!Objects.equals(a, b)) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
-        }
-    }
-
     public static void isNoEquals(Object a, Object b, String message) {
         if (Objects.equals(a, b)) {
             throw new AssertException(message);
-        }
-    }
-
-    public static void isNoEquals(Object a, Object b, ExpMessageCode expMessageCode) {
-        if (Objects.equals(a, b)) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -41,25 +27,9 @@ public class Assert {
         }
     }
 
-    public static void isNull(Object object, ExpMessageCode expMessageCode) {
-        if (object != null) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
-        }
-    }
-
-    public static void notNull(Object object) {
-        notNull(object, ExpMessageCode.PARAM_NULL);
-    }
-
     public static void notNull(Object object, String message) {
         if (object == null) {
             throw new AssertException(message);
-        }
-    }
-
-    public static void notNull(Object object, ExpMessageCode expMessageCode) {
-        if (object == null) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -69,25 +39,9 @@ public class Assert {
         }
     }
 
-    public static void isBlank(String str, ExpMessageCode expMessageCode) {
-        if (!isBlankInternal(str)) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
-        }
-    }
-
-    public static void notBlank(String str) {
-        notBlank(str, ExpMessageCode.PARAM_BLANK);
-    }
-
     public static void notBlank(String str, String message) {
         if (isBlankInternal(str)) {
             throw new AssertException(message);
-        }
-    }
-
-    public static void notBlank(String str, ExpMessageCode expMessageCode) {
-        if (isBlankInternal(str)) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -97,33 +51,15 @@ public class Assert {
         }
     }
 
-    public static void failIfTrue(boolean condition, ExpMessageCode expMessageCode) {
-        if (condition) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
-        }
-    }
-
     public static void failIfFalse(boolean condition, String message) {
         if (!condition) {
             throw new AssertException(message);
         }
     }
 
-    public static void failIfFalse(boolean condition, ExpMessageCode expMessageCode) {
-        if (!condition) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
-        }
-    }
-
     public static void affectOneRow(int rows, String message) {
         if (rows != 1) {
             throw new AssertException(message);
-        }
-    }
-
-    public static void affectOneRow(int rows, ExpMessageCode expMessageCode) {
-        if (rows != 1) {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
@@ -166,21 +102,6 @@ public class Assert {
             trueBack.call();
         } else {
             throw new AssertException(message);
-        }
-    }
-
-    /**
-     * Assert flag is true
-     *
-     * @param flag flag
-     * @param trueBack true callback function
-     * @param expMessageCode false throw exception
-     */
-    public static void doIfTrueElseThrow(boolean flag, CallBack trueBack, ExpMessageCode expMessageCode) {
-        if (flag) {
-            trueBack.call();
-        } else {
-            throw new AssertException(expMessageCode.getCode(), expMessageCode.getArgs());
         }
     }
 
