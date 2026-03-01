@@ -22,9 +22,10 @@ public interface ResourceCacheService {
     /**
      * 清除资源缓存
      *
-     * @param cacheKey 缓存键
+     * @param requestUri 请求路径
+     * @param requestMethod 请求方法
      */
-    default void clearCache(String cacheKey) {
+    default void clearCache(String requestUri, String requestMethod) {
     }
 
     /**

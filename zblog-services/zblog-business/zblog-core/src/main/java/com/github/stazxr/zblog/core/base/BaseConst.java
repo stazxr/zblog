@@ -170,27 +170,29 @@ public class BaseConst {
      */
     public enum GlobalCacheKey {
         /**
-         * 接口访问级别，默认 5 分钟
+         * 资源信息
+         *
+         * 当资源等级变更时（权限的新增，编辑和删除），需要更新缓存的资源信息
          */
-        interfaceLevel("intLevel:%s_%s", 5 * 60 * 1000);
+        resource("resource:%s_%s", 30 * 60 * 1000);
 
         /**
          * 缓存Key
          */
-        private final String cacheKey;
+        private final String key;
 
         /**
          * 缓存有效时间，单位秒
          */
         private final int duration;
 
-        GlobalCacheKey(String cacheKey, int duration) {
-            this.cacheKey = cacheKey;
+        GlobalCacheKey(String key, int duration) {
+            this.key = key;
             this.duration = duration;
         }
 
-        public String cacheKey() {
-            return cacheKey;
+        public String getKey() {
+            return key;
         }
 
         public int duration() {

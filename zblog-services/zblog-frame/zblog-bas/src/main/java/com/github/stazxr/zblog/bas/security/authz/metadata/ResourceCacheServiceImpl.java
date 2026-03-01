@@ -2,7 +2,8 @@ package com.github.stazxr.zblog.bas.security.authz.metadata;
 
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.router.RouterParser;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
@@ -17,8 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2024-11-24
  * @version 5.0
  */
-@Slf4j
 public class ResourceCacheServiceImpl implements ResourceCacheService, InitializingBean {
+    private static final Logger log = LoggerFactory.getLogger(ResourceCacheServiceImpl.class);
+
     private static final Map<String, Resource> RESOURCE_MAP = new ConcurrentHashMap<>();
 
     /**
@@ -47,6 +49,6 @@ public class ResourceCacheServiceImpl implements ResourceCacheService, Initializ
             RESOURCE_MAP.put(cacheKey, resource);
         }
 
-        log.info("Loaded {} Resources", RESOURCE_MAP.size());
+        log.info("Application startup - Resource initialization completed. Total: {}", resources.size());
     }
 }

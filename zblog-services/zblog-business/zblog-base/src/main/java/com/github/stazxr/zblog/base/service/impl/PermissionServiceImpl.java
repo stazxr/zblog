@@ -334,15 +334,13 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             if (StringUtils.isNotBlank(oldPermCode)) {
                 Resource resource = permissionMapper.selectResourceByPermCode(oldPermCode);
                 if (resource != null) {
-                    String cacheKey = resource.getResourceUri() + ":" + resource.getResourceMethod();
-                    resourceCacheService.clearCache(cacheKey);
+                    resourceCacheService.clearCache(resource.getResourceUri(), resource.getResourceMethod());
                 }
             }
             if (StringUtils.isNotBlank(newPermCode)) {
                 Resource resource = permissionMapper.selectResourceByPermCode(newPermCode);
                 if (resource != null) {
-                    String cacheKey = resource.getResourceUri() + ":" + resource.getResourceMethod();
-                    resourceCacheService.clearCache(cacheKey);
+                    resourceCacheService.clearCache(resource.getResourceUri(), resource.getResourceMethod());
                 }
             }
         } catch (Exception e) {
