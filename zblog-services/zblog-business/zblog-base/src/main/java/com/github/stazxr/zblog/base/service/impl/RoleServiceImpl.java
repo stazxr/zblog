@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
+import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.base.converter.RoleConverter;
 import com.github.stazxr.zblog.base.domain.dto.RoleAuthDto;
@@ -21,6 +23,7 @@ import com.github.stazxr.zblog.base.mapper.RoleMapper;
 import com.github.stazxr.zblog.base.mapper.RolePermMapper;
 import com.github.stazxr.zblog.base.mapper.UserRoleMapper;
 import com.github.stazxr.zblog.base.service.RoleService;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.stazxr.zblog.base.util.Constants.SecurityRole.*;
 
@@ -133,6 +137,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         checkRole(role);
         // 编辑角色
         ThrowUtils.when(!updateById(role)).system(BaseErrorCode.SCOREA002);
+        // 获取当前角色涉及的用户ID列表并清空缓存
+        if (!roleDto.getRoleCode().equals(dbRole.getRoleCode())) {
+            removeCache(role.getId());
+        }
     }
 
     /**
@@ -143,24 +151,22 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void authRole(RoleAuthDto authDto) {
-        Long roleId = authDto.getRoleId();
-        rolePermMapper.deleteByRoleIdHard(roleId);
+        // 删除数据库存储的角色授权信息
+        rolePermMapper.deleteByRoleIdHard(authDto.getRoleId());
+        // 保存授权信息
         if (authDto.getPermIds() != null && !authDto.getPermIds().isEmpty()) {
             List<RolePermissionRelation> rolePerms = new ArrayList<>();
             for (Long permId : authDto.getPermIds()) {
                 RolePermissionRelation rolePerm = new RolePermissionRelation();
-                rolePerm.setRoleId(roleId);
+                rolePerm.setRoleId(authDto.getRoleId());
                 rolePerm.setPermId(permId);
                 rolePerm.setDeleted(Boolean.FALSE);
                 rolePerms.add(rolePerm);
             }
             rolePermMapper.insertBatch(rolePerms);
         }
-
-        // 获取当前角色涉及的用户ID列表并清空缓存
-        for (Long userId : userRoleMapper.selectUserIdsByRoleId(roleId)) {
-            SecurityUserCache.remove(String.valueOf(userId));
-        }
+        // 清除相关缓存
+        removeCache(authDto.getRoleId());
     }
 
     /**
@@ -192,8 +198,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         ThrowUtils.when(!removeById(roleId)).system(BaseErrorCode.SCOREA003);
         // 删除角色关联信息
         rolePermMapper.deleteByRoleIdSoft(roleId);
-        // 清除缓存
-        userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
+        // 清除相关缓存
+        removeCache(roleId);
     }
 
     /**
@@ -246,7 +252,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public Set<String> selectResourceRoles(String requestUri, String requestMethod) {
-        return roleMapper.selectResourceRoles(requestUri, requestMethod);
+        BaseConst.GlobalCacheKey resourceRolesKey = BaseConst.GlobalCacheKey.resourceRoles;
+        String cacheKey = String.format(resourceRolesKey.getKey(), requestUri, requestMethod);
+        return GlobalCache.getOrLoad(
+                cacheKey,
+                () -> roleMapper.selectResourceRoles(requestUri, requestMethod),
+                GlobalCache.jitter(resourceRolesKey.duration() * 1000L),
+                TimeUnit.MILLISECONDS
+        );
     }
 
     private void checkRole(Role role) {
@@ -282,6 +295,21 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             return roleMapper.existsIgnoreDeleted(queryWrapper);
         }
         return false;
+    }
+
+    private void removeCache(Long roleId) {
+        try {
+            for (Long userId : userRoleMapper.selectUserIdsByRoleId(roleId)) {
+                SecurityUserCache.remove(String.valueOf(userId));
+            }
+            BaseConst.GlobalCacheKey resourceRolesKey = BaseConst.GlobalCacheKey.resourceRoles;
+            for (Resource resource : roleMapper.selectResourceByRoleId(roleId)) {
+                String cacheKey = String.format(resourceRolesKey.getKey(), resource.getResourceUri(), resource.getResourceMethod());
+                GlobalCache.remove(cacheKey);
+            }
+        } catch (Exception e) {
+            log.error("remove cache failed", e);
+        }
     }
 
     private LambdaQueryWrapper<Role> queryBuild() {

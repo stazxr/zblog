@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheService;
@@ -17,6 +18,7 @@ import com.github.stazxr.zblog.base.domain.vo.*;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.PermissionService;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -331,20 +333,22 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             List<Long> userIds = permissionMapper.selectUserIdsByPermId(permId);
             userIds.forEach(userId -> SecurityUserCache.remove(String.valueOf(userId)));
             // 清除资源缓存信息
-            if (StringUtils.isNotBlank(oldPermCode)) {
-                Resource resource = permissionMapper.selectResourceByPermCode(oldPermCode);
-                if (resource != null) {
-                    resourceCacheService.clearCache(resource.getResourceUri(), resource.getResourceMethod());
-                }
-            }
-            if (StringUtils.isNotBlank(newPermCode)) {
-                Resource resource = permissionMapper.selectResourceByPermCode(newPermCode);
-                if (resource != null) {
-                    resourceCacheService.clearCache(resource.getResourceUri(), resource.getResourceMethod());
-                }
-            }
+            clearResourceCache(oldPermCode);
+            clearResourceCache(newPermCode);
         } catch (Exception e) {
             log.error("remove cache failed", e);
+        }
+    }
+
+    private void clearResourceCache(String permCode) {
+        if (StringUtils.isNotBlank(permCode)) {
+            BaseConst.GlobalCacheKey resourceRolesKey = BaseConst.GlobalCacheKey.resourceRoles;
+            Resource resource = permissionMapper.selectResourceByPermCode(permCode);
+            if (resource != null) {
+                resourceCacheService.clearCache(resource.getResourceUri(), resource.getResourceMethod());
+                String cacheKey = String.format(resourceRolesKey.getKey(), resource.getResourceUri(), resource.getResourceMethod());
+                GlobalCache.remove(cacheKey);
+            }
         }
     }
 

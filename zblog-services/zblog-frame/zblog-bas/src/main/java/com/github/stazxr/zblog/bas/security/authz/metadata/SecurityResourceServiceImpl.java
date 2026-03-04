@@ -3,11 +3,8 @@ package com.github.stazxr.zblog.bas.security.authz.metadata;
 import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.bas.router.RouterExtLevel;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
-import com.github.stazxr.zblog.bas.security.cache.BlackWhiteListCache;
 import com.github.stazxr.zblog.bas.security.authz.DefaultRoleCode;
 import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
-import com.github.stazxr.zblog.util.Assert;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -19,19 +16,14 @@ import java.util.*;
  * @author SunTao
  * @since 2024-11-18
  */
-@Slf4j
 public class SecurityResourceServiceImpl implements SecurityResourceService {
     private final ResourceCacheService resourceCacheService;
 
     private final SecurityRoleService securityRoleService;
 
     public SecurityResourceServiceImpl(ResourceCacheService resourceCacheService, SecurityRoleService securityRoleService) {
-        Assert.notNull(resourceCacheService, "ResourceCacheService is required");
-        Assert.notNull(resourceCacheService, "SecurityRoleService is required");
         this.resourceCacheService = resourceCacheService;
         this.securityRoleService = securityRoleService;
-        log.info("Use ResourceCacheService: " + resourceCacheService);
-        log.info("Use SecurityRoleService: " + securityRoleService);
     }
 
     /**
@@ -58,25 +50,11 @@ public class SecurityResourceServiceImpl implements SecurityResourceService {
             roles.add(DefaultRoleCode.PUBLIC);
         } else if (RouterExtLevel.FORBIDDEN == resourceLevel) {
             roles.add(DefaultRoleCode.FORBIDDEN);
-        } else if (RouterExtLevel.NULL == resourceLevel) {
-            roles.add(DefaultRoleCode.NULL);
         } else {
             Set<String> resourceRoles = doSelectResourceRoles(requestUri, requestMethod);
             roles.addAll(resourceRoles);
         }
         return roles;
-    }
-
-    /**
-     * 获取指定资源的允许访问角色集合。
-     *
-     * @param requestUri    请求的 URL 路径，表示要访问的资源地址。
-     * @param requestMethod 请求的 HTTP 方法类型（例如 GET、POST 等），
-     *                      用于标识请求的操作类型。
-     * @return 角色编码集合。
-     */
-    protected Set<String> doSelectResourceRoles(String requestUri, String requestMethod) {
-        return securityRoleService.selectResourceRoles(requestUri, requestMethod);
     }
 
     /**
@@ -93,23 +71,24 @@ public class SecurityResourceServiceImpl implements SecurityResourceService {
         requestUri = requestUri.contains(whLabel) ? requestUri.substring(0, requestUri.indexOf(whLabel)) : requestUri;
         requestMethod = requestMethod.toUpperCase(Locale.ROOT);
 
-        // 白名单校验
-        String checkKey = requestUri + ":" + requestMethod;
-        if (BlackWhiteListCache.isWhitelisted(checkKey)) {
-            return RouterExtLevel.OPEN;
-        }
-
-        // 黑名单校验
-        if (BlackWhiteListCache.isBlacklisted(checkKey)) {
-            return RouterExtLevel.FORBIDDEN;
-        }
-
-        // 查找资源信息（带有缓存）
+        // 查找资源信息
         Resource resource = resourceCacheService.findResource(requestUri, requestMethod);
         if (resource == null) {
             return RouterExtLevel.OPEN;
         } else {
             return resource.getResourceLevel();
         }
+    }
+
+    /**
+     * 获取指定资源的允许访问角色集合。
+     *
+     * @param requestUri    请求的 URL 路径，表示要访问的资源地址。
+     * @param requestMethod 请求的 HTTP 方法类型（例如 GET、POST 等），
+     *                      用于标识请求的操作类型。
+     * @return 角色编码集合。
+     */
+    protected Set<String> doSelectResourceRoles(String requestUri, String requestMethod) {
+        return securityRoleService.selectResourceRoles(requestUri, requestMethod);
     }
 }

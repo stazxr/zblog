@@ -9,19 +9,11 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-01-25
  */
 public enum ValidationErrorCode implements ErrorCode {
-    /**
-     * 参数校验失败（MethodArgumentNotValidException）
-     */
+    /** 参数校验失败（MethodArgumentNotValidException） */
     EVALIA000("error.service.validation.param"),
-
-    /**
-     * 数据校验失败（AssertException）
-     */
+    /** 数据校验失败（AssertException） */
     EVALIA001("error.service.validation.data"),
-
-    /**
-     * 参数错误（ServletRequestBindingException,TypeMismatchException,UnexpectedTypeException）
-     */
+    /** 参数错误（ServletRequestBindingException,TypeMismatchException,UnexpectedTypeException） */
     EVALIA002("error.service.validation.unknown");
 
     private final String i18nKey;

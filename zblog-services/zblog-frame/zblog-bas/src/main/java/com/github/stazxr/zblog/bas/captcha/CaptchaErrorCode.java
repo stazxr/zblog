@@ -9,9 +9,7 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-01-26
  */
 public enum CaptchaErrorCode implements ErrorCode {
-    /**
-     * 验证码创建失败
-     */
+    /** 验证码创建失败 */
     SCAPTA000("error.system.captcha.failed"),
     ;
 
@@ -20,7 +18,6 @@ public enum CaptchaErrorCode implements ErrorCode {
     CaptchaErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
-
 
     /**
      * 错误码

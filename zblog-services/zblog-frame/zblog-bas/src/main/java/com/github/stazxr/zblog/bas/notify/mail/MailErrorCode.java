@@ -9,9 +9,7 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-01-25
  */
 public enum MailErrorCode implements ErrorCode {
-    /**
-     * 邮箱服务器故障
-     */
+    /** 邮箱服务器故障 */
     SMAILA000("error.system.mail.failed"),
     ;
 
@@ -20,7 +18,6 @@ public enum MailErrorCode implements ErrorCode {
     MailErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
-
 
     /**
      * 错误码

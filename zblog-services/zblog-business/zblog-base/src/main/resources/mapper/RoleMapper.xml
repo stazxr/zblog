@@ -4,7 +4,7 @@
     <select id="selectResourceRoles" resultType="java.lang.String">
         SELECT DISTINCT ROLE_CODE FROM role WHERE ID IN (
             SELECT ROLE_ID FROM role_permission_relation WHERE DELETED = 0 AND PERM_ID IN (
-                SELECT ID FROM permission p WHERE p.DELETED = 0 AND p.PERM_CODE IN (
+                SELECT ID FROM permission p WHERE p.DELETED = 0 AND p.PERM_CODE = (
                     SELECT RESOURCE_CODE FROM resource WHERE RESOURCE_CODE IS NOT NULL
                     AND RESOURCE_URI = #{requestUri} AND RESOURCE_METHOD = #{requestMethod}
                 )
@@ -39,6 +39,14 @@
             (SELECT USERNAME FROM user u WHERE u.ID = r.CREATE_USER) AS CREATE_USERNAME,
             (SELECT USERNAME FROM user u WHERE u.ID = r.UPDATE_USER) AS UPDATE_USERNAME
         FROM role r
-        WHERE r.DELETED = 0 AND r.ID = #{roleId}
+        WHERE r.ID = #{roleId} AND r.DELETED = 0
+    </select>
+
+    <select id="selectResourceByRoleId" resultType="com.github.stazxr.zblog.bas.router.Resource">
+        SELECT RESOURCE_URI, RESOURCE_METHOD FROM resource WHERE RESOURCE_CODE IN (
+            SELECT PERM_CODE FROM permission WHERE DELETED = 0 AND PERM_CODE IS NOT NULL AND ID IN (
+                SELECT PERM_ID from role_permission_relation WHERE DELETED = 0 AND ROLE_ID = #{roleId}
+            )
+        )
     </select>
 </mapper>

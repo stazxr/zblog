@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.stazxr.zblog.bas.router.Resource;
 import com.github.stazxr.zblog.base.domain.dto.query.RoleQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.Role;
 import com.github.stazxr.zblog.base.domain.vo.RoleVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,6 +47,14 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return Set<String> 角色编码集合。
      */
     Set<String> selectResourceRoles(@Param("requestUri") String requestUri, @Param("requestMethod") String requestMethod);
+
+    /**
+     * 查询角色对应的资源清单
+     *
+     * @param roleId 角色序列
+     * @return List<Resource>
+     */
+    List<Resource> selectResourceByRoleId(@Param("roleId") Long roleId);
 
     /**
      * 判断是否存在，忽略逻辑删除

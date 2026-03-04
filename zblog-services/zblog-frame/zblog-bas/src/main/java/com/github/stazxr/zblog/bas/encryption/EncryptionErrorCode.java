@@ -9,9 +9,7 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-01-25
  */
 public enum EncryptionErrorCode implements ErrorCode {
-    /**
-     * 加解密失败
-     */
+    /** 加解密失败 */
     SENCYA000("error.system.encryption");
 
     private final String i18nKey;
@@ -19,7 +17,6 @@ public enum EncryptionErrorCode implements ErrorCode {
     EncryptionErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
-
 
     /**
      * 错误码

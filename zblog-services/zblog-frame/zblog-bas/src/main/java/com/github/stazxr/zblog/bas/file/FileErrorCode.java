@@ -9,38 +9,22 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-01-25
  */
 public enum FileErrorCode implements ErrorCode {
-    /**
-     * {0}存储功能未启用
-     */
+    /** {0}存储功能未启用 */
     EFILEA000("error.service.file.disabled"),
-
-    /**
-     * 存储参数配置错误
-     */
+    /** 存储参数配置错误 */
     SFILEA000("error.system.file.config"),
-
-    /**
-     * 文件上传失败
-     */
+    /** 文件上传失败 */
     SFILEA001("error.system.file.upload"),
-
-    /**
-     * 文件下载失败
-     */
+    /** 文件下载失败 */
     SFILEA002("error.system.file.download"),
-
-    /**
-     * 文件删除失败
-     */
-    SFILEA003("error.system.file.delete"),
-    ;
+    /** 文件删除失败 */
+    SFILEA003("error.system.file.delete");
 
     private final String i18nKey;
 
     FileErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
-
 
     /**
      * 错误码

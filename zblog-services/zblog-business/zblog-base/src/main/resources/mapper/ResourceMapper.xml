@@ -19,7 +19,8 @@
     </delete>
 
     <insert id="insertBatch">
-        INSERT INTO resource (RESOURCE_NAME, RESOURCE_URI, RESOURCE_METHOD, RESOURCE_CODE, RESOURCE_LEVEL)
+        INSERT INTO resource
+            (RESOURCE_NAME, RESOURCE_URI, RESOURCE_METHOD, RESOURCE_CODE, RESOURCE_LEVEL)
         VALUES
         <foreach collection="resources" item="resource" separator=",">
             (#{resource.resourceName}, #{resource.resourceUri}, #{resource.resourceMethod}, #{resource.resourceCode}, #{resource.resourceLevel})
