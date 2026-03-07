@@ -20,7 +20,7 @@ public interface SecurityUserService {
      * @param userId 用户 ID
      * @return 用户的 {@link SecurityUser} 实例
      */
-    SecurityUser findUserById(String userId);
+    SecurityUser loadUserInfo(String userId);
 
     /**
      * 根据用户名 {@code username} 登录并返回登录用户信息。
@@ -39,4 +39,3 @@ public interface SecurityUserService {
      */
     void updateUserLoginInfo(String username, int type, HttpServletRequest request);
 }
-

@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.util.time;
 
-import com.github.stazxr.zblog.util.Assert;
+import cn.hutool.core.lang.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;

@@ -87,7 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 用户的 {@link SecurityUser} 实例
      */
     @Override
-    public SecurityUser findUserById(String userId) {
+    public SecurityUser loadUserInfo(String userId) {
         // 根据用户ID查询用户信息
         ThrowUtils.when(StringUtils.isBlank(userId)).system(BaseErrorCode.SCOREB000);
         User user = userMapper.selectUserById(Long.parseLong(userId));

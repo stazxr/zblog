@@ -53,7 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, InitializingB
      */
     @Override
     public void afterPropertiesSet() {
-        Assert.notNull(securityUserService, "A SecurityUserService must be set");
+        Assert.notNull(securityUserService, "SecurityUserService must be set");
     }
 
     @Autowired

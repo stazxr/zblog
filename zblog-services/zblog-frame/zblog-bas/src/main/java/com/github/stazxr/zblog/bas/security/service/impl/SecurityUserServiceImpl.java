@@ -5,7 +5,8 @@ import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.core.UserStatus;
 import com.github.stazxr.zblog.bas.security.core.UserType;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,8 +25,9 @@ import java.util.List;
  * @author SunTao
  * @since 2024-11-10
  */
-@Slf4j
 public class SecurityUserServiceImpl implements SecurityUserService, InitializingBean {
+    private static final Logger log = LoggerFactory.getLogger(SecurityUserServiceImpl.class);
+
     private static final String DEFAULT_USER_ID = "1";
 
     private final SecurityProperties securityProperties;
@@ -50,7 +52,7 @@ public class SecurityUserServiceImpl implements SecurityUserService, Initializin
      * @return 用户的 {@link SecurityUser} 实例；如果未找到用户，返回 {@code null}
      */
     @Override
-    public SecurityUser findUserById(String userId) {
+    public SecurityUser loadUserInfo(String userId) {
         if (DEFAULT_USER_ID.equals(userId)) {
             return createSecurityUser();
         }

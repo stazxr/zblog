@@ -2,7 +2,6 @@ package com.github.stazxr.zblog.bas.security.core;
 
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
  * @author SunTao
  * @since 2024-11-10
  */
-@Slf4j
 public class SecurityUser implements UserDetails {
     private static final long serialVersionUID = -7721668082752933835L;
 
