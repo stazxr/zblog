@@ -97,7 +97,8 @@ export default {
         confirmPass: [
           { required: true, validator: confirmPass, trigger: 'blur' }
         ]
-      }
+      },
+      publicKey: null
     }
   },
   computed: {
@@ -144,6 +145,7 @@ export default {
       const { username, type } = JSON.parse(data)
       this.formData.username = username
       this.type = type
+      this.loadPublicKey()
     } else {
       // 防止非法访问
       this.$router.replace('/login')
@@ -153,6 +155,13 @@ export default {
     sessionStorage.removeItem('force_update_pwd_user')
   },
   methods: {
+    loadPublicKey() {
+      this.$mapi.communal.querySystemPublicKey().then(res => {
+        this.publicKey = res.data
+      }).catch(_ => {
+        this.publicKey = null
+      })
+    },
     cancel() {
       this.resetForm()
       this.$router.push('/login')
@@ -166,7 +175,7 @@ export default {
       this.$refs.updatePassForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          const payload = encrypt(JSON.stringify({
+          const payload = encrypt(this.publicKey, JSON.stringify({
             username: this.formData.username,
             oldPass: this.formData.oldPass,
             newPass: this.formData.newPass,

@@ -53,7 +53,7 @@ public class CommonController {
     @GetMapping("/querySystemPublicKey")
     @ApiOperation(value = "获取系统公钥")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "获取系统公钥", code = "COMMQ001", level = RouterLevel.PUBLIC)
+    @Router(name = "获取系统公钥", code = "COMMQ001", level = RouterLevel.OPEN)
     public String querySystemPublicKey() {
         return systemPublicKey;
     }

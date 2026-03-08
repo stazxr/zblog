@@ -2,9 +2,9 @@ package com.github.stazxr.zblog.bas.security.autoconfigure;
 
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.ValidateLoginCodeFilter;
 import com.github.stazxr.zblog.bas.security.filter.ParseLoginParamFilter;
 import com.github.stazxr.zblog.bas.security.filter.SecurityFilterChainCustomizer;
+import com.github.stazxr.zblog.bas.security.filter.ValidateLoginCodeFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -99,7 +99,8 @@ export default {
           this.redirect = '/'
         }
       },
-      immediate: true
+      immediate: true,
+      publicKey: null
     }
   },
   // 在模板渲染成html前调用，即通常初始化某些属性值，然后再渲染成视图
@@ -112,6 +113,9 @@ export default {
 
     // 登录过期提醒
     this.point()
+
+    // 获取公钥
+    this.loadPublicKey()
 
     // 单点登录
     const data = qs.parse(window.location.search.replace('?', ''))
@@ -147,6 +151,13 @@ export default {
     }
   },
   methods: {
+    loadPublicKey() {
+      this.$mapi.communal.querySystemPublicKey().then(res => {
+        this.publicKey = res.data
+      }).catch(_ => {
+        this.publicKey = null
+      })
+    },
     getPwdFlag() {
       this.pwdFlag = !this.pwdFlag
       this.pwdFlagType = this.pwdFlag ? 'text' : 'password'
@@ -180,16 +191,17 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           const username = this.loginForm.username
-          const loginParam = {
+
+          const payload = encrypt(this.publicKey, JSON.stringify({
             username: username,
-            password: encrypt(this.loginForm.password),
+            password: this.loginForm.password,
             rememberMe: this.loginForm.rememberMe,
             code: this.loginForm.code,
             uuid: this.loginForm.uuid
-          }
+          }))
 
           this.loading = true
-          this.$store.dispatch('Login', loginParam).then(change_pwd => {
+          this.$store.dispatch('Login', { _l: payload }).then(change_pwd => {
             if (change_pwd) {
               this.$message.error('需要重置您的密码，请修改密码')
               sessionStorage.setItem('force_update_pwd_user', JSON.stringify({

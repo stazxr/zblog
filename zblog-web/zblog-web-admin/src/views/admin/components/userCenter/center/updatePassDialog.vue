@@ -93,7 +93,8 @@ export default {
         confirmPass: [
           { required: true, validator: confirmPass, trigger: 'blur' }
         ]
-      }
+      },
+      publicKey: null
     }
   },
   computed: {
@@ -128,12 +129,22 @@ export default {
       return 100
     }
   },
+  mounted() {
+    this.loadPublicKey()
+  },
   methods: {
+    loadPublicKey() {
+      this.$mapi.communal.querySystemPublicKey().then(res => {
+        this.publicKey = res.data
+      }).catch(_ => {
+        this.publicKey = null
+      })
+    },
     submit() {
       this.$refs.updatePassForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          const payload = encrypt(JSON.stringify({
+          const payload = encrypt(this.publicKey, JSON.stringify({
             oldPass: this.formData.oldPass,
             newPass: this.formData.newPass,
             confirmPass: this.formData.confirmPass
