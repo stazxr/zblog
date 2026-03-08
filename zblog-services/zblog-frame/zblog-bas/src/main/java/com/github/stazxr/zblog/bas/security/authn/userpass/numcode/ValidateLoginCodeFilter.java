@@ -1,15 +1,11 @@
 package com.github.stazxr.zblog.bas.security.authn.userpass.numcode;
 
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
-import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import com.github.stazxr.zblog.bas.security.exception.LoginNumCodeException;
 import com.github.stazxr.zblog.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -19,18 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 验证码校验过滤器
- *
- * <p>
- * 此过滤器拦截登录请求，验证用户提交的验证码是否正确，以防止恶意登录。继承自 {@link OncePerRequestFilter}，
- * 确保在每个请求中只执行一次。
- * </p>
+ * 验证码校验过滤器，此过滤器拦截登录请求，验证用户提交的验证码是否正确，以防止恶意登录。
  *
  * @author SunTao
  * @since 2024-11-18
  */
-@Slf4j
-@Component
 public class ValidateLoginCodeFilter extends OncePerRequestFilter {
     /**
      * 默认验证码字段名称
@@ -48,9 +37,9 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
     private CaptchaHandler captchaHandler;
 
     /**
-     * 扩展参数
+     * 登录地址
      */
-    private SecurityExtProperties securityExtProperties;
+    private String loginPath;
 
     /**
      * 认证失败处理逻辑
@@ -58,21 +47,26 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
     private AuthenticationFailureHandler authenticationFailureHandler;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         // 判断是否为登录请求，并且请求方法为 POST
-        if (isLoginRequest(request)) {
-            try {
-                // 验证验证码
-                validateCaptcha(request);
-            } catch (AuthenticationException ex) {
-                // 验证失败处理
-                authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
-                return;
-            }
+        if (!isLoginRequest(request)) {
+            // 验证通过，继续后续过滤链
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // 验证通过，继续后续过滤链
-        filterChain.doFilter(request, response);
+        try {
+            // 验证登录验证码
+            validateCaptcha(request);
+        } catch (AuthenticationException ex) {
+            // 验证失败处理
+            authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
+        } catch (Exception ex) {
+            // 未知异常
+            LoginNumCodeException loginNumCodeException = new LoginNumCodeException(LoginNumCodeErrorCode.ELOGNC000, ex);
+            authenticationFailureHandler.onAuthenticationFailure(request, response, loginNumCodeException);
+        }
     }
 
     /**
@@ -82,7 +76,7 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
      * @return true 如果是登录请求，false 否则
      */
     private boolean isLoginRequest(HttpServletRequest request) {
-        return securityExtProperties.getLoginUrl().equals(request.getRequestURI()) && HttpMethod.POST.name().equalsIgnoreCase(request.getMethod());
+        return request.getRequestURI().equals(loginPath) && HttpMethod.POST.name().equalsIgnoreCase(request.getMethod());
     }
 
     /**
@@ -95,39 +89,35 @@ public class ValidateLoginCodeFilter extends OncePerRequestFilter {
         // 获取验证码缓存的唯一标识
         String uuid = (String) request.getAttribute(DEFAULT_CACHE_KEY);
         if (StringUtils.isEmpty(uuid)) {
-            throw new LoginNumCodeException("验证码验证失败，缺失参数 " + DEFAULT_CACHE_KEY + "，请检查前端代码");
+            throw new LoginNumCodeException(LoginNumCodeErrorCode.ELOGNC000);
         }
 
         // 获取用户输入的验证码
         String code = (String) request.getAttribute(DEFAULT_CODE_KEY);
         if (StringUtils.isEmpty(code)) {
-            throw new LoginNumCodeException("请输入验证码");
+            throw new LoginNumCodeException(LoginNumCodeErrorCode.ELOGNC001);
         }
 
         // 获取后台缓存的验证码并校验
         String cacheCode = captchaHandler.getCaptchaText(uuid);
         if (cacheCode == null) {
-            throw new LoginNumCodeException("验证码已过期");
+            throw new LoginNumCodeException(LoginNumCodeErrorCode.ELOGNC002);
         }
 
         // 验证用户输入的验证码是否正确
-        // if (!captchaHandler.verifyCaptcha(uuid, code)) { // 概率验证失败，待分析原因
-        if (!code.equals(cacheCode)) {
-            throw new LoginNumCodeException("验证码不正确");
+        if (!captchaHandler.verifyCaptcha(uuid, code)) {
+            throw new LoginNumCodeException(LoginNumCodeErrorCode.ELOGNC003);
         }
     }
 
-    @Autowired
     public void setCaptchaHandler(CaptchaHandler captchaHandler) {
         this.captchaHandler = captchaHandler;
     }
 
-    @Autowired
-    public void setSecurityExtProperties(SecurityExtProperties securityExtProperties) {
-        this.securityExtProperties = securityExtProperties;
+    public void setLoginPath(String loginPath) {
+        this.loginPath = loginPath;
     }
 
-    @Autowired
     public void setAuthenticationFailureHandler(AuthenticationFailureHandler authenticationFailureHandler) {
         this.authenticationFailureHandler = authenticationFailureHandler;
     }

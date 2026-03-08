@@ -108,18 +108,25 @@ public class CaptchaBuilder {
         @Override
         protected char[] alphas() {
             // 生成随机数字和运算符
-            int n1 = num(1, 10), n2 = num(1, 10);
-            int opt = num(2);
+            while (true) {
+                // 生成随机数字和运算符
+                int n1 = num(1, 10), n2 = num(1, 10);
+                int opt = num(3);
 
-            // 计算结果
-            int res = new int[]{n1 + n2, n1 - n2, n1 * n2}[opt];
+                // 计算结果
+                int res = new int[]{n1 + n2, n1 - n2, n1 * n2}[opt];
+                if (res < -1) {
+                    continue;
+                }
 
-            // 转换为字符运算符
-            char optChar = "+x".charAt(opt);
+                // 转换为字符运算符
+                char optChar = "+-x".charAt(opt);
 
-            this.setArithmeticString(String.format("%s%c%s=?", n1, optChar, n2));
-            this.chars = String.valueOf(res);
-            return chars.toCharArray();
+                // 返回结果
+                this.setArithmeticString(String.format("%s%c%s=?", n1, optChar, n2));
+                this.chars = String.valueOf(res);
+                return chars.toCharArray();
+            }
         }
     }
 }
