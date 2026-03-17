@@ -114,9 +114,6 @@ export default {
     // 登录过期提醒
     this.point()
 
-    // 获取公钥
-    this.loadPublicKey()
-
     // 单点登录
     const data = qs.parse(window.location.search.replace('?', ''))
     if (data['isIframe'] && data.origin) {
@@ -149,6 +146,8 @@ export default {
         this.$refs.loginBtn.focus()
       }
     }
+
+    this.loadPublicKey()
   },
   methods: {
     loadPublicKey() {
@@ -191,7 +190,6 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           const username = this.loginForm.username
-
           const payload = encrypt(this.publicKey, JSON.stringify({
             username: username,
             password: this.loginForm.password,
@@ -203,7 +201,7 @@ export default {
           this.loading = true
           this.$store.dispatch('Login', { _l: payload }).then(change_pwd => {
             if (change_pwd) {
-              this.$message.error('需要重置您的密码，请修改密码')
+              this.$message.error('首次登录需要重置密码，请修改密码')
               sessionStorage.setItem('force_update_pwd_user', JSON.stringify({
                 username,
                 type: '1'
@@ -214,8 +212,7 @@ export default {
               this.$router.push({ path: this.redirect || '/' })
             }
           }).catch(e => {
-            console.log('Login Error', e)
-            if (e.message && e.message === '10002') {
+            if (e.message && e.message === 'EAUTHN004') {
               // 跳转修改密码界面
               sessionStorage.setItem('force_update_pwd_user', JSON.stringify({
                 username,

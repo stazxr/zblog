@@ -26,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stazxr/zblog-web-admin.git"
+    "url": "https://github.com/stazxr/zblog.git"
   },
   "bugs": {
-    "url": "https://github.com/stazxr/zblog-web-admin/issues"
+    "url": "https://github.com/stazxr/zblog/issues"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "^0.4.0",
@@ -96,8 +96,8 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "chalk": "2.4.2",
     "chokidar": "2.1.5",
-    "connect": "3.6.6",
     "compression-webpack-plugin": "5.0.2",
+    "connect": "3.6.6",
     "eslint": "5.15.3",
     "eslint-plugin-vue": "5.2.2",
     "html-webpack-plugin": "3.2.0",

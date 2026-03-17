@@ -172,16 +172,17 @@ public class BaseConst {
         /**
          * 资源信息
          *
-         * 当资源等级变更时（权限的新增，编辑和删除），需要更新缓存的资源信息
+         * 1、当资源等级变更时（权限的新增，编辑和删除），需要更新缓存的资源信息
+         * 2、当修改源码时，需要注意清理缓存中的资源信息
          */
-        resource("resource:%s_%s", -1),
+        resource("resource:%s_%s", 24 * 60 * 60 * 1000),
 
         /**
          * 资源对应的角色清单
          *
          * 角色授权，权限变更需要更新缓存
          */
-        resourceRoles("resourceRoles:%s_%s", -1);
+        resourceRoles("resourceRoles:%s_%s", 24 * 60 * 60 * 1000);
 
         /**
          * 缓存Key

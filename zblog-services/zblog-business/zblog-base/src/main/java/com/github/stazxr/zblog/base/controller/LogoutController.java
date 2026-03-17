@@ -60,7 +60,7 @@ public class LogoutController {
         // TODO userService.clearUserStorageToken(userId);
 
         // 清除缓存
-        jwtTokenStorage.expire(String.valueOf(userId));
+        jwtTokenStorage.remove(String.valueOf(userId));
         String preTknCacheKey = String.format(Constants.SysCacheKey.preTkn.cacheKey(), userId, Locale.ROOT);
         String ssoTknCacheKey = String.format(Constants.SysCacheKey.ssoTkn.cacheKey(), IpUtils.getIp(request), Locale.ROOT);
         GlobalCache.remove(preTknCacheKey, ssoTknCacheKey);

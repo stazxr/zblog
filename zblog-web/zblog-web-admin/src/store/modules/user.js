@@ -21,18 +21,14 @@ const user = {
     Login({ commit }, loginParam) {
       return new Promise((resolve, reject) => {
         communal.login(loginParam).then(res => {
-          const { access_token, change_pwd } = res.data
-          if (!change_pwd) {
-            // 查询用户信息
-            setToken(access_token)
-            commit('SET_LOAD_MENUS', true)
-            communal.loginId().then(res => {
-              commit('SET_USER', res.data)
-              resolve(change_pwd)
-            })
-          } else {
+          const { access_token } = res.data
+          setToken(access_token)
+          commit('SET_LOAD_MENUS', true)
+          communal.loginId().then(res => {
+            commit('SET_USER', res.data)
+            const change_pwd = res.data.passwordExpireTime == null
             resolve(change_pwd)
-          }
+          })
         }).catch(error => {
           reject(error)
         })

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.cors;
 
 import com.github.stazxr.zblog.bas.order.FilterOrder;
+import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,7 @@ public class CorsFilterAutoConfiguration {
         config.addAllowedMethod("*");
         config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
-        config.addExposedHeader("new-token");
+        config.addExposedHeader(JwtConstants.NEW_TOKEN_HEADER);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

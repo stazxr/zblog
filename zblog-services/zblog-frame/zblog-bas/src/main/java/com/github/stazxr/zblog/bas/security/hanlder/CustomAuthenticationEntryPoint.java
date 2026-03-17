@@ -1,9 +1,10 @@
-package com.github.stazxr.zblog.bas.security.exception.handler;
+package com.github.stazxr.zblog.bas.security.hanlder;
 
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.TokenError;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -20,9 +21,10 @@ import java.io.IOException;
  * @author SunTao
  * @since 2024-11-18
  */
-@Slf4j
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
+
     /**
      * 处理认证异常。
      *

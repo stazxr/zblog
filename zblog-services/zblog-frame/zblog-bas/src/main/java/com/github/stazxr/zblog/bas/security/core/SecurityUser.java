@@ -226,6 +226,6 @@ public class SecurityUser implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        return UserStatus.NORMAL.getStatus().equals(getUserStatus());
+        return !UserStatus.FORBID.getStatus().equals(getUserStatus());
     }
 }

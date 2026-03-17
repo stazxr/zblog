@@ -36,5 +36,6 @@ public abstract class DefaultRoleCode {
     /**
      * 角色代码：ROLE_NULL - 标记资源不存在。
      */
+    @Deprecated
     public static final String NULL = "ROLE_NULL";
 }

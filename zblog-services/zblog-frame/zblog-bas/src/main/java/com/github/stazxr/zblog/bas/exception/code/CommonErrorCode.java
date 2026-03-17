@@ -43,6 +43,11 @@ public enum CommonErrorCode implements ErrorCode {
      * 包括接口调用超时、RPC 超时、数据库查询超时等。
      */
     SBASEA004("error.system.timeout"),
+
+    /**
+     * 权限不足
+     */
+    EBASEA000("error.service.403"),
     ;
 
     private final String i18nKey;

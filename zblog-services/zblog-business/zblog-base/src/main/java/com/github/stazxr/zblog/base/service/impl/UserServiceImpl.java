@@ -40,10 +40,8 @@ import com.github.stazxr.zblog.util.UuidUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,10 +60,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author SunTao
  * @since 2020-11-15
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserMapper userMapper;
 
     private final UserConverter userConverter;
@@ -107,20 +106,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public SecurityUser loginWithUsername(String username) {
         // 根据用户ID查询用户信息
         User user = userMapper.selectUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("用户不存在");
+        if (user != null) {
+            // 设置角色和权限信息
+            setRoleAndPerm(user);
         }
-        // 系统用户被禁止登录
-        if (UserType.SYSTEM_USER.getType().equals(user.getUserType())) {
-            throw new AccessDeniedException("系统用户被禁止登录");
-        }
-        // 提前校验用户是否锁定，放在密码校验前
-        if (!user.isAccountNonLocked()) {
-            throw new LockedException("用户已锁定");
-        }
-
-        // 设置角色和权限信息
-        setRoleAndPerm(user);
         return user;
     }
 
@@ -173,9 +162,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             LocalDateTime lockedExpireTime = LocalDateTime.now().plus(lockConfig.getLockDuration());
             int maxFailCount = lockConfig.getMaxFailCount();
             userMapper.updateLoginInfoWhenFailed(userId, maxFailCount, lockedExpireTime);
-        } else if (type == 3) {
-            // 登录失败，使用不存在的用户名，DO NOTHING
-            return;
         } else {
             // 有其他场景后续在扩展，目前默认为 UNKNOWN
             loginLog.setLoginType(LoginType.UNKNOWN.getType());

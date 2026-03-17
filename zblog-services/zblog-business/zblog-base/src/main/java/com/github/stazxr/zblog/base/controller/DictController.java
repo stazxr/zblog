@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.base.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.bo.NameValue;
@@ -142,7 +143,7 @@ public class DictController {
         @ApiImplicitParam(name = "dictKey", value = "字典key", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "根据字典KEY查询配置信息列表", code = "DICTQ004")
+    @Router(name = "根据字典KEY查询配置信息列表", code = "DICTQ004", level = RouterLevel.PUBLIC)
     public List<NameValue> queryConfListByDictKey(@RequestParam String dictKey) {
         return dictService.queryConfListByDictKey(dictKey);
     }
@@ -159,7 +160,7 @@ public class DictController {
         @ApiImplicitParam(name = "dictKey", value = "字典key", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "根据字典KEY查询配置信息", code = "DICTQ005")
+    @Router(name = "根据字典KEY查询配置信息", code = "DICTQ005", level = RouterLevel.PUBLIC)
     public String queryDictValueByDictKey(@RequestParam String dictKey) {
         return dictService.queryDictValueByDictKey(dictKey);
     }

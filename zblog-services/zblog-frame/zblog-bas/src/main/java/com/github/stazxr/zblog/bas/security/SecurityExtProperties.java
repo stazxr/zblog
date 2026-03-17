@@ -32,11 +32,6 @@ public class SecurityExtProperties {
     private int passwordLimitedDay = 90;
 
     /**
-     * 资源与角色关联关系的缓存时长, 单位毫秒, 默认 30 分钟
-     */
-    private long resourceRolesCacheMills = 30 * 60 * 1000L;
-
-    /**
      * SSO 令牌缓存时长, 单位毫秒, 默认 3 天
      */
     private long ssoTokenCacheMills = 24 * 3600 * 1000L;
@@ -50,11 +45,6 @@ public class SecurityExtProperties {
      * 登录认证是否扩展额外检查规则
      */
     private boolean enableAdditionalChecks = false;
-
-    /**
-     * 是否隐藏用户找不到异常
-     */
-    protected boolean hideUserNotFoundExceptions = true;
 
     /**
      * 用户登录失败锁定配置
@@ -118,14 +108,6 @@ public class SecurityExtProperties {
         this.passwordLimitedDay = passwordLimitedDay;
     }
 
-    public long getResourceRolesCacheMills() {
-        return resourceRolesCacheMills;
-    }
-
-    public void setResourceRolesCacheMills(long resourceRolesCacheMills) {
-        this.resourceRolesCacheMills = resourceRolesCacheMills;
-    }
-
     public long getSsoTokenCacheMills() {
         return ssoTokenCacheMills;
     }
@@ -148,14 +130,6 @@ public class SecurityExtProperties {
 
     public void setEnableAdditionalChecks(boolean enableAdditionalChecks) {
         this.enableAdditionalChecks = enableAdditionalChecks;
-    }
-
-    public boolean isHideUserNotFoundExceptions() {
-        return hideUserNotFoundExceptions;
-    }
-
-    public void setHideUserNotFoundExceptions(boolean hideUserNotFoundExceptions) {
-        this.hideUserNotFoundExceptions = hideUserNotFoundExceptions;
     }
 
     public UserLockConfig getLockConfig() {

@@ -37,8 +37,8 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['LOGID001']" type="danger" :loading="deleteLoading" @click="deleteLog">删除</el-button>
-          <el-button v-perm="['LOGIE001']" type="primary" :loading="exportLoading" @click="exportData">导出</el-button>
+          <el-button v-perm="['LOGOD001']" type="danger" :loading="deleteLoading" @click="deleteLog">删除</el-button>
+          <el-button v-perm="['LOGOE001']" type="primary" :loading="exportLoading" @click="exportData">导出</el-button>
         </span>
       </div>
     </div>

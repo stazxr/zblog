@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.bas.security.cache;
 
+import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * 用户信息缓存处理类。
@@ -18,12 +21,27 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author SunTao
  * @since 2024-11-14
  */
-@Slf4j
-public class SecurityUserCache {
+public final class SecurityUserCache {
+    private static final Logger log = LoggerFactory.getLogger(SecurityUserCache.class);
+
+    private static final String KEY_PREFIX = "user:";
+
     /**
-     * 用户信息缓存
+     * 默认缓存时间（30分钟）
      */
-    private static final Map<String, SecurityUser> CACHE = new ConcurrentHashMap<>();
+    private static final long DEFAULT_TIMEOUT = 30;
+
+    /**
+     * 空用户默认缓存时间（30分钟）
+     */
+    private static final long DEFAULT_EMPTY_TIMEOUT = 2;
+
+    private static final TimeUnit DEFAULT_UNIT = TimeUnit.MINUTES;
+
+    /**
+     * 空用户对象
+     */
+    private static final SecurityUser EMPTY_USER = new SecurityUser();
 
     /**
      * 获取缓存中的用户信息。
@@ -32,8 +50,32 @@ public class SecurityUserCache {
      * @return 如果缓存中存在该用户，返回 {@link SecurityUser} 对象，否则返回 null
      */
     public static SecurityUser get(String userId) {
-        // 从缓存中获取用户信息
-        return CACHE.get(userId);
+        if (userId == null) {
+            return null;
+        }
+        SecurityUser securityUser = GlobalCache.get(buildKey(userId));
+        return securityUser == EMPTY_USER ? null : securityUser;
+    }
+
+    /**
+     * 获取或加载缓存（推荐方式）。
+     *
+     * @param userId 用户标识
+     * @param loader 用户加载函数
+     * @return 如果缓存中存在该用户，返回 {@link SecurityUser} 对象，否则加载用户信息
+     */
+    public static SecurityUser getOrLoad(String userId, Function<String, SecurityUser> loader) {
+        String key = buildKey(userId);
+        Object cached = GlobalCache.get(key);
+        if (cached != null) {
+            return cached == EMPTY_USER ? null : (SecurityUser) cached;
+        }
+
+        // load user
+        SecurityUser securityUser = loader.apply(userId);
+        long ttl = (securityUser != null) ? DEFAULT_TIMEOUT : DEFAULT_EMPTY_TIMEOUT;
+        GlobalCache.put(key, securityUser != null ? securityUser : EMPTY_USER, GlobalCache.jitter(ttl), DEFAULT_UNIT);
+        return securityUser;
     }
 
     /**
@@ -44,37 +86,25 @@ public class SecurityUserCache {
      */
     public static SecurityUser put(String userId, SecurityUser securityUser) {
         if (userId != null && securityUser != null) {
-            CACHE.put(userId, securityUser);
-            if (log.isDebugEnabled()) {
-                log.debug("add user cache: {}", userId);
-            }
-            return securityUser;
+            GlobalCache.put(buildKey(userId), securityUser, GlobalCache.jitter(DEFAULT_TIMEOUT), DEFAULT_UNIT);
+            log.debug("add user cache: {}", userId);
         }
-        return null;
+        return securityUser;
     }
 
     /**
-     * 从缓存中移除指定的用户信息。
+     * 删除缓存（踢人/权限变更用）。
      *
      * @param userId 用户标识
      */
     public static void remove(String userId) {
         if (userId != null) {
-            CACHE.remove(userId);
-            if (log.isDebugEnabled()) {
-                log.debug("remove user cache: {}", userId);
-            }
+            GlobalCache.remove(buildKey(userId));
+            log.debug("remove user cache: {}", userId);
         }
     }
 
-    /**
-     * 清空缓存中的所有用户信息。
-     */
-    public static void clean() {
-        // 清空整个缓存
-        CACHE.clear();
-        if (log.isDebugEnabled()) {
-            log.debug("clear user cache");
-        }
+    private static String buildKey(String userId) {
+        return KEY_PREFIX + userId;
     }
 }

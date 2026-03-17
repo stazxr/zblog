@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.authn.userpass;
+package com.github.stazxr.zblog.bas.security.filter;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;

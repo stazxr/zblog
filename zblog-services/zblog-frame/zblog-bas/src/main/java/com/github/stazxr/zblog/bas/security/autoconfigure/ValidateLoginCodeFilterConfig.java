@@ -2,13 +2,13 @@ package com.github.stazxr.zblog.bas.security.autoconfigure;
 
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import com.github.stazxr.zblog.bas.security.filter.ParseLoginParamFilter;
 import com.github.stazxr.zblog.bas.security.filter.SecurityFilterChainCustomizer;
 import com.github.stazxr.zblog.bas.security.filter.ValidateLoginCodeFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * 验证码校验过滤器配置
@@ -39,6 +39,6 @@ public class ValidateLoginCodeFilterConfig {
 
     @Bean
     public SecurityFilterChainCustomizer validateLoginCodeFilterCustomizer(ValidateLoginCodeFilter validateLoginCodeFilter) {
-        return http -> http.addFilterAfter(validateLoginCodeFilter, ParseLoginParamFilter.class);
+        return http -> http.addFilterBefore(validateLoginCodeFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -25,8 +25,7 @@ public class Application {
             SpringApplication.run(Application.class, args);
             log.info("Application start successfully...");
         } catch (Exception e) {
-            log.error("Application start failed...");
+            log.error("Application start failed...", e);
         }
-
     }
 }

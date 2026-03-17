@@ -52,7 +52,11 @@ public class SecurityResourceServiceImpl implements SecurityResourceService {
             roles.add(DefaultRoleCode.FORBIDDEN);
         } else {
             Set<String> resourceRoles = doSelectResourceRoles(requestUri, requestMethod);
-            roles.addAll(resourceRoles);
+            if (resourceRoles == null || resourceRoles.isEmpty()) {
+                roles.add(DefaultRoleCode.NONE);
+            } else {
+                roles.addAll(resourceRoles);
+            }
         }
         return roles;
     }
@@ -74,6 +78,7 @@ public class SecurityResourceServiceImpl implements SecurityResourceService {
         // 查找资源信息
         Resource resource = resourceCacheService.findResource(requestUri, requestMethod);
         if (resource == null) {
+            // 资源未纳管，则允许默认允许资源访问
             return RouterExtLevel.OPEN;
         } else {
             return resource.getResourceLevel();

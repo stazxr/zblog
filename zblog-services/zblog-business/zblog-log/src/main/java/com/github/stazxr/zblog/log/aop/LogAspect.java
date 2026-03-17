@@ -253,7 +253,7 @@ public class LogAspect {
 
     private String getLoginUser() {
         try {
-            return SecurityUtils.getLoginUsernameWithoutNull();
+            return SecurityUtils.getUserName();
         } catch (Exception e) {
             return "anonymous";
         }

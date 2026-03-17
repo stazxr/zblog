@@ -1,8 +1,5 @@
 package com.github.stazxr.zblog.bas.security.authn.userpass;
 
-import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -11,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -19,11 +15,8 @@ import org.springframework.stereotype.Component;
  * @author SunTao
  * @since 2024-11-18
  */
-@Component
-public class UserPassAuthenticationProvider extends DaoAuthenticationProvider implements InitializingBean {
+public class UserPassAuthenticationProvider extends DaoAuthenticationProvider {
     private boolean enableAdditionalChecks;
-
-    private SecurityExtProperties securityExtProperties;
 
     private UserDetailsChecker customPostAuthenticationChecks;
 
@@ -56,20 +49,12 @@ public class UserPassAuthenticationProvider extends DaoAuthenticationProvider im
         this.enableAdditionalChecks = enableAdditionalChecks;
     }
 
-    @Autowired
-    public void setSecurityExtProperties(SecurityExtProperties securityExtProperties) {
-        this.securityExtProperties = securityExtProperties;
-    }
-
-    @Autowired(required = false)
     public void setCustomPostAuthenticationChecks(UserDetailsChecker customPostAuthenticationChecks) {
         this.customPostAuthenticationChecks = customPostAuthenticationChecks;
     }
 
     @Override
-    protected void doAfterPropertiesSet() {
-        setEnableAdditionalChecks(securityExtProperties.isEnableAdditionalChecks());
-        setHideUserNotFoundExceptions(securityExtProperties.isHideUserNotFoundExceptions());
-        super.doAfterPropertiesSet();
+    public boolean supports(Class<?> authentication) {
+        return super.supports(authentication);
     }
 }

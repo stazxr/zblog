@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class ExceptionAdvice implements Ordered {
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);
+    private static final Logger log = LoggerFactory.getLogger(ExceptionAdvice.class);
 
     /**
      * 业务异常
@@ -35,7 +35,7 @@ public class ExceptionAdvice implements Ordered {
      */
     @ExceptionHandler(SystemException.class)
     public Result<Void> handleSystem(SystemException e) {
-        logger.error("SystemException occurred", e);
+        log.error("SystemException occurred", e);
         String errorCode = ErrorCode.DEFAULT_SYSTEM_ERROR_CODE;
         String errorMessage = e.getMessage();
         if (e.hasErrorCode()) {
@@ -55,7 +55,7 @@ public class ExceptionAdvice implements Ordered {
         } else if (e instanceof SystemException) {
             return handleSystem((SystemException) e);
         } else {
-            logger.error("Unknown BaseException occurred", e);
+            log.error("Unknown BaseException occurred", e);
             String errorCode = ErrorCode.DEFAULT_SYSTEM_ERROR_CODE;
             String errorMessage = e.getMessage();
             if (e.hasErrorCode()) {
@@ -70,7 +70,7 @@ public class ExceptionAdvice implements Ordered {
      */
     @ExceptionHandler(Throwable.class)
     public Result<Void> handleThrowable(Throwable e) {
-        logger.error("Unhandled exception occurred", e);
+        log.error("Unhandled exception occurred", e);
         String errorCode = ErrorCode.DEFAULT_SYSTEM_ERROR_CODE;
         String errorMessage = MessageSupportLoader.getMessage("error.system.unknown");
         return Result.failure(errorCode, errorMessage);

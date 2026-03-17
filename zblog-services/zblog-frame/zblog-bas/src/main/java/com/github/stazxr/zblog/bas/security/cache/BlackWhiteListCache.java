@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 管理 {IP} 和 {URI} 黑白名单的缓存类。
+ * 管理 {IP} 黑白名单的缓存类。
  * <p>
- * 提供线程安全的操作，用于检查 {IP} 和 {URI} 是否存在于黑名单或白名单中，
+ * 提供线程安全的操作，用于检查 {IP} 是否存在于黑名单或白名单中，
  * 并支持对名单的批量更新。
  * </p>
  *

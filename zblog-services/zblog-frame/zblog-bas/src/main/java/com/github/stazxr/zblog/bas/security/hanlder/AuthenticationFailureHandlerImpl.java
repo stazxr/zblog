@@ -1,15 +1,17 @@
 package com.github.stazxr.zblog.bas.security.hanlder;
 
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
-import com.github.stazxr.zblog.bas.security.exception.LoginNumCodeException;
+import com.github.stazxr.zblog.bas.security.exception.resolver.AuthenticationErrorResolver;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
@@ -26,10 +28,13 @@ import java.io.IOException;
  * @author SunTao
  * @since 2020-11-15
  */
-@Slf4j
 @Component
 public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHandler {
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationFailureHandlerImpl.class);
+
     private SecurityUserService securityUserService;
+
+    private AuthenticationErrorResolver authenticationErrorResolver;
 
     /**
      * 处理认证失败逻辑。
@@ -49,10 +54,10 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
         exceptionHandle(username, exception, request);
 
         // 生成返回结果
-        Result result = genResult(username, exception);
+        Result<String> result = genResult(username, exception);
 
         // 写入响应
-        ResponseUtils.responseJsonWriter(response, result);
+        ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -62,14 +67,10 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
      * @param exception 认证失败的具体异常
      * @return 封装的失败响应对象
      */
-    private Result genResult(String username, AuthenticationException exception) {
-        log.error("用户 [{}] 登录失败，异常信息：{}", username, exception.getMessage(), exception);
-
-        if (exception instanceof CredentialsExpiredException) {
-            return Result.failure("10002", errorMsg(exception)).data(username).code(HttpStatus.UNAUTHORIZED.value());
-        }
-
-        return Result.failure("10001", errorMsg(exception)).code(HttpStatus.UNAUTHORIZED.value());
+    private Result<String> genResult(String username, AuthenticationException exception) {
+        log.warn("用户登录失败 | username={} | reason={}", username, exception.getMessage());
+        ErrorCode errorCode = authenticationErrorResolver.resolve(exception);
+        return Result.<String>failure(errorCode.getCode(), I18nUtils.getMessage(errorCode.getI18nKey())).data(username);
     }
 
     /**
@@ -79,41 +80,10 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
      * @param exception 认证失败异常
      * @param request   当前 HTTP 请求
      */
-    private void exceptionHandle(String username, AuthenticationException exception, HttpServletRequest request) {
+    protected void exceptionHandle(String username, AuthenticationException exception, HttpServletRequest request) {
         if (exception instanceof BadCredentialsException) {
             // 密码错误逻辑：记录错误次数，满足规则时锁定用户
             securityUserService.updateUserLoginInfo(username, 2, request);
-        }
-
-        if (exception instanceof UsernameNotFoundException) {
-            // 用户不存在逻辑：记录IP访问次数，满足规则时拉黑IP
-            securityUserService.updateUserLoginInfo(username, 3, request);
-        }
-    }
-
-    /**
-     * 根据异常类型返回对应的错误提示信息。
-     *
-     * @param exception 认证失败异常
-     * @return 错误提示信息
-     */
-    private String errorMsg(AuthenticationException exception) {
-        if (exception instanceof LoginNumCodeException) {
-            return exception.getMessage();
-        } else if (exception instanceof UsernameNotFoundException) {
-            return "用户不存在";
-        } else if (exception instanceof LockedException) {
-            return "用户已锁定";
-        } else if (exception instanceof DisabledException) {
-            return "用户已禁用";
-        } else if (exception instanceof AccountExpiredException) {
-            return "用户已过期";
-        } else if (exception instanceof BadCredentialsException) {
-            return "密码错误";
-        } else if (exception instanceof CredentialsExpiredException) {
-            return "密码已过期，请修改密码";
-        } else {
-            return exception.getMessage();
         }
     }
 
@@ -121,5 +91,9 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
     public void setSecurityUserService(SecurityUserService securityUserService) {
         this.securityUserService = securityUserService;
     }
-}
 
+    @Autowired
+    public void setAuthenticationErrorResolver(AuthenticationErrorResolver authenticationErrorResolver) {
+        this.authenticationErrorResolver = authenticationErrorResolver;
+    }
+}

@@ -6,7 +6,6 @@ import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
-import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.ValidateLoginCodeFilter;
 import com.github.stazxr.zblog.base.domain.bo.LoginUser;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.service.ZblogService;
@@ -65,7 +64,7 @@ public class AuthController {
         Map<String, Object> data = new HashMap<>(2);
         Captcha captcha = captchaHandler.createCaptcha("loginCode");
         data.put("img", captcha.getBase64());
-        data.put(ValidateLoginCodeFilter.DEFAULT_CACHE_KEY, captcha.getCaptchaId());
+        data.put("uuid", captcha.getCaptchaId());
         return data;
     }
 

@@ -1,9 +1,12 @@
 package com.github.stazxr.zblog.bas.security.authn.userpass;
 
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
+import com.github.stazxr.zblog.bas.security.core.UserType;
+import com.github.stazxr.zblog.bas.security.exception.SystemUserDeniedException;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +45,14 @@ public class UserDetailsServiceImpl implements UserDetailsService, InitializingB
         SecurityUser securityUser = securityUserService.loginWithUsername(username);
         if (securityUser == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        // 系统用户被禁止登录
+        if (UserType.SYSTEM_USER.getType().equals(securityUser.getUserType())) {
+            throw new SystemUserDeniedException();
+        }
+        // 提前校验用户是否锁定，放在密码校验前
+        if (!securityUser.isAccountNonLocked()) {
+            throw new LockedException("用户已锁定");
         }
         return securityUser;
     }

@@ -4,14 +4,14 @@ import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.SecurityConstant;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
-import com.github.stazxr.zblog.bas.security.core.SecurityToken;
+import com.github.stazxr.zblog.bas.security.jwt.JwtContext;
 import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
-import com.github.stazxr.zblog.bas.security.service.SecurityTokenService;
 import com.github.stazxr.zblog.bas.security.sso.SsoToken;
 import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
 import com.github.stazxr.zblog.util.net.IpUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -29,12 +29,11 @@ import java.util.*;
  * @author SunTao
  * @since 2024-11-11
  */
-@Slf4j
 @Component
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
-    private JwtTokenGenerator jwtTokenGenerator;
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationSuccessHandlerImpl.class);
 
-    private SecurityTokenService userTokenService;
+    private JwtTokenGenerator jwtTokenGenerator;
 
     private SecurityUserService securityUserService;
 
@@ -56,12 +55,11 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             log.info("用户 {} 登录成功，IP: {}", securityUser.getUsername(), userIp);
 
             // 生成新的 Token
-            String token = jwtTokenGenerator.generateToken(request, userId, 1, null);
+            JwtContext jwtContext = new JwtContext();
+            jwtContext.setUserId(userId);
+            jwtContext.setLoginIp(userIp);
+            String token = jwtTokenGenerator.generateToken(jwtContext);
             log.debug("为用户 {} 生成了新的 Token: {}", userId, token);
-
-            // 存储 Token
-            SecurityToken userToken = new SecurityToken(userId, token);
-            userTokenService.saveToken(userToken);
 
             // 缓存 SSO Token
             SsoToken ssoToken = new SsoToken(userId, token, userIp);
@@ -84,11 +82,6 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
     @Autowired
     public void setJwtTokenGenerator(JwtTokenGenerator jwtTokenGenerator) {
         this.jwtTokenGenerator = jwtTokenGenerator;
-    }
-
-    @Autowired
-    public void setUserTokenService(SecurityTokenService userTokenService) {
-        this.userTokenService = userTokenService;
     }
 
     @Autowired

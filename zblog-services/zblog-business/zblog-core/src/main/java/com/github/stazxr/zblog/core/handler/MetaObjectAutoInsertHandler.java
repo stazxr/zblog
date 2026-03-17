@@ -44,7 +44,7 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         if (getFieldValByName(CREATE_USER, metaObject) == null) {
-            this.strictInsertFill(metaObject, CREATE_USER, Long.class, SecurityUtils.getLoginIdWithoutNull());
+            this.strictInsertFill(metaObject, CREATE_USER, Long.class, getLoginId());
         }
 
         if (getFieldValByName(CREATE_TIME, metaObject) == null) {
@@ -55,11 +55,19 @@ public class MetaObjectAutoInsertHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         if (getFieldValByName(UPDATE_USER, metaObject) == null) {
-            this.strictUpdateFill(metaObject, UPDATE_USER, Long.class, SecurityUtils.getLoginIdWithoutNull());
+            this.strictUpdateFill(metaObject, UPDATE_USER, Long.class, getLoginId());
         }
 
         if (getFieldValByName(UPDATE_TIME, metaObject) == null) {
             this.strictUpdateFill(metaObject, UPDATE_TIME, String.class, DateUtils.format(new Date(), TIME_PATTERN));
+        }
+    }
+
+    private Long getLoginId() {
+        try {
+            return SecurityUtils.getLoginId();
+        } catch (Exception e) {
+            return 1L;
         }
     }
 }

@@ -172,9 +172,8 @@ public class User extends SecurityUser {
         if (UserType.TEST_USER.getType().equals(getUserType()) || UserType.SYSTEM_USER.getType().equals(getUserType())) {
             return true;
         }
-        // 首次登录或密码未设置，需要重置密码
         if (passwordExpireTime == null) {
-            return false;
+            return true;
         }
         // 密码未过期返回 true，否则返回 false
         return LocalDateTime.now().isBefore(passwordExpireTime);
@@ -202,12 +201,7 @@ public class User extends SecurityUser {
      */
     @Override
     public boolean isEnabled() {
-        if (isAccountNonLocked()) {
-            // 用户未锁定
-            return !UserStatus.FORBID.getStatus().equals(getUserStatus());
-        }
-        // 用户已锁定
-        return true;
+        return !UserStatus.FORBID.getStatus().equals(getUserStatus());
     }
 
     @Override

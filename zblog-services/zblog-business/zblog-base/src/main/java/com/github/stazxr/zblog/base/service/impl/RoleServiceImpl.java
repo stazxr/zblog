@@ -255,10 +255,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         BaseConst.GlobalCacheKey resourceRolesKey = BaseConst.GlobalCacheKey.resourceRoles;
         String cacheKey = String.format(resourceRolesKey.getKey(), requestUri, requestMethod);
         return GlobalCache.getOrLoad(
-                cacheKey,
-                () -> roleMapper.selectResourceRoles(requestUri, requestMethod),
-                GlobalCache.jitter(resourceRolesKey.duration() * 1000L),
-                TimeUnit.MILLISECONDS
+            cacheKey,
+            () -> roleMapper.selectResourceRoles(requestUri, requestMethod),
+            GlobalCache.jitter(resourceRolesKey.duration() * 1000L),
+            TimeUnit.MILLISECONDS
         );
     }
 

@@ -3,11 +3,11 @@ package com.github.stazxr.zblog.bas.security.authz;
 import com.github.stazxr.zblog.bas.security.core.SecurityRole;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.core.UserType;
+import com.github.stazxr.zblog.bas.security.hanlder.AccessDeniedHandlerImpl;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class CustomAccessDecisionManager implements AccessDecisionManager {
+    private static final String ERROR_MESSAGE = "权限不足，请联系管理员";
+
     /**
      * 权限决策方法，根据请求的角色列表和用户的角色信息决定是否允许访问。
      * <p>决策规则：</p>
@@ -73,19 +76,17 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
 
         // 禁止测试用户执行增删改操作
         if (UserType.TEST_USER.getType().equals(userType) && allowRoles.contains(DefaultRoleCode.NO_TEST)) {
-            throw new AccessDeniedException("测试用户被禁止执行该操作，请使用其他用户操作");
+            throw new AccessDeniedException(AccessDeniedHandlerImpl.TEST);
         }
 
         // 特定角色判断
-        if (allowRoles.contains(DefaultRoleCode.NULL)) {
-            throw new AccessDeniedException("访问资源不存在");
-        } else if (allowRoles.contains(DefaultRoleCode.NONE)) {
-            throw new AccessDeniedException("没有权限");
+        if (allowRoles.contains(DefaultRoleCode.NONE)) {
+            throw new AccessDeniedException(ERROR_MESSAGE);
         } else if (allowRoles.contains(DefaultRoleCode.FORBIDDEN)) {
-            throw new AccessDeniedException("资源被禁止访问");
+            throw new AccessDeniedException(AccessDeniedHandlerImpl.FORBIDDEN);
         } else if (allowRoles.contains(DefaultRoleCode.PUBLIC)) {
             if (authentication instanceof AnonymousAuthenticationToken) {
-                throw new BadCredentialsException("未登录");
+                throw new InsufficientAuthenticationException("用户未登录或登录状态已失效");
             } else {
                 return;
             }
@@ -93,16 +94,15 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
             return;
         } else {
             // 用户角色校验，至少拥有目标资源中的一个角色
-            for (String roleCode : allowRoles) {
-                for (SecurityRole userRole : userRoles) {
-                    if (userRole.isEnabled() && userRole.getAuthority().equalsIgnoreCase(roleCode)) {
-                        return;
-                    }
+            Set<String> userRoleSet = userRoles.stream().filter(SecurityRole::isEnabled).map(SecurityRole::getAuthority).collect(Collectors.toSet());
+            for (String role : allowRoles) {
+                if (userRoleSet.contains(role)) {
+                    return;
                 }
             }
         }
 
-        throw new AccessDeniedException("权限不足，请联系管理员");
+        throw new AccessDeniedException(ERROR_MESSAGE);
     }
 
     /**

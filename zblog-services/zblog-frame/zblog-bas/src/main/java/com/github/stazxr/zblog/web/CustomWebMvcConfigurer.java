@@ -134,7 +134,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         }
         String fileUrlPathPrefix = accessPath.replaceFirst("^.+?://[^/]+", "") + "**";
         String fileLocalPathPrefix = "file:" + storagePath;
-        log.info("本地存储配置为>>> {} -> {}", fileLocalPathPrefix, fileUrlPathPrefix);
+        log.info("[LocalFileConfiguration] {} >>> {}", fileLocalPathPrefix, fileUrlPathPrefix);
         registry.addResourceHandler(fileUrlPathPrefix).addResourceLocations(fileLocalPathPrefix).setCachePeriod(3600);
 
         // 静态资源

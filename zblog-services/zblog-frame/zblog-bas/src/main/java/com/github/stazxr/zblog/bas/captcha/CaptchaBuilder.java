@@ -115,7 +115,7 @@ public class CaptchaBuilder {
 
                 // 计算结果
                 int res = new int[]{n1 + n2, n1 - n2, n1 * n2}[opt];
-                if (res < -1) {
+                if (res < 0) {
                     continue;
                 }
 

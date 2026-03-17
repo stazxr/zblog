@@ -1,20 +1,17 @@
 package com.github.stazxr.zblog.bas.security.service.impl;
 
-import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
-import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
-import com.github.stazxr.zblog.bas.security.service.SecurityTokenService;
 import com.github.stazxr.zblog.bas.security.service.SecurityLogoutService;
 import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
 import com.github.stazxr.zblog.util.net.IpUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -25,12 +22,8 @@ import java.util.Objects;
  * @author SunTao
  * @since 2024-11-16
  */
-@Slf4j
 public class SecurityLogoutServiceImpl implements SecurityLogoutService {
-    /**
-     * 安全令牌服务
-     */
-    private volatile SecurityTokenService securityTokenService;
+    private static final Logger log = LoggerFactory.getLogger(SecurityLogoutServiceImpl.class);
 
     /**
      * JWT Token 存储服务
@@ -51,17 +44,10 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
         boolean success = false;
         try {
             // 更新 JWT Token 状态为已过期
-            jwtTokenStorage.expire(userId);
-
-            // 更新安全令牌状态为已过期
-            securityTokenService.expireToken(userId);
+            jwtTokenStorage.remove(userId);
 
             // 移除缓存中的 SSO 令牌
             removeSsoToken();
-
-            // 移除缓存中相关信息
-            String preTknCacheKey = String.format(Locale.ROOT, JwtConstants.PTK_TOKEN_CACHE_KEY, userId);
-            GlobalCache.remove(preTknCacheKey);
 
             // 清理用户的缓存信息
             SecurityUserCache.remove(userId);
@@ -108,18 +94,12 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
      * </p>
      */
     private void initBeans() {
-        if (jwtTokenStorage == null || securityTokenService == null) {
+        if (jwtTokenStorage == null) {
             synchronized (SecurityLogoutServiceImpl.class) {
                 if (jwtTokenStorage == null) {
                     jwtTokenStorage = SpringContextHolder.getBean(JwtTokenStorage.class);
                     if (jwtTokenStorage == null) {
-                        throw new RuntimeException("未找到 JwtTokenStorage Bean");
-                    }
-                }
-                if (securityTokenService == null) {
-                    securityTokenService = SpringContextHolder.getBean(SecurityTokenService.class);
-                    if (securityTokenService == null) {
-                        throw new RuntimeException("未找到 SecurityTokenService Bean");
+                        throw new RuntimeException("未找到 JwtTokenStorage 实例");
                     }
                 }
             }

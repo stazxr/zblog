@@ -7,13 +7,11 @@ public class PasswordEncryptorTest {
     @Test
     public void testPasswordEncryptor() throws Exception {
         String password = "111111";
-        RsaUtils.RsaKeyPair rsaKeyPair = RsaUtils.generateKeyPair(1024);
+        RsaUtils.RsaKeyPair rsaKeyPair = RsaUtils.generateKeyPair(2048);
         System.out.println(rsaKeyPair.getPublicKey());
         System.out.println(rsaKeyPair.getPrivateKey());
         // String pubKeyBase64 = FileUtils.readFileFromStream(new ClassPathResource("pub.key").getInputStream());
         String encrypt = RsaUtils.encryptByPublicKey(rsaKeyPair.getPublicKey(), password);
-        System.out.println(encrypt);
-
         // String priKeyBase64 = FileUtils.readFileFromStream(new ClassPathResource("pri.key").getInputStream());
         String decrypt = RsaUtils.decryptByPrivateKey(rsaKeyPair.getPrivateKey(), encrypt);
         System.out.println(decrypt);

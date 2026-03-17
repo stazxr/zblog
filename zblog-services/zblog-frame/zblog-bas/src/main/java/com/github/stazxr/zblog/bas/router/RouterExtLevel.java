@@ -16,5 +16,6 @@ public class RouterExtLevel extends RouterLevel {
     /**
      * 404
      */
+    @Deprecated // 未纳管资源允许访问，404 由框架自己控制
     public static final int NULL = 16;
 }

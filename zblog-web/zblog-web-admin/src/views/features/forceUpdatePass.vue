@@ -104,9 +104,9 @@ export default {
   computed: {
     title() {
       if (this.type === '1') {
-        return '重置密码'
+        return '首次登录重置密码'
       } else if (this.type === '2') {
-        return '密码已过期'
+        return '密码过期修改密码'
       } else {
         return '修改密码'
       }
