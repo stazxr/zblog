@@ -7,8 +7,6 @@ import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.jwt.JwtContext;
 import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
-import com.github.stazxr.zblog.bas.security.sso.SsoToken;
-import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,11 +57,10 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             jwtContext.setUserId(userId);
             jwtContext.setLoginIp(userIp);
             String token = jwtTokenGenerator.generateToken(jwtContext);
-            log.debug("为用户 {} 生成了新的 Token: {}", userId, token);
 
-            // 缓存 SSO Token
-            SsoToken ssoToken = new SsoToken(userId, token, userIp);
-            SsoTokenCache.set(ssoToken);
+            // TODO 缓存 SSO Token
+            // SsoToken ssoToken = new SsoToken(userId, token, userIp);
+            // SsoTokenCache.set(ssoToken);
 
             // 记录用户登录日志
             int loginType = 1; // 登录成功

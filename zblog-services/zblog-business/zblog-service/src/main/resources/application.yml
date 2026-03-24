@@ -254,8 +254,8 @@ zblog:
       enable-additional-checks: false # 登录认证是否扩展额外检查规则
       # JWT 配置
       jwt:
-        access-token-duration: 180
-        refresh-token-duration: 360
+        access-token-duration: 1800
+        refresh-token-duration: 3600
         allowed-renew-token: true
         algorithm: RS256
         cert-info:

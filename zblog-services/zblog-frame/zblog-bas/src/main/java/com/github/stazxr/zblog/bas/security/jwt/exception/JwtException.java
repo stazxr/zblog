@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.jwt;
+package com.github.stazxr.zblog.bas.security.jwt.exception;
 
 /**
  * 自定义的 JWT 异常类，用于表示与 JWT 相关的错误。
@@ -7,6 +7,8 @@ package com.github.stazxr.zblog.bas.security.jwt;
  * @since 2022-08-18
  */
 public class JwtException extends RuntimeException {
+    private static final long serialVersionUID = 5284166305528495746L;
+
     /**
      * 默认构造函数
      */

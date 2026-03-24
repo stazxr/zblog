@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.security.jwt.decoder;
 
-import com.github.stazxr.zblog.bas.security.jwt.JwtException;
+import com.github.stazxr.zblog.bas.security.jwt.exception.JwtException;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 /**

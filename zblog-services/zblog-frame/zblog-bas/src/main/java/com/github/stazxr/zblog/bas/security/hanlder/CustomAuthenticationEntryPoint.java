@@ -44,7 +44,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         // 返回结果
         Result result = Result.failure(noticeMsg).data(errorMsg).code(HttpStatus.UNAUTHORIZED.value());
-        ResponseUtils.responseJsonWriter(response, result);
+        ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 
     /**

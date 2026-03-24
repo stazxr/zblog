@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2024-08-21
  */
 public class CaptchaCache {
-    public static final String CAPTCHA_CACHE_KEY = "captcha:";
+    public static final String CAPTCHA_CACHE_KEY = "CAPTCHA:";
 
     /**
      * 将验证码及其过期时间放入缓存中。

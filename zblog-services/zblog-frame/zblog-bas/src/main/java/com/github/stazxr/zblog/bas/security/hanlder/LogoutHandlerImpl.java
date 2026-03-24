@@ -2,7 +2,8 @@ package com.github.stazxr.zblog.bas.security.hanlder;
 
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.service.SecurityLogoutService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -18,9 +19,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author SunTao
  * @since 2024-11-18
  */
-@Slf4j
 @Component
 public class LogoutHandlerImpl implements LogoutHandler {
+    private static final Logger log = LoggerFactory.getLogger(LogoutHandlerImpl.class);
+
     private SecurityLogoutService securityLogoutService;
 
     /**
@@ -32,19 +34,11 @@ public class LogoutHandlerImpl implements LogoutHandler {
      */
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            log.warn("用户未登录，无法执行登出操作。");
+        if (authentication == null || authentication.getPrincipal() == null || !(authentication.getPrincipal() instanceof SecurityUser)) {
             return;
         }
 
-        // 获取当前用户信息
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof SecurityUser)) {
-            log.warn("无法识别的用户信息，登出操作被跳过。");
-            return;
-        }
-
-        SecurityUser user = (SecurityUser) principal;
+        SecurityUser user = (SecurityUser) authentication.getPrincipal();
         String username = user.getUsername();
         Long userId = user.getId();
 
@@ -54,9 +48,9 @@ public class LogoutHandlerImpl implements LogoutHandler {
         try {
             // 清除用户登录信息
             securityLogoutService.clearUserLoginInfo(String.valueOf(userId));
-            log.info("用户 [{}] (ID: {}) 的登录信息已清除。", username, userId);
+            log.info("用户 [{}] (ID: {}) 登出成功", username, userId);
         } catch (Exception e) {
-            log.error("用户 [{}] (ID: {}) 的登录信息清除失败：{}", username, userId, e.getMessage(), e);
+            log.error("用户 [{}] (ID: {}) 登出失败", username, userId, e);
         }
     }
 

@@ -4,10 +4,6 @@ import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.security.service.SecurityLogoutService;
-import com.github.stazxr.zblog.bas.security.sso.SsoTokenCache;
-import com.github.stazxr.zblog.util.net.IpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -23,8 +19,6 @@ import java.util.Objects;
  * @since 2024-11-16
  */
 public class SecurityLogoutServiceImpl implements SecurityLogoutService {
-    private static final Logger log = LoggerFactory.getLogger(SecurityLogoutServiceImpl.class);
-
     /**
      * JWT Token 存储服务
      */
@@ -47,7 +41,7 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
             jwtTokenStorage.remove(userId);
 
             // 移除缓存中的 SSO 令牌
-            removeSsoToken();
+            // removeSsoToken();
 
             // 清理用户的缓存信息
             SecurityUserCache.remove(userId);
@@ -60,13 +54,13 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
         }
     }
 
-    private void removeSsoToken() {
+    /* private void removeSsoToken() {
         try {
             SsoTokenCache.remove(IpUtils.getIp(getRequest()));
         } catch (Exception e) {
             log.error("Remove Sso Token Failed: {}", e.getMessage());
         }
-    }
+    } */
 
     /**
      * 在清理用户登录信息之前执行的操作。

@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.jwt;
+package com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -18,27 +18,22 @@ public class JwtProperties {
     /**
      * 访问令牌有效时间，单位为秒，默认值 30 分钟
      */
-    private int accessTokenDuration = 30 * 60;
+    private int accessTokenDuration = 1800;
 
     /**
-     * 刷新令牌有效时间，单位为秒，通常为访问令牌有效时间的两倍
+     * 刷新令牌有效时间，单位为秒，默认 7 天
      */
-    private int refreshTokenDuration = accessTokenDuration * 2;
+    private int refreshTokenDuration = 604800;
 
     /**
-     * 是否允许续签，默认不允许
+     * 是否允许续签，默认不允许（refreshToken 机制不生效）
      */
     private boolean allowedRenewToken = false;
 
     /**
-     * 续签判定阙值，单位为秒，当访问令牌剩余时间小于该值时，可进行续签操作
+     * 是否检查IP地址是否变化
      */
-    private int refreshMinDuration = accessTokenDuration / 6;
-
-    /**
-     * 最大续签次数，默认 5 次
-     */
-    private int maxVersion = 5;
+    private boolean checkIpChange = true;
 
     /**
      * JWT 签名算法 {@link com.nimbusds.jose.JWSAlgorithm}，默认为 RS256
@@ -103,9 +98,9 @@ public class JwtProperties {
         private String issuer;
 
         /**
-         * JWT 面向的用户
+         * JWT 面向的对象
          */
-        private String subject;
+        private String audience;
 
         public String getIssuer() {
             return issuer;
@@ -115,12 +110,12 @@ public class JwtProperties {
             this.issuer = issuer;
         }
 
-        public String getSubject() {
-            return subject;
+        public String getAudience() {
+            return audience;
         }
 
-        public void setSubject(String subject) {
-            this.subject = subject;
+        public void setAudience(String audience) {
+            this.audience = audience;
         }
     }
 
@@ -169,40 +164,12 @@ public class JwtProperties {
         return allowedRenewToken;
     }
 
-    /**
-     * 设置最小续签时间，单位为秒，必须小于 accessTokenDuration
-     *
-     * @param refreshMinDuration 最小续签时间，不能为负数且小于访问令牌有效时间
-     */
-    public void setRefreshMinDuration(int refreshMinDuration) {
-        if (refreshMinDuration < 0) {
-            throw new IllegalArgumentException(JWT_PREFIX + ".refresh-token-duration must not be negative.");
-        }
-
-        if (refreshMinDuration >= accessTokenDuration) {
-            throw new IllegalArgumentException(JWT_PREFIX + ".refresh-token-duration must be less then jwt.refresh-token-duration.");
-        }
-        this.refreshMinDuration = refreshMinDuration;
+    public boolean isCheckIpChange() {
+        return checkIpChange;
     }
 
-    public int getRefreshMinDuration() {
-        return refreshMinDuration;
-    }
-
-    /**
-     * 设置最大版本数
-     *
-     * @param maxVersion 最大版本数，不能为负数
-     */
-    public void setMaxVersion(int maxVersion) {
-        if (maxVersion < 0) {
-            throw new IllegalArgumentException(JWT_PREFIX + ".max-version must not be negative.");
-        }
-        this.maxVersion = maxVersion;
-    }
-
-    public int getMaxVersion() {
-        return maxVersion;
+    public void setCheckIpChange(boolean checkIpChange) {
+        this.checkIpChange = checkIpChange;
     }
 
     /**

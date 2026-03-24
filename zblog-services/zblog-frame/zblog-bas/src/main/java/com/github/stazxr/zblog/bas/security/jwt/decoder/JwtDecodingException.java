@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.security.jwt.decoder;
 
-import com.github.stazxr.zblog.bas.security.jwt.JwtException;
+import com.github.stazxr.zblog.bas.security.jwt.exception.JwtException;
 
 /**
  * 表示解码 JWT（JSON Web Token）过程中发生的异常。
@@ -12,6 +12,8 @@ import com.github.stazxr.zblog.bas.security.jwt.JwtException;
  * @since 2022-08-17
  */
 public class JwtDecodingException extends JwtException {
+	private static final long serialVersionUID = -7986811623699094018L;
+
 	/**
 	 * 使用指定的错误消息创建一个新的 {@code JwtDecodingException} 实例。
 	 *

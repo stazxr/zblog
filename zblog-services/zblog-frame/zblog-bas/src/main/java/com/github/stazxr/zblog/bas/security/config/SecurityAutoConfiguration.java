@@ -1,8 +1,6 @@
 package com.github.stazxr.zblog.bas.security.config;
 
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
-import com.github.stazxr.zblog.bas.security.authn.userpass.UserPassAuthenticationFilter;
-import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.ValidateLoginCodeFilter;
 import com.github.stazxr.zblog.bas.security.authz.CustomAccessDecisionManager;
 import com.github.stazxr.zblog.bas.security.authz.CustomSecurityInterceptorPostProcessor;
 import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheService;
@@ -10,18 +8,16 @@ import com.github.stazxr.zblog.bas.security.authz.metadata.ResourceCacheServiceI
 import com.github.stazxr.zblog.bas.security.authz.metadata.SecurityResourceServiceImpl;
 import com.github.stazxr.zblog.bas.security.authz.metadata.SecurityResourceService;
 import com.github.stazxr.zblog.bas.security.filter.IpCheckFilter;
-import com.github.stazxr.zblog.bas.security.filter.JwtAuthenticationFilter;
-import com.github.stazxr.zblog.bas.security.filter.ParseLoginParamFilter;
+import com.github.stazxr.zblog.bas.security.filter.SecurityFilterChainCustomizer;
 import com.github.stazxr.zblog.bas.security.service.SecurityRoleService;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
-import com.github.stazxr.zblog.bas.security.service.SecurityTokenService;
 import com.github.stazxr.zblog.bas.security.service.SecurityLogoutService;
-import com.github.stazxr.zblog.bas.security.service.impl.SecurityTokenServiceImpl;
 import com.github.stazxr.zblog.bas.security.service.impl.SecurityRoleServiceImpl;
 import com.github.stazxr.zblog.bas.security.service.impl.SecurityUserServiceImpl;
 import com.github.stazxr.zblog.bas.security.service.impl.SecurityLogoutServiceImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,24 +28,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.SecurityMetadataSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.web.filter.CorsFilter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Spring Security 自动配置类，提供了安全配置相关的 Bean 和定制化的 Web 安全配置。
@@ -60,125 +58,29 @@ import org.springframework.web.filter.CorsFilter;
  * @author SunTao
  * @since 2024-11-08
  */
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(SecurityExtProperties.class)
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityAutoConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(SecurityAutoConfiguration.class);
+
     /**
-     * Spring Security 配置
+     * Spring Security 默认配置
      */
     private final SecurityProperties securityProperties;
+
+    /**
+     * Spring Security 扩展配置
+     */
+    private final SecurityExtProperties securityExtProperties;
 
     /**
      * 创建安全配置相关的BEAN。
      */
     @Configuration
     class SecurityBeanConfig {
-        /**
-         * 提供一个 BCryptPasswordEncoder 实例，用于密码的加密与验证。
-         *
-         * 该方法定义了一个 Bean，通过 Spring 容器管理密码加密器。在 Spring Security 中，
-         * BCryptPasswordEncoder 是常用的加密实现，能够提供安全的加密算法并且支持加盐处理。
-         *
-         * @return 返回一个 BCryptPasswordEncoder 实例，用于处理密码的加密和校验。
-         */
-        @Bean("passwordEncoder")
-        public PasswordEncoder passwordEncoder() {
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            log.info("Use Default PasswordEncoder: {}", passwordEncoder);
-            return passwordEncoder;
-        }
-
-        /**
-         * 创建并返回一个 SecurityUserService 实例，处理与安全用户相关的业务逻辑。
-         *
-         * <p>该方法根据条件创建一个默认的 SecurityUserServiceImpl 实例。
-         * 基于 {@link org.springframework.boot.autoconfigure.security.SecurityProperties#getUser} 创建一个内存存储的用户。</p>
-         *
-         * <p>建议覆盖当前BEAN，实现基于DB或其他机制的安全用户服务。</p>
-         *
-         * <p>该方法仅在以下条件下创建 Bean：
-         * <li>1. Spring 容器中存在一个 PasswordEncoder 实例（用于密码加密与校验）。</li>
-         * <li>2. Spring 容器中不存在 SecurityUserService 的 Bean 实例（确保不会重复创建）。</li>
-         * </p>
-         *
-         * @param passwordEncoder 用于密码加密与校验的 PasswordEncoder 实例
-         * @return 返回一个 SecurityUserServiceImpl 实例
-         */
-        @Bean("securityUserService")
-        @ConditionalOnBean(PasswordEncoder.class)
-        @ConditionalOnMissingBean(SecurityUserService.class)
-        public SecurityUserService securityUserService(PasswordEncoder passwordEncoder) {
-            SecurityUserServiceImpl securityUserService = new SecurityUserServiceImpl(securityProperties, passwordEncoder);
-            log.info("Use Default SecurityUserService: {}", securityUserService);
-            return securityUserService;
-        }
-
-        /**
-         * 创建并返回一个 SecurityRoleService 实例。
-         *
-         * <p>该方法根据条件创建一个默认的 SecurityRoleServiceImpl 实例。
-         * SecurityRoleService 主要用于管理和操作用户角色、权限等信息。</p>
-         *
-         * <p>建议覆盖当前BEAN，实现基于DB或其他机制的更复杂的安全角色服务。</p>
-         *
-         * <p>该方法仅在 Spring 容器中没有 SecurityRoleService 类型的 Bean 时才会创建新的实例。</p>
-         *
-         * @return 返回一个 SecurityRoleServiceImpl 实例
-         */
-        @Bean("securityRoleService")
-        @ConditionalOnMissingBean(SecurityRoleService.class)
-        public SecurityRoleService securityRoleService() {
-            SecurityRoleServiceImpl securityRoleService = new SecurityRoleServiceImpl();
-            log.info("Use Default SecurityRoleService: {}", securityRoleService);
-            return securityRoleService;
-        }
-
-        /**
-         * 创建并注册一个默认的 {@link SecurityTokenService} 实例。
-         *
-         * <p>
-         * 该方法会在 Spring 容器中没有 {@link SecurityTokenService} 类型的 bean 时调用。
-         * 如果容器中已经存在该类型的 bean，则不会重复创建实例。
-         * </p>
-         *
-         * <p>建议覆盖当前BEAN，实现基于DB或其他机制的安全令牌服务。</p>
-         *
-         * <strong>注意：</strong>该服务处理与用户安全令牌相关的所有操作，如生成、验证和过期管理。
-         *
-         * @return 返回一个 {@link SecurityTokenService} 类型的 bean，默认实现为 {@link SecurityTokenServiceImpl}
-         */
-        @Bean("securityTokenService")
-        @ConditionalOnMissingBean(SecurityTokenService.class)
-        public SecurityTokenService securityTokenService() {
-            SecurityTokenServiceImpl securityTokenService = new SecurityTokenServiceImpl();
-            log.info("Use Default SecurityTokenService: {}", securityTokenService);
-            return securityTokenService;
-        }
-
-        /**
-         * 创建并注册一个默认的 {@link SecurityLogoutService} 实例。
-         *
-         * <p>
-         * 该方法会在 Spring 容器中没有 {@link SecurityLogoutService} 类型的 bean 时调用。
-         * 如果容器中已经存在该类型的 bean，则不会重复创建实例。
-         * </p>
-         *
-         * <strong>注意：</strong>该服务主要用于处理用户注销操作，清除用户的安全信息和令牌等内容。
-         *
-         * @return 返回一个 {@link SecurityLogoutService} 类型的 bean，默认实现为 {@link SecurityLogoutServiceImpl}
-         */
-        @Bean("securityLogoutService")
-        @ConditionalOnMissingBean(SecurityLogoutService.class)
-        public SecurityLogoutService securityLogoutService() {
-            SecurityLogoutServiceImpl securityLogoutService = new SecurityLogoutServiceImpl();
-            log.info("Use Default SecurityLogoutService: {}", securityLogoutService);
-            return securityLogoutService;
-        }
-
         /**
          * 创建并注册一个默认的 {@link ResourceCacheService} 实例。
          *
@@ -189,25 +91,38 @@ public class SecurityAutoConfiguration {
          *
          * <p>建议覆盖当前BEAN，实现基于DB或其他机制的资源缓存服务。</p>
          *
-         * <strong>注意：</strong>该服务用于处理与资源缓存相关的操作，如缓存资源文件、缓存策略、缓存过期等。
-         *
          * @return 返回一个 {@link ResourceCacheService} 类型的 bean，默认实现为 {@link ResourceCacheServiceImpl}
          */
         @Bean("resourceCacheService")
         @ConditionalOnMissingBean(ResourceCacheService.class)
         public ResourceCacheService resourceCacheService() {
             ResourceCacheServiceImpl resourceCacheService = new ResourceCacheServiceImpl();
-            log.info("Use Default ResourceCacheService: {}", resourceCacheService);
+            log.info("[AutoConfiguration] No custom ResourceCacheService bean found, " +
+                    "using default implementation: {}", ResourceCacheServiceImpl.class.getName());
             return resourceCacheService;
         }
 
         /**
-         * 创建并注册一个默认的 {@link SecurityResourceService} 实例。
+         * 创建并返回一个 SecurityRoleService 实例。
          *
-         * <p>
-         * 该方法会在 Spring 容器中没有 {@link SecurityResourceService} 类型的 bean 时调用。
-         * 如果容器中已经存在该类型的 bean，则不会重复创建实例。
-         * </p>
+         * <p>该方法根据条件创建一个默认的 SecurityRoleServiceImpl 实例。
+         * SecurityRoleService 主要用于管理和操作用户角色、权限等信息。</p>
+         *
+         * <p>建议覆盖当前BEAN，实现基于DB或其他机制的更复杂的安全角色服务。</p>
+         *
+         * @return 返回一个 SecurityRoleServiceImpl 实例
+         */
+        @Bean("securityRoleService")
+        @ConditionalOnMissingBean(SecurityRoleService.class)
+        public SecurityRoleService securityRoleService() {
+            SecurityRoleServiceImpl securityRoleService = new SecurityRoleServiceImpl();
+            log.info("[AutoConfiguration] No custom SecurityRoleService bean found, " +
+                    "using default implementation: {}", SecurityRoleServiceImpl.class.getName());
+            return securityRoleService;
+        }
+
+        /**
+         * 创建并注册一个默认的 {@link SecurityResourceService} 实例。
          *
          * <p>非必要不建议覆盖当前BEAN，可以通过覆写 {@link ResourceCacheService} 和 {@link SecurityRoleService} 进行定制。</p>
          *
@@ -221,10 +136,67 @@ public class SecurityAutoConfiguration {
          */
         @Bean("securityResourceService")
         @ConditionalOnMissingBean(SecurityResourceService.class)
-        public SecurityResourceService securityResourceService(ResourceCacheService resourceCacheService, SecurityRoleService securityRoleService) {
+        public SecurityResourceService securityResourceService(
+                ResourceCacheService resourceCacheService, SecurityRoleService securityRoleService) {
             SecurityResourceServiceImpl securityResourceService = new SecurityResourceServiceImpl(resourceCacheService, securityRoleService);
-            log.info("Use Default SecurityResourceService: {}", securityResourceService);
+            log.info("[AutoConfiguration] No custom SecurityResourceService bean found, " +
+                    "using default implementation: {}", SecurityResourceService.class.getName());
             return securityResourceService;
+        }
+
+        /**
+         * 提供一个 DelegatingPasswordEncoder 实例，用于密码的加密与验证。
+         *
+         * @return 返回一个 DelegatingPasswordEncoder 实例，用于处理密码的加密和校验。
+         */
+        @Bean("passwordEncoder")
+        @ConditionalOnMissingBean(PasswordEncoder.class)
+        public PasswordEncoder passwordEncoder() {
+            String idForEncode = "bcrypt";
+            Map<String, PasswordEncoder> encoders = new HashMap<>();
+            encoders.put("bcrypt", new BCryptPasswordEncoder(12));
+            encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
+            encoders.put("scrypt", new SCryptPasswordEncoder());
+            log.info("[AutoConfiguration] No custom PasswordEncoder bean found, " +
+                    "using default implementation: {}", DelegatingPasswordEncoder.class.getName());
+            return new DelegatingPasswordEncoder(idForEncode, encoders);
+        }
+
+        /**
+         * 创建并返回一个 SecurityUserService 实例，处理与安全用户相关的业务逻辑。
+         *
+         * <p>该方法根据条件创建一个默认的 SecurityUserServiceImpl 实例。
+         * 基于 {@link org.springframework.boot.autoconfigure.security.SecurityProperties#getUser} 创建一个内存存储的用户。</p>
+         *
+         * <p>建议覆盖当前BEAN，实现基于DB或其他机制的安全用户服务。</p>
+         *
+         * @param passwordEncoder 用于密码加密与校验的 PasswordEncoder 实例
+         * @return 返回一个 SecurityUserServiceImpl 实例
+         */
+        @Bean("securityUserService")
+        @ConditionalOnBean(PasswordEncoder.class)
+        @ConditionalOnMissingBean(SecurityUserService.class)
+        public SecurityUserService securityUserService(PasswordEncoder passwordEncoder) {
+            SecurityUserServiceImpl securityUserService = new SecurityUserServiceImpl(securityProperties, passwordEncoder);
+            log.info("[AutoConfiguration] No custom SecurityUserService bean found, " +
+                    "using default implementation: {}", SecurityUserServiceImpl.class.getName());
+            return securityUserService;
+        }
+
+        /**
+         * 创建并注册一个默认的 {@link SecurityLogoutService} 实例。
+         *
+         * <strong>注意：</strong>该服务主要用于处理用户注销操作，清除用户的安全信息和令牌等内容。
+         *
+         * @return 返回一个 {@link SecurityLogoutService} 类型的 bean，默认实现为 {@link SecurityLogoutServiceImpl}
+         */
+        @Bean("securityLogoutService")
+        @ConditionalOnMissingBean(SecurityLogoutService.class)
+        public SecurityLogoutService securityLogoutService() {
+            SecurityLogoutServiceImpl securityLogoutService = new SecurityLogoutServiceImpl();
+            log.info("[AutoConfiguration] No custom SecurityLogoutService bean found, " +
+                    "using default implementation: {}", SecurityLogoutServiceImpl.class.getName());
+            return securityLogoutService;
         }
     }
 
@@ -244,6 +216,9 @@ public class SecurityAutoConfiguration {
          */
         private final SecurityExtProperties securityExtProperties;
 
+        /** 自定义过滤器链配置 */
+        private final List<SecurityFilterChainCustomizer> customizers;
+
         /**
          *
          */
@@ -253,10 +228,6 @@ public class SecurityAutoConfiguration {
          *
          */
         private final AuthenticationFailureHandler authenticationFailureHandler;
-
-
-
-        private final DaoAuthenticationProvider daoAuthenticationProvider;
 
         private final LogoutHandler logoutHandler;
 
@@ -268,32 +239,9 @@ public class SecurityAutoConfiguration {
 
         private final IpCheckFilter ipCheckFilter;
 
-        private final ValidateLoginCodeFilter validateLoginCodeFilter;
-
-        private final ParseLoginParamFilter parseLoginParamFilter;
-
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
         private final SecurityMetadataSource securityMetadataSource;
 
         private final CustomAccessDecisionManager accessDecisionManager;
-
-        @Bean
-        @Override
-        public AuthenticationManager authenticationManagerBean() throws Exception {
-            return super.authenticationManagerBean();
-        }
-
-        @Bean
-        public UserPassAuthenticationFilter userPassAuthenticationFilter() throws Exception {
-            UserPassAuthenticationFilter authenticationFilter = new UserPassAuthenticationFilter();
-            authenticationFilter.setAuthenticationManager(authenticationManagerBean());
-            authenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-            authenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-            authenticationFilter.setFilterProcessesUrl(securityExtProperties.getLoginUrl());
-            authenticationFilter.setAllowSessionCreation(false);
-            return authenticationFilter;
-        }
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -312,6 +260,7 @@ public class SecurityAutoConfiguration {
 
             // 登出配置
             http.logout().logoutUrl(securityExtProperties.getLogoutUrl())
+                    .invalidateHttpSession(false)
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler(logoutSuccessHandler);
 
@@ -321,21 +270,15 @@ public class SecurityAutoConfiguration {
 
             // 配置过滤器链，see: FilterOrderRegistration
             http.addFilterBefore(ipCheckFilter, LogoutFilter.class);
-            http.addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
-            http.addFilterBefore(parseLoginParamFilter, UsernamePasswordAuthenticationFilter.class);
-            http.addFilterAfter(validateLoginCodeFilter, ParseLoginParamFilter.class);
-            http.addFilterAt(userPassAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            for (SecurityFilterChainCustomizer customizer : customizers) {
+                customizer.customize(http);
+            }
 
             // 防止iframe 造成跨域
             http.headers().frameOptions().disable();
 
             // 关闭CSRF保护, 开启跨域资源共享
             http.csrf().disable().cors();
-        }
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) {
-            auth.authenticationProvider(daoAuthenticationProvider);
         }
 
         @Override

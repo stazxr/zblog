@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.security.jwt.encoder;
 
-import com.github.stazxr.zblog.bas.security.jwt.JwtException;
+import com.github.stazxr.zblog.bas.security.jwt.exception.JwtException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jwt.JWTClaimsSet;
 

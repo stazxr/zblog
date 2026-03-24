@@ -12,7 +12,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.produce.JWSSignerFactory;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -56,7 +55,9 @@ public class NimbusJwsEncoder extends BaseJwkSourceHandler implements JwtEncoder
      * @throws IllegalArgumentException 如果 jwkSource 为 null
      */
     public NimbusJwsEncoder(JWKSource<SecurityContext> jwkSource) {
-        Assert.notNull(jwkSource, "jwkSource cannot be null");
+        if (jwkSource == null) {
+            throw new IllegalStateException("jwkSource cannot be null");
+        }
         this.jwkSource = jwkSource;
     }
 

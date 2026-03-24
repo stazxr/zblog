@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.bas.security.jwt.decoder;
 
 import com.github.stazxr.zblog.bas.security.jwt.BaseJwkSourceHandler;
-import com.github.stazxr.zblog.util.Assert;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -10,6 +9,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import java.util.Date;
 
 /**
  * 基于 Nimbus 库实现的 JWS 解码器，用于将 JWS（JSON Web Signature）解码为 JWT（JSON Web Token）。
@@ -38,7 +39,9 @@ public class NimbusJwsDecoder extends BaseJwkSourceHandler implements JwtDecoder
      * @throws IllegalArgumentException 如果 jwkSource 为 null
      */
     public NimbusJwsDecoder(JWKSource<SecurityContext> jwkSource) {
-        Assert.notNull(jwkSource, "jwkSource cannot be null");
+        if (jwkSource == null) {
+            throw new IllegalStateException("jwkSource cannot be null");
+        }
         this.jwkSource = jwkSource;
     }
 
@@ -69,7 +72,9 @@ public class NimbusJwsDecoder extends BaseJwkSourceHandler implements JwtDecoder
         }
 
         // 校验 JWT 声明集是否为空
-        Assert.notNull(jwtClaimsSet, String.format(DECODING_ERROR_MESSAGE_TEMPLATE, "jwt claims set is null"));
+        if (jwtClaimsSet == null) {
+            throw new JwtDecodingException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE, "jwt claims set is null"));
+        }
 
         // 获取 JWS 头部并从中选择 JWK
         JWSHeader header = signedJwt.getHeader();
@@ -85,7 +90,12 @@ public class NimbusJwsDecoder extends BaseJwkSourceHandler implements JwtDecoder
         }
 
         if (!verify) {
-            throw new JwtDecodingException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE, "The JWS signature is valid: " + jws));
+            throw new JwtDecodingException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE, "The JWS signature is invalid: " + jws));
+        }
+
+        Date notBeforeTime = jwtClaimsSet.getNotBeforeTime();
+        if (notBeforeTime != null && new Date().before(notBeforeTime)) {
+            throw new JwtDecodingException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE, "The JWS is not active: " + jws));
         }
 
         return jwtClaimsSet;

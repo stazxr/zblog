@@ -1,5 +1,6 @@
-package com.github.stazxr.zblog.bas.security.exception;
+package com.github.stazxr.zblog.bas.security.jwt.exception;
 
+import com.github.stazxr.zblog.bas.security.core.TokenError;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -13,15 +14,38 @@ import org.springframework.security.core.AuthenticationException;
  * @author SunTao
  * @since 2024-11-18
  */
-public class PreJwtCheckAuthenticationException extends AuthenticationException {
+public class JwtAuthenticationException extends AuthenticationException {
     private static final long serialVersionUID = 2399675277250587214L;
+
+    private TokenError tokenError;
+
+    /**
+     * 构造方法，接受自定义异常消息。
+     *
+     * @param tokenError JWT Token 错误码
+     */
+    public JwtAuthenticationException(TokenError tokenError) {
+        super(tokenError.getMessage());
+        this.tokenError = tokenError;
+    }
+
+    /**
+     * 构造方法，接受自定义异常消息。
+     *
+     * @param tokenError JWT Token 错误码
+     * @param cause 异常原因，用于追踪问题的根本原因。
+     */
+    public JwtAuthenticationException(TokenError tokenError, Throwable cause) {
+        super(tokenError.getMessage(), cause);
+        this.tokenError = tokenError;
+    }
 
     /**
      * 构造方法，接受自定义异常消息。
      *
      * @param msg 异常消息，用于描述认证失败的原因。
      */
-    public PreJwtCheckAuthenticationException(String msg) {
+    public JwtAuthenticationException(String msg) {
         super(msg);
     }
 
@@ -31,7 +55,7 @@ public class PreJwtCheckAuthenticationException extends AuthenticationException 
      * @param msg   异常消息，用于描述认证失败的原因。
      * @param cause 异常原因，用于追踪问题的根本原因。
      */
-    public PreJwtCheckAuthenticationException(String msg, Throwable cause) {
+    public JwtAuthenticationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
@@ -40,8 +64,11 @@ public class PreJwtCheckAuthenticationException extends AuthenticationException 
      *
      * @param e 原始的 {@link AuthenticationException}。
      */
-    public PreJwtCheckAuthenticationException(AuthenticationException e) {
+    public JwtAuthenticationException(AuthenticationException e) {
         super(e.getMessage(), e.getCause());
     }
-}
 
+    public TokenError getTokenError() {
+        return tokenError;
+    }
+}
