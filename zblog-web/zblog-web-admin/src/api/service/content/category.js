@@ -1,18 +1,18 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const categoryApi = '/api/categories'
 
 export default {
-  // 查询类别树列表
-  queryCategoryTreeList: params => {
-    return api.httpRequest().get(`${categoryApi}/treeList`, params)
+  // 查询分类树列表
+  queryCategoryTree: params => {
+    return api.httpRequest().get(`${categoryApi}/queryCategoryTree`, params)
   },
   // 查询一级类别列表
   queryFirstCategoryList: params => {
     return api.httpRequest().get(`${categoryApi}/queryFirstCategoryList`, params)
   },
-  // 查询类别详情
+  // 查询分类详情
   queryCategoryDetail: params => {
     return api.httpRequest().get(`${categoryApi}/queryCategoryDetail`, params)
   },
