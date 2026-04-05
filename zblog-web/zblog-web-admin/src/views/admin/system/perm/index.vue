@@ -99,7 +99,7 @@
             <el-tag v-else type="warning">禁用</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="menuSort" label="排序" align="center" width="80px">
+        <el-table-column prop="sort" label="排序" align="center" width="80px">
           <template v-slot="scope">
             {{ scope.row.sort }}
           </template>

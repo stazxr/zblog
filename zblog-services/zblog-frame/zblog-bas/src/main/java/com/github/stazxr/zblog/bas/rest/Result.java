@@ -82,6 +82,7 @@ public final class Result<T> implements Serializable {
         return this;
     }
 
+    @Deprecated
     public Result<T> code(int httpStatus) {
         this.code = httpStatus;
         return this;

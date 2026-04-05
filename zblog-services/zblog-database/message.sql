@@ -230,4 +230,29 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('FILE_UPLOAD_WITH_DB_FAILED', 'zh-CN', '上传失败，数据库异常，请稍后再试', 'common'),
 ('FILE_UPLOAD_WITH_DB_FAILED', 'en-US', 'Upload failed due to a database error. Please try again later', 'common'),
 ('FILE_DELETE_WITH_BUSINESS', 'zh-CN', '文件已关联业务数据，无法删除', 'common'),
-('FILE_DELETE_WITH_BUSINESS', 'en-US', 'The file is associated with business data and cannot be deleted', 'common');
+('FILE_DELETE_WITH_BUSINESS', 'en-US', 'The file is associated with business data and cannot be deleted', 'common'),
+-- 分类相关
+('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
+('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),
+('CATEGORY_SLUG_REQUIRED', 'zh-CN', '分类 SLUG 不能为空', 'common'),
+('CATEGORY_SLUG_REQUIRED', 'en-US', 'Category slug cannot be blank', 'common'),
+('CATEGORY_ALLOWINDEX_REQUIRED', 'zh-CN', '分类是否允许搜索引擎收录不能为空', 'common'),
+('CATEGORY_ALLOWINDEX_REQUIRED', 'en-US', 'Category allowIndex cannot be blank', 'common'),
+('CATEGORY_ENABLED_REQUIRED', 'zh-CN', '分类状态不能为空', 'common'),
+('CATEGORY_ENABLED_REQUIRED', 'en-US', 'Category status cannot be blank', 'common'),
+('CATEGORY_VISIBLE_REQUIRED', 'zh-CN', '分类是否前台显示不能为空', 'common'),
+('CATEGORY_VISIBLE_REQUIRED', 'en-US', 'Category visible cannot be blank', 'common'),
+('CATEGORY_NAME_EXISTS', 'zh-CN', '分类名称已存在', 'common'),
+('CATEGORY_NAME_EXISTS', 'en-US', 'Category name exist', 'common'),
+('CATEGORY_SLUG_EXISTS', 'zh-CN', '分类 SLUG 已存在', 'common'),
+('CATEGORY_SLUG_EXISTS', 'en-US', 'Category slug exist', 'common'),
+('CATEGORY_DELETE_WITH_CHILDREN', 'zh-CN', '存在子分类，无法删除，请先删除子分类', 'common'),
+('CATEGORY_DELETE_WITH_CHILDREN', 'en-US', 'Cannot delete category with child nodes', 'common'),
+('CATEGORY_DELETE_WITH_ARTICLE', 'zh-CN', '分类下存在文章，无法删除，请先迁移文章到其他分类', 'common'),
+('CATEGORY_DELETE_WITH_ARTICLE', 'en-US', 'Category is associated with articles. please unbind before deletion', 'common');
+-- 标签
+
+-- 文章
+
+-- 栏目
+

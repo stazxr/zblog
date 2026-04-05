@@ -173,7 +173,7 @@ public interface PortalService {
      *
      * @return CategoryList
      */
-    List<ArticleCategoryVo> queryCategoryList();
+    List<CategoryVo> queryCategoryList();
 
     /**
      * 查询前台归档列表
@@ -189,7 +189,7 @@ public interface PortalService {
      * @param categoryId 查询详情
      * @return CategoryVo
      */
-    ArticleCategoryVo queryCategoryById(Long categoryId);
+    CategoryVo queryCategoryById(Long categoryId);
 
     /**
      * 查询前台标签详情
@@ -235,7 +235,7 @@ public interface PortalService {
      *
      * @return CategoryVos
      */
-    List<ArticleCategoryVo> queryBoardCategoryList();
+    List<CategoryVo> queryBoardCategoryList();
 
     /**
      * 获取最新评论列表

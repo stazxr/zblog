@@ -9,29 +9,15 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-02-06
  */
 public enum RoleErrorCode implements ErrorCode {
-    /**
-     * 角色名称已存在
-     */
+    /** 角色名称已存在 */
     EROLEA000("ROLE_ROLENAME_EXISTS"),
-
-    /**
-     * 角色编码已存在
-     */
+    /** 角色编码已存在 */
     EROLEA001("ROLE_ROLECODE_EXISTS"),
-
-    /**
-     * 角色编码格式不正确
-     */
+    /** 角色编码格式不正确 */
     EROLEA002("ROLE_ROLECODE_PATTERN_INVALID"),
-
-    /**
-     * 角色编码不可用
-     */
+    /** 角色编码不可用 */
     EROLEA003("ROLE_ROLECODE_DISABLED"),
-
-    /**
-     * 角色已与用户关联
-     */
+    /** 角色已与用户关联 */
     EROLEA004("ROLE_DELETE_WITH_USER");
 
     private final String i18nKey;

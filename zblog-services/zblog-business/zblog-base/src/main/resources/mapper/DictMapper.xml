@@ -24,9 +24,9 @@
 
     <select id="selectDictDetail" resultType="com.github.stazxr.zblog.base.domain.vo.DictVo">
         SELECT
-            ID, PID, DICT_NAME, DICT_TYPE, DICT_KEY, DICT_VALUE, DICT_SORT, DICT_DESC, ENABLED,
-            CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME,
-            (SELECT COUNT(1) FROM dict WHERE PID = d.ID AND DELETED = 0) subCount,
+            d.ID, d.PID, d.DICT_NAME, d.DICT_TYPE, d.DICT_KEY, d.DICT_VALUE, d.DICT_SORT, d.DICT_DESC, d.ENABLED,
+            d.CREATE_USER, d.CREATE_TIME, d.UPDATE_USER, d.UPDATE_TIME,
+            (SELECT COUNT(1) FROM dict d2 WHERE d2.PID = d.ID AND DELETED = 0) AS subCount,
             (SELECT USERNAME FROM user u WHERE u.ID = d.CREATE_USER) AS CREATE_USERNAME,
             (SELECT USERNAME FROM user u WHERE u.ID = d.UPDATE_USER) AS UPDATE_USERNAME
         FROM dict d WHERE DELETED = 0 AND ID = #{dictId}

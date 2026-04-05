@@ -164,6 +164,7 @@ function responseJsonHandler(result) {
       return Promise.reject(new Error(message || '操作失败'))
     }
   } else if (code === 401) {
+    console.log('result401', result)
     const identifier = result.identifier || 10001
     if (identifier === 10001) {
       Message.error(result.message || '登录失败')
@@ -181,10 +182,8 @@ function responseJsonHandler(result) {
       Message.error(result.message || '请登录')
       logout(false)
     }
-  } else if (code === 404) {
-    Message.error(result.message || '请求资源不存在')
-    return Promise.reject(new Error(result.message || '404'))
   } else {
+    console.log('result-unknown', result)
     Message.error(result.message || '系统发生未知错误')
     return Promise.reject(new Error(result.message || '系统发生未知错误'))
   }

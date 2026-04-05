@@ -8,7 +8,7 @@ package com.github.stazxr.zblog.base.domain.enums;
  */
 public final class BasUploadBusinessType {
     /**
-     * 头像上传
+     * 用户头像
      */
     public static final Integer HEADER_IMG = 0;
 }

@@ -63,9 +63,9 @@ export default {
     }
   },
   methods: {
-    initData(roleId) {
+    initData(dataId) {
       this.$nextTick(() => {
-        this.queryDetail(roleId)
+        this.queryDetail(dataId)
       })
     },
     queryDetail(dataId) {

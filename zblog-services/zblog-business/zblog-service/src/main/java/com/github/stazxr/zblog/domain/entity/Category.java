@@ -2,7 +2,6 @@ package com.github.stazxr.zblog.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
@@ -16,16 +15,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("article_category")
-public class ArticleCategory extends BaseEntity {
+@TableName("category")
+public class Category extends BaseEntity {
+    private static final long serialVersionUID = -3089181571970402860L;
+
     /**
-     * 主键
+     * 分类ID
      */
     @TableId
     private Long id;
 
     /**
-     * 上级分类
+     * 父分类ID
      */
     @TableField(value = "`PID`")
     private Long pid;
@@ -37,15 +38,39 @@ public class ArticleCategory extends BaseEntity {
     private String name;
 
     /**
-     * 分类预览图
+     * 唯一标识(URL)
+     */
+    private String slug;
+
+    /**
+     * 分类图片
      */
     private String imageUrl;
 
     /**
      * 分类描述
      */
-    @TableField(value = "`DESC`")
-    private String desc;
+    private String description;
+
+    /**
+     * SEO标题
+     */
+    private String seoTitle;
+
+    /**
+     * SEO关键词
+     */
+    private String seoKeywords;
+
+    /**
+     * SEO描述
+     */
+    private String seoDescription;
+
+    /**
+     * 是否允许搜索引擎收录
+     */
+    private Boolean allowIndex;
 
     /**
      * 排序
@@ -58,8 +83,7 @@ public class ArticleCategory extends BaseEntity {
     private Boolean enabled;
 
     /**
-     * 是否已删除（逻辑操作，保护数据）
+     * 是否前台展示
      */
-    @TableLogic
-    private Boolean deleted;
+    private Boolean visible;
 }

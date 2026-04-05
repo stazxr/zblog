@@ -5,7 +5,7 @@ module.exports = {
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:19992',
+        target: 'http://localhost:8081',
         // target: 'https://www.suntaoblog.com',
         changeOrigin: true,
         pathRewrite: {

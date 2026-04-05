@@ -131,9 +131,9 @@ export default {
     }
   },
   methods: {
-    initData(userId) {
+    initData(dataId) {
       this.$nextTick(() => {
-        this.queryDetail(userId)
+        this.queryDetail(dataId)
       })
     },
     queryDetail(dataId) {

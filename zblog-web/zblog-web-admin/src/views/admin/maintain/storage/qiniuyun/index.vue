@@ -11,7 +11,7 @@
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-businessType">
             <el-select id="search-businessType" v-model="filters.businessType" placeholder="业务类型" clearable @change="search">
-              <el-option label="用户头像" value="0" />
+              <el-option v-for="item in businessTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-hasBusiness">
@@ -87,12 +87,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="fileMd5" label="文件MD5" align="center" width="240px" />
         <el-table-column :show-overflow-tooltip="true" prop="businessType" label="业务类型" align="center" width="120px">
           <template v-slot="scope">
-            <span v-if="scope.row['businessType'] === 0">用户头像</span>
-            <span v-else-if="scope.row['businessType'] === 1">待定</span>
-            <span v-else-if="scope.row['businessType'] === 2">待定</span>
-            <span v-else-if="scope.row['businessType'] === 3">待定</span>
-            <span v-else-if="scope.row['businessType'] === 4">待定</span>
-            <span v-else />
+            {{ businessTypeMap.get(scope.row.businessType) || '' }}
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="createUsername" label="上传用户" align="center" width="100px" />
@@ -143,6 +138,7 @@ export default {
         createStartTime: null,
         createEndTime: null
       },
+      businessTypeList: [],
       tableData: [],
       tableLoading: false,
       nodataImg: nodataImg,
@@ -153,14 +149,32 @@ export default {
       uploadFileDialogVisible: false
     }
   },
+  computed: {
+    businessTypeMap() {
+      const map = new Map()
+      this.businessTypeList.forEach(item => {
+        map.set(Number(item.value), item.name)
+      })
+      return map
+    }
+  },
   methods: {
     initData() {
       this.$nextTick(() => {
         this.listTableData()
       })
+      this.loadBusinessTypeList()
     },
     handleCurrentChange(row) {
       this.row = row
+    },
+    loadBusinessTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FILE_BUSINESS_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.businessTypeList = data
+      }).catch(_ => {
+        this.businessTypeList = []
+      })
     },
     // 查询
     search() {

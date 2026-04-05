@@ -1,3 +1,4 @@
+// base
 import communal from '@/api/communal.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
@@ -14,9 +15,11 @@ import file from '@/api/base/maintain/file.js'
 import cache from '@/api/base/maintain/cache.js'
 import session from '@/api/base/maintain/session.js'
 
+// service
+import category from '@/api/service/content/category.js'
+
 // TODO
 import column from '@/api/service/column.js'
-import category from '@/api/service/category.js'
 import tag from '@/api/service/tag.js'
 import article from '@/api/service/article.js'
 import webSetting from '@/api/service/webSetting.js'
@@ -33,6 +36,6 @@ export default {
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,
-
-  column, category, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
+  category,
+  column, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

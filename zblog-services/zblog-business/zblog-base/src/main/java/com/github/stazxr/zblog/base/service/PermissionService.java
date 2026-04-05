@@ -17,10 +17,10 @@ import java.util.List;
  */
 public interface PermissionService extends IService<Permission> {
     /**
-     * 查询权限列表（树）
+     * 查询权限树列表
      *
      * @param queryDto 查询参数
-     * @return PermissionVoList
+     * @return List<PermissionVo>
      */
     List<PermissionVo> queryPermTree(PermissionQueryDto queryDto);
 

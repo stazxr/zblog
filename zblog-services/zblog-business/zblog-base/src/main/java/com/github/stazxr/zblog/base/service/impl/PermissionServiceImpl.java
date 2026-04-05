@@ -48,10 +48,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private final ResourceCacheService resourceCacheService;
 
     /**
-     * 查询权限列表（树）
+     * 查询权限树列表
      *
      * @param queryDto 查询参数
-     * @return permsList
+     * @return List<PermissionVo>
      */
     @Override
     public List<PermissionVo> queryPermTree(PermissionQueryDto queryDto) {
