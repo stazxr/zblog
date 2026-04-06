@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.domain.bo;
 
 import com.github.stazxr.zblog.core.base.BaseVo;
-import com.github.stazxr.zblog.domain.vo.ArticleTagVo;
+import com.github.stazxr.zblog.domain.vo.TagVo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -94,7 +94,7 @@ public class ArticlePagePortalData extends BaseVo {
     /**
      * 标签明细列表
      */
-    private List<ArticleTagVo> tagList;
+    private List<TagVo> tagList;
 
     /**
      * 封面链接列表

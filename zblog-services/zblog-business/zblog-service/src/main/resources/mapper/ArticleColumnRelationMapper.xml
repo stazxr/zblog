@@ -12,7 +12,7 @@
         <result property="authorGender" column="AUTHOR_GENDER" />
         <result property="createTime" column="CREATE_TIME" />
         <result property="updateTime" column="UPDATE_TIME" />
-        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.ArticleTagVo" select="selectArticleTagList" column="ID" />
+        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.TagVo" select="selectArticleTagList" column="ID" />
         <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />
     </resultMap>
 
@@ -65,7 +65,7 @@
         ORDER BY acr.SORT
     </select>
 
-    <select id="selectArticleTagList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTagVo">
+    <select id="selectArticleTagList" resultType="com.github.stazxr.zblog.domain.vo.TagVo">
         SELECT
             ata.ID, ata.NAME, ata.TYPE
         FROM article_tag_relation atr

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.TagMapper">
+    <select id="selectTagList" resultType="com.github.stazxr.zblog.content.domain.vo.TagVo">
+        SELECT
+            t.ID,
+            ANY_VALUE(t.NAME) AS NAME,
+            ANY_VALUE(t.SLUG) AS SLUG,
+            ANY_VALUE(t.ALLOW_INDEX) AS ALLOW_INDEX,
+            ANY_VALUE(t.ENABLED) AS ENABLED,
+            COUNT(atr.ARTICLE_ID) AS ARTICLE_COUNT
+        FROM tag t
+        LEFT JOIN article_tag_relation atr ON atr.TAG_ID = t.ID AND atr.DELETED = 0
+        <where>
+            <if test="query.name != null and query.name != ''">
+                <bind name="nameBind" value="'%' + query.name + '%'"/>
+                AND t.NAME LIKE #{nameBind}
+            </if>
+            <if test="query.slug != null and query.slug != ''">
+                <bind name="slugBind" value="'%' + query.slug + '%'"/>
+                AND t.SLUG LIKE #{slugBind}
+            </if>
+            <if test="query.allowIndex != null">
+                AND t.ALLOW_INDEX = #{query.allowIndex}
+            </if>
+            <if test="query.enabled != null">
+                AND t.ENABLED = #{query.enabled}
+            </if>
+        </where>
+        GROUP BY t.ID
+        ORDER BY ARTICLE_COUNT DESC, t.ID DESC
+    </select>
+
+    <select id="selectTagDetail" resultType="com.github.stazxr.zblog.content.domain.vo.TagVo">
+        SELECT
+            t.ID, t.NAME, t.SLUG,
+            t.SEO_TITLE, t.SEO_KEYWORDS, t.SEO_DESCRIPTION,
+            t.ALLOW_INDEX, t.ENABLED,
+            CREATE_TIME, UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.UPDATE_USER) AS UPDATE_USERNAME,
+            (SELECT COUNT(ARTICLE_ID) FROM article_tag_relation atr WHERE atr.TAG_ID = t.ID AND atr.DELETED = 0) AS ARTICLE_COUNT
+        FROM tag t WHERE t.ID = #{tagId}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--    <select id="selectByTagName" resultType="com.github.stazxr.zblog.domain.entity.Tag">-->
+<!--        SELECT-->
+<!--            ID, NAME, TYPE, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME-->
+<!--        FROM article_tag WHERE DELETED = 0 AND NAME = #{name}-->
+<!--    </select>-->
+
+<!--    <select id="selectArticleCountByTag" resultType="java.lang.Long">-->
+<!--        SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ID IN (-->
+<!--            SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID = #{tagId}-->
+<!--        )-->
+<!--    </select>-->
+
+<!--    <select id="selectWebTagList" resultType="com.github.stazxr.zblog.domain.vo.TagVo">-->
+<!--        SELECT ID, `NAME` FROM article_tag WHERE DELETED = 0 AND ENABLED = 1 AND ID IN (-->
+<!--            SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (-->
+<!--                SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1-->
+<!--            )-->
+<!--        )-->
+<!--    </select>-->
+
+<!--    <select id="queryBoardTagList" resultType="com.github.stazxr.zblog.domain.vo.CloudTagVo">-->
+<!--        SELECT-->
+<!--            at.ID, at.`NAME`, (SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.ID IN (-->
+<!--                SELECT atr.ARTICLE_ID FROM article_tag_relation atr WHERE atr.TAG_ID = at.ID-->
+<!--            )) AS VALUE-->
+<!--        FROM article_tag at WHERE at.DELETED = 0 AND at.ENABLED = 1 AND at.ID IN (-->
+<!--            SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID IN (-->
+<!--                SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1-->
+<!--            )-->
+<!--        )-->
+<!--    </select>-->
+</mapper>

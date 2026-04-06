@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.domain.vo;
 
 import com.github.stazxr.zblog.base.domain.entity.File;
 import com.github.stazxr.zblog.core.base.BaseVo;
+import io.swagger.annotations.ApiModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,10 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ApiModel("文章VO")
 public class ArticleVo extends BaseVo {
+    private static final long serialVersionUID = -2823287174828491697L;
+
     /**
      * 主键
      */
@@ -140,7 +144,7 @@ public class ArticleVo extends BaseVo {
     /**
      * 标签明细列表
      */
-    private List<ArticleTagVo> tagList;
+    private List<TagVo> tagList;
 
     /**
      * 封面列表
@@ -191,7 +195,7 @@ public class ArticleVo extends BaseVo {
     public List<Long> getArticleTag() {
         List<Long> tmp = new ArrayList<>();
         if (this.tagList != null) {
-            for (ArticleTagVo tagVo : tagList) {
+            for (TagVo tagVo : tagList) {
                 tmp.add(tagVo.getId());
             }
         }

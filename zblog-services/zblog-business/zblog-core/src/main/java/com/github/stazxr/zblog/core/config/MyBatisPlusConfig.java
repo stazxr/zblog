@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
  * @author SunTao
  * @since 2020-12-09
  */
-@Slf4j
 @Configuration(proxyBeanMethods = false)
 @MapperScan("com.github.stazxr.zblog.**.mapper")
 public class MyBatisPlusConfig {

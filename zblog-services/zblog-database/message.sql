@@ -249,9 +249,22 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('CATEGORY_DELETE_WITH_CHILDREN', 'zh-CN', '存在子分类，无法删除，请先删除子分类', 'common'),
 ('CATEGORY_DELETE_WITH_CHILDREN', 'en-US', 'Cannot delete category with child nodes', 'common'),
 ('CATEGORY_DELETE_WITH_ARTICLE', 'zh-CN', '分类下存在文章，无法删除，请先迁移文章到其他分类', 'common'),
-('CATEGORY_DELETE_WITH_ARTICLE', 'en-US', 'Category is associated with articles. please unbind before deletion', 'common');
+('CATEGORY_DELETE_WITH_ARTICLE', 'en-US', 'Category is associated with articles. please unbind before deletion', 'common'),
 -- 标签
-
+('TAG_NAME_REQUIRED', 'zh-CN', '标签名称不能为空', 'common'),
+('TAG_NAME_REQUIRED', 'en-US', 'Tag name cannot be blank', 'common'),
+('TAG_SLUG_REQUIRED', 'zh-CN', '标签 SLUG 不能为空', 'common'),
+('TAG_SLUG_REQUIRED', 'en-US', 'Tag slug cannot be blank', 'common'),
+('TAG_ALLOWINDEX_REQUIRED', 'zh-CN', '标签是否允许搜索引擎收录不能为空', 'common'),
+('TAG_ALLOWINDEX_REQUIRED', 'en-US', 'Tag allowIndex cannot be blank', 'common'),
+('TAG_ENABLED_REQUIRED', 'zh-CN', '标签状态不能为空', 'common'),
+('TAG_ENABLED_REQUIRED', 'en-US', 'Tag status cannot be blank', 'common'),
+('TAG_NAME_EXISTS', 'zh-CN', '标签名称已存在', 'common'),
+('TAG_NAME_EXISTS', 'en-US', 'Tag name exist', 'common'),
+('TAG_SLUG_EXISTS', 'zh-CN', '标签 SLUG 已存在', 'common'),
+('TAG_SLUG_EXISTS', 'en-US', 'Tag slug exist', 'common'),
+('TAG_DELETE_WITH_ARTICLE', 'zh-CN', '标签下存在文章，无法删除', 'common'),
+('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common');
 -- 文章
 
 -- 栏目

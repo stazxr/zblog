@@ -166,7 +166,7 @@ public interface PortalService {
      *
      * @return TagList
      */
-    List<ArticleTagVo> queryTagList();
+    List<TagVo> queryTagList();
 
     /**
      * 查询前台分类列表
@@ -197,7 +197,7 @@ public interface PortalService {
      * @param tagId 查询详情
      * @return TagVo
      */
-    ArticleTagVo queryTagById(Long tagId);
+    TagVo queryTagById(Long tagId);
 
     /**
      * 浏览文章

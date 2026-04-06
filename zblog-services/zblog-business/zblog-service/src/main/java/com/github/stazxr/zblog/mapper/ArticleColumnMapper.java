@@ -2,7 +2,6 @@ package com.github.stazxr.zblog.mapper;
 
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import com.github.stazxr.zblog.domain.dto.query.ArticleColumnQueryDto;
-import com.github.stazxr.zblog.domain.entity.Category;
 import com.github.stazxr.zblog.domain.entity.ArticleColumn;
 import com.github.stazxr.zblog.domain.vo.ArticleColumnVo;
 import com.github.stazxr.zblog.domain.vo.ArticleVo;
@@ -39,7 +38,7 @@ public interface ArticleColumnMapper extends BaseMapper<ArticleColumn> {
      * @param name 栏目名称
      * @return ColumnVo
      */
-    Category selectByColumnName(@Param("name") String name);
+    ArticleColumn selectByColumnName(@Param("name") String name);
 
     /**
      * 查询非专栏对应的文章列表

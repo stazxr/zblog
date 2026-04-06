@@ -14,8 +14,8 @@
               <el-option v-for="item in allowIndexList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-enabled">
-            <el-select id="search-enabled" v-model="filters.visible" placeholder="前台显示" clearable @change="search">
+          <muses-search-form-item label="" prop="search-visible">
+            <el-select id="search-visible" v-model="filters.visible" placeholder="前台显示" clearable @change="search">
               <el-option v-for="item in visibleList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
@@ -57,7 +57,7 @@
           <template v-slot="scope">
             <el-image class="article-cover" :src="scope.row['imageUrl']" :preview-src-list="getPreviewList(scope.row)">
               <div slot="error" class="image-slot">
-                <span v-if="scope.row['imageUrl'] === ''">未配置</span>
+                <span v-if="scope.row['imageUrl'] === null">未配置</span>
                 <span v-else>加载失败</span>
               </div>
             </el-image>
@@ -111,9 +111,9 @@
 </template>
 
 <script>
+import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/content/category/template/detailDialog'
 import addOrEditDialog from '@/views/admin/content/category/template/addOrEditDialog'
-import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Category',
   components: {
@@ -157,7 +157,7 @@ export default {
       this.row = row
     },
     loadAllowIndexList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'CATEGORY_ALLOW_INDEX_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ALLOW_INDEX_CONFIG' }).then(res => {
         const { data } = res
         this.allowIndexList = data
       }).catch(_ => {
@@ -165,7 +165,7 @@ export default {
       })
     },
     loadVisibleList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'CATEGORY_VISIBLE_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'VISIBLE_CONFIG' }).then(res => {
         const { data } = res
         this.visibleList = data
       }).catch(_ => {

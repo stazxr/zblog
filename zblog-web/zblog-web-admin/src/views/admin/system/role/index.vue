@@ -96,10 +96,10 @@
 </template>
 
 <script>
+import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/system/role/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/role/template/addOrEditDialog'
 import authRoleDialog from '@/views/admin/system/role/template/authRoleDialog'
-import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Role',
   components: {

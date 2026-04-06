@@ -13,7 +13,7 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="角色序列"> {{ dataInfo.id }} </el-descriptions-item>
+        <el-descriptions-item label="分类序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="分类名称"> {{ dataInfo.name }} </el-descriptions-item>
         <el-descriptions-item label="SLUG"> {{ dataInfo.slug }} </el-descriptions-item>
         <el-descriptions-item label="分类状态">

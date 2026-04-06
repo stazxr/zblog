@@ -15,12 +15,12 @@ import file from '@/api/base/maintain/file.js'
 import cache from '@/api/base/maintain/cache.js'
 import session from '@/api/base/maintain/session.js'
 
-// service
+// content
 import category from '@/api/service/content/category.js'
+import tag from '@/api/service/content/tag.js'
 
 // TODO
 import column from '@/api/service/column.js'
-import tag from '@/api/service/tag.js'
 import article from '@/api/service/article.js'
 import webSetting from '@/api/service/webSetting.js'
 import friendLink from '@/api/service/friendLink.js'
@@ -36,6 +36,6 @@ export default {
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,
-  category,
-  column, tag, article, webSetting, friendLink, talk, page, album, message, comment, test
+  category, tag,
+  column, article, webSetting, friendLink, talk, page, album, message, comment, test
 }

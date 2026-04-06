@@ -33,7 +33,7 @@
         WHERE ID = #{columnId}
     </select>
 
-    <select id="selectByColumnName" resultType="com.github.stazxr.zblog.domain.entity.Category">
+    <select id="selectByColumnName" resultType="com.github.stazxr.zblog.domain.entity.ArticleColumn">
         SELECT
             ID, NAME, IMAGE_URL, `DESC`, SORT, ENABLED, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME
         FROM article_column

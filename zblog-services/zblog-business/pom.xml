@@ -19,6 +19,38 @@
         <module>zblog-core</module>
         <module>zblog-log</module>
         <module>zblog-base</module>
+        <module>zblog-content</module>
+        <module>zblog-app</module>
         <module>zblog-service</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-core</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-log</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-base</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-content</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stazxr.zblog</groupId>
+                <artifactId>zblog-app</artifactId>
+                <version>${zblog.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
