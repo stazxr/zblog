@@ -224,7 +224,7 @@
 
 <script>
 import Clipboard from 'clipboard'
-import tocbot from 'tocbot'
+// import tocbot from 'tocbot/dist/tocbot.js'
 import Comment from '../../components/Comment'
 import { Editor } from '@wangeditor/editor-for-vue'
 // import hljs from 'highlight.js'
@@ -324,10 +324,10 @@ export default {
     this.getArticle()
   },
   destroyed() {
-    tocbot.destroy()
-    if (this.clipboard != null) {
-      this.clipboard.destroy()
-    }
+    // tocbot.destroy()
+    // if (this.clipboard != null) {
+    //   this.clipboard.destroy()
+    // }
   },
   methods: {
     // Editor
@@ -449,15 +449,15 @@ export default {
           this.readTime = Math.round(this.article.wordCount / 400) + '分钟'
 
           // 添加文章生成目录功能
-          tocbot.init({
-            tocSelector: '#toc', // 要把目录添加元素位置，支持选择器
-            contentSelector: '.w-e-scroll', // 获取html的元素
-            headingSelector: 'h1, h2, h3', // 要显示的id的目录
-            hasInnerContainers: true,
-            onClick: function(e) {
-              e.preventDefault()
-            }
-          })
+          // tocbot.init({
+          //   tocSelector: '#toc', // 要把目录添加元素位置，支持选择器
+          //   contentSelector: '.w-e-scroll', // 获取html的元素
+          //   headingSelector: 'h1, h2, h3', // 要显示的id的目录
+          //   hasInnerContainers: true,
+          //   onClick: function(e) {
+          //     e.preventDefault()
+          //   }
+          // })
         })
       }).catch(e => {
         console.log('文章信息反显失败', e)
