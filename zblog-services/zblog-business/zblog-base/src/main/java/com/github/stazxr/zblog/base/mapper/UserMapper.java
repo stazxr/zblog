@@ -82,7 +82,7 @@ public interface UserMapper extends BaseMapper<User> {
     void updateLoginInfoWhenFailed(@Param("userId") Long userId, @Param("maxFailCount") int maxFailCount, @Param("lockedExpireTime") LocalDateTime lockedExpireTime);
 
     /**
-     * 查询用户列表
+     * 分页查询用户列表
      *
      * @param page     分页参数
      * @param queryDto 查询参数

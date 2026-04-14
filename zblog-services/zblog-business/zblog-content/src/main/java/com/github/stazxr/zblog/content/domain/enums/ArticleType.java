@@ -1,6 +1,4 @@
-package com.github.stazxr.zblog.domain.enums;
-
-import lombok.Getter;
+package com.github.stazxr.zblog.content.domain.enums;
 
 /**
  * 文章类型
@@ -8,7 +6,6 @@ import lombok.Getter;
  * @author SunTao
  * @since 2021-07-31
  */
-@Getter
 public enum ArticleType {
     /**
      * 原创
@@ -31,13 +28,7 @@ public enum ArticleType {
         this.type = type;
     }
 
-    public static ArticleType of(Integer articleType) {
-        for (ArticleType item : values()) {
-            if (item.type.equals(articleType)) {
-                return item;
-            }
-        }
-
-        return null;
+    public Integer getType() {
+        return type;
     }
 }

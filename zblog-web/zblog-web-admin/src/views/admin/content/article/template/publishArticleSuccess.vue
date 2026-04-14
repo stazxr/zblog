@@ -27,7 +27,7 @@
 
 <script>
 import PublishSuccess from '@/assets/images/publish-success.png'
-import previewArticle from '@/views/admin/web/article/template/previewArticle'
+import previewArticle from '@/views/admin/content/article/template/previewArticle'
 export default {
   name: 'PublishSuccess',
   components: {

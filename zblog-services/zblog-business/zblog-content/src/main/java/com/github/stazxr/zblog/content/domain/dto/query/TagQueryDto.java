@@ -27,9 +27,9 @@ public class TagQueryDto extends PageParam {
     private String name;
 
     /**
-     * SLUG
+     * 标签唯一标识
      */
-    @ApiModelProperty("SLUG")
+    @ApiModelProperty("标签唯一标识")
     private String slug;
 
     /**

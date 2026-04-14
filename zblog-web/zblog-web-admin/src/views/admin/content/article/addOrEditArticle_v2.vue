@@ -1,174 +1,150 @@
 <template>
   <div v-loading="pageLoading" element-loading-text="数据加载中..." class="editor-container">
-    <div class="editor-toolbar">
-      <Toolbar
-        v-if="activeEditor"
-        :editor="editor"
-        :default-config="toolbarConfig"
-        :mode="mode"
-      />
-    </div>
+    <div class="editor-toolbar" />
     <div class="editor-content">
-      <div class="editor-content-right">
-        <div class="editor-content-inner editor-content-core">
-          <div v-show="showTipAlert" style="padding-bottom: 15px;">
-            <el-alert title="友情提示" description="未防止会话过期、忘记保存等原因导致文章内容丢失，请及时保存草稿！" type="info" show-icon />
-          </div>
-          <div v-if="showRecentDraftFlag && recentDraft.id !== null && recentDraft.id !== ''" class="recent-draft-box">
-            <span class="icon-type">草稿</span>
-            <p class="draft-title" :title="recentDraft.title">
-              <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">{{ recentDraft.title }}</a>
-            </p>
-            <a class="draft-btn-edit" target="_self" @click="openDraftPage(recentDraft.id)">继续编辑</a>
-            <a class="draft-btn-more" @click="openMoreDraftPage(draftTagFlag)">更多草稿</a>
-            <button class="draft-btn-close" @click="closeDraftPage()">
-              <svg data-v-c1361018="" width="200" height="200" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" class="icon">
-                <!-- eslint-disable-next-line -->
-                <path data-v-c1361018="" d="M512 438.379l294.507-294.486a52.032 52.032 0 1173.6 73.622L585.62 512l294.486 294.485a52.075 52.075 0 01-73.6 73.643L512 585.621 217.515 880.128a52.053 52.053 0 11-73.622-73.643L438.38 512 143.893 217.515a52.053 52.053 0 1173.622-73.622L512 438.38z"></path>
-              </svg>
-            </button>
-          </div>
-          <div class="editor-title">
-            <input v-model="addForm.title" placeholder="请输入文章标题（最多 100 个字符）" maxlength="100">
-          </div>
-          <div class="editor-text-area">
-            <Editor
-              v-if="activeEditor"
-              v-model="html"
-              :default-config="editorConfig"
-              :mode="mode"
-              @onCreated="onCreated"
-              @onChange="onChange"
-              @onDestroyed="onDestroyed"
-              @onMaxLength="onMaxLength"
-              @onFocus="onFocus"
-              @onBlur="onBlur"
-              @customAlert="customAlert"
-            />
-          </div>
+      <div class="editor-content-inner editor-content-core">
+        <div v-show="showTipAlert" style="padding-bottom: 15px;">
+          <el-alert title="友情提示" description="未防止会话过期、忘记保存等原因导致文章内容丢失，请及时保存草稿！" type="warning" show-icon />
         </div>
-        <div class="editor-content-inner editor-content-config">
-          <el-form ref="addForm" :model="addForm" :rules="addRules" label-width="100px">
-            <el-form-item label="文章封面：" prop="coverImageType">
-              <el-radio-group v-model="addForm.coverImageType">
-                <el-radio v-for="item in coverImageTypeEnums" :key="item.value" :label="item.value" :disabled="item.disabled">{{ item.name }}</el-radio>
-              </el-radio-group>
-              <div v-if="addForm.coverImageType === 1" class="cover-img-box-flex cover-img-box-1">
-                <!-- 单封面 -->
-                <div v-if="addForm.articleImg.length < maxUploadSize" class="cover-img-box" @click="uploadCoverImg">
-                  <div class="cover-img">
-                    <div class="cover_img_hover">
-                      <img :src="addIcon" alt="" class="cover-img-add-icon">
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="cover-img-box">
-                  <div class="cover-img">
-                    <div class="cover_img_over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
-                      <img :src="addForm.articleImg[0]['downloadUrl']" alt="" class="cover-img-img-icon">
-                      <span class="cover-img-close-icon" @click="removeCoverImg(addForm.articleImg[0], 0)">X</span>
-                      <span class="cover-img-replace-icon" @click="replaceCoverImg(addForm.articleImg[0], 0)">替换</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <span v-if="addForm.coverImageType === 1" style="display: block;">
-                <strong>*支持 jpg、jpeg、png、webp 格式，单张图片最大支持 5MB，建议图片尺寸 16:9</strong>
-              </span>
-              <div v-if="addForm.coverImageType === 2" class="cover-img-box-flex cover-img-box-more">
-                <!-- 多封面 -->
-                <div v-if="addForm.articleImg.length < maxUploadSize" class="cover-img-box" @click="uploadCoverImg">
-                  <div class="cover-img">
-                    <div class="cover_img_hover">
-                      <img :src="addIcon" alt="" class="cover-img-add-icon">
-                    </div>
-                  </div>
-                </div>
-                <div v-for="(articleImg, index) in addForm.articleImg" :key="articleImg.id" class="cover-img-box">
-                  <div class="cover-img">
-                    <div class="cover_img_over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
-                      <img :src="articleImg['downloadUrl']" alt="" class="cover-img-img-icon">
-                      <span class="cover-img-close-icon" @click="removeCoverImg(articleImg, index)">X</span>
-                      <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImg, index)">替换</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <span v-if="addForm.coverImageType === 2" style="display: block;">
-                <strong>*支持 jpg、jpeg、png、webp 格式，单张图片最大支持 5MB，建议图片尺寸 16:9，最多支持 4 张图片</strong>
-              </span>
-              <img v-if="addForm.coverImageType === 3" :src="articleDefaultImg === '' ? noImg : articleDefaultImg" alt="" style="display: block;width: 160px; height: 90px;margin-top: 5px;">
-              <span v-if="addForm.coverImageType === 4" style="display: block;margin-top: 5px;">
-                <strong>*后台会根据文章标题自动生成文章封面</strong>
-              </span>
-            </el-form-item>
-            <el-form-item label="文章摘要：" prop="remark">
-              <el-input v-model="addForm.remark" type="textarea" resize="none" :autosize="{ minRows: 6, maxRows: 6 }" maxlength="250" />
-              <el-button round class="set-remark-btn" @click="autoSetArticleRemark">一件提取</el-button>
-            </el-form-item>
-            <el-form-item label="文章类型：" prop="articleType">
-              <el-radio-group v-model="addForm.articleType">
-                <el-radio v-for="item in articleTypeEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="addForm.articleType !== 1" label="原文链接：" prop="reprintLink">
-              <el-input v-model="addForm.reprintLink" placeholder="请填写原文链接" maxlength="1000" show-word-limit />
-            </el-form-item>
-            <el-form-item label="文章分类：" prop="categoryId">
-              <el-select v-model="addForm.categoryId" placeholder="请选择文章分类" clearable filterable style="width: 300px">
-                <el-option-group v-for="group in articleCategoryOptions" :key="group.id" :label="group.name">
-                  <el-option v-for="item in group.children" :key="item.id" :value="item.id" :label="item.name" :disabled="!group.enabled || !item.enabled" />
-                </el-option-group>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="文章标签：" prop="articleTag">
-              <el-select
-                v-model="addForm.articleTag"
-                placeholder="请选择文章标签"
-                multiple
-                :multiple-limit="3"
-                filterable
-                :remote-method="customTagSearchWithoutCase"
-                :loading="tagSearchLoading"
-                allow-create
-                default-first-option
-                clearable
-                style="width: 300px"
-              >
-                <el-option v-for="item in articleTagOptions" :key="item.id" :value="item.id" :label="item.name" />
-              </el-select>
-              <span style="margin-left: 5px;color: gray;">输入文字可搜索，按回车可添加自定义标签</span>
-            </el-form-item>
-            <el-form-item label="发布范围：" prop="articlePerm">
-              <el-radio-group v-model="addForm.articlePerm">
-                <el-radio v-for="item in articlePermEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="评论设置：" prop="commentFlag">
-              <el-radio-group v-model="addForm.commentFlag">
-                <el-radio v-for="item in commentEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-form>
-          <div class="editor-content-config-opt">
-            <div class="editor-content-config-opt-left">
-              <span v-show="saveDraftSpanShow" class="save-draft-span">草稿已保存 {{ saveDraftTime }} </span>
-              <span>共 {{ totalCount }} 字</span>
-            </div>
-            <div class="editor-content-config-opt-right">
-              <el-button v-show="addForm.id != null && addForm.id !== ''" round @click="showContentRecord">编辑记录</el-button>
-              <el-button round @click="saveDraft">{{ draftBtnName }}</el-button>
-              <el-button v-show="autoPublishBtnShow" round @click="openPublishArticleByTimingDialog">定时发布</el-button>
-              <el-button type="danger" round :loading="submitLoading" @click="publishArticle">发布文章</el-button>
-            </div>
-          </div>
+        <div v-if="showRecentDraftFlag && recentDraft.id !== null && recentDraft.id !== ''" class="recent-draft-box">
+          <span class="icon-type">草稿</span>
+          <p class="draft-title" :title="recentDraft.title">
+            <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">{{ recentDraft.title }}</a>
+          </p>
+          <a class="draft-btn-edit" target="_self" @click="openDraftPage(recentDraft.id)">继续编辑</a>
+          <a class="draft-btn-more" @click="openMoreDraftPage(draftTagFlag)">更多草稿</a>
+          <button class="draft-btn-close" @click="closeDraftPage()">
+            <svg data-v-c1361018="" width="200" height="200" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" class="icon">
+              <!-- eslint-disable-next-line -->
+              <path data-v-c1361018="" d="M512 438.379l294.507-294.486a52.032 52.032 0 1173.6 73.622L585.62 512l294.486 294.485a52.075 52.075 0 01-73.6 73.643L512 585.621 217.515 880.128a52.053 52.053 0 11-73.622-73.643L438.38 512 143.893 217.515a52.053 52.053 0 1173.622-73.622L512 438.38z"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="editor-title">
+          <input v-model="addForm.title" placeholder="请输入文章标题（最多 100 个字符）" maxlength="100">
+        </div>
+        <div class="editor-text-area">
+          <v-md-editor
+            v-model="addForm.contentMd"
+            height="600px"
+          />
         </div>
       </div>
-      <div v-show="false" class="editor-content-left">
-        <div class="editor-header-content">
-          <h2 style="padding-left: 20px;">目录</h2>
-          <hr>
-          <ul id="header-container" class="header-container" />
+      <div class="editor-content-inner editor-content-config">
+        <el-form ref="addForm" :model="addForm" :rules="addRules" label-width="100px">
+          <el-form-item label="文章封面：" prop="coverImageType">
+            <el-radio-group v-model="addForm.coverImageType">
+              <el-radio v-for="item in coverImageTypeEnums" :key="item.value" :label="item.value" :disabled="item.disabled">{{ item.name }}</el-radio>
+            </el-radio-group>
+            <div v-if="addForm.coverImageType === 1" class="cover-img-box-flex cover-img-box-1">
+              <!-- 单封面 -->
+              <div v-if="addForm.articleImg.length < maxUploadSize" class="cover-img-box" @click="uploadCoverImg">
+                <div class="cover-img">
+                  <div class="cover_img_hover">
+                    <img :src="addIcon" alt="" class="cover-img-add-icon">
+                  </div>
+                </div>
+              </div>
+              <div v-else class="cover-img-box">
+                <div class="cover-img">
+                  <div class="cover_img_over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
+                    <img :src="addForm.articleImg[0]['downloadUrl']" alt="" class="cover-img-img-icon">
+                    <span class="cover-img-close-icon" @click="removeCoverImg(addForm.articleImg[0], 0)">X</span>
+                    <span class="cover-img-replace-icon" @click="replaceCoverImg(addForm.articleImg[0], 0)">替换</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span v-if="addForm.coverImageType === 1" style="display: block;">
+              <strong>*支持 jpg、jpeg、png、webp 格式，单张图片最大支持 5MB，建议图片尺寸 16:9</strong>
+            </span>
+            <div v-if="addForm.coverImageType === 2" class="cover-img-box-flex cover-img-box-more">
+              <!-- 多封面 -->
+              <div v-if="addForm.articleImg.length < maxUploadSize" class="cover-img-box" @click="uploadCoverImg">
+                <div class="cover-img">
+                  <div class="cover_img_hover">
+                    <img :src="addIcon" alt="" class="cover-img-add-icon">
+                  </div>
+                </div>
+              </div>
+              <div v-for="(articleImg, index) in addForm.articleImg" :key="articleImg.id" class="cover-img-box">
+                <div class="cover-img">
+                  <div class="cover_img_over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
+                    <img :src="articleImg['downloadUrl']" alt="" class="cover-img-img-icon">
+                    <span class="cover-img-close-icon" @click="removeCoverImg(articleImg, index)">X</span>
+                    <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImg, index)">替换</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span v-if="addForm.coverImageType === 2" style="display: block;">
+              <strong>*支持 jpg、jpeg、png、webp 格式，单张图片最大支持 5MB，建议图片尺寸 16:9，最多支持 4 张图片</strong>
+            </span>
+            <img v-if="addForm.coverImageType === 3" :src="articleDefaultImg === '' ? noImg : articleDefaultImg" alt="" style="display: block;width: 160px; height: 90px;margin-top: 5px;">
+            <span v-if="addForm.coverImageType === 4" style="display: block;margin-top: 5px;">
+              <strong>*后台会根据文章标题自动生成文章封面</strong>
+            </span>
+          </el-form-item>
+          <el-form-item label="文章摘要：" prop="remark">
+            <el-input v-model="addForm.remark" type="textarea" resize="none" :autosize="{ minRows: 6, maxRows: 6 }" maxlength="250" />
+            <el-button round class="set-remark-btn" @click="autoSetArticleRemark">一件提取</el-button>
+          </el-form-item>
+          <el-form-item label="文章类型：" prop="articleType">
+            <el-radio-group v-model="addForm.articleType">
+              <el-radio v-for="item in articleTypeEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item v-if="addForm.articleType !== 1" label="原文链接：" prop="reprintLink">
+            <el-input v-model="addForm.reprintLink" placeholder="请填写原文链接" maxlength="1000" show-word-limit />
+          </el-form-item>
+          <el-form-item label="文章分类：" prop="categoryId">
+            <el-select v-model="addForm.categoryId" placeholder="请选择文章分类" clearable filterable style="width: 300px">
+              <el-option-group v-for="group in articleCategoryOptions" :key="group.id" :label="group.name">
+                <el-option v-for="item in group.children" :key="item.id" :value="item.id" :label="item.name" :disabled="!group.enabled || !item.enabled" />
+              </el-option-group>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="文章标签：" prop="tags">
+            <el-select
+              v-model="formData.tags"
+              placeholder="请选择文章标签"
+              multiple
+              :multiple-limit="3"
+              filterable
+              remote
+              :remote-method="customTagSearchWithoutCase"
+              :loading="tagSearchLoading"
+              allow-create
+              default-first-option
+              clearable
+              style="width: 300px"
+            >
+              <el-option v-for="item in articleTagOptions" :key="item" :value="item" :label="item" />
+            </el-select>
+            <span style="margin-left: 5px;color: gray;">输入文字可搜索，按回车可添加自定义标签</span>
+          </el-form-item>
+          <el-form-item label="发布范围：" prop="articlePerm">
+            <el-radio-group v-model="addForm.articlePerm">
+              <el-radio v-for="item in articlePermEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="评论设置：" prop="commentFlag">
+            <el-radio-group v-model="addForm.commentFlag">
+              <el-radio v-for="item in commentEnums" :key="item.value" :label="item.value">{{ item.name }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+        <div class="editor-content-config-opt">
+          <div class="editor-content-config-opt-left">
+            <span v-show="saveDraftSpanShow" class="save-draft-span">草稿已保存 {{ saveDraftTime }} </span>
+            <span>共 {{ totalCount }} 字</span>
+          </div>
+          <div class="editor-content-config-opt-right">
+            <el-button v-show="addForm.id != null && addForm.id !== ''" round @click="showContentRecord">编辑记录</el-button>
+            <el-button round @click="saveDraft">{{ draftBtnName }}</el-button>
+            <el-button v-show="autoPublishBtnShow" round @click="openPublishArticleByTimingDialog">定时发布</el-button>
+            <el-button type="danger" round :loading="submitLoading" @click="publishArticle">发布文章</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -210,214 +186,154 @@ import NoImg from '@/assets/images/no-img-4_3.jpg'
 import AddIcon from '@/assets/images/add-icon.png'
 import { getToken } from '@/utils/token'
 import { formatMonth, formatDay } from '@/utils'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-import { Message } from 'element-ui'
-import uploadImgDialog from '@/views/admin/web/article/template/uploadImgDialog'
-import contentEditRecordDrawer from '@/views/admin/web/article/template/contentEditRecordDrawer'
+// import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+// import { Message } from 'element-ui'
+import MarkdownIt from 'markdown-it'
+import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
+import contentEditRecordDrawer from '@/views/admin/content/article/template/contentEditRecordDrawer'
 import NProgress from 'nprogress'
+const md = new MarkdownIt()
 export default {
   name: 'AddArticle',
   components: {
-    uploadImgDialog, contentEditRecordDrawer, Editor, Toolbar
+    uploadImgDialog, contentEditRecordDrawer
   },
+
   data() {
     return {
-      editor: null,
+      pageLoading: false,
+      showTipAlert: true,
       activeEditor: true,
       html: '<p><br></p>',
-      // 默认模式
-      mode: 'default',
       // 简单模式，取消悬浮菜单，检查工具栏菜单
       // mode: 'simple',
-      toolbarConfig: {
-        modalAppendToBody: false,
-        // 获取 wangeditor 默认配置
-        // import { DomEditor } from '@wangeditor/editor'
-        // const toolbar = DomEditor.getToolbar(this.editor)
-        // const defaultConfig = toolbar.getConfig().toolbarKeys
-        // console.log('defaultConfig', defaultConfig)
-        toolbarKeys: [
-          'undo', 'redo', '|',
-          'headerSelect', 'fontSize', 'fontFamily', 'lineHeight', '|',
-          'color', 'bgColor',
-          {
-            'key': 'group-more-style',
-            'title': '其他',
-            'iconSvg': '<svg viewBox=\"0 0 1024 1024\"><path d=\"M204.8 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path><path d=\"M505.6 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path><path d=\"M806.4 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path></svg>',
-            'menuKeys': [
-              'bold', 'italic', 'underline', 'through', 'clearStyle'
-            ]
-          }, '|',
-          'bulletedList', 'numberedList', 'todo',
-          {
-            'key': 'group-justify',
-            'title': '对齐',
-            'iconSvg': '<svg viewBox=\"0 0 1024 1024\"><path d=\"M768 793.6v102.4H51.2v-102.4h716.8z m204.8-230.4v102.4H51.2v-102.4h921.6z m-204.8-230.4v102.4H51.2v-102.4h716.8zM972.8 102.4v102.4H51.2V102.4h921.6z\"></path></svg>',
-            'menuKeys': [
-              'justifyLeft',
-              'justifyRight',
-              'justifyCenter',
-              'justifyJustify'
-            ]
-          },
-          {
-            'key': 'group-indent',
-            'title': '缩进',
-            'iconSvg': '<svg viewBox=\"0 0 1024 1024\"><path d=\"M0 64h1024v128H0z m384 192h640v128H384z m0 192h640v128H384z m0 192h640v128H384zM0 832h1024v128H0z m0-128V320l256 192z\"></path></svg>',
-            'menuKeys': [
-              'indent',
-              'delIndent'
-            ]
-          },
-          'divider', 'blockquote', 'codeBlock', 'insertTable', '|',
-          {
-            'key': 'group-image',
-            'title': '图片',
-            'iconSvg': '<svg viewBox=\"0 0 1024 1024\"><path d=\"M959.877 128l0.123 0.123v767.775l-0.123 0.122H64.102l-0.122-0.122V128.123l0.122-0.123h895.775zM960 64H64C28.795 64 0 92.795 0 128v768c0 35.205 28.795 64 64 64h896c35.205 0 64-28.795 64-64V128c0-35.205-28.795-64-64-64zM832 288.01c0 53.023-42.988 96.01-96.01 96.01s-96.01-42.987-96.01-96.01S682.967 192 735.99 192 832 234.988 832 288.01zM896 832H128V704l224.01-384 256 320h64l224.01-192z\"></path></svg>',
-            'menuKeys': [
-              'insertImage',
-              'uploadImage'
-            ]
-          },
-          {
-            'key': 'group-video',
-            'title': '视频',
-            'iconSvg': '<svg viewBox=\"0 0 1024 1024\"><path d=\"M981.184 160.096C837.568 139.456 678.848 128 512 128S186.432 139.456 42.816 160.096C15.296 267.808 0 386.848 0 512s15.264 244.16 42.816 351.904C186.464 884.544 345.152 896 512 896s325.568-11.456 469.184-32.096C1008.704 756.192 1024 637.152 1024 512s-15.264-244.16-42.816-351.904zM384 704V320l320 192-320 192z\"></path></svg>',
-            'menuKeys': [
-              'insertVideo',
-              'uploadVideo'
-            ]
-          },
-          'uploadAttachment', 'insertFormula', 'insertLink', 'emotion'
-        ]
-      },
-      editorConfig: {
-        placeholder: '请输入文章内容...',
-        // editor.enable() or editor.disable()
-        readOnly: false,
-        autoFocus: false,
-        scroll: false,
-        hoverbarKeys: {
-          attachment: {
-            menuKeys: ['downloadAttachment']
-          },
-          formula: {
-            menuKeys: ['editFormula']
-          }
-        },
-        // editor.getAllMenuKeys()：获取所有的菜单默认配置信息
-        MENU_CONF: {
-          'uploadImage': {
-            server: this.$store.state.api.fileUploadApi,
-            timeout: 120 * 1000,
-            fieldName: 'file',
-            headers: {
-              Authorization: this.getUserToken()
-            },
-            maxNumberOfFiles: 10,
-            maxFileSize: 10 * 1024 * 1024,
-            // async onBeforeUpload(file) {
-            //   let key = ''
-            //   for (const prop in file) {
-            //     key = prop
-            //   }
-            //
-            //   if (file[key].size / 1024 < 200) {
-            //     return file
-            //   }
-            //
-            //   await imageConversion.compressAccurately(file[key].data, 200).then(res => {
-            //     return res
-            //   })
-            // },
-            // async customUpload(file, insertFn) {
-            //   // insertFn(url, alt, href)
-            // },
-            customInsert(res, insertFn) {
-              const { code, data } = res
-              if (code === 200) {
-                if (data && Array.isArray(data) && data.length > 0) {
-                  for (let i = 0; i < data.length; i++) {
-                    // 从 res 中找到 url alt href ，然后插入图片
-                    const { downloadUrl, originalFilename, fileType } = data[i]
-                    if (fileType === '图片') {
-                      insertFn(downloadUrl, originalFilename, downloadUrl)
-                    } else {
-                      Message.error('只能上传图片')
-                    }
-                  }
-                } else {
-                  Message.error('图片列表为空')
-                }
-              } else {
-                Message.error(res.message)
-              }
-            },
-            // async customUpload(file, insertFn) {
-            // },
-            onError(file, err, res) {
-              Message.error('图片上传失败')
-              console.log('图片上传失败', err.message)
-            }
-          },
-          'uploadVideo': {
-            server: this.$store.state.api.fileUploadApi,
-            timeout: 120 * 1000,
-            maxFileSize: 10 * 1024 * 1024,
-            maxNumberOfFiles: 1,
-            fieldName: 'file',
-            headers: {
-              Authorization: this.getUserToken()
-            },
-            customInsert(res, insertFn) {
-              const { code, data } = res
-              if (code === 200) {
-                if (data && Array.isArray(data) && data.length > 0) {
-                  for (let i = 0; i < data.length; i++) {
-                    // 从 res 中找到 url poster ，然后插入视频
-                    const { downloadUrl, fileType } = data[i]
-                    if (fileType === '视频') {
-                      insertFn(downloadUrl, downloadUrl)
-                    } else {
-                      Message.error('只能上传视频')
-                    }
-                  }
-                } else {
-                  Message.error('视频列表为空')
-                }
-              } else {
-                Message.error(res.message)
-              }
-            }
-          },
-          // <a data-w-e-type="attachment" data-w-e-is-void data-w-e-is-inline href="https://xxx.com/aaa/bbb/xxx.zip" download="xxx.zip">xxx.zip</a>
-          'uploadAttachment': {
-            server: this.$store.state.api.fileUploadApi,
-            timeout: 120 * 1000,
-            fieldName: 'file',
-            headers: {
-              Authorization: this.getUserToken()
-            },
-            maxFileSize: 10 * 1024 * 1024,
-            customInsert(res, file, insertFn) {
-              const { code, data } = res
-              if (code === 200) {
-                if (data && Array.isArray(data) && data.length > 0) {
-                  for (let i = 0; i < data.length; i++) {
-                    // 从 res 中找到 url ，然后插入附件
-                    const { downloadUrl, originalFilename } = data[i]
-                    insertFn(originalFilename, downloadUrl)
-                  }
-                } else {
-                  Message.error('附件列表为空')
-                }
-              } else {
-                Message.error(res.message)
-              }
-            }
-          }
-        }
-      },
+      // editorConfig: {
+      //   placeholder: '请输入文章内容...',
+      //   // editor.enable() or editor.disable()
+      //   readOnly: false,
+      //   autoFocus: false,
+      //   scroll: false,
+      //   hoverbarKeys: {
+      //     attachment: {
+      //       menuKeys: ['downloadAttachment']
+      //     },
+      //     formula: {
+      //       menuKeys: ['editFormula']
+      //     }
+      //   },
+      //   // editor.getAllMenuKeys()：获取所有的菜单默认配置信息
+      //   MENU_CONF: {
+      //     'uploadImage': {
+      //       server: this.$store.state.api.fileUploadApi,
+      //       timeout: 120 * 1000,
+      //       fieldName: 'file',
+      //       headers: {
+      //         Authorization: this.getUserToken()
+      //       },
+      //       maxNumberOfFiles: 10,
+      //       maxFileSize: 10 * 1024 * 1024,
+      //       // async onBeforeUpload(file) {
+      //       //   let key = ''
+      //       //   for (const prop in file) {
+      //       //     key = prop
+      //       //   }
+      //       //
+      //       //   if (file[key].size / 1024 < 200) {
+      //       //     return file
+      //       //   }
+      //       //
+      //       //   await imageConversion.compressAccurately(file[key].data, 200).then(res => {
+      //       //     return res
+      //       //   })
+      //       // },
+      //       // async customUpload(file, insertFn) {
+      //       //   // insertFn(url, alt, href)
+      //       // },
+      //       customInsert(res, insertFn) {
+      //         const { code, data } = res
+      //         if (code === 200) {
+      //           if (data && Array.isArray(data) && data.length > 0) {
+      //             for (let i = 0; i < data.length; i++) {
+      //               // 从 res 中找到 url alt href ，然后插入图片
+      //               const { downloadUrl, originalFilename, fileType } = data[i]
+      //               if (fileType === '图片') {
+      //                 insertFn(downloadUrl, originalFilename, downloadUrl)
+      //               } else {
+      //                 Message.error('只能上传图片')
+      //               }
+      //             }
+      //           } else {
+      //             Message.error('图片列表为空')
+      //           }
+      //         } else {
+      //           Message.error(res.message)
+      //         }
+      //       },
+      //       // async customUpload(file, insertFn) {
+      //       // },
+      //       onError(file, err, res) {
+      //         Message.error('图片上传失败')
+      //         console.log('图片上传失败', err.message)
+      //       }
+      //     },
+      //     'uploadVideo': {
+      //       server: this.$store.state.api.fileUploadApi,
+      //       timeout: 120 * 1000,
+      //       maxFileSize: 10 * 1024 * 1024,
+      //       maxNumberOfFiles: 1,
+      //       fieldName: 'file',
+      //       headers: {
+      //         Authorization: this.getUserToken()
+      //       },
+      //       customInsert(res, insertFn) {
+      //         const { code, data } = res
+      //         if (code === 200) {
+      //           if (data && Array.isArray(data) && data.length > 0) {
+      //             for (let i = 0; i < data.length; i++) {
+      //               // 从 res 中找到 url poster ，然后插入视频
+      //               const { downloadUrl, fileType } = data[i]
+      //               if (fileType === '视频') {
+      //                 insertFn(downloadUrl, downloadUrl)
+      //               } else {
+      //                 Message.error('只能上传视频')
+      //               }
+      //             }
+      //           } else {
+      //             Message.error('视频列表为空')
+      //           }
+      //         } else {
+      //           Message.error(res.message)
+      //         }
+      //       }
+      //     },
+      //     // <a data-w-e-type="attachment" data-w-e-is-void data-w-e-is-inline href="https://xxx.com/aaa/bbb/xxx.zip" download="xxx.zip">xxx.zip</a>
+      //     'uploadAttachment': {
+      //       server: this.$store.state.api.fileUploadApi,
+      //       timeout: 120 * 1000,
+      //       fieldName: 'file',
+      //       headers: {
+      //         Authorization: this.getUserToken()
+      //       },
+      //       maxFileSize: 10 * 1024 * 1024,
+      //       customInsert(res, file, insertFn) {
+      //         const { code, data } = res
+      //         if (code === 200) {
+      //           if (data && Array.isArray(data) && data.length > 0) {
+      //             for (let i = 0; i < data.length; i++) {
+      //               // 从 res 中找到 url ，然后插入附件
+      //               const { downloadUrl, originalFilename } = data[i]
+      //               insertFn(originalFilename, downloadUrl)
+      //             }
+      //           } else {
+      //             Message.error('附件列表为空')
+      //           }
+      //         } else {
+      //           Message.error(res.message)
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
       // 编辑器字数
       totalCount: 0,
       saveDraftTime: '',
@@ -425,9 +341,6 @@ export default {
       contentRecordDrawerVisible: false,
       noImg: NoImg,
       addIcon: AddIcon,
-      pageLoading: false,
-      // false：提示关闭
-      showTipAlert: false,
       articleDefaultImg: '',
       submitLoading: false,
       submitByTimeLoading: false,
@@ -446,9 +359,10 @@ export default {
         { name: '翻译', value: 3 }
       ],
       articlePermEnums: [
-        { name: '全部可见', value: 1 },
+        { name: '公开', value: 1 },
         // { name: '登录可见', value: 2 },
-        { name: '仅我可见', value: 3 }
+        { name: '私密', value: 3 },
+        { name: '密码', value: 3 }
       ],
       commentEnums: [
         { name: '开启评论', value: true },
@@ -487,6 +401,12 @@ export default {
       callActivated: false,
       interval: null,
       oldContent: '',
+      formData: {
+        id: null,
+        contentMd: null,
+        contentHtml: null,
+        tags: []
+      },
       addForm: {
         action: '',
         id: '',
@@ -499,7 +419,6 @@ export default {
         articlePerm: 1,
         reprintLink: '',
         commentFlag: true,
-        articleTag: [],
         articleImg: [],
         articleStatus: '',
         extend1: 1,
@@ -507,6 +426,9 @@ export default {
         autoPublishTime: ''
       },
       addRules: {
+        tags: [
+          { required: true, message: '请选择文章标签', trigger: 'blur' }
+        ],
         coverImageType: [
           { required: true, message: '请选择封面类型', trigger: 'blur' }
         ],
@@ -521,9 +443,6 @@ export default {
         ],
         categoryId: [
           { required: true, message: '请选择文章分类', trigger: 'blur' }
-        ],
-        articleTag: [
-          { required: true, message: '请选择文章标签', trigger: 'blur' }
         ],
         reprintLink: [
           { required: true, message: '请填写原文链接', trigger: 'blur' }
@@ -575,6 +494,12 @@ export default {
         }
       },
       immediate: true
+    },
+    'formData.tags'(val) {
+      if (val.length > 3) {
+        this.formData.tags = val.slice(0, 3)
+        this.$message.warning('最多选择3个标签')
+      }
     }
   },
   created() {
@@ -687,6 +612,11 @@ export default {
     next()
   },
   methods: {
+    onContentChange(text) {
+      this.formData.contentMd = text
+      this.formData.contentHtml = md.render(text)
+      this.totalCount = text.replace(/\s+/g, '').length
+    },
     getUserToken() {
       return getToken()
     },
@@ -748,7 +678,7 @@ export default {
         this.addForm.extend1 = '1'
         this.addForm.action = 'edit'
         this.oldContent = this.addForm.content
-        this.editor.setHtml(this.addForm.content)
+        // this.editor.setHtml(this.addForm.content)
       }).catch(e => {
         this.$message.error('加载文章信息失败，请刷新浏览器再试！')
         console.log('getArticleDetail failed', e)
@@ -800,6 +730,9 @@ export default {
       this.interval = window.setInterval(() => {
         this.preDoAutoSaveArticleContent()
       }, 60000)
+      // this.autoSave = debounce(() => {
+      //   this.doAutoSaveArticleContent()
+      // }, 60000)
     },
     closeAutoSaveEvent() {
       if (this.interval != null) {
@@ -851,7 +784,6 @@ export default {
         articlePerm: 1,
         reprintLink: '',
         commentFlag: true,
-        articleTag: [],
         articleImg: [],
         articleStatus: '',
         extend1: 1,
@@ -970,6 +902,7 @@ export default {
     },
     // 保存草稿
     saveDraft() {
+      console.log('this.formData', this.formData)
       this.addForm.extend2 = this.totalCount
       this.addForm.action = this.addForm.articleStatus === 1 ? 'edit' : this.addForm.action
       this.$mapi.article.saveArticleDraft(this.addForm).then(({ data, message }) => {
@@ -1132,17 +1065,6 @@ export default {
         this.addForm.articleImg = this.addForm.articleImg.splice(this.addForm.articleImg.length - this.maxUploadSize)
       }
     },
-    setArticleHeader(editor) {
-      const headerContainer = document.getElementById('header-container')
-      const headers = editor.getElemsByTypePrefix('header')
-      if (headerContainer != null && headers != null && headers.length > 0) {
-        headerContainer.innerHTML = headers.map(header => {
-          const { id, type } = header
-          const text = header.children && header.children.length > 0 ? header.children[0].text : '【未知】'
-          return `<li id="${id}" type="${type}">${text}</li>`
-        }).join('')
-      }
-    },
     // Editor
     onCreated(editor) {
       this.editor = Object.seal(editor)
@@ -1157,13 +1079,6 @@ export default {
 
       // 设置摘要
       // this.addForm.remark = contentNoSpace.substring(0, 250)
-
-      // 设置标题
-      this.setArticleHeader(editor)
-    },
-    onDestroyed(editor) {
-    },
-    onMaxLength(editor) {
     },
     onFocus(editor) {
       // 实施获取最新的Token，防止使用后台弃用的Token进行访问
@@ -1171,11 +1086,6 @@ export default {
       if (token == null || token === '') {
         this.$message.warning('令牌信息不存在，请手动保存文章信息后刷新页面重试')
       }
-      this.editorConfig.MENU_CONF.uploadImage.headers.Authorization = token
-      this.editorConfig.MENU_CONF.uploadVideo.headers.Authorization = token
-      this.editorConfig.MENU_CONF.uploadAttachment.headers.Authorization = token
-    },
-    onBlur(editor) {
     },
     // customPaste(editor, event, callback) {
     //   console.log('ClipboardEvent 粘贴事件对象', event)
@@ -1215,110 +1125,7 @@ export default {
 }
 </script>
 
-<style src='@wangeditor/editor/dist/css/style.css'></style>
-
 <style scoped>
-.cover-img-box-flex {
-  width: 100%;
-  display: flex;
-  box-sizing: border-box;
-}
-.cover-img-box-1 {
-  padding: 0;
-  margin: 5px 0 0 0;
-}
-.cover-img-box-more {
-  padding: 0;
-  margin: 5px 0 0 0;
-  flex-wrap: wrap;
-}
-.cover-img-box {
-  padding: 0;
-  margin: 0;
-}
-.cover-img {
-  position: relative;
-  width: 160px;
-  height: 90px;
-  display: inline-block;
-  border: none;
-  vertical-align: top;
-  text-align: center;
-  line-height: 105px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  margin-right: 24px;
-  margin-bottom: 10px;
-}
-.cover_img_hover {
-  width: 160px;
-  height: 90px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  cursor: pointer;
-  background: #fff;
-  border: 1px dashed #bfbfbf;
-  border-radius: 4px;
-}
-.cover_img_over {
-  position: absolute;
-  width: 160px;
-  height: 90px;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  border-radius: 4px;
-}
-.cover-img-add-icon {
-  color: #999;
-  font-size: 24px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-.cover-img-img-icon {
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
-  border-style: none;
-}
-.cover-img-close-icon {
-  position: absolute;
-  background: #999;
-  color: #fff;
-  line-height: 20px;
-  right: -8px;
-  top: -8px;
-  display: none;
-  width: 20px;
-  height: 20px;
-  font-size: 14px;
-  text-align: center;
-  background-size: contain;
-  border-radius: 50%;
-  cursor: pointer;
-}
-.cover-img-replace-icon {
-  position: absolute;
-  display: none;
-  bottom: 12px;
-  height: 32px;
-  width: 56px;
-  background-color: rgba(0,0,0,.4);
-  font-size: 14px;
-  line-height: 20px;
-  padding: 6px 0;
-  left: 50%;
-  margin-left: -28px;
-  border-radius: 4px;
-  text-align: center;
-  color: #fff;
-  cursor: pointer;
-}
-
 .editor-container {
   background-color: #fff;
   height: 100%;
@@ -1326,36 +1133,21 @@ export default {
   color: #333;
 }
 .editor-toolbar {
-  width: 1350px;
-  min-width: 1350px;
+  width: 100%;
   margin: 0 auto;
   background-color: #FCFCFC;
   border-bottom: 1px solid #e8e8e8;
 }
 .editor-content {
-  display: flex;
+  display: block;
   height: calc(100% - 140px);
   background-color: rgb(245, 245, 245);
   overflow-y: auto;
   position: relative;
 }
-.editor-content-right {
-  flex: 1;
-  width: calc(100vw - 350px);
-}
-.editor-content-left {
-  width: 350px;
-}
-.editor-header-content {
-  width: 250px;
-  margin: 30px auto 150px 0;
-  background-color: #fff;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 2px 10px rgb(0 0 70);
-}
 .editor-content-inner {
-  width: 850px;
-  margin: 30px auto 150px auto;
+  width: 1250px;
+  margin: 30px auto 100px auto;
   background-color: #fff;
   padding: 20px 50px 50px 50px;
   border: 1px solid #e8e8e8;
@@ -1529,42 +1321,104 @@ export default {
   width: 12px;
   fill: #595959;
 }
-
-::v-deep .header-container {
-  list-style-type: none;
-  padding: 0 20px 20px 20px;
-  background-color: #fff;
+.cover-img-box-flex {
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
 }
-::v-deep .header-container li {
-  color: #333;
-  margin: 10px 0;
+.cover-img-box-1 {
+  padding: 0;
+  margin: 5px 0 0 0;
+}
+.cover-img-box-more {
+  padding: 0;
+  margin: 5px 0 0 0;
+  flex-wrap: wrap;
+}
+.cover-img-box {
+  padding: 0;
+  margin: 0;
+}
+.cover-img {
+  position: relative;
+  width: 160px;
+  height: 90px;
+  display: inline-block;
+  border: none;
+  vertical-align: top;
+  text-align: center;
+  line-height: 105px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-right: 24px;
+  margin-bottom: 10px;
+}
+.cover_img_hover {
+  width: 160px;
+  height: 90px;
+  position: absolute;
+  left: 0;
+  top: 0;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  background: #fff;
+  border: 1px dashed #bfbfbf;
+  border-radius: 4px;
 }
-::v-deep .header-container li:hover {
-  text-decoration: underline;
+.cover_img_over {
+  position: absolute;
+  width: 160px;
+  height: 90px;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  border-radius: 4px;
 }
-::v-deep .header-container li[type="header1"] {
-  font-size: 20px;
-  font-weight: bold;
+.cover-img-add-icon {
+  color: #999;
+  font-size: 24px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
-::v-deep .header-container li[type="header2"] {
-  font-size: 16px;
-  padding-left: 15px;
-  font-weight: bold;
+.cover-img-img-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  border-style: none;
 }
-::v-deep .header-container li[type="header3"] {
+.cover-img-close-icon {
+  position: absolute;
+  background: #999;
+  color: #fff;
+  line-height: 20px;
+  right: -8px;
+  top: -8px;
+  display: none;
+  width: 20px;
+  height: 20px;
   font-size: 14px;
-  padding-left: 30px;
+  text-align: center;
+  background-size: contain;
+  border-radius: 50%;
+  cursor: pointer;
 }
-::v-deep .header-container li[type="header4"] {
-  font-size: 12px;
-  padding-left: 45px;
-}
-::v-deep .header-container li[type="header5"] {
-  font-size: 12px;
-  padding-left: 60px;
+.cover-img-replace-icon {
+  position: absolute;
+  display: none;
+  bottom: 12px;
+  height: 32px;
+  width: 56px;
+  background-color: rgba(0,0,0,.4);
+  font-size: 14px;
+  line-height: 20px;
+  padding: 6px 0;
+  left: 50%;
+  margin-left: -28px;
+  border-radius: 4px;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
 }
 </style>

@@ -2,12 +2,9 @@ import Vue from 'vue'
 import Cookies from 'js-cookie'
 import 'normalize.css/normalize.css'
 import ElementUI from 'element-ui'
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
 import perm from '@/directive/perm'
 import checkPerm from '@/directive/checkPerm'
 import preventReClick from '@/directive/preventReClick'
-import Highlight from '@/directive/highlight'
 import './assets/styles/element-variables.scss'
 import './assets/styles/index.scss'
 import App from './App'
@@ -23,26 +20,42 @@ import config from '@/utils/config'
 import 'default-passive-events'
 import $ from 'jquery'
 
-import { Boot } from '@wangeditor/editor'
-import attachmentModule from '@wangeditor/plugin-upload-attachment'
-import formulaModule from '@wangeditor/plugin-formula'
-import markdownModule from '@wangeditor/plugin-md'
+// highlightjs
+import hljs from 'highlight.js'
+import Highlight from '@/directive/highlight'
 
-// wangeditor 附件上传注册
-Boot.registerModule(attachmentModule)
+// codemirror 编辑器的相关资源
+import Codemirror from 'codemirror'
+import 'codemirror/mode/markdown/markdown'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/mode/css/css'
+import 'codemirror/mode/htmlmixed/htmlmixed'
+import 'codemirror/mode/vue/vue'
+import 'codemirror/addon/edit/closebrackets'
+import 'codemirror/addon/edit/closetag'
+import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror/addon/display/placeholder'
+import 'codemirror/addon/selection/active-line'
+import 'codemirror/addon/scroll/simplescrollbars'
+import 'codemirror/addon/scroll/simplescrollbars.css'
+import 'codemirror/lib/codemirror.css'
 
-// wangeditor 公式注册
-Boot.registerModule(formulaModule)
-
-// wangeditor markdown 注册
-Boot.registerModule(markdownModule)
+// v-md-editor 编辑器配置
+import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor'
+import '@kangc/v-md-editor/lib/style/codemirror-editor.css'
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
+import '@kangc/v-md-editor/lib/theme/style/github.css'
+VMdEditor.Codemirror = Codemirror
+VMdEditor.use(githubTheme, {
+  Hljs: hljs
+})
+Vue.use(VMdEditor)
 
 // 加载插件
 Vue.use(perm)
 Vue.use(checkPerm)
 Vue.use(preventReClick)
 Vue.use(Highlight)
-Vue.use(mavonEditor)
 Vue.use(ElementUI, {
   size: Cookies.get('size') || 'small',
   locale: ''

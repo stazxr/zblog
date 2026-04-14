@@ -16,8 +16,8 @@ CREATE TABLE `sys_props`  (
   `GROUP` varchar(30) NOT NULL COMMENT 'props 所属组',
   `REMARK` varchar(200) DEFAULT NULL COMMENT '备注',
   `DELETED` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否逻辑删除',
-  INDEX `KEY_INDEX`(`KEY`) USING BTREE,
-  UNIQUE KEY `UK_IDX_PROPS` (`KEY`, `GROUP`)
+  INDEX `idx_props_key`(`KEY`) USING BTREE,
+  UNIQUE KEY `uk_idx_props` (`KEY`, `GROUP`)
 ) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '系统配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------

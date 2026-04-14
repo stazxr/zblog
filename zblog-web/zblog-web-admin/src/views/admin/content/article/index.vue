@@ -2,73 +2,45 @@
   <div class="app-container">
     <div class="head-container">
       <div class="head-nav-tabs">
-        <span class="article-status">状态</span>
+        <span v-show="!isMobile" class="article-status">状态</span>
         <ul class="nav nav-pills">
-          <li class="nav-item">
-            <span ref="tab-all" class="nav-link" :class="{ 'active': isAllActive }" @click="statusTabChange(1)"> 全部({{ countInfo.allCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-public" class="nav-link" :class="{ 'active': isPublicActive }" @click="statusTabChange(2)"> 全部可见({{ countInfo.publicCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-private" class="nav-link" :class="{ 'active': isPrivateActive }" @click="statusTabChange(3)"> 仅我可见({{ countInfo.privateCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-audit" class="nav-link" :class="{ 'active': isAuditActive }" @click="statusTabChange(4)"> 待审核({{ countInfo.auditCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-publish" class="nav-link" :class="{ 'active': isPublishActive }" @click="statusTabChange(5)"> 待发布({{ countInfo.publishCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-deal" class="nav-link" :class="{ 'active': isDealActive }" @click="statusTabChange(6)"> 待处理({{ countInfo.dealCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-draft" class="nav-link" :class="{ 'active': isDraftActive }" @click="statusTabChange(7)"> 草稿箱({{ countInfo.draftCount }}) </span>
-          </li>
-          <li class="nav-item">
-            <span ref="tab-delete" class="nav-link" :class="{ 'active': isDeleteActive }" @click="statusTabChange(8)"> 回收站({{ countInfo.deleteCount }}) </span>
+          <li v-for="tab in statusTabs" :key="tab.key" class="nav-item">
+            <span :ref="'tab-' + tab.field" class="nav-link" :class="{ active: filters.tagStatus === tab.key }" @click="statusTabChange(tab.key)">
+              {{ tab.label }}({{ articleCountInfo[tab.field] || 0 }})
+            </span>
           </li>
         </ul>
       </div>
-      <div>
-        <el-input v-model="filters.title" clearable placeholder="文章标题" style="width: 180px" class="filter-item" @keyup.enter.native="search" />
-        <el-input v-model="filters.keywords" clearable placeholder="关键字（标签名称）" style="width: 180px" class="filter-item" @keyup.enter.native="search" />
-        <el-select v-model="filters.categoryId" clearable placeholder="文章分类" style="width: 150px" class="filter-item">
-          <el-option-group v-for="group in categoryList" :key="group.id" :label="group.name">
-            <el-option v-for="item in group.children" :key="item.id" :value="item.id" :label="item.name" />
-          </el-option-group>
-        </el-select>
-        <el-select v-model="filters.articleType" clearable placeholder="文章类型" style="width: 150px" class="filter-item">
-          <el-option label="原创" value="1" />
-          <el-option label="转载" value="2" />
-          <el-option label="翻译" value="3" />
-        </el-select>
-        <el-select v-model="filters.commentFlag" clearable placeholder="评论状态" style="width: 150px" class="filter-item">
-          <el-option label="开启评论" value="true" />
-          <el-option label="关闭评论" value="false" />
-        </el-select>
-        <span>
-          <el-button class="filter-item" size="small" type="success" icon="el-icon-search" @click="search">查询</el-button>
-          <el-button class="filter-item" size="small" type="warning" icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
-        </span>
+      <div class="search-opts">
+        <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
+          <muses-search-form-item label="" prop="search-title">
+            <el-input id="search-title" v-model="filters.title" clearable placeholder="文章标题" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-slug">
+            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item btn btn-open-name="" btn-close-name="">
+            <el-button type="success" @click="search()">查 询</el-button>
+            <el-button type="warning" @click="resetSearch()">重 置</el-button>
+          </muses-search-form-item>
+        </muses-search-form>
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['addArticle']" size="small" type="primary" @click="addArticle()">
-            写文章
-          </el-button>
-          <el-button v-show="filters.tagStatus !== 8" :disabled="selectRows.length === 0" size="small" type="warning" @click="batchMoveToRecycleBin()">
-            批量删除
-          </el-button>
-          <el-button v-show="filters.tagStatus === 8" size="small" type="danger" @click="clearRecycleBin()">
-            清空回收站
-          </el-button>
+          <el-button v-perm="['TAGSA001']" type="success" @click="addArticle">新增</el-button>
         </span>
       </div>
     </div>
-
     <div class="components-container">
-      <el-table v-if="!showEmpty" ref="articleTable" v-loading="tableLoading" :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table
+        ref="articleTable"
+        v-loading="tableLoading"
+        :data="tableData"
+        :header-cell-style="{background:'#FAFAFA'}"
+        row-key="id"
+        border
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" width="45" />
         <el-table-column :show-overflow-tooltip="true" prop="articleImgLinkList" label="文章封面" align="center" width="180" fixed="left">
           <template slot-scope="scope">
@@ -161,93 +133,73 @@
         <el-table-column :show-overflow-tooltip="true" prop="likeCount" label="点赞量" width="70" align="center" />
         <el-table-column :show-overflow-tooltip="true" prop="commentCount" label="评论数" width="70" align="center" />
         <el-table-column :show-overflow-tooltip="true" prop="desc" label="备注" width="150" align="center" />
-        <el-table-column label="操作" align="center" width="220" fixed="right">
-          <template slot-scope="scope">
-            <el-button-group v-if="scope.row['articleStatus'] !== 8">
-              <el-button type="info" size="mini" @click="showArticleDetail(scope.row)">预览</el-button>
-              <el-button v-show="loginUserId === scope.row['authorId']" v-perm="['editArticle']" type="success" size="mini" @click="editArticle(scope.row)">编辑</el-button>
-              <el-popconfirm title="操作不可撤销，确定删除吗？" @confirm="moveToRecycleBin(scope.row)">
-                <el-button slot="reference" type="warning" size="mini">删除</el-button>
-              </el-popconfirm>
-            </el-button-group>
-            <el-button-group v-else>
-              <el-button type="info" size="mini" @click="showArticleDetail(scope.row)">预览</el-button>
-              <el-button type="info" size="mini" @click="recycleToDraftBox(scope.row)">回收至草稿箱</el-button>
-              <el-popconfirm title="操作不可撤销，确定删除吗？" @confirm="deleteArticle(scope.row)">
-                <el-button slot="reference" type="danger" size="mini">彻底删除</el-button>
-              </el-popconfirm>
-            </el-button-group>
-          </template>
-        </el-table-column>
+        <div slot="empty">
+          <el-empty :image="nodataImg" description=" " />
+        </div>
       </el-table>
-      <el-result v-if="showEmpty" title="空空如也" sub-title="少壮不努力，老大徒伤悲。">
-        <template slot="icon">
-          <el-image :src="emptyImg" style="width: 200px;" />
-        </template>
-        <template slot="extra">
-          <el-button v-perm="['addArticle']" type="primary" size="medium" @click="addArticle()">去创作</el-button>
-        </template>
-      </el-result>
-    </div>
-
-    <div class="pagination-container">
-      <el-pagination
-        :total="total"
-        :current-page="page"
-        :page-size="pageSize"
-        :page-sizes="[5, 10, 15, 20, 25]"
-        style="margin-top: 8px;"
-        :hide-on-single-page="true"
-        layout="total, prev, pager, next, sizes"
-        @size-change="sizeChange"
-        @current-change="pageChange"
-      />
-    </div>
-
-    <el-dialog :visible.sync="previewArticleDialogVisible" title="预览" width="900px">
-      <previewArticle ref="previewArticleRef" />
-      <div slot="footer" class="dialog-footer">
-        <el-button type="default" @click="closePreviewArticleDialog">关 闭</el-button>
+      <div class="pagination-container">
+        <el-pagination
+          :total="total"
+          :current-page.sync="page"
+          :page-size.sync="pageSize"
+          :page-sizes="[5, 10, 15, 20, 25]"
+          layout="total, prev, pager, next, sizes"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+        />
       </div>
-    </el-dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import EmptyImg from '@/assets/images/empty.png'
-import previewArticle from '@/views/admin/web/article/template/previewArticle'
+import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Article',
-  components: {
-    previewArticle
-  },
   data() {
     return {
-      categoryList: [],
-      articleDefaultImg: '',
-      emptyImg: EmptyImg,
-      showEmpty: false,
+      statusTabs: [
+        { key: 1, label: '全部', field: 'totalCount' },
+        { key: 2, label: '公开', field: 'publicCount' },
+        { key: 3, label: '私密', field: 'privateCount' },
+        { key: 4, label: '待审核', field: 'pendingAuditCount' },
+        { key: 5, label: '待发布', field: 'pendingPublishCount' },
+        { key: 6, label: '待处理', field: 'pendingDealCount' },
+        { key: 7, label: '草稿箱', field: 'draftCount' },
+        { key: 8, label: '回收站', field: 'recycleCount' }
+      ],
+      articleCountInfo: {
+        // 全部
+        totalCount: 0,
+        // 公开
+        publicCount: 0,
+        // 私密
+        privateCount: 0,
+        // 待审核
+        pendingAuditCount: 0,
+        // 待发布
+        pendingPublishCount: 0,
+        // 待处理（比如审核不通过 / 待整改）
+        pendingDealCount: 0,
+        // 草稿箱
+        draftCount: 0,
+        // 回收站
+        recycleCount: 0
+      },
       filters: {
         tagStatus: 1,
-        title: '',
-        keywords: '',
-        categoryId: '',
-        commentFlag: '',
-        articleType: ''
+        title: null,
+        categoryId: null,
+        tagId: null,
+        articleType: null,
+        commentFlag: null
       },
-      countInfo: {
-        allCount: 0,
-        publicCount: 0,
-        privateCount: 0,
-        auditCount: 0,
-        publishCount: 0,
-        dealCount: 0,
-        draftCount: 0,
-        deleteCount: 0
-      },
+      categoryList: [],
+      articleDefaultImg: '',
       tableData: [],
-      selectRows: [],
       tableLoading: false,
+      nodataImg: nodataImg,
+      rows: [],
       total: 0,
       page: 1,
       pageSize: 5,
@@ -255,38 +207,14 @@ export default {
     }
   },
   computed: {
-    loginUserId() {
-      return this.$store.getters.user ? this.$store.getters.user.id : null
-    },
-    isAllActive() {
-      return this.filters.tagStatus === 1
-    },
-    isPublicActive() {
-      return this.filters.tagStatus === 2
-    },
-    isPrivateActive() {
-      return this.filters.tagStatus === 3
-    },
-    isAuditActive() {
-      return this.filters.tagStatus === 4
-    },
-    isPublishActive() {
-      return this.filters.tagStatus === 5
-    },
-    isDealActive() {
-      return this.filters.tagStatus === 6
-    },
-    isDraftActive() {
-      return this.filters.tagStatus === 7
-    },
-    isDeleteActive() {
-      return this.filters.tagStatus === 8
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
     }
   },
   mounted() {
-    this.getDefaultArticleImg()
-    this.queryCategoryTree()
     this.listTableData()
+    this.queryCategoryTree()
+    // this.getDefaultArticleImg()
   },
   activated() {
     if (this.$route.query._ts && this.$route.query._ts !== '') {
@@ -300,39 +228,31 @@ export default {
   },
   methods: {
     handleSelectionChange(val) {
-      this.selectRows = val
+      this.rows = val
     },
+    // 查询
     statusTabChange(status) {
       this.page = 1
       this.filters.tagStatus = status
       this.listTableData()
-    },
-    getDefaultArticleImg() {
-      this.$mapi.article.queryArticleDefaultImg().then(res => {
-        const { data } = res
-        this.articleDefaultImg = data || ''
-      })
-    },
-    queryCategoryTree() {
-      this.$mapi.article.queryCategoryTree().then(({ data }) => {
-        this.categoryList = data
-      }).catch(_ => {
-        this.categoryList = []
-      })
     },
     search() {
       this.page = 1
       this.listTableData()
     },
     resetSearch() {
+      Object.keys(this.filters).forEach(key => { this.filters[key] = null })
       this.filters.tagStatus = 1
-      this.filters.title = ''
-      this.filters.keywords = ''
-      this.filters.categoryId = ''
-      this.filters.commentFlag = ''
-      this.filters.articleType = ''
-
       this.page = 1
+      this.listTableData()
+    },
+    handleSizeChange(size) {
+      this.page = 1
+      this.pageSize = size
+      this.listTableData()
+    },
+    handlePageChange(page) {
+      this.page = page
       this.listTableData()
     },
     listTableData() {
@@ -341,28 +261,41 @@ export default {
         page: this.page,
         pageSize: this.pageSize
       }
-
-      this.tableData = []
-      this.showEmpty = false
       this.tableLoading = true
-      this.$mapi.article.pageArticleList(param).then(({ data }) => {
-        const { dataList, countInfo } = data
-        this.tableData = dataList.list
-        this.total = dataList.total
-
-        Object.keys(this.countInfo).forEach(key => {
-          this.countInfo[key] = countInfo[key] || 0
-        })
+      this.$mapi.article.pageMyList(param).then(res => {
+        const { data } = res
+        this.total = data.total
+        this.tableData = data.records
       }).catch(_ => {
-        this.tableData = []
         this.total = 0
-
-        Object.keys(this.countInfo).forEach(key => {
-          this.countInfo[key] = 0
-        })
+        this.tableData = []
       }).finally(() => {
+        this.rows = []
         this.tableLoading = false
-        this.showEmpty = this.tableData.length === 0
+        this.$refs.articleTable.setCurrentRow()
+        this.loadMyArticleCountInfo()
+      })
+    },
+    loadMyArticleCountInfo() {
+      this.$mapi.article.queryMyArticleCountInfo().then(res => {
+        const { data } = res
+        Object.keys(this.articleCountInfo).forEach(key => {
+          this.articleCountInfo[key] = data[key] || 0
+        })
+      })
+    },
+    queryCategoryTree() {
+      this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
+        this.categoryList = data
+      }).catch(_ => {
+        this.categoryList = []
+      })
+    },
+    // TODO
+    getDefaultArticleImg() {
+      this.$mapi.article.queryArticleDefaultImg().then(res => {
+        const { data } = res
+        this.articleDefaultImg = data || ''
       })
     },
     addArticle() {
@@ -401,7 +334,7 @@ export default {
     },
     batchMoveToRecycleBin() {
       const articleIds = []
-      this.selectRows.forEach(row => {
+      this.rows.forEach(row => {
         articleIds.push(row.id)
       })
 
@@ -459,6 +392,7 @@ export default {
   line-height: 36px;
   height: 30px;
   margin-right: 24px;
+  font-weight: bold;
 }
 .head-nav-tabs .nav {
   display: -webkit-box;

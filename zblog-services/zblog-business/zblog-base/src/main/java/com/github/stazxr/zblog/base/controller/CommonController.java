@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  * @author SunTao
  * @since 2025-12-27
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/common")

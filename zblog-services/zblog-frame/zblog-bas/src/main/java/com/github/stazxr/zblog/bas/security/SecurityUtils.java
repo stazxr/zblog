@@ -53,6 +53,7 @@ public final class SecurityUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T extends SecurityUser> T getLoginUser() {
+        // TODO 待优化，获取失败直接抛出401
         if (!isAuthenticated()) {
             throw new IllegalStateException("用户未登录");
         }

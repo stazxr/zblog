@@ -25,9 +25,9 @@ public class CategoryQueryDto extends PageParam {
     private String name;
 
     /**
-     * SLUG
+     * 分类唯一标识
      */
-    @ApiModelProperty("SLUG")
+    @ApiModelProperty("分类唯一标识")
     private String slug;
 
     /**

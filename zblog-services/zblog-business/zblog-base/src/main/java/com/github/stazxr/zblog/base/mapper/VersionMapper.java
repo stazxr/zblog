@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface VersionMapper extends BaseMapper<Version> {
     /**
-     * 查询版本列表
+     * 分页查询版本列表
      *
      * @param page     分页参数
      * @param queryDto 查询参数

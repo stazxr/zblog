@@ -16,8 +16,9 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface TagMapper extends BaseMapper<Tag> {
     /**
-     * 查询标签列表
+     * 分页查询标签列表
      *
+     * @param page     分页参数
      * @param queryDto 查询参数
      * @return IPage<TagVo>
      */

@@ -1,6 +1,4 @@
-package com.github.stazxr.zblog.domain.enums;
-
-import lombok.Getter;
+package com.github.stazxr.zblog.content.domain.enums;
 
 /**
  * 文章状态
@@ -8,7 +6,6 @@ import lombok.Getter;
  * @author SunTao
  * @since 2021-07-31
  */
-@Getter
 public enum ArticleStatus {
     /**
      * 草稿
@@ -26,34 +23,39 @@ public enum ArticleStatus {
     PUBLISH_REVIEW(3),
 
     /**
+     * 待发布（定时）
+     */
+    TIME_PUBLISH(4),
+
+    /**
      * 审核不通过
      */
-    FAILED_REVIEW(4),
+    FAILED_REVIEW(5),
 
     /**
      * 已发布
      */
-    PUBLISHED(5),
+    PUBLISHED(6),
 
     /**
      * 临时下线（已发布的文章由于某些原因临时下线）
      */
-    TEMP_DOWN(6),
+    TEMP_DOWN(7),
 
     /**
      * 待整改（已发布的文章由于某些原因需要内容调整）
      */
-    TO_CHANGE(7),
+    TO_CHANGE(8),
 
     /**
      * 回收站
      */
-    RECYCLE(8),
+    RECYCLE(9),
 
     /**
-     * 待发布（定时）
+     * 已删除
      */
-    TIME_PUBLISH(9);
+    DELETED(99);
 
     private final Integer type;
 
@@ -61,13 +63,7 @@ public enum ArticleStatus {
         this.type = type;
     }
 
-    public static ArticleStatus of(Integer articleStatus) {
-        for (ArticleStatus item : values()) {
-            if (item.type.equals(articleStatus)) {
-                return item;
-            }
-        }
-
-        return null;
+    public Integer getType() {
+        return type;
     }
 }

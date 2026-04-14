@@ -143,11 +143,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-result v-if="showEmpty" title="空空如也" sub-title="这里没有需要处理的事务。">
-        <template slot="icon">
-          <el-image :src="emptyImg" style="width: 200px;" />
-        </template>
-      </el-result>
     </div>
 
     <div class="pagination-container">
@@ -176,9 +171,8 @@
 </template>
 
 <script>
-import EmptyImg from '@/assets/images/empty.png'
-import auditDialog from '@/views/admin/web/article/template/auditDialog'
-import previewArticle from '@/views/admin/web/article/template/previewArticle'
+import auditDialog from '@/views/admin/content/article/template/auditDialog'
+import previewArticle from '@/views/admin/content/article/template/previewArticle'
 export default {
   name: 'ArticleAudit',
   components: {
@@ -188,7 +182,6 @@ export default {
     return {
       categoryList: [],
       articleDefaultImg: '',
-      emptyImg: EmptyImg,
       showEmpty: false,
       filters: {
         tagStatus: 1,

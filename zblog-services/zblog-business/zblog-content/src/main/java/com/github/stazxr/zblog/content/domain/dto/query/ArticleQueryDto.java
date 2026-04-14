@@ -1,11 +1,10 @@
-package com.github.stazxr.zblog.domain.dto.query;
+package com.github.stazxr.zblog.content.domain.dto.query;
 
 import com.github.stazxr.zblog.core.base.PageParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * 文章查询
@@ -15,20 +14,21 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("文章查询参数")
 public class ArticleQueryDto extends PageParam {
-    /**
-     * 登录用户id
-     */
-    @ApiModelProperty("登录用户id")
-    private Long loginUser;
+    private static final long serialVersionUID = 6190775176041347791L;
 
     /**
-     * 文章id
+     * 作者ID
      */
-    @ApiModelProperty("文章id")
-    private Long articleId;
+    @ApiModelProperty("作者ID")
+    private Long authorId;
+
+    /**
+     * 状态查询
+     */
+    @ApiModelProperty("状态查询")
+    private Integer tagStatus;
 
     /**
      * 文章标题
@@ -37,28 +37,22 @@ public class ArticleQueryDto extends PageParam {
     private String title;
 
     /**
-     * 文章关键字
+     * 文章唯一标识
      */
-    @ApiModelProperty("文章关键字")
-    private String keywords;
+    @ApiModelProperty("文章唯一标识")
+    private String slug;
 
     /**
-     * 文章分类
+     * 分类ID
      */
-    @ApiModelProperty("文章分类")
+    @ApiModelProperty("分类ID")
     private Long categoryId;
 
     /**
-     * 文章标签
+     * 标签ID
      */
-    @ApiModelProperty("文章标签")
+    @ApiModelProperty("标签ID")
     private Long tagId;
-
-    /**
-     * 文章专栏
-     */
-    @ApiModelProperty("文章专栏")
-    private Long columnId;
 
     /**
      * 文章类型
@@ -72,11 +66,26 @@ public class ArticleQueryDto extends PageParam {
     @ApiModelProperty("评论状态")
     private Boolean commentFlag;
 
+
+
+
+
+
+
+
+    // TODO
+
     /**
-     * 状态查询
+     * 文章id
      */
-    @ApiModelProperty("状态查询")
-    private Integer tagStatus;
+    @ApiModelProperty("文章id")
+    private Long articleId;
+
+    /**
+     * 文章专栏
+     */
+    @ApiModelProperty("文章专栏")
+    private Long columnId;
 
     /**
      * 作者用户名、昵称

@@ -1,61 +1,109 @@
-//package com.github.stazxr.zblog.controller;
-//
-//import com.github.stazxr.zblog.bas.rest.Result;
-//import com.github.stazxr.zblog.bas.router.Router;
-//import com.github.stazxr.zblog.bas.router.RouterLevel;
-//import com.github.stazxr.zblog.core.annotation.ApiVersion;
-//import com.github.stazxr.zblog.core.base.BaseConst;
-//import com.github.stazxr.zblog.domain.dto.ArticleAuditDto;
-//import com.github.stazxr.zblog.domain.dto.ArticleDto;
-//import com.github.stazxr.zblog.domain.dto.query.ArticleCategoryQueryDto;
-//import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
-//import com.github.stazxr.zblog.domain.dto.query.ArticleTagQueryDto;
-//import com.github.stazxr.zblog.log.annotation.Log;
-//import com.github.stazxr.zblog.service.ArticleCategoryService;
-//import com.github.stazxr.zblog.service.ArticleService;
-//import com.github.stazxr.zblog.service.ArticleTagService;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiImplicitParam;
-//import io.swagger.annotations.ApiImplicitParams;
-//import io.swagger.annotations.ApiOperation;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-///**
-// * 文章管理
-// *
-// * @author SunTao
-// * @since 2020-11-19
-// */
-//@Slf4j
-//@RestController
-//@RequiredArgsConstructor
-//@RequestMapping("/api/articles")
-//@Api(value = "ArticleController", tags = { "文章控制器" })
-//public class ArticleController {
-//    private final ArticleService articleService;
-//
+package com.github.stazxr.zblog.content.controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.stazxr.zblog.bas.router.ApiVersion;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
+import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.service.ArticleService;
+import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.log.annotation.Log;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 文章管理
+ *
+ * @author SunTao
+ * @since 2020-11-19
+ * @since 2026-04-12 代码重构
+ */
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/articles")
+@Api(value = "ArticleController", tags = { "文章管理" })
+public class ArticleController {
+    private final ArticleService articleService;
+
+    /**
+     * 分页查询我的文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    @GetMapping(value = "/pageMyList")
+    @ApiOperation(value = "分页查询我的文章列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "分页查询我的文章列表", code = "ARTIQ001", level = RouterLevel.PUBLIC)
+    public IPage<ArticleVo> queryMyArticleListByPage(ArticleQueryDto queryDto) {
+        return articleService.queryMyArticleListByPage(queryDto);
+    }
+
+    /**
+     * 查询我的文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    @GetMapping(value = "/queryMyArticleCountInfo")
+    @ApiOperation(value = "查询我的文章数量统计信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询我的文章数量统计信息", code = "ARTIQ002", level = RouterLevel.PUBLIC)
+    public ArticleCountVo queryMyArticleCountInfo() {
+        return articleService.queryMyArticleCountInfo();
+    }
+
+    /**
+     * 新增文章
+     *
+     * @param articleDto 文章信息
+     */
+    @Log
+    @PostMapping(value = "/addArticle")
+    @ApiOperation(value = "新增文章")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "新增文章", code = "ARTIA001")
+    public void addArticle(@RequestBody @Validated(Create.class) ArticleDto articleDto) {
+        articleService.addArticle(articleDto);
+    }
+
+    /**
+     * 编辑文章
+     *
+     * @param articleDto 文章信息
+     */
+    @Log
+    @PostMapping(value = "/editArticle")
+    @ApiOperation(value = "编辑文章")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "编辑文章", code = "ARTIU001")
+    public void editArticle(@RequestBody @Validated(Update.class) ArticleDto articleDto) {
+        articleService.editArticle(articleDto);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //    private final ArticleTagService articleTagService;
-//
 //    private final ArticleCategoryService articleCategoryService;
-//
-//    /**
-//     * 分页查询用户的文章列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticlePageData
-//     */
-//    @GetMapping(value = "/pageList")
-//    @ApiOperation(value = "分页查询用户的文章列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "分页查询用户的文章列表", code = "queryArticleListByPage")
-//    public Result queryArticleListByPage(ArticleQueryDto queryDto) {
-//        return Result.success().data(articleService.queryArticleListByPage(queryDto));
-//    }
-//
+
 //    /**
 //     * 分页查询可见的文章列表
 //     *
@@ -85,22 +133,6 @@
 //    @Router(name = "查询文章详情", code = "queryArticleDetail", level = RouterLevel.PUBLIC)
 //    public Result queryArticleDetail(@RequestParam Long articleId) {
 //        return Result.success().data(articleService.queryArticleDetail(articleId));
-//    }
-//
-//    /**
-//     * 新增文章
-//     *
-//     * @param articleDto 文章信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/addArticle")
-//    @ApiOperation(value = "新增文章")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "新增文章", code = "addArticle")
-//    public Result addArticle(@RequestBody ArticleDto articleDto) {
-//        articleService.addArticle(articleDto);
-//        return Result.success();
 //    }
 //
 //    /**
@@ -344,35 +376,6 @@
 //        log.info("articleIds: {}", articleIds);
 //        return Result.failure();
 //    }
-//
-//    /**
-//     * 查询文章分类列表（树）
-//     *
-//     * @return CategoryVoList
-//     */
-//    @GetMapping(value = "/queryCategoryTree")
-//    @ApiOperation(value = "查询文章分类列表（树）")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询文章分类列表（树）", code = "queryArticleCategoryTree", level = RouterLevel.PUBLIC)
-//    public Result queryCategoryTreeList() {
-//        return Result.success().data(articleCategoryService.queryCategoryTreeList(new ArticleCategoryQueryDto()));
-//    }
-//
-//    /**
-//     * 查询文章标签列表
-//     *
-//     * @return CategoryVoList
-//     */
-//    @GetMapping(value = "/queryTagList")
-//    @ApiOperation(value = "查询文章标签列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询文章标签列表", code = "queryArticleTagList", level = RouterLevel.PUBLIC)
-//    public Result queryTagList() {
-//        ArticleTagQueryDto queryDto = new ArticleTagQueryDto();
-//        queryDto.setEnabled(true);
-//        return Result.success().data(articleTagService.queryTagList(queryDto));
-//    }
-//
 //    /**
 //     * 查询文章默认封面，前台会使用这个接口，需要接口权限为《RouterLevel.OPEN》
 //     *
@@ -385,4 +388,4 @@
 //    public Result queryArticleDefaultImg() {
 //        return Result.success().data(articleService.queryArticleDefaultImg());
 //    }
-//}
+}

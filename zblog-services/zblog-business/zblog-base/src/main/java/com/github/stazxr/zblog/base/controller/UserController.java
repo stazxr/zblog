@@ -17,7 +17,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
  * @author SunTao
  * @since 2020-12-10
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")

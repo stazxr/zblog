@@ -8,7 +8,6 @@ import com.github.stazxr.zblog.core.base.BaseConst;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.List;
  * @author SunTao
  * @since 2026-02-10
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cache")

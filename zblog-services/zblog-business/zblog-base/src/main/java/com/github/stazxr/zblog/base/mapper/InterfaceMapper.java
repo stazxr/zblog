@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface InterfaceMapper {
     /**
-     * 查询接口列表
+     * 分页查询接口列表
      *
      * @param page     分页参数
      * @param queryDto 查询参数

@@ -7,7 +7,7 @@
             c.ALLOW_INDEX, c.ENABLED, c.VISIBLE, c.SORT, c.CREATE_TIME, c.UPDATE_TIME, COUNT(a.ID) AS ARTICLE_COUNT
         FROM category c
         LEFT JOIN category c2 ON c2.PID = c.ID
-        LEFT JOIN article a ON a.DELETED = 0 AND (
+        LEFT JOIN article a ON a.ARTICLE_STATUS != 99 AND (
             a.CATEGORY_ID = c.ID OR a.CATEGORY_ID = c2.ID
         )
         <where>
@@ -48,12 +48,12 @@
             IF(
                 c.PID IS NULL,
                 (
-                    SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID IN (
+                    SELECT COUNT(1) FROM article a WHERE a.ARTICLE_STATUS != 99 AND a.CATEGORY_ID IN (
                         SELECT c1.ID FROM category c1 WHERE c1.PID = c.ID
                     )
                 ),
                 (
-                    SELECT COUNT(1) FROM article a WHERE a.DELETED = 0 AND a.CATEGORY_ID = c.ID
+                    SELECT COUNT(1) FROM article a WHERE a.ARTICLE_STATUS != 99 AND a.CATEGORY_ID = c.ID
                 )
             ) AS ARTICLE_COUNT
         FROM category c

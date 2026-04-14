@@ -159,10 +159,10 @@ public class MenuServiceImpl implements MenuService {
 
         // 设置菜单是否显示
         menuVo.setShow(!perm.getHidden());
-        SecurityUser loginUser = SecurityUtils.getLoginUser();
-        if (UserType.ADMIN_USER.getType().equals(loginUser.getUserType())) {
-            menuVo.setShow(true);
-        }
+        // SecurityUser loginUser = SecurityUtils.getLoginUser(); // 代码不安全，计划下线
+        // if (UserType.ADMIN_USER.getType().equals(loginUser.getUserType())) {
+        //     menuVo.setShow(true);
+        // }
 
         // 设置菜单组件
         menuVo.setComponent(determineComponentForMenu(perm));

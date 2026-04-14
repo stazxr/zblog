@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public interface RoleMapper extends BaseMapper<Role> {
     /**
-     * 查询角色列表
+     * 分页查询角色列表
      *
      * @param page     分页参数
      * @param queryDto 查询参数

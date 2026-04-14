@@ -18,10 +18,10 @@ import session from '@/api/base/maintain/session.js'
 // content
 import category from '@/api/service/content/category.js'
 import tag from '@/api/service/content/tag.js'
+import article from '@/api/service/content/article.js'
 
 // TODO
 import column from '@/api/service/column.js'
-import article from '@/api/service/article.js'
 import webSetting from '@/api/service/webSetting.js'
 import friendLink from '@/api/service/friendLink.js'
 import talk from '@/api/service/talk.js'
@@ -36,6 +36,6 @@ export default {
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,
-  category, tag,
-  column, article, webSetting, friendLink, talk, page, album, message, comment, test
+  category, tag, article,
+  column, webSetting, friendLink, talk, page, album, message, comment, test
 }

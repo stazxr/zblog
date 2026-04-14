@@ -264,8 +264,10 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('TAG_SLUG_EXISTS', 'zh-CN', '标签 SLUG 已存在', 'common'),
 ('TAG_SLUG_EXISTS', 'en-US', 'Tag slug exist', 'common'),
 ('TAG_DELETE_WITH_ARTICLE', 'zh-CN', '标签下存在文章，无法删除', 'common'),
-('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common');
+('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common'),
 -- 文章
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common');
 
 -- 栏目
 

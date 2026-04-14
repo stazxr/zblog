@@ -14,7 +14,6 @@ import com.github.stazxr.zblog.log.annotation.IgnoreLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import java.util.Map;
  * @author SunTao
  * @since 2022-01-15
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")

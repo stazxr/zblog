@@ -1,57 +1,97 @@
-//package com.github.stazxr.zblog.service.impl;
-//
-//import com.alibaba.fastjson.JSON;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-//import com.github.pagehelper.PageHelper;
-//import com.github.pagehelper.PageInfo;
-//import com.github.stazxr.zblog.bas.file.handler.FileHandler;
-//import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
-//import com.github.stazxr.zblog.bas.file.model.FileInfo;
-//import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
-//import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-//import com.github.stazxr.zblog.base.domain.entity.File;
-//import com.github.stazxr.zblog.base.service.FileService;
-//import com.github.stazxr.zblog.converter.ArticleConverter;
-//import com.github.stazxr.zblog.core.base.BaseConst;
-//import com.github.stazxr.zblog.core.util.DataValidated;
-//import com.github.stazxr.zblog.core.util.SecurityUtils;
-//import com.github.stazxr.zblog.domain.bo.ArticleCountData;
-//import com.github.stazxr.zblog.domain.bo.ArticlePageData;
-//import com.github.stazxr.zblog.domain.dto.ArticleAuditDto;
-//import com.github.stazxr.zblog.domain.dto.ArticleDto;
-//import com.github.stazxr.zblog.domain.dto.query.ArticleQueryDto;
-//import com.github.stazxr.zblog.domain.dto.setting.OtherInfo;
-//import com.github.stazxr.zblog.domain.entity.*;
-//import com.github.stazxr.zblog.domain.enums.*;
-//import com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo;
-//import com.github.stazxr.zblog.domain.vo.ArticleVo;
-//import com.github.stazxr.zblog.mapper.*;
-//import com.github.stazxr.zblog.service.ArticleService;
-//import com.github.stazxr.zblog.util.Assert;
-//import com.github.stazxr.zblog.util.StringUtils;
-//import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
-//import com.github.stazxr.zblog.util.http.HtmlContentUtils;
-//import com.github.stazxr.zblog.util.io.FileUtils;
-//import com.github.stazxr.zblog.util.math.MathUtils;
-//import com.github.stazxr.zblog.util.time.DateUtils;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.transaction.interceptor.TransactionAspectSupport;
-//import org.springframework.web.multipart.MultipartFile;
-//
-//import java.io.FileInputStream;
-//import java.util.*;
-//
-///**
-// * 文章业务实现层
-// *
-// * @author SunTao
-// * @since 2021-02-23
-// */
-//@Service
-//@RequiredArgsConstructor
-//public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+package com.github.stazxr.zblog.content.service.impl;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
+import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.content.domain.entity.Article;
+import com.github.stazxr.zblog.content.domain.error.ArticleErrorCode;
+import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
+import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.mapper.ArticleMapper;
+import com.github.stazxr.zblog.content.service.ArticleService;
+import com.github.stazxr.zblog.util.StringUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 文章管理业务实现层
+ *
+ * @author SunTao
+ * @since 2021-02-23
+ */
+@Service
+@RequiredArgsConstructor
+public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+    /**
+     * 分页查询我的文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    @Override
+    public IPage<ArticleVo> queryMyArticleListByPage(ArticleQueryDto queryDto) {
+        // 设置用户ID
+        Long loginId = SecurityUtils.getLoginId();
+        queryDto.setAuthorId(loginId);
+
+        // 参数检查
+        queryDto.checkPage();
+        ThrowUtils.throwIfNull(queryDto.getTagStatus(), ArticleErrorCode.EARTIA001);
+        if (StringUtils.isNotBlank(queryDto.getTitle())) {
+            queryDto.setTitle(queryDto.getTitle().trim());
+        }
+        if (StringUtils.isNotBlank(queryDto.getSlug())) {
+            queryDto.setSlug(queryDto.getSlug().trim());
+        }
+
+        // 分页查询
+        Page<ArticleVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return baseMapper.selectMyArticleList(page, queryDto);
+    }
+
+    /**
+     * 查询我的文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    @Override
+    public ArticleCountVo queryMyArticleCountInfo() {
+        Long loginId = SecurityUtils.getLoginId();
+        ArticleCountVo articleCountVo = baseMapper.selectMyArticleCountInfo(loginId);
+        if (articleCountVo == null) {
+            articleCountVo = new ArticleCountVo();
+        }
+        return articleCountVo;
+    }
+
+    /**
+     * 新增文章
+     *
+     * @param articleDto 文章信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addArticle(ArticleDto articleDto) {
+
+    }
+
+    /**
+     * 编辑文章
+     *
+     * @param articleDto 文章信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editArticle(ArticleDto articleDto) {
+
+    }
+
+
 //    /**
 //     * 多封面最多支持上传四个封面
 //     */
@@ -152,10 +192,6 @@
 //    @Override
 //    @Transactional(rollbackFor = Exception.class)
 //    public void editArticle(ArticleDto articleDto) {
-//        // 操作类型检查
-//        boolean isAction = StringUtils.isBlank(articleDto.getAction()) || !BaseConst.Action.EDIT.equals(articleDto.getAction());
-//        Assert.isTrue(isAction, "参数【action】不正确，理论为：" + BaseConst.Action.EDIT);
-//
 //        // 编辑文章
 //        checkArticle(articleDto);
 //        Article article = articleConverter.dtoToEntity(articleDto);
@@ -668,4 +704,4 @@
 //            articleTagRelationMapper.insert(relation);
 //        }
 //    }
-//}
+}

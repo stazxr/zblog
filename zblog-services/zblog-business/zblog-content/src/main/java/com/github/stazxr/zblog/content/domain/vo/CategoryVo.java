@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ApiModel("标签VO")
+@ApiModel("分类VO")
 public class CategoryVo extends BaseVo {
     private static final long serialVersionUID = 353567845249460600L;
 

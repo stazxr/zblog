@@ -16,7 +16,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +27,6 @@ import java.util.List;
  * @author SunTao
  * @since 2020-11-19
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/categories")
@@ -48,6 +46,19 @@ public class CategoryController {
     @Router(name = "查询分类树列表", code = "CATEQ001")
     public List<CategoryVo> queryCategoryTree(CategoryQueryDto queryDto) {
         return categoryService.queryCategoryTree(queryDto);
+    }
+
+    /**
+     * 查询分类树列表（公共）
+     *
+     * @return List<CategoryVo>
+     */
+    @GetMapping(value = "/queryPublicCategoryTree")
+    @ApiOperation(value = "查询分类树列表（公共）")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询分类树列表（公共）", code = "CATEQ004", level = RouterLevel.PUBLIC)
+    public List<CategoryVo> queryPublicCategoryTree() {
+        return categoryService.queryCategoryTree(new CategoryQueryDto());
     }
 
     /**

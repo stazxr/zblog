@@ -8,6 +8,10 @@ export default {
   queryCategoryTree: params => {
     return api.httpRequest().get(`${categoryApi}/queryCategoryTree`, params)
   },
+  // 查询分类树列表（公共）
+  queryPublicCategoryTree: params => {
+    return api.httpRequest().get(`${categoryApi}/queryCategoryTree`, params)
+  },
   // 查询一级类别列表
   queryFirstCategoryList: params => {
     return api.httpRequest().get(`${categoryApi}/queryFirstCategoryList`, params)

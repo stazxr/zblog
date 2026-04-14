@@ -1,13 +1,18 @@
 import qs from 'qs'
-import api from '../custom-axios'
+import api from '../../custom-axios'
 
 const articleApi = '/api/articles'
 
 export default {
-  // 分页查询用户文章列表
-  pageArticleList: params => {
-    return api.httpRequest().get(`${articleApi}/pageList`, params)
+  // 分页查询我的文章列表
+  pageMyList: params => {
+    return api.httpRequest().get(`${articleApi}/pageMyList`, params)
   },
+  // 查询我的文章数量统计信息
+  queryMyArticleCountInfo: params => {
+    return api.httpRequest().get(`${articleApi}/queryMyArticleCountInfo`, params)
+  },
+
   // 分页查询用户文章列表
   pageAuditArticleList: params => {
     return api.httpRequest().get(`${articleApi}/pagePublicList`, params)

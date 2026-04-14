@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import previewArticle from '@/views/admin/web/article/template/previewArticle'
+import previewArticle from '@/views/admin/content/article/template/previewArticle'
 export default {
   components: {
     previewArticle

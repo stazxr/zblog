@@ -9,7 +9,6 @@ import com.github.stazxr.zblog.log.annotation.IgnoreLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
  * @author SunTao
  * @since 2021-09-05
  */
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/host")
