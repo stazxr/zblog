@@ -20,6 +20,8 @@
         <module>zblog-log</module>
         <module>zblog-base</module>
         <module>zblog-content</module>
+        <module>zblog-content-ext</module>
+        <module>zblog-portal</module>
         <module>zblog-app</module>
         <module>zblog-service</module>
     </modules>

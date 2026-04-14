@@ -4,6 +4,18 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 获取标签列表
+  queryTagList: params => {
+    return api.httpRequest().get(`${portalApi}/queryTagList`, params)
+  },
+  // 获取标签详情
+  queryTagById: params => {
+    return api.httpRequest().get(`${portalApi}/queryTagById`, params)
+  },
+  // 获取标签云数据
+  queryBoardTagList: params => {
+    return api.httpRequest().get(`${portalApi}/queryBoardTagList`, params)
+  },
   // 登录
   webLogin: params => {
     return api.httpRequest().post(`${portalApi}/webLogin`, params)
@@ -64,10 +76,6 @@ export default {
   queryBoardTalkList: params => {
     return api.httpRequest().get(`${portalApi}/queryBoardTalkList`, params)
   },
-  // 获取标签云数据
-  queryBoardTagList: params => {
-    return api.httpRequest().get(`${portalApi}/queryBoardTagList`, params)
-  },
   // 获取热门文章列表
   queryBoardHotArticleList: params => {
     return api.httpRequest().get(`${portalApi}/queryBoardHotArticleList`, params)
@@ -92,10 +100,6 @@ export default {
   likeTalk: params => {
     return api.httpRequest().post(`${portalApi}/likeTalk`, params)
   },
-  // 获取标签列表
-  queryTagList: params => {
-    return api.httpRequest().get(`${portalApi}/queryTagList`, params)
-  },
   // 获取分类列表
   queryCategoryList: params => {
     return api.httpRequest().get(`${portalApi}/queryCategoryList`, params)
@@ -107,10 +111,6 @@ export default {
   // 获取分类详情
   queryCategoryById: params => {
     return api.httpRequest().get(`${portalApi}/queryCategoryById`, params)
-  },
-  // 获取标签详情
-  queryTagById: params => {
-    return api.httpRequest().get(`${portalApi}/queryTagById`, params)
   },
   // 点赞文章
   likeArticle: params => {

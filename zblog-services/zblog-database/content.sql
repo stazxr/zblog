@@ -85,6 +85,39 @@ CREATE TABLE `tag` (
   UNIQUE KEY `uk_tag_slug` (`SLUG`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章标签表';
 
+/*Data for table `tag` */
+INSERT INTO `tag` (`ID`,`NAME`,`SLUG`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`ALLOW_INDEX`,`ENABLED`,`VERSION`,`CREATE_USER`,`CREATE_TIME`) VALUES
+    (1,'Java','java','Java技术文章','Java,后端,编程','Java开发相关技术文章',1,1,1,1,'2026-01-01 10:00:00'),
+    (2,'Spring Boot','spring-boot','Spring Boot教程','SpringBoot,Java,框架','Spring Boot开发实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (3,'MySQL','mysql','MySQL数据库','MySQL,数据库,SQL','MySQL使用与优化',1,1,1,1,'2026-01-01 10:00:00'),
+    (4,'Redis','redis','Redis缓存','Redis,缓存,NoSQL','Redis缓存实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (5,'Docker','docker','Docker容器技术','Docker,容器,DevOps','Docker部署与实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (6,'Kubernetes','kubernetes','K8s容器编排','Kubernetes,K8s,容器','Kubernetes实战指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (7,'Vue','vue','Vue前端框架','Vue,前端,JavaScript','Vue开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (8,'React','react','React前端框架','React,前端,JS','React开发实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (9,'JavaScript','javascript','JavaScript基础','JS,前端,编程','JavaScript深入解析',1,1,1,1,'2026-01-01 10:00:00'),
+    (10,'TypeScript','typescript','TypeScript开发','TS,JavaScript,类型系统','TypeScript教程',1,1,1,1,'2026-01-01 10:00:00'),
+    (11,'HTML','html','HTML基础','HTML,前端,网页','HTML开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (12,'CSS','css','CSS样式设计','CSS,前端,样式','CSS布局与优化',1,1,1,1,'2026-01-01 10:00:00'),
+    (13,'Node.js','nodejs','Node.js后端开发','Node.js,JavaScript,后端','Node开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (14,'Nginx','nginx','Nginx配置','Nginx,服务器,反向代理','Nginx实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (15,'Linux','linux','Linux系统','Linux,服务器,操作系统','Linux常用命令',1,1,1,1,'2026-01-01 10:00:00'),
+    (16,'Git','git','Git版本控制','Git,版本控制,代码管理','Git使用指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (17,'算法','algorithm','算法与数据结构','算法,数据结构,编程','算法基础与实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (18,'设计模式','design-pattern','设计模式','设计模式,架构,编程','常见设计模式解析',1,1,1,1,'2026-01-01 10:00:00'),
+    (19,'微服务','microservices','微服务架构','微服务,架构,SpringCloud','微服务架构实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (20,'Spring Cloud','spring-cloud','Spring Cloud教程','SpringCloud,微服务,Java','Spring Cloud开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (21,'消息队列','mq','消息队列技术','MQ,RabbitMQ,Kafka','消息队列使用',1,1,1,1,'2026-01-01 10:00:00'),
+    (22,'Kafka','kafka','Kafka消息队列','Kafka,消息队列,大数据','Kafka实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (23,'RabbitMQ','rabbitmq','RabbitMQ消息队列','RabbitMQ,MQ,消息队列','RabbitMQ入门',1,1,1,1,'2026-01-01 10:00:00'),
+    (24,'Elasticsearch','elasticsearch','ES搜索引擎','ES,搜索引擎,大数据','Elasticsearch教程',1,1,1,1,'2026-01-01 10:00:00'),
+    (25,'日志','log','日志系统','日志,Logback,ELK','日志系统设计',1,1,1,1,'2026-01-01 10:00:00'),
+    (26,'安全','security','系统安全','安全,加密,认证','系统安全实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (27,'性能优化','performance','性能优化','性能优化,调优','系统性能优化技巧',1,1,1,1,'2026-01-01 10:00:00'),
+    (28,'分布式','distributed','分布式系统','分布式,架构','分布式系统设计',1,1,1,1,'2026-01-01 10:00:00'),
+    (29,'DevOps','devops','DevOps实践','DevOps,CI/CD','DevOps实践指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (30,'测试','test','软件测试','测试,单元测试,自动化','软件测试方法',1,1,1,1,'2026-01-01 10:00:00');
+
 -- article
 
 /*Table structure for table `article_tag_relation` */

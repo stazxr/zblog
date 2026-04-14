@@ -47,8 +47,11 @@
       >
         <el-table-column :show-overflow-tooltip="true" prop="name" label="标签名称" />
         <el-table-column :show-overflow-tooltip="true" prop="slug" label="SLUG" />
+        <el-table-column :show-overflow-tooltip="true" prop="seoTitle" label="SEO标题" />
+        <el-table-column :show-overflow-tooltip="true" prop="seoKeywords" label="SEO关键字" />
+        <el-table-column :show-overflow-tooltip="true" prop="seoDescription" label="SEO描述" />
         <el-table-column :show-overflow-tooltip="true" prop="articleCount" label="文章数" align="center" width="100" />
-        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="收录状态" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="allowIndex" label="收录状态" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.allowIndex" type="success">收录</el-tag>
             <el-tag v-else type="danger">禁止</el-tag>

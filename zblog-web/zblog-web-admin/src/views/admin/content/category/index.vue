@@ -65,13 +65,13 @@
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="desc" label="分类描述" />
         <el-table-column :show-overflow-tooltip="true" prop="articleCount" label="文章数" align="center" width="100" />
-        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="前台展示" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="visible" label="前台展示" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.visible" type="success">展示</el-tag>
             <el-tag v-else type="danger">隐藏</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="false" prop="enabled" label="收录状态" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="allowIndex" label="收录状态" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.allowIndex" type="success">收录</el-tag>
             <el-tag v-else type="danger">禁止</el-tag>
