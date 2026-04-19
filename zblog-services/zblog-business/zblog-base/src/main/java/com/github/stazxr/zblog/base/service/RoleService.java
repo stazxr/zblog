@@ -39,7 +39,7 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
     /**
      * 查询角色详情
      *
-     * @param roleId 角色序列
+     * @param roleId 角色ID
      * @return RoleVo
      */
     RoleVo queryRoleDetail(Long roleId);
@@ -47,14 +47,14 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
     /**
      * 新增角色
      *
-     * @param roleDto 角色
+     * @param roleDto 角色信息
      */
     void addRole(RoleDto roleDto);
 
     /**
      * 编辑角色
      *
-     * @param roleDto 角色
+     * @param roleDto 角色信息
      */
     void editRole(RoleDto roleDto);
 
@@ -68,7 +68,7 @@ public interface RoleService extends SecurityRoleService, IService<Role> {
     /**
      * 查询角色对应的权限id列表
      *
-     * @param roleId 角色id
+     * @param roleId 角色ID
      * @return permIds
      */
     Set<Long> queryPermIdsByRoleId(Long roleId);

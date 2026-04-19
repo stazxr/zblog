@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * 标签查询
@@ -15,7 +14,6 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
 @ApiModel("标签查询参数")
 public class TagQueryDto extends PageParam {
     private static final long serialVersionUID = 2296445247589027937L;

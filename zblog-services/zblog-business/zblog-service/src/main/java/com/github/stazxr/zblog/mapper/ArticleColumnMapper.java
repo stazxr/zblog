@@ -4,7 +4,6 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
 import com.github.stazxr.zblog.domain.dto.query.ArticleColumnQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleColumn;
 import com.github.stazxr.zblog.domain.vo.ArticleColumnVo;
-import com.github.stazxr.zblog.domain.vo.ArticleVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -40,13 +39,13 @@ public interface ArticleColumnMapper extends BaseMapper<ArticleColumn> {
      */
     ArticleColumn selectByColumnName(@Param("name") String name);
 
-    /**
-     * 查询非专栏对应的文章列表
-     *
-     * @param queryDto 查询参数
-     * @return ArticleVo
-     */
-    List<ArticleVo> selectArticleListNotColumn(ArticleColumnQueryDto queryDto);
+//    /**
+//     * 查询非专栏对应的文章列表
+//     *
+//     * @param queryDto 查询参数
+//     * @return ArticleVo
+//     */
+//    List<ArticleVo> selectArticleListNotColumn(ArticleColumnQueryDto queryDto);
 
     /**
      * 查询前台专栏列表

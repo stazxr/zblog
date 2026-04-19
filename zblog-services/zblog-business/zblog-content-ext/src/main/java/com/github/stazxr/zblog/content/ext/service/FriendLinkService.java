@@ -1,11 +1,11 @@
-package com.github.stazxr.zblog.service;
+package com.github.stazxr.zblog.content.ext.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
-import com.github.stazxr.zblog.domain.dto.FriendLinkDto;
-import com.github.stazxr.zblog.domain.dto.query.FriendLinkQueryDto;
-import com.github.stazxr.zblog.domain.entity.FriendLink;
-import com.github.stazxr.zblog.domain.vo.FriendLinkVo;
+import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
+import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
+import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 
 /**
  * 友链管理业务层
@@ -18,14 +18,14 @@ public interface FriendLinkService extends IService<FriendLink> {
      * 分页查询友链列表
      *
      * @param queryDto 查询参数
-     * @return FriendLinkVoList
+     * @return IPage<FriendLinkVo>
      */
-    PageInfo<FriendLinkVo> queryFriendLinkListByPage(FriendLinkQueryDto queryDto);
+    IPage<FriendLinkVo> queryFriendLinkListByPage(FriendLinkQueryDto queryDto);
 
     /**
      * 查询友链详情
      *
-     * @param friendLinkId 友链ID
+     * @param friendLinkId 友链id
      * @return FriendLinkVo
      */
     FriendLinkVo queryFriendLinkDetail(Long friendLinkId);

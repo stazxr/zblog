@@ -162,8 +162,6 @@ export default {
               this.submitLoading = false
             })
           }
-        } else {
-          return false
         }
       })
     }

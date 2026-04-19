@@ -1,9 +1,9 @@
-package com.github.stazxr.zblog.converter;
+package com.github.stazxr.zblog.content.ext.converter;
 
+import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
+import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
+import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.core.base.BaseConverter;
-import com.github.stazxr.zblog.domain.dto.FriendLinkDto;
-import com.github.stazxr.zblog.domain.entity.FriendLink;
-import com.github.stazxr.zblog.domain.vo.FriendLinkVo;
 import org.springframework.stereotype.Component;
 
 /**

@@ -169,7 +169,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     /**
      * 删除权限
      *
-     * @param permId 权限序列
+     * @param permId 权限ID
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -110,7 +110,7 @@ public class FileController {
     /**
      * 删除文件
      *
-     * @param fileId 文件id
+     * @param fileId 文件ID
      */
     @Log
     @PostMapping("/deleteFile")

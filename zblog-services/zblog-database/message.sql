@@ -268,6 +268,7 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 文章
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common');
-
 -- 栏目
+
+-- 友链
 

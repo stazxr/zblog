@@ -123,7 +123,7 @@ public class CategoryController {
     /**
      * 删除分类
      *
-     * @param categoryId 分类id
+     * @param categoryId 分类ID
      */
     @Log
     @PostMapping(value = "/deleteCategory")

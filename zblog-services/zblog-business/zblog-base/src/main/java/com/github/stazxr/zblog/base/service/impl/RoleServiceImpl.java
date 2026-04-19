@@ -107,7 +107,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     /**
      * 新增角色
      *
-     * @param roleDto 角色
+     * @param roleDto 角色信息
      */
     @Override
     public void addRole(RoleDto roleDto) {
@@ -124,7 +124,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     /**
      * 编辑角色
      *
-     * @param roleDto 角色
+     * @param roleDto 角色信息
      */
     @Override
     public void editRole(RoleDto roleDto) {

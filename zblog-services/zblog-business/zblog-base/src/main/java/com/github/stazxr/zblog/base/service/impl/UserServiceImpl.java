@@ -273,7 +273,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 删除用户
      *
-     * @param userId 用户序列
+     * @param userId 用户ID
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

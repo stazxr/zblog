@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.FriendLinkMapper">
+    <select id="selectFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
+        SELECT ID, NAME, URL, LOGO, DESCRIPTION, STATUS, IS_VISIBLE, ALLOW_FOLLOW, SORT, CREATE_TIME
+        FROM friend_link fl
+        <where>
+            <if test="query.name != null and query.name != ''">
+                <bind name="nameBind" value="'%' + query.name + '%'"/>
+                AND fl.NAME LIKE #{nameBind}
+            </if>
+            <if test="query.url != null and query.url != ''">
+                <bind name="urlBind" value="'%' + query.url + '%'"/>
+                AND fl.URL LIKE #{urlBind}
+            </if>
+            <if test="query.status != null">
+                AND fl.STATUS = #{query.status}
+            </if>
+            <if test="query.isVisible != null">
+                AND fl.IS_VISIBLE = #{query.isVisible}
+            </if>
+            <if test="query.allowFollow != null">
+                AND t.ALLOW_FOLLOW = #{query.allowFollow}
+            </if>
+        </where>
+        ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC
+    </select>
+
+    <select id="selectFriendLinkDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
+        SELECT
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.EMAIL, fl.CONTACT,
+            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.SORT,
+            fl.CREATE_TIME, UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = fl.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = fl.UPDATE_USER) AS UPDATE_USERNAME
+        FROM friend_link fl
+        WHERE fl.ID = #{friendLinkId}
+    </select>
+</mapper>

@@ -113,7 +113,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     /**
      * 删除字典
      *
-     * @param dictId 字典序列
+     * @param dictId 字典ID
      */
     @Override
     public void deleteDict(Long dictId) {

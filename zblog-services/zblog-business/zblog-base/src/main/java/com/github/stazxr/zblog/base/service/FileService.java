@@ -57,7 +57,7 @@ public interface FileService {
     /**
      * 删除文件
      *
-     * @param fileId 文件id
+     * @param fileId 文件ID
      */
     void deleteFile(Long fileId);
 }

@@ -5,7 +5,7 @@ const friendLinkApi = '/api/friendLinks'
 
 export default {
   // 分页查询友链列表
-  pageList: params => {
+  pageFriendLinkList: params => {
     return api.httpRequest().get(`${friendLinkApi}/pageList`, params)
   },
   // 查询友链详情

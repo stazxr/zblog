@@ -115,7 +115,7 @@ public class DictController {
     /**
      * 删除字典
      *
-     * @param dictId 字典序列
+     * @param dictId 字典ID
      */
     @Log
     @PostMapping(value = "/deleteDict")

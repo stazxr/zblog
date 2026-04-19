@@ -22,6 +22,10 @@
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-content</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.stazxr.zblog</groupId>
+            <artifactId>zblog-content-ext</artifactId>
+        </dependency>
         <!-- Springboot Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

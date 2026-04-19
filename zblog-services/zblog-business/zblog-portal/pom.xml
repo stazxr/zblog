@@ -13,7 +13,7 @@
     <artifactId>zblog-portal</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>博客门户管理模块</description>
 
     <dependencies>

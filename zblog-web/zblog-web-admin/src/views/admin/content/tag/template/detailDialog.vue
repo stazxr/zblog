@@ -64,10 +64,10 @@ export default {
         seoDescription: null,
         allowIndex: null,
         enabled: null,
-        createUsername: '',
-        createTime: '',
-        updateUsername: '',
-        updateTime: ''
+        createUsername: null,
+        createTime: null,
+        updateUsername: null,
+        updateTime: null
       }
     }
   },

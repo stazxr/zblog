@@ -20,10 +20,12 @@ import category from '@/api/service/content/category.js'
 import tag from '@/api/service/content/tag.js'
 import article from '@/api/service/content/article.js'
 
+// websiteConfig
+import friendLink from '@/api/service/websiteConfig/friendLink.js'
+
 // TODO
 import column from '@/api/service/column.js'
 import webSetting from '@/api/service/webSetting.js'
-import friendLink from '@/api/service/friendLink.js'
 import talk from '@/api/service/talk.js'
 import page from '@/api/service/page.js'
 import album from '@/api/service/album.js'
@@ -37,5 +39,6 @@ export default {
   log, host, interfaces,
   version, file, cache, session,
   category, tag, article,
-  column, webSetting, friendLink, talk, page, album, message, comment, test
+  friendLink,
+  column, webSetting, talk, page, album, message, comment, test
 }

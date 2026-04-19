@@ -89,8 +89,8 @@ const routes = [
     }
   },
   {
-    path: '/links',
-    component: resolve => require(['../views/link/index'], resolve),
+    path: '/friendLink',
+    component: resolve => require(['../views/friendLink/index'], resolve),
     meta: {
       title: '友链列表'
     }

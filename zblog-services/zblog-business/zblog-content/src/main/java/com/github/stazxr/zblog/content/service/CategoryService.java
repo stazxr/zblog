@@ -56,7 +56,7 @@ public interface CategoryService extends IService<Category> {
     /**
      * 删除分类
      *
-     * @param categoryId 分类id
+     * @param categoryId 分类ID
      */
     void deleteCategory(Long categoryId);
 }

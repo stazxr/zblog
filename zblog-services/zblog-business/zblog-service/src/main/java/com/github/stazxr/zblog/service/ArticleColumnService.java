@@ -6,7 +6,6 @@ import com.github.stazxr.zblog.domain.dto.ArticleColumnDto;
 import com.github.stazxr.zblog.domain.dto.query.ArticleColumnQueryDto;
 import com.github.stazxr.zblog.domain.entity.ArticleColumn;
 import com.github.stazxr.zblog.domain.vo.ArticleColumnVo;
-import com.github.stazxr.zblog.domain.vo.ArticleVo;
 
 import java.util.List;
 
@@ -60,12 +59,12 @@ public interface ArticleColumnService extends IService<ArticleColumn> {
      * @param columnId 专栏id
      */
     void deleteColumn(Long columnId);
-
-    /**
-     * 查询非专栏对应的文章列表
-     *
-     * @param queryDto 查询参数
-     * @return ArticleVo
-     */
-    List<ArticleVo> queryArticleListNotColumn(ArticleColumnQueryDto queryDto);
+//
+//    /**
+//     * 查询非专栏对应的文章列表
+//     *
+//     * @param queryDto 查询参数
+//     * @return ArticleVo
+//     */
+//    List<ArticleVo> queryArticleListNotColumn(ArticleColumnQueryDto queryDto);
 }

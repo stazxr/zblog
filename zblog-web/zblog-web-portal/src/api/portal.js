@@ -4,6 +4,11 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 获取友链列表
+  queryFriendLinkList: params => {
+    return api.httpRequest().get(`${portalApi}/queryFriendLinkList`, params)
+  },
+
   // 获取标签列表
   queryTagList: params => {
     return api.httpRequest().get(`${portalApi}/queryTagList`, params)
@@ -43,10 +48,6 @@ export default {
   // 发送弹幕
   saveMessage: params => {
     return api.httpRequest().post(`${portalApi}/saveMessage`, params)
-  },
-  // 获取友链列表
-  queryFriendLinkList: params => {
-    return api.httpRequest().get(`${portalApi}/queryFriendLinkList`, params)
   },
   // 获取评论列表
   queryCommentList: params => {

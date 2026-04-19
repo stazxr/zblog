@@ -13,7 +13,7 @@
     <artifactId>zblog-content-ext</artifactId>
     <packaging>jar</packaging>
 
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>博客核心内容扩展模块</description>
 
     <dependencies>

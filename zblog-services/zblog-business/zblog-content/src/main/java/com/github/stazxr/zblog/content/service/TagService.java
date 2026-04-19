@@ -47,7 +47,7 @@ public interface TagService extends IService<Tag> {
     /**
      * 删除标签
      *
-     * @param tagId 标签id
+     * @param tagId 标签ID
      */
     void deleteTag(Long tagId);
 }
