@@ -82,6 +82,15 @@ public interface UserMapper extends BaseMapper<User> {
     void updateLoginInfoWhenFailed(@Param("userId") Long userId, @Param("maxFailCount") int maxFailCount, @Param("lockedExpireTime") LocalDateTime lockedExpireTime);
 
     /**
+     * 重置用户登录信息-失败
+     *
+     * @param userId           用户id
+     * @param locked           用户是否锁定
+     * @param lockedExpireTime 锁定到期时间
+     */
+    void resetLoginInfoWhenFailed(@Param("userId") Long userId, @Param("locked") boolean locked, @Param("lockedExpireTime") LocalDateTime lockedExpireTime);
+
+    /**
      * 分页查询用户列表
      *
      * @param page     分页参数

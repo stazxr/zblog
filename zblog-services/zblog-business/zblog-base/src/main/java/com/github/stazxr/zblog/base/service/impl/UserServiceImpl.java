@@ -13,6 +13,7 @@ import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
+import com.github.stazxr.zblog.bas.security.core.UserStatus;
 import com.github.stazxr.zblog.bas.security.core.UserType;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.converter.UserConverter;
@@ -161,7 +162,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             SecurityExtProperties.UserLockConfig lockConfig = securityExtProperties.getLockConfig();
             LocalDateTime lockedExpireTime = LocalDateTime.now().plus(lockConfig.getLockDuration());
             int maxFailCount = lockConfig.getMaxFailCount();
-            userMapper.updateLoginInfoWhenFailed(userId, maxFailCount, lockedExpireTime);
+            if (UserStatus.LOCKED.getStatus().equals(user.getUserStatus()) && user.isAccountNonLocked()) {
+                // 用户状态为已锁定，但是校验逻辑为非锁定状态
+                boolean locked = maxFailCount == 1;
+                userMapper.resetLoginInfoWhenFailed(userId, locked, lockedExpireTime);
+            } else {
+                userMapper.updateLoginInfoWhenFailed(userId, maxFailCount, lockedExpireTime);
+            }
         } else {
             // 有其他场景后续在扩展，目前默认为 UNKNOWN
             loginLog.setLoginType(LoginType.UNKNOWN.getType());

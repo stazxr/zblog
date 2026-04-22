@@ -52,7 +52,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, InitializingB
         }
         // 提前校验用户是否锁定，放在密码校验前
         if (!securityUser.isAccountNonLocked()) {
-            throw new LockedException("用户已锁定");
+            throw new LockedException("Pre check user status failed: Locked");
         }
         return securityUser;
     }

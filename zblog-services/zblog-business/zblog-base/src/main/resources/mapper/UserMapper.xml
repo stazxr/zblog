@@ -118,15 +118,31 @@
         UPDATE user
         <set>
             LOGIN_ERROR_COUNT = LOGIN_ERROR_COUNT + 1
-            <if test="maxFailCount >= 0">
+            <if test="maxFailCount > 0">
                 , USER_STATUS = CASE WHEN LOGIN_ERROR_COUNT + 1 > #{maxFailCount} THEN 2 ELSE USER_STATUS END,
                 LOCKED_EXPIRE_TIME = CASE WHEN LOGIN_ERROR_COUNT + 1 > #{maxFailCount} THEN #{lockedExpireTime} ELSE LOCKED_EXPIRE_TIME END
             </if>
         </set>
         WHERE ID = #{userId}
-        <if test="maxFailCount >= 0">
+        <if test="maxFailCount > 0">
             AND USER_STATUS != 2
         </if>
+    </update>
+
+    <update id="resetLoginInfoWhenFailed">
+        UPDATE user
+        <set>
+            LOGIN_ERROR_COUNT = 1,
+            <choose>
+                <when test="locked">
+                    USER_STATUS = 2, LOCKED_EXPIRE_TIME = #{lockedExpireTime}
+                </when>
+                <otherwise>
+                    USER_STATUS = 0, LOCKED_EXPIRE_TIME = NULL
+                </otherwise>
+            </choose>
+        </set>
+        WHERE ID = #{userId} AND USER_STATUS = 2
     </update>
 
     <select id="selectUserList" resultMap="userVoListMap">

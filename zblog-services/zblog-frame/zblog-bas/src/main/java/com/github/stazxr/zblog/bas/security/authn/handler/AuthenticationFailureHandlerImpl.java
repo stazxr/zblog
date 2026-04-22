@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.hanlder;
+package com.github.stazxr.zblog.bas.security.authn.handler;
 
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 import com.github.stazxr.zblog.bas.i18n.I18nUtils;

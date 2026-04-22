@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.bas.security.authz;
 
+import com.github.stazxr.zblog.bas.security.authz.handler.AccessDeniedHandlerImpl;
 import com.github.stazxr.zblog.bas.security.core.SecurityRole;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.core.UserType;
-import com.github.stazxr.zblog.bas.security.hanlder.AccessDeniedHandlerImpl;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;

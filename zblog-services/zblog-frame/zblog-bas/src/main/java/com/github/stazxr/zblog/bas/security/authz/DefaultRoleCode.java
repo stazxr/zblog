@@ -32,10 +32,4 @@ public abstract class DefaultRoleCode {
      * 角色代码：ROLE_NONE - 标记资源无访问角色，只有内置管理员可以访问。
      */
     public static final String NONE = "ROLE_NONE";
-
-    /**
-     * 角色代码：ROLE_NULL - 标记资源不存在。
-     */
-    @Deprecated
-    public static final String NULL = "ROLE_NULL";
 }

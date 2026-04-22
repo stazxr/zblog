@@ -142,7 +142,7 @@ public class SecurityExtProperties {
 
     public static class UserLockConfig {
         /**
-         * 允许最大失败次数
+         * 允许最大失败次数，配置为 0 代表不锁定用户
          */
         private int maxFailCount = 5;
 

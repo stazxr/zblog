@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.bas.security.authn.userpass.numcode;
 
-import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -25,7 +24,7 @@ public class LoginNumCodeException extends AuthenticationException {
      * @param errorCode 异常消息
      */
     public LoginNumCodeException(LoginNumCodeErrorCode errorCode) {
-        super(I18nUtils.getMessage(errorCode.getI18nKey()));
+        super(errorCode.getI18nKey());
         this.errorCode = errorCode;
     }
 
@@ -36,7 +35,7 @@ public class LoginNumCodeException extends AuthenticationException {
      * @param cause     异常原因，可用于追踪根因
      */
     public LoginNumCodeException(LoginNumCodeErrorCode errorCode, Throwable cause) {
-        super(I18nUtils.getMessage(errorCode.getI18nKey()), cause);
+        super(errorCode.getI18nKey(), cause);
         this.errorCode = errorCode;
     }
 

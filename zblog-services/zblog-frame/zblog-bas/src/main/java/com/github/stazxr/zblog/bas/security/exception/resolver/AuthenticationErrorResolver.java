@@ -19,31 +19,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationErrorResolver {
     public ErrorCode resolve(AuthenticationException exception) {
-        if (exception instanceof LoginNumCodeException) {
-            return ((LoginNumCodeException) exception).getErrorCode();
+        Throwable realException = exception;
+        if (exception instanceof InternalAuthenticationServiceException) {
+            realException = exception.getCause();
         }
 
-        if (exception instanceof SystemUserDeniedException) {
-            return ((SystemUserDeniedException) exception).getErrorCode();
+        if (realException instanceof LoginNumCodeException) {
+            return ((LoginNumCodeException) realException).getErrorCode();
         }
 
-        if (exception instanceof LockedException) {
+        if (realException instanceof SystemUserDeniedException) {
+            return ((SystemUserDeniedException) realException).getErrorCode();
+        }
+
+        if (realException instanceof LockedException) {
             return AuthenticationErrorCode.EAUTHN001;
         }
 
-        if (exception instanceof DisabledException) {
+        if (realException instanceof DisabledException) {
             return AuthenticationErrorCode.EAUTHN002;
         }
 
-        if (exception instanceof AccountExpiredException) {
+        if (realException instanceof AccountExpiredException) {
             return AuthenticationErrorCode.EAUTHN003;
         }
 
-        if (exception instanceof CredentialsExpiredException) {
+        if (realException instanceof CredentialsExpiredException) {
             return AuthenticationErrorCode.EAUTHN004;
         }
 
-        if (exception instanceof UsernameNotFoundException || exception instanceof BadCredentialsException) {
+        if (realException instanceof UsernameNotFoundException || realException instanceof BadCredentialsException) {
             return AuthenticationErrorCode.EAUTHN000;
         }
 
