@@ -1,35 +1,35 @@
-//package com.github.stazxr.zblog.controller;
-//
-//import com.github.stazxr.zblog.bas.rest.Result;
-//import com.github.stazxr.zblog.bas.router.Router;
-//import com.github.stazxr.zblog.core.annotation.ApiVersion;
-//import com.github.stazxr.zblog.core.base.BaseConst;
-//import com.github.stazxr.zblog.domain.dto.query.CommentQueryDto;
-//import com.github.stazxr.zblog.log.annotation.Log;
-//import com.github.stazxr.zblog.service.CommentService;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiImplicitParam;
-//import io.swagger.annotations.ApiImplicitParams;
-//import io.swagger.annotations.ApiOperation;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-///**
-// * 评论管理
-// *
-// * @author SunTao
-// * @since 2023-02-03
-// */
-//@Slf4j
-//@RestController
-//@RequiredArgsConstructor
-//@RequestMapping("/api/comments")
-//@Api(value = "CommentController", tags = { "评论控制器" })
-//public class CommentController {
-//    private final CommentService commentService;
+package com.github.stazxr.zblog.content.ext.controller;
+
+import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.content.ext.service.CommentService;
+import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.log.annotation.Log;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 评论管理
+ *
+ * @author SunTao
+ * @since 2026-04-22
+ */
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/comments")
+@Api(value = "CommentController", tags = { "评论管理" })
+public class CommentController {
+    private final CommentService commentService;
+
+
 //
 //    /**
 //     * 分页查询评论列表
@@ -82,4 +82,4 @@
 //        commentService.auditComment(commentIds);
 //        return Result.success();
 //    }
-//}
+}

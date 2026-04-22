@@ -53,17 +53,17 @@
         ORDER BY SORT
     </select>
 
-    <select id="selectWebArticleList" resultMap="articleVoWebListMap">
-        SELECT
-            acr.ARTICLE_ID AS ID, acr.ARTICLE_TITLE, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,
-            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, u.GENDER AUTHOR_GENDER, a.CREATE_TIME, a.UPDATE_TIME
-        FROM article_column_relation acr
-        LEFT JOIN article a ON a.ID = acr.ARTICLE_ID
-        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID
-        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
-        WHERE acr.COLUMN_ID = #{columnId}
-        ORDER BY acr.SORT
-    </select>
+<!--    <select id="selectWebArticleList" resultMap="articleVoWebListMap">-->
+<!--        SELECT-->
+<!--            acr.ARTICLE_ID AS ID, acr.ARTICLE_TITLE, a.ARTICLE_TYPE, a.CATEGORY_ID, c.NAME CATEGORY_NAME,-->
+<!--            a.COVER_IMAGE_TYPE, u.NICKNAME AUTHOR_NICKNAME, u.GENDER AUTHOR_GENDER, a.CREATE_TIME, a.UPDATE_TIME-->
+<!--        FROM article_column_relation acr-->
+<!--        LEFT JOIN article a ON a.ID = acr.ARTICLE_ID-->
+<!--        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID-->
+<!--        LEFT JOIN user u ON u.ID = a.AUTHOR_ID-->
+<!--        WHERE acr.COLUMN_ID = #{columnId}-->
+<!--        ORDER BY acr.SORT-->
+<!--    </select>-->
 
     <select id="selectArticleTagList" resultType="com.github.stazxr.zblog.domain.vo.TagVo">
         SELECT

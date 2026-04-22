@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.strategy;
 
-import com.github.stazxr.zblog.domain.vo.ArticleVo;
-
 import java.util.List;
 
 /**
@@ -17,5 +15,5 @@ public interface ArticleSearchStrategy {
      * @param keywords 关键字
      * @return {@link List<ArticleVo>} 文章列表
      */
-    List<ArticleVo> searchArticle(String keywords);
+//    List<ArticleVo> searchArticle(String keywords);
 }
