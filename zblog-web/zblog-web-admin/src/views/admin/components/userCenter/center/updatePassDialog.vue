@@ -155,7 +155,7 @@ export default {
             this.$message.success('密码修改成功，请重新登录')
             setTimeout(() => {
               this.$store.dispatch('Logout').then(() => {
-                location.reload()
+                this.$router.replace('/login?reset')
               })
             }, 100)
           }).finally(() => {

@@ -8,6 +8,10 @@ export default {
   queryPermTree: params => {
     return api.httpRequest().get(`${permApi}/queryPermTree`, params)
   },
+  // 查询权限树列表（公共）
+  queryPublicPermTree: params => {
+    return api.httpRequest().get(`${permApi}/queryPublicPermTree`, params)
+  },
   // 查询权限详细信息
   queryPermDetail: params => {
     return api.httpRequest().get(`${permApi}/queryPermDetail`, params)

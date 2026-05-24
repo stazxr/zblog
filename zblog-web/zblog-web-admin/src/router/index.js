@@ -4,51 +4,60 @@ import Config from '@/settings'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { getToken } from '@/utils/token'
 import { filterAsyncRouter } from '@/utils/router'
-import menu from '@/api/menu'
 
-NProgress.configure({ showSpinner: false })
+NProgress.configure({
+  showSpinner: false
+})
 
-// no redirect whitelist
-const whiteList = ['/login', '/forceUpdatePass']
+// 白名单
+const whiteList = new Set([
+  '/login', // 登录
+  '/forceUpdatePass' // 修改密码（登录前）
+])
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   NProgress.start()
-  if (getToken()) {
-    // 已登录
-    if (to.path === '/login') {
-      // 在已登录情况下，访问登录页面跳转到后台管理首页
-      next({ path: '/' })
-      NProgress.done()
-    } else {
-      // 在已登录情况下，访问其他页面
-      if (store.getters.user === null) {
-        store.dispatch('RefreshUser').then(() => {
-          loadMenus(next, to)
-        }).catch(() => {
-          store.dispatch('Logout').then(() => {
-            location.reload()
-          })
-        })
+
+  console.log('store', store)
+
+  const isLoginRoute = to.path === '/login'
+  const isWhiteRoute = whiteList.has(to.path)
+
+  try {
+    // 白名单直接放行
+    if (isWhiteRoute) {
+      if (store.getters.user && isLoginRoute) {
+        next('/')
       } else {
-        if (store.getters.loadMenus) {
-          loadMenus(next, to)
-        } else {
-          next()
-        }
+        next()
       }
+      return
     }
-  } else {
-    // 未登录
-    if (whiteList.indexOf(to.path) !== -1) {
-      // 白名单直接访问
-      next()
-    } else {
-      // 重定向到登录页面
-      next(`/login?redirect=${to.fullPath}`)
-      NProgress.done()
+
+    // 未初始化用户信息
+    if (!store.getters.user) {
+      // 重新加载用户信息
+      await store.dispatch('RefreshUser')
     }
+
+    if (!store.getters.routeLoaded) {
+      const menus = store.getters.menus
+      const sidebarRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)))
+      const rewriteRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)), false, true)
+      rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
+      store.commit('SET_ROUTERS', rewriteRoutes)
+      store.commit('SET_SIDEBAR_ROUTERS', sidebarRoutes)
+      store.commit('SET_ROUTE_LOADED', true)
+      router.addRoutes(rewriteRoutes)
+      next({ ...to, replace: true })
+    }
+
+    next()
+  } catch (e) {
+    console.error('Route Error:', e)
+    await store.dispatch('Logout')
+    next(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 })
 
@@ -58,29 +67,7 @@ router.afterEach((to, from) => {
 })
 
 router.onError(error => {
-  NProgress.done()
+  console.error(error)
   Message.error(error.message || '系统发生未知错误')
+  NProgress.done()
 })
-
-export const loadMenus = (next, to) => {
-  store.commit('SET_LOAD_MENUS', false)
-  menu.queryUserMenuTree().then(res => {
-    const data = res.data
-    const sdata = JSON.parse(JSON.stringify(data))
-    const rdata = JSON.parse(JSON.stringify(data))
-    const sidebarRoutes = filterAsyncRouter(sdata)
-    const rewriteRoutes = filterAsyncRouter(rdata, false, true)
-    rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
-
-    store.dispatch('GenerateRoutes', rewriteRoutes).then(() => {
-      router.addRoutes(rewriteRoutes)
-      next({ ...to, replace: true })
-    })
-
-    store.dispatch('SetSidebarRouters', sidebarRoutes)
-  }).catch(e => {
-    console.log('Load Menus Error', e)
-  }).finally(_ => {
-    NProgress.done()
-  })
-}

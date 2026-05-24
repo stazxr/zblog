@@ -59,7 +59,7 @@ export default {
       this.getPermission()
     },
     getPermission() {
-      this.$mapi.communal.queryPublicPermTree().then(res => {
+      this.$mapi.perm.queryPublicPermTree().then(res => {
         this.permissions = res.data
         this.$nextTick(() => {
           this.queryRolePerm()

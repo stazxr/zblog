@@ -2,7 +2,6 @@ import axios from 'axios'
 import router from '../router/routers'
 import { Message } from 'element-ui'
 import JsonBig from 'json-bigint'
-import { setToken, getToken, removeToken } from '@/utils/token'
 import { isJson } from '@/utils/validate'
 
 const defaultTimeout = 120000
@@ -28,6 +27,9 @@ instance.defaults.baseURL = process.env.VUE_APP_BASE_API
 
 // 超时时间
 instance.defaults.timeout = defaultTimeout
+
+// 是否允许携带凭证
+instance.defaults.withCredentials = true
 
 // 处理超过 16 位数字精度丢失问题
 instance.defaults.transformResponse = [
@@ -58,9 +60,6 @@ instance.defaults.transformResponse = [
   }
 ]
 
-// 是否允许携带凭证
-instance.defaults.withCredentials = false
-
 // 自定义响应成功的HTTP状态码
 instance.defaults.validateStatus = status => {
   return status >= 200 && status < 300
@@ -68,17 +67,10 @@ instance.defaults.validateStatus = status => {
 
 // 设置请求拦截器
 instance.interceptors.request.use(config => {
-  // set default header
-  const token = getToken()
-  if (token) {
-    config.headers.Authorization = token
-  }
-  // config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-
   // 根据 User-Agent 判断客户端类型
-  // const ua = navigator.userAgent.toLowerCase()
-  // const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
-  // config.headers['x-client-type'] = isMobile ? '01' : '02'
+  const ua = navigator.userAgent.toLowerCase()
+  const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
+  config.headers['x-client-type'] = isMobile ? '01' : '02'
 
   // return config
   return config
@@ -94,13 +86,6 @@ instance.interceptors.response.use(response => {
   // return Promise.reject(new Error(res.msg || 'Error'))
   console.log('response', response)
   if (response.status === 200 && response.data) {
-    // refresh Token
-    const newToken = response.headers['x-new-token']
-    if (newToken) {
-      setToken(newToken)
-      console.log('refresh token success')
-    }
-
     const result = response.data
     const responseType = response.config.responseType
     if (responseType === 'json') {
@@ -144,11 +129,11 @@ instance.interceptors.response.use(response => {
 })
 
 function logout(expired) {
+  console.log('expired', expired)
   if (expired) {
     window.sessionStorage.setItem('point', '401')
   }
 
-  removeToken()
   router.replace('/login')
 }
 
@@ -203,7 +188,6 @@ export const get = (url, params, requestItem = {}) => {
     responseType: 'json',
     ...requestItem
   }
-  console.log(options, options)
   return instance(options)
 }
 

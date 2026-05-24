@@ -8,7 +8,6 @@ function resolve(dir) {
 }
 
 const name = defaultSettings.title // 网址标题
-const devPort = 31945 // 端口配置
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
@@ -19,10 +18,9 @@ module.exports = {
   productionSourceMap: false, // 生产环境 不生成 sourcemap, 防止源码泄露
   devServer: {
     host: '0.0.0.0', // 支持 IP / 局域网访问
-    port: devPort,
+    port: 31945,
     open: false, // 启动自动打开浏览器
-    // 已弃用 disableHostCheck: true, // 允许非 localhost 访问（有安全风险）
-    allowedHosts: [], // 高版本可以使用 'all' 替换
+    allowedHosts: [],
     overlay: { // 浏览器只显示错误
       warnings: false,
       errors: true
@@ -32,7 +30,7 @@ module.exports = {
         target: process.env.VUE_APP_BASE_API,
         changeOrigin: true,
         pathRewrite: {
-          '^/api': 'api'
+          '^/api': '/api'
         }
       }
     }

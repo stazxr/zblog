@@ -1,28 +1,49 @@
 import { defaultRouterMap } from '@/router/routers'
 
-const permission = {
+const router = {
   state: {
+    // 全部路由
     routers: defaultRouterMap,
+    // 动态路由
     addRouters: [],
-    sidebarRouters: []
+    // 左侧菜单路由
+    sidebarRouters: [],
+    // 是否已加载路由
+    routeLoaded: false
   },
   mutations: {
+    /**
+     * 设置动态路由
+     */
     SET_ROUTERS: (state, routers) => {
-      state.addRouters = routers
-      state.routers = defaultRouterMap.concat(routers)
+      state.addRouters = routers || []
+      state.routers = [
+        ...defaultRouterMap,
+        ...state.addRouters
+      ]
     },
+    /**
+     * 设置侧边栏路由
+     */
     SET_SIDEBAR_ROUTERS: (state, routers) => {
-      state.sidebarRouters = defaultRouterMap.concat(routers)
-    }
-  },
-  actions: {
-    GenerateRoutes({ commit }, asyncRouter) {
-      commit('SET_ROUTERS', asyncRouter)
+      state.sidebarRouters = [
+        ...defaultRouterMap,
+        ...(routers || [])
+      ]
     },
-    SetSidebarRouters({ commit }, sidebarRouter) {
-      commit('SET_SIDEBAR_ROUTERS', sidebarRouter)
+    SET_ROUTE_LOADED: (state, loaded) => {
+      state.routeLoaded = loaded
+    },
+    /**
+     * 重置状态
+     */
+    RESET_ROUTERS: (state) => {
+      state.routers = defaultRouterMap
+      state.addRouters = []
+      state.sidebarRouters = []
+      state.routeLoaded = false
     }
   }
 }
 
-export default permission
+export default router
