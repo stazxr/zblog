@@ -4,11 +4,6 @@ import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.security.service.SecurityLogoutService;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 /**
  * 用于管理系统中的安全注销服务接口的默认实现。
@@ -40,9 +35,6 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
             // 更新 JWT Token 状态为已过期
             jwtTokenStorage.remove(userId);
 
-            // 移除缓存中的 SSO 令牌
-            // removeSsoToken();
-
             // 清理用户的缓存信息
             SecurityUserCache.remove(userId);
             success = true;
@@ -53,14 +45,6 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
             afterClean(userId, success);
         }
     }
-
-    /* private void removeSsoToken() {
-        try {
-            SsoTokenCache.remove(IpUtils.getIp(getRequest()));
-        } catch (Exception e) {
-            log.error("Remove Sso Token Failed: {}", e.getMessage());
-        }
-    } */
 
     /**
      * 在清理用户登录信息之前执行的操作。
@@ -98,10 +82,5 @@ public class SecurityLogoutServiceImpl implements SecurityLogoutService {
                 }
             }
         }
-    }
-
-
-    private HttpServletRequest getRequest() {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }
 }

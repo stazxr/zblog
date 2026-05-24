@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.security.jwt.autoconfigure;
 
 import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties;
 import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties;
 import com.github.stazxr.zblog.bas.security.jwt.decoder.JwtDecoder;
 import com.github.stazxr.zblog.bas.security.jwt.decoder.NimbusJwsDecoder;
@@ -37,7 +38,7 @@ import java.security.KeyStoreException;
  * @author SunTao
  */
 @Configuration
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({ JwtProperties.class, JwtCookieProperties.class })
 public class JwtAutoConfiguration {
     /**
      * 用于加载 RSA 密钥的 JKS (Java KeyStore) 实例。

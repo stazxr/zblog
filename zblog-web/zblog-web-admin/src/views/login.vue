@@ -2,52 +2,67 @@
   <div style="height: 100%">
     <div v-if="pageLoading" class="oauth-background">
       <div id="preloader_1">
-        <span />
-        <span />
-        <span />
-        <span />
-        <span />
+        <span /><span /><span /><span /><span />
       </div>
     </div>
-    <div v-else class="login" :style="'background-image:url('+ Background +');'">
-      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-position="left" label-width="0px" class="login-form">
-        <h3 class="title">
-          Z-BLOG 后台管理系统
-        </h3>
-        <el-form-item prop="username">
-          <el-input id="username" ref="username" v-model="loginForm.username" type="text" auto-complete="off" placeholder="请输入用户名">
-            <svg-icon slot="prefix" icon-class="username" class="el-input__icon input-icon" />
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input id="password" ref="password" v-model="loginForm.password" :type="pwdFlagType" auto-complete="off" placeholder="请输入密码" @keyup.enter.native="handleLogin">
-            <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-            <svg-icon v-show="loginForm.password !== ''" slot="suffix" :icon-class="pwdFlag ? 'eye-close' : 'eye'" class="el-input__icon input-icon" style="margin-right: 5px;" @click="getPwdFlag()" />
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="code">
-          <el-input id="code" ref="code" v-model="loginForm.code" auto-complete="off" placeholder="请输入验证码" style="width: 63%" @keyup.enter.native="handleLogin">
-            <svg-icon slot="prefix" icon-class="auth-code" class="el-input__icon input-icon" />
-          </el-input>
-          <div class="login-code">
-            <img :src="codeUrl" alt="" @click="getCode">
-          </div>
-        </el-form-item>
-        <!-- <el-checkbox v-model="loginForm.rememberMe" style="margin:0 0 25px 0;">
-          记住我
-        </el-checkbox> -->
-        <el-form-item style="width:100%;">
-          <el-button ref="loginBtn" :loading="loading" size="medium" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-            <span v-if="!loading">登 录</span>
-            <span v-else>登 录 中...</span>
-          </el-button>
-        </el-form-item>
-      </el-form>
-      <!--  底部  -->
-      <div v-if="$store.state.settings.showFooter" id="el-login-footer">
-        <span v-html="$store.state.settings.footerTxt" />
-        <span> ⋅ </span>
-        <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">{{ $store.state.settings.caseNumber }}</a>
+
+    <!-- 背景容器（新增） -->
+    <div v-else class="login-wrapper">
+      <!-- 背景图 -->
+      <div class="bg-image" :style="'background-image:url('+ background +');'" />
+
+      <!-- 渐变遮罩（新增） -->
+      <div class="bg-overlay" />
+
+      <!-- 登录 -->
+      <div class="login">
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginFormRules"
+          label-position="left"
+          label-width="0px"
+          class="login-form"
+        >
+          <h3 class="title">{{ $store.state.settings.title }}</h3>
+
+          <el-form-item prop="username">
+            <el-input ref="username" v-model="loginForm.username" placeholder="请输入用户名">
+              <svg-icon slot="prefix" icon-class="icon-username" />
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="password">
+            <el-input ref="password" v-model="loginForm.password" :type="pwdFlagType" placeholder="请输入密码">
+              <svg-icon slot="prefix" icon-class="icon-password" />
+              <svg-icon v-show="loginForm.password" slot="suffix" :icon-class="pwdFlag ? 'eye-close' : 'eye'" @click="getPwdFlag" />
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="code">
+            <div class="code-wrapper">
+              <el-input ref="code" v-model="loginForm.code" placeholder="请输入验证码" @keyup.enter.native="handleLogin">
+                <svg-icon slot="prefix" icon-class="icon-authCode" />
+              </el-input>
+              <img :src="codeUrl" class="code-img" alt="" @click="getCode">
+            </div>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button :loading="loginLoading" type="primary" class="login-btn" @click="handleLogin">
+              {{ loginLoading ? '登录中...' : '登录' }}
+            </el-button>
+          </el-form-item>
+        </el-form>
+
+        <!-- footer -->
+        <div v-if="$store.state.settings.showFooter" id="el-login-footer">
+          <span v-html="$store.state.settings.footerTxt" />
+          <span> ⋅ </span>
+          <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">
+            {{ $store.state.settings.caseNumber }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -55,34 +70,38 @@
 
 <script>
 import qs from 'qs'
-import Background from '@/assets/images/background.jpg'
+import backgroundWebImg from '@/assets/images/login/bg-web.webp'
+import backgroundMobileImg from '@/assets/images/login/bg-mobile.webp'
 import { encrypt } from '@/utils/rsaEncrypt'
-import { setToken } from '@/utils/token'
 export default {
   name: 'Login',
   data() {
     return {
-      pageLoading: true,
-      Background: Background,
-      codeUrl: '',
-      loginForm: {
-        username: '',
-        password: '',
-        rememberMe: false,
-        code: '',
-        uuid: '',
-        loginType: '1'
+      pageLoading: false, // 页面加载状态
+      backgroundWebImg: backgroundWebImg,
+      backgroundMobileImg: backgroundMobileImg,
+      publicKey: null, // 公钥
+      codeUrl: null, // 验证码
+      loginForm: { // 登录表单
+        username: null,
+        password: null,
+        code: null,
+        uuid: null
       },
-      loginRules: {
+      loginFormRules: { // 登录表单校验规则
         username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
         password: [{ required: true, trigger: 'blur', message: '密码不能为空' }],
         code: [{ required: true, trigger: 'change', message: '验证码不能为空' }]
       },
-      loading: false,
-      redirect: undefined,
-      // password input type
-      pwdFlag: false,
-      pwdFlagType: 'password'
+      loginLoading: false, // 登录按钮加载状态
+      redirect: undefined, // 重定向页面
+      pwdFlag: false, // 是否显示密码
+      pwdFlagType: 'password' // 密码输入框类型
+    }
+  },
+  computed: {
+    background() {
+      return this.$store.state.app.device === 'mobile' ? backgroundMobileImg : backgroundWebImg
     }
   },
   watch: {
@@ -99,54 +118,17 @@ export default {
           this.redirect = '/'
         }
       },
-      immediate: true,
-      publicKey: null
+      immediate: true
     }
   },
-  // 在模板渲染成html前调用，即通常初始化某些属性值，然后再渲染成视图
   created() {
-    // 判断用户是否登录
-    this.checkUserLoginStatus()
-
     // 获取验证码
     this.getCode()
 
     // 登录过期提醒
     this.point()
-
-    // 单点登录
-    const data = qs.parse(window.location.search.replace('?', ''))
-    if (data['isIframe'] && data.origin) {
-      console.log('第一次交互成功：后台连接上了前台，并准备向前台发送一个消息', data)
-      window.parent.postMessage('ok', data.origin)
-      window.addEventListener('message', function(event) {
-        console.log('后台收到前台的消息', event)
-        if (event.origin === data.origin) {
-          if (event.data != null) {
-            console.log('单点登录', event.data)
-            setToken(event.data)
-          } else {
-            console.log('第三次交互成功：后台收到了前台的回应')
-          }
-        }
-      }, false)
-    }
   },
-  // 在模板渲染成html后调用，通常是初始化页面完成后，再对html的dom节点进行一些需要的操作
   mounted() {
-    // 页面加载自动聚焦
-    if (!this.pageLoading) {
-      if (this.loginForm.username === '') {
-        this.$refs.username.focus()
-      } else if (this.loginForm.password === '') {
-        this.$refs.password.focus()
-      } else if (this.loginForm.code === '') {
-        this.$refs.code.focus()
-      } else {
-        this.$refs.loginBtn.focus()
-      }
-    }
-
     this.loadPublicKey()
   },
   methods: {
@@ -157,48 +139,39 @@ export default {
         this.publicKey = null
       })
     },
+    loginFormAuthFocus() {
+      if (this.loginForm.username == null) {
+        this.$refs.username.focus()
+      } else if (this.loginForm.password == null) {
+        this.$refs.password.focus()
+      } else if (this.loginForm.code == null) {
+        this.$refs.code.focus()
+      }
+    },
     getPwdFlag() {
       this.pwdFlag = !this.pwdFlag
       this.pwdFlagType = this.pwdFlag ? 'text' : 'password'
     },
     getCode() {
-      this.$mapi.communal.loginCode({ _t: new Date().getTime() }).then(res => {
+      this.$mapi.login.loginCode({ _t: new Date().getTime() }).then(res => {
         this.codeUrl = res.data.img
-        this.loginForm.code = ''
+        this.loginForm.code = null
         this.loginForm.uuid = res.data.uuid
       })
     },
-    checkUserLoginStatus() {
-      this.pageLoading = true
-      console.log('开始检查用户的登录状态...')
-      this.$mapi.communal.checkUserLoginStatus().then(res => {
-        if (res.code === 200 && res.data != null) {
-          // 查询用户信息
-          console.log('用户已登录，加载用户信息...')
-          const userToken = res.data['accessToken']
-          setToken(userToken)
-          this.$router.push({ path: this.redirect || '/' })
-        } else {
-          console.log('用户未登录...')
-          this.pageLoading = false
-        }
-      }).catch(_ => {
-        this.pageLoading = false
-      })
-    },
     handleLogin() {
+      if (this.loginLoading) return
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           const username = this.loginForm.username
           const payload = encrypt(this.publicKey, JSON.stringify({
             username: username,
             password: this.loginForm.password,
-            rememberMe: this.loginForm.rememberMe,
             code: this.loginForm.code,
             uuid: this.loginForm.uuid
           }))
 
-          this.loading = true
+          this.loginLoading = true
           this.$store.dispatch('Login', { _l: payload }).then(change_pwd => {
             if (change_pwd) {
               this.$message.error('首次登录需要重置密码，请修改密码')
@@ -212,6 +185,7 @@ export default {
               this.$router.push({ path: this.redirect || '/' })
             }
           }).catch(e => {
+            console.log('e', e)
             if (e.message && e.message === 'EAUTHN004') {
               // 跳转修改密码界面
               sessionStorage.setItem('force_update_pwd_user', JSON.stringify({
@@ -224,10 +198,15 @@ export default {
               this.$refs.code.focus()
             }
           }).finally(_ => {
-            this.loading = false
+            this.loginLoading = false
           })
         }
       })
+    },
+    buildLoginPayload() {
+      return encrypt(this.publicKey, JSON.stringify({
+        ...this.loginForm
+      }))
     },
     point() {
       const point = window.sessionStorage.getItem('point')
@@ -235,6 +214,7 @@ export default {
         this.$message.warning('当前登录状态已过期，请重新登录')
         window.sessionStorage.removeItem('point')
       }
+      this.pageLoading = false
     }
   }
 }
@@ -304,51 +284,113 @@ export default {
 }
 </style>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-  .login {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    background-size: cover;
-  }
-  .title {
-    margin: 0 auto 30px auto;
-    text-align: center;
-    color: #707070;
-  }
+<style lang="scss" scoped>
+/* 背景容器 */
+.login-wrapper {
+  position: relative;
+  height: 100%;
+}
 
+/* 背景图 */
+.bg-image {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+/* ⭐ 渐变遮罩（高级感核心） */
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  backdrop-filter: blur(2px);
+  background:
+    linear-gradient(
+        rgba(255,255,255,0.15),
+        rgba(255,255,255,0.05)
+    ),
+    radial-gradient(circle at center,
+      rgba(255,255,255,0.15),
+      rgba(0,0,0,0.3)
+    );
+}
+
+/* 登录区域 */
+.login {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* 登录卡片 */
+.login-form {
+  width: 385px;
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  background: linear-gradient(
+      rgba(255,255,255,0.6),
+      rgba(255,255,255,0.3)
+  );
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.login-form ::v-deep .el-input__inner {
+  background-color: rgba(255,255,255,0.7);
+}
+
+.login-form ::v-deep .input-icon {
+  opacity: 0.7;
+}
+
+/* 标题 */
+.title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* ⭐ 验证码一行布局 */
+.code-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.code-wrapper .el-input {
+  flex: 1;
+}
+
+.code-img {
+  width: 110px;
+  height: 31px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
+  opacity: 0.7;
+}
+
+.code-img:hover {
+  transform: scale(1.05);
+}
+
+/* 按钮 */
+.login-btn {
+  width: 100%;
+  opacity: 0.7;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
   .login-form {
-    border-radius: 6px;
-    width: 385px;
-    padding: 25px 25px 5px 25px;
-    background-color: rgba(255, 255, 255, 0.9);
-    opacity: 0.9;
-    .el-input {
-      height: 38px;
-      input {
-        height: 38px;
-      }
-    }
-    .input-icon {
-      // height: 39px;
-      // width: 14px;
-      margin-left: 2px;
-    }
+    width: 90%;
   }
-  .login-tip {
-    font-size: 13px;
-    text-align: center;
-    color: #bfbfbf;
-  }
-  .login-code {
-    width: 33%;
-    display: inline-block;
-    height: 38px;
-    float: right;
-    img {
-      cursor: pointer;
-      vertical-align:middle
-    }
-  }
+}
+
 </style>

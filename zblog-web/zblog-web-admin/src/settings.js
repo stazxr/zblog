@@ -1,6 +1,6 @@
 module.exports = {
   // 网站标题
-  title: '磨刀霍霍',
+  title: '一隅藏记',
 
   // 是否显示标签栏
   tagsView: true,
@@ -15,10 +15,10 @@ module.exports = {
   showFooter: true,
 
   // 底部文字，支持html语法
-  footerTxt: '© 2024 Sun Tao <a href="https://mit-license.org" target="_blank">MIT License</a>',
+  footerTxt: '© 2026 Sun Tao <a href="https://github.com/stazxr/zblog/blob/master/LICENSE" target="_blank">MIT License</a>',
 
   // 备案号
-  caseNumber: '陕ICP备2021003044号-1',
+  caseNumber: '陕ICP备2026001026号-1',
 
   // 前台访问地址
   webApi: 'http://localhost:31943' // 本地开发

@@ -102,28 +102,35 @@
       "sourceType": "com.github.stazxr.zblog.bas.rest.autoconfigure.properties.RestProperties",
       "description": "统一响应配置项."
     },
-
-
-
     {
       "name": "zblog.base.security",
       "type": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties"
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "Security配置."
     },
     {
       "name": "zblog.base.security.jwt",
-      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "JWT配置."
     },
     {
       "name": "zblog.base.security.jwt.cert-info",
-      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$CertInfo",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "JWT证书信息配置."
     },
     {
       "name": "zblog.base.security.jwt.claims",
-      "type": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties"
+      "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$Claims",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "JWT声明信息配置."
+    },
+    {
+      "name": "zblog.base.security.jwt.cookie",
+      "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "JWT Cookie参数配置."
     }
   ],
   "properties": [
@@ -581,76 +588,46 @@
       "defaultValue": true
     },
     {
-      "name": "zblog.base.security.jwt.access-token-duration",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "访问令牌有效时间，单位为秒，默认值 30 分钟.",
-      "defaultValue": 1200
+      "name": "zblog.base.security.jwt.cookie.domain",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "Cookie 域名，例如：localhost。本地开发可为空.",
+      "defaultValue": "localhost"
     },
     {
-      "name": "zblog.base.security.jwt.refresh-token-duration",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "刷新令牌有效时间，单位为秒，通常为访问令牌有效时间的两倍.",
-      "defaultValue": 2400
-    },
-    {
-      "name": "zblog.base.security.jwt.allowed-renew-token",
+      "name": "zblog.base.security.jwt.cookie.secure",
       "type": "java.lang.Boolean",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "是否允许续签，默认不允许.",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "是否仅允许 HTTPS 传输 Cookie.",
       "defaultValue": false
     },
     {
-      "name": "zblog.base.security.jwt.refresh-min-duration",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "续签判定阙值，单位为秒，当访问令牌剩余时间小于该值时，可进行续签操作.",
-      "defaultValue": 300
+      "name": "zblog.base.security.jwt.cookie.http-only",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "是否禁止 JavaScript 访问 Cookie，开启后可防止通过 document.cookie 获取 Token.",
+      "defaultValue": true
     },
     {
-      "name": "zblog.base.security.jwt.max-version",
-      "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "最大续签次数，默认 5 次.",
-      "defaultValue": 5
-    },
-    {
-      "name": "zblog.base.security.jwt.algorithm",
+      "name": "zblog.base.security.jwt.cookie.same-site",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties",
-      "description": "JWT 签名算法 {@link com.nimbusds.jose.JWSAlgorithm}，默认为 RS256.",
-      "defaultValue": "RS256"
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "Cookie SameSite 策略，可选值：Strict、Lax、None.",
+      "defaultValue": "Lax"
     },
     {
-      "name": "zblog.base.security.jwt.cert-info.alias",
+      "name": "zblog.base.security.jwt.cookie.path",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
-      "description": "证书名称."
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "Cookie 生效路径.",
+      "defaultValue": "/"
     },
     {
-      "name": "zblog.base.security.jwt.cert-info.key-password",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
-      "description": "证书密钥."
-    },
-    {
-      "name": "zblog.base.security.jwt.cert-info.cert-location",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$CertInfo",
-      "description": "证书路径."
-    },
-    {
-      "name": "zblog.base.security.jwt.claims.issuer",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
-      "description": "JWT 发布者的 URL 地址."
-    },
-    {
-      "name": "zblog.base.security.jwt.claims.subject",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.JwtProperties$Claims",
-      "description": "JWT 面向的用户."
+      "name": "zblog.base.security.jwt.cookie.max-age",
+      "type": "java.lang.Long",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "Cookie 有效时间，单位秒。建议与 AccessToken 有效时间保持一致.",
+      "defaultValue": 1800
     }
   ],
   "hints": [
@@ -738,6 +715,23 @@
         { "value": "PS384", "description": "PS384." },
         { "value": "PS512", "description": "PS512." },
         { "value": "EdDSA", "description": "EdDSA." }
+      ]
+    },
+    {
+      "name": "zblog.base.security.jwt.cookie.same-site",
+      "values": [
+        {
+          "value": "Strict",
+          "description": "仅同站点请求携带 Cookie."
+        },
+        {
+          "value": "Lax",
+          "description": "允许普通页面跳转携带 Cookie."
+        },
+        {
+          "value": "None",
+          "description": "允许跨站请求携带 Cookie，需要同时开启 secure=true."
+        }
       ]
     }
   ]

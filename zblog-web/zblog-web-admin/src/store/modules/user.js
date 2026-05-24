@@ -1,76 +1,58 @@
+import login from '@/api/login'
 import communal from '@/api/communal'
-import { setToken, removeToken } from '@/utils/token'
 
 const user = {
   state: {
     // 登录用户信息
     user: null,
-    // 用户菜单是否已加载
-    loadMenus: false
+    // 用户权限信息
+    perms: [],
+    // 用户菜单信息
+    menus: []
   },
   mutations: {
-    SET_USER: (state, user) => {
-      state.user = user
-    },
-    SET_LOAD_MENUS: (state, loadMenus) => {
-      state.loadMenus = loadMenus
+    /**
+     * 设置用户信息
+     */
+    SET_USER: (state, data) => {
+      if (data == null) {
+        state.user = null
+        state.perms = []
+        state.menus = []
+      } else {
+        state.user = data.user
+        state.perms = data.perms || []
+        state.menus = data.menus || []
+      }
     }
   },
   actions: {
     // 登录
-    Login({ commit }, loginParam) {
-      return new Promise((resolve, reject) => {
-        communal.login(loginParam).then(res => {
-          const { access_token } = res.data
-          setToken(access_token)
-          commit('SET_LOAD_MENUS', true)
-          communal.loginId().then(res => {
-            commit('SET_USER', res.data)
-            const change_pwd = res.data.passwordExpireTime == null
-            resolve(change_pwd)
-          })
-        }).catch(error => {
-          reject(error)
-        })
-      })
+    async Login({ commit }, loginParam) {
+      await login.login(loginParam)
+      const res = await communal.loginId()
+      commit('SET_USER', res.data)
+      const user = res.data.user
+      return (user && user.passwordExpireTime == null)
     },
     // 刷新用户信息
-    RefreshUser({ commit }) {
-      return new Promise((resolve, reject) => {
-        communal.checkUserLoginStatus().then(res => {
-          if (res.code === 200 && res.data != null) {
-            const userToken = res.data['accessToken']
-            setToken(userToken)
-          }
-
-          communal.loginId().then(res => {
-            commit('SET_USER', res.data)
-            resolve(res)
-          }).catch(error => {
-            reject(error)
-          })
-        }).catch(error => {
-          reject(error)
-        })
-      })
+    async RefreshUser({ commit }) {
+      const res = await communal.loginId()
+      commit('SET_USER', res.data)
+      return res.data
     },
-    Logout({ commit }) {
-      return new Promise((resolve, reject) => {
-        communal.logout().then(_ => {
-          logout(commit)
-          resolve()
-        }).catch(error => {
-          logout(commit)
-          reject(error)
-        })
-      })
+    // 登出
+    async Logout({ commit }) {
+      try {
+        await login.logout()
+      } catch (e) {
+        console.warn('logout error:', e)
+      } finally {
+        commit('SET_USER', null)
+        commit('RESET_ROUTERS')
+      }
     }
   }
-}
-
-export const logout = (commit) => {
-  commit('SET_USER', null)
-  removeToken()
 }
 
 export default user

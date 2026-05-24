@@ -1,50 +1,36 @@
-// token key
-const tokenKey = 'usrToken'
+import Cookies from 'js-cookie'
 
-// refresh token key
-const refTokenKey = 'usrRefToken'
+const tokenKey = 'token'
 
-// set token pair
-export function setTokenPair(tokenPair) {
-  const { atk, rtk } = tokenPair
-  setToken(atk)
-  setRefToken(rtk)
-}
+// 过期时间（单位：天）
+const tokenExpireDays = 1
 
-// set token
+/**
+ * 设置token
+ */
 export function setToken(token) {
   removeToken()
-  window.localStorage.setItem(tokenKey, token)
+
+  Cookies.set(tokenKey, token, {
+    expires: tokenExpireDays,
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Lax'
+  })
 }
 
-// set refresh token
-export function setRefToken(refToken) {
-  removeRefToken()
-  window.localStorage.setItem(refTokenKey, refToken)
-}
-
-// get token
+/**
+ * 获取token
+ */
 export function getToken() {
-  return window.localStorage.getItem(tokenKey) || ''
+  return Cookies.get(tokenKey) || ''
 }
 
-// get refresh token
-export function getRefToken() {
-  return window.localStorage.getItem(refTokenKey) || ''
-}
-
-// remove token pair
-export function removeTokenPair() {
-  removeToken()
-  removeRefToken()
-}
-
-// remove token
+/**
+ * 删除token
+ */
 export function removeToken() {
-  window.localStorage.removeItem(tokenKey)
-}
-
-// remove refresh token
-export function removeRefToken() {
-  window.localStorage.removeItem(refTokenKey)
+  Cookies.remove(tokenKey, {
+    path: '/'
+  })
 }

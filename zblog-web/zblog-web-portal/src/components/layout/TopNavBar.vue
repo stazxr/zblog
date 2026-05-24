@@ -36,7 +36,7 @@
         <div class="menus-item">
           <a class="menu-btn">
             📕 文章
-            <i class="iconfont icon-xiangxia expand" />
+            <i class="iconfont" />
           </a>
           <ul class="menus-submenu">
             <li>

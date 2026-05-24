@@ -92,8 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         ThrowUtils.when(StringUtils.isBlank(userId)).system(BaseErrorCode.SCOREB000);
         User user = userMapper.selectUserById(Long.parseLong(userId));
         ThrowUtils.throwIfNull(user, UserErrorCode.EUSERA008);
-        // 设置角色和权限信息
-        setRoleAndPerm(user);
+        setOtherUserInfo(user);
         return user;
     }
 
@@ -106,12 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public SecurityUser loginWithUsername(String username) {
         // 根据用户ID查询用户信息
-        User user = userMapper.selectUserByUsername(username);
-        if (user != null) {
-            // 设置角色和权限信息
-            setRoleAndPerm(user);
-        }
-        return user;
+        return userMapper.selectUserByUsername(username);
     }
 
     /**
@@ -419,17 +413,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         mailTemplateSender.send(receiver, emailCode, variables);
     }
 
-    private void setRoleAndPerm(User user) {
+    private void setOtherUserInfo(User user) {
         // 查询用户角色列表
         List<Role> roles = userMapper.selectRolesByUserId(user.getId());
         user.setAuthorities(roles);
-
-        // 查询用户权限列表
-        if (UserType.ADMIN_USER.getType().equals(user.getUserType())) {
-            user.setPerms(userMapper.selectAllMd5PermCodes());
-        } else {
-            user.setPerms(userMapper.selectMd5PermCodesByUserId(user.getId()));
-        }
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

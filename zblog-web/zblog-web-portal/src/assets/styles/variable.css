@@ -4,9 +4,9 @@
     /* --globalFont: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif; */
     --globalFontSize: 16px;
 
-    /* 箭头 */
-    --globalCursor: url(https://file.suntaoblog.com/cur/default.cur), default;
-    --globalPointer: url(https://file.suntaoblog.com/cur/pointer.cur), pointer;
+    /* 光标 */
+    --globalCursor: url(/cursor/default.ani), url(/cursor/default.cur), auto;
+    --globalPointer: url(/cursor/pointer.ani), url(/cursor/pointer.cur), pointer;
 
     /* 字体颜色 */
     --theme-light-color: #4c4948;

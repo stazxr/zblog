@@ -20,7 +20,7 @@ export default {
   },
   // 查询用户详情
   logout: params => {
-    return api.httpRequest().post(`/api/logout/custom`, qs.stringify(params), {
+    return api.httpRequest().post(`/api/logout`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   }

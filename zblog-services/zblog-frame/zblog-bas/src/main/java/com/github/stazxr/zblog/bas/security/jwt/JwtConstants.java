@@ -8,6 +8,16 @@ package com.github.stazxr.zblog.bas.security.jwt;
  */
 public final class JwtConstants {
     /**
+     * 访问令牌名
+     */
+    public static final String ACCESS_TOKEN = "access_token";
+
+    /**
+     * 刷新令牌名
+     */
+    public static final String REFRESH_TOKEN = "refresh_token";
+
+    /**
      * 用户登录IP
      */
     public static final String LOGIN_IP_KEY = "loginIp";

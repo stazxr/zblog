@@ -147,22 +147,27 @@ public class BaseConst {
         /**
          * V_4.0.0
          */
-        public static final String V_4_0_0 = "v4";
+        public static final String V_4_0_0 = "4.0";
 
         /**
          * V_4.1.0
          */
-        public static final String V_4_1_0 = "v4_1";
+        public static final String V_4_1_0 = "4.1";
 
         /**
          * V_4.2.0
          */
-        public static final String V_4_2_0 = "v4_2";
+        public static final String V_4_2_0 = "4.2";
 
         /**
          * V_5.0.0
          */
-        public static final String V_5_0_0 = "v5";
+        public static final String V_5_0_0 = "5.0";
+
+        /**
+         * V_P_1.0.0（门户版本）
+         */
+        public static final String V_P_1_0_0 = "P1.0";
     }
 
     /**

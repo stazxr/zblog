@@ -12,7 +12,7 @@
         <!-- 菜单搜索 -->
         <header-search id="header-search" class="right-menu-item" />
         <!-- 网站首页 -->
-        <el-tooltip content="孙涛个人博客" effect="dark" placement="bottom">
+        <el-tooltip content="首页" effect="dark" placement="bottom">
           <Web class="right-menu-item hover-effect" />
         </el-tooltip>
         <!-- 全屏缩放 -->
@@ -38,7 +38,7 @@
           <router-link to="/user/center">
             <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
-          <span style="display: block;" @click="open">
+          <span style="display: block;" @click="logout">
             <el-dropdown-item divided>退出登录</el-dropdown-item>
           </span>
         </el-dropdown-menu>
@@ -56,7 +56,6 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import HeaderSearch from '@/components/HeaderSearch'
 import DefaultAvatar from '@/assets/images/default-avatar.png'
-import { removeToken } from '@/utils/token'
 
 export default {
   components: {
@@ -96,22 +95,19 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/ToggleSideBar')
     },
-    open() {
+    async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.logout()
-      })
+        this.doLogout()
+      }).catch(() => {})
     },
-    logout() {
-      this.$mapi.communal.logout().then(res => {
-        removeToken()
-        this.$message.success(res.message)
-        this.$store.commit('user/ClearUserInfo')
-        location.reload()
-      })
+    async doLogout() {
+      await this.$store.dispatch('Logout')
+      this.$message.success('退出成功')
+      this.$router.replace('/login?logout')
     }
   }
 }

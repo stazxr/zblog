@@ -54,11 +54,6 @@ public class SecurityUser implements UserDetails {
     private List<? extends SecurityRole> authorities;
 
     /**
-     * 权限列表
-     */
-    private List<String> perms;
-
-    /**
      * 获取用户唯一标识
      *
      * @return 用户唯一标识
@@ -167,24 +162,6 @@ public class SecurityUser implements UserDetails {
      */
     public void setAuthorities(List<? extends SecurityRole> authorities) {
         this.authorities = authorities;
-    }
-
-    /**
-     * 获取用户的权限列表
-     *
-     * @return 用户的权限列表
-     */
-    public List<String> getPerms() {
-        return perms;
-    }
-
-    /**
-     * 设置用户的权限列表
-     *
-     * @param perms 用户的权限列表
-     */
-    public void setPerms(List<String> perms) {
-        this.perms = perms;
     }
 
     /**

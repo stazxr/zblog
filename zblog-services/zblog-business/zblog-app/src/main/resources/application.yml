@@ -243,8 +243,6 @@ zblog:
         - /swagger-resources
         - /v3/api-docs
         - /v2/api-docs
-
-    # TODO 安全配置
     security:
       login-url: /api/login # 登录 URL
       logout-url: /api/logout # 注销 URL
@@ -265,6 +263,13 @@ zblog:
         claims:
           issuer: http://localhost:${server.port}
           audience: ${spring.application.name}
+        cookie:
+          domain: localhost
+          secure: false
+          http-only: true
+          same-site: Lax
+          path: /
+          max-age: 1800
   website:
     name: Z-BLOG # 站点名称
     url: http://127.0.0.1:31945 # 站点地址

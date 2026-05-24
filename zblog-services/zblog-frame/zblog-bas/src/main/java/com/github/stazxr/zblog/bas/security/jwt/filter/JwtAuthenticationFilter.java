@@ -42,6 +42,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -166,7 +167,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 令牌解析
-        String jwtToken = getTokenFromHeader(request);
+        String jwtToken = getTokenFromCookie(request);
         if (jwtToken != null) {
             try {
                 // 验证 Token 并将用户信息写入上下文
@@ -422,6 +423,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = authorizationHeader.replace(AUTHENTICATION_PREFIX, "");
             if (StringUtils.isNotBlank(jwtToken)) {
                 return jwtToken;
+            }
+        }
+        return null;
+    }
+
+    /** 从 Cookie 中获取 jwt token */
+    protected String getTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                String name = cookie.getName();
+                if (JwtConstants.ACCESS_TOKEN.equals(name)) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;

@@ -1,16 +1,19 @@
-package com.github.stazxr.zblog.bas.security.hanlder;
+package com.github.stazxr.zblog.bas.security.authn.handler;
 
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
-import com.github.stazxr.zblog.bas.security.SecurityConstant;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
+import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
 import com.github.stazxr.zblog.bas.security.jwt.JwtContext;
 import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -18,7 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.time.Duration;
 
 /**
  * 自定义认证成功处理器，实现 Spring Security 提供的 {@link AuthenticationSuccessHandler} 接口。
@@ -30,6 +33,8 @@ import java.util.*;
 @Component
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationSuccessHandlerImpl.class);
+
+    private JwtCookieProperties jwtCookieProperties;
 
     private JwtTokenGenerator jwtTokenGenerator;
 
@@ -56,24 +61,32 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             JwtContext jwtContext = new JwtContext();
             jwtContext.setUserId(userId);
             jwtContext.setLoginIp(userIp);
-            String token = jwtTokenGenerator.generateToken(jwtContext);
-
-            // TODO 缓存 SSO Token
-            // SsoToken ssoToken = new SsoToken(userId, token, userIp);
-            // SsoTokenCache.set(ssoToken);
+            String jwt = jwtTokenGenerator.generateToken(jwtContext);
 
             // 记录用户登录日志
             int loginType = 1; // 登录成功
             securityUserService.updateUserLoginInfo(securityUser.getUsername(), loginType, request);
 
-            // 构造登录结果并返回
-            Map<String, Object> loginResult = new HashMap<>(1);
-            loginResult.put("access_token", SecurityConstant.AUTHENTICATION_PREFIX.concat(token));
-            ResponseUtils.responseJsonWriter(response, Result.success("登录成功").data(loginResult));
+            // 构造返回Cookie
+            ResponseCookie cookie = ResponseCookie.from(JwtConstants.ACCESS_TOKEN, jwt)
+                .httpOnly(jwtCookieProperties.isHttpOnly())
+                .secure(jwtCookieProperties.getSecure())
+                .domain(jwtCookieProperties.getDomain())
+                .path(jwtCookieProperties.getPath())
+                .sameSite(jwtCookieProperties.getSameSite())
+                .maxAge(Duration.ofSeconds(jwtCookieProperties.getMaxAge()))
+                .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            ResponseUtils.responseJsonWriter(response, Result.success("登录成功"));
         } catch (Exception e) {
             log.error("处理认证成功逻辑时发生异常：{}", e.getMessage(), e);
             ResponseUtils.responseJsonWriter(response, Result.failure("登录失败，请稍后重试"));
         }
+    }
+
+    @Autowired
+    public void setJwtCookieProperties(JwtCookieProperties jwtCookieProperties) {
+        this.jwtCookieProperties = jwtCookieProperties;
     }
 
     @Autowired
