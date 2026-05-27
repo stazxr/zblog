@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import lombok.Getter;
 import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,9 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * 框架级统一响应体
- *
- * <p>包含 HTTP 状态码、业务成功标识、错误码、链路追踪ID、节点信息、时间戳等字段</p>
- * <p>前端可直接解析 success 或 errorCode，无需依赖 HTTP code</p>
  *
  * @param <T> 返回数据类型
  * @author SunTao
@@ -25,14 +21,9 @@ public final class Result<T> implements Serializable {
     private static final long serialVersionUID = -7847907472897585204L;
 
     /**
-     * 业务是否成功
+     * 响应结果
      */
     private boolean success;
-
-    /**
-     * HTTP 状态码
-     */
-    private int code;
 
     /**
      * 响应消息
@@ -40,7 +31,7 @@ public final class Result<T> implements Serializable {
     private String message;
 
     /**
-     * 返回数据
+     * 响应数据
      */
     private T data;
 
@@ -74,17 +65,10 @@ public final class Result<T> implements Serializable {
         this();
         this.success = success;
         this.message = message;
-        this.code = success ? HttpStatus.OK.value() : HttpStatus.INTERNAL_SERVER_ERROR.value();
     }
 
     public Result<T> success(boolean success) {
         this.success = success;
-        return this;
-    }
-
-    @Deprecated
-    public Result<T> code(int httpStatus) {
-        this.code = httpStatus;
         return this;
     }
 

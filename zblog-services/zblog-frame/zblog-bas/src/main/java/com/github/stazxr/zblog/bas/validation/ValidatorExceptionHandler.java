@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
@@ -45,9 +44,7 @@ public class ValidatorExceptionHandler implements Ordered {
         }
 
         // return
-        Result<Void> result = Result.failure(errorCode.getCode(), errorMessage);
-        result.code(HttpStatus.BAD_REQUEST.value());
-        return result;
+        return Result.failure(errorCode.getCode(), errorMessage);
     }
 
     @ExceptionHandler(AssertException.class)

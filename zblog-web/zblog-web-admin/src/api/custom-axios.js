@@ -80,32 +80,33 @@ instance.interceptors.request.use(config => {
 
 // 设置响应拦截器
 instance.interceptors.response.use(response => {
-  // response {data: {}, status: 200, statusText: 'OK', headers: {}, config: {}, request: {}}
-  // data formatter: {code: 200, message, '操作成功', data: {}, identifier: 1} => code maybe [200, 401, 403, 404, 500...]
-  // data maybe really data, eg: data => 后端直接返回了数据，没有封装为上述格式
-  // return Promise.reject(new Error(res.msg || 'Error'))
-  console.log('response', response)
   if (response.status === 200 && response.data) {
     const result = response.data
     const responseType = response.config.responseType
     if (responseType === 'json') {
-      return responseJsonHandler(result)
+      if (result.success) {
+        return result
+      } else {
+        Message.error(result.message || '操作失败')
+        return Promise.reject(new Error(result.message || '操作失败'))
+      }
     } else {
       return result
     }
   }
 }, error => {
-  // 统一异常处理，一般不会出现401|403|404，后端将其作为业务异常处理了
+  console.log('error', error)
   const { response, request } = error
   if (response) {
-    console.log('response', response)
     // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
     const status = response.status
-    const errorMessage = response && response.data ? response.data.message : null
-    const errorCode = response && response.data ? response.data.errorCode : null
+    const result = response.data
+    const errorCode = result ? result.errorCode : null
+    const errorMessage = result ? result.message : null
     const _errorMessage = errorMessage || statusMessageMap[status] || `系统发生未知错误`
     Message.error(_errorMessage)
     if (status === 401) {
+      // 登录失败、登录失效、未登录
       logout(false)
     }
     return Promise.reject(new Error(errorCode))
@@ -122,10 +123,10 @@ instance.interceptors.response.use(response => {
       }
     }
     return Promise.reject(new Error())
+  } else {
+    Message.error('系统发生未知错误') // default
+    return Promise.reject(new Error())
   }
-
-  Message.error('系统发生未知错误') // default
-  return Promise.reject(new Error())
 })
 
 function logout(expired) {
@@ -135,43 +136,6 @@ function logout(expired) {
   }
 
   router.replace('/login')
-}
-
-function responseJsonHandler(result) {
-  const { code, success, message } = result
-  if (code === 200) {
-    if (success) {
-      // 业务成功
-      return result
-    } else {
-      // 业务失败
-      Message.error(message || '操作失败')
-      return Promise.reject(new Error(message || '操作失败'))
-    }
-  } else if (code === 401) {
-    console.log('result401', result)
-    const identifier = result.identifier || 10001
-    if (identifier === 10001) {
-      Message.error(result.message || '登录失败')
-      return Promise.reject(new Error(result.message || '登录失败'))
-    } else if (identifier === 10002) {
-      // 密码过期，跳转到修改密码的页面
-      Message.error(result.message || '请修改密码')
-      return Promise.reject(new Error('' + identifier))
-    } else if (identifier === 900002) {
-      logout(true)
-    } else if (identifier === 900003 || identifier === 900004) {
-      Message.error(result.message || '系统异常')
-      return Promise.reject(new Error(result.message || '系统异常'))
-    } else {
-      Message.error(result.message || '请登录')
-      logout(false)
-    }
-  } else {
-    console.log('result-unknown', result)
-    Message.error(result.message || '系统发生未知错误')
-    return Promise.reject(new Error(result.message || '系统发生未知错误'))
-  }
 }
 
 export const get = (url, params, requestItem = {}) => {

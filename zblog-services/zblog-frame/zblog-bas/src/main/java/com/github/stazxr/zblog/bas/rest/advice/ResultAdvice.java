@@ -88,7 +88,7 @@ public class ResultAdvice implements ResponseBodyAdvice<Object>, Ordered {
             // 返回默认错误信息
             String errorCode = ErrorCode.DEFAULT_SYSTEM_ERROR_CODE;
             String errorMessage = MessageSupportLoader.getMessage("error.system.unknown");
-            return Result.failure(errorCode, errorMessage).code(statusCode).data(data);
+            return Result.failure(errorCode, errorMessage).data(data);
         }
 
         return Result.success().data(data);

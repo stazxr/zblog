@@ -42,8 +42,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         // 记录认证异常日志
         logAuthenticationError(errorMsg, authException);
 
-        // 返回结果
-        Result result = Result.failure(noticeMsg).data(errorMsg).code(HttpStatus.UNAUTHORIZED.value());
+        // 返回结果 401
+        Result result = Result.failure(noticeMsg).data(errorMsg);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 

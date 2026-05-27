@@ -6,7 +6,9 @@ import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
 import com.github.stazxr.zblog.bas.security.jwt.JwtContext;
 import com.github.stazxr.zblog.bas.security.jwt.JwtTokenGenerator;
+import com.github.stazxr.zblog.bas.security.jwt.JwtTokenPair;
 import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties;
+import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.slf4j.Logger;
@@ -33,6 +35,8 @@ import java.time.Duration;
 @Component
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationSuccessHandlerImpl.class);
+
+    private JwtProperties jwtProperties;
 
     private JwtCookieProperties jwtCookieProperties;
 
@@ -61,27 +65,44 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             JwtContext jwtContext = new JwtContext();
             jwtContext.setUserId(userId);
             jwtContext.setLoginIp(userIp);
-            String jwt = jwtTokenGenerator.generateToken(jwtContext);
+            JwtTokenPair tokenPair = jwtTokenGenerator.generateToken(jwtContext);
 
             // 记录用户登录日志
             int loginType = 1; // 登录成功
             securityUserService.updateUserLoginInfo(securityUser.getUsername(), loginType, request);
 
-            // 构造返回Cookie
-            ResponseCookie cookie = ResponseCookie.from(JwtConstants.ACCESS_TOKEN, jwt)
+            // 访问令牌
+            ResponseCookie accessCookie = ResponseCookie.from(JwtConstants.ACCESS_TOKEN, tokenPair.getAccessToken())
                 .httpOnly(jwtCookieProperties.isHttpOnly())
                 .secure(jwtCookieProperties.getSecure())
                 .domain(jwtCookieProperties.getDomain())
                 .path(jwtCookieProperties.getPath())
                 .sameSite(jwtCookieProperties.getSameSite())
-                .maxAge(Duration.ofSeconds(jwtCookieProperties.getMaxAge()))
+                .maxAge(Duration.ofSeconds(jwtProperties.getAccessTokenTtl()))
                 .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+            // 刷新令牌
+            ResponseCookie refreshTokenCookie = ResponseCookie.from(JwtConstants.REFRESH_TOKEN, tokenPair.getRefreshToken())
+                    .httpOnly(jwtCookieProperties.isHttpOnly())
+                    .secure(jwtCookieProperties.getSecure())
+                    .domain(jwtCookieProperties.getDomain())
+                    .path(jwtCookieProperties.getPath())
+                    .sameSite(jwtCookieProperties.getSameSite())
+                    .maxAge(Duration.ofSeconds(jwtProperties.getRefreshTokenTtl()))
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
             ResponseUtils.responseJsonWriter(response, Result.success("登录成功"));
         } catch (Exception e) {
             log.error("处理认证成功逻辑时发生异常：{}", e.getMessage(), e);
             ResponseUtils.responseJsonWriter(response, Result.failure("登录失败，请稍后重试"));
         }
+    }
+
+    @Autowired
+    public void setJwtProperties(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
     }
 
     @Autowired

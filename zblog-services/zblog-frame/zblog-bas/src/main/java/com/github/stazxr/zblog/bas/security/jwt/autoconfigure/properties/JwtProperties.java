@@ -18,12 +18,12 @@ public class JwtProperties {
     /**
      * 访问令牌有效时间，单位为秒，默认值 30 分钟
      */
-    private int accessTokenDuration = 1800;
+    private int accessTokenTtl = 1800;
 
     /**
      * 刷新令牌有效时间，单位为秒，默认 7 天
      */
-    private int refreshTokenDuration = 604800;
+    private int refreshTokenTtl = 604800;
 
     /**
      * 是否允许续签，默认不允许（refreshToken 机制不生效）
@@ -119,36 +119,36 @@ public class JwtProperties {
         }
     }
 
+    public int getAccessTokenTtl() {
+        return accessTokenTtl;
+    }
+
     /**
      * 设置访问令牌有效时间，单位为秒
      *
-     * @param accessTokenDuration 访问令牌有效时间，不能为负数
+     * @param accessTokenTtl 访问令牌有效时间，不能为负数
      */
-    public void setAccessTokenDuration(int accessTokenDuration) {
-        if (accessTokenDuration < 0) {
-            throw new IllegalArgumentException(JWT_PREFIX + ".access-token-duration must not be negative.");
+    public void setAccessTokenTtl(int accessTokenTtl) {
+        if (accessTokenTtl < 0) {
+            throw new IllegalArgumentException(JWT_PREFIX + ".access-token-ttl must not be negative.");
         }
-        this.accessTokenDuration = accessTokenDuration;
+        this.accessTokenTtl = accessTokenTtl;
     }
 
-    public int getAccessTokenDuration() {
-        return accessTokenDuration;
+    public int getRefreshTokenTtl() {
+        return refreshTokenTtl;
     }
 
     /**
      * 设置刷新令牌有效时间，单位为秒，必须大于等于 accessTokenDuration
      *
-     * @param refreshTokenDuration 刷新令牌有效时间，不能为负数且大于访问令牌有效时间
+     * @param refreshTokenTtl 刷新令牌有效时间，不能为负数
      */
-    public void setRefreshTokenDuration(int refreshTokenDuration) {
-        if (refreshTokenDuration < 0) {
-            throw new IllegalArgumentException(JWT_PREFIX + ".refresh-token-duration must not be negative.");
+    public void setRefreshTokenTtl(int refreshTokenTtl) {
+        if (refreshTokenTtl < 0) {
+            throw new IllegalArgumentException(JWT_PREFIX + ".refresh-token-ttl must not be negative.");
         }
-        this.refreshTokenDuration = refreshTokenDuration;
-    }
-
-    public int getRefreshTokenDuration() {
-        return refreshTokenDuration;
+        this.refreshTokenTtl = refreshTokenTtl;
     }
 
     /**

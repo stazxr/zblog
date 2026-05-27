@@ -399,7 +399,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             JwtContext jwtContext = new JwtContext();
             jwtContext.setUserId(userId);
             jwtContext.setLoginIp(claimsSet.getStringClaim(JwtConstants.LOGIN_IP_KEY));
-            return jwtTokenGenerator.refreshToken(jwtContext);
+            // return jwtTokenGenerator.refreshToken(jwtContext);
+            return null;
         } catch (Exception e) {
             throw new JwtAuthenticationException(TokenError.TE010, e);
         }

@@ -54,9 +54,9 @@ public class JwtTokenGenerator {
      * 令牌生成（登录调用）。
      *
      * @param jwtContext Jwt 参数上下文
-     * @return 返回生成的访问令牌（accessToken）
+     * @return 令牌对
      */
-    public String generateToken(JwtContext jwtContext) {
+    public JwtTokenPair generateToken(JwtContext jwtContext) {
         // 获取当前时间，作为 JWT 的发放时间
         Date issueTime = new Date();
 
@@ -73,48 +73,21 @@ public class JwtTokenGenerator {
         String accessToken = jwtEncoder.encode(algorithm, accessClaims);
 
         String refreshToken = null;
-        int ttl = jwtProperties.getAccessTokenDuration();
+        int cacheTtl = jwtProperties.getAccessTokenTtl();
         if (jwtProperties.isAllowedRenewToken()) {
             // 生成刷新令牌的声明集，并通过编码器编码为 refresh token
             String refreshJwtId = "RTK_" + SequenceUtils.getId();
             JWTClaimsSet refreshClaims = buildRefreshJwtChaimSet(issueTime, refreshJwtId, userId);
             refreshToken = jwtEncoder.encode(algorithm, refreshClaims);
-            ttl = jwtProperties.getRefreshTokenDuration();
+            cacheTtl = jwtProperties.getRefreshTokenTtl();
         }
 
         // 缓存令牌信息
         TokenPayload tokenPayload = new TokenPayload(userId, refreshToken, issueTime, accessJwtId);
-        jwtTokenStorage.put(userId, tokenPayload, ttl);
+        jwtTokenStorage.put(userId, tokenPayload, cacheTtl);
 
         // 返回访问令牌
-        return accessToken;
-    }
-
-    /**
-     * 令牌刷新（续签调用）。
-     *
-     * @param jwtContext Jwt 参数上下文
-     * @return 返回新生成的访问令牌（accessToken）
-     */
-    public String refreshToken(JwtContext jwtContext) {
-        // 获取当前时间，作为新 JWT 的发放时间
-        Date issueTime = new Date();
-
-        // 获取参数信息
-        String userId = jwtContext.getUserId();
-        String loginIp = jwtContext.getLoginIp();
-
-        // 生成访问令牌的声明集，并通过编码器编码为 access token
-        String newAccessJwtId = String.valueOf(SequenceUtils.getId());
-        JWTClaimsSet accessClaims = buildAccessJwtChaimSet(issueTime, newAccessJwtId, userId, loginIp);
-        String accessToken = jwtEncoder.encode(new JWSAlgorithm(jwtProperties.getAlgorithm()), accessClaims);
-
-        // 缓存新令牌信息
-        TokenPayload tokenPayload = jwtTokenStorage.get(userId);
-        tokenPayload.setAccessTokenId(newAccessJwtId);
-        tokenPayload.setRenewTime(issueTime);
-        jwtTokenStorage.put(userId, tokenPayload, jwtProperties.getRefreshTokenDuration());
-        return accessToken;
+        return new JwtTokenPair(accessToken, refreshToken);
     }
 
     /**
@@ -143,7 +116,7 @@ public class JwtTokenGenerator {
             // JWT 的生效时间
             .notBeforeTime(issueTime)
             // JWT 的过期时间
-            .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getAccessTokenDuration() * 1000L)))
+            .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getAccessTokenTtl() * 1000L)))
             // 用户登录 IP
             .claim(JwtConstants.LOGIN_IP_KEY, loginIp)
             .build();
@@ -174,7 +147,7 @@ public class JwtTokenGenerator {
             // JWT 的生效时间
             .notBeforeTime(issueTime)
             // JWT 的过期时间
-            .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getRefreshTokenDuration() * 1000L)))
+            .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getRefreshTokenTtl() * 1000L)))
             .build();
     }
 }

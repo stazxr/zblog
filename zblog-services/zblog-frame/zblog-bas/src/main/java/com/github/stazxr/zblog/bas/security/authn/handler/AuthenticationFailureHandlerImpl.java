@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.bas.security.authn.handler;
 
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
-import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.exception.resolver.AuthenticationErrorResolver;
@@ -68,9 +67,11 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
      * @return 封装的失败响应对象
      */
     private Result<String> genResult(String username, AuthenticationException exception) {
-        log.warn("用户登录失败 | username={} | reason={}", username, exception.getMessage());
         ErrorCode errorCode = authenticationErrorResolver.resolve(exception);
-        return Result.<String>failure(errorCode.getCode(), I18nUtils.getMessage(errorCode.getI18nKey())).data(username);
+        String code = errorCode.getCode();
+        String message = errorCode.getMessage();
+        log.warn("用户登录失败 | 用户名={} | 错误码={} | 失败原因={}", username, code, message);
+        return Result.<String>failure(code, message).data(username);
     }
 
     /**
