@@ -16,6 +16,18 @@ const whiteList = new Set([
   '/forceUpdatePass' // 修改密码（登录前）
 ])
 
+function validateRoutes(routes = []) {
+  routes.forEach(route => {
+    if (!route.path) {
+      throw new Error('路由缺少path: ' + JSON.stringify(route))
+    }
+
+    if (route.children && route.children.length) {
+      validateRoutes(route.children)
+    }
+  })
+}
+
 router.beforeEach(async(to, from, next) => {
   NProgress.start()
 
@@ -42,15 +54,25 @@ router.beforeEach(async(to, from, next) => {
     }
 
     if (!store.getters.routeLoaded) {
-      const menus = store.getters.menus
-      const sidebarRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)))
-      const rewriteRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)), false, true)
-      rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
-      store.commit('SET_ROUTERS', rewriteRoutes)
-      store.commit('SET_SIDEBAR_ROUTERS', sidebarRoutes)
-      store.commit('SET_ROUTE_LOADED', true)
-      router.addRoutes(rewriteRoutes)
-      next({ ...to, replace: true })
+      try {
+        const menus = store.getters.menus
+        const sidebarRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)))
+        const rewriteRoutes = filterAsyncRouter(JSON.parse(JSON.stringify(menus)), false, true)
+        validateRoutes(rewriteRoutes)
+        rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
+        store.commit('SET_ROUTERS', rewriteRoutes)
+        store.commit('SET_SIDEBAR_ROUTERS', sidebarRoutes)
+        store.commit('SET_ROUTE_LOADED', true)
+        router.addRoutes(rewriteRoutes)
+        next({ ...to, replace: true })
+      } catch (e) {
+        console.error('Dynamic Route Error:', e)
+        Message.error('动态路由加载失败，请检查路由配置')
+        await store.dispatch('Logout')
+        next('/login')
+        NProgress.done()
+        return
+      }
     }
 
     next()
