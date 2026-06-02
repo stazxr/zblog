@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.bas.security.filter;
 
+import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.cache.BlackWhiteListCache;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,8 +30,8 @@ import java.io.IOException;
 @Component
 public class IpCheckFilter extends OncePerRequestFilter {
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         // 获取请求IP
         String requestIp = IpUtils.getIp(request);
 
@@ -57,7 +60,8 @@ public class IpCheckFilter extends OncePerRequestFilter {
      */
     private void handleBlacklistedIp(HttpServletResponse response, String requestIp) throws IOException {
         response.getWriter().write(String.format("Access denied for IP: %s (Blacklisted)", requestIp));
-        Result result = Result.failure("拒绝访问");
+        ErrorCode errorCode = CommonErrorCode.EBASEA000;
+        Result<?> result = Result.failure(errorCode.getCode(), errorCode.getMessage());
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.FORBIDDEN);
     }
 

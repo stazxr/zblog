@@ -185,7 +185,6 @@ export default {
               this.$router.push({ path: this.redirect || '/' })
             }
           }).catch(e => {
-            console.log('e', e)
             if (e.message && e.message === 'EAUTHN004') {
               // 跳转修改密码界面
               sessionStorage.setItem('force_update_pwd_user', JSON.stringify({

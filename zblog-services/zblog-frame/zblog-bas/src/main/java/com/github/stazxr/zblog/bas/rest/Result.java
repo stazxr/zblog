@@ -1,13 +1,11 @@
 package com.github.stazxr.zblog.bas.rest;
 
-import com.alibaba.fastjson.JSONObject;
+import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
 import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import lombok.Getter;
 import org.slf4j.MDC;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 框架级统一响应体
@@ -21,9 +19,19 @@ public final class Result<T> implements Serializable {
     private static final long serialVersionUID = -7847907472897585204L;
 
     /**
-     * 响应结果
+     * 成功响应码
      */
-    private boolean success;
+    public static final String SUCCESS_CODE = "000000000";
+
+    /**
+     * 响应码
+     */
+    private String code;
+
+    /**
+     * 响应类型
+     */
+    private String type;
 
     /**
      * 响应消息
@@ -36,11 +44,6 @@ public final class Result<T> implements Serializable {
     private T data;
 
     /**
-     * 错误码
-     */
-    private String errorCode;
-
-    /**
      * 链路追踪ID
      */
     private final String traceId;
@@ -51,24 +54,29 @@ public final class Result<T> implements Serializable {
     private final String instanceId;
 
     /**
-     * 响应时间戳
+     * 响应时间戳（毫秒）
      */
-    private final String timestamp;
+    private final long timestamp;
 
     private Result() {
-        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.timestamp = System.currentTimeMillis();
         this.traceId = MDC.get("traceId");
         this.instanceId = MDC.get("deployCode");
     }
 
-    private Result(boolean success, String message) {
+    private Result(String code, String message) {
         this();
-        this.success = success;
+        this.code = code;
         this.message = message;
     }
 
-    public Result<T> success(boolean success) {
-        this.success = success;
+    public Result<T> code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public Result<T> type(String type) {
+        this.type = type;
         return this;
     }
 
@@ -82,40 +90,25 @@ public final class Result<T> implements Serializable {
         return this;
     }
 
-    public Result<T> errorCode(String errorCode) {
-        this.errorCode = errorCode;
-        return this;
-    }
-
     public static <T> Result<T> success() {
         String successMessage = I18nUtils.getMessage("result.success");
-        return new Result<>(true, successMessage);
+        return new Result<T>(SUCCESS_CODE, successMessage).type(ResultType.SUCCESS);
     }
 
     public static <T> Result<T> success(String message) {
-        return new Result<>(true, message);
+        return new Result<T>(SUCCESS_CODE, message).type(ResultType.SUCCESS);
     }
 
     public static <T> Result<T> failure() {
         String failureMessage = I18nUtils.getMessage("result.failure");
-        return new Result<>(false, failureMessage);
+        return new Result<>(CommonErrorCode.SBASEA000.getCode(), failureMessage);
     }
 
     public static <T> Result<T> failure(String message) {
-        return new Result<>(false, message);
+        return new Result<>(CommonErrorCode.SBASEA000.getCode(), message);
     }
 
-    public static <T> Result<T> failure(String errorCode, String message) {
-        return new Result<T>(false, message).errorCode(errorCode);
-    }
-
-    /**
-     * 重写 toString 方法，将 Result 转换为 JSON 格式字符串。
-     *
-     * @return JSON 格式的 Result 字符串表示
-     */
-    @Override
-    public String toString() {
-        return JSONObject.toJSONString(this);
+    public static <T> Result<T> failure(String code, String message) {
+        return new Result<>(code, message);
     }
 }

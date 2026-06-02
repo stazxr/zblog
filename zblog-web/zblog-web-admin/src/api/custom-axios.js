@@ -84,7 +84,7 @@ instance.interceptors.response.use(response => {
     const result = response.data
     const responseType = response.config.responseType
     if (responseType === 'json') {
-      if (result.success) {
+      if (result.code === '000000000') {
         return result
       } else {
         Message.error(result.message || '操作失败')
@@ -101,15 +101,27 @@ instance.interceptors.response.use(response => {
     // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
     const status = response.status
     const result = response.data
-    const errorCode = result ? result.errorCode : null
+    const code = result ? result.code : null
+    const type = result ? result.type : null
     const errorMessage = result ? result.message : null
     const _errorMessage = errorMessage || statusMessageMap[status] || `系统发生未知错误`
     Message.error(_errorMessage)
     if (status === 401) {
-      // 登录失败、登录失效、未登录
-      logout(false)
+      // 登录失败、、未登录
+      switch (type) {
+        case 'ST000001': // 登录失败
+          break
+        case 'ST000002': // 未登录
+          gotoLogin()
+          break
+        case 'ST000003': // 登录失效
+          // refreshToken()
+          // gotoLogin() // 未登录
+          logout(false)
+          break
+      }
     }
-    return Promise.reject(new Error(errorCode))
+    return Promise.reject(new Error(code))
   } else if (request) {
     // 请求已经成功发起，但没有收到响应
     if (!window.navigator.onLine) {
@@ -129,13 +141,18 @@ instance.interceptors.response.use(response => {
   }
 })
 
+function gotoLogin() {
+  // 跳转登录页面
+  router.replace('/login')
+}
+
 function logout(expired) {
-  console.log('expired', expired)
   if (expired) {
     window.sessionStorage.setItem('point', '401')
   }
 
-  router.replace('/login')
+  // 跳转登录页面
+  gotoLogin('/login')
 }
 
 export const get = (url, params, requestItem = {}) => {

@@ -55,18 +55,16 @@ public class ResLogControlAdvice implements ResponseBodyAdvice<Object>, Ordered 
                 String apiVersion = LogUtil.getApiVersion(returnType);
                 String ipAddr = IpUtils.getIp(request);
                 long costTime = System.currentTimeMillis() - LogTraceContext.getStartTime();
-                String success = "SUCCESS";
-                String errorCode = "";
+                String code = Result.SUCCESS_CODE;
                 if (body instanceof Result) {
                     Result<?> result = (Result<?>) body;
-                    success = result.isSuccess() ? "SUCCESS" : "FAIL";
-                    errorCode = result.getErrorCode() == null ? "" : result.getErrorCode();
+                    code = result.getCode();
                 }
 
-                if ("SUCCESS".equals(success)) {
-                    log.info("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, success, errorCode, costTime);
+                if (Result.SUCCESS_CODE.equals(code)) {
+                    log.info("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, "00", code, costTime);
                 } else {
-                    log.error("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, success, errorCode, costTime);
+                    log.error("RES|{}|{}|{}|{}|{}|{}|{}|{}|", traceId, apiCode, apiVersion, "", ipAddr, "01", code, costTime);
                 }
             }
         } catch (Exception e) {

@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.bas.security.authn.handler;
 
+import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
 import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.ResultType;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.jwt.JwtConstants;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -96,7 +99,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             ResponseUtils.responseJsonWriter(response, Result.success("登录成功"));
         } catch (Exception e) {
             log.error("处理认证成功逻辑时发生异常：{}", e.getMessage(), e);
-            ResponseUtils.responseJsonWriter(response, Result.failure("登录失败，请稍后重试"));
+            CommonErrorCode errorCode = CommonErrorCode.SBASEA000;
+            Result<Object> result = Result.failure(errorCode.getCode(), errorCode.getMessage()).type(ResultType.LOGIN_FAILED);
+            ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
         }
     }
 

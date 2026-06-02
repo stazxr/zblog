@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.bas.security.hanlder;
 
 import com.github.stazxr.zblog.bas.rest.Result;
+import com.github.stazxr.zblog.bas.rest.ResultType;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.TokenError;
+import com.github.stazxr.zblog.bas.security.jwt.exception.JwtAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,15 +37,15 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        // 提取异常信息
-        String errorMsg = extractErrorMessage(authException);
-        String noticeMsg = generateNoticeMessage(errorMsg);
-
         // 记录认证异常日志
-        logAuthenticationError(errorMsg, authException);
+        logAuthenticationError(authException);
+
+        // 提取异常信息
+        TokenError tokenError = extractErrorMessage(authException);
+        String noticeMsg = generateNoticeMessage(tokenError);
 
         // 返回结果 401
-        Result result = Result.failure(noticeMsg).data(errorMsg);
+        Result<?> result = Result.failure(noticeMsg).type(ResultType.TOKEN_EXPIRED);
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 
@@ -53,8 +55,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
      * @param authException 认证异常
      * @return 错误消息字符串
      */
-    private String extractErrorMessage(AuthenticationException authException) {
-        return authException.getMessage() != null ? authException.getMessage() : "未知认证错误";
+    private TokenError extractErrorMessage(AuthenticationException authException) {
+        if (authException instanceof JwtAuthenticationException) {
+            return ((JwtAuthenticationException) authException).getTokenError();
+        }
+        return null;
     }
 
     /**
@@ -63,18 +68,24 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
      * @param errorMsg      错误消息字符串
      * @return 友好提示消息
      */
-    private String generateNoticeMessage(String errorMsg) {
-        if (errorMsg.contains(TokenError.Const.EXCEPTION)) {
-            return "权限校验异常，请联系网站管理员";
-        } else if (errorMsg.contains(TokenError.Const.BUSY)) {
-            return "系统繁忙，请稍后再试";
-        } else if (errorMsg.contains(TokenError.Const.EXPIRED)) {
-            return "当前登录状态已过期，请重新登录";
-        } else if (errorMsg.contains(TokenError.Const.NO_LOGIN)) {
-            return "用户未登录";
-        } else {
+    private String generateNoticeMessage(TokenError tokenError) {
+        if (tokenError == null) {
             return "用户未认证，请检查登录状态";
         }
+        if (TokenError.Const.NO_LOGIN.equals(tokenError.getLabel())) {
+            return "用户未登录";
+        }
+        if (TokenError.Const.EXPIRED.equals(tokenError.getLabel())) {
+            return "当前登录状态已过期，请重新登录";
+        }
+        if (TokenError.Const.BUSY.equals(tokenError.getLabel())) {
+            return "系统繁忙，请稍后再试";
+        }
+        if (TokenError.Const.EXCEPTION.equals(tokenError.getLabel())) {
+            return "用户登录信息校验异常，请联系网站管理员";
+        }
+
+        return "用户未登录";
     }
 
     /**
@@ -83,11 +94,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
      * @param errorMsg      错误消息字符串
      * @param authException 认证异常
      */
-    private void logAuthenticationError(String errorMsg, AuthenticationException authException) {
-        if (errorMsg.contains(TokenError.Const.EXCEPTION)) {
-            log.error("权限校验异常：{}", errorMsg, authException);
-        } else {
-            log.warn("认证失败：{}", errorMsg, authException);
-        }
+    private void logAuthenticationError(AuthenticationException authException) {
+        log.error("authentication failed", authException);
     }
 }
