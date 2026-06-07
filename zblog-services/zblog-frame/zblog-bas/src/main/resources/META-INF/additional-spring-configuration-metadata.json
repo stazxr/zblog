@@ -623,6 +623,13 @@
       "defaultValue": "/"
     },
     {
+      "name": "zblog.base.security.jwt.cookie.refresh-path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
+      "description": "刷新令牌的 Cookie 生效路径.",
+      "defaultValue": "/"
+    },
+    {
       "name": "zblog.base.security.jwt.cookie.max-age",
       "type": "java.lang.Long",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",

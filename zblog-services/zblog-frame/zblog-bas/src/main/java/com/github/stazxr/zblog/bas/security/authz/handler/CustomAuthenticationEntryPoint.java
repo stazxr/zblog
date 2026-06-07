@@ -1,7 +1,7 @@
-package com.github.stazxr.zblog.bas.security.hanlder;
+package com.github.stazxr.zblog.bas.security.authz.handler;
 
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.rest.Result;
-import com.github.stazxr.zblog.bas.rest.ResultType;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import com.github.stazxr.zblog.bas.security.core.TokenError;
 import com.github.stazxr.zblog.bas.security.jwt.exception.JwtAuthenticationException;
@@ -41,60 +41,27 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         logAuthenticationError(authException);
 
         // 提取异常信息
-        TokenError tokenError = extractErrorMessage(authException);
-        String noticeMsg = generateNoticeMessage(tokenError);
+        TokenError tokenError = extractTokenError(authException);
 
-        // 返回结果 401
-        Result<?> result = Result.failure(noticeMsg).type(ResultType.TOKEN_EXPIRED);
+        // 返回结果
+        String errorMessage = I18nUtils.getMessage(tokenError.getLabel());
+        Result<?> result = Result.failure(tokenError.getCode(), errorMessage).type(tokenError.getType().name());
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * 提取异常信息，获取详细错误消息。
-     *
-     * @param authException 认证异常
-     * @return 错误消息字符串
-     */
-    private TokenError extractErrorMessage(AuthenticationException authException) {
+    private TokenError extractTokenError(AuthenticationException authException) {
         if (authException instanceof JwtAuthenticationException) {
             return ((JwtAuthenticationException) authException).getTokenError();
         }
-        return null;
-    }
-
-    /**
-     * 根据异常信息生成用户友好的提示消息。
-     *
-     * @param errorMsg      错误消息字符串
-     * @return 友好提示消息
-     */
-    private String generateNoticeMessage(TokenError tokenError) {
-        if (tokenError == null) {
-            return "用户未认证，请检查登录状态";
-        }
-        if (TokenError.Const.NO_LOGIN.equals(tokenError.getLabel())) {
-            return "用户未登录";
-        }
-        if (TokenError.Const.EXPIRED.equals(tokenError.getLabel())) {
-            return "当前登录状态已过期，请重新登录";
-        }
-        if (TokenError.Const.BUSY.equals(tokenError.getLabel())) {
-            return "系统繁忙，请稍后再试";
-        }
-        if (TokenError.Const.EXCEPTION.equals(tokenError.getLabel())) {
-            return "用户登录信息校验异常，请联系网站管理员";
-        }
-
-        return "用户未登录";
+        return TokenError.TE099;
     }
 
     /**
      * 记录认证异常日志。
      *
-     * @param errorMsg      错误消息字符串
      * @param authException 认证异常
      */
     private void logAuthenticationError(AuthenticationException authException) {
-        log.error("authentication failed", authException);
+        log.error("[401] authentication failed", authException);
     }
 }

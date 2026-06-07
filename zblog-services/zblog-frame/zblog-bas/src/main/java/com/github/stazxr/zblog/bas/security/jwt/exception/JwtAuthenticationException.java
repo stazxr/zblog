@@ -17,7 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 public class JwtAuthenticationException extends AuthenticationException {
     private static final long serialVersionUID = 2399675277250587214L;
 
-    private TokenError tokenError;
+    private final TokenError tokenError;
 
     /**
      * 构造方法，接受自定义异常消息。
@@ -25,7 +25,7 @@ public class JwtAuthenticationException extends AuthenticationException {
      * @param tokenError JWT Token 错误码
      */
     public JwtAuthenticationException(TokenError tokenError) {
-        super(tokenError.getMessage());
+        super(tokenError.getCode());
         this.tokenError = tokenError;
     }
 
@@ -36,36 +36,8 @@ public class JwtAuthenticationException extends AuthenticationException {
      * @param cause 异常原因，用于追踪问题的根本原因。
      */
     public JwtAuthenticationException(TokenError tokenError, Throwable cause) {
-        super(tokenError.getMessage(), cause);
+        super(tokenError.getCode(), cause);
         this.tokenError = tokenError;
-    }
-
-    /**
-     * 构造方法，接受自定义异常消息。
-     *
-     * @param msg 异常消息，用于描述认证失败的原因。
-     */
-    public JwtAuthenticationException(String msg) {
-        super(msg);
-    }
-
-    /**
-     * 构造方法，接受自定义异常消息和异常原因。
-     *
-     * @param msg   异常消息，用于描述认证失败的原因。
-     * @param cause 异常原因，用于追踪问题的根本原因。
-     */
-    public JwtAuthenticationException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    /**
-     * 构造方法，从已有的 {@link AuthenticationException} 中提取异常信息。
-     *
-     * @param e 原始的 {@link AuthenticationException}。
-     */
-    public JwtAuthenticationException(AuthenticationException e) {
-        super(e.getMessage(), e.getCause());
     }
 
     public TokenError getTokenError() {

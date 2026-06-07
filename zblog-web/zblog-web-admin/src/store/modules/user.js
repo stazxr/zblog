@@ -1,5 +1,5 @@
 import login from '@/api/login'
-import communal from '@/api/communal'
+import auth from '@/api/base/auth'
 
 const user = {
   state: {
@@ -30,14 +30,14 @@ const user = {
     // 登录
     async Login({ commit }, loginParam) {
       await login.login(loginParam)
-      const res = await communal.loginId()
+      const res = await auth.loginId()
       commit('SET_USER', res.data)
       const user = res.data.user
       return (user && user.passwordExpireTime == null)
     },
     // 刷新用户信息
     async RefreshUser({ commit }) {
-      const res = await communal.loginId()
+      const res = await auth.loginId()
       commit('SET_USER', res.data)
       return res.data
     },

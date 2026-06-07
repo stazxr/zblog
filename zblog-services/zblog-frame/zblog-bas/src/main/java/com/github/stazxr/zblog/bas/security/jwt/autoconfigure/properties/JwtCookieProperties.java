@@ -38,6 +38,11 @@ public class JwtCookieProperties {
     private String path = "/";
 
     /**
+     * 刷新令牌的Cookie路径
+     */
+    private String refreshPath = "/";
+
+    /**
      * 有效时间(秒)
      */
     private long maxAge = 1800L;
@@ -88,6 +93,14 @@ public class JwtCookieProperties {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getRefreshPath() {
+        return refreshPath;
+    }
+
+    public void setRefreshPath(String refreshPath) {
+        this.refreshPath = refreshPath;
     }
 
     public long getMaxAge() {

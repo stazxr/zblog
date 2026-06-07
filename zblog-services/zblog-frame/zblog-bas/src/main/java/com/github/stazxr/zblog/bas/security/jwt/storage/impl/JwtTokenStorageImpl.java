@@ -17,7 +17,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     /**
      * 令牌信息缓存键模板。
      */
-    private static final String RTK_TOKEN_CACHE_KEY = "LOGIN:TOKEN:%s";
+    private static final String TOKEN_CACHE_KEY = "token:%s";
 
     /**
      * 存储令牌。
@@ -29,6 +29,18 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     @Override
     public void put(String uid, TokenPayload token, int duration) {
         GlobalCache.put(buildKey(uid), token, duration, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 刷新令牌。
+     *
+     * @param uid   用户的唯一标识符（通常是用户 ID）
+     * @param token 令牌信息
+     */
+    @Override
+    public void update(String uid, TokenPayload token) {
+        String cacheKey = buildKey(uid);
+        GlobalCache.put(buildKey(uid), token, GlobalCache.expire(cacheKey), TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -53,6 +65,6 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     }
 
     private String buildKey(String uid) {
-        return String.format(RTK_TOKEN_CACHE_KEY, uid);
+        return String.format(TOKEN_CACHE_KEY, uid);
     }
 }

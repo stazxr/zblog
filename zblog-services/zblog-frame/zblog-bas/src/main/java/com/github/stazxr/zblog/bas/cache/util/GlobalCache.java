@@ -70,6 +70,11 @@ public final class GlobalCache {
         }
     }
 
+    public static long expire(String key) {
+        checkInitialized();
+        return CACHE.getTtl(key);
+    }
+
     public static List<CacheInfo> scan(String pattern) {
         checkInitialized();
         List<CacheInfo> cacheInfoList = new ArrayList<>();

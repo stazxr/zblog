@@ -73,17 +73,18 @@ public class JwtTokenGenerator {
         String accessToken = jwtEncoder.encode(algorithm, accessClaims);
 
         String refreshToken = null;
+        String refreshJwtId = null;
         int cacheTtl = jwtProperties.getAccessTokenTtl();
         if (jwtProperties.isAllowedRenewToken()) {
             // 生成刷新令牌的声明集，并通过编码器编码为 refresh token
-            String refreshJwtId = "RTK_" + SequenceUtils.getId();
-            JWTClaimsSet refreshClaims = buildRefreshJwtChaimSet(issueTime, refreshJwtId, userId);
+            refreshJwtId = "RTK_" + SequenceUtils.getId();
+            JWTClaimsSet refreshClaims = buildRefreshJwtChaimSet(issueTime, refreshJwtId, userId, loginIp);
             refreshToken = jwtEncoder.encode(algorithm, refreshClaims);
             cacheTtl = jwtProperties.getRefreshTokenTtl();
         }
 
         // 缓存令牌信息
-        TokenPayload tokenPayload = new TokenPayload(userId, refreshToken, issueTime, accessJwtId);
+        TokenPayload tokenPayload = new TokenPayload(userId, issueTime, accessJwtId, refreshJwtId);
         jwtTokenStorage.put(userId, tokenPayload, cacheTtl);
 
         // 返回访问令牌
@@ -128,9 +129,10 @@ public class JwtTokenGenerator {
      * @param issueTime JWT 的发放时间
      * @param jwtId JWT 唯一标识 ID
      * @param uid 用户唯一标识符
+     * @param loginIp 用户的登录 IP 地址
      * @return 返回包含刷新令牌声明集的 {@link JWTClaimsSet}
      */
-    private JWTClaimsSet buildRefreshJwtChaimSet(Date issueTime, String jwtId, String uid) {
+    private JWTClaimsSet buildRefreshJwtChaimSet(Date issueTime, String jwtId, String uid, String loginIp) {
         // 获取 JWT 配置中的声明信息
         JwtProperties.Claims claims = jwtProperties.getClaims();
         return new JWTClaimsSet.Builder()
@@ -148,6 +150,8 @@ public class JwtTokenGenerator {
             .notBeforeTime(issueTime)
             // JWT 的过期时间
             .expirationTime(new Date(issueTime.getTime() + (jwtProperties.getRefreshTokenTtl() * 1000L)))
+            // 用户登录 IP
+            .claim(JwtConstants.LOGIN_IP_KEY, loginIp)
             .build();
     }
 }

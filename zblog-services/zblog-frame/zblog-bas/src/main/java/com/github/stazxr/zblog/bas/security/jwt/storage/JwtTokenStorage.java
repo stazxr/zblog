@@ -17,6 +17,14 @@ public interface JwtTokenStorage {
     void put(String uid, TokenPayload token, int duration);
 
     /**
+     * 刷新令牌。
+     *
+     * @param uid      用户的唯一标识符（通常是用户 ID）
+     * @param token    令牌信息
+     */
+    void update(String uid, TokenPayload token);
+
+    /**
      * 获取令牌。
      *
      * @param uid 用户的唯一标识符（通常是用户 ID）

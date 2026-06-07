@@ -24,7 +24,7 @@ public class CorsFilterAutoConfiguration {
         config.addAllowedMethod("*");
         config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
-        config.addExposedHeader(JwtConstants.NEW_TOKEN_HEADER);
+        config.addExposedHeader(JwtConstants.X_TOKEN_STATUS);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

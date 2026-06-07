@@ -4,6 +4,8 @@ import login from '@/api/login.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
 import userCenter from '@/api/userCenter.js'
+
+import auth from '@/api/base/auth.js'
 import user from '@/api/base/system/user.js'
 import role from '@/api/base/system/role.js'
 import perm from '@/api/base/system/perm.js'
@@ -36,6 +38,7 @@ import test from '@/api/service/test.js'
 
 export default {
   communal, login, home, menu, userCenter,
+  auth,
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,

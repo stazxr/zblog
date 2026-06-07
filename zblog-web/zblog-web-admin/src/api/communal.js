@@ -14,10 +14,6 @@ export default {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   },
-  // 获取当前登录人信息
-  loginId: params => {
-    return api.httpRequest().get(`/api/auth/loginId`, params)
-  },
   // 根据字典KEY查询配置信息列表
   queryConfListByDictKey: params => {
     return api.httpRequest().get(`/api/dict/queryConfListByDictKey`, params)

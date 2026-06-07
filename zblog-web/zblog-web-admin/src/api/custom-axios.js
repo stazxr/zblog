@@ -1,5 +1,6 @@
 import axios from 'axios'
 import router from '../router/routers'
+import authApi from '@/api/base/auth'
 import { Message } from 'element-ui'
 import JsonBig from 'json-bigint'
 import { isJson } from '@/utils/validate'
@@ -7,7 +8,7 @@ import { isJson } from '@/utils/validate'
 const defaultTimeout = 120000
 
 // 错误码
-const statusMessageMap = {
+const defaultStatusMessageMap = {
   400: '请求参数错误，请检查输入内容',
   401: '登录状态已失效，请重新登录',
   403: '没有访问权限，请联系管理员',
@@ -18,6 +19,10 @@ const statusMessageMap = {
   503: '系统繁忙，请稍后再试',
   504: '服务器响应超时，请稍后重试'
 }
+
+// refresh 相关变量
+let isRefreshing = false
+let requestQueue = []
 
 // create instance
 const instance = axios.create()
@@ -104,24 +109,63 @@ instance.interceptors.response.use(response => {
     const code = result ? result.code : null
     const type = result ? result.type : null
     const errorMessage = result ? result.message : null
-    const _errorMessage = errorMessage || statusMessageMap[status] || `系统发生未知错误`
-    Message.error(_errorMessage)
+    const _errorMessage = errorMessage || defaultStatusMessageMap[status] || `系统发生未知错误`
     if (status === 401) {
-      // 登录失败、、未登录
+      console.log('type', type)
       switch (type) {
         case 'ST000001': // 登录失败
-          break
-        case 'ST000002': // 未登录
+          Message.error(_errorMessage)
+          return Promise.reject(new Error(code))
+        case 'TET_001': // 未登录或登录过期
+          // eslint-disable-next-line no-case-declarations
+          const config = response.config
+          // 防止无限重试
+          if (config._retry) {
+            gotoLogin()
+            return Promise.reject(error)
+          }
+          config._retry = true
+          return new Promise((resolve, reject) => {
+            requestQueue.push({
+              resolve: () => {
+                resolve(instance(config))
+              },
+              reject: () => {
+                reject(error)
+              }
+            })
+
+            if (!isRefreshing) {
+              isRefreshing = true
+              refreshToken().then(success => {
+                console.log('success', success)
+                isRefreshing = false
+                if (success === true) {
+                  processQueue(true)
+                } else {
+                  processQueue(false)
+                  gotoLogin()
+                }
+              }).catch(() => {
+                isRefreshing = false
+                processQueue(false)
+                gotoLogin()
+              })
+            }
+          })
+        case 'TET_002': // TODO
+        case 'TET_003': // TODO
+        case 'TET_004': // TODO
+        case 'TET_005': // TODO
+        case 'TET_006': // 认证服务异常，请联系管理员或重新登录
           gotoLogin()
           break
-        case 'ST000003': // 登录失效
-          // refreshToken()
-          // gotoLogin() // 未登录
-          logout(false)
-          break
+        default:
+          Message.error(_errorMessage)
       }
+    } else {
+      Message.error(_errorMessage)
     }
-    return Promise.reject(new Error(code))
   } else if (request) {
     // 请求已经成功发起，但没有收到响应
     if (!window.navigator.onLine) {
@@ -136,24 +180,41 @@ instance.interceptors.response.use(response => {
     }
     return Promise.reject(new Error())
   } else {
-    Message.error('系统发生未知错误') // default
-    return Promise.reject(new Error())
+    const defaultMessage = '服务异常，请稍后再试'
+    Message.error(defaultMessage)
+    return Promise.reject(new Error(defaultMessage))
   }
 })
 
+function processQueue(success) {
+  requestQueue.forEach(p => {
+    if (success) {
+      p.resolve()
+    } else {
+      p.reject(new Error('refresh failed'))
+    }
+  })
+  requestQueue = []
+}
+
+function refreshToken() {
+  return authApi.refresh().then(res => {
+    return res.data
+  })
+}
+
 function gotoLogin() {
-  // 跳转登录页面
   router.replace('/login')
 }
 
-function logout(expired) {
-  if (expired) {
-    window.sessionStorage.setItem('point', '401')
-  }
-
-  // 跳转登录页面
-  gotoLogin('/login')
-}
+// function logout(expired) {
+//   if (expired) {
+//     window.sessionStorage.setItem('point', '401')
+//   }
+//
+//   // 跳转登录页面
+//   gotoLogin('/login')
+// }
 
 export const get = (url, params, requestItem = {}) => {
   const options = {

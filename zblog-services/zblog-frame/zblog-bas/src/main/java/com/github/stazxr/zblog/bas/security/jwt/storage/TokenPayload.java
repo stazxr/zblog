@@ -18,11 +18,6 @@ public class TokenPayload implements Serializable {
     private String userId;
 
     /**
-     * 刷新令牌
-     */
-    private String refreshToken;
-
-    /**
      * 登录时间
      */
     private Date loginTime;
@@ -31,6 +26,11 @@ public class TokenPayload implements Serializable {
      * 访问令牌ID
      */
     private String accessTokenId;
+
+    /**
+     * 刷新令牌ID
+     */
+    private String refreshTokenId;
 
     /**
      * 访问时间
@@ -50,25 +50,15 @@ public class TokenPayload implements Serializable {
     public TokenPayload() {
     }
 
-    public TokenPayload(String userId, String refreshToken, Date loginTime) {
+    public TokenPayload(String userId, Date loginTime, String accessTokenId, String refreshTokenId) {
         this.userId = userId;
-        this.refreshToken = refreshToken;
-        this.loginTime = loginTime;
-    }
-
-    public TokenPayload(String userId, String refreshToken, Date loginTime, String accessTokenId) {
-        this.userId = userId;
-        this.refreshToken = refreshToken;
         this.loginTime = loginTime;
         this.accessTokenId = accessTokenId;
+        this.refreshTokenId = refreshTokenId;
     }
 
     public String getUserId() {
         return userId;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
     }
 
     public Date getLoginTime() {
@@ -77,6 +67,10 @@ public class TokenPayload implements Serializable {
 
     public String getAccessTokenId() {
         return accessTokenId;
+    }
+
+    public String getRefreshTokenId() {
+        return refreshTokenId;
     }
 
     public void setAccessTokenId(String accessTokenId) {

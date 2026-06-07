@@ -25,5 +25,5 @@ public final class JwtConstants {
     /**
      * 新生成的令牌的请求头描述
      */
-    public static final String NEW_TOKEN_HEADER = "x-new-token";
+    public static final String X_TOKEN_STATUS = "x-token-status";
 }

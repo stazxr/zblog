@@ -252,8 +252,8 @@ zblog:
       enable-additional-checks: false # 登录认证是否扩展额外检查规则
       # JWT 配置
       jwt:
-        access-token-duration: 1800
-        refresh-token-duration: 3600
+        access-token-ttl: 120
+        refresh-token-ttl: 500
         allowed-renew-token: true
         algorithm: RS256
         cert-info:
@@ -268,7 +268,8 @@ zblog:
           secure: false
           http-only: true
           same-site: Lax
-          path: /
+          path: /api
+          refresh-path: /api/auth/refresh
           max-age: 1800
   website:
     name: Z-BLOG # 站点名称

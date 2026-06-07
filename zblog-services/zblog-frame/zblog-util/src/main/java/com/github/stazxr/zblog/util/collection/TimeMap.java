@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.util.thread.ThreadUtils;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -153,12 +154,12 @@ public class TimeMap<K, V> {
             if (expireAt == null) {
                 return -1L;
             }
-            long ttlSeconds = Duration.between(Instant.now(), expireAt).getSeconds();
+            long ttlMills = Duration.between(Instant.now(), expireAt).toMillis();
             // TTL 小于等于 0 表示已经过期
-            if (ttlSeconds <= 0) {
+            if (ttlMills <= 0) {
                 return -1L;
             } else {
-                return ttlSeconds;
+                return ttlMills;
             }
         } else {
             return -2L;

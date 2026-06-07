@@ -233,7 +233,7 @@ public class RedisCache<K, V> extends BaseCache<K, V> {
      */
     @Override
     public Long getTtl(K key) {
-        return redisTemplate.getExpire(buildKey(key));
+        return redisTemplate.getExpire(buildKey(key), TimeUnit.MILLISECONDS);
     }
 
     /**

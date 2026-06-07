@@ -51,8 +51,6 @@ public class JwtAuthenticationFilterConfig {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
         // JWT 解码器
         jwtAuthenticationFilter.setJwtDecoder(jwtDecoder);
-        // JWT Token 生成器
-        jwtAuthenticationFilter.setJwtTokenGenerator(jwtTokenGenerator);
         // JWT Token 缓存器
         jwtAuthenticationFilter.setJwtTokenStorage(jwtTokenStorage);
         // JWT 配置对象

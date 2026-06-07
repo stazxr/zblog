@@ -31,8 +31,6 @@ function validateRoutes(routes = []) {
 router.beforeEach(async(to, from, next) => {
   NProgress.start()
 
-  console.log('store', store)
-
   const isLoginRoute = to.path === '/login'
   const isWhiteRoute = whiteList.has(to.path)
 

@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.bas.security.core;
 
+import static com.github.stazxr.zblog.bas.security.core.TokenErrorType.*;
+
 /**
  * 封装令牌校验的错误信息
  *
@@ -8,92 +10,91 @@ package com.github.stazxr.zblog.bas.security.core;
  */
 public enum TokenError {
     /**
-     * Token 未上送
+     * 未上送访问令牌
      */
-    TE001("TE001", Const.NO_LOGIN, "未登录，请先登录"),
+    TE001("TE001", TET_001, Const.NO_LOGIN),
 
     /**
-     * Token 未生效
+     * 访问令牌解码失败
      */
-    TE002("TE002", Const.NO_LOGIN, "Token 未生效"),
+    TE002("TE002", TET_002, Const.NO_LOGIN),
 
     /**
-     * Token 解码失败
+     * 账号被禁用
      */
-    TE003("TE003", Const.NO_LOGIN, "非法的访问令牌"), // TODO
+    TE003("TE003", TET_003, Const.ACCT_DISABLED),
 
     /**
-     * Token 验证失败，系统未知错误
+     * 账号被锁定
      */
-    TE004("TE004", Const.EXCEPTION, "Token 验证失败，系统未知错误"),
+    TE004("TE004", TET_003, Const.ACCT_LOCKED),
 
     /**
-     * 主体未授权
+     * 账号未授权
      */
-    TE005("TE005", Const.NO_LOGIN, "主体未授权"), // TODO
+    TE005("TE005", TET_003, Const.ACCT_UNAUTHORIZED),
 
     /**
      * 令牌已过期
      */
-    TE006("TE006", Const.EXPIRED, "令牌已过期"), // TODO
+    TE006("TE006", TET_004, Const.EXPIRED),
 
     /**
-     * 请求令牌与服务器端缓存的令牌对比失败
+     * 令牌比对失败
      */
-    TE007("TE007", Const.EXPIRED, "请求令牌与服务器端缓存的令牌对比失败"),
+    TE007("TE007", TET_004, Const.EXPIRED),
 
     /**
      * 用户被踢出
      */
-    TE008("TE008", Const.EXPIRED, "用户被踢出"),
+    TE008("TE008", TET_003, Const.ACCT_KICK_OUT),
 
     /**
-     * IP 地址发生变化
+     * 请求地址发生变化
      */
-    TE009("TE009", Const.EXPIRED, "IP 地址发生变化"),
+    TE009("TE009", TET_004, Const.IP_CHANGE),
 
     /**
-     * 续签失败
+     * 访问令牌已过期
      */
-    TE010("TE010", Const.EXPIRED, "续签失败"),
+    TE010("TE010", TET_005, Const.EXPIRED),
 
     /**
-     * 等待令牌续签超时
+     * 令牌认证发生未知异常
      */
-    TE011("TE011", Const.BUSY, "等待令牌续签超时"),
+    TE099("TE099", TET_006, Const.EXCEPTION);
 
     /**
-     * 触发续签限流
+     * 错误码
      */
-    TE012("TE012", Const.BUSY, "触发续签限流"),
-
-    /**
-     * JWT 认证发生未知异常
-     */
-    TE099("TE099", Const.EXCEPTION, "用户信息认证失败，请重新登录后再试"); // TODO
-
     private final String code;
 
+    /**
+     * 前端业务类型
+     */
+    private final TokenErrorType type;
+
+    /**
+     * 国际化消息Key
+     */
     private final String label;
 
-    private final String message;
-
-    TokenError(String code, String label, String message) {
+    TokenError(String code, TokenErrorType type, String label) {
         this.code = code;
+        this.type = type;
         this.label = label;
-        this.message = message;
     }
 
     public String getCode() {
         return code;
     }
 
-    public String getLabel() {
-        return label;
+    public TokenErrorType getType() {
+        return type;
     }
 
-    public String getMessage() {
-        return message;
+    public String getLabel() {
+        return label;
     }
 
     public static class Const {
@@ -103,14 +104,34 @@ public enum TokenError {
         public static final String NO_LOGIN = "SUN_TAO_001";
 
         /**
-         * 登录状态过期
+         * 用户被禁用
          */
-        public static final String EXPIRED = "SUN_TAO_002";
+        public static final String ACCT_DISABLED = "SUN_TAO_002";
 
         /**
-         * 系统繁忙
+         * 用户被锁定
          */
-        public static final String BUSY = "SUN_TAO_003";
+        public static final String ACCT_LOCKED = "SUN_TAO_003";
+
+        /**
+         * 用户未授权
+         */
+        public static final String ACCT_UNAUTHORIZED = "SUN_TAO_004";
+
+        /**
+         * 用户被踢出
+         */
+        public static final String ACCT_KICK_OUT = "SUN_TAO_005";
+
+        /**
+         * 登录状态过期
+         */
+        public static final String EXPIRED = "SUN_TAO_006";
+
+        /**
+         * 登录状态过期
+         */
+        public static final String IP_CHANGE = "SUN_TAO_007";
 
         /**
          * 未知异常【告警】

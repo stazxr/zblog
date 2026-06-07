@@ -90,7 +90,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
                     .httpOnly(jwtCookieProperties.isHttpOnly())
                     .secure(jwtCookieProperties.getSecure())
                     .domain(jwtCookieProperties.getDomain())
-                    .path(jwtCookieProperties.getPath())
+                    .path(jwtCookieProperties.getRefreshPath())
                     .sameSite(jwtCookieProperties.getSameSite())
                     .maxAge(Duration.ofSeconds(jwtProperties.getRefreshTokenTtl()))
                     .build();
