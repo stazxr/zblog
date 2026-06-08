@@ -72,6 +72,9 @@ muses.install(Vue)
 // 关闭提示
 Vue.config.productionTip = false
 
+// remove reloaded
+sessionStorage.removeItem('reloaded')
+
 new Vue({
   el: '#app',
   router,

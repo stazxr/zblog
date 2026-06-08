@@ -86,8 +86,44 @@ router.afterEach((to, from) => {
   NProgress.done()
 })
 
-router.onError(error => {
-  console.error(error)
-  Message.error(error.message || '系统发生未知错误')
-  NProgress.done()
+router.onError((error) => {
+  console.error('Router Error:', error)
+
+  const chunkFailed = /Loading chunk .* failed/i.test(error.message)
+  const networkError = /Network Error/i.test(error.message)
+  const timeoutError = /timeout/i.test(error.message)
+
+  if (chunkFailed) {
+    if (sessionStorage.getItem('reloaded')) {
+      showError('系统更新失败，请清除缓存后重试', 0, true)
+      return
+    }
+    sessionStorage.setItem('reloaded', '1')
+    showError('页面资源加载失败，正在为您刷新...', 2000, false)
+    setTimeout(() => {
+      window.location.reload()
+    }, 800)
+    return
+  }
+
+  if (networkError) {
+    showError('网络异常，请检查网络连接后重试')
+    return
+  }
+
+  if (timeoutError) {
+    showError('页面加载超时，请稍后重试')
+    return
+  }
+
+  showError('页面加载失败，请稍后重试')
 })
+
+function showError(msg, duration = 3000, showClose = true) {
+  Message({
+    message: msg,
+    type: 'error',
+    duration,
+    showClose: showClose
+  })
+}
