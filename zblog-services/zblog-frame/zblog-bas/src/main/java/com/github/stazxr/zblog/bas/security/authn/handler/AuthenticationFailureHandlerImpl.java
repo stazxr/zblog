@@ -4,7 +4,7 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.ResultType;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
-import com.github.stazxr.zblog.bas.security.exception.resolver.AuthenticationErrorResolver;
+import com.github.stazxr.zblog.bas.security.authn.exception.resolver.AuthenticationErrorResolver;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

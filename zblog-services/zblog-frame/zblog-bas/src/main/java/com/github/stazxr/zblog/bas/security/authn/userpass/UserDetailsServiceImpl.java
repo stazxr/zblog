@@ -2,7 +2,7 @@ package com.github.stazxr.zblog.bas.security.authn.userpass;
 
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.security.core.UserType;
-import com.github.stazxr.zblog.bas.security.exception.SystemUserDeniedException;
+import com.github.stazxr.zblog.bas.security.authn.exception.SystemUserDeniedException;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

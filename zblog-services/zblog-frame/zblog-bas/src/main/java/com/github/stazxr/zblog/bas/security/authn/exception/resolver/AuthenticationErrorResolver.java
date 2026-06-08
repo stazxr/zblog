@@ -1,10 +1,10 @@
-package com.github.stazxr.zblog.bas.security.exception.resolver;
+package com.github.stazxr.zblog.bas.security.authn.exception.resolver;
 
 import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
+import com.github.stazxr.zblog.bas.security.authn.exception.AuthenticationErrorCode;
 import com.github.stazxr.zblog.bas.security.authn.userpass.numcode.LoginNumCodeException;
-import com.github.stazxr.zblog.bas.security.exception.AuthenticationErrorCode;
-import com.github.stazxr.zblog.bas.security.exception.SystemUserDeniedException;
+import com.github.stazxr.zblog.bas.security.authn.exception.SystemUserDeniedException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

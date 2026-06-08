@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.exception;
+package com.github.stazxr.zblog.bas.security.authn.exception;
 
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
