@@ -185,7 +185,7 @@ public class RedisCache<K, V> extends BaseCache<K, V> {
         // 1, 先读缓存
         V value = (V) redisTemplate.opsForValue().get(redisKey);
         if (value != null) {
-            return NULL_VALUE.equals(value) ? null : (V) value;
+            return NULL_VALUE.equals(value) ? null : value;
         }
 
         // 2, 尝试获取分布式锁（防缓存击穿）
