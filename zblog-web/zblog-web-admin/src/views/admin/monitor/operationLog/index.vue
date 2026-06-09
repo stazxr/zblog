@@ -94,9 +94,10 @@
         <el-table-column :show-overflow-tooltip="true" prop="execResult" label="请求结果" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row['execResult']" type="success">成功</el-tag>
-            <el-link v-else type="danger" :disabled="!hasPerm('LOGIQ002')" @click="showDetail(scope.row.id)">
+            <el-link v-else-if="hasPerm('LOGOQ002')" type="danger" @click="showDetail(scope.row.id)">
               失败<i class="el-icon-view el-icon--right" />
             </el-link>
+            <el-tag v-else type="danger">失败</el-tag>
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="errorCode" label="错误码" align="center" width="100" />
