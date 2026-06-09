@@ -5,7 +5,6 @@
  */
 export function clearTimer(timer) {
   if (timer) {
-    console.log('Clear Interval', timer)
     clearInterval(timer)
     return null
   }

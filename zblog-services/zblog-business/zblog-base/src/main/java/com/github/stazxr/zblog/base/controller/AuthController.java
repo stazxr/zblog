@@ -51,7 +51,7 @@ public class AuthController {
     @PostMapping("/refresh")
     @ApiOperation("续签")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @RateLimit(time = 5, enableIp = true, enableUser = true)
+    // @RateLimit(time = 5, enableIp = true, enableUser = true)
     @Router(name = "续签", code = "AUTH0002", level = RouterLevel.OPEN)
     public boolean refreshToken(HttpServletRequest request, HttpServletResponse response) {
         return authService.refreshToken(request, response);

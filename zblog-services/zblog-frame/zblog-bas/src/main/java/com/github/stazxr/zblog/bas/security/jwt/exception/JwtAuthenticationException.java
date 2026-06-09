@@ -25,7 +25,7 @@ public class JwtAuthenticationException extends AuthenticationException {
      * @param tokenError JWT Token 错误码
      */
     public JwtAuthenticationException(TokenError tokenError) {
-        super(tokenError.getCode());
+        super(tokenError.getMessage());
         this.tokenError = tokenError;
     }
 
@@ -36,7 +36,7 @@ public class JwtAuthenticationException extends AuthenticationException {
      * @param cause 异常原因，用于追踪问题的根本原因。
      */
     public JwtAuthenticationException(TokenError tokenError, Throwable cause) {
-        super(tokenError.getCode(), cause);
+        super(tokenError.getMessage(), cause);
         this.tokenError = tokenError;
     }
 

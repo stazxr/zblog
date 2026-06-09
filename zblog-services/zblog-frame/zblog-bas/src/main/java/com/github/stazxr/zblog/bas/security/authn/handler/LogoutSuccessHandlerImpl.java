@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.bas.security.authn.handler;
 
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
 import org.springframework.security.core.Authentication;
@@ -29,7 +30,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
      */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        // 构造返回结果并输出响应
-        ResponseUtils.responseJsonWriter(response, Result.success());
+        String message = I18nUtils.getMessage("res.logout.success");
+        ResponseUtils.responseJsonWriter(response, Result.success(message));
     }
 }

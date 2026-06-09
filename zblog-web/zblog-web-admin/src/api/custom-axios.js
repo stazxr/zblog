@@ -1,9 +1,9 @@
 import axios from 'axios'
-import router from '../router/routers'
-import authApi from '@/api/base/auth'
 import { Message } from 'element-ui'
 import JsonBig from 'json-bigint'
 import { isJson } from '@/utils/validate'
+import { refreshRequest } from '@/utils/refreshManager'
+import { gotoLogin } from '@/utils/authManager'
 
 const defaultTimeout = 120000
 
@@ -19,10 +19,6 @@ const defaultStatusMessageMap = {
   503: '系统繁忙，请稍后再试',
   504: '服务器响应超时，请稍后重试'
 }
-
-// refresh 相关变量
-let isRefreshing = false
-let requestQueue = []
 
 // create instance
 const instance = axios.create()
@@ -111,61 +107,11 @@ instance.interceptors.response.use(response => {
     const errorMessage = result ? result.message : null
     const _errorMessage = errorMessage || defaultStatusMessageMap[status] || `系统发生未知错误`
     if (status === 401) {
-      console.log('type', type)
-      switch (type) {
-        case 'ST000001': // 登录失败
-          Message.error(_errorMessage)
-          return Promise.reject(new Error(code))
-        case 'TET_001': // 未登录或登录过期
-          // eslint-disable-next-line no-case-declarations
-          const config = response.config
-          // 防止无限重试
-          if (config._retry) {
-            gotoLogin()
-            return Promise.reject(error)
-          }
-          config._retry = true
-          return new Promise((resolve, reject) => {
-            requestQueue.push({
-              resolve: () => {
-                resolve(instance(config))
-              },
-              reject: () => {
-                reject(error)
-              }
-            })
-
-            if (!isRefreshing) {
-              isRefreshing = true
-              refreshToken().then(success => {
-                console.log('success', success)
-                isRefreshing = false
-                if (success === true) {
-                  processQueue(true)
-                } else {
-                  processQueue(false)
-                  gotoLogin()
-                }
-              }).catch(() => {
-                isRefreshing = false
-                processQueue(false)
-                gotoLogin()
-              })
-            }
-          })
-        case 'TET_002': // TODO
-        case 'TET_003': // TODO
-        case 'TET_004': // TODO
-        case 'TET_005': // TODO
-        case 'TET_006': // 认证服务异常，请联系管理员或重新登录
-          gotoLogin()
-          break
-        default:
-          Message.error(_errorMessage)
-      }
-    } else {
-      Message.error(_errorMessage)
+      return handle401(code, type, _errorMessage, response, error)
     }
+
+    Message.error(_errorMessage)
+    return Promise.reject(error)
   } else if (request) {
     // 请求已经成功发起，但没有收到响应
     if (!window.navigator.onLine) {
@@ -186,35 +132,25 @@ instance.interceptors.response.use(response => {
   }
 })
 
-function processQueue(success) {
-  requestQueue.forEach(p => {
-    if (success) {
-      p.resolve()
-    } else {
-      p.reject(new Error('refresh failed'))
-    }
-  })
-  requestQueue = []
-}
+function handle401(code, type, message, response, error) {
+  switch (type) {
+    case 'ST000001':
+      Message.error(message)
+      return Promise.reject(new Error(code))
 
-function refreshToken() {
-  return authApi.refresh().then(res => {
-    return res.data
-  })
-}
+    case 'ST000002':
+      Message.error(message)
+      gotoLogin()
+      return Promise.reject(error)
 
-function gotoLogin() {
-  router.replace('/login')
-}
+    case 'ST000003':
+      return refreshRequest(response.config, config => instance(config), gotoLogin, message)
 
-// function logout(expired) {
-//   if (expired) {
-//     window.sessionStorage.setItem('point', '401')
-//   }
-//
-//   // 跳转登录页面
-//   gotoLogin('/login')
-// }
+    default:
+      Message.error(message)
+      return Promise.reject(error)
+  }
+}
 
 export const get = (url, params, requestItem = {}) => {
   const options = {

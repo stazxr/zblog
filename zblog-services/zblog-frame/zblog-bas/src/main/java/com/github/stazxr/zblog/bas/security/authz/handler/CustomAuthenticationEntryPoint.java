@@ -45,7 +45,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         // 返回结果
         String errorMessage = I18nUtils.getMessage(tokenError.getLabel());
-        Result<?> result = Result.failure(tokenError.getCode(), errorMessage).type(tokenError.getType().name());
+        Result<?> result = Result.failure(tokenError.getCode(), errorMessage).type(tokenError.getType());
         ResponseUtils.responseJsonWriter(response, result, HttpStatus.UNAUTHORIZED);
     }
 

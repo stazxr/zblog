@@ -252,8 +252,8 @@ zblog:
       enable-additional-checks: false # 登录认证是否扩展额外检查规则
       # JWT 配置
       jwt:
-        access-token-ttl: 120
-        refresh-token-ttl: 500
+        access-token-ttl: 60
+        refresh-token-ttl: 180
         allowed-renew-token: true
         algorithm: RS256
         cert-info:

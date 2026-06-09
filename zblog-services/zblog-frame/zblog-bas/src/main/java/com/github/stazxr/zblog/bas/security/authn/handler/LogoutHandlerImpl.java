@@ -40,33 +40,28 @@ public class LogoutHandlerImpl implements LogoutHandler {
      */
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null
-                || !(authentication.getPrincipal() instanceof SecurityUser)) {
+        if (!(authentication != null && authentication.getPrincipal() instanceof SecurityUser)) {
             return;
         }
 
-        SecurityUser user = (SecurityUser) authentication.getPrincipal();
-        String username = user.getUsername();
-        Long userId = user.getId();
-
         try {
-            // 清除用户登录信息
-            securityLogoutService.clearUserLoginInfo(String.valueOf(userId));
-            clearCookie(response, JwtConstants.ACCESS_TOKEN);
-            clearCookie(response, JwtConstants.REFRESH_TOKEN);
-            log.info("用户 [{}] (ID: {}) 登出成功", username, userId);
+            SecurityUser user = (SecurityUser) authentication.getPrincipal();
+            clearCookie(response, JwtConstants.ACCESS_TOKEN, jwtCookieProperties.getPath());
+            clearCookie(response, JwtConstants.REFRESH_TOKEN, jwtCookieProperties.getRefreshPath());
+            securityLogoutService.clearUserLoginInfo(String.valueOf(user.getId()));
+            log.info("用户 [{}] 登出成功", user.getUsername());
         } catch (Exception e) {
-            log.error("用户 [{}] (ID: {}) 登出失败", username, userId, e);
+            log.error("登出异常", e);
         }
     }
 
-    private void clearCookie(HttpServletResponse response, String key) {
+    private void clearCookie(HttpServletResponse response, String key, String path) {
         ResponseCookie cookie = ResponseCookie.from(key, "")
             .httpOnly(jwtCookieProperties.isHttpOnly())
             .secure(jwtCookieProperties.getSecure())
             .domain(jwtCookieProperties.getDomain())
-            .path(jwtCookieProperties.getPath())
             .sameSite(jwtCookieProperties.getSameSite())
+            .path(path)
             .maxAge(0L)
             .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

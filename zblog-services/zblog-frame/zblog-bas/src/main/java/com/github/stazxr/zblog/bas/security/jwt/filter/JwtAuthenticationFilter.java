@@ -95,7 +95,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         TokenError tokenError = jex.getTokenError();
                         response.setHeader(JwtConstants.X_TOKEN_STATUS, tokenError.getLabel());
                     }
-                    request.setAttribute("__TOKEN_ERROR", ex);
+                    request.setAttribute(JwtConstants.__TOKEN_ERROR, ex);
                     chain.doFilter(request, response);
                 } else {
                     authenticationEntryPoint.commence(request, response, ex);
@@ -137,7 +137,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /** 判断接口是否是开放接口 */
     private boolean isOpenResource(HttpServletRequest request) {
         int resourceLevel = securityResourceService.getResourceLevel(request.getRequestURI(), request.getMethod());
-        request.setAttribute("__RESOURCE_LEVEL", resourceLevel);
+        request.setAttribute(JwtConstants.__RESOURCE_LEVEL, resourceLevel);
         return RouterLevel.OPEN == resourceLevel;
     }
 
@@ -149,9 +149,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 检查 token 缓存信息
             String userId = claimsSet.getSubject();
+            request.setAttribute(JwtConstants.__WEAK_USER_ID, userId);
             TokenPayload tokenPayload = jwtTokenStorage.get(userId);
             if (tokenPayload == null) {
-                throw new JwtAuthenticationException(TokenError.TE006);
+                throw new JwtAuthenticationException(TokenError.TE009);
             }
 
             // 检查 access token 信息
@@ -204,11 +205,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         // 校验越权
         if (!claimsSet.getJWTID().equals(tokenPayload.getAccessTokenId())) {
-            throw new JwtAuthenticationException(TokenError.TE007);
+            throw new JwtAuthenticationException(TokenError.TE006);
         }
         // 校验踢人
         if (Boolean.TRUE.equals(tokenPayload.isKickOut())) {
-            throw new JwtAuthenticationException(TokenError.TE008);
+            throw new JwtAuthenticationException(TokenError.TE007);
         }
         // 校验访问IP
         checkLoginIp(request, claimsSet);
@@ -227,7 +228,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.error("{} 用户 [{}] IP检查异常", claimsSet.getSubject(), ERROR_PREFIX, ex);
             }
 
-            throw new JwtAuthenticationException(TokenError.TE009);
+            throw new JwtAuthenticationException(TokenError.TE008);
         }
     }
 

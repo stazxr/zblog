@@ -259,7 +259,7 @@ public class SecurityAutoConfiguration {
                     .failureHandler(authenticationFailureHandler);
 
             // 登出配置
-            http.logout().logoutUrl(securityExtProperties.getLogoutUrl())
+            http.logout().deleteCookies().logoutUrl(securityExtProperties.getLogoutUrl())
                     .invalidateHttpSession(false)
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler(logoutSuccessHandler);

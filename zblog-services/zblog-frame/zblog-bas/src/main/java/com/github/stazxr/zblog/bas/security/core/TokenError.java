@@ -1,6 +1,9 @@
 package com.github.stazxr.zblog.bas.security.core;
 
-import static com.github.stazxr.zblog.bas.security.core.TokenErrorType.*;
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
+
+import static com.github.stazxr.zblog.bas.rest.ResultType.JWT_FAILED_WITH_REFRESH;
+import static com.github.stazxr.zblog.bas.rest.ResultType.JWT_FAILED_WITHOUT_REFRESH;
 
 /**
  * 封装令牌校验的错误信息
@@ -12,57 +15,57 @@ public enum TokenError {
     /**
      * 未上送访问令牌
      */
-    TE001("TE001", TET_001, Const.NO_LOGIN),
+    TE001("TE001", JWT_FAILED_WITH_REFRESH, Const.NO_LOGIN),
 
     /**
      * 访问令牌解码失败
      */
-    TE002("TE002", TET_002, Const.NO_LOGIN),
+    TE002("TE002", JWT_FAILED_WITHOUT_REFRESH, Const.NO_LOGIN),
 
     /**
      * 账号被禁用
      */
-    TE003("TE003", TET_003, Const.ACCT_DISABLED),
+    TE003("TE003", JWT_FAILED_WITHOUT_REFRESH, Const.ACCT_DISABLED),
 
     /**
      * 账号被锁定
      */
-    TE004("TE004", TET_003, Const.ACCT_LOCKED),
+    TE004("TE004", JWT_FAILED_WITHOUT_REFRESH, Const.ACCT_LOCKED),
 
     /**
      * 账号未授权
      */
-    TE005("TE005", TET_003, Const.ACCT_UNAUTHORIZED),
-
-    /**
-     * 令牌已过期
-     */
-    TE006("TE006", TET_004, Const.EXPIRED),
+    TE005("TE005", JWT_FAILED_WITHOUT_REFRESH, Const.ACCT_UNAUTHORIZED),
 
     /**
      * 令牌比对失败
      */
-    TE007("TE007", TET_004, Const.EXPIRED),
+    TE006("TE006", JWT_FAILED_WITHOUT_REFRESH, Const.EXPIRED),
 
     /**
      * 用户被踢出
      */
-    TE008("TE008", TET_003, Const.ACCT_KICK_OUT),
+    TE007("TE007", JWT_FAILED_WITHOUT_REFRESH, Const.ACCT_KICK_OUT),
 
     /**
      * 请求地址发生变化
      */
-    TE009("TE009", TET_004, Const.IP_CHANGE),
+    TE008("TE008", JWT_FAILED_WITHOUT_REFRESH, Const.IP_CHANGE),
+
+    /**
+     * 令牌已过期
+     */
+    TE009("TE009", JWT_FAILED_WITHOUT_REFRESH, Const.EXPIRED),
 
     /**
      * 访问令牌已过期
      */
-    TE010("TE010", TET_005, Const.EXPIRED),
+    TE010("TE010", JWT_FAILED_WITH_REFRESH, Const.EXPIRED),
 
     /**
      * 令牌认证发生未知异常
      */
-    TE099("TE099", TET_006, Const.EXCEPTION);
+    TE099("TE099", JWT_FAILED_WITHOUT_REFRESH, Const.EXCEPTION);
 
     /**
      * 错误码
@@ -72,14 +75,14 @@ public enum TokenError {
     /**
      * 前端业务类型
      */
-    private final TokenErrorType type;
+    private final String type;
 
     /**
      * 国际化消息Key
      */
     private final String label;
 
-    TokenError(String code, TokenErrorType type, String label) {
+    TokenError(String code, String type, String label) {
         this.code = code;
         this.type = type;
         this.label = label;
@@ -89,12 +92,16 @@ public enum TokenError {
         return code;
     }
 
-    public TokenErrorType getType() {
+    public String getType() {
         return type;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public String getMessage() {
+        return code + ":" + I18nUtils.getMessage(label);
     }
 
     public static class Const {
@@ -134,7 +141,7 @@ public enum TokenError {
         public static final String IP_CHANGE = "SUN_TAO_007";
 
         /**
-         * 未知异常【告警】
+         * 未知异常
          */
         public static final String EXCEPTION = "SUN_TAO_999";
     }

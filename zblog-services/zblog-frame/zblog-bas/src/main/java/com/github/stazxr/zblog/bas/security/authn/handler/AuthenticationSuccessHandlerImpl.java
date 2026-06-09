@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.security.authn.handler;
 
 import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.rest.Result;
 import com.github.stazxr.zblog.bas.rest.ResultType;
 import com.github.stazxr.zblog.bas.rest.util.ResponseUtils;
@@ -96,7 +97,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-            ResponseUtils.responseJsonWriter(response, Result.success("登录成功"));
+            // 返回
+            String message = I18nUtils.getMessage("res.login.success");
+            ResponseUtils.responseJsonWriter(response, Result.success(message));
         } catch (Exception e) {
             log.error("处理认证成功逻辑时发生异常：{}", e.getMessage(), e);
             CommonErrorCode errorCode = CommonErrorCode.SBASEA000;

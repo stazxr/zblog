@@ -18,4 +18,14 @@ public interface ResultType {
      * 登录失败
      */
     String LOGIN_FAILED = "ST000001";
+
+    /**
+     * 验签失败（不可续签）
+     */
+    String JWT_FAILED_WITHOUT_REFRESH = "ST000002";
+
+    /**
+     * 验签失败（尝试续签）
+     */
+    String JWT_FAILED_WITH_REFRESH = "ST000003";
 }
