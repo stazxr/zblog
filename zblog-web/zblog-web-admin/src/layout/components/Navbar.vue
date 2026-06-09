@@ -28,7 +28,7 @@
       <!-- 个人头像 -->
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img alt="" :src="user['headImgUrl'] ? user['headImgUrl'] : DefaultAvatar" class="user-avatar">
+          <img alt="" :src="avatarSrc" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -78,6 +78,9 @@ export default {
       device: state => state.app.device,
       user: state => state.user.user
     }),
+    avatarSrc() {
+      return (this.user && this.user.headImgUrl) ? this.user.headImgUrl : DefaultAvatar
+    },
     show: {
       get() {
         return this.$store.state.settings.showSettings

@@ -182,7 +182,7 @@ export default {
               this.$router.push({ path: '/forceUpdatePass' })
             } else {
               this.$message.success('登录成功')
-              this.$router.push({ path: this.redirect || '/' })
+              window.location.href = this.redirect || '/'
             }
           }).catch(e => {
             if (e.message && e.message === 'EAUTHN004') {

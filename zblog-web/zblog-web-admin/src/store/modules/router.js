@@ -35,7 +35,7 @@ const router = {
       state.routeLoaded = loaded
     },
     /**
-     * 重置状态
+     * 重置路由状态
      */
     RESET_ROUTERS: (state) => {
       state.routers = defaultRouterMap

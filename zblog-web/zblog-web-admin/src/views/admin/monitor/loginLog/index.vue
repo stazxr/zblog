@@ -142,7 +142,6 @@ export default {
       this.$mapi.communal.queryConfListByDictKey({ dictKey: 'LOGIN_TYPE_CONFIG' }).then(res => {
         const { data } = res
         this.loginTypeList = data
-        console.log('this.loginTypeList', this.loginTypeList)
       }).catch(_ => {
         this.loginTypeList = []
       })
