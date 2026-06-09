@@ -34,7 +34,6 @@ public class AuthenticationManagerConfig {
     public UserPassAuthenticationProvider userPassAuthenticationProvider(@Autowired(required = false) UserDetailsChecker customPostAuthenticationChecks) {
         UserPassAuthenticationProvider provider = new UserPassAuthenticationProvider(passwordEncoder, userDetailsService);
         provider.setEnableAdditionalChecks(securityExtProperties.isEnableAdditionalChecks());
-        provider.setEnableAdditionalChecks(securityExtProperties.isEnableAdditionalChecks());
         provider.setHideUserNotFoundExceptions(false);
         provider.setCustomPostAuthenticationChecks(customPostAuthenticationChecks);
         return provider;

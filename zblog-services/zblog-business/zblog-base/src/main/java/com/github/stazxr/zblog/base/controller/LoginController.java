@@ -2,17 +2,14 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.captcha.Captcha;
 import com.github.stazxr.zblog.bas.captcha.handler.CaptchaHandler;
-import com.github.stazxr.zblog.bas.rest.IgnoreResult;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -45,17 +42,5 @@ public class LoginController {
         data.put("img", captcha.getBase64());
         data.put("uuid", captcha.getCaptchaId());
         return data;
-    }
-
-    /**
-     * 用户登录
-     */
-    @Log
-    @IgnoreResult
-    @PostMapping("/api/login")
-    @ApiOperation(value = "用户登录")
-    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "用户登录", code = "LOGI0002", level = RouterLevel.OPEN)
-    public void login() {
     }
 }

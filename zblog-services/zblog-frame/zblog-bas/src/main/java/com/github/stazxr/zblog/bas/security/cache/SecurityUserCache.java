@@ -24,7 +24,7 @@ import java.util.function.Function;
 public final class SecurityUserCache {
     private static final Logger log = LoggerFactory.getLogger(SecurityUserCache.class);
 
-    private static final String KEY_PREFIX = "user:";
+    private static final String KEY_PREFIX = "USER:";
 
     /**
      * 默认缓存时间（30分钟）

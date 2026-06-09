@@ -42,11 +42,6 @@ public class JwtCookieProperties {
      */
     private String refreshPath = "/";
 
-    /**
-     * 有效时间(秒)
-     */
-    private long maxAge = 1800L;
-
     public String getDomain() {
         return domain;
     }
@@ -101,13 +96,5 @@ public class JwtCookieProperties {
 
     public void setRefreshPath(String refreshPath) {
         this.refreshPath = refreshPath;
-    }
-
-    public long getMaxAge() {
-        return maxAge;
-    }
-
-    public void setMaxAge(long maxAge) {
-        this.maxAge = maxAge;
     }
 }

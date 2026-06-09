@@ -8,11 +8,6 @@ package com.github.stazxr.zblog.base.util;
  */
 public class Constants {
     /**
-     * 超级管理员ID
-     */
-    public static final Long SUPER_USER_ID = 1L;
-
-    /**
      * 树结构的顶部序列
      */
     public static final Long TOP_ID = 0L;
@@ -41,26 +36,6 @@ public class Constants {
      * 一周的秒数
      */
     public static final int ONE_WEEK_SEC_UNIT = ONE_DAY_SEC_UNIT * 7;
-
-    /**
-     * AUTHENTICATION_PREFIX
-     */
-    public static final String AUTHENTICATION_PREFIX = "Bearer ";
-
-    /**
-     * 默认排序
-     */
-    public static final int DEFAULT_SORT = 99999;
-
-    /**
-     * 否
-     */
-    public static final Integer FALSE = 0;
-
-    /**
-     * 是
-     */
-    public static final Integer TRUE = 1;
 
     /**
      * 内置安全系统的角色
@@ -99,62 +74,5 @@ public class Constants {
          * 角色：ROLE_NO_TEST（此角色标记的资源不允许测试用户访问）
          */
         public static final String NO_TEST = "ROLE_NO_TEST";
-    }
-
-    /**
-     * Cache Key
-     *
-     * @author SunTao
-     * @since 2020-11-14
-     */
-    @Deprecated
-    public enum SysCacheKey {
-        /**
-         * 缓存接口访问级别
-         */
-        interfaceLevel("intLevel:%s", 3600),
-
-        /**
-         * token
-         */
-        usrTkn("usrTkn", 1800),
-
-        /**
-         * ssoTkn
-         */
-        ssoTkn("ssoTkn:%s", 604800),
-
-        /**
-         * preTkn
-         */
-        preTkn("preTkn:%s", -1),
-
-        /**
-         * email code
-         */
-        emailCode("emailCode:%s:%s", 300);
-
-        /**
-         * 缓存Key
-         */
-        private final String cacheKey;
-
-        /**
-         * 缓存有效时间，单位秒
-         */
-        private final int duration;
-
-        SysCacheKey(String cacheKey, int duration) {
-            this.cacheKey = cacheKey;
-            this.duration = duration;
-        }
-
-        public String cacheKey() {
-            return cacheKey;
-        }
-
-        public int duration() {
-            return duration;
-        }
     }
 }

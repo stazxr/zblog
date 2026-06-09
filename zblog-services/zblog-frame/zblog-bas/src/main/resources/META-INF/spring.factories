@@ -23,4 +23,6 @@ com.github.stazxr.zblog.bas.context.autoconfigure.SpringContextAutoConfiguration
 com.github.stazxr.zblog.bas.log.autoconfigure.LogAutoConfiguration,\
 com.github.stazxr.zblog.bas.log.autoconfigure.LogContextFilterAutoConfiguration,\
 com.github.stazxr.zblog.bas.file.autoconfigure.FileAutoConfiguration,\
+com.github.stazxr.zblog.bas.security.autoconfigure.SecurityAutoConfiguration,\
+com.github.stazxr.zblog.bas.security.jwt.autoconfigure.JwtAutoConfiguration,\
 com.github.stazxr.zblog.bas.rest.autoconfigure.RestAutoConfiguration

@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.bas.security.config;
+package com.github.stazxr.zblog.bas.security.autoconfigure;
 
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.bas.security.authz.CustomAccessDecisionManager;
@@ -70,11 +70,6 @@ public class SecurityAutoConfiguration {
      * Spring Security 默认配置
      */
     private final SecurityProperties securityProperties;
-
-    /**
-     * Spring Security 扩展配置
-     */
-    private final SecurityExtProperties securityExtProperties;
 
     /**
      * 创建安全配置相关的BEAN。

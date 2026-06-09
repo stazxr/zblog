@@ -106,6 +106,7 @@ spring:
       max-request-size: 100MB # 单次请求最大（多文件）
       file-size-threshold: 2MB # 超过后写入磁盘
       location: ${java.io.tmpdir} # 临时文件的存放目录，linux场景下某些系统 /tmp 目录很小，需要重新客户化这个参数
+  # 邮箱配置
   mail:
     host: ${zblog.email.host} # 邮箱服务器
     port: ${zblog.email.port} # 邮箱服务器端口 25/465/587
@@ -146,6 +147,8 @@ swagger:
       name: 孙涛
       email: stazxr@qq.com
       url: https://www.suntaoblog.com
+
+# 框架配置
 zblog:
   base:
     # 线程池配置
@@ -154,7 +157,7 @@ zblog:
       max-size: 4 # 最大线程数
       queue-capacity: 20 # 任务队列容量
       keep-alive-seconds: 180 # 线程空闲存活时间（秒）
-      thread-name-prefix: zblog- # 线程名称前缀
+      thread-name-prefix: z- # 线程名称前缀
       wait-for-tasks-to-complete-on-shutdown: true # 应用关闭时是否等待线程池中的任务执行完成
       monitor-enabled: true # 是否开启线程池监控日志.
       monitor-interval: 10000 # 线程池监控日志打印间隔（毫秒）.
@@ -183,10 +186,6 @@ zblog:
       from:
         address: ${spring.mail.username} # 发件地址，务必与配置的邮件发送人保持一致
         name: Z-BLOG # 发件人
-    # 序号配置
-    sequence:
-      datacenter-id: 0 # 数据中心id
-      machine-id: 0 # 机器id
     # 上下文配置
     header:
       sys-code: ST # 系统编码
@@ -199,6 +198,10 @@ zblog:
     context:
       tags: # 自定义标签配置
         - { tag-name: token } # token
+    # 序号配置
+    sequence:
+      datacenter-id: 0 # 数据中心id
+      machine-id: ${zblog.base.header.deploy.deploy-unit} # 机器id
     # 日志打印配置
     log:
       control:
@@ -243,37 +246,42 @@ zblog:
         - /swagger-resources
         - /v3/api-docs
         - /v2/api-docs
+    # Security 配置
     security:
-      login-url: /api/login # 登录 URL
-      logout-url: /api/logout # 注销 URL
-      password-limited-day: 90 # 密码有效天数，默认 90 天
-      sso-token-cache-mills: 86400000 # SSO 令牌缓存时长, 单位毫秒, 默认 3 天
-      password-history-count: 1 # 新密码不能与最近X次密码重复，可配置 -1，关闭校验
-      enable-additional-checks: false # 登录认证是否扩展额外检查规则
+      login-url: /api/login # 登录接口URL
+      logout-url: /api/logout # 登出接口URL
+      password-limited-day: 180 # 密码有效天数（天），默认90天
+      password-history-count: -1 # 新密码不能与最近X次密码重复，-1表示关闭校验
+      enable-additional-checks: false # 是否启用额外登录认证校验
+      lock-config:
+        max-fail-count: 99 # 允许登录失败最大次数，0表示不锁定
+        lock-duration: PT5M # 账号锁定时长（例如5m / 10m / 1h）
       # JWT 配置
       jwt:
-        access-token-ttl: 60
-        refresh-token-ttl: 180
-        allowed-renew-token: true
-        algorithm: RS256
+        access-token-ttl: 1800 # 访问令牌有效时间（秒），默认 1800 秒（30分钟）
+        refresh-token-ttl: 604800 # 刷新令牌有效时间（秒），默认 604800 秒（7天）
+        allowed-renew-token: true # 是否允许续签，默认 false
+        check-ip-change: true # 是否检查IP变化
+        algorithm: RS256 # JWT签名算法，参考 com.nimbusds.jose.JWSAlgorithm
         cert-info:
-          alias: zblog
-          key-password: 123456
-          cert-location: zblog.jks
+          alias: zblog # 证书别名
+          key-password: 123456 # 证书别名
+          cert-location: zblog.jks # 证书文件路径
         claims:
-          issuer: http://localhost:${server.port}
-          audience: ${spring.application.name}
+          issuer: ${spring.application.name} # JWT签发者
+          audience: ${spring.application.name} # JWT接收方
         cookie:
-          domain: localhost
-          secure: false
-          http-only: true
-          same-site: Lax
-          path: /api
-          refresh-path: /api/auth/refresh
-          max-age: 1800
+          domain: localhost # Cookie 域名，例如：localhost
+          secure: false # 是否仅允许 HTTPS 传输 Cookie
+          http-only: true # 是否禁止 JavaScript 访问 Cookie
+          same-site: Lax # Cookie SameSite 策略，可选值：Strict、Lax、None
+          path: /api # 访问令牌的 Cookie 生效路径
+          refresh-path: /api/auth/refresh # 刷新令牌的 Cookie 生效路径
+  # 站点配置信息
   website:
     name: Z-BLOG # 站点名称
-    url: http://127.0.0.1:31945 # 站点地址
+    url: http://localhost:31945 # 站点地址
+  # 切面日志配置
   aop-log:
     enabled: true # 是否启用切面日志
     async: true # 是否开启异步日志写入

@@ -17,7 +17,7 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
     /**
      * 令牌信息缓存键模板。
      */
-    private static final String TOKEN_CACHE_KEY = "token:%s";
+    private static final String TOKEN_CACHE_KEY = "TOKEN:%s";
 
     /**
      * 存储令牌。

@@ -32,14 +32,9 @@ public class SecurityExtProperties {
     private int passwordLimitedDay = 90;
 
     /**
-     * SSO 令牌缓存时长, 单位毫秒, 默认 3 天
-     */
-    private long ssoTokenCacheMills = 24 * 3600 * 1000L;
-
-    /**
      * 新密码不能与最近X次密码重复，可配置 -1，关闭校验
      */
-    private int passwordHistoryCount = 3;
+    private int passwordHistoryCount = -1;
 
     /**
      * 登录认证是否扩展额外检查规则
@@ -108,14 +103,6 @@ public class SecurityExtProperties {
         this.passwordLimitedDay = passwordLimitedDay;
     }
 
-    public long getSsoTokenCacheMills() {
-        return ssoTokenCacheMills;
-    }
-
-    public void setSsoTokenCacheMills(long ssoTokenCacheMills) {
-        this.ssoTokenCacheMills = ssoTokenCacheMills;
-    }
-
     public int getPasswordHistoryCount() {
         return passwordHistoryCount;
     }
@@ -142,12 +129,12 @@ public class SecurityExtProperties {
 
     public static class UserLockConfig {
         /**
-         * 允许最大失败次数，配置为 0 代表不锁定用户
+         * 允许登录失败的最大次数，配置为 0 代表不锁定用户.
          */
-        private int maxFailCount = 5;
+        private int maxFailCount = 99;
 
         /**
-         * 锁定时长
+         * 锁定时长，单位分钟
          */
         private Duration lockDuration = Duration.ofMinutes(5);
 

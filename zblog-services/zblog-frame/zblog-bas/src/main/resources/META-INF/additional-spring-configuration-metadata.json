@@ -109,6 +109,12 @@
       "description": "Security配置."
     },
     {
+      "name": "zblog.base.security.lock-config",
+      "type": "com.github.stazxr.zblog.bas.security.SecurityExtProperties$UserLockConfig",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
+      "description": "用户登录失败锁定配置."
+    },
+    {
       "name": "zblog.base.security.jwt",
       "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
@@ -528,64 +534,119 @@
       "description": "不进行统一包装的 URI 列表，例如第三方回调或 Swagger 文档.",
       "defaultValue": "[]"
     },
-
-
-
     {
       "name": "zblog.base.security.login-url",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "登录 URL.",
+      "description": "登录接口URL.",
       "defaultValue": "/api/login"
     },
     {
       "name": "zblog.base.security.logout-url",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "登出 URL.",
+      "description": "登出接口URL.",
       "defaultValue": "/api/logout"
     },
     {
       "name": "zblog.base.security.password-limited-day",
       "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "密码有效天数，默认 90 天.",
+      "description": "密码有效天数（天），默认90天.",
       "defaultValue": 90
     },
     {
-      "name": "zblog.base.security.resource-roles-cache-mills",
-      "type": "java.lang.Long",
-      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "资源与角色关联关系的缓存时长, 单位毫秒, 默认 30 分钟.",
-      "defaultValue": 1800000
-    },
-    {
-      "name": "zblog.base.security.sso-token-cache-mills",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "SSO 令牌缓存时长, 单位毫秒, 默认 3 天.",
-      "defaultValue": 86400000
-    },
-    {
       "name": "zblog.base.security.password-history-count",
-      "type": "java.lang.Boolean",
+      "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "新密码不能与最近X次密码重复，可配置 -1，关闭校验.",
-      "defaultValue": 3
+      "description": "新密码不能与最近X次密码重复，-1表示关闭校验.",
+      "defaultValue": -1
     },
     {
       "name": "zblog.base.security.enable-additional-checks",
       "type": "java.lang.Boolean",
       "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "登录认证是否扩展额外检查规则.",
+      "description": "是否启用额外登录认证校验.",
       "defaultValue": false
     },
     {
-      "name": "zblog.base.security.hide-user-not-found-exceptions",
+      "name": "zblog.base.security.lock-config.max-fail-count",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties$UserLockConfig",
+      "description": "允许登录失败最大次数，0表示不锁定.",
+      "defaultValue": 99
+    },
+    {
+      "name": "zblog.base.security.lock-config.lock-duration",
+      "type": "java.time.Duration",
+      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties$UserLockConfig",
+      "description": "账号锁定时长（例如5m / 10m / 1h）.",
+      "defaultValue": "PT5M"
+    },
+    {
+      "name": "zblog.base.security.jwt.access-token-ttl",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "访问令牌有效时间（秒），默认 1800 秒（30分钟）.",
+      "defaultValue": 1800
+    },
+    {
+      "name": "zblog.base.security.jwt.refresh-token-ttl",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "刷新令牌有效时间（秒），默认 604800 秒（7天）.",
+      "defaultValue": 604800
+    },
+    {
+      "name": "zblog.base.security.jwt.allowed-renew-token",
       "type": "java.lang.Boolean",
-      "sourceType": "com.github.stazxr.zblog.bas.security.SecurityExtProperties",
-      "description": "是否隐藏用户找不到异常.",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "是否允许续签Token（开启后refresh token机制生效）.",
+      "defaultValue": false
+    },
+    {
+      "name": "zblog.base.security.jwt.check-ip-change",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "是否检查IP变化.",
       "defaultValue": true
+    },
+    {
+      "name": "zblog.base.security.jwt.algorithm",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
+      "description": "JWT签名算法，参考 com.nimbusds.jose.JWSAlgorithm.",
+      "defaultValue": "RS256"
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.alias",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$CertInfo",
+      "description": "证书别名."
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.key-password",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$CertInfo",
+      "description": "证书密钥密码."
+    },
+    {
+      "name": "zblog.base.security.jwt.cert-info.cert-location",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$CertInfo",
+      "description": "证书文件路径."
+    },
+    {
+      "name": "zblog.base.security.jwt.claims.issuer",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$Claims",
+      "description": "JWT签发者（issuer）."
+    },
+    {
+      "name": "zblog.base.security.jwt.claims.audience",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$Claims",
+      "description": "JWT接收方（audience）."
     },
     {
       "name": "zblog.base.security.jwt.cookie.domain",
@@ -619,7 +680,7 @@
       "name": "zblog.base.security.jwt.cookie.path",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
-      "description": "Cookie 生效路径.",
+      "description": "访问令牌的 Cookie 生效路径.",
       "defaultValue": "/"
     },
     {
@@ -628,13 +689,6 @@
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
       "description": "刷新令牌的 Cookie 生效路径.",
       "defaultValue": "/"
-    },
-    {
-      "name": "zblog.base.security.jwt.cookie.max-age",
-      "type": "java.lang.Long",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
-      "description": "Cookie 有效时间，单位秒。建议与 AccessToken 有效时间保持一致.",
-      "defaultValue": 1800
     }
   ],
   "hints": [

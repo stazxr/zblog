@@ -13,6 +13,7 @@ import com.github.stazxr.zblog.bas.security.jwt.JwtTokenPair;
 import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties;
 import com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties;
 import com.github.stazxr.zblog.bas.security.service.SecurityUserService;
+import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,15 +88,18 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
             // 刷新令牌
-            ResponseCookie refreshTokenCookie = ResponseCookie.from(JwtConstants.REFRESH_TOKEN, tokenPair.getRefreshToken())
-                    .httpOnly(jwtCookieProperties.isHttpOnly())
-                    .secure(jwtCookieProperties.getSecure())
-                    .domain(jwtCookieProperties.getDomain())
-                    .path(jwtCookieProperties.getRefreshPath())
-                    .sameSite(jwtCookieProperties.getSameSite())
-                    .maxAge(Duration.ofSeconds(jwtProperties.getRefreshTokenTtl()))
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+            String refreshToken = tokenPair.getRefreshToken();
+            if (StringUtils.isNotBlank(refreshToken)) {
+                ResponseCookie refreshTokenCookie = ResponseCookie.from(JwtConstants.REFRESH_TOKEN, tokenPair.getRefreshToken())
+                        .httpOnly(jwtCookieProperties.isHttpOnly())
+                        .secure(jwtCookieProperties.getSecure())
+                        .domain(jwtCookieProperties.getDomain())
+                        .path(jwtCookieProperties.getRefreshPath())
+                        .sameSite(jwtCookieProperties.getSameSite())
+                        .maxAge(Duration.ofSeconds(jwtProperties.getRefreshTokenTtl()))
+                        .build();
+                response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+            }
 
             // 返回
             String message = I18nUtils.getMessage("res.login.success");
