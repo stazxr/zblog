@@ -14,9 +14,9 @@
             ref="upload"
             name="file"
             :action="$store.state.api.uploadFileTest + '?uploadType=' + uploadType"
-            :headers="headers"
             :auto-upload="false"
             :limit="maxUploadSize"
+            :with-credentials="true"
             :on-exceed="handleExceed"
             :on-change="handleChange"
             :on-remove="handleRemove"
@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { getToken } from '@/utils/token'
 export default {
   props: {
     dialogVisible: {
@@ -63,9 +62,6 @@ export default {
       submitLoading: false,
       previewDialogVisible: false,
       previewImageUrl: '',
-      headers: {
-        Authorization: ''
-      },
       fileList: []
     }
   },
@@ -92,7 +88,6 @@ export default {
       this.handleClose()
     },
     submit() {
-      this.headers.Authorization = getToken()
       this.$refs.upload.submit()
     },
     handleExceed(files, fileList) {
@@ -127,7 +122,7 @@ export default {
     },
     handleSuccess(response, file, fileList) {
       this.submitLoading = false
-      if (response.code === 200) {
+      if (response.code === '000000000') {
         // success
         this.$message.success(response.message || '上传成功')
         this.doClose(true)

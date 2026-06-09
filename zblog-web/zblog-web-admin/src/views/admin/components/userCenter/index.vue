@@ -15,9 +15,9 @@
                   ref="imgUploadRef"
                   v-model="showImgUpload"
                   field="file"
-                  :headers="headers"
                   :url="$store.state.api.fileUploadApi"
                   :lang-ext="imageUploadLangExt"
+                  :with-credentials="true"
                   @crop-upload-success="avatarUploadSuccess"
                 />
               </div>
@@ -109,7 +109,6 @@ import userProfileForm from './center/userProfileForm'
 import userOperateLog from './center/userOperateLog'
 import userLoginLog from './center/userLoginLog'
 import ImgUpload from 'vue-image-crop-upload'
-import { getToken } from '@/utils/token'
 import { mapGetters } from 'vuex'
 export default {
   name: 'UserCenter',
@@ -117,10 +116,6 @@ export default {
   data() {
     return {
       DefaultAvatar: DefaultAvatar,
-      headers: {
-        // 图片上传请求头配置
-        Authorization: ''
-      },
       imageUploadLangExt: {
         success: '上传成功!',
         fail: '图片上传失败!'
@@ -152,13 +147,12 @@ export default {
   methods: {
     // 修改头像
     showAvatarUpload() {
-      this.headers.Authorization = getToken()
       this.$refs.imgUploadRef.step = 1
       this.showImgUpload = true
     },
     avatarUploadSuccess(jsonData) {
       const { code, data, message } = jsonData
-      if (code === 200) {
+      if (code === '000000000') {
         // success
         if (data == null || data.length !== 1) {
           this.$message.error('上传文件列表获取失败')

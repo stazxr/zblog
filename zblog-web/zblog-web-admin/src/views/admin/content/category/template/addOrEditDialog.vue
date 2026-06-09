@@ -84,8 +84,8 @@
             class="upload-cover"
             drag
             :action="$store.state.api.fileUploadApi"
-            :headers="headers"
             :show-file-list="false"
+            :with-credentials="true"
             :before-upload="beforeUpload"
             :on-error="handleError"
             :on-success="handleSuccess"
@@ -108,7 +108,6 @@
 </template>
 
 <script>
-import { getToken } from '@/utils/token'
 export default {
   props: {
     dialogVisible: {
@@ -140,9 +139,6 @@ export default {
       langExt: {
         success: '上传成功!',
         fail: '上传失败!'
-      },
-      headers: {
-        Authorization: ''
       },
       formData: {
         id: null,
@@ -230,7 +226,6 @@ export default {
         return false
       }
 
-      this.headers.Authorization = getToken()
       return file
       // 压缩图片
       // return new Promise(resolve => {
@@ -252,7 +247,7 @@ export default {
       }
     },
     handleSuccess(response, file) {
-      if (response.code === 200) {
+      if (response.code === '000000000') {
         // success
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           this.formData.imageId = response.data[0]['fileId']

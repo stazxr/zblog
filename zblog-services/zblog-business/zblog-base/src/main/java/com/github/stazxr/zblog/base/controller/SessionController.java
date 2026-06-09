@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/api/sessions")
 @Api(value = "SessionController", tags = { "会话管理" })
 public class SessionController {
-    private static final String LOGIN_USER_KEY = "LOGIN:TOKEN:";
+    private static final String LOGIN_USER_KEY = "TOKEN:";
 
     /**
      * 查询在线用户列表
