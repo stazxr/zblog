@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.core.base.BaseConst;
+import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class CacheController {
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "模糊查询缓存池数据", code = "CACHQ001")
     public List<CacheInfo> scan(@RequestParam(required = false) String pattern) {
-        return GlobalCache.scan(pattern);
+        return GlobalCache.scan(pattern, false);
     }
 
     /**
@@ -52,6 +53,7 @@ public class CacheController {
     /**
      * 删除缓存
      */
+    @Log
     @GetMapping("/delete")
     @ApiOperation(value = "删除缓存")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)

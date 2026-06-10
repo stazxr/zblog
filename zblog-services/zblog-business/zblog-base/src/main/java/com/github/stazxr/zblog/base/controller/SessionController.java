@@ -43,7 +43,7 @@ public class SessionController {
     public List<TokenPayload> scan(@RequestParam(required = false) String userId) {
         userId = StringUtils.isBlank(userId) ? "*" : userId;
         List<TokenPayload> tokenPayloads = new ArrayList<>();
-        List<CacheInfo> scan = GlobalCache.scan(LOGIN_USER_KEY + userId);
+        List<CacheInfo> scan = GlobalCache.scan(LOGIN_USER_KEY + userId, true);
         if (scan.size() > 0) {
             for (CacheInfo cacheInfo : scan) {
                 tokenPayloads.add((TokenPayload) cacheInfo.getValue());

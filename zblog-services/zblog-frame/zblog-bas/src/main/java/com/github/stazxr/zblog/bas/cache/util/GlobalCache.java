@@ -75,7 +75,7 @@ public final class GlobalCache {
         return CACHE.getTtl(key);
     }
 
-    public static List<CacheInfo> scan(String pattern) {
+    public static List<CacheInfo> scan(String pattern, boolean showValue) {
         checkInitialized();
         List<CacheInfo> cacheInfoList = new ArrayList<>();
         Map<String, Object> dataList = CACHE.scan(pattern);
@@ -87,6 +87,7 @@ public final class GlobalCache {
                 cacheInfo.setValue(dataList.get(key));
                 cacheInfo.setTtl(CACHE.getTtl(key));
                 cacheInfo.setCachePool(simpleName);
+                cacheInfo.setShowValue(showValue);
                 cacheInfoList.add(cacheInfo);
             }
         }

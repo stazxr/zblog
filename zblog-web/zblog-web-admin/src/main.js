@@ -19,6 +19,8 @@ import muses from '@/frame/muses'
 import config from '@/utils/config'
 import 'default-passive-events'
 import $ from 'jquery'
+import JsonViewer from 'vue-json-viewer'
+import 'vue-json-viewer/style.css'
 
 // highlightjs
 import hljs from 'highlight.js'
@@ -56,6 +58,7 @@ Vue.use(perm)
 Vue.use(checkPerm)
 Vue.use(preventReClick)
 Vue.use(Highlight)
+Vue.use(JsonViewer)
 Vue.use(ElementUI, {
   size: Cookies.get('size') || 'small',
   locale: ''

@@ -10,6 +10,7 @@ public class CacheInfo {
     private String key;
     private Object value;
     private Long ttl;
+    private String type;
     private String cachePool;
     private boolean showValue = false;
 
@@ -22,7 +23,11 @@ public class CacheInfo {
     }
 
     public Object getValue() {
-        return value;
+        if (showValue) {
+            return value;
+        } else {
+            return null;
+        }
     }
 
     public void setValue(Object value) {
@@ -51,5 +56,12 @@ public class CacheInfo {
 
     public void setShowValue(boolean showValue) {
         this.showValue = showValue;
+    }
+
+    public String getType() {
+        if (value == null) {
+            return null;
+        }
+        return value.getClass().getName();
     }
 }
