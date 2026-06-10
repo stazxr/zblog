@@ -4,7 +4,9 @@ import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.security.jwt.storage.TokenPayload;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 该类实现了 {@link JwtTokenStorage} 接口，提供了对令牌进行存储、获取、过期处理的功能。
@@ -18,6 +20,8 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      * 令牌信息缓存键模板。
      */
     private static final String TOKEN_CACHE_KEY = "TOKEN:%s";
+
+    private final ConcurrentHashMap<String, ReentrantLock> updateLockMap = new ConcurrentHashMap<>();
 
     /**
      * 存储令牌。
@@ -39,8 +43,14 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
      */
     @Override
     public void update(String uid, TokenPayload token) {
-        String cacheKey = buildKey(uid);
-        GlobalCache.put(buildKey(uid), token, GlobalCache.expire(cacheKey), TimeUnit.MILLISECONDS);
+        ReentrantLock lock = getLock(uid);
+        lock.lock();
+        try {
+            String cacheKey = buildKey(uid);
+            GlobalCache.put(buildKey(uid), token, GlobalCache.expire(cacheKey), TimeUnit.MILLISECONDS);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -66,5 +76,9 @@ public class JwtTokenStorageImpl implements JwtTokenStorage {
 
     private String buildKey(String uid) {
         return String.format(TOKEN_CACHE_KEY, uid);
+    }
+
+    private ReentrantLock getLock(String uid) {
+        return updateLockMap.computeIfAbsent(uid, k -> new ReentrantLock());
     }
 }

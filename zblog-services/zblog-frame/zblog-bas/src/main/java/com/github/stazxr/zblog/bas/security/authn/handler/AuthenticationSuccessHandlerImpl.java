@@ -63,18 +63,20 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
             // 获取用户信息
             SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
             String userId = String.valueOf(securityUser.getId());
+            String username = securityUser.getUsername();
             String userIp = IpUtils.getIp(request);
-            log.info("用户 {} 登录成功，IP: {}", securityUser.getUsername(), userIp);
+            log.info("用户 {} 登录成功，IP: {}", username, userIp);
 
             // 生成新的 Token
             JwtContext jwtContext = new JwtContext();
             jwtContext.setUserId(userId);
+            jwtContext.setUsername(username);
             jwtContext.setLoginIp(userIp);
             JwtTokenPair tokenPair = jwtTokenGenerator.generateToken(jwtContext);
 
             // 记录用户登录日志
             int loginType = 1; // 登录成功
-            securityUserService.updateUserLoginInfo(securityUser.getUsername(), loginType, request);
+            securityUserService.updateUserLoginInfo(username, loginType, request);
 
             // 访问令牌
             ResponseCookie accessCookie = ResponseCookie.from(JwtConstants.ACCESS_TOKEN, tokenPair.getAccessToken())

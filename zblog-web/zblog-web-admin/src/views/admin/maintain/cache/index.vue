@@ -47,12 +47,15 @@
         @sort-change="handleSortChange"
       >
         <el-table-column prop="key" label="KEY" show-overflow-tooltip />
-        <el-table-column prop="type" label="Type" width="200" show-overflow-tooltip />
+        <el-table-column prop="type" label="Type" width="250" show-overflow-tooltip />
         <el-table-column prop="ttl" label="TTL" width="150" sortable="custom">
           <template v-slot="{ row }">
             {{ formatTtl(row.ttl) }}
           </template>
         </el-table-column>
+        <div slot="empty">
+          <el-empty :image="nodataImg" description=" " />
+        </div>
       </el-table>
       <div class="pagination-container">
         <el-pagination

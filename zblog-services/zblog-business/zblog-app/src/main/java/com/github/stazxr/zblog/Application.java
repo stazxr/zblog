@@ -23,9 +23,9 @@ public class Application {
     public static void main(String[] args) {
         try {
             SpringApplication.run(Application.class, args);
-            log.info("Z-BLOG application start successfully...");
+            log.info("application start successfully...");
         } catch (Exception e) {
-            log.error("Z-BLOG application start failed...", e);
+            log.error("application start failed...", e);
         }
     }
 }

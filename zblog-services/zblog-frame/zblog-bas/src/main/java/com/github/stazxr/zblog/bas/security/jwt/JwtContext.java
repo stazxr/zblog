@@ -9,6 +9,8 @@ package com.github.stazxr.zblog.bas.security.jwt;
 public class JwtContext {
     /** 用户ID */
     private String userId;
+    /** 用户名 */
+    private String username;
     /** 登录IP */
     private String loginIp;
 
@@ -18,6 +20,14 @@ public class JwtContext {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getLoginIp() {

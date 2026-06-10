@@ -18,6 +18,11 @@ public class TokenPayload implements Serializable {
     private String userId;
 
     /**
+     * 用户名
+     */
+    private String username;
+
+    /**
      * 登录时间
      */
     private Date loginTime;
@@ -45,13 +50,14 @@ public class TokenPayload implements Serializable {
     /**
      * 是否被踢出
      */
-    private boolean isKickOut = false;
+    private boolean kickOut = false;
 
     public TokenPayload() {
     }
 
-    public TokenPayload(String userId, Date loginTime, String accessTokenId, String refreshTokenId) {
+    public TokenPayload(String userId, String username, Date loginTime, String accessTokenId, String refreshTokenId) {
         this.userId = userId;
+        this.username = username;
         this.loginTime = loginTime;
         this.accessTokenId = accessTokenId;
         this.refreshTokenId = refreshTokenId;
@@ -59,6 +65,10 @@ public class TokenPayload implements Serializable {
 
     public String getUserId() {
         return userId;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public Date getLoginTime() {
@@ -94,10 +104,10 @@ public class TokenPayload implements Serializable {
     }
 
     public boolean isKickOut() {
-        return isKickOut;
+        return kickOut;
     }
 
-    public void kickOut() {
-        isKickOut = true;
+    public void setKickOut(boolean kickOut) {
+        this.kickOut = kickOut;
     }
 }

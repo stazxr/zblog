@@ -4,16 +4,14 @@ import com.github.stazxr.zblog.bas.cache.CacheInfo;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.security.jwt.storage.TokenPayload;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +29,8 @@ import java.util.List;
 public class SessionController {
     private static final String LOGIN_USER_KEY = "TOKEN:";
 
+    private final JwtTokenStorage jwtTokenStorage;
+
     /**
      * 查询在线用户列表
      *
@@ -40,15 +40,32 @@ public class SessionController {
     @ApiOperation(value = "查询在线用户列表")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "查询在线用户列表", code = "SESSQ001")
-    public List<TokenPayload> scan(@RequestParam(required = false) String userId) {
-        userId = StringUtils.isBlank(userId) ? "*" : userId;
+    public List<TokenPayload> scan() {
         List<TokenPayload> tokenPayloads = new ArrayList<>();
-        List<CacheInfo> scan = GlobalCache.scan(LOGIN_USER_KEY + userId, true);
-        if (scan.size() > 0) {
-            for (CacheInfo cacheInfo : scan) {
-                tokenPayloads.add((TokenPayload) cacheInfo.getValue());
+        List<CacheInfo> users = GlobalCache.scan(LOGIN_USER_KEY + "*", true);
+        if (users.size() > 0) {
+            for (CacheInfo user : users) {
+                if (user.getValue() instanceof TokenPayload) {
+                    tokenPayloads.add((TokenPayload) user.getValue());
+                }
             }
         }
         return tokenPayloads;
+    }
+
+    /**
+     * 踢出用户
+     */
+    @Log
+    @PostMapping("/kickout")
+    @ApiOperation(value = "踢出用户")
+    @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "踢出用户", code = "SESSD001")
+    public void kickout(@RequestParam String userId) {
+        TokenPayload tokenPayload = jwtTokenStorage.get(userId);
+        if (tokenPayload != null) {
+            tokenPayload.setKickOut(true);
+            jwtTokenStorage.update(userId, tokenPayload);
+        }
     }
 }

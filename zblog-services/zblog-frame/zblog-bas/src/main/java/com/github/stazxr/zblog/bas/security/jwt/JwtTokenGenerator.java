@@ -65,6 +65,7 @@ public class JwtTokenGenerator {
 
         // 获取参数信息
         String userId = jwtContext.getUserId();
+        String username = jwtContext.getUsername();
         String loginIp = jwtContext.getLoginIp();
 
         // 生成访问令牌的声明集，并通过编码器编码为 access token
@@ -84,7 +85,7 @@ public class JwtTokenGenerator {
         }
 
         // 缓存令牌信息
-        TokenPayload tokenPayload = new TokenPayload(userId, issueTime, accessJwtId, refreshJwtId);
+        TokenPayload tokenPayload = new TokenPayload(userId, username, issueTime, accessJwtId, refreshJwtId);
         jwtTokenStorage.put(userId, tokenPayload, cacheTtl);
 
         // 返回访问令牌

@@ -185,14 +185,16 @@ export default {
             // 跳转登录页面
             this.resetForm()
             this.$message.success('密码修改成功，请重新登录')
-            setTimeout(() => {
-              this.$router.replace('/login')
-            }, 100)
+            this.doLogout()
           }).finally(() => {
             this.submitLoading = false
           })
         }
       })
+    },
+    async doLogout() {
+      await this.$store.dispatch('Logout')
+      this.$router.replace('/login?reset')
     }
   }
 }

@@ -54,7 +54,7 @@ public class CacheController {
      * 删除缓存
      */
     @Log
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     @ApiOperation(value = "删除缓存")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "删除缓存", code = "CACHD001")

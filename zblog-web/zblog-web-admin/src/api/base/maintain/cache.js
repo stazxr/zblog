@@ -1,4 +1,5 @@
 import api from '../../custom-axios'
+import qs from 'qs'
 
 const cacheApi = '/api/cache'
 
@@ -13,6 +14,8 @@ export default {
   },
   // 删除缓存
   delete: params => {
-    return api.httpRequest().get(`${cacheApi}/delete`, params)
+    return api.httpRequest().post(`${cacheApi}/delete`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   }
 }

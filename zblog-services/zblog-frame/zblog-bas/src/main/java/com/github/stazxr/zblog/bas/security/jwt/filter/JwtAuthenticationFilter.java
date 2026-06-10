@@ -233,8 +233,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void updateLastAccessTime(String userId, TokenPayload tokenPayload, Date requestTime) {
-        tokenPayload.setLastAccessTime(requestTime);
-        jwtTokenStorage.update(userId, tokenPayload);
+        // 废弃，待替换 tokenPayload.setLastAccessTime(requestTime);
+        // jwtTokenStorage.update(userId, tokenPayload);
     }
 
     private void setContextAuthentication(HttpServletRequest request, SecurityUser user) {

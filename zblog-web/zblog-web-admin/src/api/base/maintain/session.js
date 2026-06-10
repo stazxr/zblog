@@ -1,4 +1,5 @@
 import api from '../../custom-axios'
+import qs from 'qs'
 
 const sessionApi = '/api/sessions'
 
@@ -8,7 +9,9 @@ export default {
     return api.httpRequest().get(`${sessionApi}/list`, params)
   },
   // 踢出用户
-  delete: params => {
-    return api.httpRequest().get(`${sessionApi}/kicout`, params)
+  kickout: params => {
+    return api.httpRequest().post(`${sessionApi}/kickout`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   }
 }
