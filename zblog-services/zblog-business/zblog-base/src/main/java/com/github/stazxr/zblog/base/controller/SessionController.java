@@ -2,10 +2,13 @@ package com.github.stazxr.zblog.base.controller;
 
 import com.github.stazxr.zblog.bas.cache.CacheInfo;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
+import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.jwt.storage.JwtTokenStorage;
 import com.github.stazxr.zblog.bas.security.jwt.storage.TokenPayload;
+import com.github.stazxr.zblog.base.domain.error.SessionErrorCode;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
@@ -62,6 +65,8 @@ public class SessionController {
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "踢出用户", code = "SESSD001")
     public void kickout(@RequestParam String userId) {
+        Long loginId = SecurityUtils.getLoginId();
+        ThrowUtils.throwIf(userId.equals(String.valueOf(loginId)), SessionErrorCode.ESESSA000);
         TokenPayload tokenPayload = jwtTokenStorage.get(userId);
         if (tokenPayload != null) {
             tokenPayload.setKickOut(true);

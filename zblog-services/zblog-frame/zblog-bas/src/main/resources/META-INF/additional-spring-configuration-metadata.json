@@ -137,6 +137,18 @@
       "type": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
       "description": "JWT Cookie参数配置."
+    },
+    {
+      "name": "zblog.base.swagger",
+      "type": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "Swagger参数配置."
+    },
+    {
+      "name": "zblog.base.swagger.contact",
+      "type": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties$Contact",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "Swagger联系人配置."
     }
   ],
   "properties": [
@@ -689,6 +701,75 @@
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtCookieProperties",
       "description": "刷新令牌的 Cookie 生效路径.",
       "defaultValue": "/"
+    },
+    {
+      "name": "zblog.base.swagger.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "是否启用接口文档.",
+      "defaultValue": false
+    },
+    {
+      "name": "zblog.base.swagger.title",
+      "type": "java.lang.String",
+      "description": "接口文档标题.",
+      "defaultValue": "Z-BLOG 接口文档"
+    },
+    {
+      "name": "zblog.base.swagger.description",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "接口文档描述.",
+      "defaultValue": "Z-BLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，Git链接：https://github.com/stazxr/zblog"
+    },
+    {
+      "name": "zblog.base.swagger.version",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "接口文档版本.",
+      "defaultValue": "1.0"
+    },
+    {
+      "name": "zblog.base.swagger.server-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "服务地址.",
+      "defaultValue": "http://localhost:8081"
+    },
+    {
+      "name": "zblog.base.swagger.license",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "许可证.",
+      "defaultValue": "MIT License"
+    },
+    {
+      "name": "zblog.base.swagger.license-url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties",
+      "description": "许可证地址.",
+      "defaultValue": "https://github.com/stazxr/zblog/blob/master/LICENSE"
+    },
+    {
+      "name": "zblog.base.swagger.contact.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties$Contact",
+      "description": "联系人姓名.",
+      "defaultValue": "孙涛"
+    },
+    {
+      "name": "zblog.base.swagger.contact.url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties$Contact",
+      "description": "联系人主页.",
+      "defaultValue": "https://github.com/stazxr"
+    },
+    {
+      "name": "zblog.base.swagger.contact.email",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.swagger.autoconfigure.properties.SwaggerProperties$Contact",
+      "description": "联系人邮箱.",
+      "defaultValue": "stazxr@qq.com"
     }
   ],
   "hints": [

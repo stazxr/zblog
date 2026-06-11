@@ -135,18 +135,6 @@ mybatis-plus:
     db-config:
       logic-delete-value: true
       logic-not-delete-value: false
-swagger:
-  config:
-    enable: true
-    title: Z-BLOG 接口文档
-    description: Z-BLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，仓库链接：https://github.com/stazxr/zblog
-    base-package: com.github.stazxr.zblog
-    server-url: https://www.suntaoblog.com
-    version: V_5.0.0
-    contact:
-      name: 孙涛
-      email: stazxr@qq.com
-      url: https://www.suntaoblog.com
 
 # 框架配置
 zblog:
@@ -277,6 +265,18 @@ zblog:
           same-site: Lax # Cookie SameSite 策略，可选值：Strict、Lax、None
           path: /api # 访问令牌的 Cookie 生效路径
           refresh-path: /api/auth/refresh # 刷新令牌的 Cookie 生效路径
+    # Swagger 配置
+    swagger:
+      enable: true # 是否启用接口文档
+      title: Z-BLOG 接口文档 # 接口文档标题
+      # 接口文档描述
+      description: Z-BLOG 是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，仓库链接：https://github.com/stazxr/zblog
+      server-url: http://localhost:8081 # 服务地址
+      version: V_5.0.0 # 接口文档版本
+      contact:
+        name: 孙涛 # 联系人姓名
+        email: stazxr@qq.com # 联系人邮箱
+        url: https://github.com/stazxr/zblog # 联系人主页
   # 站点配置信息
   website:
     name: Z-BLOG # 站点名称

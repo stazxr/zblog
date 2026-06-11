@@ -231,6 +231,9 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('FILE_UPLOAD_WITH_DB_FAILED', 'en-US', 'Upload failed due to a database error. Please try again later', 'common'),
 ('FILE_DELETE_WITH_BUSINESS', 'zh-CN', '文件已关联业务数据，无法删除', 'common'),
 ('FILE_DELETE_WITH_BUSINESS', 'en-US', 'The file is associated with business data and cannot be deleted', 'common'),
+-- 会话相关
+('SESSION_FORBID_KICK_OUT_SELF', 'zh-CN', '无法踢出自己', 'common'),
+('SESSION_FORBID_KICK_OUT_SELF', 'en-US', 'Can not kick out self', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),

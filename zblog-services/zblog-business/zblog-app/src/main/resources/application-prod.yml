@@ -41,6 +41,12 @@ zblog:
         cookie:
           domain: yiyucangji # Cookie 域名，例如：localhost
           secure: true # 是否仅允许 HTTPS 传输 Cookie
+    swagger:
+      enable: true # 是否启用接口文档
+      title: 接口文档 - 一隅藏记 # 接口文档标题
+      # 接口文档描述
+      description: 一隅藏记是一款基于 MIT 协议的前后端分离博客框架，同时也可用作为前后端分离脚手架，快速进行项目搭建，仓库链接：https://github.com/stazxr/zblog
+      server-url: https://www.yiyucangji.com # 服务地址
   website:
     name: 一隅藏记 # 站点名称
     url: https://www.yiyucangji.com # 站点地址
