@@ -94,7 +94,7 @@ public class FriendLinkController {
     /**
      * 删除友链
      *
-     * @param friendLinkId 友链ID
+     * @param friendLinkId 友链id
      */
     @Log
     @PostMapping(value = "/deleteFriendLink")

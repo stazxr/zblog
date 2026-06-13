@@ -270,8 +270,15 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common'),
 -- 文章
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
-('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common');
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common'),
 -- 栏目
 
 -- 友链
 
+-- 页面
+('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
+('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'zh-CN', '页面标签不能为空', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'en-US', 'Page label cannot be blank', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'zh-CN', '页面标签已存在', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common');

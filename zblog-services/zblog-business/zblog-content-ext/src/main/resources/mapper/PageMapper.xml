@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.PageMapper">
+    <select id="selectPageList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.PageVo">
+        SELECT
+            ID, PAGE_NAME, PAGE_LABEL, PAGE_SORT, CREATE_TIME, UPDATE_TIME,
+            (SELECT USERNAME FROM user u WHERE u.ID = p.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT USERNAME FROM user u WHERE u.ID = p.UPDATE_USER) AS UPDATE_USERNAME
+        FROM page p
+        <where>
+            <if test="query.pageName != null and query.pageName != ''">
+                <bind name="pageNameBind" value="'%' + query.pageName + '%'"/>
+                AND PAGE_NAME LIKE #{pageNameBind}
+            </if>
+            <if test="query.pageLabel != null and query.pageLabel != ''">
+                <bind name="pageLabelBind" value="'%' + query.pageLabel + '%'"/>
+                AND PAGE_LABEL LIKE #{pageLabelBind}
+            </if>
+        </where>
+        ORDER BY PAGE_SORT
+    </select>
+
+    <select id="selectPageDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.PageVo">
+        SELECT
+            ID, PAGE_NAME, PAGE_LABEL, PAGE_SORT, CREATE_TIME, UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = p.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = p.UPDATE_USER) AS UPDATE_USERNAME
+        FROM page p
+        WHERE ID = #{pageId}
+    </select>
+</mapper>

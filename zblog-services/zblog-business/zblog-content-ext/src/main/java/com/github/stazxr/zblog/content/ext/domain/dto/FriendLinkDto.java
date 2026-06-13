@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.content.ext.domain.dto;
 
+import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 友链信息
@@ -19,8 +22,9 @@ public class FriendLinkDto extends BaseDto {
     private static final long serialVersionUID = 9022736711594848655L;
 
     /**
-     * 友链ID
+     * 友链id
      */
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("友链ID")
     private Long id;
 

@@ -4,7 +4,6 @@ import login from '@/api/login.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
 import userCenter from '@/api/userCenter.js'
-
 import auth from '@/api/base/auth.js'
 import user from '@/api/base/system/user.js'
 import role from '@/api/base/system/role.js'
@@ -18,31 +17,30 @@ import file from '@/api/base/maintain/file.js'
 import cache from '@/api/base/maintain/cache.js'
 import session from '@/api/base/maintain/session.js'
 
+// website
+import friendLink from '@/api/service/website/friendLink.js'
+import page from '@/api/service/website/page.js'
+
 // content
 import category from '@/api/service/content/category.js'
 import tag from '@/api/service/content/tag.js'
 import article from '@/api/service/content/article.js'
 
-// websiteConfig
-import friendLink from '@/api/service/websiteConfig/friendLink.js'
-
 // TODO
 import column from '@/api/service/column.js'
 import webSetting from '@/api/service/webSetting.js'
 import talk from '@/api/service/talk.js'
-import page from '@/api/service/page.js'
 import album from '@/api/service/album.js'
 import message from '@/api/service/message.js'
 import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
 export default {
-  communal, login, home, menu, userCenter,
-  auth,
+  communal, login, home, menu, userCenter, auth,
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,
+  friendLink, page,
   category, tag, article,
-  friendLink,
-  column, webSetting, talk, page, album, message, comment, test
+  column, webSetting, talk, album, message, comment, test
 }

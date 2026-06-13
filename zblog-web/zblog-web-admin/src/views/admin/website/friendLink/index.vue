@@ -127,8 +127,8 @@
 
 <script>
 import nodataImg from '@/assets/images/nodata.png'
-import detailDialog from '@/views/admin/websiteConfig/friendLink/template/detailDialog'
-import addOrEditDialog from '@/views/admin/websiteConfig/friendLink/template/addOrEditDialog'
+import detailDialog from '@/views/admin/website/friendLink/template/detailDialog'
+import addOrEditDialog from '@/views/admin/website/friendLink/template/addOrEditDialog'
 export default {
   name: 'FriendLink',
   components: {

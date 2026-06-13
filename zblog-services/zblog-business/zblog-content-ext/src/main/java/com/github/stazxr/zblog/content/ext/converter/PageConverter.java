@@ -1,20 +1,19 @@
-package com.github.stazxr.zblog.converter;
+package com.github.stazxr.zblog.content.ext.converter;
 
+import com.github.stazxr.zblog.content.ext.domain.dto.PageDto;
+import com.github.stazxr.zblog.content.ext.domain.entity.Page;
+import com.github.stazxr.zblog.content.ext.domain.vo.PageVo;
 import com.github.stazxr.zblog.core.base.BaseConverter;
-import com.github.stazxr.zblog.domain.dto.PageDto;
-import com.github.stazxr.zblog.domain.entity.Page;
-import com.github.stazxr.zblog.domain.vo.PageVo;
 import org.springframework.stereotype.Component;
 
 /**
  * PageConverter
  *
  * @author SunTao
- * @since 2022-12-12
+ * @since 2026-06-12
  */
 @Component
 public class PageConverter implements BaseConverter<Page, PageDto, PageVo> {
-
     /**
      * 获取实体对象类型
      *

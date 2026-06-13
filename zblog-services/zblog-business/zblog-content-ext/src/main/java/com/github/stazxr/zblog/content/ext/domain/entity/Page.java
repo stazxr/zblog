@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.domain.entity;
+package com.github.stazxr.zblog.content.ext.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,12 +10,14 @@ import lombok.Setter;
  * 页面
  *
  * @author SunTao
- * @since 2022-12-14
+ * @since 2026-06-12
  */
 @Getter
 @Setter
 @TableName("page")
 public class Page extends BaseEntity {
+    private static final long serialVersionUID = -1418611832649084034L;
+
     /**
      * 主键
      */
@@ -31,11 +33,6 @@ public class Page extends BaseEntity {
      * 页面标签
      */
     private String pageLabel;
-
-    /**
-     * 页面封面
-     */
-    private String pageCover;
 
     /**
      * 页面排序

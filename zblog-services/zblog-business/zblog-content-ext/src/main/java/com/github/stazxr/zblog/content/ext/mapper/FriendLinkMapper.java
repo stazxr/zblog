@@ -2,7 +2,6 @@ package com.github.stazxr.zblog.content.ext.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.stazxr.zblog.content.domain.vo.TagVo;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
@@ -22,7 +21,7 @@ public interface FriendLinkMapper extends BaseMapper<FriendLink> {
      * @param queryDto 查询参数
      * @return IPage<FriendLinkVo>
      */
-    IPage<FriendLinkVo> selectFriendLinkList(@Param("page") Page<TagVo> page, @Param("query") FriendLinkQueryDto queryDto);
+    IPage<FriendLinkVo> selectFriendLinkList(@Param("page") Page<FriendLinkVo> page, @Param("query") FriendLinkQueryDto queryDto);
 
     /**
      * 查询友链详情

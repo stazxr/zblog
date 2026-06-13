@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
-import com.github.stazxr.zblog.content.domain.vo.TagVo;
 import com.github.stazxr.zblog.content.ext.converter.FriendLinkConverter;
 import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
@@ -44,7 +43,7 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
         }
 
         // 分页查询
-        Page<TagVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        Page<FriendLinkVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
         return baseMapper.selectFriendLinkList(page, queryDto);
     }
 
