@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.ThemeMapper">
+    <select id="selectThemeList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo">
+        SELECT
+            t.ID, t.THEME_NAME, t.THEME_TYPE, t.OWNER_TYPE, t.OWNER_ID, u.USERNAME AS OWNER_NAME,
+            t.IS_DEFAULT, t.IS_ACTIVE, t.PREVIEW_COVER, t.DESCRIPTION
+        FROM theme t
+        LEFT JOIN user u ON u.ID = t.OWNER_ID
+        <where>
+            <if test="query.themeName != null and query.themeName != ''">
+                <bind name="themeNameBind" value="'%' + query.themeName + '%'"/>
+                AND t.THEME_NAME LIKE #{themeNameBind}
+            </if>
+            <if test="query.themeType != null and query.themeType != ''">
+                AND t.THEME_TYPE = #{query.themeType}
+            </if>
+            <if test="query.ownerType != null and query.ownerType != ''">
+                AND t.OWNER_TYPE = #{query.ownerType}
+            </if>
+            <if test="query.ownerName != null and query.ownerName != ''">
+                <bind name="ownerNameBind" value="'%' + query.ownerName + '%'"/>
+                AND u.USERNAME LIKE #{ownerNameBind}
+            </if>
+            <if test="query.isDefault != null">
+                AND t.IS_DEFAULT = #{query.isDefault}
+            </if>
+            <if test="query.isActive != null">
+                AND t.IS_ACTIVE = #{query.isActive}
+            </if>
+        </where>
+        ORDER BY COALESCE(t.UPDATE_TIME, t.CREATE_TIME) DESC
+    </select>
+
+    <select id="selectThemeDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo">
+        SELECT
+            t.ID, t.THEME_NAME, t.THEME_TYPE, t.OWNER_TYPE, t.OWNER_ID, u.USERNAME AS OWNER_NAME,
+            t.IS_DEFAULT, t.IS_ACTIVE, t.PREVIEW_COVER, t.DESCRIPTION, t.CREATE_TIME, t.UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.UPDATE_USER) AS UPDATE_USERNAME
+        FROM theme t
+        LEFT JOIN user u ON u.ID = t.OWNER_ID
+        WHERE t.ID = #{themeId}
+    </select>
+
+    <update id="updateThemeBaseInfo">
+        UPDATE theme SET
+            THEME_NAME = #{t.themeName}, THEME_TYPE = #{t.themeType}, DESCRIPTION = #{t.description}, PREVIEW_COVER = #{t.previewCover},
+            UPDATE_USER = #{t.updateUser}, UPDATE_TIME = #{t.updateTime}
+        WHERE ID = #{t.id}
+    </update>
+</mapper>

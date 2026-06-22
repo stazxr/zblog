@@ -53,9 +53,9 @@
       >
         <el-table-column :show-overflow-tooltip="true" prop="name" label="分类名称" width="200" />
         <el-table-column :show-overflow-tooltip="true" prop="slug" label="SLUG" width="200" />
-        <el-table-column prop="articleImgLinkList" label="分类图" align="center" width="180">
+        <el-table-column label="分类图" align="center" width="180">
           <template v-slot="scope">
-            <el-image class="article-cover" :src="scope.row['imageUrl']" :preview-src-list="getPreviewList(scope.row)">
+            <el-image class="category-cover" :src="scope.row['imageUrl']" :preview-src-list="getPreviewList(scope.row)">
               <div slot="error" class="image-slot">
                 <span v-if="scope.row['imageUrl'] === null">未配置</span>
                 <span v-else>加载失败</span>
@@ -264,7 +264,7 @@ export default {
 </script>
 
 <style scoped>
-.article-cover {
+.category-cover {
   position: relative;
   width: 100%;
   height: 90px;

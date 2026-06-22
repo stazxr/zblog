@@ -95,7 +95,7 @@ public class PageServiceImpl extends ServiceImpl<PageMapper, Page> implements Pa
         ThrowUtils.throwIfNull(dbPage, BaseErrorCode.ECOREA001);
         // 页面信息检查
         checkPage(page);
-        // 编辑友链
+        // 编辑页面
         ThrowUtils.when(!updateById(page)).system(BaseErrorCode.SCOREA002);
     }
 

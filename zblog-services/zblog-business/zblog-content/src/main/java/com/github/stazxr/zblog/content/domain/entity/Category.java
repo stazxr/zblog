@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.content.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -45,6 +46,7 @@ public class Category extends BaseEntity {
     /**
      * 分类图片
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String imageUrl;
 
     /**

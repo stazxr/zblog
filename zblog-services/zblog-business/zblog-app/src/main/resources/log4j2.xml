@@ -111,7 +111,7 @@
             <AppenderRef ref="ThreadErrorMonitorFile"/>
         </Logger>
 
-        <!-- 上下文 DEBUG -->
+        <Logger name="com.github.stazxr.zblog.bas.validation.ValidatorExceptionHandler" level="WARN"/>
         <Logger name="com.github.stazxr.zblog.bas.context.Context" level="DEBUG"/>
 
         <!-- Spring 日志 -->

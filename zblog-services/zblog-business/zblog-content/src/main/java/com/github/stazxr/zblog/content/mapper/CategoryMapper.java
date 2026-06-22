@@ -32,8 +32,6 @@ public interface CategoryMapper extends BaseMapper<Category> {
     CategoryVo selectCategoryDetail(@Param("categoryId") Long categoryId);
 
 
-
-
 //
 //    /**
 //     * 查询类别对应的文章数目

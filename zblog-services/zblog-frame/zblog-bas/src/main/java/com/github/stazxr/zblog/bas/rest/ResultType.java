@@ -28,4 +28,9 @@ public interface ResultType {
      * 验签失败（尝试续签）
      */
     String JWT_FAILED_WITH_REFRESH = "ST000003";
+
+    /**
+     * 参数验证失败
+     */
+    String PARAM_FAILED = "ST000004";
 }

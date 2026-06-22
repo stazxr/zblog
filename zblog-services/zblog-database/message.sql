@@ -281,4 +281,11 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('PAGE_PAGELABEL_REQUIRED', 'zh-CN', '页面标签不能为空', 'common'),
 ('PAGE_PAGELABEL_REQUIRED', 'en-US', 'Page label cannot be blank', 'common'),
 ('PAGE_PAGELABEL_EXISTS', 'zh-CN', '页面标签已存在', 'common'),
-('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common');
+('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common'),
+-- 主题
+('THEME_THEMENAME_REQUIRED', 'zh-CN', '主题名称不能为空', 'common'),
+('THEME_THEMENAME_REQUIRED', 'en-US', 'Theme name cannot be blank', 'common'),
+('THEME_THEMENAME_EXISTS', 'zh-CN', '主题名称已存在', 'common'),
+('THEME_THEMENAME_EXISTS', 'en-US', 'Theme name exist', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'zh-CN', '主题类型不能为空', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common');

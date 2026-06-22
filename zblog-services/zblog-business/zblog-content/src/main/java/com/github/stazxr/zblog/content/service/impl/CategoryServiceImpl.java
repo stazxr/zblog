@@ -112,13 +112,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public void addCategory(CategoryDto categoryDto) {
         // 获取分类信息
-        Long imageId = categoryDto.getImageId();
         Category category = categoryConverter.dtoToEntity(categoryDto);
         // 新增时，不允许传入 CategoryId
         ThrowUtils.when(category.getId() != null).system(BaseErrorCode.SCOREB001);
         // 分类信息检查
+        checkCategory(category);
+        // 检查图片
         category.setId(SequenceUtils.getId());
-        checkCategory(category, imageId);
+        if (categoryDto.getImageId() != null) {
+            insertCategoryImage(category.getId(), categoryDto.getImageId());
+        }
         // 新增分类
         ThrowUtils.when(!save(category)).system(BaseErrorCode.SCOREA001);
     }
@@ -131,14 +134,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public void editCategory(CategoryDto categoryDto) {
         // 获取分类信息
-        Long imageId = categoryDto.getImageId();
         Category category = categoryConverter.dtoToEntity(categoryDto);
         // 判断分类是否存在
         Category dbCategory = baseMapper.selectById(category.getId());
         ThrowUtils.throwIfNull(dbCategory, BaseErrorCode.ECOREA001);
         // 分类信息检查
-        checkCategory(category, imageId);
-        // 编辑角色
+        checkCategory(category);
+        // 检查图片
+        if (categoryDto.getImageId() != null) {
+            if (StringUtils.isBlank(dbCategory.getImageUrl()) || !dbCategory.getImageUrl().equals(category.getImageUrl())) {
+                deleteCategoryImage(category.getId());
+                insertCategoryImage(category.getId(), categoryDto.getImageId());
+            }
+        } else {
+            if (StringUtils.isBlank(categoryDto.getImageUrl())) {
+                deleteCategoryImage(category.getId());
+            }
+        }
+        // 编辑分类
         ThrowUtils.when(!updateById(category)).system(BaseErrorCode.SCOREA002);
     }
 
@@ -181,7 +194,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         }
     }
 
-    private void checkCategory(Category category, Long imageId) {
+    private void checkCategory(Category category) {
         // 检查分类名称
         category.setName(category.getName().trim());
         ThrowUtils.when(checkCategoryNameExist(category)).service(CategoryErrorCode.ECATEA000);
@@ -189,29 +202,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         // 检查分类编码
         category.setSlug(category.getSlug().trim());
         ThrowUtils.throwIf(checkCategorySlugExist(category), CategoryErrorCode.ECATEA001);
+    }
 
-        // 图片信息检查
-        Long categoryId = category.getId();
-        if (category.getImageUrl() == null && imageId == null) {
-            fileMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-            fileRelationMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-        }
-        if (imageId != null) {
-            // 新增或修改了分类图
-            fileMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-            fileRelationMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-            FileRelation fileRelation = new FileRelation();
-            fileRelation.setFileId(imageId);
-            fileRelation.setBusinessId(categoryId);
-            fileRelation.setBusinessType(ServiceUploadBusinessType.CATEGORY_IMG);
-            fileRelationMapper.insert(fileRelation);
-        } else {
-            // 没有设置或删除了分类图
-            if (category.getImageUrl() == null) {
-                fileMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-                fileRelationMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
-            }
-        }
+    private void insertCategoryImage(Long categoryId, Long imageId) {
+        FileRelation fileRelation = new FileRelation();
+        fileRelation.setFileId(imageId);
+        fileRelation.setBusinessId(categoryId);
+        fileRelation.setBusinessType(ServiceUploadBusinessType.CATEGORY_IMG);
+        fileRelationMapper.insert(fileRelation);
+    }
+
+    private void deleteCategoryImage(Long categoryId) {
+        fileMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
+        fileRelationMapper.deleteByBusinessInfo(categoryId, ServiceUploadBusinessType.CATEGORY_IMG);
     }
 
     private boolean checkCategoryNameExist(Category category) {
