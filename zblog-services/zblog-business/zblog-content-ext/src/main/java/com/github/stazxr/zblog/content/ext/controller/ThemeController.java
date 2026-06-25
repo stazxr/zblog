@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.ThemeStatusDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.service.ThemeService;
@@ -89,6 +90,48 @@ public class ThemeController {
     @Router(name = "编辑主题", code = "THEMU001")
     public void editTheme(@RequestBody @Validated(Update.class) ThemeDto themeDto) {
         themeService.editTheme(themeDto);
+    }
+
+    /**
+     * 设置用户主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    @Log
+    @PostMapping(value = "/editUserThemeStatus")
+    @ApiOperation(value = "设置用户主题状态")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "设置用户主题状态", code = "THEMU002")
+    public void editUserThemeStatus(@RequestBody ThemeStatusDto themeStatusDto) {
+        themeService.editUserThemeStatus(themeStatusDto);
+    }
+
+    /**
+     * 设置系统主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    @Log
+    @PostMapping(value = "/editSystemThemeStatus")
+    @ApiOperation(value = "设置系统主题状态")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "设置系统主题状态", code = "THEMU003")
+    public void editSystemThemeStatus(@RequestBody ThemeStatusDto themeStatusDto) {
+        themeService.editSystemThemeStatus(themeStatusDto);
+    }
+
+    /**
+     * 升级用户主题为系统主题
+     *
+     * @param themeId 主题id
+     */
+    @Log
+    @PostMapping(value = "/upgradeTheme")
+    @ApiOperation(value = "升级用户主题为系统主题")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "升级用户主题为系统主题", code = "THEMU004")
+    public void upgradeTheme(@RequestParam Long themeId) {
+        themeService.upgradeTheme(themeId);
     }
 
     /**

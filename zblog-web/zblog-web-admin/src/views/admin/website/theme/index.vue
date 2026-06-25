@@ -37,29 +37,17 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['PAGEA001']" type="success" @click="addPage">新增</el-button>
-          <el-button v-perm="['PAGEQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['PAGEU001']" :disabled="row === null" type="primary" @click="editPage">激活</el-button>
-          <el-button v-perm="['PAGEU001']" :disabled="row === null" type="primary" @click="editPage">转为系统主题</el-button>
-          <el-button v-perm="['PAGEU001']" :disabled="row === null" type="primary" @click="editPage">编辑</el-button>
-          <el-button v-perm="['PAGED001']" :disabled="row === null" type="danger" @click="deletePage">删除</el-button>
-        </span>
-      </div>
-      <div class="crud-opts">
-        <span class="crud-opts-left">
-          <el-button v-perm="['PAGEA001']" type="success" @click="addPage">新增</el-button>
-          <el-button v-perm="['PAGEQ002']" :disabled="!row" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['PAGEU001']" :disabled="!row" type="primary" @click="editPage">编辑</el-button>
-          <el-dropdown trigger="click" :disabled="!row" @command="handleCommand">
-            <el-button type="warning">
-              更多<i class="el-icon-arrow-down el-icon--right" />
-            </el-button>
+          <el-button v-perm="['THEMA001']" type="success" @click="addPage">新增</el-button>
+          <el-button v-perm="['THEMQ002']" :disabled="!row" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['THEMU001']" :disabled="!row" type="primary" @click="editPage">编辑</el-button>
+          <el-dropdown trigger="click" :disabled="!row" @command="handleEditCommand">
+            <el-button type="info" :disabled="!row">更多<i class="el-icon-arrow-down el-icon--right" /></el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-if="row && row.ownerType === 'USER' && !row.isActive" command="active">激活主题</el-dropdown-item>
-              <el-dropdown-item v-if="row && row.ownerType === 'USER' && row.isActive" command="inactive">取消激活</el-dropdown-item>
-              <el-dropdown-item v-if="row && row.ownerType === 'SYSTEM' && !row.isDefault" command="default">设为默认</el-dropdown-item>
-              <el-dropdown-item v-if="row && row.ownerType === 'SYSTEM' && row.isDefault" command="cancelDefault">取消默认</el-dropdown-item>
-              <el-dropdown-item v-if="row && row.ownerType === 'USER'" command="system">转为系统主题</el-dropdown-item>
+              <el-dropdown-item v-if="canActiveTheme" command="activeTheme">激活主题</el-dropdown-item>
+              <el-dropdown-item v-if="canInactiveTheme" command="inactiveTheme">取消激活</el-dropdown-item>
+              <el-dropdown-item v-if="canUpgradeTheme" command="upgradeTheme">转为系统主题</el-dropdown-item>
+              <el-dropdown-item v-if="canSetDefault" command="defaultTheme">设为默认</el-dropdown-item>
+              <el-dropdown-item v-if="canCancelDefault" command="cancelDefaultTheme">取消默认</el-dropdown-item>
               <el-dropdown-item divided command="delete">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -154,6 +142,7 @@
 import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/website/theme/template/detailDialog'
 import addOrEditDialog from '@/views/admin/website/theme/template/addOrEditDialog'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Theme',
   components: {
@@ -186,6 +175,40 @@ export default {
       addOrEditDialogVisible: false
     }
   },
+  computed: {
+    ...mapGetters(['user']),
+    canActiveTheme() {
+      return this.hasPerm('THEMU002') &&
+        this.row &&
+        this.row.ownerType === 'USER' &&
+        this.row.ownerId === this.user.id &&
+        !this.row.isActive
+    },
+    canInactiveTheme() {
+      return this.hasPerm('THEMU002') &&
+        this.row &&
+        this.row.ownerType === 'USER' &&
+        this.row.ownerId === this.user.id &&
+        this.row.isActive
+    },
+    canUpgradeTheme() {
+      return this.hasPerm('THEMU004') &&
+        this.row &&
+        this.row.ownerType === 'USER'
+    },
+    canSetDefault() {
+      return this.hasPerm('THEMU003') &&
+        this.row &&
+        this.row.ownerType === 'SYSTEM' &&
+        !this.row.isDefault
+    },
+    canCancelDefault() {
+      return this.hasPerm('THEMU003') &&
+        this.row &&
+        this.row.ownerType === 'SYSTEM' &&
+        this.row.isDefault
+    }
+  },
   mounted() {
     this.loadThemeTypeList()
     this.loadThemeOwnerTypeList()
@@ -194,6 +217,9 @@ export default {
     this.listTableData()
   },
   methods: {
+    hasPerm(value) {
+      return this.checkPerm(value)
+    },
     handleCurrentChange(row) {
       this.row = row
     },
@@ -228,6 +254,28 @@ export default {
       }).catch(_ => {
         this.themeUserStatusList = []
       })
+    },
+    handleEditCommand(command) {
+      switch (command) {
+        case 'activeTheme':
+          this.activeTheme()
+          break
+        case 'inactiveTheme':
+          this.inactiveTheme()
+          break
+        case 'upgradeTheme':
+          this.upgradeTheme()
+          break
+        case 'defaultTheme':
+          this.setDefault()
+          break
+        case 'cancelDefaultTheme':
+          this.cancelDefault()
+          break
+        case 'delete':
+          this.deletePage()
+          break
+      }
     },
     // 查询
     search() {
@@ -290,16 +338,16 @@ export default {
     // 新增与编辑
     addPage() {
       this.addOrEditDialogVisible = true
-      this.addOrEditDialogTitle = '新增页面'
+      this.addOrEditDialogTitle = '新增主题'
       this.$refs.addOrEditDialogRef.initData()
     },
     editPage() {
       if (this.row === null) {
-        this.$message.error('请选择要编辑的页面')
+        this.$message.error('请选择要编辑的主题')
         return
       }
       this.addOrEditDialogVisible = true
-      this.addOrEditDialogTitle = '编辑页面'
+      this.addOrEditDialogTitle = '编辑主题'
       this.$refs.addOrEditDialogRef.initData(this.row.id)
     },
     addOrEditDone(result = false) {
@@ -308,6 +356,90 @@ export default {
       if (result) {
         this.listTableData()
       }
+    },
+    // 设置用户主题状态
+    activeTheme() {
+      this.doSetActiveTheme(true)
+    },
+    inactiveTheme() {
+      this.doSetActiveTheme(false)
+    },
+    doSetActiveTheme(isActive) {
+      if (this.row === null) {
+        this.$message.error('请选择要操作的主题')
+        return
+      }
+      if (this.row.ownerType !== 'USER') {
+        this.$message.error('只允许操作用户主题')
+        return
+      }
+      if (this.row.ownerId !== this.user.id) {
+        this.$message.error('只允许操作自己创建的主题')
+        return
+      }
+      const action = isActive ? '启用' : '停用'
+      const content = isActive ? `启用后将切换为当前主题，是否继续？` : `停用后该主题将无法继续使用，是否继续？`
+      this.$confirm(`${content}`, `${action}主题`, {
+        confirmButtonText: action,
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const param = { themeId: this.row.id, status: isActive }
+        this.$mapi.theme.editUserThemeStatus(param).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
+    },
+    // 升级用户主题为系统主题
+    upgradeTheme() {
+      if (this.row === null) {
+        this.$message.error('请选择要操作的主题')
+        return
+      }
+      if (this.row.ownerType !== 'USER') {
+        this.$message.error('只允许操作用户主题')
+        return
+      }
+      this.$confirm('此操作将升级用户主题为系统主题, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.theme.upgradeTheme({ themeId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
+    },
+    // 设置系统主题状态
+    setDefault() {
+      this.doSetDefaultTheme(true)
+    },
+    cancelDefault() {
+      this.doSetDefaultTheme(false)
+    },
+    doSetDefaultTheme(isDefault) {
+      if (this.row === null) {
+        this.$message.error('请选择要操作的主题')
+        return
+      }
+      if (this.row.ownerType !== 'SYSTEM') {
+        this.$message.error('只允许操作系统主题')
+        return
+      }
+      const content = isDefault ? `是否确认将主题设置为默认主题？` : `是否确认将主题设置为普通主题？`
+      this.$confirm(`${content}`, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const param = { themeId: this.row.id, status: isDefault }
+        this.$mapi.theme.editSystemThemeStatus(param).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
     },
     // 删除
     deletePage() {
@@ -320,7 +452,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$mapi.page.deletePage({ pageId: this.row.id }).then(res => {
+        this.$mapi.theme.deleteTheme({ themeId: this.row.id }).then(res => {
           this.$message.success(res.message)
           this.listTableData()
         })

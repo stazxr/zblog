@@ -22,6 +22,7 @@ import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -110,6 +111,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * @param categoryDto 分类
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addCategory(CategoryDto categoryDto) {
         // 获取分类信息
         Category category = categoryConverter.dtoToEntity(categoryDto);
@@ -132,6 +134,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * @param categoryDto 分类
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void editCategory(CategoryDto categoryDto) {
         // 获取分类信息
         Category category = categoryConverter.dtoToEntity(categoryDto);

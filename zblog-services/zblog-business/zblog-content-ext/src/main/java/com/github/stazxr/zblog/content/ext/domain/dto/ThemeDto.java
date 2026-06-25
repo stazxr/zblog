@@ -27,6 +27,7 @@ public class ThemeDto extends BaseDto {
     /**
      * 主题id
      */
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("主题id")
     private Long id;
 
@@ -40,7 +41,7 @@ public class ThemeDto extends BaseDto {
     /**
      * 主题类型
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{THEME_THEMETYPE_REQUIRED}")
+    @NotNull(groups = Create.class, message = "{THEME_THEMETYPE_REQUIRED}")
     @ApiModelProperty("主题类型")
     private ThemeType themeType;
 

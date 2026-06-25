@@ -26,6 +26,7 @@ public class TagDto extends BaseDto {
     /**
      * 标签id
      */
+    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("标签id")
     private Long id;
 

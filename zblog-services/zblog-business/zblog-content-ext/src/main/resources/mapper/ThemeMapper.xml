@@ -45,8 +45,28 @@
 
     <update id="updateThemeBaseInfo">
         UPDATE theme SET
-            THEME_NAME = #{t.themeName}, THEME_TYPE = #{t.themeType}, DESCRIPTION = #{t.description}, PREVIEW_COVER = #{t.previewCover},
+            THEME_NAME = #{t.themeName}, DESCRIPTION = #{t.description}, PREVIEW_COVER = #{t.previewCover},
             UPDATE_USER = #{t.updateUser}, UPDATE_TIME = #{t.updateTime}
         WHERE ID = #{t.id}
+    </update>
+
+    <update id="inactiveUserTheme">
+        UPDATE theme SET IS_ACTIVE = false WHERE OWNER_TYPE = 'USER' AND THEME_TYPE = #{themeType} AND OWNER_ID = #{ownerId}
+    </update>
+
+    <update id="updateUserThemeStatus">
+        UPDATE theme SET IS_ACTIVE = #{status} WHERE ID = #{themeId}
+    </update>
+
+    <update id="inactiveSystemTheme">
+        UPDATE theme SET IS_DEFAULT = false WHERE OWNER_TYPE = 'SYSTEM' AND THEME_TYPE = #{themeType}
+    </update>
+
+    <update id="updateSystemThemeStatus">
+        UPDATE theme SET IS_DEFAULT = #{status} WHERE ID = #{themeId}
+    </update>
+
+    <update id="upgradeTheme">
+        UPDATE theme SET OWNER_TYPE = 'SYSTEM', OWNER_ID = null, IS_DEFAULT = false, IS_ACTIVE = false WHERE ID = #{themeId}
     </update>
 </mapper>

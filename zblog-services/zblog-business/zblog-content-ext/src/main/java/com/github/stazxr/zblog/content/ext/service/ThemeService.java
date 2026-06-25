@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.content.ext.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.ThemeStatusDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Theme;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
@@ -43,6 +44,27 @@ public interface ThemeService extends IService<Theme> {
      * @param themeDto 主题信息
      */
     void editTheme(ThemeDto themeDto);
+
+    /**
+     * 设置用户主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    void editUserThemeStatus(ThemeStatusDto themeStatusDto);
+
+    /**
+     * 设置系统主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    void editSystemThemeStatus(ThemeStatusDto themeStatusDto);
+
+    /**
+     * 升级用户主题为系统主题
+     *
+     * @param themeId 主题id
+     */
+    void upgradeTheme(Long themeId);
 
     /**
      * 删除主题

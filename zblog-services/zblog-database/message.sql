@@ -288,4 +288,16 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('THEME_THEMENAME_EXISTS', 'zh-CN', '主题名称已存在', 'common'),
 ('THEME_THEMENAME_EXISTS', 'en-US', 'Theme name exist', 'common'),
 ('THEME_THEMETYPE_REQUIRED', 'zh-CN', '主题类型不能为空', 'common'),
-('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common');
+('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common'),
+('THEME_ID_REQUIRED', 'zh-CN', '主题ID不能为空', 'common'),
+('THEME_ID_REQUIRED', 'en-US', 'Theme id cannot be blank', 'common'),
+('THEME_STATUS_REQUIRED', 'zh-CN', '主题状态不能为空', 'common'),
+('THEME_STATUS_REQUIRED', 'en-US', 'Theme status cannot be blank', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'zh-CN', '只允许修改用户主题状态', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'en-US', 'Only user theme status can be modified', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'zh-CN', '只允许修改系统主题状态', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'en-US', 'Only system theme status can be modified', 'common'),
+('THEME_ONLY_OWN_THEME', 'zh-CN', '只允许操作自己创建的主题', 'common'),
+('THEME_ONLY_OWN_THEME', 'en-US', 'Only your own themes can be operated', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'zh-CN', '只允许升级用户主题', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'en-US', 'Only user themes can be upgraded', 'common');

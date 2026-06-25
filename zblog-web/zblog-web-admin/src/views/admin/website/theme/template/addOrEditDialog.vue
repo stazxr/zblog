@@ -15,7 +15,7 @@
           <el-input v-model="formData.themeName" :style="isMobile ? '' : 'width: 360px;'" maxlength="50" show-word-limit />
         </el-form-item>
         <el-form-item label="主题类型" prop="themeType">
-          <el-select v-model="formData.themeType" placeholder="主题类型" :style="isMobile ? '' : 'width: 360px;'">
+          <el-select v-model="formData.themeType" placeholder="主题类型" :disabled="formData.id != null" :style="isMobile ? '' : 'width: 360px;'">
             <el-option v-for="item in themeTypeEnums" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>

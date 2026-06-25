@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Theme;
+import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,4 +39,42 @@ public interface ThemeMapper extends BaseMapper<Theme> {
      * @return boolean
      */
     boolean updateThemeBaseInfo(@Param("t") Theme theme);
+
+    /**
+     * 设置用户主题状态为未激活
+     *
+     * @param themeType 主题类型
+     * @param ownerId   所属用户
+     */
+    void inactiveUserTheme(@Param("themeType") ThemeType themeType, @Param("ownerId") Long ownerId);
+
+    /**
+     * 设置用户主题状态
+     *
+     * @param themeId 主题id
+     * @param status  主题状态
+     */
+    void updateUserThemeStatus(@Param("themeId") Long themeId, @Param("status") Boolean status);
+
+    /**
+     * 设置系统主题状态为普通主题
+     *
+     * @param themeType 主题类型
+     */
+    void inactiveSystemTheme(@Param("themeType") ThemeType themeType);
+
+    /**
+     * 设置系统主题状态
+     *
+     * @param themeId 主题id
+     * @param status  主题状态
+     */
+    void updateSystemThemeStatus(@Param("themeId") Long themeId, @Param("status") Boolean status);
+
+    /**
+     * 升级用户主题为系统主题
+     *
+     * @param themeId 主题id
+     */
+    void upgradeTheme(@Param("themeId") Long themeId);
 }

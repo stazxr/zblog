@@ -10,7 +10,15 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  */
 public enum ThemeErrorCode implements ErrorCode {
     /** 主题名称已存在 */
-    ETHEMA001("THEME_THEMENAME_EXISTS");
+    ETHEMA001("THEME_THEMENAME_EXISTS"),
+    /** 只允许编辑用户主题状态 */
+    ETHEMA002("THEME_ONLY_USER_THEME_STATUS"),
+    /** 只允许编辑系统主题状态 */
+    ETHEMA003("THEME_ONLY_SYSTEM_THEME_STATUS"),
+    /** 只允许编辑自己的主题 */
+    ETHEMA004("THEME_ONLY_OWN_THEME"),
+    /** 只允许升级用户主题 */
+    ETHEMA005("THEME_ONLY_USER_THEME_UPGRADE");
 
     private final String i18nKey;
 

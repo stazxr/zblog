@@ -14,13 +14,13 @@ import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.content.domain.enums.ServiceUploadBusinessType;
 import com.github.stazxr.zblog.content.ext.converter.ThemeConverter;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.ThemeStatusDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Theme;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeOwnerType;
 import com.github.stazxr.zblog.content.ext.domain.error.ThemeErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
-import com.github.stazxr.zblog.content.ext.mapper.PageMapper;
 import com.github.stazxr.zblog.content.ext.mapper.ThemeMapper;
 import com.github.stazxr.zblog.content.ext.mapper.ThemePageMapper;
 import com.github.stazxr.zblog.content.ext.service.ThemeService;
@@ -94,6 +94,7 @@ public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements
      * @param themeDto 主题信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addTheme(ThemeDto themeDto) {
         // 获取主题信息
         Theme theme = themeConverter.dtoToEntity(themeDto);
@@ -146,6 +147,66 @@ public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements
         theme.setUpdateUser(SecurityUtils.getLoginId());
         theme.setUpdateTime(DateUtils.formatNow(DateUtils.YMD_HMS_PATTERN));
         ThrowUtils.when(!baseMapper.updateThemeBaseInfo(theme)).system(BaseErrorCode.SCOREA002);
+    }
+
+    /**
+     * 设置用户主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editUserThemeStatus(ThemeStatusDto themeStatusDto) {
+        // 判断主题是否存在
+        Theme dbTheme = baseMapper.selectById(themeStatusDto.getThemeId());
+        ThrowUtils.throwIfNull(dbTheme, BaseErrorCode.ECOREA001);
+        // 只允许编辑用户主题状态
+        ThrowUtils.throwIf(!ThemeOwnerType.USER.equals(dbTheme.getOwnerType()), ThemeErrorCode.ETHEMA002);
+        // 只允许编辑自己的主题
+        Long loginId = SecurityUtils.getLoginId();
+        ThrowUtils.throwIf(!loginId.equals(dbTheme.getOwnerId()), ThemeErrorCode.ETHEMA004);
+        if (themeStatusDto.getStatus()) {
+            // 将主题修改为已激活状态，需要将当前激活的主题置为未激活状态，用户名下每个类别只能有一个激活态的主题
+            baseMapper.inactiveUserTheme(dbTheme.getThemeType(), dbTheme.getOwnerId());
+        }
+
+        baseMapper.updateUserThemeStatus(themeStatusDto.getThemeId(), themeStatusDto.getStatus());
+    }
+
+    /**
+     * 设置系统主题状态
+     *
+     * @param themeStatusDto 主题状态信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editSystemThemeStatus(ThemeStatusDto themeStatusDto) {
+        // 判断主题是否存在
+        Theme dbTheme = baseMapper.selectById(themeStatusDto.getThemeId());
+        ThrowUtils.throwIfNull(dbTheme, BaseErrorCode.ECOREA001);
+        // 只允许编辑系统主题状态
+        ThrowUtils.throwIf(!ThemeOwnerType.SYSTEM.equals(dbTheme.getOwnerType()), ThemeErrorCode.ETHEMA003);
+        if (themeStatusDto.getStatus()) {
+            // 将主题修改为普通主题，系统主题每个类别下只能有一个默认主题
+            baseMapper.inactiveSystemTheme(dbTheme.getThemeType());
+        }
+
+        baseMapper.updateSystemThemeStatus(themeStatusDto.getThemeId(), themeStatusDto.getStatus());
+    }
+
+    /**
+     * 升级用户主题为系统主题
+     *
+     * @param themeId 主题id
+     */
+    @Override
+    public void upgradeTheme(Long themeId) {
+        // 判断主题是否存在
+        Theme dbTheme = baseMapper.selectById(themeId);
+        ThrowUtils.throwIfNull(dbTheme, BaseErrorCode.ECOREA001);
+        // 只允许升级用户主题
+        ThrowUtils.throwIf(!ThemeOwnerType.USER.equals(dbTheme.getOwnerType()), ThemeErrorCode.ETHEMA005);
+        baseMapper.upgradeTheme(themeId);
     }
 
     /**
