@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 主题封面
+ * 主题页面
  *
  * @author SunTao
  * @since 2026-06-14
@@ -19,7 +19,7 @@ public class ThemePage extends BaseEntity {
     private static final long serialVersionUID = -4769835795977810805L;
 
     /**
-     * 主题封面id
+     * 主题页面id
      */
     @TableId
     private Long id;
@@ -35,7 +35,7 @@ public class ThemePage extends BaseEntity {
     private Long pageId;
 
     /**
-     * 封面地址
+     * 页面预览图
      */
     private String pageCover;
 }

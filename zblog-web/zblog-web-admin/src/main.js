@@ -53,6 +53,11 @@ VMdEditor.use(githubTheme, {
 })
 Vue.use(VMdEditor)
 
+// 页面插画
+Vue.prototype.$assets = {
+  nodata: require('@/assets/gallery/v1/nodata.png')
+}
+
 // 加载插件
 Vue.use(perm)
 Vue.use(checkPerm)

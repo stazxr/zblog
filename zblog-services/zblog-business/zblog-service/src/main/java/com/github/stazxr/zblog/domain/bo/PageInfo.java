@@ -30,7 +30,7 @@ public class PageInfo {
     private String pageLabel;
 
     /**
-     * 封面地址
+     * 页面预览图
      */
     private String pageCover;
 }

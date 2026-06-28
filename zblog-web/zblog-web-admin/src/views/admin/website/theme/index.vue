@@ -48,6 +48,8 @@
               <el-dropdown-item v-if="canUpgradeTheme" command="upgradeTheme">转为系统主题</el-dropdown-item>
               <el-dropdown-item v-if="canSetDefault" command="defaultTheme">设为默认</el-dropdown-item>
               <el-dropdown-item v-if="canCancelDefault" command="cancelDefaultTheme">取消默认</el-dropdown-item>
+              <el-dropdown-item divided command="showPageConfig">页面预览</el-dropdown-item>
+              <el-dropdown-item command="editPageConfig">页面配置</el-dropdown-item>
               <el-dropdown-item divided command="delete">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -272,6 +274,12 @@ export default {
         case 'cancelDefaultTheme':
           this.cancelDefault()
           break
+        case 'showPageConfig':
+          this.showPageConfig()
+          break
+        case 'editPageConfig':
+          this.editPageConfig()
+          break
         case 'delete':
           this.deletePage()
           break
@@ -439,6 +447,24 @@ export default {
           this.$message.success(res.message)
           this.listTableData()
         })
+      })
+    },
+    // 查看页面配置
+    showPageConfig() {
+      this.$router.push({
+        path: `/website/theme/config/${this.row.id}`,
+        query: {
+          mode: 'view'
+        }
+      })
+    },
+    // 编辑页面配置
+    editPageConfig() {
+      this.$router.push({
+        path: `/website/theme/config/${this.row.id}`,
+        query: {
+          mode: 'edit'
+        }
       })
     },
     // 删除

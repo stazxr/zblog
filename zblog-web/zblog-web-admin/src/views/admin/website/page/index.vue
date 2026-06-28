@@ -37,6 +37,13 @@
       >
         <el-table-column :show-overflow-tooltip="true" prop="pageName" label="页面名称" align="center" />
         <el-table-column :show-overflow-tooltip="true" prop="pageLabel" label="页面标识" align="center" />
+        <el-table-column label="展示模式" align="center">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.displayMode === 'BANNER'" type="primary">顶部横幅</el-tag>
+            <el-tag v-else-if="scope.row.displayMode === 'FULL'" type="primary">全屏背景</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="pageSort" label="页面排序" align="center" width="100px" />
         <el-table-column :show-overflow-tooltip="true" prop="createUsername" label="创建用户" align="center" width="120px" />
         <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="160px" />

@@ -7,6 +7,8 @@ import com.github.stazxr.zblog.content.ext.domain.dto.query.PageQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Page;
 import com.github.stazxr.zblog.content.ext.domain.vo.PageVo;
 
+import java.util.List;
+
 /**
  * 页面管理业务层
  *
@@ -21,6 +23,14 @@ public interface PageService extends IService<Page> {
      * @return IPage<PageVo>
      */
     IPage<PageVo> queryPageListByPage(PageQueryDto queryDto);
+
+    /**
+     * 查询页面列表
+     *
+     * @param queryDto 查询参数
+     * @return List<PageVo>
+     */
+    List<PageVo> queryPageList(PageQueryDto queryDto);
 
     /**
      * 查询页面详情

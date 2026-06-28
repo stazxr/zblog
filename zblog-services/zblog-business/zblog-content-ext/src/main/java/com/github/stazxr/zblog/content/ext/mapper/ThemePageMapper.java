@@ -14,6 +14,11 @@ import java.util.List;
  * @since 2026-06-14
  */
 public interface ThemePageMapper extends BaseMapper<ThemePage> {
+    /**
+     * 根据主题id删除页面配置
+     *
+     * @param themeId 主题id
+     */
     void deleteByThemeId(@Param("themeId") Long themeId);
 
     /**
@@ -23,4 +28,12 @@ public interface ThemePageMapper extends BaseMapper<ThemePage> {
      * @return List<ThemePageVo>
      */
     List<ThemePageVo> selectThemePage(@Param("themeId") Long themeId);
+
+    /**
+     * 查询主题页面详情
+     *
+     * @param themePageId 主题页面id
+     * @return ThemePageVo
+     */
+    ThemePageVo selectThemePageDetail(@Param("themePageId") Long themePageId);
 }

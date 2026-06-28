@@ -13,10 +13,14 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="页面序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="页面名称"> {{ dataInfo.pageName }} </el-descriptions-item>
         <el-descriptions-item label="页面编码"> {{ dataInfo.pageLabel }} </el-descriptions-item>
         <el-descriptions-item label="页面排序"> {{ dataInfo.pageSort }} </el-descriptions-item>
+        <el-descriptions-item label="展示模式">
+          <el-tag v-if="dataInfo.displayMode === 'BANNER'" type="primary">顶部横幅</el-tag>
+          <el-tag v-else-if="dataInfo.displayMode === 'FULL'" type="primary">全屏背景</el-tag>
+          <span v-else> - </span>
+        </el-descriptions-item>
         <!-- 2 -->
         <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
         <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
@@ -42,6 +46,7 @@ export default {
         id: '',
         pageName: '',
         pageLabel: '',
+        displayMode: '',
         pageSort: '',
         createUsername: '',
         createTime: '',

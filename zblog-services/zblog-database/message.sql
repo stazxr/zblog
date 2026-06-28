@@ -234,6 +234,36 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 会话相关
 ('SESSION_FORBID_KICK_OUT_SELF', 'zh-CN', '无法踢出自己', 'common'),
 ('SESSION_FORBID_KICK_OUT_SELF', 'en-US', 'Can not kick out self', 'common'),
+-- 页面
+('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
+('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'zh-CN', '页面标签不能为空', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'en-US', 'Page label cannot be blank', 'common'),
+('PAGE_DISPLAYMODE_REQUIRED', 'zh-CN', '页面展示模式不能为空', 'common'),
+('PAGE_DISPLAYMODE_REQUIRED', 'en-US', 'Page displayMode cannot be blank', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'zh-CN', '页面标签已存在', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common'),
+-- 主题
+('THEME_THEMENAME_REQUIRED', 'zh-CN', '主题名称不能为空', 'common'),
+('THEME_THEMENAME_REQUIRED', 'en-US', 'Theme name cannot be blank', 'common'),
+('THEME_THEMENAME_EXISTS', 'zh-CN', '主题名称已存在', 'common'),
+('THEME_THEMENAME_EXISTS', 'en-US', 'Theme name exist', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'zh-CN', '主题类型不能为空', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common'),
+('THEME_PAGE_REQUIRED', 'zh-CN', '请上传页面预览图', 'common'),
+('THEME_PAGE_REQUIRED', 'en-US', 'Theme page cannot be blank', 'common'),
+('THEME_PAGEID_REQUIRED', 'zh-CN', '请选择页面', 'common'),
+('THEME_PAGEID_REQUIRED', 'en-US', 'Theme pageId cannot be blank', 'common'),
+('THEME_STATUS_REQUIRED', 'zh-CN', '主题状态不能为空', 'common'),
+('THEME_STATUS_REQUIRED', 'en-US', 'Theme status cannot be blank', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'zh-CN', '只允许修改用户主题状态', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'en-US', 'Only user theme status can be modified', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'zh-CN', '只允许修改系统主题状态', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'en-US', 'Only system theme status can be modified', 'common'),
+('THEME_ONLY_OWN_THEME', 'zh-CN', '只允许操作自己创建的主题', 'common'),
+('THEME_ONLY_OWN_THEME', 'en-US', 'Only your own themes can be operated', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'zh-CN', '只允许升级用户主题', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'en-US', 'Only user themes can be upgraded', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),
@@ -270,34 +300,4 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common'),
 -- 文章
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
-('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common'),
--- 栏目
-
--- 友链
-
--- 页面
-('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
-('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),
-('PAGE_PAGELABEL_REQUIRED', 'zh-CN', '页面标签不能为空', 'common'),
-('PAGE_PAGELABEL_REQUIRED', 'en-US', 'Page label cannot be blank', 'common'),
-('PAGE_PAGELABEL_EXISTS', 'zh-CN', '页面标签已存在', 'common'),
-('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common'),
--- 主题
-('THEME_THEMENAME_REQUIRED', 'zh-CN', '主题名称不能为空', 'common'),
-('THEME_THEMENAME_REQUIRED', 'en-US', 'Theme name cannot be blank', 'common'),
-('THEME_THEMENAME_EXISTS', 'zh-CN', '主题名称已存在', 'common'),
-('THEME_THEMENAME_EXISTS', 'en-US', 'Theme name exist', 'common'),
-('THEME_THEMETYPE_REQUIRED', 'zh-CN', '主题类型不能为空', 'common'),
-('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common'),
-('THEME_ID_REQUIRED', 'zh-CN', '主题ID不能为空', 'common'),
-('THEME_ID_REQUIRED', 'en-US', 'Theme id cannot be blank', 'common'),
-('THEME_STATUS_REQUIRED', 'zh-CN', '主题状态不能为空', 'common'),
-('THEME_STATUS_REQUIRED', 'en-US', 'Theme status cannot be blank', 'common'),
-('THEME_ONLY_USER_THEME_STATUS', 'zh-CN', '只允许修改用户主题状态', 'common'),
-('THEME_ONLY_USER_THEME_STATUS', 'en-US', 'Only user theme status can be modified', 'common'),
-('THEME_ONLY_SYSTEM_THEME_STATUS', 'zh-CN', '只允许修改系统主题状态', 'common'),
-('THEME_ONLY_SYSTEM_THEME_STATUS', 'en-US', 'Only system theme status can be modified', 'common'),
-('THEME_ONLY_OWN_THEME', 'zh-CN', '只允许操作自己创建的主题', 'common'),
-('THEME_ONLY_OWN_THEME', 'en-US', 'Only your own themes can be operated', 'common'),
-('THEME_ONLY_USER_THEME_UPGRADE', 'zh-CN', '只允许升级用户主题', 'common'),
-('THEME_ONLY_USER_THEME_UPGRADE', 'en-US', 'Only user themes can be upgraded', 'common');
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common');

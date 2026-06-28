@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.content.ext.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
+import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.content.ext.domain.dto.PageDto;
@@ -18,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 页面管理
@@ -44,6 +47,20 @@ public class PageController {
     @Router(name = "分页查询页面列表", code = "PAGEQ001")
     public IPage<PageVo> queryPageListByPage(PageQueryDto queryDto) {
         return pageService.queryPageListByPage(queryDto);
+    }
+
+    /**
+     * 查询页面列表
+     *
+     * @param queryDto 查询参数
+     * @return List<PageVo>
+     */
+    @GetMapping(value = "/list")
+    @ApiOperation(value = "查询页面列表（公共）")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询页面列表（公共）", code = "PAGEQ003", level = RouterLevel.PUBLIC)
+    public List<PageVo> queryPageList(PageQueryDto queryDto) {
+        return pageService.queryPageList(queryDto);
     }
 
     /**

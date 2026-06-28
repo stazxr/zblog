@@ -8,6 +8,10 @@ export default {
   pagePageList: params => {
     return api.httpRequest().get(`${pageApi}/pageList`, params)
   },
+  // 查询页面列表（公共）
+  pageList: params => {
+    return api.httpRequest().get(`${pageApi}/list`, params)
+  },
   // 查询页面详情
   queryPageDetail: params => {
     return api.httpRequest().get(`${pageApi}/queryPageDetail`, params)

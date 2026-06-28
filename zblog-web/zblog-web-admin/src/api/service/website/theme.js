@@ -39,5 +39,27 @@ export default {
     return api.httpRequest().post(`${themeApi}/deleteTheme`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
+  },
+  // 查询主题页面配置列表
+  queryThemePageList: params => {
+    return api.httpRequest().get(`${themeApi}/queryThemePageList`, params)
+  },
+  // 查询主题页面详情
+  queryThemePageDetail: params => {
+    return api.httpRequest().get(`${themeApi}/queryThemePageDetail`, params)
+  },
+  // 新增主题页面
+  addThemePage: params => {
+    return api.httpRequest().post(`${themeApi}/addThemePage`, params)
+  },
+  // 编辑主题页面
+  editThemePage: params => {
+    return api.httpRequest().post(`${themeApi}/editThemePage`, params)
+  },
+  // 删除主题页面
+  deleteThemePage: params => {
+    return api.httpRequest().post(`${themeApi}/deleteThemePage`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   }
 }

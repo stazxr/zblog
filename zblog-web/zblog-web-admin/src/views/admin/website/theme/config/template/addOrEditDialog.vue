@@ -8,28 +8,15 @@
       :close-on-press-escape="true"
       :before-close="handleClose"
       append-to-body
-      width="530px"
+      width="520px"
     >
-      <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="100px">
-        <el-form-item label="主题名称" prop="themeName">
-          <el-input v-model="formData.themeName" :style="isMobile ? '' : 'width: 360px;'" maxlength="50" show-word-limit />
-        </el-form-item>
-        <el-form-item label="主题类型" prop="themeType">
-          <el-select v-model="formData.themeType" placeholder="主题类型" :disabled="formData.id != null" :style="isMobile ? '' : 'width: 360px;'">
-            <el-option v-for="item in themeTypeEnums" :key="item.value" :label="item.name" :value="item.value" />
+      <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
+        <el-form-item label="页面名称" prop="pageId">
+          <el-select v-model="formData.pageId" :style="isMobile ? '' : 'width: 360px;'" placeholder="请选择页面">
+            <el-option v-for="item in pageList" :key="item.id" :label="item.pageName + '（' + item.pageLabel + '）'" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="主题描述" prop="description">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            rows="4"
-            maxlength="200"
-            show-word-limit
-            :style="isMobile ? '' : 'width: 360px;'"
-          />
-        </el-form-item>
-        <el-form-item label="主题预览图" prop="previewCover">
+        <el-form-item label="页面封面" prop="pageCover">
           <el-upload
             ref="upload"
             name="file"
@@ -42,13 +29,13 @@
             :on-error="handleError"
             :on-success="handleSuccess"
           >
-            <i v-if="formData.previewCover === null" class="el-icon-upload" />
-            <div v-if="formData.previewCover === null" class="el-upload__text">
+            <i v-if="formData.pageCover === null" class="el-icon-upload" />
+            <div v-if="formData.pageCover === null" class="el-upload__text">
               将文件拖到此处，或<em>点击上传</em>
             </div>
-            <img v-else :src="formData.previewCover" width="360px" height="180px" alt="">
+            <img v-else :src="formData.pageCover" width="360px" height="180px" alt="">
           </el-upload>
-          <el-button v-if="formData.previewCover !== null" type="danger" @click="removeImg">清除图片</el-button>
+          <el-button v-if="formData.pageCover !== null" type="danger" @click="removeImg">清除图片</el-button>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -74,25 +61,21 @@ export default {
   data() {
     return {
       submitLoading: false,
-      themeTypeEnums: [
-        { name: '移动端', value: 'MOBILE' },
-        { name: 'PC端', value: 'PC' }
-      ],
       showImgUpload: false,
+      pageList: [],
       formData: {
         id: null,
-        themeName: null,
-        themeType: null,
-        previewCover: null,
-        previewCoverId: null,
-        description: null
+        themeId: null,
+        pageId: null,
+        pageCover: null,
+        pageCoverId: null
       },
       formRules: {
-        themeName: [
-          { required: true, message: '请输入主题名称', trigger: 'blur' }
+        pageId: [
+          { required: true, message: '请选择页面', trigger: 'change' }
         ],
-        themeType: [
-          { required: true, message: '请选择主题类型', trigger: 'change' }
+        pageCover: [
+          { required: true, message: '请上传页面封面', trigger: 'blur' }
         ]
       }
     }
@@ -103,21 +86,33 @@ export default {
     }
   },
   methods: {
-    initData(dataId) {
-      this.$nextTick(() => {
-        if (dataId != null && dataId !== '') {
-          this.queryDetail(dataId)
-        }
-      })
-    },
-    queryDetail(dataId) {
-      this.$mapi.theme.queryThemeDetail({ themeId: dataId }).then(res => {
-        const { data } = res
-        Object.keys(this.formData).forEach(key => {
-          this.formData[key] = data[key]
+    initData(themeId, dataId) {
+      this.formData.themeId = themeId
+      if (dataId != null && dataId !== '') {
+        this.$nextTick(() => {
+          this.getThemePageDetail(dataId)
         })
+      }
+      this.loadPageList()
+    },
+    getThemePageDetail(dataId) {
+      if (dataId != null && dataId !== '') {
+        this.$mapi.theme.queryThemePageDetail({ themePageId: dataId }).then(res => {
+          const { data } = res
+          Object.keys(this.formData).forEach(key => {
+            this.formData[key] = data[key]
+          })
+        }).catch(_ => {
+          this.doClose()
+        })
+      }
+    },
+    loadPageList() {
+      this.$mapi.page.pageList().then(res => {
+        const { data } = res
+        this.pageList = data
       }).catch(_ => {
-        setTimeout(() => { this.doClose() }, 500)
+        this.pageList = []
       })
     },
     beforeUpload(file) {
@@ -155,8 +150,8 @@ export default {
       if (response.code === '000000000') {
         // success
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          this.formData.previewCoverId = response.data[0]['fileId']
-          this.formData.previewCover = response.data[0]['fileAccessUrL']
+          this.formData.pageCoverId = response.data[0]['fileId']
+          this.formData.pageCover = response.data[0]['fileAccessUrL']
         }
 
         this.$message.success('上传成功')
@@ -166,8 +161,8 @@ export default {
       }
     },
     removeImg() {
-      this.formData.previewCoverId = null
-      this.formData.previewCover = null
+      this.formData.pageCoverId = null
+      this.formData.pageCover = null
     },
     submit() {
       this.$refs.addOrEditForm.validate((valid) => {
@@ -175,7 +170,7 @@ export default {
           this.submitLoading = true
           if (this.formData.id == null || this.formData.id === '') {
             // add
-            this.$mapi.theme.addTheme(this.formData).then(res => {
+            this.$mapi.theme.addThemePage(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
@@ -183,7 +178,7 @@ export default {
             })
           } else {
             // edit
-            this.$mapi.theme.editTheme(this.formData).then(res => {
+            this.$mapi.theme.editThemePage(this.formData).then(res => {
               this.$message.success(res.message)
               this.doClose(true)
             }).finally(_ => {
@@ -206,11 +201,10 @@ export default {
     doClose(result = false) {
       this.formData = {
         id: null,
-        themeName: null,
-        themeType: null,
-        previewCover: null,
-        previewCoverId: null,
-        description: null
+        themeId: null,
+        pageId: null,
+        pageCover: null,
+        pageCoverId: null
       }
       this.$refs.addOrEditForm.resetFields()
       this.showImgUpload = false
@@ -221,8 +215,6 @@ export default {
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-::v-deep .el-input-number .el-input__inner {
-  text-align: left;
-}
+<style lang="scss" scoped>
+
 </style>

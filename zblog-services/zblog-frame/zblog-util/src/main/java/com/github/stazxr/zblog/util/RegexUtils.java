@@ -109,5 +109,14 @@ public class RegexUtils {
          * ${变量}正则表达式
          */
         public static final String DOLLAR_VARIATE_REGEX = "\\$\\{[^}]+\\}";
+
+        /**
+         * 前端路由正则表达式
+         * article
+         * article/config
+         * article/config/:articleId
+         * article/:id
+         */
+        public static final String ROUTE_REGEX = "^[A-Za-z][A-Za-z0-9_-]*(/[A-Za-z][A-Za-z0-9_-]*|/:[A-Za-z][A-Za-z0-9_]*)*$";
     }
 }

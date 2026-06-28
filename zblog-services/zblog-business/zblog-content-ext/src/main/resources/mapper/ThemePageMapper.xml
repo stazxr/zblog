@@ -3,14 +3,22 @@
 <mapper namespace="com.github.stazxr.zblog.content.ext.mapper.ThemePageMapper">
     <select id="selectThemePage" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo">
         SELECT
-            tp.ID, tp.THEME_ID, tp.PAGE_ID, p.PAGE_NAME, p.PAGE_LABEL, tp.PAGE_COVER
-        FROM page p
-        LEFT JOIN theme_page tp on p.ID = tp.PAGE_ID
+            tp.ID, tp.THEME_ID, tp.PAGE_ID, tp.PAGE_COVER, p.PAGE_NAME, p.PAGE_LABEL, p.DISPLAY_MODE
+        FROM theme_page tp
+        LEFT JOIN page p on p.ID = tp.PAGE_ID
         WHERE tp.THEME_ID = #{themeId}
         ORDER BY p.PAGE_SORT
     </select>
 
-    <select id="deleteByThemeId">
+    <select id="selectThemePageDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo">
+        SELECT
+            tp.ID, tp.THEME_ID, tp.PAGE_ID, tp.PAGE_COVER, p.PAGE_NAME, p.PAGE_LABEL, p.DISPLAY_MODE
+        FROM theme_page tp
+        LEFT JOIN page p on p.ID = tp.PAGE_ID
+        WHERE tp.ID = #{themePageId}
+    </select>
 
+    <select id="deleteByThemeId">
+        DELETE FROM theme_page WHERE THEME_ID = #{themeId}
     </select>
 </mapper>

@@ -227,7 +227,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             // 参数校验
             String routerPath = permission.getRouterPath();
             ThrowUtils.throwIfBlank(routerPath, PermErrorCode.EPERMA002);
-            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), PermErrorCode.EPERMA003);
+            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.ROUTE_REGEX), PermErrorCode.EPERMA003);
             ThrowUtils.throwIf(checkRouterPathExist(permission), PermErrorCode.EPERMA004);
             ThrowUtils.throwIfNull(permission.getHidden(), PermErrorCode.EPERMA000);
             // 上级信息校验，要求上级只能是目录
@@ -241,7 +241,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
             String routerPath = permission.getRouterPath();
             ThrowUtils.throwIfBlank(routerPath, PermErrorCode.EPERMA002);
-            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.LETTER_REGEX), PermErrorCode.EPERMA003);
+            ThrowUtils.throwIf(!routerPath.matches(RegexUtils.Regex.ROUTE_REGEX), PermErrorCode.EPERMA003);
             ThrowUtils.throwIf(checkRouterPathExist(permission), PermErrorCode.EPERMA004);
             if (permission.getPermCode() != null) {
                 ThrowUtils.throwIf(checkPermCodeExist(permission), PermErrorCode.EPERMA008);

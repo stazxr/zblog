@@ -1,10 +1,10 @@
 import MusesSearchForm from './components/search-form/index.js'
 import MusesSearchFormItem from './components/search-form-item/index.js'
 import MusesPagination from './components/pagination/index.js'
+import MusesEmpty from './components/empty/index.js'
 
 const components = [
-  MusesSearchForm, MusesSearchFormItem,
-  MusesPagination
+  MusesSearchForm, MusesSearchFormItem, MusesPagination, MusesEmpty
 ]
 
 const install = function(vue) {
@@ -21,5 +21,6 @@ export default {
   install,
   MusesSearchForm,
   MusesSearchFormItem,
-  MusesPagination
+  MusesPagination,
+  MusesEmpty
 }

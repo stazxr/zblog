@@ -17,6 +17,11 @@
         <el-form-item label="页面标识" prop="pageLabel">
           <el-input v-model="formData.pageLabel" :style="isMobile ? '' : 'width: 380px;'" maxlength="25" show-word-limit />
         </el-form-item>
+        <el-form-item label="展示模式" prop="displayMode">
+          <el-select v-model="formData.displayMode" :style="isMobile ? '' : 'width: 380px;'" placeholder="展示模式">
+            <el-option v-for="item in displayModeList" :key="item.value" :label="item.name" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="页面排序" prop="pageSort">
           <el-input-number v-model.number="formData.pageSort" :min="0" :max="99999" :style="isMobile ? '' : 'width: 380px;'" step-strictly controls-position="right" />
         </el-form-item>
@@ -44,10 +49,12 @@ export default {
   data() {
     return {
       submitLoading: false,
+      displayModeList: [],
       formData: {
         id: null,
         pageName: null,
         pageLabel: null,
+        displayMode: 'BANNER',
         pageSort: 99999
       },
       formRules: {
@@ -56,6 +63,9 @@ export default {
         ],
         pageLabel: [
           { required: true, message: '请输入页面标识', trigger: 'blur' }
+        ],
+        displayMode: [
+          { required: true, message: '请选择页面展示模式', trigger: 'change' }
         ],
         pageSort: [
           { required: true, message: '请选择页面排序', trigger: 'change' }
@@ -75,6 +85,7 @@ export default {
           this.getPageDetail(dataId)
         })
       }
+      this.loadDisplayModeList()
     },
     getPageDetail(dataId) {
       this.$mapi.page.queryPageDetail({ pageId: dataId }).then(res => {
@@ -84,6 +95,14 @@ export default {
         })
       }).catch(_ => {
         this.doClose()
+      })
+    },
+    loadDisplayModeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'PAGE_DISPLAY_MODE_CONFIG' }).then(res => {
+        const { data } = res
+        this.displayModeList = data
+      }).catch(_ => {
+        this.displayModeList = []
       })
     },
     submit() {
@@ -125,6 +144,7 @@ export default {
         id: null,
         pageName: null,
         pageLabel: null,
+        displayMode: 'BANNER',
         pageSort: 99999
       }
       this.$refs.addOrEditForm.resetFields()

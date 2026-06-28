@@ -13,10 +13,14 @@ import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.content.domain.enums.ServiceUploadBusinessType;
 import com.github.stazxr.zblog.content.ext.converter.ThemeConverter;
+import com.github.stazxr.zblog.content.ext.converter.ThemePageConverter;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.ThemePageDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeStatusDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemePageQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Theme;
+import com.github.stazxr.zblog.content.ext.domain.entity.ThemePage;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeOwnerType;
 import com.github.stazxr.zblog.content.ext.domain.error.ThemeErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
@@ -43,6 +47,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements ThemeService {
     private final ThemeConverter themeConverter;
+
+    private final ThemePageConverter themePageConverter;
 
     private final ThemePageMapper themePageMapper;
 
@@ -135,12 +141,12 @@ public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements
         // 检查图片
         if (themeDto.getPreviewCoverId() != null) {
             if (StringUtils.isBlank(dbTheme.getPreviewCover()) || !dbTheme.getPreviewCover().equals(theme.getPreviewCover())) {
-                deleteThemePage(theme.getId());
+                deleteThemeImage(theme.getId());
                 insertThemeImage(theme.getId(), themeDto.getPreviewCoverId());
             }
         } else {
             if (StringUtils.isBlank(themeDto.getPreviewCover())) {
-                deleteThemePage(theme.getId());
+                deleteThemeImage(theme.getId());
             }
         }
         // 编辑主题
@@ -222,7 +228,95 @@ public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements
         ThrowUtils.throwIfNull(dbTheme, BaseErrorCode.ECOREA001);
         // 删除主题
         ThrowUtils.when(!removeById(themeId)).system(BaseErrorCode.SCOREA003);
+        deleteThemeImage(themeId);
+        List<ThemePageVo> themePageVos = themePageMapper.selectThemePage(themeId);
+        for (ThemePageVo themePageVo : themePageVos) {
+            deleteThemePageImage(themePageVo.getId());
+        }
         themePageMapper.deleteByThemeId(themeId);
+    }
+
+    /**
+     * 查询主题页面配置列表
+     *
+     * @param queryDto 查询参数
+     * @return List<ThemePageVo>
+     */
+    @Override
+    public List<ThemePageVo> queryThemePageList(ThemePageQueryDto queryDto) {
+        return themePageMapper.selectThemePage(queryDto.getThemeId());
+    }
+
+    /**
+     * 查询主题页面详情
+     *
+     * @param themePageId 主题页面id
+     * @return ThemePageVo
+     */
+    @Override
+    public ThemePageVo queryThemePageDetail(Long themePageId) {
+        ThemePageVo themePageVo = themePageMapper.selectThemePageDetail(themePageId);
+        return ThrowUtils.requireNonNull(themePageVo, BaseErrorCode.ECOREA001);
+    }
+
+    /**
+     * 新增主题页面
+     *
+     * @param themePageDto 主题页面信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addThemePage(ThemePageDto themePageDto) {
+        // 获取主题页面信息
+        ThemePage themePage = themePageConverter.dtoToEntity(themePageDto);
+        // 新增时，不允许传入 ThemePageId
+        ThrowUtils.when(themePageDto.getId() != null).system(BaseErrorCode.SCOREB001);
+        // 检查图片
+        ThrowUtils.throwIfNull(themePageDto.getPageCoverId(), ThemeErrorCode.ETHEMA006);
+        Long themePageId = SequenceUtils.getId();
+        insertThemePageImage(themePageId, themePageDto.getPageCoverId());
+        themePage.setId(themePageId);
+        // 新增主题页面
+        ThrowUtils.when(themePageMapper.insert(themePage) != 1).system(BaseErrorCode.SCOREA001);
+    }
+
+    /**
+     * 编辑主题页面
+     *
+     * @param themePageDto 主题页面信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editThemePage(ThemePageDto themePageDto) {
+        // 获取主题页面信息
+        ThemePage themePage = themePageConverter.dtoToEntity(themePageDto);
+        // 判断主题页面是否存在
+        ThemePage dbThemePage = themePageMapper.selectById(themePage.getId());
+        ThrowUtils.throwIfNull(dbThemePage, BaseErrorCode.ECOREA001);
+        // 检查图片
+        ThrowUtils.throwIfBlank(themePageDto.getPageCover(), ThemeErrorCode.ETHEMA006);
+        if (themePageDto.getPageCoverId() != null) {
+            deleteThemePageImage(themePage.getId());
+            insertThemePageImage(themePage.getId(), themePageDto.getPageCoverId());
+        }
+        // 编辑主题页面
+        ThrowUtils.when(themePageMapper.updateById(themePage) != 1).system(BaseErrorCode.SCOREA002);
+    }
+
+    /**
+     * 删除主题页面
+     *
+     * @param themePageId 主题页面id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteThemePage(Long themePageId) {
+        // 判断主题页面是否存在
+        ThemePage dbThemePage = themePageMapper.selectById(themePageId);
+        ThrowUtils.throwIfNull(dbThemePage, BaseErrorCode.ECOREA001);
+        // 删除主题页面
+        ThrowUtils.when(themePageMapper.deleteById(themePageId) != 1).system(BaseErrorCode.SCOREA003);
+        deleteThemePageImage(themePageId);
     }
 
     private void checkTheme(Theme theme) {
@@ -238,9 +332,22 @@ public class ThemeServiceImpl extends ServiceImpl<ThemeMapper, Theme> implements
         fileRelationMapper.insert(fileRelation);
     }
 
-    private void deleteThemePage(Long themeId) {
+    private void deleteThemeImage(Long themeId) {
         fileMapper.deleteByBusinessInfo(themeId, ServiceUploadBusinessType.THEME_IMG);
         fileRelationMapper.deleteByBusinessInfo(themeId, ServiceUploadBusinessType.THEME_IMG);
+    }
+
+    private void insertThemePageImage(Long themePageId, Long pageCoverId) {
+        FileRelation fileRelation = new FileRelation();
+        fileRelation.setFileId(pageCoverId);
+        fileRelation.setBusinessId(themePageId);
+        fileRelation.setBusinessType(ServiceUploadBusinessType.THEME_PAGE_IMG);
+        fileRelationMapper.insert(fileRelation);
+    }
+
+    private void deleteThemePageImage(Long themePageId) {
+        fileMapper.deleteByBusinessInfo(themePageId, ServiceUploadBusinessType.THEME_PAGE_IMG);
+        fileRelationMapper.deleteByBusinessInfo(themePageId, ServiceUploadBusinessType.THEME_PAGE_IMG);
     }
 
     private boolean checkThemeNameExist(Theme theme) {

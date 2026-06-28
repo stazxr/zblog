@@ -7,21 +7,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 主题封面信息
+ * 主题页面信息
  *
  * @author SunTao
  * @since 2026-06-14
  */
 @Getter
 @Setter
-@ApiModel("主题封面VO")
+@ApiModel("主题页面VO")
 public class ThemePageVo extends BaseVo {
     private static final long serialVersionUID = 1491930301706205484L;
 
     /**
-     * 主题封面id
+     * 主题页面id
      */
-    @ApiModelProperty("主题封面id")
+    @ApiModelProperty("主题页面id")
     private Long id;
 
     /**
@@ -49,8 +49,14 @@ public class ThemePageVo extends BaseVo {
     private String pageLabel;
 
     /**
-     * 封面地址
+     * 页面展示模式
      */
-    @ApiModelProperty("封面地址")
+    @ApiModelProperty("页面展示模式")
+    private String displayMode;
+
+    /**
+     * 页面预览图
+     */
+    @ApiModelProperty("页面预览图")
     private String pageCover;
 }

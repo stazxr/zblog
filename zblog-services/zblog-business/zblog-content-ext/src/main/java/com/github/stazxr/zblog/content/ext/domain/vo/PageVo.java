@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.content.ext.domain.vo;
 
+import com.github.stazxr.zblog.content.ext.domain.enums.PageDisplayMode;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,6 +36,12 @@ public class PageVo extends BaseVo {
      */
     @ApiModelProperty("页面标签")
     private String pageLabel;
+
+    /**
+     * 页面展示模式
+     */
+    @ApiModelProperty("页面展示模式")
+    private PageDisplayMode displayMode;
 
     /**
      * 页面排序

@@ -18,6 +18,8 @@ import com.github.stazxr.zblog.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 页面管理业务实现层
  *
@@ -50,6 +52,26 @@ public class PageServiceImpl extends ServiceImpl<PageMapper, Page> implements Pa
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<PageVo> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(queryDto.getPage(), queryDto.getPageSize());
         return baseMapper.selectPageList(page, queryDto);
+    }
+
+    /**
+     * 查询页面列表
+     *
+     * @param queryDto 查询参数
+     * @return List<PageVo>
+     */
+    @Override
+    public List<PageVo> queryPageList(PageQueryDto queryDto) {
+        if (StringUtils.isNotBlank(queryDto.getPageName())) {
+            queryDto.setPageName(queryDto.getPageName().trim());
+        }
+        if (StringUtils.isNotBlank(queryDto.getPageLabel())) {
+            queryDto.setPageLabel(queryDto.getPageLabel().trim());
+        }
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<PageVo> page =
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, Integer.MAX_VALUE);
+        page.setSearchCount(false);
+        return baseMapper.selectPageList(page, queryDto).getRecords();
     }
 
     /**

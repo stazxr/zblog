@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.content.ext.domain.dto;
 
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.content.ext.domain.enums.PageDisplayMode;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -45,6 +46,13 @@ public class PageDto extends BaseDto {
     @NotBlank(groups = {Create.class, Update.class}, message = "{PAGE_PAGELABEL_REQUIRED}")
     @ApiModelProperty("页面标签")
     private String pageLabel;
+
+    /**
+     * 页面展示模式
+     */
+    @NotNull(groups = {Create.class, Update.class}, message = "{PAGE_DISPLAYMODE_REQUIRED}")
+    @ApiModelProperty("页面展示模式")
+    private PageDisplayMode displayMode;
 
     /**
      * 页面排序

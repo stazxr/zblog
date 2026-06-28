@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.content.ext.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.stazxr.zblog.content.ext.domain.enums.PageDisplayMode;
 import com.github.stazxr.zblog.core.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,11 @@ public class Page extends BaseEntity {
      * 页面标签
      */
     private String pageLabel;
+
+    /**
+     * 页面展示模式
+     */
+    private PageDisplayMode displayMode;
 
     /**
      * 页面排序

@@ -6,8 +6,11 @@ import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.ThemePageDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.ThemeStatusDto;
+import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemePageQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.ThemeQueryDto;
+import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.service.ThemeService;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -19,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 主题管理
@@ -149,5 +154,81 @@ public class ThemeController {
     @Router(name = "删除主题", code = "THEMD001")
     public void deleteTheme(@RequestParam Long themeId) {
         themeService.deleteTheme(themeId);
+    }
+
+    /**
+     * 查询主题页面配置列表
+     *
+     * @param queryDto 查询参数
+     * @return List<ThemePageVo>
+     */
+    @GetMapping(value = "/queryThemePageList")
+    @ApiOperation(value = "查询主题页面配置列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询主题页面配置列表", code = "THEMQ003")
+    public List<ThemePageVo> queryThemePageList(ThemePageQueryDto queryDto) {
+        return themeService.queryThemePageList(queryDto);
+    }
+
+    /**
+     * 查询主题页面详情
+     *
+     * @param themePageId 主题页面id
+     * @return ThemePageVo
+     */
+    @GetMapping(value = "/queryThemePageDetail")
+    @ApiOperation(value = "查询主题页面详情")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "themePageId", value = "主题页面id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询主题页面详情", code = "THEMQ004")
+    public ThemePageVo queryThemePageDetail(@RequestParam Long themePageId) {
+        return themeService.queryThemePageDetail(themePageId);
+    }
+
+    /**
+     * 新增主题页面
+     *
+     * @param themePageDto 主题页面信息
+     */
+    @Log
+    @PostMapping(value = "/addThemePage")
+    @ApiOperation(value = "新增主题页面")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "新增主题页面", code = "THEMA002")
+    public void addThemePage(@RequestBody @Validated(Create.class) ThemePageDto themePageDto) {
+        themeService.addThemePage(themePageDto);
+    }
+
+    /**
+     * 编辑主题页面
+     *
+     * @param themePageDto 主题页面信息
+     */
+    @Log
+    @PostMapping(value = "/editThemePage")
+    @ApiOperation(value = "编辑主题页面")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "编辑主题页面", code = "THEMU005")
+    public void editThemePage(@RequestBody @Validated(Update.class) ThemePageDto themePageDto) {
+        themeService.editThemePage(themePageDto);
+    }
+
+    /**
+     * 删除主题页面
+     *
+     * @param themePageId 主题页面id
+     */
+    @Log
+    @PostMapping(value = "/deleteThemePage")
+    @ApiOperation(value = "删除主题页面")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "themePageId", value = "主题页面id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "删除主题页面", code = "THEMD002")
+    public void deleteThemePage(@RequestParam Long themePageId) {
+        themeService.deleteThemePage(themePageId);
     }
 }
