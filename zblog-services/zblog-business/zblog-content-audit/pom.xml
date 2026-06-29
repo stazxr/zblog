@@ -10,21 +10,29 @@
         <version>5.0.0</version>
     </parent>
 
-    <artifactId>zblog-content</artifactId>
+    <artifactId>zblog-content-audit</artifactId>
     <packaging>jar</packaging>
-    <description>
-        博客核心内容管理模块（文章，分类，标签，专题...）
-    </description>
+
+    <name>${project.artifactId}</name>
+    <description>内容审核模块</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>sensitive-word</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+        </dependency>
         <!-- Z-BLOG Base -->
         <dependency>
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.stazxr.zblog</groupId>
-            <artifactId>zblog-content-audit</artifactId>
         </dependency>
         <!-- Springboot Configuration -->
         <dependency>

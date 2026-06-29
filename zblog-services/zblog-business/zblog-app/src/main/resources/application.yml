@@ -289,3 +289,22 @@ zblog:
     recordResult: false # 是否记录接口返回值，建议关闭以避免日志过大
     max-param-length: 5000 # 记录的最大参数长度，超过部分将被截断
     max-result-length: 5000 # 记录的最大返回长度，超过部分将被截断
+  audit:
+    enabled: true # 总开关
+    log-enabled: true # 是否开启日志
+    xss:
+      enabled: true # 是否启用XSS检测
+      replace: true # 是否清洗内容（推荐开启）
+      reject: false # 是否直接拒绝（不建议与replace同时true）
+    sensitive:
+      enabled: true # 是否启用敏感词检测
+      replace: true # 是否替换敏感词为***
+      pending: false # 是否进入人工审核
+    rule:
+      enabled: true # 是否启用规则审核
+      max-length: 500 # 最大内容长度限制
+    cloud:
+      enabled: false # 是否启用云审核（阿里云/腾讯云）
+      timeout: 3000 # 超时配置
+    manual:
+      enabled: false # 人工审核开关

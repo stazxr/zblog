@@ -1,0 +1,139 @@
+{
+  "groups": [
+    {
+      "name": "zblog.audit",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "内容审核核心配置项，用于控制XSS、敏感词、规则、云审核及人工审核流程."
+    },
+    {
+      "name": "zblog.audit.xss",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Xss",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "XSS审核配置项，用于控制脚本过滤策略."
+    },
+    {
+      "name": "zblog.audit.sensitive",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Sensitive",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "敏感词审核配置项，用于控制敏感词过滤与人工审核策略."
+    },
+    {
+      "name": "zblog.audit.rule",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Rule",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "内容规则审核配置项，用于控制长度等基础规则."
+    },
+    {
+      "name": "zblog.audit.cloud",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Cloud",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "云端内容审核配置项，用于对接第三方内容安全服务."
+    },
+    {
+      "name": "zblog.audit.manual",
+      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Manual",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "description": "人工审核配置项，用于控制是否进入人工审核流程."
+    }
+  ],
+  "properties": [
+    {
+      "name": "zblog.audit.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "defaultValue": true,
+      "description": "是否启用内容审核总开关。关闭后所有审核链路失效."
+    },
+    {
+      "name": "zblog.audit.log-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "defaultValue": true,
+      "description": "是否开启审核日志输出."
+    },
+
+    {
+      "name": "zblog.audit.xss.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Xss",
+      "defaultValue": true,
+      "description": "是否启用XSS审核处理器."
+    },
+    {
+      "name": "zblog.audit.xss.replace",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Xss",
+      "defaultValue": true,
+      "description": "命中XSS时是否进行内容清洗替换."
+    },
+    {
+      "name": "zblog.audit.xss.reject",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Xss",
+      "defaultValue": false,
+      "description": "命中XSS时是否直接拒绝请求."
+    },
+
+    {
+      "name": "zblog.audit.sensitive.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Sensitive",
+      "defaultValue": true,
+      "description": "是否启用敏感词审核."
+    },
+    {
+      "name": "zblog.audit.sensitive.replace",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Sensitive",
+      "defaultValue": true,
+      "description": "命中敏感词时是否进行替换处理."
+    },
+    {
+      "name": "zblog.audit.sensitive.pending",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Sensitive",
+      "defaultValue": false,
+      "description": "命中敏感词时是否进入人工审核流程."
+    },
+
+    {
+      "name": "zblog.audit.rule.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Rule",
+      "defaultValue": true,
+      "description": "是否启用基础规则审核."
+    },
+    {
+      "name": "zblog.audit.rule.max-length",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Rule",
+      "defaultValue": 500,
+      "description": "内容最大长度限制。超过该长度将被拒绝或截断."
+    },
+
+    {
+      "name": "zblog.audit.cloud.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Cloud",
+      "defaultValue": false,
+      "description": "是否启用云端内容审核."
+    },
+    {
+      "name": "zblog.audit.cloud.timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Cloud",
+      "defaultValue": 3000,
+      "description": "云审核请求超时时间（毫秒）."
+    },
+
+    {
+      "name": "zblog.audit.manual.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties$Manual",
+      "defaultValue": false,
+      "description": "是否启用人工审核流程."
+    }
+  ],
+  "hints": []
+}
