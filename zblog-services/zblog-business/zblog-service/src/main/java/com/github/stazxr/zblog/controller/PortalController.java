@@ -110,22 +110,6 @@
 //    }
 //
 //    /**
-//     * 弹幕留言
-//     *
-//     * @param request    请求信息
-//     * @param messageDto 留言信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/saveMessage")
-//    @ApiOperation(value = "弹幕留言")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "弹幕留言", code = "saveMessage", level = RouterLevel.OPEN)
-//    public Result recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
-//        portalService.saveMessage(request, messageDto);
-//        return Result.success();
-//    }
-//
-//    /**
 //     * 查询前台友链列表
 //     *
 //     * @return FriendLinkVo

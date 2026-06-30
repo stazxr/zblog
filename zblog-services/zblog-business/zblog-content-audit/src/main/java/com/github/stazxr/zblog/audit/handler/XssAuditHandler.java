@@ -64,6 +64,19 @@ public class XssAuditHandler implements AuditHandler {
      */
     private final AuditProperties auditProperties;
 
+    public static final Safelist SAFE_LIST = Safelist.relaxed()
+        // ❌ 移除高危标签
+        .removeTags("script", "iframe", "style", "object", "embed", "link", "meta")
+        // ✅ img 只允许安全属性（自动剔除 onerror/onload）
+        .addAttributes("img", "src", "alt", "title")
+        // ✅ a 标签限制（避免 javascript:）
+        .addAttributes("a", "href", "title", "target", "rel")
+        // ❌ 强制去掉所有事件属性（onerror/onload/onclick等）
+        .removeAttributes(":all", "onerror", "onload", "onclick", "onmouseover", "onfocus")
+        // ❌ 防 javascript: data: 这类协议
+        .addProtocols("a", "href", "http", "https", "mailto")
+        .addProtocols("img", "src", "http", "https", "data");
+
     /**
      * 获取处理器顺序。
      *
@@ -133,9 +146,26 @@ public class XssAuditHandler implements AuditHandler {
              *
              * Safelist.none() 表示不允许任何HTML标签。
              */
-            clean = Jsoup.clean(normalize, Safelist.none());
+            clean = Jsoup.clean(normalize, SAFE_LIST);
         } catch (Exception e) {
             log.error("XSS内容清洗失败，已忽略，content={}", normalize, e);
+        }
+
+        if (clean == null || clean.trim().isEmpty()) {
+            log.debug("XSS清洗后内容为空，原内容={}", content);
+
+            // 如果配置直接拒绝
+            if (auditProperties.getXss().isReject()) {
+                return AuditResult.reject("内容包含非法脚本");
+            }
+
+            // 如果配置进入人工审核
+            if (auditProperties.getSensitive().isPending()) {
+                return AuditResult.pending("清洗后字符串为空");
+            }
+
+            // 默认策略：也建议拒绝（推荐）
+            return AuditResult.reject("内容无效或包含非法内容");
         }
 
         /*

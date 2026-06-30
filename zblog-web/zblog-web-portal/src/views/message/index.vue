@@ -93,12 +93,12 @@ export default {
       }
       this.messageContent = ''
       this.barrageList.push(message)
-      // this.$mapi.portal.saveMessage(message).then(_ => {
-      //   this.barrageList.push(message)
-      //   this.$toast({ type: 'success', message: '发送成功' })
-      // }).catch(_ => {
-      //   this.$toast({ type: 'error', message: '发送失败' })
-      // })
+      this.$mapi.portal.saveMessage(message).then(_ => {
+        this.barrageList.push(message)
+        this.$toast({ type: 'success', message: '发送成功' })
+      }).catch(_ => {
+        this.$toast({ type: 'error', message: '发送失败' })
+      })
     },
     listMessage() {
       this.$mapi.portal.queryMessageList().then(({ data }) => {
