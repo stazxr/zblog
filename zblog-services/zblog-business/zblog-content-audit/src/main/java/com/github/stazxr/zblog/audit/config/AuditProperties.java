@@ -160,7 +160,7 @@ public class AuditProperties {
         private boolean replace = true;
 
         /**
-         * 是否进入人工审核
+         * 是否进入人工审核，配置为 true，当涉及敏感字后会直接进入人工审核流程，不会进入后续流程
          */
         private boolean pending = false;
 

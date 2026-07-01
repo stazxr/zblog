@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>内容审核模块</description>
+    <description>内容审核模块（先实现基本功能，慢慢打磨）</description>
 
     <dependencies>
         <dependency>
