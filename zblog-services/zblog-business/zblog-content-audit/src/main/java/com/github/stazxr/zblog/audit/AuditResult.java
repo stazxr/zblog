@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 审核结果。
+ * 审核结果
  *
  * @author SunTao
  * @since 2026-06-29

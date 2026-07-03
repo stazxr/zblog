@@ -51,6 +51,7 @@
         <hutool.version>5.8.18</hutool.version>
         <fastjson.version>2.0.32</fastjson.version>
         <jackson.version>2.13.1</jackson.version>
+        <tencentcloud.version>3.1.1493</tencentcloud.version>
         <jsch.version>0.1.55</jsch.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <poi.version>4.0.0</poi.version>
@@ -115,6 +116,12 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <!-- 腾讯云 SDK -->
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencentcloud.version}</version>
             </dependency>
             <!-- Jsch 相关工具包 -->
             <dependency>
