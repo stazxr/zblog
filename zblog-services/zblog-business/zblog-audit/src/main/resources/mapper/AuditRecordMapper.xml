@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.audit.mapper.AuditRecordMapper">
+    <resultMap id="BaseResultMap" type="com.github.stazxr.zblog.audit.model.AuditRecord">
+        <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="oid" property="oid"/>
+        <result column="scene" property="scene"/>
+        <result column="original_content" property="originalContent"/>
+        <result column="final_content" property="finalContent"/>
+        <result column="decision" property="decision"/>
+        <result column="hit_words" property="hitWords" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="traces" property="traces" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="reason" property="reason"/>
+        <result column="risk_score" property="riskScore"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="cost_ms" property="costMs"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.github.stazxr.zblog.audit.model.AuditRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO audit_record (
+            UID, OID, SCENE,
+            ORIGINAL_CONTENT, FINAL_CONTENT,
+            DECISION,
+            HIT_WORDS, REASON,
+            TRACES, COST_MS,
+            CREATE_TIME
+        ) VALUES (
+            #{uid},
+            #{oid},
+            #{scene},
+            #{originalContent},
+            #{finalContent},
+            #{decision},
+            #{hitWords, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},
+            #{reason},
+            #{traces, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},
+            #{costMs},
+            NOW()
+        )
+    </insert>
+</mapper>

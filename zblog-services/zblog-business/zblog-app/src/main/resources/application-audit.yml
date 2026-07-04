@@ -1,0 +1,19 @@
+audit:
+  processors:
+    config:
+      xssProcessor:
+        strategy: CLEAN # CLEAN / REJECT / MANUAL
+        scenes:
+          COMMENT:
+            strategy: REJECT # CLEAN / REJECT / MANUAL
+  policies:
+    DEFAULT:
+      processors:
+        - name: xssProcessor
+          order: 1
+          enabled: true
+    COMMENT:
+      processors:
+        - name: xssProcessor
+          order: 1
+          enabled: true

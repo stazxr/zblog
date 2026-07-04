@@ -6,7 +6,7 @@ spring:
   application:
     name: zblog # 应用名称
   profiles:
-    include: dev
+    include: dev,audit
   main:
     allow-bean-definition-overriding: false # 是否允许覆盖BEAN
     allow-circular-references: false # 是否允许循环依赖，不建议开启

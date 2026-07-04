@@ -1,9 +1,9 @@
 package com.github.stazxr.zblog.portal.controller;
 
-import com.github.stazxr.zblog.audit.AuditContext;
-import com.github.stazxr.zblog.audit.AuditResult;
-import com.github.stazxr.zblog.audit.model.AuditScene;
-import com.github.stazxr.zblog.audit.service.AuditService;
+import com.github.stazxr.zblog.audit.api.AuditService;
+import com.github.stazxr.zblog.audit.enums.AuditScene;
+import com.github.stazxr.zblog.audit.model.AuditContext;
+import com.github.stazxr.zblog.audit.model.AuditResult;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
@@ -43,10 +43,8 @@ public class PortalController {
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "弹幕留言", code = "saveMessage", level = RouterLevel.OPEN)
     public void recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
-        AuditContext context = new AuditContext();
-        context.setUserId(1L);
+        AuditContext context = new AuditContext(messageDto.getMessageContent(), AuditScene.COMMENT);
         context.setContent(messageDto.getMessageContent());
-        context.setScene(AuditScene.COMMENT);
         AuditResult audit = auditService.audit(context);
         System.out.println("请求结果: " + audit);
     }

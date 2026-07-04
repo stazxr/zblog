@@ -19,9 +19,9 @@
         <module>zblog-core</module>
         <module>zblog-log</module>
         <module>zblog-base</module>
+        <module>zblog-audit</module>
         <module>zblog-content</module>
         <module>zblog-content-ext</module>
-        <module>zblog-content-audit</module>
         <module>zblog-portal</module>
         <module>zblog-app</module>
         <module>zblog-service</module>
@@ -56,7 +56,7 @@
             </dependency>
             <dependency>
                 <groupId>com.github.stazxr.zblog</groupId>
-                <artifactId>zblog-content-audit</artifactId>
+                <artifactId>zblog-audit</artifactId>
                 <version>${zblog.version}</version>
             </dependency>
             <dependency>
