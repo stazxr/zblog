@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.audit.config;
 
 import com.github.stazxr.zblog.audit.config.properties.AuditProperties;
+import com.github.stazxr.zblog.audit.config.properties.SensitiveProcessorConfig;
 import com.github.stazxr.zblog.audit.config.properties.XssProcessorConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,6 @@ import org.springframework.context.annotation.Configuration;
  * @since 2026-07-04
  */
 @Configuration
-@EnableConfigurationProperties({AuditProperties.class, XssProcessorConfig.class})
+@EnableConfigurationProperties({AuditProperties.class, XssProcessorConfig.class, SensitiveProcessorConfig.class})
 public class AuditAutoConfiguration {
 }

@@ -16,6 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * XSS 审核处理器
+ *
+ * @author Sun Tao
+ * @since 2026-07-05
+ */
 @Component
 public class XssAuditProcessor extends AbstractAuditProcessor {
     private static final Logger log = LoggerFactory.getLogger(XssAuditProcessor.class);
@@ -94,7 +100,7 @@ public class XssAuditProcessor extends AbstractAuditProcessor {
                 case REJECT:
                     return reject("XSS检测命中", Collections.singletonList("XSS"));
                 case MANUAL:
-                    return manual("XSS检测命中");
+                    return manual("XSS检测命中", Collections.singletonList("XSS"));
             }
         }
 

@@ -45,12 +45,12 @@ public class AuditEngine {
      */
     public AuditResult audit(AuditContext context) {
         // ========== 1. 基础校验 ==========
-        if (context == null || context.getContent() == null) {
+        if (context == null || context.getOriginalContent() == null || context.getScene() == null) {
             throw new IllegalArgumentException("AuditContext invalid");
         }
 
         // 初始化可变内容
-        context.setContent(context.getContent());
+        context.setContent(context.getOriginalContent());
 
         // ========== 2. 策略解析 ==========
         AuditPolicyProperties policy = getPolicy(context.getScene());
@@ -101,7 +101,7 @@ public class AuditEngine {
         record.setUid(context.getUid());
         record.setOid(context.getUid());
         record.setScene(context.getScene());
-        record.setOriginalContent(context.getContent());
+        record.setOriginalContent(context.getOriginalContent());
         record.setFinalContent(result.getContent());
         record.setDecision(result.getDecision());
         record.setHitWords(result.getHitWords());

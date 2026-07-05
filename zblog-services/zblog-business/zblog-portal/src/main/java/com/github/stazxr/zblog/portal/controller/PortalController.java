@@ -43,8 +43,7 @@ public class PortalController {
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "弹幕留言", code = "saveMessage", level = RouterLevel.OPEN)
     public void recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
-        AuditContext context = new AuditContext(messageDto.getMessageContent(), AuditScene.COMMENT);
-        context.setContent(messageDto.getMessageContent());
+        AuditContext context = new AuditContext(messageDto.getMessageContent(), AuditScene.DEFAULT);
         AuditResult audit = auditService.audit(context);
         System.out.println("请求结果: " + audit);
     }

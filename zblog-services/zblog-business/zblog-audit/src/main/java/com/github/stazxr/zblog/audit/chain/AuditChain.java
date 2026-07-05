@@ -55,7 +55,7 @@ public class AuditChain {
             throw new IllegalStateException("No audit policy configured");
         }
 
-        String content = context.getOriginalContent(); // 当前处理内容（链路中会不断被修改）
+        String content = context.getContent(); // 当前处理内容（链路中会不断被修改）
         List<String> hitWords = new ArrayList<>(); // 命中词汇总
         StringBuilder reasonBuilder = new StringBuilder(); // 原因汇总（多个 Processor 叠加）
         List<ProcessorTrace> traces = new ArrayList<>(); // 执行链路追踪（用于审计 & 排查问题）

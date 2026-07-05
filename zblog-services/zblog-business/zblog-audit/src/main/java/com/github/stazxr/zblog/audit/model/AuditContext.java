@@ -35,7 +35,6 @@ public class AuditContext {
     private AuditScene scene;
 
     public AuditContext(String originalContent, AuditScene scene) {
-        this.content = originalContent;
         this.originalContent = originalContent;
         this.scene = scene;
     }

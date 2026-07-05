@@ -46,9 +46,10 @@ public abstract class AbstractAuditProcessor implements AuditProcessor {
     /**
      * MANUAL结果构建
      */
-    protected ProcessorResult manual(String reason) {
+    protected ProcessorResult manual(String reason, List<String> hitWords) {
         ProcessorResult r = new ProcessorResult();
         r.setDecision(AuditDecision.MANUAL);
+        r.setHitWords(hitWords);
         r.setReason(reason);
         return r;
     }

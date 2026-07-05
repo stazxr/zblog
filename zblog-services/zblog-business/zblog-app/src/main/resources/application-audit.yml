@@ -6,11 +6,19 @@ audit:
         scenes:
           COMMENT:
             strategy: REJECT # CLEAN / REJECT / MANUAL
+      sensitiveProcessor:
+        strategy:  # REPLACEREPLACE / REJECT / MANUAL
+        scenes:
+          COMMENT:
+            strategy: REJECT # REPLACE / REJECT / MANUAL
   policies:
     DEFAULT:
       processors:
         - name: xssProcessor
           order: 1
+          enabled: true
+        - name: sensitiveProcessor
+          order: 2
           enabled: true
     COMMENT:
       processors:

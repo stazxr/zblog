@@ -1,16 +1,16 @@
 package com.github.stazxr.zblog.audit.enums;
 
 /**
- * XSS 策略类型
+ * 敏感词策略类型
  *
  * @author SunTao
  * @since 2026-07-05
  */
-public enum XssStrategy {
+public enum SensitiveStrategy {
     /**
-     * 清洗
+     * 替换
      */
-    CLEAN,
+    REPLACE,
     /**
      * 直接拒绝
      */
