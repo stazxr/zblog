@@ -84,11 +84,11 @@ public class XssAuditProcessor extends AbstractAuditProcessor {
         }
 
         if (!normalizeRow.equals(cleanRow)) {
-            Map<String, XssStrategy> scenes = xssProcessorConfig.getScenes();
+            Map<String, XssStrategy> strategyMap = xssProcessorConfig.getStrategyMap();
             XssStrategy strategy = xssProcessorConfig.getStrategy();
             String sceneKey = context.getScene().name() + ".strategy";
-            if (scenes != null && scenes.containsKey(sceneKey)) {
-                strategy = scenes.get(sceneKey);
+            if (strategyMap != null && strategyMap.containsKey(sceneKey)) {
+                strategy = strategyMap.get(sceneKey);
             }
             if (strategy == null) {
                 strategy = DEFAULT_STRATEGY;

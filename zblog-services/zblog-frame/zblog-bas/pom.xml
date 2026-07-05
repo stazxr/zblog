@@ -139,6 +139,10 @@
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+        </dependency>
         <!-- Nimbus Jose Jwt -->
         <dependency>
             <groupId>com.nimbusds</groupId>

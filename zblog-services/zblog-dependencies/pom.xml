@@ -189,6 +189,12 @@
                 <groupId>com.qcloud</groupId>
                 <artifactId>cos_api</artifactId>
                 <version>${qcloud.cos.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.tencentcloudapi</groupId>
+                        <artifactId>tencentcloud-sdk-java-kms</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Sensitive-word：敏感词/脏词过滤 -->
             <dependency>

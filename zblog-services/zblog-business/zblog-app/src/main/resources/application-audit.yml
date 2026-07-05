@@ -1,27 +1,44 @@
 audit:
   processors:
     config:
-      xssProcessor:
-        strategy: CLEAN # CLEAN / REJECT / MANUAL
-        scenes:
+      xssProcessor: # XSS 处理器配置
+        strategy: CLEAN # 默认执行策略：CLEAN / REJECT / MANUAL
+        strategy-map: # 场景执行策略
           COMMENT:
-            strategy: REJECT # CLEAN / REJECT / MANUAL
-      sensitiveProcessor:
-        strategy:  # REPLACEREPLACE / REJECT / MANUAL
-        scenes:
+            strategy: REJECT
+      sensitiveProcessor: # 敏感词处理器配置
+        strategy: REPLACE # 默认执行策略: REPLACE / REJECT / MANUAL
+        strategy-map:
           COMMENT:
-            strategy: REJECT # REPLACE / REJECT / MANUAL
+            strategy: MANUAL # REPLACE / REJECT / MANUAL
+      tencentTmsProcessor: # TMS 处理器配置
+        enabled: ${zblog.audit.tms.enabled} # 腾讯云 TMS 是否启用
+        secretId: ${zblog.audit.tms.accessKey} # 腾讯云访问密钥 ID
+        secretKey: ${zblog.audit.tms.secretKey} # 腾讯云访问密钥 SecretKey
+        region: ${zblog.audit.tms.region} # 腾讯云 TMS 所在地域
+        endpoint: ${zblog.audit.tms.endpoint} # 腾讯云 TMS 接口地址
+        bizType: ${zblog.audit.tms.bizType} # 识别策略编号（默认）
+        connectTimeout: 1000 # 连接超时时间（毫秒）
+        readTimeout: 2000 # 读取超时时间（毫秒）
+        degradeOnFailure: true # 是否开启失败降级
+        maxTextLength: 5000 # 最大文本长度限制
   policies:
-    DEFAULT:
+    DEFAULT: # 默认策略
+      processors:
+        - name: xssProcessor # 处理器名称：xssProcessor / sensitiveProcessor / tencentTmsProcessor
+          order: 1 # 处理器执行顺序
+          enabled: true # 处理器是否启用
+        - name: sensitiveProcessor
+          order: 2
+          enabled: true
+        - name: tencentTmsProcessor
+          order: 3
+          enabled: true
+    COMMENT: # 评论
       processors:
         - name: xssProcessor
           order: 1
           enabled: true
         - name: sensitiveProcessor
           order: 2
-          enabled: true
-    COMMENT:
-      processors:
-        - name: xssProcessor
-          order: 1
           enabled: true

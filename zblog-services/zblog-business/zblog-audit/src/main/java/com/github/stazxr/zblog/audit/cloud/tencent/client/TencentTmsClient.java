@@ -1,10 +1,12 @@
 package com.github.stazxr.zblog.audit.cloud.tencent.client;
 
-import com.github.stazxr.zblog.audit.cloud.tencent.config.TencentTmsProperties;
+import com.github.stazxr.zblog.audit.config.properties.TencentTmsProcessorProperties;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.tms.v20201229.TmsClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,14 +19,16 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class TencentTmsClient {
-    private final TencentTmsProperties properties;
+    private static final Logger log = LoggerFactory.getLogger(TencentTmsClient.class);
+
+    private final TencentTmsProcessorProperties properties;
 
     /**
      * SDK Client（线程安全，可复用）
      */
-    private TmsClient client;
+    private volatile TmsClient client;
 
-    public TencentTmsClient(TencentTmsProperties properties) {
+    public TencentTmsClient(TencentTmsProcessorProperties properties) {
         this.properties = properties;
     }
 
@@ -34,39 +38,51 @@ public class TencentTmsClient {
     @PostConstruct
     public void init() {
         if (!properties.isEnabled()) {
+            log.info("TMS 内容安全审核开关关闭，跳过初始化");
             return;
         }
 
-        // Tencent Cloud Credential
-        Credential credential = new Credential(properties.getSecretId(), properties.getSecretKey());
+        try {
+            // Tencent Cloud Credential
+            Credential credential = new Credential(properties.getSecretId(), properties.getSecretKey());
 
-        // HttpProfile
-        HttpProfile httpProfile = new HttpProfile();
-        if (properties.getEndpoint() != null) {
-            // endpoint 可配置化
-            httpProfile.setEndpoint(properties.getEndpoint());
-        } else {
-            httpProfile.setEndpoint("tms.tencentcloudapi.com");
+            // HttpProfile
+            HttpProfile httpProfile = new HttpProfile();
+            if (properties.getEndpoint() != null) {
+                // endpoint 可配置化
+                httpProfile.setEndpoint(properties.getEndpoint());
+            } else {
+                httpProfile.setEndpoint("tms.tencentcloudapi.com");
+            }
+
+            // 超时控制
+            httpProfile.setConnTimeout(properties.getConnectTimeout());
+            httpProfile.setReadTimeout(properties.getReadTimeout());
+
+            // ClientProfile
+            ClientProfile clientProfile = new ClientProfile();
+            clientProfile.setHttpProfile(httpProfile);
+            this.client = new TmsClient(credential, properties.getRegion(), clientProfile);
+            log.info("TmsClient 初始化成功，region={}, endpoint={}", properties.getRegion(), httpProfile.getEndpoint());
+        } catch (Exception e) {
+            log.error("region={}", properties.getRegion());
+            log.error("endpoint={}", properties.getEndpoint());
+            log.error("TmsClient 初始化失败，会影响后续的 TMS 内容安全审核", e);
         }
-
-        // 超时控制
-        httpProfile.setConnTimeout(properties.getConnectTimeout());
-        httpProfile.setReadTimeout(properties.getReadTimeout());
-
-        // ClientProfile
-        ClientProfile clientProfile = new ClientProfile();
-        clientProfile.setHttpProfile(httpProfile);
-        this.client = new TmsClient(credential, properties.getRegion(), clientProfile);
     }
 
     /**
      * 是否可用
      */
     public boolean available() {
-        return client != null && properties.isEnabled();
+        return properties.isEnabled() && client != null;
     }
 
     public TmsClient getClient() {
-        return client;
+        if (available()) {
+            return client;
+        }
+
+        throw new IllegalStateException("TmsClient 不可用");
     }
 }

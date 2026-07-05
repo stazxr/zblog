@@ -14,14 +14,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "audit.processors.config.xss-processor")
 public class XssProcessorConfig {
     /**
-     * 默认策略
+     * 执行策略（默认）
      */
     private XssStrategy strategy;
 
     /**
-     * 按场景覆盖策略
+     * 执行策略（场景定制）
      */
-    private Map<String, XssStrategy> scenes;
+    private Map<String, XssStrategy> strategyMap;
 
     public XssStrategy getStrategy() {
         return strategy;
@@ -31,11 +31,11 @@ public class XssProcessorConfig {
         this.strategy = strategy;
     }
 
-    public Map<String, XssStrategy> getScenes() {
-        return scenes;
+    public Map<String, XssStrategy> getStrategyMap() {
+        return strategyMap;
     }
 
-    public void setScenes(Map<String, XssStrategy> scenes) {
-        this.scenes = scenes;
+    public void setStrategyMap(Map<String, XssStrategy> strategyMap) {
+        this.strategyMap = strategyMap;
     }
 }

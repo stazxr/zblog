@@ -1,7 +1,8 @@
-package com.github.stazxr.zblog.audit.cloud.tencent.config;
+package com.github.stazxr.zblog.audit.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * 腾讯云 TMS 配置属性类。
@@ -9,9 +10,8 @@ import org.springframework.stereotype.Component;
  * @author SunTao
  * @since 2026-07-03
  */
-@Component
-@ConfigurationProperties(prefix = "tencent.cloud.tms")
-public class TencentTmsProperties {
+@ConfigurationProperties(prefix = "audit.processors.config.tencent-tms-processor")
+public class TencentTmsProcessorProperties {
     /**
      * 是否启用腾讯云内容审核
      */
@@ -28,17 +28,27 @@ public class TencentTmsProperties {
     private String secretKey;
 
     /**
-     * 腾讯云服务地域（Region）
+     * 腾讯云 TMS 所在地域
      */
-    private String region = "ap-guangzhou";
+    private String region = "ap-beijing";
 
     /**
-     * TMS 接口地址
+     * 腾讯云 TMS 接口地址
      *
      * <p>默认：
      * tms.tencentcloudapi.com
      */
     private String endpoint = "tms.tencentcloudapi.com";
+
+    /**
+     * 识别策略编号（默认）
+     */
+    private String bizType;
+
+    /**
+     * 识别策略编号（场景定制）
+     */
+    private Map<String, String> bizTypeMap;
 
     /**
      * 连接超时时间（毫秒）
@@ -58,7 +68,7 @@ public class TencentTmsProperties {
     /**
      * 最大文本长度限制
      */
-    private int maxTextLength = 8000;
+    private int maxTextLength = 5000;
 
     public boolean isEnabled() {
         return enabled;
@@ -98,6 +108,22 @@ public class TencentTmsProperties {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public String getBizType() {
+        return bizType;
+    }
+
+    public void setBizType(String bizType) {
+        this.bizType = bizType;
+    }
+
+    public Map<String, String> getBizTypeMap() {
+        return bizTypeMap;
+    }
+
+    public void setBizTypeMap(Map<String, String> bizTypeMap) {
+        this.bizTypeMap = bizTypeMap;
     }
 
     public int getConnectTimeout() {

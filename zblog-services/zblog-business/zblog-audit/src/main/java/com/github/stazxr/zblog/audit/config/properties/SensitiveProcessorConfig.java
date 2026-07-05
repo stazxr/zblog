@@ -14,14 +14,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "audit.processors.config.sensitive-processor")
 public class SensitiveProcessorConfig {
     /**
-     * 默认策略
+     * 执行策略（默认）
      */
     private SensitiveStrategy strategy;
 
     /**
-     * 按场景覆盖策略
+     * 执行策略（场景定制）
      */
-    private Map<String, SensitiveStrategy> scenes;
+    private Map<String, SensitiveStrategy> strategyMap;
 
     public SensitiveStrategy getStrategy() {
         return strategy;
@@ -31,11 +31,11 @@ public class SensitiveProcessorConfig {
         this.strategy = strategy;
     }
 
-    public Map<String, SensitiveStrategy> getScenes() {
-        return scenes;
+    public Map<String, SensitiveStrategy> getStrategyMap() {
+        return strategyMap;
     }
 
-    public void setScenes(Map<String, SensitiveStrategy> scenes) {
-        this.scenes = scenes;
+    public void setStrategyMap(Map<String, SensitiveStrategy> strategyMap) {
+        this.strategyMap = strategyMap;
     }
 }

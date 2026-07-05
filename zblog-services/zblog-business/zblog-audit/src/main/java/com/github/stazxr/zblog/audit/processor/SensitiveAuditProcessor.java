@@ -61,11 +61,11 @@ public class SensitiveAuditProcessor extends AbstractAuditProcessor {
         // =========================
         // 3. 获取处理策略
         // =========================
-        Map<String, SensitiveStrategy> scenes = sensitiveProcessorConfig.getScenes();
+        Map<String, SensitiveStrategy> strategyMap = sensitiveProcessorConfig.getStrategyMap();
         SensitiveStrategy strategy = sensitiveProcessorConfig.getStrategy();
         String sceneKey = context.getScene().name() + ".strategy";
-        if (scenes != null && scenes.containsKey(sceneKey)) {
-            strategy = scenes.get(sceneKey);
+        if (strategyMap != null && strategyMap.containsKey(sceneKey)) {
+            strategy = strategyMap.get(sceneKey);
         }
         if (strategy == null) {
             strategy = DEFAULT_STRATEGY;
