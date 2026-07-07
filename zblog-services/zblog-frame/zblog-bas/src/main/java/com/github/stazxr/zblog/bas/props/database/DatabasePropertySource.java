@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.NonNull;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Properties;
  * @author SunTao
  * @since 2024-07-22
  */
-public class DatabasePropertySource extends PropertySource<Map<String, String>> {
+public class DatabasePropertySource extends PropertySource<Map<String, Object>> {
     private static final Logger log = LoggerFactory.getLogger(DatabasePropertySource.class);
 
     /**
@@ -71,7 +72,7 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
      * @return v 属性值
      */
     @Override
-    public Object getProperty(String k) {
+    public Object getProperty(@NonNull String k) {
         return this.source.get(k);
     }
 
@@ -80,15 +81,19 @@ public class DatabasePropertySource extends PropertySource<Map<String, String>> 
      *
      * @return 加载的配置数据，以 Map 的形式返回
      */
-    private Map<String, String> loadPropertiesFromDatabase() {
+    private Map<String, Object> loadPropertiesFromDatabase() {
         try {
-            Map<String, String> properties = new HashMap<>(64);
+            Map<String, Object> properties = new HashMap<>(64);
             String enabled = config.getProperty("zblog.props.enabled");
             if (Boolean.TRUE.toString().equals(enabled)) {
                 jdbcTemplate.query(config.getProperty("zblog.props.load-sql"), resultSet -> {
                     String name = resultSet.getString("k");
                     String value = resultSet.getString("v");
-                    properties.put(name, value);
+                    if ("true".equals(value) || "false".equals(value)) {
+                        properties.put(name, Boolean.valueOf(value));
+                    } else {
+                        properties.put(name, value);
+                    }
                 });
             }
             return properties;

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 页面查询
+ * 页面查询参数
  *
  * @author SunTao
  * @since 2026-06-12

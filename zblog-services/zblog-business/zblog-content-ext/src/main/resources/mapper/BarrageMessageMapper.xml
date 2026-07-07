@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.BarrageMessageMapper">
+    <select id="selectBarrageMessageList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
+        SELECT
+            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.IP, bm.IP_REGION,
+            bm.AUDIT_STATUS, bm.AUDIT_REASON, bm.AUDIT_TIME, bm.COLOR, bm.CREATE_TIME,
+            (SELECT USERNAME FROM user u WHERE u.ID = bm.AUDIT_USER_ID) AS AUDIT_USERNAME
+        FROM barrage_message bm
+        <where>
+            <if test="query.content != null and query.content != ''">
+                <bind name="contentBind" value="'%' + query.content + '%'"/>
+                AND bm.CONTENT LIKE #{contentBind}
+            </if>
+            <if test="query.nickname != null and query.nickname != ''">
+                <bind name="nicknameBind" value="'%' + query.nickname + '%'"/>
+                AND bm.NICKNAME LIKE #{nicknameBind}
+            </if>
+            <if test="query.ip != null and query.ip != ''">
+                AND bm.THEME_TYPE = #{query.ip}
+            </if>
+            <if test="query.auditStatus != null">
+                AND bm.AUDIT_STATUS = #{query.auditStatus}
+            </if>
+        </where>
+        ORDER BY bm.CREATE_TIME DESC
+    </select>
+
+    <select id="selectBarrageMessageDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
+        SELECT
+            ID, CONTENT, NICKNAME, AVATAR, IP, IP_REGION, USER_AGENT,
+            AUDIT_STATUS, AUDIT_REASON, AUDIT_TIME, DEVICE_ID, SPEED, COLOR, CREATE_TIME,
+            (SELECT USERNAME FROM user u WHERE u.ID = bm.AUDIT_USER_ID) AS AUDIT_USERNAME
+        FROM barrage_message bm
+        WHERE bm.ID = #{barrageMessageId}
+    </select>
+</mapper>

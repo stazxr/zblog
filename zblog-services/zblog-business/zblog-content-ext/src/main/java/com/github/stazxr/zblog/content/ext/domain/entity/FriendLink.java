@@ -19,7 +19,7 @@ public class FriendLink extends BaseEntity {
     private static final long serialVersionUID = 4781446474431803234L;
 
     /**
-     * 友链ID
+     * 友链id
      */
     @TableId
     private Long id;

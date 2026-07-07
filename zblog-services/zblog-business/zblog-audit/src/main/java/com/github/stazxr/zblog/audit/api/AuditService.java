@@ -1,8 +1,11 @@
 package com.github.stazxr.zblog.audit.api;
 
 import com.github.stazxr.zblog.audit.engine.AuditEngine;
+import com.github.stazxr.zblog.audit.enums.AuditDecision;
 import com.github.stazxr.zblog.audit.model.AuditContext;
 import com.github.stazxr.zblog.audit.model.AuditResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AuditService {
+    private static final Logger log = LoggerFactory.getLogger(AuditService.class);
+
     private final AuditEngine auditEngine;
 
     public AuditService(AuditEngine auditEngine) {
@@ -28,6 +33,14 @@ public class AuditService {
      * @return 审核结果
      */
     public AuditResult audit(AuditContext context) {
-        return auditEngine.audit(context);
+        try {
+            return auditEngine.audit(context);
+        } catch (Exception e) {
+            log.error("AuditEngine execute failed", e);
+            AuditResult result = new AuditResult();
+            result.setDecision(AuditDecision.MANUAL);
+            result.setReason("Audit Engine Error: " + e.getMessage());
+            return result;
+        }
     }
 }

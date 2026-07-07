@@ -1,17 +1,17 @@
 package com.github.stazxr.zblog.portal.controller;
 
-import com.github.stazxr.zblog.audit.api.AuditService;
-import com.github.stazxr.zblog.audit.enums.AuditScene;
-import com.github.stazxr.zblog.audit.model.AuditContext;
-import com.github.stazxr.zblog.audit.model.AuditResult;
+import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.core.base.BaseConst;
-import com.github.stazxr.zblog.portal.domain.dto.MessageDto;
+import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
+import com.github.stazxr.zblog.portal.service.PortalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,29 +23,29 @@ import javax.servlet.http.HttpServletRequest;
  * 门户管理
  *
  * @author SunTao
- * @since 2026-04-27
+ * @since 2027-07-07
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/portal")
 @Api(value = "PortalController", tags = { "门户管理" })
 public class PortalController {
-    private final AuditService auditService;
+    private final PortalService portalService;
 
     /**
-     * 弹幕留言
+     * 新增弹幕
      *
-     * @param request    请求信息
-     * @param messageDto 留言信息
+     * @param request 请求信息
+     * @param barrageMessageDto 弹幕信息
      */
-    @PostMapping(value = "/saveMessage")
-    @ApiOperation(value = "弹幕留言")
+    @Log
+    @PostMapping(value = "/addBarrageMessage")
+    @ApiOperation(value = "新增弹幕")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
-    @Router(name = "弹幕留言", code = "saveMessage", level = RouterLevel.OPEN)
-    public void recordVisitor(HttpServletRequest request, @RequestBody MessageDto messageDto) {
-        AuditContext context = new AuditContext(messageDto.getMessageContent(), AuditScene.DEFAULT);
-        AuditResult audit = auditService.audit(context);
-        System.out.println("请求结果: " + audit);
+    @Router(name = "新增弹幕", code = "PORTA001", level = RouterLevel.OPEN)
+    @RateLimit(time = 60, count = 5, enableIp = true, enableApi = true, message = "发送太快啦，请休息一下再发~")
+    public void addBarrageMessage(HttpServletRequest request, @RequestBody @Validated BarrageMessageDto barrageMessageDto) {
+        portalService.addBarrageMessage(request, barrageMessageDto);
     }
 
 //    /**

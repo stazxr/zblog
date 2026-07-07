@@ -46,7 +46,7 @@ export default {
   },
   // 发送弹幕
   saveMessage: params => {
-    return api.httpRequest().post(`${portalApi}/saveMessage`, params)
+    return api.httpRequest().post(`${portalApi}/addBarrageMessage`, params)
   },
   // 获取评论列表
   queryCommentList: params => {

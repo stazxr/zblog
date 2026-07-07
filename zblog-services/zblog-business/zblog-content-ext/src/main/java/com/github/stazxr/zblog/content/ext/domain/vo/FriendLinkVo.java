@@ -19,9 +19,9 @@ public class FriendLinkVo extends BaseVo {
     private static final long serialVersionUID = 9022736711594848655L;
 
     /**
-     * 友链ID
+     * 友链id
      */
-    @ApiModelProperty("友链ID")
+    @ApiModelProperty("友链id")
     private Long id;
 
     /**

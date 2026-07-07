@@ -35,7 +35,7 @@ public class Theme extends BaseEntity {
     private static final long serialVersionUID = -3434434170467181151L;
 
     /**
-     * 主题编号
+     * 主题id
      */
     @TableId
     private Long id;

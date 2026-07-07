@@ -50,11 +50,11 @@ INSERT INTO `sys_props` VALUES ('zblog.file.cos.accessKey', '', 'zblog.service',
 INSERT INTO `sys_props` VALUES ('zblog.file.cos.secretKey', '', 'zblog.service', '腾讯云访问密钥 SecretKey', 0);
 INSERT INTO `sys_props` VALUES ('zblog.file.cos.region', 'ap-beijing', 'zblog.service', '腾讯云 COS 所在地域', 0);
 INSERT INTO `sys_props` VALUES ('zblog.file.cos.bucketName', '', 'zblog.service', '腾讯云 COS 存储桶名称', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.enabled}', 'false', 'zblog.service', '是否启用腾讯云内容审核', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.accessKey}', '', 'zblog.service', '腾讯云 SecretId（访问密钥 ID）', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.secretKey}', '', 'zblog.service', '腾讯云 SecretKey（访问密钥）', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.region}', 'ap-beijing', 'zblog.service', '腾讯云 TMS 所在地域', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.bizType}', '', 'zblog.service', '腾讯云 TMS 接口地址', 0);
-INSERT INTO `sys_props` VALUES ('${zblog.audit.tms.endpoint}', 'tms.tencentcloudapi.com', 'zblog.service', '识别策略编号（默认）', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.enabled', 'false', 'zblog.service', '是否启用腾讯云内容审核', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.accessKey', '', 'zblog.service', '腾讯云 SecretId（访问密钥 ID）', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.secretKey', '', 'zblog.service', '腾讯云 SecretKey（访问密钥）', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.region', 'ap-beijing', 'zblog.service', '腾讯云 TMS 所在地域', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.bizType', '', 'zblog.service', '腾讯云 TMS 接口地址', 0);
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.endpoint', 'tms.tencentcloudapi.com', 'zblog.service', '识别策略编号（默认）', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 友链查询
+ * 友链查询参数
  *
  * @author SunTao
  * @since 2026-04-15

@@ -25,7 +25,7 @@ public class FriendLinkDto extends BaseDto {
      * 友链id
      */
     @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
-    @ApiModelProperty("友链ID")
+    @ApiModelProperty("友链id")
     private Long id;
 
     /**

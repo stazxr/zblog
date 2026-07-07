@@ -18,7 +18,8 @@
           <template v-slot:default="slotProps">
             <span class="barrage-items">
               <img :src="slotProps.item.avatar" width="30" height="30" style="border-radius:50%" alt="">
-              <span class="ml-2">{{ slotProps.item.nickname }} :</span>
+<!--              <span class="ml-2">{{ slotProps.item.nickname }} :</span>-->
+              <span class="ml-2">张三 :</span>
               <span class="ml-2">{{ slotProps.item.messageContent }}</span>
             </span>
           </template>
@@ -82,14 +83,11 @@ export default {
       }
 
       // 访问信息
-      const userAvatar = this.$store.state.user ? this.$store.state.user.avatar : this.$store.state.otherConfig['touristAvatar']
-      const userNickname = this.$store.state.user ? this.$store.state.user.nickname : '游客'
+      // const userAvatar = this.$store.state.user ? this.$store.state.user.avatar : this.$store.state.otherConfig['touristAvatar']
+      // const userNickname = this.$store.state.user ? this.$store.state.user.nickname : '游客'
 
       const message = {
-        avatar: userAvatar,
-        nickname: userNickname,
-        messageContent: this.messageContent,
-        time: Math.floor(Math.random() * (10 - 7)) + 7
+        content: this.messageContent
       }
       this.messageContent = ''
       this.barrageList.push(message)

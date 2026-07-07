@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.audit.enums;
 /**
  * 内容审核场景
  *
- * 不同场景可以配置不同的审核策略，例如：
+ * 不同场景可以配置不同的审核策略
  *
  * @author SunTao
  * @since 2026-06-29

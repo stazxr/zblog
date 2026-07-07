@@ -264,6 +264,13 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('THEME_ONLY_OWN_THEME', 'en-US', 'Only your own themes can be operated', 'common'),
 ('THEME_ONLY_USER_THEME_UPGRADE', 'zh-CN', '只允许升级用户主题', 'common'),
 ('THEME_ONLY_USER_THEME_UPGRADE', 'en-US', 'Only user themes can be upgraded', 'common'),
+-- 弹幕
+('BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
+('BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),
+('BARRAGE_MESSAGE_STATUS_REQUIRED', 'zh-CN', '弹幕审核状态不能为空', 'common'),
+('BARRAGE_MESSAGE_STATUS_REQUIRED', 'en-US', 'BarrageMessage audit status cannot be blank', 'common'),
+('BARRAGE_MESSAGE_STATUS_INVALID', 'zh-CN', '弹幕已被审核，请刷新页面重试', 'common'),
+('BARRAGE_MESSAGE_STATUS_INVALID', 'en-US', 'BarrageMessage audit status invalid', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),

@@ -27,12 +27,14 @@ import category from '@/api/service/content/category.js'
 import tag from '@/api/service/content/tag.js'
 import article from '@/api/service/content/article.js'
 
+// webfeed
+import barrageMessage from '@/api/service/webfeed/barrageMessage.js'
+
 // TODO
 import column from '@/api/service/column.js'
 import webSetting from '@/api/service/webSetting.js'
 import talk from '@/api/service/talk.js'
 import album from '@/api/service/album.js'
-import message from '@/api/service/message.js'
 import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
@@ -43,5 +45,6 @@ export default {
   version, file, cache, session,
   friendLink, page, theme,
   category, tag, article,
-  column, webSetting, talk, album, message, comment, test
+  barrageMessage,
+  column, webSetting, talk, album, comment, test
 }

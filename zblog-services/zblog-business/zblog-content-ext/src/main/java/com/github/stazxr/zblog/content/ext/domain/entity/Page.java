@@ -20,7 +20,7 @@ public class Page extends BaseEntity {
     private static final long serialVersionUID = -1418611832649084034L;
 
     /**
-     * 主键
+     * 页面id
      */
     @TableId
     private Long id;
