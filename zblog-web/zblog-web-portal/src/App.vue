@@ -65,6 +65,9 @@ export default {
     }
   },
   created() {
+    // 获取页面信息
+    this.getPageInfo()
+
     // 获取博客信息
     this.getBlogInfo()
     // 上传访客信息
@@ -81,6 +84,11 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
+    getPageInfo() {
+      this.$mapi.portal.queryPageInfo().then(res => {
+        this.$store.commit('setPageInfo', res.data)
+      })
+    },
     getBlogInfo() {
       this.$mapi.portal.queryBlogInfo().then(res => {
         this.$store.commit('setBlogInfo', res.data)

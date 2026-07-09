@@ -1,7 +1,7 @@
 {
   "name": "zblog-web-admin",
   "version": "5.0.0",
-  "description": "ZBLOG 前端源码-管理系统",
+  "description": "ZBLOG 前端源码-管理端",
   "author": "Sun Tao",
   "license": "MIT",
   "scripts": {
@@ -34,7 +34,7 @@
   "dependencies": {
     "@kangc/v-md-editor": "^1.7.12",
     "@riophae/vue-treeselect": "^0.4.0",
-    "axios": "^0.21.1",
+    "axios": "1.2.1",
     "clipboard": "2.0.4",
     "codemirror": "^5.49.2",
     "core-js": "^2.6.12",
@@ -63,20 +63,17 @@
     "resize-observer-polyfill": "^1.5.1",
     "screenfull": "4.2.0",
     "sortablejs": "1.8.4",
-    "vue": "^2.6.14",
+    "vue": "2.6.14",
     "vue-count-to": "^1.0.13",
     "vue-cropper": "0.4.9",
     "vue-echarts": "^5.0.0-beta.0",
     "vue-image-crop-upload": "^2.5.0",
     "vue-json-viewer": "^2.2.22",
-    "vue-router": "3.0.2",
+    "vue-router": "3.2.0",
     "vue-splitpane": "1.0.4",
     "vuedraggable": "2.20.0",
-    "vuex": "3.1.0",
-    "xlsx": "^0.17.4",
-    "xterm": "^3.1.0",
-    "xterm-addon-attach": "^0.7.0",
-    "xterm-addon-fit": "^0.6.0"
+    "vuex": "3.4.0",
+    "xlsx": "^0.17.4"
   },
   "devDependencies": {
     "@babel/parser": "^7.7.4",
@@ -90,7 +87,6 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
     "babel-plugin-dynamic-import-node": "2.3.0",
-    "babel-plugin-transform-remove-console": "^6.9.4",
     "chalk": "2.4.2",
     "chokidar": "2.1.5",
     "compression-webpack-plugin": "5.0.2",

@@ -30,19 +30,9 @@ import InfiniteLoading from 'vue-infinite-loading'
 import { vueBaberrage } from 'vue-baberrage'
 // 日期工具
 import dayjs from 'dayjs'
-// WangEditor
-import { Boot } from '@wangeditor/editor'
-import attachmentModule from '@wangeditor/plugin-upload-attachment'
-import formulaModule from '@wangeditor/plugin-formula'
 // 代码高亮
 import Highlight from './directive/highlight'
 import loading from './components/loading/index'
-
-// WangEditor 附件上传注册
-Boot.registerModule(attachmentModule)
-
-// WangEditor 公式注册
-Boot.registerModule(formulaModule)
 
 // 安装插件
 Vue.use(animated)
@@ -70,8 +60,9 @@ Vue.filter('hour', function(value) {
 })
 
 new Vue({
+  el: '#app',
   router,
   store,
   vuetify,
   render: h => h(App)
-}).$mount('#app')
+})

@@ -20,7 +20,6 @@ module.exports = {
     host: '0.0.0.0', // 支持 IP / 局域网访问
     port: 31945,
     open: false, // 启动自动打开浏览器
-    allowedHosts: [],
     overlay: { // 浏览器只显示错误
       warnings: false,
       errors: true
@@ -32,7 +31,8 @@ module.exports = {
         pathRewrite: {
           '^/api': '/api'
         }
-      }
+      },
+      disableHostCheck: true
     }
   },
   configureWebpack: {

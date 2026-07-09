@@ -21,6 +21,5 @@ module.exports = {
   caseNumber: '陕ICP备2026001026号-1',
 
   // 前台访问地址
-  webApi: 'http://localhost:31943' // 本地开发
-  // webApi: 'https://www.suntaoblog.com' // 生产环境
+  webApi: 'http://localhost:31943'
 }

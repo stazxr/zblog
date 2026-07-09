@@ -4,6 +4,11 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 查询页面信息
+  queryPageInfo: params => {
+    return api.httpRequest().get(`${portalApi}/queryPageInfo`, params)
+  },
+
   // 登录
   webLogin: params => {
     return api.httpRequest().post(`${portalApi}/webLogin`, params)

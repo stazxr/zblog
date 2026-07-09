@@ -1,130 +1,128 @@
-// import Vue from 'vue'
 import axios from 'axios'
-import JSONBIG from 'json-bigint'
-import { getToken } from '../utils/token'
+import JsonBig from 'json-bigint'
+import { isJson } from '@/utils/validate'
 
 const defaultTimeout = 120000
 
 // create instance
 const instance = axios.create()
 
-// baseURL
-// instance.defaults.baseURL = process.env.VUE_APP_BASE_API
+// baseURL  TODO 这个是否需要，本地环境和生产环境分析
+instance.defaults.baseURL = process.env.VUE_APP_BASE_API
 
 // 超时时间
 instance.defaults.timeout = defaultTimeout
 
-// 处理超过16位数字精度丢失问题
-instance.defaults.transformResponse = [
-  function(data) {
-    if (data instanceof Blob) {
-      return data
-    }
-
-    const json = JSONBIG({
-      storeAsString: true
-    })
-    return json.parse(data)
-  }
-]
-
 // 是否允许携带凭证
 instance.defaults.withCredentials = true
 
-// 设置请求拦截器
-instance.interceptors.request.use(
-  config => {
-    // set default header
-    config.headers.Authorization = getToken()
-    // config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-    // config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
-    return config
-  },
-  error => {
-    return Promise.reject(error)
+// 处理超过 16 位数字精度丢失问题
+instance.defaults.transformResponse = [
+  function(data) {
+    try {
+      if (isJson(data)) {
+        return JsonBig.parse(data, {
+          // 指定在解析过程中是否严格检查 JSON 格式的语法
+          strict: false,
+          // 指定解析后的值是否应该存储为字符串而不是 BigNumber 类型
+          storeAsString: true,
+          // 指定是否始终将所有数字解析为 BigNumber 类型，默认情况下，只有超出 JavaScript 数字范围的数字才会解析为 BigNumber 类型
+          alwaysParseAsBig: false,
+          // 指定是否使用本地的 BigInt 类型而不是 bignumber.js 库来表示大整数
+          useNativeBigInt: false,
+          // 指定在解析 JSON 时如何处理原型污染（prototype pollution）问题
+          // 默认为 "error"，表示在遇到原型污染时抛出错误；可以设置为 "remove"，表示移除原型污染属性；或者设置为 "ignore"，表示忽略原型污染问题
+          protoAction: 'error',
+          // 指定在解析 JSON 时如何处理 JavaScript 构造函数的问题
+          // 默认为 "error"，表示在遇到 JavaScript 构造函数时抛出错误；可以设置为 "remove"，表示移除构造函数；或者设置为 "ignore"，表示忽略构造函数问题
+          constructorAction: 'error'
+        })
+      }
+    } catch (e) {
+      console.log('transform response error [' + data + ']', e)
+    }
+    return data
   }
-)
+]
+
+// 自定义响应成功的HTTP状态码
+instance.defaults.validateStatus = status => {
+  return status >= 200 && status < 300
+}
+
+// 设置请求拦截器
+instance.interceptors.request.use(config => {
+  // 根据 User-Agent 判断客户端类型
+  const ua = navigator.userAgent.toLowerCase()
+  const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
+  config.headers['x-client-type'] = isMobile ? '01' : '02'
+
+  // return config
+  return config
+}, error => {
+  return Promise.reject(error)
+})
 
 // 设置响应拦截器
-instance.interceptors.response.use(
-  response => {
-    // response {data: {}, status: 200, statusText: 'OK', headers: {}, config: {}, request: {}}
-    // data formatter: {code: 200, message, '操作成功', data: {}, identifier: 1} => code maybe [200, 401, 403, 404, 500...]
-    // data maybe really data, eg: data => 后端直接返回了数据，没有封装为上述格式
-    // return Promise.reject(new Error(res.msg || 'Error'))
-    if (response.status === 200 && response.data) {
-      const result = response.data
-      return responseHandler(result)
+instance.interceptors.response.use(response => {
+  if (response.status === 200 && response.data) {
+    const result = response.data
+    const responseType = response.config.responseType
+    if (responseType === 'json') {
+      if (result.code === '000000000') {
+        return result
+      } else {
+        return Promise.reject(new Error(result.message || '操作失败'))
+      }
+    } else {
+      return result
     }
-  },
-  error => {
-    return Promise.reject(error)
   }
-)
+}, error => {
+  return Promise.reject(error)
+})
 
-function responseHandler(result) {
-  const code = result.code || 200
-  if (code === 200) {
-    // success, return data
-    return result
-  } else {
-    return result
-    // Vue.prototype.$toast({ type: 'error', message: '系统异常' })
+export const get = (url, params, requestItem = {}) => {
+  const options = {
+    method: 'get',
+    url,
+    // 是与请求一起发送的 URL 参数，必须是一个简单对象或 URLSearchParams 对象
+    params,
+    // 自定义请求头
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
+    responseType: 'json',
+    ...requestItem
   }
+  return instance(options)
 }
 
-export const get = (url, params, requestItem) => {
-  return new Promise((resolve, reject) => {
-    let options = {
-      method: 'get',
-      url: url,
-      // 是与请求一起发送的 URL 参数，必须是一个简单对象或 URLSearchParams 对象
-      params: params,
-      // 自定义请求头
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8'
-      },
-      // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
-      responseType: 'json'
-    }
-
-    options = Object.assign({}, options, requestItem)
-    instance(options).then(response => {
-      resolve(response)
-    }).catch(err => {
-      reject(err)
-    })
-  })
-}
-
-export const post = (url, params, requestItem) => {
-  return new Promise((resolve, reject) => {
-    let options = {
-      method: 'post',
-      url: url,
-      // 作为请求体被发送的数据，[string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams]
-      // 浏览器专属: FormData, File, Blob; Node 专属: Stream, Buffer
-      // 可选语法，Country=China&City=Xian，只有 value 会被发送，key 则不会
-      data: params,
-      // 自定义请求头
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8'
-      },
-      // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
-      responseType: 'json'
-    }
-
-    options = Object.assign({}, options, requestItem)
-    instance(options).then(response => {
-      resolve(response)
-    }).catch(err => {
-      reject(err)
-    })
-  })
+export const post = (url, data, requestItem = {}) => {
+  const options = {
+    method: 'post',
+    url,
+    // 作为请求体被发送的数据，[string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams]
+    // 浏览器专属: FormData, File, Blob; Node 专属: Stream, Buffer
+    // 可选语法，Country=China&City=Xian，只有 value 会被发送，key 则不会
+    data,
+    // 自定义请求头
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
+    responseType: 'json',
+    ...requestItem
+  }
+  return instance(options)
 }
 
 export default {
   httpRequest() {
-    return { get, post }
+    return {
+      get,
+      post
+    }
   }
 }
