@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
@@ -12,12 +13,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 门户管理
@@ -31,6 +31,21 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value = "PortalController", tags = { "门户管理" })
 public class PortalController {
     private final PortalService portalService;
+
+    /**
+     * 查询博客页面信息
+     *
+     * @return Map<String, List<ThemePageVo>>
+     *     K: pageLabel
+     *     V: List<ThemePageVo>
+     */
+    @GetMapping("/queryPageInfo")
+    @ApiOperation(value = "查询博客页面信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询博客页面信息", code = "PORTQ001", level = RouterLevel.OPEN)
+    public Map<String, List<ThemePageVo>> queryPageInfo() {
+        return portalService.queryPageInfo();
+    }
 
     /**
      * 新增弹幕

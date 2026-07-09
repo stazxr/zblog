@@ -6,6 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 页面信息
+    pages: {},
     // 网站配置信息
     websiteConfig: {},
     // 社交配置信息
@@ -39,8 +41,6 @@ export default new Vuex.Store({
     websiteVersion: '',
     // 文章默认封面
     articleDefaultImg: '',
-    // 页面信息
-    pageList: [],
     // 用户信息
     user: {
       id: null,
@@ -68,6 +68,10 @@ export default new Vuex.Store({
     talkLikeSet: []
   },
   mutations: {
+    // 设置页面信息
+    setPageInfo(state, pages) {
+      state.pages = pages || {}
+    },
     // 设置网站信息
     setBlogInfo(state, blogInfo) {
       state.websiteConfig = blogInfo['webInfo'] || {}
@@ -85,7 +89,7 @@ export default new Vuex.Store({
       state.countInfo.messageCount = blogInfo['messageCount'] || 0
       state.websiteVersion = blogInfo['websiteVersion'] || ''
       state.articleDefaultImg = blogInfo['articleDefaultImg'] || ''
-      state.pageList = blogInfo['pageList'] || []
+      state.pages = blogInfo['pages'] || []
     },
     // 登录成功，设置用户信息
     login(state, user) {

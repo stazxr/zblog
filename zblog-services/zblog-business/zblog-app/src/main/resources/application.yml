@@ -185,7 +185,7 @@ zblog:
         deploy-ip: # 部署IP（为空会自动获取）
     context:
       tags: # 自定义标签配置
-        - { tag-name: token } # token
+        - { tag-name: x-client-type } # 客户端类型：01 - 移动端，02 - PC端
     # 序号配置
     sequence:
       datacenter-id: 0 # 数据中心id

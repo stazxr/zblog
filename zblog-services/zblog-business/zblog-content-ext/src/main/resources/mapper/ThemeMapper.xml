@@ -69,4 +69,26 @@
     <update id="upgradeTheme">
         UPDATE theme SET OWNER_TYPE = 'SYSTEM', OWNER_ID = null, IS_DEFAULT = false, IS_ACTIVE = false WHERE ID = #{themeId}
     </update>
+
+    <select id="selectUserCurrentTheme" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo">
+        SELECT
+            t.ID, t.THEME_NAME, t.THEME_TYPE, t.OWNER_TYPE, t.OWNER_ID, u.USERNAME AS OWNER_NAME,
+            t.IS_DEFAULT, t.IS_ACTIVE, t.PREVIEW_COVER, t.DESCRIPTION, t.CREATE_TIME, t.UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.UPDATE_USER) AS UPDATE_USERNAME
+        FROM theme t
+        LEFT JOIN user u ON u.ID = t.OWNER_ID
+        WHERE t.OWNER_ID = #{ownerId} AND t.THEME_TYPE = #{themeType} AND t.IS_ACTIVE IS TRUE
+    </select>
+
+    <select id="selectDefaultTheme" resultType="com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo">
+        SELECT
+            t.ID, t.THEME_NAME, t.THEME_TYPE, t.OWNER_TYPE, t.OWNER_ID, u.USERNAME AS OWNER_NAME,
+            t.IS_DEFAULT, t.IS_ACTIVE, t.PREVIEW_COVER, t.DESCRIPTION, t.CREATE_TIME, t.UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = t.UPDATE_USER) AS UPDATE_USERNAME
+        FROM theme t
+        LEFT JOIN user u ON u.ID = t.OWNER_ID
+        WHERE t.THEME_TYPE = #{themeType} AND t.IS_DEFAULT IS TRUE
+    </select>
 </mapper>

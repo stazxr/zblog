@@ -4,6 +4,7 @@ import com.github.stazxr.zblog.audit.api.AuditService;
 import com.github.stazxr.zblog.audit.enums.AuditScene;
 import com.github.stazxr.zblog.audit.model.AuditContext;
 import com.github.stazxr.zblog.audit.model.AuditResult;
+import com.github.stazxr.zblog.bas.context.Context;
 import com.github.stazxr.zblog.bas.encryption.util.Md5Utils;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
@@ -11,7 +12,12 @@ import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessage;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
+import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
+import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.mapper.BarrageMessageMapper;
+import com.github.stazxr.zblog.content.ext.mapper.ThemeMapper;
+import com.github.stazxr.zblog.content.ext.mapper.ThemePageMapper;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.service.PortalService;
@@ -22,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -36,6 +43,48 @@ public class PortalServiceImpl implements PortalService {
     private final BarrageMessageMapper barrageMessageMapper;
 
     private final AuditService auditService;
+
+    private final ThemeMapper themeMapper;
+
+    private final ThemePageMapper themePageMapper;
+
+    /**
+     * 查询博客页面信息
+     *
+     * @return Map<String, List<ThemePageVo>>
+     *     K: pageLabel
+     *     V: List<ThemePageVo>
+     */
+    @Override
+    public Map<String, List<ThemePageVo>> queryPageInfo() {
+        // 获取客户端类型
+        String clientType = Context.get("x-client-type");
+        ThemeType themeType = "01".equals(clientType) ? ThemeType.MOBILE : ThemeType.PC;
+
+        ThemeVo themeVo = null; // 当前主题
+        if (SecurityUtils.isAuthenticated()) { // 用户已登录，查询用户当前激活主题
+            Long loginId = SecurityUtils.getLoginId();
+            themeVo = themeMapper.selectUserCurrentTheme(loginId, themeType);
+        }
+
+        if (themeVo == null) { // 查询系统默认主题
+            themeVo = themeMapper.selectDefaultTheme(themeType);
+        }
+
+        // 查询主题页面
+        List<ThemePageVo> themePages = new ArrayList<>();
+        if (themeVo != null) {
+            themePages = themePageMapper.selectThemePage(themeVo.getId());
+        }
+
+        Map<String, List<ThemePageVo>> themeMap = new LinkedHashMap<>();
+        for (ThemePageVo themePage : themePages) {
+            List<ThemePageVo> pages = themeMap.getOrDefault(themePage.getPageLabel(), new ArrayList<>());
+            pages.add(themePage);
+            themeMap.putIfAbsent(themePage.getPageLabel(), pages);
+        }
+        return themeMap;
+    }
 
     /**
      * 新增弹幕

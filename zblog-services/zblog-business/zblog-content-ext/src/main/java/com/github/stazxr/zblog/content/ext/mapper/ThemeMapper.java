@@ -77,4 +77,21 @@ public interface ThemeMapper extends BaseMapper<Theme> {
      * @param themeId 主题id
      */
     void upgradeTheme(@Param("themeId") Long themeId);
+
+    /**
+     * 查询用户当前主题
+     *
+     * @param ownerId   用户id
+     * @param themeType 主题类型
+     * @return ThemeVo
+     */
+    ThemeVo selectUserCurrentTheme(@Param("ownerId") Long ownerId, @Param("themeType") ThemeType themeType);
+
+    /**
+     * 查询默认主题
+     *
+     * @param themeType 主题类型
+     * @return ThemeVo
+     */
+    ThemeVo selectDefaultTheme(@Param("themeType") ThemeType themeType);
 }
