@@ -351,6 +351,7 @@
 <script>
 import EasyTyper from 'easy-typer-js'
 // import Swiper from '../../components/Swiper.vue'
+import { getPageRandomCover } from '@/utils/theme'
 import TagCloud3D from '../../components/TagCloud3D.vue'
 export default {
   name: 'Home',
@@ -360,6 +361,7 @@ export default {
   },
   data() {
     return {
+      cover: '',
       tip: false,
       typedConfig: {
         // 表示要显示的文本内容
@@ -391,16 +393,6 @@ export default {
     }
   },
   computed: {
-    cover() {
-      let cover = ''
-      this.$store.state.pageList.forEach(item => {
-        if (item['pageLabel'] === 'home') {
-          cover = item['pageCover']
-          return 'background: url(' + cover + ') center center / cover no-repeat'
-        }
-      })
-      return 'background: url(' + cover + ') center center / cover no-repeat'
-    },
     articleDefaultImg() {
       return this.$store.state.articleDefaultImg
     },
@@ -428,6 +420,7 @@ export default {
     }
   },
   created() {
+    this.cover = getPageRandomCover(this.$store.state.pages, 'home')
     this.init()
     this.listArticles()
     // this.listHomeTalks()

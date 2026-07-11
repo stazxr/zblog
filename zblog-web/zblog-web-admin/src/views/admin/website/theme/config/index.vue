@@ -18,7 +18,11 @@
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
-            <el-image fit="cover" class="page-cover" :src="item['pageCover']" />
+            <el-image
+              :class="['page-cover', isMobileTheme ? 'mobile-page-cover' : 'pc-page-cover']"
+              :src="item.pageCover"
+              fit="contain"
+            />
             <div class="page-name">{{ item['pageName'] }}</div>
           </div>
         </el-col>
@@ -44,6 +48,7 @@ export default {
   },
   data() {
     return {
+      theme: null,
       tableData: [],
       tableLoading: false,
       addOrEditDialogTitle: null,
@@ -53,6 +58,9 @@ export default {
   computed: {
     themeId() {
       return this.$route.params.themeId
+    },
+    isMobileTheme() {
+      return this.theme && this.theme.themeType === 'MOBILE'
     },
     mode() {
       return this.$route.query.mode || 'edit'
@@ -68,11 +76,18 @@ export default {
     }
   },
   created() {
+    this.queryThemeDetail()
     this.listTableData()
   },
   methods: {
     hasPerm(value) {
       return this.checkPerm(value)
+    },
+    queryThemeDetail() {
+      this.$mapi.theme.queryThemeDetail({ themeId: this.themeId }).then(res => {
+        const { data } = res
+        this.theme = data
+      })
     },
     listTableData() {
       this.tableLoading = true
@@ -128,12 +143,27 @@ export default {
 .page-cover {
   position: relative;
   border-radius: 4px;
+  background: #f5f7fa;
+}
+/* PC页面 */
+.pc-page-cover {
   width: 100%;
   height: 170px;
 }
+/* 移动端页面 */
+.mobile-page-cover {
+  width: 100%;
+  height: 260px;
+}
+::v-deep .el-image__inner {
+  object-fit: contain;
+}
 .page-name {
-  text-align: center;
-  margin-top: 0.5rem;
+  text-align:center;
+  margin-top:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .page-item {
   position: relative;

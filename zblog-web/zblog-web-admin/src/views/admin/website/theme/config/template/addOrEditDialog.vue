@@ -17,25 +17,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="页面封面" prop="pageCover">
-          <el-upload
-            ref="upload"
-            name="file"
-            class="upload-cover"
-            drag
-            :action="$store.state.api.fileUploadApi"
-            :show-file-list="false"
-            :with-credentials="true"
-            :before-upload="beforeUpload"
-            :on-error="handleError"
-            :on-success="handleSuccess"
-          >
-            <i v-if="formData.pageCover === null" class="el-icon-upload" />
-            <div v-if="formData.pageCover === null" class="el-upload__text">
-              将文件拖到此处，或<em>点击上传</em>
-            </div>
-            <img v-else :src="formData.pageCover" width="360px" height="180px" alt="">
-          </el-upload>
-          <el-button v-if="formData.pageCover !== null" type="danger" @click="removeImg">清除图片</el-button>
+          <muses-image-upload
+            v-model="formData.pageCover"
+            @on-success="handleUploadSuccess"
+            @on-remove="handleUploadRemove"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -61,7 +47,6 @@ export default {
   data() {
     return {
       submitLoading: false,
-      showImgUpload: false,
       pageList: [],
       formData: {
         id: null,
@@ -95,6 +80,14 @@ export default {
       }
       this.loadPageList()
     },
+    handleUploadSuccess(file) {
+      this.formData.pageCoverId = file.fileId
+      this.formData.pageCover = file.fileAccessUrL
+    },
+    handleUploadRemove() {
+      this.formData.pageCoverId = null
+      this.formData.pageCover = null
+    },
     getThemePageDetail(dataId) {
       if (dataId != null && dataId !== '') {
         this.$mapi.theme.queryThemePageDetail({ themePageId: dataId }).then(res => {
@@ -114,55 +107,6 @@ export default {
       }).catch(_ => {
         this.pageList = []
       })
-    },
-    beforeUpload(file) {
-      // 支持类型：.jpg,.jpeg,.png
-      let imgType = ''
-      if (file.name.indexOf('.') !== -1) {
-        imgType = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase()
-      }
-      if (imgType === '' || (imgType !== 'jpg' && imgType !== 'jpeg' && imgType !== 'png')) {
-        this.$message.warning('上传文件只能是 jpg, jpeg, png 格式!')
-        return false
-      }
-
-      return file
-      // 压缩图片
-      // return new Promise(resolve => {
-      //   if (file.size / 1024 < this.$config.UPLOAD_SIZE) {
-      //     resolve(file)
-      //   }
-      //
-      //   imageConversion.compressAccurately(file, this.$config.UPLOAD_SIZE).then(res => {
-      //     resolve(res)
-      //   })
-      // })
-    },
-    handleError(err) {
-      try {
-        console.log('err', err)
-        this.$message.error(err.message)
-      } catch {
-        this.$message.error('系统发生未知错误')
-      }
-    },
-    handleSuccess(response, file) {
-      if (response.code === '000000000') {
-        // success
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          this.formData.pageCoverId = response.data[0]['fileId']
-          this.formData.pageCover = response.data[0]['fileAccessUrL']
-        }
-
-        this.$message.success('上传成功')
-      } else {
-        // error
-        this.$refs.upload.handleError(response, file)
-      }
-    },
-    removeImg() {
-      this.formData.pageCoverId = null
-      this.formData.pageCover = null
     },
     submit() {
       this.$refs.addOrEditForm.validate((valid) => {
@@ -207,7 +151,6 @@ export default {
         pageCoverId: null
       }
       this.$refs.addOrEditForm.resetFields()
-      this.showImgUpload = false
       this.submitLoading = false
       this.$emit('addOrEditDone', result)
     }

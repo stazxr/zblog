@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div class="message-banner">
-      <!-- 背景 -->
-      <div class="background-blur" :style="backgroundStyle" />
-      <!-- 内容 -->
+    <div class="message-banner" :style="cover">
       <div class="message-container">
         <div class="animated fadeInUp message-input-wrapper">
           <input v-model="messageContent" placeholder="说点什么吧" maxlength="200" @click="showBtn = true" @keyup.enter="addToList">
@@ -18,8 +15,7 @@
           <template v-slot:default="slotProps">
             <span class="barrage-items">
               <img :src="slotProps.item.avatar" width="30" height="30" style="border-radius:50%" alt="">
-<!--              <span class="ml-2">{{ slotProps.item.nickname }} :</span>-->
-              <span class="ml-2">张三 :</span>
+              <span class="ml-2">{{ slotProps.item.nickname }} :</span>
               <span class="ml-2">{{ slotProps.item.messageContent }}</span>
             </span>
           </template>
@@ -30,65 +26,31 @@
 </template>
 
 <script>
+import { getPageRandomCover } from '@/utils/theme'
 export default {
   name: 'Message',
   data() {
     return {
-      backgroundUrl: null,
-      backgroundLoaded: false,
+      cover: null,
       showBtn: false,
       messageContent: '',
       barrageList: []
     }
   },
-  computed: {
-    backgroundStyle() {
-      if (this.backgroundUrl) {
-        return `background: url(${this.backgroundUrl}) center center / cover no-repeat`
-      }
-
-      return 'background: linear-gradient(135deg, #89f7fe, #66a6ff)'
-    }
+  created() {
+    this.cover = getPageRandomCover(this.$store.state.pages, 'message')
   },
   mounted() {
     this.listMessage()
-    this.loadBackground()
   },
   methods: {
-    loadBackground() {
-      const item = this.$store.state.pageList.find(i => i.pageLabel === 'message')
-      const url = item?.pageCover
-      if (!url) {
-        this.backgroundUrl = null
-        return
-      }
-
-      const backgroundImage = new Image()
-      backgroundImage.onload = () => {
-        this.backgroundUrl = url
-        this.backgroundLoaded = true
-      }
-
-      backgroundImage.onerror = () => {
-        this.backgroundUrl = null
-        this.backgroundLoaded = false
-      }
-
-      backgroundImage.src = url
-    },
     addToList() {
       if (this.messageContent.trim() === '') {
         this.$toast({ type: 'warning', message: '内容不能为空' })
         return false
       }
 
-      // 访问信息
-      // const userAvatar = this.$store.state.user ? this.$store.state.user.avatar : this.$store.state.otherConfig['touristAvatar']
-      // const userNickname = this.$store.state.user ? this.$store.state.user.nickname : '游客'
-
-      const message = {
-        content: this.messageContent
-      }
+      const message = { content: this.messageContent }
       this.messageContent = ''
       this.barrageList.push(message)
       this.$mapi.portal.saveMessage(message).then(_ => {
@@ -119,30 +81,8 @@ export default {
   left: 0;
   right: 0;
   height: 100vh;
-  /*animation: header-effect 2s;*/
   overflow: hidden;
 }
-/* =========================
-   🌫 背景
-========================= */
-.background-blur {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  /* filter: blur(1px); */
-  /* transform: scale(1.01); */
-  z-index: 2;
-}
-.background-blur::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  /* background: rgba(0, 0, 0, 0.12); */
-}
-/* =========================
-   🧠 输入区域
-========================= */
 .message-container {
   position: absolute;
   width: 360px;
@@ -180,9 +120,6 @@ export default {
   padding: 0 1.25rem;
   border: #fff 1px solid;
 }
-/* =========================
-   🎯 弹幕层
-========================= */
 .barrage-container {
   position: absolute;
   top: 50px;

@@ -67,11 +67,16 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column label="预览图" align="center" width="180">
+        <el-table-column label="预览图" align="center" width="220">
           <template v-slot="scope">
-            <el-image class="theme-cover" :src="scope.row['previewCover']" :preview-src-list="getPreviewList(scope.row)">
+            <el-image
+              :class="['theme-cover', scope.row.themeType === 'MOBILE' ? 'mobile-cover' : 'pc-cover']"
+              :src="scope.row['previewCover']"
+              :preview-src-list="getPreviewList(scope.row)"
+              fit="contain"
+            >
               <div slot="error" class="image-slot">
-                <span v-if="scope.row['previewCover'] === null">未配置</span>
+                <span v-if="scope.row.previewCover === null">未配置</span>
                 <span v-else>加载失败</span>
               </div>
             </el-image>
@@ -490,10 +495,21 @@ export default {
 
 <style scoped>
 .theme-cover {
-  position: relative;
-  width: 100%;
-  height: 90px;
   border-radius: 4px;
+}
+/* PC主题 */
+.pc-cover {
+  width: 180px;
+  height: 90px;
+}
+/* 移动端主题 */
+.mobile-cover {
+  width: 100px;
+  height: 160px;
+}
+/* 图片适配 */
+::v-deep img {
+  object-fit: contain;
 }
 ::v-deep .image-slot, .demo-image__placeholder .image-slot {
   display: flex;
