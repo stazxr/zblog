@@ -2,14 +2,14 @@
   "groups": [
     {
       "name": "zblog.audit",
-      "type": "com.github.stazxr.zblog.audit.config.AuditProperties",
-      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "type": "com.github.stazxr.zblog.audit.config.properties.AuditProperties",
+      "sourceType": "com.github.stazxr.zblog.audit.config.properties.AuditProperties",
       "description": "内容审核核心配置项，用于控制XSS、敏感词、规则、云审核及人工审核流程."
     },
     {
       "name": "zblog.audit.xss",
-      "type": "com.github.stazxr.zblog.audit.config.AuditProperties$Xss",
-      "sourceType": "com.github.stazxr.zblog.audit.config.AuditProperties",
+      "type": "com.github.stazxr.zblog.audit.config.properties.AuditProperties$Xss",
+      "sourceType": "com.github.stazxr.zblog.audit.config.properties.AuditProperties",
       "description": "XSS审核配置项，用于控制脚本过滤策略."
     },
     {

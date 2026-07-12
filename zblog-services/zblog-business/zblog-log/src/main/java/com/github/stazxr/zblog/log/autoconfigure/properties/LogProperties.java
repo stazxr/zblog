@@ -3,7 +3,7 @@ package com.github.stazxr.zblog.log.autoconfigure.properties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- *
+ * 切面日志自动装配
  *
  * @author SunTao
  * @since 2022-06-20

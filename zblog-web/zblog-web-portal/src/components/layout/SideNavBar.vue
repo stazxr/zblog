@@ -85,7 +85,7 @@
         </router-link>
       </div>
       <div class="menus-item">
-        <router-link to="/message">
+        <router-link to="/barrageMessage">
           <span>💌</span> 弹幕
         </router-link>
       </div>

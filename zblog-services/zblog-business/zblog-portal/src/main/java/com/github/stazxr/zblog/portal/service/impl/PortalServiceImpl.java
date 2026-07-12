@@ -13,13 +13,16 @@ import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessage;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
+import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.mapper.BarrageMessageMapper;
 import com.github.stazxr.zblog.content.ext.mapper.ThemeMapper;
 import com.github.stazxr.zblog.content.ext.mapper.ThemePageMapper;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
+import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
+import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
@@ -40,13 +43,35 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
+    private final AuditService auditService;
+
     private final BarrageMessageMapper barrageMessageMapper;
 
-    private final AuditService auditService;
+    private final BarrageMessagePublisher barrageMessagePublisher;
 
     private final ThemeMapper themeMapper;
 
     private final ThemePageMapper themePageMapper;
+
+    /**
+     * 获取Web端登录用户信息
+     *
+     * @return WebLoginUser
+     */
+    @Override
+    public WebLoginUser currentWebUserDetail() {
+        if (!SecurityUtils.isAuthenticated()) {
+            return null;
+        }
+
+        WebLoginUser webLoginUser = new WebLoginUser();
+
+        // 查询用户基础信息
+        User loginUser = SecurityUtils.getLoginUser();
+        webLoginUser.setUser(loginUser);
+
+        return webLoginUser;
+    }
 
     /**
      * 查询博客页面信息
@@ -87,6 +112,18 @@ public class PortalServiceImpl implements PortalService {
     }
 
     /**
+     * 查询最新弹幕列表
+     *
+     * @return List<BarrageMessageVo>
+     */
+    @Override
+    public List<BarrageMessageVo> queryBarrageMessageList() {
+        // TODO 网站配置功能待开发
+        int size = 100;
+        return barrageMessageMapper.selectLastedBarrageMessageList(size);
+    }
+
+    /**
      * 新增弹幕
      *
      * @param request           请求信息
@@ -94,31 +131,36 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public void addBarrageMessage(HttpServletRequest request, BarrageMessageDto barrageMessageDto) {
+        // 生成弹幕id
         Long messageId = SequenceUtils.getId();
-        boolean isLogin = SecurityUtils.isAuthenticated();
 
-        // 自动审核
+        // 1.审核
         String content = barrageMessageDto.getContent();
+        AuditResult auditResult = auditBarrageMessage(messageId, content);
+
+        // 2.入库
+        BarrageMessage message = buildBarrageMessage(request, content, messageId, auditResult);
+        ThrowUtils.when(barrageMessageMapper.insert(message) != 1).system(BaseErrorCode.SCOREA001);
+
+        // 3.广播
+        barrageMessagePublisher.send(barrageMessageMapper.selectBarrageMessageDetail(messageId));
+    }
+
+    private AuditResult auditBarrageMessage(Long messageId, String content) {
         AuditContext auditContext = new AuditContext(content, AuditScene.BARRAGE);
         auditContext.setOid(String.valueOf(messageId));
-        if (isLogin) {
+        if (SecurityUtils.isAuthenticated()) {
             auditContext.setUid(String.valueOf(SecurityUtils.getLoginId()));
         }
-        AuditResult auditResult = auditService.audit(auditContext);
-
-        // 构造弹幕信息
-        BarrageMessage message = buildBarrageMessage(request, content, messageId, auditResult, isLogin);
-
-        // 数据入库
-        ThrowUtils.when(barrageMessageMapper.insert(message) != 1).system(BaseErrorCode.SCOREA001);
+        return auditService.audit(auditContext);
     }
 
     private BarrageMessage buildBarrageMessage(HttpServletRequest request,
-            String content, Long messageId, AuditResult auditResult, boolean isLogin) {
+            String content, Long messageId, AuditResult auditResult) {
         BarrageMessage message = new BarrageMessage();
         message.setId(messageId);
         message.setContent(content);
-        if (isLogin) {
+        if (SecurityUtils.isAuthenticated()) {
             User user = SecurityUtils.getLoginUser();
             message.setUserId(user.getId());
             message.setNickname(user.getNickname());

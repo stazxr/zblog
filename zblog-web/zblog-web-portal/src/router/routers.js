@@ -96,8 +96,8 @@ const routes = [
     }
   },
   {
-    path: '/message',
-    component: resolve => require(['../views/message/index'], resolve),
+    path: '/barrageMessage',
+    component: resolve => require(['../views/barrageMessage/index'], resolve),
     meta: {
       title: '弹幕'
     }

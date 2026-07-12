@@ -18,6 +18,11 @@ module.exports = {
         pathRewrite: {
           '^/api': '/api'
         }
+      },
+      'ws': {
+        target: defaultSettings.devBaseApiUrl,
+        ws: true,
+        changeOrigin: true
       }
     },
     disableHostCheck: true

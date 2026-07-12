@@ -20,6 +20,20 @@ CREATE TABLE `barrage_message` (
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='弹幕';
 
+/*Table structure for table `barrage_message_like` */
+DROP TABLE IF EXISTS `barrage_message_like`;
+CREATE TABLE `barrage_message_like` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `BARRAGE_MESSAGE_ID` BIGINT NOT NULL COMMENT '弹幕ID',
+  `USER_ID` BIGINT NULL COMMENT '用户ID',
+  `IP` VARCHAR(50) NULL COMMENT '访问IP',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`ID`) USING BTREE
+);
+
+CREATE UNIQUE INDEX uk_barrage_message_like_user ON barrage_message_like(`BARRAGE_MESSAGE_ID`, `USER_ID`);
+CREATE UNIQUE INDEX uk_barrage_message_like_ip ON barrage_message_like(`BARRAGE_MESSAGE_ID`, `IP`);
+
 /*Table structure for table `category` */
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (

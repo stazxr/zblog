@@ -30,6 +30,11 @@
             <groupId>com.github.stazxr.zblog</groupId>
             <artifactId>zblog-content-ext</artifactId>
         </dependency>
+        <!-- Springboot Websocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <!-- Springboot Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

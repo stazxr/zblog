@@ -3,8 +3,6 @@ package com.github.stazxr.zblog.bas.cache.autoconfigure.properties;
 import com.github.stazxr.zblog.bas.cache.CacheType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Arrays;
-
 /**
  * 缓存配置类。
  *

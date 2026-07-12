@@ -6,6 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 用户信息
+    user: {
+      id: null,
+      nickname: null,
+      avatar: null,
+      gender: null,
+      intro: null,
+      webSite: null
+    },
     // 页面信息
     pages: {},
     // 网站配置信息
@@ -41,15 +50,6 @@ export default new Vuex.Store({
     websiteVersion: '',
     // 文章默认封面
     articleDefaultImg: '',
-    // 用户信息
-    user: {
-      id: null,
-      nickname: '',
-      avatar: '',
-      gender: '',
-      intro: '',
-      webSite: ''
-    },
     // 登录模态框是否显示
     loginFlag: false,
     // 注册模态框是否显示
@@ -68,6 +68,16 @@ export default new Vuex.Store({
     talkLikeSet: []
   },
   mutations: {
+    // 设置用户信息
+    setUserInfo(state, loginUser) {
+      state.user.id = loginUser ? null : loginUser.user.id
+      state.user.nickname = loginUser.user.nickname
+      state.user.avatar = loginUser.user.headImgUrl
+      state.user.gender = loginUser.user.gender
+      state.user.webSite = loginUser.user.website
+      state.user.intro = loginUser.user.signature
+      state.user.email = loginUser.user.email
+    },
     // 设置页面信息
     setPageInfo(state, pages) {
       state.pages = pages || {}
@@ -93,14 +103,6 @@ export default new Vuex.Store({
     },
     // 登录成功，设置用户信息
     login(state, user) {
-      state.user.id = user['id']
-      state.user.nickname = user['nickname']
-      state.user.avatar = user['headImgUrl']
-      state.user.gender = user['gender']
-      state.user.webSite = user['website']
-      state.user.intro = user['signature']
-      state.user.email = user['email']
-
       state.commentLikeSet = user.commentLikeSet ? user.commentLikeSet : []
       state.talkLikeSet = user.talkLikeSet ? user.talkLikeSet : []
       state.articleLikeSet = user.articleLikeSet ? user.articleLikeSet : []

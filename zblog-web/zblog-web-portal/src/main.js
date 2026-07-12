@@ -8,6 +8,8 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 // Api
 import api from './api/http-index'
+// WS
+import ws from '@/utils/websocket'
 // 消息提醒
 import Toast from './components/toast/index'
 // 确认框
@@ -44,8 +46,9 @@ Vue.use(VueImageSwipe)
 Vue.use(Highlight)
 Vue.use(loading)
 
-// 声明全局变量
+// 全局挂载
 Vue.prototype['$mapi'] = api
+Vue.prototype['$ws'] = ws
 
 // 关闭提示
 Vue.config.productionTip = false

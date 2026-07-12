@@ -4,9 +4,25 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 获取Web端登录用户信息
+  webLoginId: params => {
+    return api.httpRequest().get(`${portalApi}/webLoginId`, params)
+  },
   // 查询页面信息
   queryPageInfo: params => {
     return api.httpRequest().get(`${portalApi}/queryPageInfo`, params)
+  },
+  // 获取弹幕列表
+  queryBarrageMessageList: params => {
+    return api.httpRequest().get(`${portalApi}/queryBarrageMessageList`, params)
+  },
+  // 发送弹幕
+  addBarrageMessage: params => {
+    return api.httpRequest().post(`${portalApi}/addBarrageMessage`, params)
+  },
+  // 弹幕点赞
+  likeBarrageMessage: params => {
+    return api.httpRequest().post(`${portalApi}/likeBarrageMessage`, params)
   },
 
   // 登录
@@ -44,14 +60,6 @@ export default {
   // 获取文章详情
   queryArticleDetail: params => {
     return api.httpRequest().get(`${portalApi}/queryArticleDetail`, params)
-  },
-  // 获取弹幕列表
-  queryMessageList: params => {
-    return api.httpRequest().get(`${portalApi}/queryMessageList`, params)
-  },
-  // 发送弹幕
-  saveMessage: params => {
-    return api.httpRequest().post(`${portalApi}/addBarrageMessage`, params)
   },
   // 获取评论列表
   queryCommentList: params => {

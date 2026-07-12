@@ -34,10 +34,11 @@ public class MenuController {
      * @return {@link List<MenuVo>} 返回构建后的用户菜单树
      * @see MenuService#queryUserMenuTree() 用于构建用户菜单树的业务逻辑方法
      */
+    @Deprecated // 接口已下线，不在对外提供单独获取用户菜单的接口
     @GetMapping(value = "/queryUserMenuTree")
     @ApiOperation(value = "查询用户菜单列表（树）")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "查询用户菜单列表（树）", code = "MENUQ001", level = RouterLevel.PUBLIC)
+    @Router(name = "查询用户菜单列表（树）", code = "MENUQ001", level = RouterLevel.PUBLIC, remark = "接口于5.0版本已下线，不在提供单独获取用户菜单的接口")
     public List<MenuVo> queryUserMenuTree() {
         return menuService.queryUserMenuTree();
     }

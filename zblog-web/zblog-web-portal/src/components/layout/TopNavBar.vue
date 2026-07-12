@@ -88,7 +88,7 @@
             <router-link to="/links">
               📌 友链
             </router-link>
-            <router-link to="/message">
+            <router-link to="/barrageMessage">
               💌 弹幕
             </router-link>
           </ul>

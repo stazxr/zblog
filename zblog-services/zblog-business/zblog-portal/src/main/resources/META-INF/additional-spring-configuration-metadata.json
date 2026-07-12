@@ -1,0 +1,36 @@
+{
+  "groups": [
+    {
+      "name": "zblog.websocket",
+      "type": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
+      "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
+      "description": "WebSocket配置."
+    }
+  ],
+  "properties": [
+    {
+      "name": "zblog.websocket.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
+      "defaultValue": "/ws",
+      "description": "WebSocket Endpoint."
+    },
+    {
+      "name": "zblog.websocket.broker-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
+      "defaultValue": "topic",
+      "description": "Broker 前缀."
+    },
+    {
+      "name": "zblog.websocket.allowed-origin-patterns",
+      "type": "java.lang.String[]",
+      "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
+      "defaultValue": [
+        "*"
+      ],
+      "description": "允许跨域配置."
+    }
+  ],
+  "hints": []
+}

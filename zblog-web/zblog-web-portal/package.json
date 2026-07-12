@@ -22,6 +22,8 @@
     "json-bigint": "^1.0.0",
     "katex": "^0.16.3",
     "qs": "^6.10.1",
+    "sockjs-client": "1.6.1",
+    "stompjs": "2.3.3",
     "vue": "2.6.14",
     "vue-baberrage": "^3.2.4",
     "vue-cute-timeline": "^1.2.8",

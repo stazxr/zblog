@@ -28,10 +28,19 @@
 
     <select id="selectBarrageMessageDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
         SELECT
-            ID, CONTENT, NICKNAME, AVATAR, IP, IP_REGION, USER_AGENT,
-            AUDIT_STATUS, AUDIT_REASON, AUDIT_TIME, DEVICE_ID, SPEED, COLOR, CREATE_TIME,
+            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.IP, bm.IP_REGION, bm.USER_AGENT,
+            bm.AUDIT_STATUS, bm.AUDIT_REASON, bm.AUDIT_TIME, bm.DEVICE_ID, bm.SPEED, bm.COLOR, bm.CREATE_TIME,
             (SELECT USERNAME FROM user u WHERE u.ID = bm.AUDIT_USER_ID) AS AUDIT_USERNAME
         FROM barrage_message bm
         WHERE bm.ID = #{barrageMessageId}
+    </select>
+
+    <select id="selectLastedBarrageMessageList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
+        SELECT
+            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.SPEED, bm.COLOR
+        FROM barrage_message bm
+        WHERE bm.AUDIT_STATUS = 1
+        ORDER BY bm.CREATE_TIME DESC
+        LIMIT #{limit}
     </select>
 </mapper>

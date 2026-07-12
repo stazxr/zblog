@@ -289,3 +289,9 @@ zblog:
     recordResult: false # 是否记录接口返回值，建议关闭以避免日志过大
     max-param-length: 5000 # 记录的最大参数长度，超过部分将被截断
     max-result-length: 5000 # 记录的最大返回长度，超过部分将被截断
+  # websocket 配置
+  websocket:
+    endpoint: /ws # WebSocket Endpoint
+    broker-prefix: topic # Broker 前缀
+    allowed-origin-patterns: # 允许跨域列表配置
+      - "*"

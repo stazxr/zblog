@@ -8,6 +8,8 @@ import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessage;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 弹幕管理数据层
  *
@@ -31,4 +33,12 @@ public interface BarrageMessageMapper extends BaseMapper<BarrageMessage> {
      * @return BarrageMessageVo
      */
     BarrageMessageVo selectBarrageMessageDetail(@Param("barrageMessageId") Long barrageMessageId);
+
+    /**
+     * 查询最新弹幕列表
+     *
+     * @param limit 查询数据量
+     * @return List<BarrageMessageVo>
+     */
+    List<BarrageMessageVo> selectLastedBarrageMessageList(@Param("limit") int limit);
 }

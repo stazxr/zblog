@@ -4,9 +4,11 @@ import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import io.swagger.annotations.Api;
@@ -33,6 +35,19 @@ public class PortalController {
     private final PortalService portalService;
 
     /**
+     * 获取Web端登录用户信息
+     *
+     * @return WebLoginUser
+     */
+    @GetMapping("/webLoginId")
+    @ApiOperation(value = "获取Web端登录用户信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "获取Web端登录用户信息", code = "PORTQ001", level = RouterLevel.OPEN)
+    public WebLoginUser currentWebUserDetail() {
+        return portalService.currentWebUserDetail();
+    }
+
+    /**
      * 查询博客页面信息
      *
      * @return Map<String, List<ThemePageVo>>
@@ -42,9 +57,22 @@ public class PortalController {
     @GetMapping("/queryPageInfo")
     @ApiOperation(value = "查询博客页面信息")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
-    @Router(name = "查询博客页面信息", code = "PORTQ001", level = RouterLevel.OPEN)
+    @Router(name = "查询博客页面信息", code = "PORTQ002", level = RouterLevel.OPEN)
     public Map<String, List<ThemePageVo>> queryPageInfo() {
         return portalService.queryPageInfo();
+    }
+
+    /**
+     * 查询最新弹幕列表
+     *
+     * @return List<BarrageMessageVo>
+     */
+    @GetMapping(value = "/queryBarrageMessageList")
+    @ApiOperation(value = "查询最新弹幕列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询最新弹幕列表", code = "PORTQ003", level = RouterLevel.OPEN)
+    public List<BarrageMessageVo> queryBarrageMessageListByPage() {
+        return portalService.queryBarrageMessageList();
     }
 
     /**

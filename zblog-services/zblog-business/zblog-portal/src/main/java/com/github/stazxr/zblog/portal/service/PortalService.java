@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.portal.service;
 
+import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
+import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,13 @@ import java.util.Map;
  */
 public interface PortalService {
     /**
+     * 获取Web端登录用户信息
+     *
+     * @return WebLoginUser
+     */
+    WebLoginUser currentWebUserDetail();
+
+    /**
      * 查询博客页面信息
      *
      * @return Map<String, List<ThemePageVo>>
@@ -22,6 +31,13 @@ public interface PortalService {
      *     V: List<ThemePageVo>
      */
     Map<String, List<ThemePageVo>> queryPageInfo();
+
+    /**
+     * 查询最新弹幕列表
+     *
+     * @return List<BarrageMessageVo>
+     */
+    List<BarrageMessageVo> queryBarrageMessageList();
 
     /**
      * 新增弹幕

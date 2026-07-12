@@ -3,23 +3,13 @@
     <div class="message-banner" :style="cover">
       <div class="message-container">
         <div class="animated fadeInUp message-input-wrapper">
-          <input v-model="messageContent" placeholder="说点什么吧" maxlength="200" @click="showBtn = true" @keyup.enter="addToList">
-          <button v-show="showBtn" class="ml-3 animated bounceInLeft" @click="addToList">
-            发送
-          </button>
+          <input v-model="messageContent" placeholder="说点什么吧" maxlength="200" @click="showSendBtn = true" @keyup.enter="addBarrageMessage">
+          <button v-show="showSendBtn" class="ml-3 animated bounceInLeft" @click="addBarrageMessage">发送</button>
         </div>
       </div>
       <!-- 弹幕 -->
       <div class="barrage-container">
-        <vue-baberrage :barrage-list="barrageList">
-          <template v-slot:default="slotProps">
-            <span class="barrage-items">
-              <img :src="slotProps.item.avatar" width="30" height="30" style="border-radius:50%" alt="">
-              <span class="ml-2">{{ slotProps.item.nickname }} :</span>
-              <span class="ml-2">{{ slotProps.item.messageContent }}</span>
-            </span>
-          </template>
-        </vue-baberrage>
+        <Barrage ref="barrageRef" :list="barrageList" @like="likeBarrageMessage" />
       </div>
     </div>
   </div>
@@ -27,13 +17,17 @@
 
 <script>
 import { getPageRandomCover } from '@/utils/theme'
+import Barrage from '@/components/barrage/Barrage.vue'
 export default {
-  name: 'Message',
+  name: 'BarrageMessage',
+  components: {
+    Barrage
+  },
   data() {
     return {
       cover: null,
-      showBtn: false,
-      messageContent: '',
+      showSendBtn: false,
+      messageContent: null,
       barrageList: []
     }
   },
@@ -41,30 +35,41 @@ export default {
     this.cover = getPageRandomCover(this.$store.state.pages, 'message')
   },
   mounted() {
-    this.listMessage()
+    this.$ws.subscribe('/topic/barrageMessage', this.receiveBarrageMessage)
+    this.queryBarrageMessageList()
+  },
+  beforeDestroy() {
+    this.$ws.unsubscribe('/topic/barrageMessage')
   },
   methods: {
-    addToList() {
-      if (this.messageContent.trim() === '') {
-        this.$toast({ type: 'warning', message: '内容不能为空' })
+    receiveBarrageMessage(barrageMessage) {
+      if (barrageMessage) {
+        this.$refs.barrageRef.add(barrageMessage)
+      }
+    },
+    queryBarrageMessageList() {
+      this.$mapi.portal.queryBarrageMessageList().then(({ data }) => {
+        this.barrageList = data
+      }).catch(_ => {
+        this.barrageList = []
+      })
+    },
+    addBarrageMessage() {
+      if (this.messageContent == null || this.messageContent.trim() === '') {
         return false
       }
 
-      const message = { content: this.messageContent }
-      this.messageContent = ''
-      this.barrageList.push(message)
-      this.$mapi.portal.saveMessage(message).then(_ => {
-        this.barrageList.push(message)
+      const param = { content: this.messageContent }
+      this.messageContent = null
+      this.$mapi.portal.addBarrageMessage(param).then(_ => {
         this.$toast({ type: 'success', message: '发送成功' })
       }).catch(_ => {
         this.$toast({ type: 'error', message: '发送失败' })
       })
     },
-    listMessage() {
-      this.$mapi.portal.queryMessageList().then(({ data }) => {
-        this.barrageList = data
-      }).catch(_ => {
-        this.barrageList = []
+    likeBarrageMessage(item) {
+      this.$mapi.portal.likeBarrageMessage({ barrageMessageId: item.id }).then(() => {
+        item.likeCount++
       })
     }
   }
@@ -72,9 +77,6 @@ export default {
 </script>
 
 <style scoped>
-/* =========================
-   📌 主容器
-========================= */
 .message-banner {
   position: absolute;
   top: -60px;

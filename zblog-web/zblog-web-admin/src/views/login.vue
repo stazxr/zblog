@@ -139,15 +139,6 @@ export default {
         this.publicKey = null
       })
     },
-    loginFormAuthFocus() {
-      if (this.loginForm.username == null) {
-        this.$refs.username.focus()
-      } else if (this.loginForm.password == null) {
-        this.$refs.password.focus()
-      } else if (this.loginForm.code == null) {
-        this.$refs.code.focus()
-      }
-    },
     getPwdFlag() {
       this.pwdFlag = !this.pwdFlag
       this.pwdFlagType = this.pwdFlag ? 'text' : 'password'
@@ -201,11 +192,6 @@ export default {
           })
         }
       })
-    },
-    buildLoginPayload() {
-      return encrypt(this.publicKey, JSON.stringify({
-        ...this.loginForm
-      }))
     },
     point() {
       const point = window.sessionStorage.getItem('point')
