@@ -70,13 +70,23 @@ export default new Vuex.Store({
   mutations: {
     // 设置用户信息
     setUserInfo(state, loginUser) {
-      state.user.id = loginUser ? null : loginUser.user.id
-      state.user.nickname = loginUser.user.nickname
-      state.user.avatar = loginUser.user.headImgUrl
-      state.user.gender = loginUser.user.gender
-      state.user.webSite = loginUser.user.website
-      state.user.intro = loginUser.user.signature
-      state.user.email = loginUser.user.email
+      if (loginUser == null || loginUser.user == null) {
+        state.user.id = null
+        state.user.nickname = null
+        state.user.avatar = null
+        state.user.gender = null
+        state.user.webSite = null
+        state.user.intro = null
+        state.user.email = null
+      } else {
+        state.user.id = loginUser.user['id']
+        state.user.nickname = loginUser.user['nickname']
+        state.user.avatar = loginUser.user['headImgUrl']
+        state.user.gender = loginUser.user['gender']
+        state.user.webSite = loginUser.user['website']
+        state.user.intro = loginUser.user['signature']
+        state.user.email = loginUser.user['email']
+      }
     },
     // 设置页面信息
     setPageInfo(state, pages) {

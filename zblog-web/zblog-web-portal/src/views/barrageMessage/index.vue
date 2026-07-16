@@ -8,9 +8,7 @@
         </div>
       </div>
       <!-- 弹幕 -->
-      <div class="barrage-container">
-        <Barrage ref="barrageRef" :list="barrageList" @like="likeBarrageMessage" />
-      </div>
+      <Barrage ref="barrageRef" @like="likeBarrageMessage" />
     </div>
   </div>
 </template>
@@ -27,46 +25,75 @@ export default {
     return {
       cover: null,
       showSendBtn: false,
-      messageContent: null,
-      barrageList: []
+      messageContent: null
     }
   },
   created() {
     this.cover = getPageRandomCover(this.$store.state.pages, 'message')
   },
   mounted() {
-    this.$ws.subscribe('/topic/barrageMessage', this.receiveBarrageMessage)
-    this.queryBarrageMessageList()
+    this.$nextTick(() => {
+      this.initBarrage()
+    })
   },
   beforeDestroy() {
     this.$ws.unsubscribe('/topic/barrageMessage')
   },
   methods: {
+    /**
+     * 初始化弹幕
+     */
+    initBarrage() {
+      /**
+       * 加载历史弹幕
+       */
+      this.queryBarrageMessageList()
+      /**
+       * 监听实时弹幕
+       */
+      this.$ws.subscribe('/topic/barrageMessage', this.receiveBarrageMessage)
+    },
+    /**
+     * 接受实时弹幕
+     */
     receiveBarrageMessage(barrageMessage) {
-      if (barrageMessage) {
+      if (barrageMessage && this.$refs.barrageRef) {
+        console.log('barrageMessage', barrageMessage)
         this.$refs.barrageRef.add(barrageMessage)
       }
     },
+    /**
+     * 查询历史弹幕
+     */
     queryBarrageMessageList() {
       this.$mapi.portal.queryBarrageMessageList().then(({ data }) => {
-        this.barrageList = data
-      }).catch(_ => {
-        this.barrageList = []
+        if (Array.isArray(data)) {
+          this.$refs.barrageRef.addAll(data)
+        }
+      }).catch(e => {
+        console.log('load barrage message error', e)
+        this.$toast({ type: 'error', message: '历史弹幕加载失败...' })
       })
     },
+    /**
+     * 发布弹幕
+     */
     addBarrageMessage() {
       if (this.messageContent == null || this.messageContent.trim() === '') {
-        return false
+        return
       }
 
-      const param = { content: this.messageContent }
-      this.messageContent = null
+      const param = { content: this.messageContent.trim() }
       this.$mapi.portal.addBarrageMessage(param).then(_ => {
+        this.messageContent = null
         this.$toast({ type: 'success', message: '发送成功' })
       }).catch(_ => {
         this.$toast({ type: 'error', message: '发送失败' })
       })
     },
+    /**
+     * 点赞
+     */
     likeBarrageMessage(item) {
       this.$mapi.portal.likeBarrageMessage({ barrageMessageId: item.id }).then(() => {
         item.likeCount++
@@ -121,23 +148,5 @@ export default {
   height: 100%;
   padding: 0 1.25rem;
   border: #fff 1px solid;
-}
-.barrage-container {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(100% - 50px);
-  width: 100%;
-  z-index: 3;
-}
-.barrage-items {
-  background: rgb(0, 0, 0, 0.7);
-  border-radius: 100px;
-  color: #fff;
-  padding: 5px 10px 5px 5px;
-  display: flex;
-  align-items: center;
 }
 </style>

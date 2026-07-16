@@ -1,70 +1,147 @@
+/**
+ * 弹幕容器
+ *
+ * 所有弹幕都绝对定位在这里
+ */
 .barrage-container {
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  overflow:hidden;
-  pointer-events:auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  /**
+   * 防止鼠标选中文字
+   */
+  user-select: none;
+  /**
+   * 弹幕可以接收鼠标事件
+   */
+  pointer-events: auto;
 }
 
+/**
+ * 单条弹幕
+ */
 .barrage-item {
-  position:absolute;
-  left:100%;
-  display:flex;
-  align-items:center;
-  height:36px;
-  padding:4px 12px 4px 5px;
-  border-radius:20px;
-  background: rgba(0,0,0,.65);
-  color:#fff;
-  font-size:14px;
-  white-space:nowrap;
-  animation-name:barrage-move;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
-  animation-play-state:running;
-}
-.barrage-item.paused {
-  animation-play-state:paused;
-  background: rgba(0,0,0,.85);
-  z-index:100;
+  /**
+   * 绝对定位
+   *
+   * top由JS计算
+   */
+  position: absolute;
+  /**
+   * 从右侧进入
+   */
+  left: 100%;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 4px 12px 4px 5px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, .65);
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+  /**
+   * 防止动画过程中产生锯齿
+   */
+  will-change: transform;
+  /**
+   * CSS动画
+   */
+  animation-name: barrage-move;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
 }
 
+/**
+ * 鼠标悬浮暂停
+ *
+ * 只影响当前弹幕
+ */
+.barrage-item.paused {
+  animation-play-state: paused;
+  background: rgba(0, 0, 0, .85);
+  z-index: 999;
+  transform: scale(1.05);
+}
+
+/**
+ * 弹幕移动动画
+ *
+ * distance由JS动态注入
+ *
+ * 例如：
+ *
+ * --move-distance:-1500px
+ */
 @keyframes barrage-move {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
+
   to {
-    transform: translateX(-120vw);
+    transform: translate3d(
+      var(--move-distance),
+      0,
+      0
+    );
   }
 }
 
+
+/**
+ * 用户头像
+ */
 .barrage-avatar {
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  margin-right:8px;
-}
-.barrage-nickname {
-  color:#ffd04b;
-  margin-right:8px;
-}
-.barrage-content {
-  max-width:300px;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
-.barrage-like {
-  margin-left:12px;
-  padding:3px 10px;
-  border-radius:20px;
-  background:#fff;
-  color:#333;
-  cursor:pointer;
-  transition:.2s;
+
+/**
+ * 用户昵称
+ */
+.barrage-nickname {
+  color: #ffd04b;
+  margin-right: 8px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+/**
+ * 弹幕内容
+ */
+.barrage-content {
+  max-width: 350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/**
+ * 点赞按钮
+ *
+ * 默认只在hover显示
+ */
+.barrage-like {
+  margin-left: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  font-size: 13px;
+  transition: .2s;
+}
+
 .barrage-like:hover {
-  transform:scale(1.1);
+  transform: scale(1.15);
 }

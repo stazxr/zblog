@@ -76,9 +76,9 @@ export default {
     this.getPageInfo()
 
     // 获取博客信息
-    this.getBlogInfo()
+    // this.getBlogInfo()
     // 上传访客信息
-    this.recordVisitor()
+    // this.recordVisitor()
   },
   beforeDestroy() {
     const stomp = this.$store.state.ws.stomp
