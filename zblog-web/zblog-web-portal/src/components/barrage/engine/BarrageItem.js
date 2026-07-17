@@ -9,7 +9,6 @@
  *
  * @author SunTao
  */
-import Measure from './Measure'
 import Constants from './Constants'
 
 export default class BarrageItem {

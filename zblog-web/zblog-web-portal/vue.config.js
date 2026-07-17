@@ -19,7 +19,7 @@ module.exports = {
           '^/api': '/api'
         }
       },
-      'ws': {
+      '/ws': {
         target: defaultSettings.devBaseApiUrl,
         ws: true,
         changeOrigin: true

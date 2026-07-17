@@ -292,6 +292,6 @@ zblog:
   # websocket 配置
   websocket:
     endpoint: /ws # WebSocket Endpoint
-    broker-prefix: topic # Broker 前缀
+    broker-prefix: /topic # Broker 前缀
     allowed-origin-patterns: # 允许跨域列表配置
       - "*"

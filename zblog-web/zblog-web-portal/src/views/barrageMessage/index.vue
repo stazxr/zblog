@@ -25,7 +25,8 @@ export default {
     return {
       cover: null,
       showSendBtn: false,
-      messageContent: null
+      messageContent: null,
+      topicDestination: '/topic/barrageMessage'
     }
   },
   created() {
@@ -37,7 +38,7 @@ export default {
     })
   },
   beforeDestroy() {
-    this.$ws.unsubscribe('/topic/barrageMessage')
+    this.$ws.unsubscribe(this.topicDestination)
   },
   methods: {
     /**
@@ -51,14 +52,13 @@ export default {
       /**
        * 监听实时弹幕
        */
-      this.$ws.subscribe('/topic/barrageMessage', this.receiveBarrageMessage)
+      this.$ws.subscribe(this.topicDestination, this.receiveBarrageMessage)
     },
     /**
      * 接受实时弹幕
      */
     receiveBarrageMessage(barrageMessage) {
       if (barrageMessage && this.$refs.barrageRef) {
-        console.log('barrageMessage', barrageMessage)
         this.$refs.barrageRef.add(barrageMessage)
       }
     },

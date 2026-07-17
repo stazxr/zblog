@@ -8,6 +8,11 @@ class WebSocketManager {
     this.connected = false
     this.subscriptions = new Map()
 
+    /**
+     * 等待连接完成的订阅
+     */
+    this.pendingSubscriptions = new Map()
+
     window.addEventListener('beforeunload', () => {
       this.disconnect()
     })
@@ -27,7 +32,8 @@ class WebSocketManager {
       this.stomp.debug = null
       this.stomp.connect({}, frame => {
         this.connected = true
-        console.log('WebSocket连接成功')
+        console.log('WebSocket连接成功', frame)
+        this.flushPendingSubscriptions()
         resolve(frame)
       }, error => {
         console.error('WebSocket连接失败', error)
@@ -42,10 +48,12 @@ class WebSocketManager {
    */
   subscribe(destination, callback) {
     if (!this.stomp || !this.connected) {
-      console.warn('WebSocket未连接')
+      console.log('WebSocket未连接，缓存订阅：', destination)
+      this.pendingSubscriptions.set(destination, callback)
       return null
     }
 
+    console.log('开启订阅', destination)
     const subscription = this.stomp.subscribe(destination, message => {
       const data = JSON.parse(message.body)
       callback(data)
@@ -61,9 +69,20 @@ class WebSocketManager {
   unsubscribe(destination) {
     const subscription = this.subscriptions.get(destination)
     if (subscription) {
+      console.log('关闭订阅', destination)
       subscription.unsubscribe()
       this.subscriptions.delete(destination)
     }
+  }
+
+  /**
+   * 处理等待订阅
+   */
+  flushPendingSubscriptions() {
+    this.pendingSubscriptions.forEach((callback, destination) => {
+      this.subscribe(destination, callback)
+    })
+    this.pendingSubscriptions.clear()
   }
 
   /**

@@ -93,8 +93,12 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
-    initWebSocket() {
-      this.$ws.connect()
+    async initWebSocket() {
+      try {
+        await this.$ws.connect()
+      } catch (e) {
+        console.error('websocket init failed', e)
+      }
     },
     getUserInfo() {
       this.$mapi.portal.webLoginId().then(res => {

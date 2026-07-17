@@ -19,14 +19,14 @@ public class BarrageMessagePublisher {
     private final SimpMessagingTemplate template;
 
     public BarrageMessagePublisher(SimpMessagingTemplate template){
-        this.template=template;
+        this.template = template;
     }
 
     public void send(BarrageMessageVo barrageMessage) {
         try {
             template.convertAndSend("/topic/barrageMessage", barrageMessage);
         } catch (Exception e) {
-            log.error("topic '/topic/barrage' send failed", e);
+            log.error("topic [/topic/barrage] send failed", e);
         }
     }
 }

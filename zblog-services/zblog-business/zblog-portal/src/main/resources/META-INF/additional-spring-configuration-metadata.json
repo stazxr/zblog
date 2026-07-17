@@ -19,7 +19,7 @@
       "name": "zblog.websocket.broker-prefix",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
-      "defaultValue": "topic",
+      "defaultValue": "/topic",
       "description": "Broker 前缀."
     },
     {
