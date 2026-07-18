@@ -26,7 +26,7 @@
       <div class="crud-opts">
         <span class="crud-opts-left">
           <el-button v-perm="['BMESQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['BMESU001']" :disabled="row === null" type="primary" @click="auditBarrageMessage">审核</el-button>
+          <el-button v-perm="['BMESU001']" :disabled="row === null || row.auditStatus === 1 || row.auditStatus === 1" type="primary" @click="auditBarrageMessage">审核</el-button>
           <el-button v-perm="['BMESD001']" :disabled="row === null" type="danger" @click="deleteBarrageMessage">删除</el-button>
         </span>
       </div>
@@ -42,22 +42,38 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="pageName" label="页面名称" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="pageLabel" label="页面标识" align="center" />
-        <el-table-column label="展示模式" align="center">
+        <el-table-column label="用户" align="center" width="180">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.displayMode === 'BANNER'" type="primary">顶部横幅</el-tag>
-            <el-tag v-else-if="scope.row.displayMode === 'FULL'" type="primary">全屏背景</el-tag>
+            <div class="user-info">
+              <el-avatar :size="32" :src="scope.row['avatar']">
+                {{ (scope.row.nickname || '?').substring(0, 1) }}
+              </el-avatar>
+              <span class="nickname"> {{ scope.row.nickname }} </span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="content" label="弹幕内容" align="center">
+          <template v-slot="scope">
+            <span class="barrage-content" :style="{ color: scope.row.color }">
+              {{ scope.row.content }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="ipRegion" label="地址" align="center" width="150px" />
+        <el-table-column label="审核状态" align="center" width="100px">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.auditStatus === 0" type="primary">待审批</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === 1" type="success">审批通过</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === 2" type="danger">审批拒绝</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === 3" type="warning">待复核</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="pageSort" label="页面排序" align="center" width="100px" />
-        <el-table-column :show-overflow-tooltip="true" prop="createUsername" label="创建用户" align="center" width="120px" />
-        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="160px" />
-        <el-table-column :show-overflow-tooltip="true" prop="updateUsername" label="更新用户" align="center" width="120px" />
-        <el-table-column :show-overflow-tooltip="true" prop="updateTime" label="更新时间" align="center" width="160px" />
+        <el-table-column :show-overflow-tooltip="true" prop="auditReason" label="审核描述" align="center" width="160px" />
+        <el-table-column prop="auditTime" label="审核时间" align="center" width="160px" />
+        <el-table-column prop="createTime" label="创建时间" align="center" width="160px" />
         <div slot="empty">
-          <muses-empty />
+          <muses-empty description="暂无弹幕数据" />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -83,7 +99,7 @@
     <auditDialog
       ref="auditDialogRef"
       :dialog-visible="auditDialogVisible"
-      @showDetailDone="auditDone"
+      @auditDone="auditDone"
     />
   </div>
 </template>
@@ -216,5 +232,26 @@ export default {
 </script>
 
 <style scoped>
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.nickname {
+  margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barrage-content {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #303133;
+  border-radius: 14px;
+  line-height: 20px;
+  max-width: 100%;
+  word-break: break-all;
+}
 </style>

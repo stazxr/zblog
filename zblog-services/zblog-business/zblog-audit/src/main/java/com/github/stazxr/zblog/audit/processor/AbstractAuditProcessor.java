@@ -21,6 +21,13 @@ public abstract class AbstractAuditProcessor implements AuditProcessor {
         return r;
     }
 
+    protected ProcessorResult pass(String reason) {
+        ProcessorResult r = new ProcessorResult();
+        r.setDecision(AuditDecision.PASS);
+        r.setReason(reason);
+        return r;
+    }
+
     /**
      * MODIFY结果构建
      */

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      :title="dialogTitle"
+      title="弹幕审核"
       :visible.sync="dialogVisible"
       :fullscreen="isMobile"
       :close-on-click-modal="false"
@@ -10,20 +10,17 @@
       append-to-body
       width="520px"
     >
-      <el-form ref="addOrEditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
-        <el-form-item label="页面名称" prop="pageName">
-          <el-input v-model="formData.pageName" :style="isMobile ? '' : 'width: 380px;'" maxlength="25" show-word-limit />
+      <el-form ref="auditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
+        <el-form-item label="弹幕内容" prop="content">
+          <el-input v-model="formData.content" :style="isMobile ? '' : 'width: 380px;'" readonly />
         </el-form-item>
-        <el-form-item label="页面标识" prop="pageLabel">
-          <el-input v-model="formData.pageLabel" :style="isMobile ? '' : 'width: 380px;'" maxlength="25" show-word-limit />
-        </el-form-item>
-        <el-form-item label="展示模式" prop="displayMode">
-          <el-select v-model="formData.displayMode" :style="isMobile ? '' : 'width: 380px;'" placeholder="展示模式">
-            <el-option v-for="item in displayModeList" :key="item.value" :label="item.name" :value="item.value" />
+        <el-form-item label="审核结果" prop="auditStatus">
+          <el-select v-model="formData.auditStatus" :style="isMobile ? '' : 'width: 380px;'" placeholder="审核结果">
+            <el-option v-for="item in auditStatusList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="页面排序" prop="pageSort">
-          <el-input-number v-model.number="formData.pageSort" :min="0" :max="99999" :style="isMobile ? '' : 'width: 380px;'" step-strictly controls-position="right" />
+        <el-form-item label="备注" prop="auditReason">
+          <el-input v-model="formData.auditReason" :style="isMobile ? '' : 'width: 380px;'" type="textarea" maxlength="200" show-word-limit />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -40,35 +37,21 @@ export default {
     dialogVisible: {
       type: Boolean,
       default: false
-    },
-    dialogTitle: {
-      type: String,
-      default: ''
     }
   },
   data() {
     return {
       submitLoading: false,
-      displayModeList: [],
+      auditStatusList: [],
       formData: {
         id: null,
-        pageName: null,
-        pageLabel: null,
-        displayMode: 'BANNER',
-        pageSort: 99999
+        content: null,
+        auditStatus: null,
+        auditReason: null
       },
       formRules: {
-        pageName: [
-          { required: true, message: '请输入页面名称', trigger: 'blur' }
-        ],
-        pageLabel: [
-          { required: true, message: '请输入页面标识', trigger: 'blur' }
-        ],
-        displayMode: [
-          { required: true, message: '请选择页面展示模式', trigger: 'change' }
-        ],
-        pageSort: [
-          { required: true, message: '请选择页面排序', trigger: 'change' }
+        auditStatus: [
+          { required: true, message: '请选择审核结果', trigger: 'blur' }
         ]
       }
     }
@@ -80,52 +63,43 @@ export default {
   },
   methods: {
     initData(dataId) {
-      if (dataId != null && dataId !== '') {
-        this.$nextTick(() => {
-          this.getPageDetail(dataId)
-        })
-      }
-      this.loadDisplayModeList()
+      this.$nextTick(() => {
+        this.queryBarrageMessageDetail(dataId)
+      })
+      this.loadAuditStatusList()
     },
-    getPageDetail(dataId) {
-      this.$mapi.page.queryPageDetail({ pageId: dataId }).then(res => {
+    queryBarrageMessageDetail(dataId) {
+      this.$mapi.barrageMessage.queryBarrageMessageDetail({ barrageMessageId: dataId }).then(res => {
         const { data } = res
-        Object.keys(this.formData).forEach(key => {
-          this.formData[key] = data[key]
-        })
+        this.formData.id = data.id
+        this.formData.content = data.content
       }).catch(_ => {
         this.doClose()
       })
     },
-    loadDisplayModeList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'PAGE_DISPLAY_MODE_CONFIG' }).then(res => {
+    loadAuditStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'AUDIT_STATUS_1_CONFIG' }).then(res => {
         const { data } = res
-        this.displayModeList = data
+        this.auditStatusList = data
       }).catch(_ => {
-        this.displayModeList = []
+        this.auditStatusList = []
       })
     },
     submit() {
-      this.$refs.addOrEditForm.validate((valid) => {
+      this.$refs.auditForm.validate((valid) => {
         if (valid) {
           this.submitLoading = true
-          if (this.formData.id === null) {
-            // add
-            this.$mapi.page.addPage(this.formData).then(res => {
-              this.$message.success(res.message)
-              this.doClose(true)
-            }).finally(_ => {
-              this.submitLoading = false
-            })
-          } else {
-            // edit
-            this.$mapi.page.editPage(this.formData).then(res => {
-              this.$message.success(res.message)
-              this.doClose(true)
-            }).finally(_ => {
-              this.submitLoading = false
-            })
+          const param = {
+            barrageMessageId: this.formData.id,
+            auditStatus: this.formData.auditStatus,
+            auditReason: this.formData.auditReason
           }
+          this.$mapi.barrageMessage.auditBarrageMessage(param).then(res => {
+            this.$message.success(res.message)
+            this.doClose(true)
+          }).finally(_ => {
+            this.submitLoading = false
+          })
         }
       })
     },
@@ -142,21 +116,18 @@ export default {
     doClose(result = false) {
       this.formData = {
         id: null,
-        pageName: null,
-        pageLabel: null,
-        displayMode: 'BANNER',
-        pageSort: 99999
+        content: null,
+        auditStatus: null,
+        auditReason: null
       }
-      this.$refs.addOrEditForm.resetFields()
+      this.$refs.auditForm.resetFields()
       this.submitLoading = false
-      this.$emit('addOrEditDone', result)
+      this.$emit('auditDone', result)
     }
   }
 }
 </script>
 
 <style scoped>
-::v-deep .el-input-number .el-input__inner {
-  text-align: left;
-}
+
 </style>

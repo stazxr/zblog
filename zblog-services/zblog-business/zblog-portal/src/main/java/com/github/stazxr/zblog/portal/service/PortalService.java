@@ -46,4 +46,11 @@ public interface PortalService {
      * @param barrageMessageDto 弹幕信息
      */
     void addBarrageMessage(HttpServletRequest request, BarrageMessageDto barrageMessageDto);
+
+    /**
+     * 点赞弹幕
+     *
+     * @param barrageMessageId 弹幕id
+     */
+    void likeBarrageMessage(Long barrageMessageId);
 }

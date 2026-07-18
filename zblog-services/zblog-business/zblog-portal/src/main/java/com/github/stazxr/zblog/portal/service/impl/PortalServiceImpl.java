@@ -27,12 +27,13 @@ import com.github.stazxr.zblog.portal.service.PortalService;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 门户管理业务实现层
@@ -43,6 +44,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
+    private static final Logger log = LoggerFactory.getLogger(PortalServiceImpl.class);
+
     private final AuditService auditService;
 
     private final BarrageMessageMapper barrageMessageMapper;
@@ -143,7 +146,19 @@ public class PortalServiceImpl implements PortalService {
         ThrowUtils.when(barrageMessageMapper.insert(message) != 1).system(BaseErrorCode.SCOREA001);
 
         // 3.广播
-        barrageMessagePublisher.send(barrageMessageMapper.selectBarrageMessageDetail(messageId));
+        if (BarrageMessageAuditStatus.APPROVED.getStatus().equals(message.getAuditStatus())) {
+            barrageMessagePublisher.send(barrageMessageMapper.selectBarrageMessageDetail(messageId));
+        }
+    }
+
+    /**
+     * 点赞弹幕
+     *
+     * @param barrageMessageId 弹幕id
+     */
+    @Override
+    public void likeBarrageMessage(Long barrageMessageId) {
+        // TODO
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {
@@ -198,7 +213,6 @@ public class PortalServiceImpl implements PortalService {
         message.setUserAgent(userAgent);
         message.setDeviceId(buildDeviceId(ip, userAgent));
         message.setColor("#FFFFFF");
-        message.setSpeed(ThreadLocalRandom.current().nextInt(6, 10));
         message.setCreateTime(now);
         return message;
     }
@@ -207,7 +221,8 @@ public class PortalServiceImpl implements PortalService {
         try {
             return Md5Utils.md5(ip + ua);
         } catch (Exception e) {
-            return "ERROR: " + e.getMessage();
+            log.error("build deviceId exception", e);
+            return null;
         }
     }
 }

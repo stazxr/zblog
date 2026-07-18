@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.content.ext.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.stazxr.zblog.audit.mapper.AuditRecordMapper;
+import com.github.stazxr.zblog.audit.model.AuditRecord;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.content.ext.domain.dto.BarrageMessageAuditDto;
@@ -29,6 +31,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BarrageMessageServiceImpl implements BarrageMessageService {
     private final BarrageMessageMapper barrageMessageMapper;
+
+    private final AuditRecordMapper auditRecordMapper;
 
     /**
      * 分页查询弹幕列表
@@ -61,6 +65,10 @@ public class BarrageMessageServiceImpl implements BarrageMessageService {
     @Override
     public BarrageMessageVo queryBarrageMessageDetail(Long barrageMessageId) {
         BarrageMessageVo barrageMessageVo = barrageMessageMapper.selectBarrageMessageDetail(barrageMessageId);
+        if (barrageMessageVo != null) {
+            AuditRecord auditRecord = auditRecordMapper.selectByOid(barrageMessageId);
+            barrageMessageVo.setAuditRecord(auditRecord);
+        }
         return ThrowUtils.requireNonNull(barrageMessageVo, BaseErrorCode.ECOREA001);
     }
 
@@ -75,13 +83,17 @@ public class BarrageMessageServiceImpl implements BarrageMessageService {
         BarrageMessage barrageMessage = barrageMessageMapper.selectById(auditDto.getBarrageMessageId());
         ThrowUtils.throwIfNull(barrageMessage, BaseErrorCode.ECOREA001);
         // 判断弹幕状态是否为待审批
-        ThrowUtils.throwIf(!BarrageMessageAuditStatus.PENDING.getStatus().equals(barrageMessage.getAuditStatus()), BarrageMessageErrorCode.EBMESA001);
+        boolean isPending = BarrageMessageAuditStatus.PENDING.getStatus().equals(barrageMessage.getAuditStatus());
+        boolean isManual = BarrageMessageAuditStatus.MANUAL.getStatus().equals(barrageMessage.getAuditStatus());
+        ThrowUtils.throwIf(!isPending && !isManual, BarrageMessageErrorCode.EBMESA001);
         if (BarrageMessageAuditStatus.REJECTED.getStatus().equals(barrageMessage.getAuditStatus())) {
             if (StringUtils.isBlank(auditDto.getAuditReason())) {
                 auditDto.setAuditReason("审批拒绝");
             }
         } else {
-            auditDto.setAuditReason("审批通过");
+            if (StringUtils.isBlank(auditDto.getAuditReason())) {
+                auditDto.setAuditReason("审批通过");
+            }
         }
 
         // 更新审核状态

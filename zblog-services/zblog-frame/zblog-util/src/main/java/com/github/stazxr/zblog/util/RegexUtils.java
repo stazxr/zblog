@@ -118,5 +118,10 @@ public class RegexUtils {
          * article/:id
          */
         public static final String ROUTE_REGEX = "^[A-Za-z][A-Za-z0-9_-]*(/[A-Za-z][A-Za-z0-9_-]*|/:[A-Za-z][A-Za-z0-9_]*)*$";
+
+        /**
+         * I18 变量正则表达式
+         */
+        public static final String I18N_MESSAGE_PATTERN = "^\\{[^{}]+}$";
     }
 }

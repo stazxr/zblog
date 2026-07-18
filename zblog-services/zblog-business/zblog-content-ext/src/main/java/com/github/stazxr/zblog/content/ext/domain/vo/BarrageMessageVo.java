@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.content.ext.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.github.stazxr.zblog.audit.model.AuditRecord;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -107,12 +108,6 @@ public class BarrageMessageVo implements Serializable {
     private String deviceId;
 
     /**
-     * 弹幕速度
-     */
-    @ApiModelProperty("弹幕速度")
-    private Integer speed;
-
-    /**
      * 弹幕颜色
      */
     @ApiModelProperty("弹幕颜色")
@@ -124,4 +119,10 @@ public class BarrageMessageVo implements Serializable {
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;
+
+    /**
+     * 审核记录
+     */
+    @ApiModelProperty("审核记录")
+    private AuditRecord auditRecord;
 }

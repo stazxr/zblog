@@ -12,8 +12,6 @@
         <result column="hit_words" property="hitWords" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="traces" property="traces" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="reason" property="reason"/>
-        <result column="risk_score" property="riskScore"/>
-        <result column="risk_level" property="riskLevel"/>
         <result column="cost_ms" property="costMs"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
@@ -40,4 +38,11 @@
             NOW()
         )
     </insert>
+
+    <select id="selectByOid" resultMap="BaseResultMap">
+        SELECT
+            ID, UID, OID, SCENE, ORIGINAL_CONTENT, FINAL_CONTENT,
+            DECISION, HIT_WORDS, REASON, TRACES, COST_MS, CREATE_TIME
+        FROM audit_record WHERE OID = #{oid} ORDER BY CREATE_TIME DESC LIMIT 1
+    </select>
 </mapper>

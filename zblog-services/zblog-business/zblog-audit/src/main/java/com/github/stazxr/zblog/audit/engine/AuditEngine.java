@@ -56,6 +56,7 @@ public class AuditEngine {
         AuditPolicyProperties policy = getPolicy(context.getScene());
 
         // ========== 3. 执行责任链 ==========
+        long startTime = System.currentTimeMillis(), costMs = 0L;
         AuditResult result;
         try {
             result = auditChain.execute(context, policy);
@@ -64,10 +65,13 @@ public class AuditEngine {
             result = new AuditResult();
             result.setDecision(AuditDecision.MANUAL);
             result.setReason("Audit Chain Error: " + e.getMessage());
+        } finally {
+            costMs = System.currentTimeMillis() - startTime;
         }
 
         // ========== 4. 构建审计记录并持久化 ==========
         AuditRecord record = buildRecord(context, result);
+        record.setCostMs(costMs);
         persist(record);
 
         // ========== 6. 返回结果 ==========
@@ -99,7 +103,7 @@ public class AuditEngine {
         AuditRecord record = new AuditRecord();
         record.setId(UuidUtils.genUuidStr());
         record.setUid(context.getUid());
-        record.setOid(context.getUid());
+        record.setOid(context.getOid());
         record.setScene(context.getScene());
         record.setOriginalContent(context.getOriginalContent());
         record.setFinalContent(result.getContent());

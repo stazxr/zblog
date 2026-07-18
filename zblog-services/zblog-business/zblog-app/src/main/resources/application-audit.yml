@@ -4,17 +4,17 @@ audit:
       xssProcessor: # XSS 处理器配置
         strategy: CLEAN # 默认执行策略：CLEAN / REJECT / MANUAL
         strategy-map: # 场景执行策略
+          BARRAGE:
+            strategy: REJECT
           COMMENT:
             strategy: REJECT
-          BARRAGE:
-            strategy: CLEAN
       sensitiveProcessor: # 敏感词处理器配置
         strategy: REPLACE # 默认执行策略: REPLACE / REJECT / MANUAL
         strategy-map:
-          COMMENT:
-            strategy: MANUAL # REPLACE / REJECT / MANUAL
           BARRAGE:
-            strategy: REPLACE
+            strategy: MANUAL
+          COMMENT:
+            strategy: MANUAL
       tencentTmsProcessor: # TMS 处理器配置
         enabled: ${zblog.audit.tms.enabled} # 腾讯云 TMS 是否启用
         secretId: ${zblog.audit.tms.accessKey} # 腾讯云访问密钥 ID

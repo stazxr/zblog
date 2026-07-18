@@ -118,22 +118,22 @@ export default class BarrageEngine {
       return
     }
 
-    /**
-     * 队列数量限制
-     */
-    if (this.queue.length >= this.maxSize) {
-      return
-    }
-
-    list.forEach(item => {
-      if (!item) {
-        return
-      }
-
-      this.queue.push(new BarrageItem(item))
-    })
+    let index = 0
+    const batchSize = 50
 
     this.start()
+    const appendBatch = () => {
+      const end = Math.min(index + batchSize, list.length)
+      while (index < end && this.queue.length < this.maxSize) {
+        this.queue.push(new BarrageItem(list[index++]))
+      }
+
+      if (index < list.length && this.queue.length < this.maxSize) {
+        requestAnimationFrame(appendBatch)
+      }
+    }
+
+    appendBatch()
   }
 
   /**

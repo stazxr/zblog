@@ -12,6 +12,8 @@ import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -86,9 +88,26 @@ public class PortalController {
     @ApiOperation(value = "新增弹幕")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "新增弹幕", code = "PORTA001", level = RouterLevel.OPEN)
-    @RateLimit(time = 60, count = 5, enableIp = true, enableApi = true, message = "发送太快啦，请休息一下再发~")
+    @RateLimit(time = 60, count = 5, enableIp = true, enableApi = true, message = "{BARRAGE_MESSAGE_LIMITED}")
     public void addBarrageMessage(HttpServletRequest request, @RequestBody @Validated BarrageMessageDto barrageMessageDto) {
         portalService.addBarrageMessage(request, barrageMessageDto);
+    }
+
+    /**
+     * 点赞弹幕
+     *
+     * @param barrageMessageId 弹幕id
+     */
+    @Log
+    @PostMapping(value = "/likeBarrageMessage")
+    @ApiOperation(value = "点赞弹幕")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "barrageMessageId", value = "弹幕id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "点赞弹幕", code = "PORTU001")
+    public void likeBarrageMessage(@RequestParam Long barrageMessageId) {
+        portalService.likeBarrageMessage(barrageMessageId);
     }
 
 //    /**

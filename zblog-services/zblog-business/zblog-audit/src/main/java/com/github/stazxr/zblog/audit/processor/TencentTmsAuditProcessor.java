@@ -39,7 +39,7 @@ public class TencentTmsAuditProcessor extends AbstractAuditProcessor {
     public ProcessorResult process(AuditContext context) {
         // 1️⃣ 开关控制（修复：逻辑必须是 !enabled 才跳过）
         if (!tencentTmsProcessorProperties.isEnabled()) {
-            return pass();
+            return pass("TMS 未启用");
         }
 
         // 2️⃣ 内容校验

@@ -17,7 +17,7 @@
                 AND bm.NICKNAME LIKE #{nicknameBind}
             </if>
             <if test="query.ip != null and query.ip != ''">
-                AND bm.THEME_TYPE = #{query.ip}
+                AND bm.IP = #{query.ip}
             </if>
             <if test="query.auditStatus != null">
                 AND bm.AUDIT_STATUS = #{query.auditStatus}
@@ -29,7 +29,7 @@
     <select id="selectBarrageMessageDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
         SELECT
             bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.IP, bm.IP_REGION, bm.USER_AGENT,
-            bm.AUDIT_STATUS, bm.AUDIT_REASON, bm.AUDIT_TIME, bm.DEVICE_ID, bm.SPEED, bm.COLOR, bm.CREATE_TIME,
+            bm.AUDIT_STATUS, bm.AUDIT_REASON, bm.AUDIT_TIME, bm.DEVICE_ID, bm.COLOR, bm.CREATE_TIME,
             (SELECT USERNAME FROM user u WHERE u.ID = bm.AUDIT_USER_ID) AS AUDIT_USERNAME
         FROM barrage_message bm
         WHERE bm.ID = #{barrageMessageId}
@@ -37,7 +37,7 @@
 
     <select id="selectLastedBarrageMessageList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
         SELECT
-            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.SPEED, bm.COLOR
+            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.COLOR
         FROM barrage_message bm
         WHERE bm.AUDIT_STATUS = 1
         ORDER BY bm.CREATE_TIME DESC

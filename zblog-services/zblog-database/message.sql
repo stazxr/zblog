@@ -271,6 +271,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('BARRAGE_MESSAGE_STATUS_REQUIRED', 'en-US', 'BarrageMessage audit status cannot be blank', 'common'),
 ('BARRAGE_MESSAGE_STATUS_INVALID', 'zh-CN', '弹幕已被审核，请刷新页面重试', 'common'),
 ('BARRAGE_MESSAGE_STATUS_INVALID', 'en-US', 'BarrageMessage audit status invalid', 'common'),
+('BARRAGE_MESSAGE_RATE_LIMIT', 'zh-CN', '发送太频繁啦，请休息一下再发哦~', 'common'),
+('BARRAGE_MESSAGE_RATE_LIMIT', 'en-US', 'You are sending barrage messages too frequently. Please wait a moment before sending another', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),

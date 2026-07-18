@@ -87,8 +87,8 @@ export default {
       this.$mapi.portal.addBarrageMessage(param).then(_ => {
         this.messageContent = null
         this.$toast({ type: 'success', message: '发送成功' })
-      }).catch(_ => {
-        this.$toast({ type: 'error', message: '发送失败' })
+      }).catch(e => {
+        this.$toast({ type: 'error', message: e.message || '发送失败' })
       })
     },
     /**

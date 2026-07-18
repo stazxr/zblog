@@ -4,11 +4,13 @@ import com.github.stazxr.zblog.bas.context.Context;
 import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 import com.github.stazxr.zblog.bas.exception.code.ErrorCodeUtils;
+import com.github.stazxr.zblog.bas.i18n.I18nUtils;
 import com.github.stazxr.zblog.bas.ratelimit.RateLimitException;
 import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.ratelimit.core.RateLimitKeyBuilder;
 import com.github.stazxr.zblog.bas.ratelimit.core.RateLimitRule;
 import com.github.stazxr.zblog.bas.ratelimit.core.RateLimitService;
+import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -56,8 +58,14 @@ public class RateLimitAspect {
                 for (String key : keys) {
                     boolean pass = rateLimitService.tryAcquire(key, rule.getTime(), rule.getCount());
                     if (!pass) {
-                        if (StringUtils.isNotBlank(rateLimit.message())) {
-                            ErrorCode customCode = ErrorCodeUtils.of(CommonErrorCode.SBASEA001.getCode(), rateLimit.message());
+                        String message = rateLimit.message();
+                        if (StringUtils.isNotBlank(message)) {
+                            if (message.matches(RegexUtils.Regex.I18N_MESSAGE_PATTERN)) {
+                                String messageKey = message.substring(1, message.length() - 1);
+                                message = I18nUtils.getMessage(messageKey);
+                            }
+
+                            ErrorCode customCode = ErrorCodeUtils.of(CommonErrorCode.SBASEA001.getCode(), message);
                             throw new RateLimitException(customCode);
                         } else {
                             throw new RateLimitException(CommonErrorCode.SBASEA001);

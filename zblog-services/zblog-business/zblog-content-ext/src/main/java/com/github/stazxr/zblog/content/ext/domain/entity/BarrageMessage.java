@@ -87,11 +87,6 @@ public class BarrageMessage implements Serializable {
     private String deviceId;
 
     /**
-     * 弹幕速度
-     */
-    private Integer speed;
-
-    /**
      * 弹幕颜色
      */
     private String color;
