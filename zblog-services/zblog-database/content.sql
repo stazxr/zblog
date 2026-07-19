@@ -1,9 +1,75 @@
+/*Table structure for table `visitor` */
+DROP TABLE IF EXISTS `visitor`;
+CREATE TABLE `visitor` (
+  `VISITOR_ID` VARCHAR(64) NOT NULL COMMENT '访客唯一标识',
+  `USER_ID` BIGINT DEFAULT NULL COMMENT '登录用户ID',
+  `IP` VARCHAR(64) DEFAULT NULL COMMENT '访问IP',
+  `COUNTRY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-国家',
+  `PROVINCE` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-省份',
+  `CITY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-城市',
+  `DISTRICT` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-区县',
+  `ISP` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-运营商',
+  `USER_AGENT` VARCHAR(512) DEFAULT NULL COMMENT '用户代理',
+  `BROWSER` VARCHAR(128) DEFAULT NULL COMMENT '浏览器名称',
+  `BROWSER_VERSION` VARCHAR(128) DEFAULT NULL COMMENT '浏览器版本',
+  `OS` VARCHAR(128) DEFAULT NULL COMMENT '操作系统',
+  `DEVICE_TYPE` VARCHAR(128) DEFAULT NULL COMMENT '设备类型',
+  `FIRST_VISIT_TIME` DATETIME NOT NULL COMMENT '首次访问时间',
+  `LAST_VISIT_DATE` DATE NOT NULL COMMENT '最后访问日期',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`VISITOR_ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客表';
+
+/*Table structure for table `visitor_profile` */
+DROP TABLE IF EXISTS `visitor_profile`;
+CREATE TABLE `visitor_profile` (
+  `VISITOR_ID` VARCHAR(64) NOT NULL COMMENT '访客唯一标识',
+  `NICKNAME` VARCHAR(50) NOT NULL COMMENT '访客昵称',
+  `AVATAR` VARCHAR(512) NOT NULL COMMENT '访客头像',
+  PRIMARY KEY (`VISITOR_ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客展示信息表';
+
+/*Table structure for table `visitor_log` */
+DROP TABLE IF EXISTS `visitor_log`;
+CREATE TABLE `visitor_log` (
+    ID BIGINT NOT NULL COMMENT '主键',
+    VISITOR_ID VARCHAR(64) NOT NULL COMMENT '访客ID',
+    USER_ID BIGINT DEFAULT NULL COMMENT '登录用户ID',
+    PATH VARCHAR(512) NOT NULL COMMENT '访问路径',
+    TITLE VARCHAR(256) DEFAULT NULL COMMENT '页面标题',
+    REFERER VARCHAR(512) DEFAULT NULL COMMENT '来源页面',
+    IP VARCHAR(64) DEFAULT NULL COMMENT 'IP',
+    USER_AGENT VARCHAR(512) DEFAULT NULL COMMENT 'UA',
+    DEVICE_TYPE VARCHAR(32) DEFAULT NULL COMMENT '设备类型',
+    VISIT_TIME DATETIME NOT NULL COMMENT '访问时间',
+    CREATE_TIME DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(ID),
+    INDEX IDX_VISITOR_TIME(VISITOR_ID, VISIT_TIME),
+    INDEX IDX_PATH_TIME(PATH, VISIT_TIME),
+    INDEX IDX_TIME(VISIT_TIME)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客日志表';
+
+/*Table structure for table `visitor_count` */
+DROP TABLE IF EXISTS `visitor_count`;
+CREATE TABLE `visitor_count` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `WEB_COUNT` INT(11) NOT NULL DEFAULT 1 COMMENT '访问量',
+  `DATA_DATE` VARCHAR(20) COMMENT '数据日期: YYYY-MM-DD',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `KEY_DATA_DATE` (`DATA_DATE`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='访客数统计表';
+
+/*Data for the table `visitor_count` */
+INSERT INTO visitor_count (ID, WEB_COUNT, DATA_DATE) VALUES (1, 0, NULL);
+
 /*Table structure for table `barrage_message` */
 DROP TABLE IF EXISTS `barrage_message`;
 CREATE TABLE `barrage_message` (
   `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
   `CONTENT` VARCHAR(200) NOT NULL COMMENT '弹幕内容',
-  `USER_ID` BIGINT NULL COMMENT '用户ID（游客为NULL）',
+  `USER_ID` BIGINT NULL COMMENT '用户ID',
+  `VISITOR_ID` VARCHAR(64) NULL COMMENT '游客ID',
   `NICKNAME` VARCHAR(64) NULL COMMENT '昵称（游客/登录用户）',
   `AVATAR` VARCHAR(255) NULL COMMENT '头像',
   `IP` VARCHAR(64) NOT NULL COMMENT '用户IP',
@@ -372,47 +438,6 @@ CREATE TABLE `website_config` (
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAdminLink":"https://admin.suntaoblog.com","websiteAuthor":"恋长安兮","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565220826456260608.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊。","websiteLink":"https://www.suntaoblog.com","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629\\n仓库地址：https://github.com/stazxr/zblog\\n相关文档：建设中\\n当前进展：页面优化中，数据迁移中","websiteRecordNo":"陕ICP备2021003044号-1"}', 17, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '{"csdn":"","gitee":"","github":"","qq":"","weChat":""}', 16, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221664612417536.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/18/3565734577953570816.jpg","articleSearchStrategy":"mysql","articleViewInterval":0,"isCommentReview":1,"isEmailNotice":0,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221129431810048.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565220996363321344.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221645289259008.jpg"}', 18, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-
-/*Table structure for table `visitor` */
-DROP TABLE IF EXISTS `visitor`;
-CREATE TABLE `visitor` (
-  `ID` VARCHAR(32) NOT NULL,
-  `ADDRESS_IP` VARCHAR(50) NOT NULL COMMENT '访问地址',
-  `OS_NAME` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '操作系统',
-  `BROWSER_NAME` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '浏览器名称',
-  `PROVINCE` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '省份',
-  `AREA_CODE` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '地域编码',
-  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
-  `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
-  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
-  `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
-  `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
-  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='访客表';
-
-/*Table structure for table `visitor_area` */
-DROP TABLE IF EXISTS `visitor_area`;
-CREATE TABLE `visitor_area` (
-  `AREA` VARCHAR(50) NOT NULL COMMENT '访问地域',
-  `AREA_COUNT` INT(11) NOT NULL DEFAULT 1 COMMENT '访问量',
-  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
-  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
-  UNIQUE KEY `KEY_AREA` (`AREA`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='访客地域表';
-
-/*Table structure for table `visitor_count` */
-DROP TABLE IF EXISTS `visitor_count`;
-CREATE TABLE `visitor_count` (
-  `ID` INT(11) NOT NULL AUTO_INCREMENT,
-  `WEB_COUNT` INT(11) NOT NULL DEFAULT 1 COMMENT '访问量',
-  `DATA_DATE` VARCHAR(20) COMMENT '数据日期: YYYY-MM-DD',
-  PRIMARY KEY (`ID`) USING BTREE,
-  UNIQUE KEY `KEY_DATA_DATE` (`DATA_DATE`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='访客数统计表';
-
-/*Data for the table `visitor_count` */
-INSERT INTO visitor_count (ID, WEB_COUNT, DATA_DATE) VALUES (1, 0, NULL);
 
 /*Table structure for table `talk` */
 DROP TABLE IF EXISTS `talk`;

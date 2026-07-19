@@ -121,11 +121,11 @@ export default class BarrageEngine {
     let index = 0
     const batchSize = 50
 
-    this.start()
     const appendBatch = () => {
       const end = Math.min(index + batchSize, list.length)
       while (index < end && this.queue.length < this.maxSize) {
         this.queue.push(new BarrageItem(list[index++]))
+        this.start()
       }
 
       if (index < list.length && this.queue.length < this.maxSize) {

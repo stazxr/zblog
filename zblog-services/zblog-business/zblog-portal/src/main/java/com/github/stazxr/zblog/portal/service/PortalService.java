@@ -50,7 +50,15 @@ public interface PortalService {
     /**
      * 点赞弹幕
      *
+     * @param request 请求信息
      * @param barrageMessageId 弹幕id
      */
-    void likeBarrageMessage(Long barrageMessageId);
+    void likeBarrageMessage(HttpServletRequest request, Long barrageMessageId);
+
+    /**
+     * 记录访客信息
+     *
+     * @param request 请求信息
+     */
+    void recordVisitor(HttpServletRequest request);
 }

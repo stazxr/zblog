@@ -41,6 +41,12 @@ public class BarrageMessageVo implements Serializable {
     private Long userId;
 
     /**
+     * 访客id
+     */
+    @ApiModelProperty("用户id")
+    private String visitorId;
+
+    /**
      * 用户昵称
      */
     @ApiModelProperty("用户昵称")
@@ -125,4 +131,10 @@ public class BarrageMessageVo implements Serializable {
      */
     @ApiModelProperty("审核记录")
     private AuditRecord auditRecord;
+
+    /**
+     * 点赞数
+     */
+    @ApiModelProperty("点赞数")
+    private Integer likeCount;
 }

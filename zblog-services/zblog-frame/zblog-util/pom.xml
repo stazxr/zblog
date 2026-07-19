@@ -99,6 +99,10 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+        </dependency>
         <!-- servlet api -->
         <dependency>
             <groupId>javax.servlet</groupId>

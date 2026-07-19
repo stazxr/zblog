@@ -8,6 +8,10 @@ export default {
   webLoginId: params => {
     return api.httpRequest().get(`${portalApi}/webLoginId`, params)
   },
+  // 记录访客信息
+  recordVisitor: params => {
+    return api.httpRequest().post(`${portalApi}/recordVisitor`, params)
+  },
   // 查询页面信息
   queryPageInfo: params => {
     return api.httpRequest().get(`${portalApi}/queryPageInfo`, params)
@@ -48,10 +52,6 @@ export default {
   // 查询博客前台信息
   queryBlogInfo: params => {
     return api.httpRequest().get(`${portalApi}/queryBlogInfo`, params)
-  },
-  // 记录访客信息
-  recordVisitor: params => {
-    return api.httpRequest().post(`${portalApi}/recordVisitor`, params)
   },
   // 获取文章列表
   queryArticleList: params => {

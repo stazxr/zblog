@@ -66,6 +66,7 @@
         <esapi.version>2.7.0.0</esapi.version>
         <jsoup.version>1.18.3</jsoup.version>
         <jjwt.version>0.9.1</jjwt.version>
+        <ip2region.version>2.7.0</ip2region.version>
         <jexl3.version>3.2.1</jexl3.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
@@ -219,6 +220,12 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+            <!-- ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
             <!-- Jexl3 -->
             <dependency>

@@ -32,6 +32,8 @@ import InfiniteLoading from 'vue-infinite-loading'
 import { vueBaberrage } from 'vue-baberrage'
 // 日期工具
 import dayjs from 'dayjs'
+// 头像获取
+import { getAvatar } from '@/utils/avatar'
 // 代码高亮
 import Highlight from './directive/highlight'
 import loading from './components/loading/index'
@@ -49,6 +51,7 @@ Vue.use(loading)
 // 全局挂载
 Vue.prototype['$mapi'] = api
 Vue.prototype['$ws'] = ws
+Vue.prototype['$getAvatar'] = getAvatar
 
 // 关闭提示
 Vue.config.productionTip = false

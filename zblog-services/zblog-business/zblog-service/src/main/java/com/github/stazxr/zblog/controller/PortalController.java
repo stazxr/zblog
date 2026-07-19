@@ -51,21 +51,6 @@
 //    }
 //
 //    /**
-//     * 记录访客信息
-//     *
-//     * @param request 请求信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/recordVisitor")
-//    @ApiOperation(value = "记录访客信息")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "记录访客信息", code = "recordVisitor", level = RouterLevel.OPEN)
-//    public Result recordVisitor(HttpServletRequest request) {
-//        portalService.recordVisitor(request);
-//        return Result.success();
-//    }
-//
-//    /**
 //     * 分页查询前台文章列表
 //     *
 //     * @param queryDto 查询参数
@@ -95,20 +80,6 @@
 //    public Result queryArticleDetail(@RequestParam(required = false) Long articleId) {
 //        return Result.success().data(portalService.queryArticleDetail(articleId));
 //    }
-//
-//    /**
-//     * 查询前台弹幕列表
-//     *
-//     * @return MessageVo
-//     */
-//    @GetMapping("/queryMessageList")
-//    @ApiOperation(value = "查询前台弹幕列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询前台弹幕列表", code = "queryWebMessageList", level = RouterLevel.OPEN)
-//    public Result queryMessageList() {
-//        return Result.success().data(portalService.queryMessageList());
-//    }
-//
 //    /**
 //     * 查询前台友链列表
 //     *

@@ -116,17 +116,16 @@
           </ul>
         </div>
         <div class="menus-item">
-          <a v-if="$store.state.user.id == null || $store.state.user.id === ''" class="menu-btn" @click="openLogin">
+          <a v-if="!isLoadUserInfo" class="menu-btn" @click="openLogin">
             🔒 登录
           </a>
           <template v-else>
-            <img v-if="$store.state.user.avatar !== ''" class="user-avatar" :src="$store.state.user.avatar" height="30" width="30" alt="">
-            <img v-else class="user-avatar" :src="$store.state.otherConfig['touristAvatar']" height="30" width="30" alt="">
+            <img class="user-avatar" :src="$getAvatar(user.avatar)" height="30" width="30" alt="">
             <ul class="menus-submenu">
               <li>
                 <router-link to="/user">
-                  <span v-if="$store.state.user.gender === 1">🧑 </span>
-                  <span v-else-if="$store.state.user.gender === 2">👧 </span>
+                  <span v-if="userGender === 1">🧑 </span>
+                  <span v-else-if="userGender === 2">👧 </span>
                   <span v-else>🤷 </span>
                   个人中心
                 </router-link>
@@ -153,11 +152,17 @@ export default {
     }
   },
   computed: {
+    user() {
+      return this.$store.state.user || {}
+    },
+    isLoadUserInfo() {
+      return this.user.id !== null && this.user.id !== ''
+    },
+    userGender() {
+      return this.user.gender
+    },
     websiteConfig() {
       return this.$store.state.websiteConfig
-    },
-    avatar() {
-      return this.$store.state.avatar
     }
   },
   mounted() {

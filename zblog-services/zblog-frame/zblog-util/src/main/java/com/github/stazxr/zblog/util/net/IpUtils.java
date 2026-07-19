@@ -63,7 +63,7 @@ public class IpUtils {
     private static final Map<String, String> CACHE1 = new HashMap<>();
     private static final Map<String, String> CACHE2 = new HashMap<>();
     private static final Map<String, String> CACHE3 = new HashMap<>();
-    private static final int MAX_CACHE_SIZE = 4096;
+    private static final int MAX_CACHE_SIZE = 20480;
     private static final int RESIZE_CACHE_SIZE = MAX_CACHE_SIZE / 4;
     private static final Object RESIZE_LOCK = new Object();
     private static final String LOCAL_IP_LOCATION = "局域网";

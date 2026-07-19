@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.portal.service.impl;
 
+import cn.hutool.http.useragent.*;
 import com.github.stazxr.zblog.audit.api.AuditService;
 import com.github.stazxr.zblog.audit.enums.AuditScene;
 import com.github.stazxr.zblog.audit.model.AuditContext;
@@ -11,27 +12,35 @@ import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessage;
+import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessageLike;
+import com.github.stazxr.zblog.content.ext.domain.entity.Visitor;
+import com.github.stazxr.zblog.content.ext.domain.entity.VisitorProfile;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
-import com.github.stazxr.zblog.content.ext.mapper.BarrageMessageMapper;
-import com.github.stazxr.zblog.content.ext.mapper.ThemeMapper;
-import com.github.stazxr.zblog.content.ext.mapper.ThemePageMapper;
+import com.github.stazxr.zblog.content.ext.mapper.*;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
+import com.github.stazxr.zblog.portal.domain.bo.UserBaseInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.PortalService;
+import com.github.stazxr.zblog.portal.util.VisitorUtil;
+import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.net.IpRegion;
+import com.github.stazxr.zblog.util.net.IpRegionUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -50,11 +59,17 @@ public class PortalServiceImpl implements PortalService {
 
     private final BarrageMessageMapper barrageMessageMapper;
 
+    private final BarrageMessageLikeMapper barrageMessageLikeMapper;
+
     private final BarrageMessagePublisher barrageMessagePublisher;
 
     private final ThemeMapper themeMapper;
 
     private final ThemePageMapper themePageMapper;
+
+    private final VisitorMapper visitorMapper;
+
+    private final VisitorProfileMapper visitorProfileMapper;
 
     /**
      * 获取Web端登录用户信息
@@ -63,15 +78,23 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public WebLoginUser currentWebUserDetail() {
-        if (!SecurityUtils.isAuthenticated()) {
-            return null;
-        }
-
         WebLoginUser webLoginUser = new WebLoginUser();
 
-        // 查询用户基础信息
+        boolean authenticated = SecurityUtils.isAuthenticated();
+        webLoginUser.setAuthenticated(authenticated);
+        if (!authenticated) {
+            // 获取访客信息
+            String visitorId = Context.get("x-visitor-id");
+            if (StringUtils.isNotBlank(visitorId)) {
+                VisitorProfile profile = visitorProfileMapper.selectById(visitorId);
+                webLoginUser.setUser(new UserBaseInfo(profile));
+            }
+            return webLoginUser;
+        }
+
+        // 查询登录用户信息
         User loginUser = SecurityUtils.getLoginUser();
-        webLoginUser.setUser(loginUser);
+        webLoginUser.setUser(new UserBaseInfo(loginUser));
 
         return webLoginUser;
     }
@@ -121,8 +144,7 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public List<BarrageMessageVo> queryBarrageMessageList() {
-        // TODO 网站配置功能待开发
-        int size = 100;
+        int size = 100; // TODO 网站配置功能待开发
         return barrageMessageMapper.selectLastedBarrageMessageList(size);
     }
 
@@ -154,11 +176,102 @@ public class PortalServiceImpl implements PortalService {
     /**
      * 点赞弹幕
      *
+     * @param request 请求信息
      * @param barrageMessageId 弹幕id
      */
     @Override
-    public void likeBarrageMessage(Long barrageMessageId) {
-        // TODO
+    public void likeBarrageMessage(HttpServletRequest request, Long barrageMessageId) {
+        boolean authenticated = SecurityUtils.isAuthenticated();
+        BarrageMessageLike newLike = null;
+        if (authenticated) {
+            Long userId = SecurityUtils.getLoginId();
+            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByUserId(barrageMessageId, userId);
+            if (like == null) {
+                newLike = new BarrageMessageLike();
+            }
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            if (StringUtils.isBlank(visitorId)) {
+                return;
+            }
+            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByVisitorId(barrageMessageId, visitorId);
+            if (like == null) {
+                newLike = new BarrageMessageLike();
+
+            }
+        }
+
+        if (newLike != null) {
+            newLike.setId(SequenceUtils.getId());
+            newLike.setBarrageMessageId(barrageMessageId);
+            newLike.setIp(IpUtils.getIp(request));
+            newLike.setUserAgent(IpUtils.getUserAgent(request));
+            newLike.setCreateTime(LocalDateTime.now());
+            barrageMessageLikeMapper.insert(newLike);
+        }
+    }
+
+    /**
+     * 记录访客信息
+     *
+     * @param request    请求信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recordVisitor(HttpServletRequest request) {
+        String visitorId = Context.get("x-visitor-id");
+        if (StringUtils.isBlank(visitorId)) {
+            return;
+        }
+
+        // 获取请求信息
+        String ip = IpUtils.getIp(request);
+        String ua = IpUtils.getUserAgent(request);
+        LocalDateTime now = LocalDateTime.now();
+        Long userId = SecurityUtils.isAuthenticated() ? SecurityUtils.getLoginId() : null;
+
+        // 查询访客信息
+        Visitor visitor = visitorMapper.selectById(visitorId);
+        if (visitor == null) {
+            visitor = new Visitor();
+            visitor.setVisitorId(visitorId);
+            visitor.setUserId(userId);
+            fillVisitorIpInfo(visitor, ip);
+            fillVisitorUserAgent(visitor, ua);
+            visitor.setFirstVisitTime(now);
+            visitor.setLastVisitDate(LocalDate.now());
+            visitor.setCreateTime(now);
+            visitorMapper.insert(visitor);
+
+            VisitorProfile profile = new VisitorProfile();
+            profile.setVisitorId(visitorId);
+            profile.setNickname(generateVisitorNickname(visitorId));
+            profile.setAvatar(generateVisitorAvatar(visitorId));
+            visitorProfileMapper.insert(profile);
+        } else {
+            boolean change = false;
+            if (StringUtils.isNotBlank(ip) && !ip.equals(visitor.getIp())) {
+                change = true;
+                fillVisitorIpInfo(visitor, ip);
+            }
+            if (StringUtils.isNotBlank(ua) && !ua.equals(visitor.getUserAgent())) {
+                change = true;
+                fillVisitorUserAgent(visitor, ua);
+            }
+            if (visitor.getUserId() == null && userId != null) {
+                change = true;
+                visitor.setUserId(userId);
+            }
+            if (!LocalDate.now().equals(visitor.getLastVisitDate())) {
+                change = true;
+                visitor.setLastVisitDate(LocalDate.now());
+                visitor.setUpdateTime(now);
+            }
+
+            if (change) {
+                visitorMapper.updateById(visitor);
+            }
+        }
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {
@@ -181,7 +294,19 @@ public class PortalServiceImpl implements PortalService {
             message.setNickname(user.getNickname());
             message.setAvatar(user.getHeadImgUrl());
         } else {
-            message.setNickname("游客" + RandomStringUtils.randomAlphanumeric(4).toUpperCase());
+            String visitorId = Context.get("x-visitor-id");
+            VisitorProfile profile = null;
+            if (StringUtils.isNotBlank(visitorId)) {
+                message.setVisitorId(visitorId);
+                profile = visitorProfileMapper.selectById(visitorId);
+            }
+
+            if (profile != null) {
+                message.setNickname(profile.getNickname());
+                message.setAvatar(profile.getAvatar());
+            } else {
+                message.setNickname("游客" + RandomStringUtils.randomAlphanumeric(4).toUpperCase());
+            }
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -209,10 +334,10 @@ public class PortalServiceImpl implements PortalService {
         String ip = IpUtils.getIp(request);
         String userAgent = IpUtils.getUserAgent(request);
         message.setIp(ip);
-        message.setIpRegion(IpUtils.getIpLocation(ip, IpUtils.IP_LOCATION_PRO_CITY_REGION));
+        message.setIpRegion(IpRegionUtils.getRegion(ip));
         message.setUserAgent(userAgent);
         message.setDeviceId(buildDeviceId(ip, userAgent));
-        message.setColor("#FFFFFF");
+        message.setColor("#FFFFFF"); // TODO 弹幕颜色待配置化
         message.setCreateTime(now);
         return message;
     }
@@ -224,5 +349,63 @@ public class PortalServiceImpl implements PortalService {
             log.error("build deviceId exception", e);
             return null;
         }
+    }
+
+    private void fillVisitorIpInfo(Visitor visitor, String ip) {
+        if (StringUtils.isBlank(ip) || visitor == null) {
+            return;
+        }
+
+        visitor.setIp(ip);
+        IpRegion search = IpRegionUtils.search(ip);
+        visitor.setCountry(search.getCountry());
+        visitor.setProvince(search.getProvince());
+        visitor.setCity(search.getCity());
+        visitor.setDistrict(null);
+        visitor.setIsp(search.getIsp());
+    }
+
+    private void fillVisitorUserAgent(Visitor visitor, String ua) {
+        if (StringUtils.isBlank(ua) || visitor == null) {
+            return;
+        }
+
+        try {
+            visitor.setUserAgent(ua);
+            UserAgent userAgent = UserAgentUtil.parse(ua);
+            if (userAgent == null) {
+                return;
+            }
+
+            Browser browser = userAgent.getBrowser();
+            if (browser != null) {
+                visitor.setBrowser(browser.getName());
+                visitor.setBrowserVersion(browser.getVersion(ua));
+            }
+
+            OS os = userAgent.getOs();
+            if (os != null) {
+                visitor.setOs(os.getName());
+            }
+
+            Platform platform = userAgent.getPlatform();
+            if (platform != null) {
+                visitor.setDeviceType(detectDeviceType(platform));
+            }
+        } catch (Exception e) {
+            log.error("parse user agent error: {}", ua, e);
+        }
+    }
+
+    private String detectDeviceType(Platform platform) {
+        return platform.getName();
+    }
+
+    private String generateVisitorNickname(String visitorId) {
+        return VisitorUtil.getNickname(visitorId);
+    }
+
+    private String generateVisitorAvatar(String visitorId) {
+        return VisitorUtil.getAvatar(visitorId);
     }
 }

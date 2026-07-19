@@ -37,6 +37,11 @@ public class BarrageMessage implements Serializable {
     private Long userId;
 
     /**
+     * 访客id
+     */
+    private String visitorId;
+
+    /**
      * 用户昵称
      */
     private String nickname;

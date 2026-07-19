@@ -81,9 +81,9 @@ export default new Vuex.Store({
       } else {
         state.user.id = loginUser.user['id']
         state.user.nickname = loginUser.user['nickname']
-        state.user.avatar = loginUser.user['headImgUrl']
+        state.user.avatar = loginUser.user['avatar']
         state.user.gender = loginUser.user['gender']
-        state.user.webSite = loginUser.user['website']
+        state.user.webSite = loginUser.user['webSite']
         state.user.intro = loginUser.user['signature']
         state.user.email = loginUser.user['email']
       }

@@ -14,7 +14,7 @@
     >
 
       <!-- 用户头像 -->
-      <img v-if="showAvatar" class="barrage-avatar" :src="item.avatar || defaultAvatar" alt="">
+      <img v-if="showAvatar" class="barrage-avatar" :src="$getAvatar(item.avatar)" alt="">
 
       <!-- 用户昵称 -->
       <span v-if="showNickname" class="barrage-nickname">{{ item.nickname || '游客' }}</span>

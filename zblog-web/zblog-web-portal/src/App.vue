@@ -65,20 +65,20 @@ export default {
     }
   },
   created() {
-    // 初始化 Socket
-    this.initWebSocket()
     // 获取当前登录用户信息
     this.getUserInfo()
     this.interval = window.setInterval(() => {
       this.getUserInfo()
     }, 60000)
+    // 记录访客信息
+    this.recordVisitor()
+    // 初始化 Socket
+    this.initWebSocket()
     // 获取页面信息
     this.getPageInfo()
 
     // 获取博客信息
     // this.getBlogInfo()
-    // 上传访客信息
-    // this.recordVisitor()
   },
   beforeDestroy() {
     const stomp = this.$store.state.ws.stomp
@@ -93,17 +93,20 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
+    getUserInfo() {
+      this.$mapi.portal.webLoginId().then(res => {
+        this.$store.commit('setUserInfo', res.data)
+      })
+    },
+    recordVisitor() {
+      this.$mapi.portal.recordVisitor()
+    },
     async initWebSocket() {
       try {
         await this.$ws.connect()
       } catch (e) {
         console.error('websocket init failed', e)
       }
-    },
-    getUserInfo() {
-      this.$mapi.portal.webLoginId().then(res => {
-        this.$store.commit('setUserInfo', res.data)
-      })
     },
     getPageInfo() {
       this.$mapi.portal.queryPageInfo().then(res => {
@@ -116,9 +119,6 @@ export default {
         this.$store.commit('setBlogInfo', res.data)
         document.title = res.data['webInfo'] ? res.data['webInfo']['websiteName'] : 'Z-BLOG'
       })
-    },
-    recordVisitor() {
-      this.$mapi.portal.recordVisitor()
     }
   }
 }

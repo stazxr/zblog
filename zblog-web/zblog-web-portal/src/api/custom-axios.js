@@ -1,6 +1,7 @@
 import axios from 'axios'
 import JsonBig from 'json-bigint'
 import { isJson } from '@/utils/validate'
+import { getVisitorId } from '@/utils/visitor'
 
 const defaultTimeout = 120000
 
@@ -56,6 +57,7 @@ instance.interceptors.request.use(config => {
   const ua = navigator.userAgent.toLowerCase()
   const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
   config.headers['x-client-type'] = isMobile ? '01' : '02'
+  config.headers['x-visitor-id'] = getVisitorId()
 
   // return config
   return config

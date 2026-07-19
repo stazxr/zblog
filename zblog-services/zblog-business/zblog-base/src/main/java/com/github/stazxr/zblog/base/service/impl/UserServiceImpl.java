@@ -38,6 +38,7 @@ import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.UuidUtils;
+import com.github.stazxr.zblog.util.net.IpRegionUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -134,7 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         loginLog.setLoginTime(loginTime);
         loginLog.setLoginIp(loginIp);
         loginLog.setLoginChan(userAgent.isMobile() ? LoginChan.MOBILE.getChan() : LoginChan.PC.getChan());
-        loginLog.setLoginAddress(IpUtils.getIpLocation(loginIp));
+        loginLog.setLoginAddress(IpRegionUtils.getRegion(loginIp));
         loginLog.setLoginBrowser(userAgent.getBrowser().getName());
         loginLog.setLoginBrowserVersion(userAgent.getVersion());
         loginLog.setLoginPlatform(userAgent.getPlatform().getName());

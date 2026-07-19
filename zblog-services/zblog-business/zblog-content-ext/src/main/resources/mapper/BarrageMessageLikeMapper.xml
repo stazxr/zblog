@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.BarrageMessageLikeMapper">
+    <select id="selectOneByUserId" resultType="com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessageLike">
+        SELECT
+            ID, BARRAGE_MESSAGE_ID, USER_ID, VISITOR_ID, IP, USER_AGENT, CREATE_TIME
+        FROM barrage_message_like
+        WHERE BARRAGE_MESSAGE_ID = #{barrageMessageId} AND USER_ID = #{userId}
+    </select>
+
+    <select id="selectOneByVisitorId" resultType="com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessageLike">
+        SELECT
+            ID, BARRAGE_MESSAGE_ID, USER_ID, VISITOR_ID, IP, USER_AGENT, CREATE_TIME
+        FROM barrage_message_like
+        WHERE BARRAGE_MESSAGE_ID = #{barrageMessageId} AND VISITOR_ID = #{visitorId}
+    </select>
+</mapper>

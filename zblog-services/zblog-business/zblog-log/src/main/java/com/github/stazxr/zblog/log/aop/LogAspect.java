@@ -15,6 +15,7 @@ import com.github.stazxr.zblog.log.service.LogService;
 import com.github.stazxr.zblog.log.service.impl.AsyncLogService;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.ThrowableUtils;
+import com.github.stazxr.zblog.util.net.IpRegionUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -186,7 +187,7 @@ public class LogAspect {
         log.setRequestIp(requestIp);
         log.setRequestUri(request.getRequestURI());
         log.setRequestMethod(request.getMethod().toUpperCase(Locale.ROOT));
-        log.setAddress(IpUtils.getIpLocation(requestIp, IpUtils.IP_LOCATION_PRO));
+        log.setAddress(IpRegionUtils.getRegion(requestIp));
 
         log.setUserAgent(ua);
         log.setBrowser(userAgent.getBrowser().getName());

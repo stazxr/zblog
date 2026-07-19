@@ -186,6 +186,7 @@ zblog:
     context:
       tags: # 自定义标签配置
         - { tag-name: x-client-type } # 客户端类型：01 - 移动端，02 - PC端
+        - { tag-name: x-visitor-id } # 访客id
     # 序号配置
     sequence:
       datacenter-id: 0 # 数据中心id
