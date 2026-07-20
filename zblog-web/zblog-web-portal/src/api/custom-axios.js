@@ -58,6 +58,9 @@ instance.interceptors.request.use(config => {
   const isMobile = /mobile|android|iphone|ipad|phone/i.test(ua)
   config.headers['x-client-type'] = isMobile ? '01' : '02'
   config.headers['x-visitor-id'] = getVisitorId()
+  config.headers['x-page-path'] = location.pathname
+  config.headers['x-page-title'] = encodeURIComponent(document.title)
+  config.headers['x-page-type'] = 'DEFAULT'
 
   // return config
   return config

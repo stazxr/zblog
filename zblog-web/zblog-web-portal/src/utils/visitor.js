@@ -1,3 +1,4 @@
+import portal from '@/api/portal'
 import { v4 as uuidv4 } from 'uuid'
 
 const KEY = 'z_visitor_id'
@@ -12,4 +13,15 @@ export function getVisitorId() {
     localStorage.setItem(KEY, visitorId)
   }
   return visitorId
+}
+
+/**
+ * 获取访客日志
+ */
+export function recordVisitorLog() {
+  try {
+    portal.recordVisitorLog()
+  } catch (e) {
+    console.error('记录操作日志异常', e)
+  }
 }

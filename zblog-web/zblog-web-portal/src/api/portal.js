@@ -12,6 +12,10 @@ export default {
   recordVisitor: params => {
     return api.httpRequest().post(`${portalApi}/recordVisitor`, params)
   },
+  // 记录访客日志
+  recordVisitorLog: params => {
+    return api.httpRequest().post(`${portalApi}/recordVisitorLog`, params)
+  },
   // 查询页面信息
   queryPageInfo: params => {
     return api.httpRequest().get(`${portalApi}/queryPageInfo`, params)
@@ -26,7 +30,9 @@ export default {
   },
   // 弹幕点赞
   likeBarrageMessage: params => {
-    return api.httpRequest().post(`${portalApi}/likeBarrageMessage`, params)
+    return api.httpRequest().post(`${portalApi}/likeBarrageMessage`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
 
   // 登录
@@ -170,9 +176,5 @@ export default {
   // QQ 登录
   loginQq: params => {
     return api.httpRequest().post(`${portalApi}/oauth/login/qq`, params)
-  },
-  // 查询用户详情
-  queryUserDetail: params => {
-    return api.httpRequest().get(`${portalApi}/queryUserDetail`, params)
   }
 }

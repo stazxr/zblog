@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 // 路由组件
-import router from './router/routers'
+import '@/router/index'
+import router from '@/router/routers'
 // Vuex
 import store from './store'
 // Vuetify

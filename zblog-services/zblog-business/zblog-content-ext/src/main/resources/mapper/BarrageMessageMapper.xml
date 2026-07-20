@@ -39,7 +39,8 @@
 
     <select id="selectLastedBarrageMessageList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo">
         SELECT
-            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.COLOR
+            bm.ID, bm.CONTENT, bm.NICKNAME, bm.AVATAR, bm.COLOR,
+            (SELECT COUNT(1) FROM barrage_message_like l WHERE l.BARRAGE_MESSAGE_ID = bm.ID) AS LIKE_COUNT
         FROM barrage_message bm
         WHERE bm.AUDIT_STATUS = 1
         ORDER BY bm.CREATE_TIME DESC

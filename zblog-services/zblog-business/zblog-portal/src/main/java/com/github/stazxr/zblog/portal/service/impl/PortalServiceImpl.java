@@ -11,10 +11,7 @@ import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.User;
-import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessage;
-import com.github.stazxr.zblog.content.ext.domain.entity.BarrageMessageLike;
-import com.github.stazxr.zblog.content.ext.domain.entity.Visitor;
-import com.github.stazxr.zblog.content.ext.domain.entity.VisitorProfile;
+import com.github.stazxr.zblog.content.ext.domain.entity.*;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
@@ -40,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -70,6 +69,8 @@ public class PortalServiceImpl implements PortalService {
     private final VisitorMapper visitorMapper;
 
     private final VisitorProfileMapper visitorProfileMapper;
+
+    private final VisitorLogMapper visitorLogMapper;
 
     /**
      * 获取Web端登录用户信息
@@ -178,9 +179,10 @@ public class PortalServiceImpl implements PortalService {
      *
      * @param request 请求信息
      * @param barrageMessageId 弹幕id
+     * @return boolean true:点赞成功 false:已点赞
      */
     @Override
-    public void likeBarrageMessage(HttpServletRequest request, Long barrageMessageId) {
+    public boolean likeBarrageMessage(HttpServletRequest request, Long barrageMessageId) {
         boolean authenticated = SecurityUtils.isAuthenticated();
         BarrageMessageLike newLike = null;
         if (authenticated) {
@@ -188,16 +190,17 @@ public class PortalServiceImpl implements PortalService {
             BarrageMessageLike like = barrageMessageLikeMapper.selectOneByUserId(barrageMessageId, userId);
             if (like == null) {
                 newLike = new BarrageMessageLike();
+                newLike.setUserId(userId);
             }
         } else {
             String visitorId = Context.get("x-visitor-id");
             if (StringUtils.isBlank(visitorId)) {
-                return;
+                return false;
             }
             BarrageMessageLike like = barrageMessageLikeMapper.selectOneByVisitorId(barrageMessageId, visitorId);
             if (like == null) {
                 newLike = new BarrageMessageLike();
-
+                newLike.setVisitorId(visitorId);
             }
         }
 
@@ -208,7 +211,10 @@ public class PortalServiceImpl implements PortalService {
             newLike.setUserAgent(IpUtils.getUserAgent(request));
             newLike.setCreateTime(LocalDateTime.now());
             barrageMessageLikeMapper.insert(newLike);
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -272,6 +278,41 @@ public class PortalServiceImpl implements PortalService {
                 visitorMapper.updateById(visitor);
             }
         }
+    }
+
+    /**
+     * 记录访客日志
+     *
+     * @param request 请求信息
+     */
+    @Override
+    public void recordVisitorLog(HttpServletRequest request) {
+        String visitorId = Context.get("x-visitor-id");
+        String path = Context.get("x-page-path");
+        String title = Context.get("x-page-title");
+        String type = Context.get("x-page-type");
+        if (StringUtils.hasBlank(visitorId, path, title, type)) {
+            return;
+        }
+
+        try {
+            title = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
+        } catch (Exception e) {
+            log.error("decode title error: {}", title, e);
+        }
+
+        VisitorLog visitorLog = new VisitorLog();
+        visitorLog.setId(SequenceUtils.getId());
+        visitorLog.setVisitorId(visitorId);
+        visitorLog.setUserId(SecurityUtils.isAuthenticated() ? SecurityUtils.getLoginId() : null);
+        visitorLog.setPath(path);
+        visitorLog.setTitle(title);
+        visitorLog.setType(type);
+        visitorLog.setReferer(request.getHeader("Referer"));
+        fillVisitorLogIpInfo(visitorLog, IpUtils.getIp(request));
+        fillVisitorLogUserAgent(visitorLog, IpUtils.getUserAgent(request));
+        visitorLog.setVisitTime(LocalDateTime.now());
+        visitorLogMapper.insert(visitorLog); // TODO 异步记录
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {
@@ -391,6 +432,50 @@ public class PortalServiceImpl implements PortalService {
             Platform platform = userAgent.getPlatform();
             if (platform != null) {
                 visitor.setDeviceType(detectDeviceType(platform));
+            }
+        } catch (Exception e) {
+            log.error("parse user agent error: {}", ua, e);
+        }
+    }
+
+    private void fillVisitorLogIpInfo(VisitorLog visitorLog, String ip) {
+        if (StringUtils.isNotBlank(ip) && visitorLog != null) {
+            visitorLog.setIp(ip);
+            IpRegion search = IpRegionUtils.search(ip);
+            visitorLog.setCountry(search.getCountry());
+            visitorLog.setProvince(search.getProvince());
+            visitorLog.setCity(search.getCity());
+            visitorLog.setDistrict(null);
+            visitorLog.setIsp(search.getIsp());
+        }
+    }
+
+    private void fillVisitorLogUserAgent(VisitorLog visitorLog, String ua) {
+        if (StringUtils.isBlank(ua) || visitorLog == null) {
+            return;
+        }
+
+        try {
+            visitorLog.setUserAgent(ua);
+            UserAgent userAgent = UserAgentUtil.parse(ua);
+            if (userAgent == null) {
+                return;
+            }
+
+            Browser browser = userAgent.getBrowser();
+            if (browser != null) {
+                visitorLog.setBrowser(browser.getName());
+                visitorLog.setBrowserVersion(browser.getVersion(ua));
+            }
+
+            OS os = userAgent.getOs();
+            if (os != null) {
+                visitorLog.setOs(os.getName());
+            }
+
+            Platform platform = userAgent.getPlatform();
+            if (platform != null) {
+                visitorLog.setDeviceType(detectDeviceType(platform));
             }
         } catch (Exception e) {
             log.error("parse user agent error: {}", ua, e);

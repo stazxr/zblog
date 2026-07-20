@@ -98,6 +98,7 @@ public class PortalController {
      *
      * @param request 请求信息
      * @param barrageMessageId 弹幕id
+     * @return boolean true:点赞成功 false:已点赞
      */
     @Log
     @PostMapping(value = "/likeBarrageMessage")
@@ -107,8 +108,8 @@ public class PortalController {
     })
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "点赞弹幕", code = "PORTU001", level = RouterLevel.OPEN)
-    public void likeBarrageMessage(HttpServletRequest request, @RequestParam Long barrageMessageId) {
-        portalService.likeBarrageMessage(request, barrageMessageId);
+    public boolean likeBarrageMessage(HttpServletRequest request, @RequestParam Long barrageMessageId) {
+        return portalService.likeBarrageMessage(request, barrageMessageId);
     }
 
     /**
@@ -124,6 +125,20 @@ public class PortalController {
     @RateLimit(time = 60, count = 1, enableIp = true, enableApi = true)
     public void recordVisitor(HttpServletRequest request) {
         portalService.recordVisitor(request);
+    }
+
+    /**
+     * 记录访客日志
+     *
+     * @param request 请求信息
+     */
+    @Log
+    @PostMapping(value = "/recordVisitorLog")
+    @ApiOperation(value = "记录访客日志")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "记录访客日志", code = "PORTA003", level = RouterLevel.OPEN)
+    public void recordVisitorLog(HttpServletRequest request) {
+        portalService.recordVisitorLog(request);
     }
 
 //    /**

@@ -23,7 +23,7 @@
       <span class="barrage-content">{{ item.content }}</span>
 
       <!-- 点赞 -->
-      <span v-if="showLike && item.hover" class="barrage-like" @click.stop="like(item)">👍 {{ item.likeCount || 0 }}</span>
+      <span v-if="showLike && (item.hover || item.likeCount > 0)" class="barrage-like" @click.stop="like(item)">👍 {{ item.likeCount || 0 }}</span>
     </div>
   </div>
 </template>

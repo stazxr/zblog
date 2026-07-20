@@ -95,8 +95,12 @@ export default {
      * 点赞
      */
     likeBarrageMessage(item) {
-      this.$mapi.portal.likeBarrageMessage({ barrageMessageId: item.id }).then(() => {
-        item.likeCount++
+      this.$mapi.portal.likeBarrageMessage({ barrageMessageId: item.id }).then(res => {
+        if (res.data) {
+          item.likeCount++
+        }
+      }).catch(e => {
+        this.$toast({ type: 'error', message: e.message || '点赞失败' })
       })
     }
   }

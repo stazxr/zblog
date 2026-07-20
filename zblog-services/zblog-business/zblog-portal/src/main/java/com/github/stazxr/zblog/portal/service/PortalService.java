@@ -52,8 +52,9 @@ public interface PortalService {
      *
      * @param request 请求信息
      * @param barrageMessageId 弹幕id
+     * @return boolean true:点赞成功 false:已点赞
      */
-    void likeBarrageMessage(HttpServletRequest request, Long barrageMessageId);
+    boolean likeBarrageMessage(HttpServletRequest request, Long barrageMessageId);
 
     /**
      * 记录访客信息
@@ -61,4 +62,11 @@ public interface PortalService {
      * @param request 请求信息
      */
     void recordVisitor(HttpServletRequest request);
+
+    /**
+     * 记录访客日志
+     *
+     * @param request 请求信息
+     */
+    void recordVisitorLog(HttpServletRequest request);
 }
