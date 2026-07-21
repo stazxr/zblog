@@ -47,7 +47,7 @@ public class VisitorLog implements Serializable {
     private String title;
 
     /**
-     * 来源页面
+     * 来源
      */
     private String referer;
 

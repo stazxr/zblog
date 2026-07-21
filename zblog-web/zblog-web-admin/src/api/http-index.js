@@ -30,6 +30,10 @@ import article from '@/api/service/content/article.js'
 // webfeed
 import barrageMessage from '@/api/service/webfeed/barrageMessage.js'
 
+// analytics
+import visitor from '@/api/service/analytics/visitor.js'
+import visitorLog from '@/api/service/analytics/visitorLog.js'
+
 // TODO
 import column from '@/api/service/column.js'
 import webSetting from '@/api/service/webSetting.js'
@@ -45,6 +49,9 @@ export default {
   version, file, cache, session,
   friendLink, page, theme,
   category, tag, article,
+  // 网站动态
   barrageMessage,
+  // 运营分析
+  visitor, visitorLog,
   column, webSetting, talk, album, comment, test
 }

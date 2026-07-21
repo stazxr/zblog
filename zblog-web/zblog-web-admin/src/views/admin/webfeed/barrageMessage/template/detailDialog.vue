@@ -43,8 +43,9 @@
         <el-descriptions-item label="审核时间" :span="2"> {{ dataInfo.auditTime }} </el-descriptions-item>
         <!-- 7 -->
         <el-descriptions-item label="访客ID" :span="4"> {{ dataInfo.visitorId }} </el-descriptions-item>
-        <el-descriptions-item label="设备ID" :span="4"> {{ dataInfo.deviceId }} </el-descriptions-item>
         <!-- 8 -->
+        <el-descriptions-item label="设备ID" :span="4"> {{ dataInfo.deviceId }} </el-descriptions-item>
+        <!-- 9 -->
         <el-descriptions-item label="访问代理" :span="4"> {{ dataInfo.userAgent }} </el-descriptions-item>
       </el-descriptions>
 

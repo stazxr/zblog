@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.ext.mapper.VisitorMapper">
+    <select id="selectVisitorList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.VisitorVo">
+        SELECT
+            v.VISITOR_ID, vp.NICKNAME AS visitorNickname, vp.AVATAR AS visitorAvatar, v.USER_ID, u.USERNAME,
+            v.IP, CONCAT(v.COUNTRY, v.PROVINCE, v.CITY, v.DISTRICT) AS ipRegion, v.ISP,
+            CONCAT(v.BROWSER, v.BROWSER_VERSION) AS BROWSER, v.DEVICE_TYPE,
+            v.FIRST_VISIT_TIME, v.LAST_VISIT_DATE
+        FROM visitor v
+        LEFT JOIN visitor_profile vp ON vp.VISITOR_ID = v.VISITOR_ID
+        LEFT JOIN user u ON u.ID = v.USER_ID
+        <where>
+            <if test="query.username != null and query.username != ''">
+                AND u.USERNAME = #{query.username}
+            </if>
+            <if test="query.ip != null and query.ip != ''">
+                AND v.IP = #{query.ip}
+            </if>
+        </where>
+        ORDER BY v.LAST_VISIT_DATE DESC
+    </select>
 
+    <select id="selectVisitorDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.VisitorVo">
+        SELECT
+            v.VISITOR_ID, vp.NICKNAME AS visitorNickname, vp.AVATAR AS visitorAvatar, v.USER_ID, u.USERNAME,
+            v.IP, v.COUNTRY, v.PROVINCE, v.CITY, v.DISTRICT, v.ISP,
+            v.USER_AGENT, v.BROWSER, v.BROWSER_VERSION, v.OS, v.DEVICE_TYPE,
+            v.FIRST_VISIT_TIME, v.LAST_VISIT_DATE, v.CREATE_TIME, v.UPDATE_TIME
+        FROM visitor v
+        LEFT JOIN visitor_profile vp ON vp.VISITOR_ID = v.VISITOR_ID
+        LEFT JOIN user u ON u.ID = v.USER_ID
+        WHERE v.VISITOR_ID = #{visitorId}
+    </select>
 </mapper>

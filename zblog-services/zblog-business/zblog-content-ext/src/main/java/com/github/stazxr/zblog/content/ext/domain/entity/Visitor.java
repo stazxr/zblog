@@ -53,7 +53,7 @@ public class Visitor implements Serializable {
     private String city;
 
     /**
-     * 区县
+     * IP归属地-区县
      */
     private String district;
 
