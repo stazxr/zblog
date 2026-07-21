@@ -43,7 +43,7 @@ public class BarrageMessageVo implements Serializable {
     /**
      * 访客id
      */
-    @ApiModelProperty("用户id")
+    @ApiModelProperty("访客id")
     private String visitorId;
 
     /**

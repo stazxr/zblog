@@ -59,6 +59,7 @@
             </span>
           </template>
         </el-table-column>
+        <el-table-column prop="likeCount" label="点赞数" align="center" width="100px" />
         <el-table-column :show-overflow-tooltip="true" prop="ipRegion" label="地址" align="center" width="150px" />
         <el-table-column label="审核状态" align="center" width="100px">
           <template v-slot="scope">
