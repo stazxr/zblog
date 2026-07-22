@@ -53,7 +53,7 @@ public class VisitorController {
     @GetMapping(value = "/queryVisitorDetail")
     @ApiOperation(value = "查询访客详情")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "visitorId", value = "访客id", required = true, dataTypeClass = Long.class)
+        @ApiImplicitParam(name = "visitorId", value = "访客id", required = true, dataTypeClass = String.class)
     })
     @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "查询访客详情", code = "VISIQ002")

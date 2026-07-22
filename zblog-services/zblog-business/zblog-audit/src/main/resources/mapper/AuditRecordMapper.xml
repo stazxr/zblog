@@ -45,4 +45,27 @@
             DECISION, HIT_WORDS, REASON, TRACES, COST_MS, CREATE_TIME
         FROM audit_record WHERE OID = #{oid} ORDER BY CREATE_TIME DESC LIMIT 1
     </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+            ID, UID, OID, SCENE, ORIGINAL_CONTENT, FINAL_CONTENT,
+            DECISION, HIT_WORDS, REASON, TRACES, COST_MS, CREATE_TIME
+        FROM audit_record WHERE ID = #{id}
+    </select>
+
+    <select id="selectAutoAuditRecordList" resultMap="BaseResultMap">
+        SELECT
+            ID, UID, OID, SCENE, ORIGINAL_CONTENT, FINAL_CONTENT,
+            DECISION, HIT_WORDS, REASON, TRACES, COST_MS, CREATE_TIME
+        FROM audit_record
+        <where>
+            <if test="scene != null and scene != ''">
+                AND SCENE = #{scene}
+            </if>
+            <if test="decision != null and decision != ''">
+                AND DECISION = #{decision}
+            </if>
+        </where>
+        ORDER BY CREATE_TIME DESC
+    </select>
 </mapper>

@@ -27,6 +27,10 @@ import category from '@/api/service/content/category.js'
 import tag from '@/api/service/content/tag.js'
 import article from '@/api/service/content/article.js'
 
+// contentAudit
+import autoAudit from '@/api/service/contentAudit/autoAudit.js'
+import sensitiveWord from '@/api/service/contentAudit/sensitiveWord.js'
+
 // webfeed
 import barrageMessage from '@/api/service/webfeed/barrageMessage.js'
 
@@ -49,6 +53,8 @@ export default {
   version, file, cache, session,
   friendLink, page, theme,
   category, tag, article,
+  // 内容审核
+  autoAudit, sensitiveWord,
   // 网站动态
   barrageMessage,
   // 运营分析

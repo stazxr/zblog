@@ -96,6 +96,7 @@ router.onError((error) => {
   if (chunkFailed) {
     if (sessionStorage.getItem('reloaded')) {
       showError('系统更新失败，请清除缓存后重试', 0, true)
+      NProgress.done()
       return
     }
     sessionStorage.setItem('reloaded', '1')
@@ -108,15 +109,18 @@ router.onError((error) => {
 
   if (networkError) {
     showError('网络异常，请检查网络连接后重试')
+    NProgress.done()
     return
   }
 
   if (timeoutError) {
     showError('页面加载超时，请稍后重试')
+    NProgress.done()
     return
   }
 
   showError('页面加载失败，请稍后重试')
+  NProgress.done()
 })
 
 function showError(msg, duration = 3000, showClose = true) {

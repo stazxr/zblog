@@ -1,9 +1,10 @@
 package com.github.stazxr.zblog.audit.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.stazxr.zblog.audit.enums.AuditDecision;
 import com.github.stazxr.zblog.audit.enums.AuditScene;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -76,7 +77,8 @@ public class AuditRecord {
     /**
      * 创建时间
      */
-    private Date createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createTime;
 
     /**
      * 执行耗时（毫秒）
@@ -163,11 +165,11 @@ public class AuditRecord {
         this.traces = traces;
     }
 
-    public Date getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
