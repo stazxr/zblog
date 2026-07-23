@@ -273,6 +273,13 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('BARRAGE_MESSAGE_STATUS_INVALID', 'en-US', 'BarrageMessage audit status invalid', 'common'),
 ('BARRAGE_MESSAGE_RATE_LIMIT', 'zh-CN', '发送太频繁啦，请休息一下再发哦~', 'common'),
 ('BARRAGE_MESSAGE_RATE_LIMIT', 'en-US', 'You are sending barrage messages too frequently. Please wait a moment before sending another', 'common'),
+-- 敏感词
+('SENSITIVE_WORD_REQUIRED', 'zh-CN', '请填写敏感词', 'common'),
+('SENSITIVE_WORD_REQUIRED', 'en-US', 'SensitiveWord cannot be blank', 'common'),
+('SENSITIVE_WORD_STATUS_REQUIRED', 'zh-CN', '敏感词状态不能为空', 'common'),
+('SENSITIVE_WORD_STATUS_REQUIRED', 'en-US', 'SensitiveWord status cannot be blank', 'common'),
+('SENSITIVE_WORD_EXISTS', 'zh-CN', '敏感词已存在', 'common'),
+('SENSITIVE_WORD_EXISTS', 'en-US', 'SensitiveWord exist', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),

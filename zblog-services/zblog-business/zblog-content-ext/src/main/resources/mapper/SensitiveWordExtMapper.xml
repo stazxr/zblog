@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.SensitiveWordExtMapper">
+    <select id="selectSensitiveWordList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.SensitiveWordVo">
+        SELECT
+            sw.ID, sw.WORD, sw.TYPE, sw.LEVEL, sw.STATUS, sw.REMARK,
+            sw.CREATE_USER, sw.CREATE_TIME, sw.UPDATE_USER, sw.UPDATE_TIME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = sw.CREATE_USER) AS CREATE_USERNAME,
+            (SELECT u.USERNAME FROM user u WHERE u.ID = sw.UPDATE_USER) AS UPDATE_USERNAME
+        FROM sensitive_word sw
+        <where>
+            <if test="query.word != null and query.word != ''">
+                <bind name="wordBind" value="'%' + query.word + '%'"/>
+                AND sw.WORD LIKE #{v}
+            </if>
+            <if test="query.status != null">
+                AND sw.STATUS = #{query.status}
+            </if>
+        </where>
+        ORDER BY sw.CREATE_TIME DESC
+    </select>
+</mapper>

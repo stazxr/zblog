@@ -86,7 +86,7 @@ public class BarrageMessageServiceImpl implements BarrageMessageService {
         boolean isPending = BarrageMessageAuditStatus.PENDING.getStatus().equals(barrageMessage.getAuditStatus());
         boolean isManual = BarrageMessageAuditStatus.MANUAL.getStatus().equals(barrageMessage.getAuditStatus());
         ThrowUtils.throwIf(!isPending && !isManual, BarrageMessageErrorCode.EBMESA001);
-        if (BarrageMessageAuditStatus.REJECTED.getStatus().equals(barrageMessage.getAuditStatus())) {
+        if (BarrageMessageAuditStatus.REJECTED.getStatus().equals(auditDto.getAuditStatus())) {
             if (StringUtils.isBlank(auditDto.getAuditReason())) {
                 auditDto.setAuditReason("审批拒绝");
             }
