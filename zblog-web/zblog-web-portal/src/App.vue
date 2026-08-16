@@ -59,12 +59,12 @@ export default {
       return this.$store.state.pageLoading
     },
     isMobile() {
-      return navigator.userAgent.match(
-        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
-      )
+      return this.$vuetify.breakpoint.smAndDown
     }
   },
   created() {
+    // 获取网站配置信息
+    this.getWebsiteConfig()
     // 获取当前登录用户信息
     this.getUserInfo()
     this.interval = window.setInterval(() => {
@@ -76,9 +76,6 @@ export default {
     this.initWebSocket()
     // 获取页面信息
     this.getPageInfo()
-
-    // 获取博客信息
-    // this.getBlogInfo()
   },
   beforeDestroy() {
     const stomp = this.$store.state.ws.stomp
@@ -87,12 +84,18 @@ export default {
       console.log('websocket断开连接')
       this.$store.commit('SET_WS', null)
     }
-  },
-  destroyed() {
-    console.log('clear interval')
-    clearInterval(this.interval)
+
+    if (this.interval) {
+      console.log('clear interval')
+      clearInterval(this.interval)
+    }
   },
   methods: {
+    getWebsiteConfig() {
+      this.$mapi.portal.getWebsiteConfig().then(res => {
+        // TODO
+      })
+    },
     getUserInfo() {
       this.$mapi.portal.webLoginId().then(res => {
         this.$store.commit('setUserInfo', res.data)
@@ -111,13 +114,6 @@ export default {
     getPageInfo() {
       this.$mapi.portal.queryPageInfo().then(res => {
         this.$store.commit('setPageInfo', res.data)
-      })
-    },
-
-    getBlogInfo() {
-      this.$mapi.portal.queryBlogInfo().then(res => {
-        this.$store.commit('setBlogInfo', res.data)
-        document.title = res.data['webInfo'] ? res.data['webInfo']['websiteName'] : 'Z-BLOG'
       })
     }
   }

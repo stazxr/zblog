@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -73,7 +74,7 @@ public class PortalController {
     @ApiOperation(value = "查询最新弹幕列表")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "查询最新弹幕列表", code = "PORTQ003", level = RouterLevel.OPEN)
-    public List<BarrageMessageVo> queryBarrageMessageListByPage() {
+    public List<BarrageMessageVo> queryBarrageMessageList() {
         return portalService.queryBarrageMessageList();
     }
 
@@ -117,12 +118,11 @@ public class PortalController {
      *
      * @param request 请求信息
      */
-    @Log
     @PostMapping(value = "/recordVisitor")
     @ApiOperation(value = "记录访客信息")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "记录访客信息", code = "PORTA002", level = RouterLevel.OPEN)
-    @RateLimit(time = 60, count = 1, enableIp = true, enableApi = true)
+    @RateLimit(time = 3600, enableIp = true, enableApi = true)
     public void recordVisitor(HttpServletRequest request) {
         portalService.recordVisitor(request);
     }
@@ -132,13 +132,25 @@ public class PortalController {
      *
      * @param request 请求信息
      */
-    @Log
     @PostMapping(value = "/recordVisitorLog")
     @ApiOperation(value = "记录访客日志")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "记录访客日志", code = "PORTA003", level = RouterLevel.OPEN)
     public void recordVisitorLog(HttpServletRequest request) {
         portalService.recordVisitorLog(request);
+    }
+
+    /**
+     * 查询前台友链列表
+     *
+     * @return List<FriendLinkVo>
+     */
+    @GetMapping(value = "/queryFriendLinkList")
+    @ApiOperation(value = "查询前台友链列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询前台友链列表", code = "PORTQ004", level = RouterLevel.OPEN)
+    public List<FriendLinkVo> queryFriendLinkList() {
+        return portalService.queryFriendLinkList();
     }
 
 //    /**

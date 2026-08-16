@@ -4,6 +4,10 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 查询网站配置信息
+  getWebsiteConfig: params => {
+    return api.httpRequest().get(`${portalApi}/getWebsiteConfig`, params)
+  },
   // 获取Web端登录用户信息
   webLoginId: params => {
     return api.httpRequest().get(`${portalApi}/webLoginId`, params)
@@ -34,14 +38,14 @@ export default {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   },
+  // 获取友链列表
+  queryFriendLinkList: params => {
+    return api.httpRequest().get(`${portalApi}/queryFriendLinkList`, params)
+  },
 
   // 登录
   webLogin: params => {
     return api.httpRequest().post(`${portalApi}/webLogin`, params)
-  },
-  // 获取友链列表
-  queryFriendLinkList: params => {
-    return api.httpRequest().get(`${portalApi}/queryFriendLinkList`, params)
   },
   // 获取标签列表
   queryTagList: params => {
@@ -54,10 +58,6 @@ export default {
   // 获取标签云数据
   queryBoardTagList: params => {
     return api.httpRequest().get(`${portalApi}/queryBoardTagList`, params)
-  },
-  // 查询博客前台信息
-  queryBlogInfo: params => {
-    return api.httpRequest().get(`${portalApi}/queryBlogInfo`, params)
   },
   // 获取文章列表
   queryArticleList: params => {

@@ -1,4 +1,9 @@
 <template>
+  <!-- app: 这个 AppBar 属于整个 Vuetify 应用布局，需要参与页面高度计算 -->
+  <!-- app: 这个 AppBar 属于整个 Vuetify 应用布局，需要参与页面高度计算 -->
+  <!-- hide-on-scroll: 页面向下滚动时隐藏 AppBar，向上滚动显示 -->
+  <!-- flat: 去掉阴影 -->
+  <!-- height: 头部导航栏高度 -->
   <v-app-bar app :class="navClass" hide-on-scroll flat height="60">
     <!-- 手机端导航栏 -->
     <div class="d-md-none nav-mobile-container">
@@ -8,7 +13,6 @@
         </router-link>
       </div>
       <div style="margin-left:auto">
-        <a @click="openSearch"><i class="iconfont icon-sousuo" style="font-weight: bold;" /></a>
         <a style="margin-left:10px;font-size:20px" @click="openDrawer">
           <i class="iconfont icon-daohang" style="font-weight: bold;" />
         </a>
@@ -17,17 +21,13 @@
 
     <!-- 电脑端导航栏 -->
     <div class="d-md-block d-none nav-container">
-      <div class="float-left blog-title">
-        <router-link to="/">
+      <div class="float-left blog-brand">
+        <img v-if="websiteConfig['websiteLogo']" class="website-logo" :src="websiteConfig['websiteLogo']" alt="">
+        <router-link class="blog-title" to="/">
           {{ websiteConfig['websiteAuthor'] }}
         </router-link>
       </div>
       <div class="float-right nav-title">
-        <div class="menus-item">
-          <a class="menu-btn" @click="openSearch">
-            🔍 搜索
-          </a>
-        </div>
         <div class="menus-item">
           <router-link class="menu-btn" to="/">
             🏡 <span>首页</span>
@@ -36,7 +36,6 @@
         <div class="menus-item">
           <a class="menu-btn">
             📕 文章
-            <i class="iconfont" />
           </a>
           <ul class="menus-submenu">
             <li>
@@ -64,7 +63,6 @@
         <div class="menus-item">
           <a class="menu-btn">
             🌈 生活
-            <i class="iconfont icon-xiangxia expand" />
           </a>
           <ul class="menus-submenu">
             <li>
@@ -82,10 +80,9 @@
         <div class="menus-item">
           <a class="menu-btn">
             💖 社交
-            <i class="iconfont icon-xiangxia expand" />
           </a>
           <ul class="menus-submenu">
-            <router-link to="/links">
+            <router-link to="/friendLink">
               📌 友链
             </router-link>
             <router-link to="/barrageMessage">
@@ -96,7 +93,6 @@
         <div class="menus-item">
           <a class="menu-btn">
             🌍 网站
-            <i class="iconfont icon-xiangxia expand" />
           </a>
           <ul class="menus-submenu">
             <li>
@@ -126,7 +122,7 @@
                 <router-link to="/user">
                   <span v-if="userGender === 1">🧑 </span>
                   <span v-else-if="userGender === 2">👧 </span>
-                  <span v-else>🤷 </span>
+                  <span v-else>🤷 ❤️</span>
                   个人中心
                 </router-link>
               </li>
@@ -148,7 +144,8 @@ export default {
   name: 'TopNavBar',
   data() {
     return {
-      navClass: 'nav'
+      navClass: 'nav',
+      ticking: false
     }
   },
   computed: {
@@ -168,18 +165,21 @@ export default {
   mounted() {
     window.addEventListener('scroll', this.scroll)
   },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.scroll)
+  },
   methods: {
     scroll() {
-      const that = this
-      that.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-      if (that.scrollTop > 60) {
-        that.navClass = 'nav-fixed'
-      } else {
-        that.navClass = 'nav'
+      if (this.ticking) {
+        return
       }
-    },
-    openSearch() {
-      this.$store.state.searchFlag = true
+
+      this.ticking = true
+      requestAnimationFrame(() => {
+        const top = document.documentElement.scrollTop
+        this.navClass = top > 60 ? 'nav-fixed' : 'nav'
+        this.ticking = false
+      })
     },
     openDrawer() {
       this.$store.state.drawerFlag = true
@@ -201,7 +201,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+
 i {
   margin-right: 4px;
 }
@@ -286,15 +287,40 @@ ul {
   width: 100%;
   height: 100%;
 }
-.blog-title, .nav-title {
+
+.blog-brand {
   display: flex;
   align-items: center;
   height: 100%;
 }
-.blog-title a {
+
+.logo-link {
+  display: flex;
+  align-items: center;
+}
+
+.website-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.blog-title {
   font-size: 20px;
   font-weight: bold;
 }
+
+/*.blog-title, .nav-title {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  height: 100%;*/
+/*}*/
+/*.blog-title a {*/
+/*  font-size: 20px;*/
+/*  font-weight: bold;*/
+/*}*/
 .menus-item {
   position: relative;
   display: inline-block;

@@ -1,7 +1,7 @@
 /** 字体 */
 @font-face {
-  font-family: customFont;
-  src: url("https://file.suntaoblog.com/font/custom.ttf");
+  font-family: defaultFont;
+  src:url("/font/font.woff2") format("woff2");
   font-display: swap;
 }
 

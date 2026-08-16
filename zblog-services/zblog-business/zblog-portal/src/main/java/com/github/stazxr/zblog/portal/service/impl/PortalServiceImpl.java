@@ -15,6 +15,7 @@ import com.github.stazxr.zblog.content.ext.domain.entity.*;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.mapper.*;
@@ -71,6 +72,8 @@ public class PortalServiceImpl implements PortalService {
     private final VisitorProfileMapper visitorProfileMapper;
 
     private final VisitorLogMapper visitorLogMapper;
+
+    private final FriendLinkMapper friendLinkMapper;
 
     /**
      * 获取Web端登录用户信息
@@ -313,6 +316,17 @@ public class PortalServiceImpl implements PortalService {
         fillVisitorLogUserAgent(visitorLog, IpUtils.getUserAgent(request));
         visitorLog.setVisitTime(LocalDateTime.now());
         visitorLogMapper.insert(visitorLog); // TODO 异步记录
+    }
+
+    /**
+     * 查询前台友链列表
+     *
+     * @return List<FriendLinkVo>
+     */
+    @Override
+    public List<FriendLinkVo> queryFriendLinkList() {
+        // TODO 加缓存
+        return friendLinkMapper.selectWebFriendLinkList();
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {

@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.portal.service;
 
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
@@ -69,4 +70,11 @@ public interface PortalService {
      * @param request 请求信息
      */
     void recordVisitorLog(HttpServletRequest request);
+
+    /**
+     * 查询前台友链列表
+     *
+     * @return List<FriendLinkVo>
+     */
+    List<FriendLinkVo> queryFriendLinkList();
 }

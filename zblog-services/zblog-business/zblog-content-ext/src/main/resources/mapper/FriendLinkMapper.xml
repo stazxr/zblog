@@ -36,4 +36,8 @@
         FROM friend_link fl
         WHERE fl.ID = #{friendLinkId}
     </select>
+
+    <select id="selectWebFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
+        SELECT * FROM friend_link
+    </select>
 </mapper>

@@ -75,13 +75,6 @@
 //    List<MessageVo> queryMessageList();
 //
 //    /**
-//     * 查询前台友链列表
-//     *
-//     * @return FriendLinkVo
-//     */
-//    List<FriendLinkVo> queryFriendLinkList();
-//
-//    /**
 //     * 前台登录
 //     *
 //     * @param request    请求信息

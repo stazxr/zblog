@@ -69,7 +69,7 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
         // 获取友链信息
         FriendLink friendLink = friendLinkConverter.dtoToEntity(friendLinkDto);
         // 设置审批状态为已审批
-        friendLink.setStatus(FriendLinkStatus.PENDING.getStatus());
+        friendLink.setStatus(FriendLinkStatus.APPROVED.getStatus());
         // 新增时，不允许传入 FriendLinkId
         ThrowUtils.when(friendLink.getId() != null).system(BaseErrorCode.SCOREB001);
         // 友链信息检查

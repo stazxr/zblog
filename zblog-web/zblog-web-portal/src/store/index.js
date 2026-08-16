@@ -6,6 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 是否手机端
+    isMobile: false,
     // 用户信息
     user: {
       id: null,
@@ -68,6 +70,9 @@ export default new Vuex.Store({
     talkLikeSet: []
   },
   mutations: {
+    SET_MOBILE(state, value) {
+      state.isMobile = value
+    },
     // 设置用户信息
     setUserInfo(state, loginUser) {
       if (loginUser == null || loginUser.user == null) {
@@ -168,8 +173,6 @@ export default new Vuex.Store({
       }
     }
   },
-  actions: {},
-  modules: {},
   plugins: [
     createPersistedState({
       storage: window.sessionStorage

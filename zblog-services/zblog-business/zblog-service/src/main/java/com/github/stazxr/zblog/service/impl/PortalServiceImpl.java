@@ -301,16 +301,6 @@
 //    }
 //
 //    /**
-//     * 查询前台友链列表
-//     *
-//     * @return FriendLinkVo
-//     */
-//    @Override
-//    public List<FriendLinkVo> queryFriendLinkList() {
-//        return friendLinkMapper.selectWebFriendLinkList();
-//    }
-//
-//    /**
 //     * 前台登录
 //     *
 //     * @param request  请求信息

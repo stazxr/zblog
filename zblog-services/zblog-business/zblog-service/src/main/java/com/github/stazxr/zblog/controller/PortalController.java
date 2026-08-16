@@ -80,18 +80,6 @@
 //    public Result queryArticleDetail(@RequestParam(required = false) Long articleId) {
 //        return Result.success().data(portalService.queryArticleDetail(articleId));
 //    }
-//    /**
-//     * 查询前台友链列表
-//     *
-//     * @return FriendLinkVo
-//     */
-//    @GetMapping("/queryFriendLinkList")
-//    @ApiOperation(value = "查询前台友链列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询前台友链列表", code = "queryWebFriendLinkList", level = RouterLevel.OPEN)
-//    public Result queryFriendLinkList() {
-//        return Result.success().data(portalService.queryFriendLinkList());
-//    }
 //
 //    /**
 //     * 前台登录

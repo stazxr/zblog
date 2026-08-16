@@ -8,6 +8,8 @@ import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 友链管理数据层
  *
@@ -31,35 +33,10 @@ public interface FriendLinkMapper extends BaseMapper<FriendLink> {
      */
     FriendLinkVo selectFriendLinkDetail(@Param("friendLinkId") Long friendLinkId);
 
-
-//    /**
-//     * 查询友链列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return FriendLinkVoLink
-//     */
-//    List<FriendLinkVo> selectFriendLinkList(FriendLinkQueryDto queryDto);
-//
-//    /**
-//     * 查询友链详情
-//     *
-//     * @param friendLinkId 友链序号
-//     * @return FriendLinkVo
-//     */
-//    FriendLinkVo selectFriendLinkDetail(@Param("friendLinkId") Long friendLinkId);
-//
-//    /**
-//     * 根据友链地址查询友链信息
-//     *
-//     * @param linkUrl 友链地址
-//     * @return FriendLink
-//     */
-//    FriendLink selectByLinkUrl(@Param("linkUrl") String linkUrl);
-//
-//    /**
-//     * 查询友链列表
-//     *
-//     * @return FriendLinkVoList
-//     */
-//    List<FriendLinkVo> selectWebFriendLinkList();
+    /**
+     * 查询前台友链列表
+     *
+     * @return FriendLinkVoList
+     */
+    List<FriendLinkVo> selectWebFriendLinkList();
 }

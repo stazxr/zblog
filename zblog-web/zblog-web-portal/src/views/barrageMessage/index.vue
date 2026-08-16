@@ -30,7 +30,7 @@ export default {
     }
   },
   created() {
-    this.cover = getPageRandomCover(this.$store.state.pages, 'message')
+    this.cover = getPageRandomCover(this.$store.state.pages, 'barrageMessage')
   },
   mounted() {
     this.$nextTick(() => {
