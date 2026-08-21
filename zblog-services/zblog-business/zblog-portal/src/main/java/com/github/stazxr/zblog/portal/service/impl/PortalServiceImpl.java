@@ -21,6 +21,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
 import com.github.stazxr.zblog.content.ext.mapper.*;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.portal.domain.bo.UserBaseInfo;
+import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
@@ -55,6 +56,8 @@ import java.util.*;
 public class PortalServiceImpl implements PortalService {
     private static final Logger log = LoggerFactory.getLogger(PortalServiceImpl.class);
 
+    private final WebsiteConfigMapper websiteConfigMapper;
+
     private final AuditService auditService;
 
     private final BarrageMessageMapper barrageMessageMapper;
@@ -74,6 +77,21 @@ public class PortalServiceImpl implements PortalService {
     private final VisitorLogMapper visitorLogMapper;
 
     private final FriendLinkMapper friendLinkMapper;
+
+    /**
+     * 获取网站初始化信息
+     *
+     * @return WebInitInfo
+     */
+    @Override
+    public WebInitInfo init() {
+        WebInitInfo webInitInfo = new WebInitInfo();
+        WebsiteConfig config = websiteConfigMapper.selectById(1L);
+        webInitInfo.setConfig(config);
+        Map<String, List<ThemePageVo>> pages = queryPageInfo();
+        webInitInfo.setPages(pages);
+        return webInitInfo;
+    }
 
     /**
      * 获取Web端登录用户信息

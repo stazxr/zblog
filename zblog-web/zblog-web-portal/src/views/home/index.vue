@@ -431,7 +431,6 @@ export default {
   },
   methods: {
     init() {
-      document.title = this.websiteConfig['websiteName']
       fetch('https://v1.hitokoto.cn?c=i').then(res => {
         return res.json()
       }).then(({ hitokoto }) => {

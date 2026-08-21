@@ -1,13 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
+import api from '@/api/http-index'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    // 是否手机端
-    isMobile: false,
+    // 网站配置信息
+    websiteConfig: {},
+
+    // 页面信息
+    pages: {},
+
     // 用户信息
     user: {
       id: null,
@@ -17,10 +22,8 @@ export default new Vuex.Store({
       intro: null,
       webSite: null
     },
-    // 页面信息
-    pages: {},
-    // 网站配置信息
-    websiteConfig: {},
+    // 是否手机端
+    isMobile: false,
     // 社交配置信息
     socialConfig: {},
     // 其他配置信息
@@ -70,6 +73,16 @@ export default new Vuex.Store({
     talkLikeSet: []
   },
   mutations: {
+    // 设置网站初始化信息
+    setWebInitInfo(state, data) {
+      state.websiteConfig = data['config'] || {}
+      state.pages = data['pages'] || {}
+    },
+    // 设置页面信息
+    setPageInfo(state, pages) {
+      state.pages = pages || {}
+    },
+
     SET_MOBILE(state, value) {
       state.isMobile = value
     },
@@ -92,10 +105,6 @@ export default new Vuex.Store({
         state.user.intro = loginUser.user['signature']
         state.user.email = loginUser.user['email']
       }
-    },
-    // 设置页面信息
-    setPageInfo(state, pages) {
-      state.pages = pages || {}
     },
     // 设置网站信息
     setBlogInfo(state, blogInfo) {
@@ -170,6 +179,24 @@ export default new Vuex.Store({
         talkLikeSet.splice(talkLikeSet.indexOf(talkId), 1)
       } else {
         talkLikeSet.push(talkId)
+      }
+    }
+  },
+  modules: {
+    website: {
+      namespaced: true,
+      actions: {
+        /** 加载网站初始化信息 */
+        async init({ commit }) {
+          const res = await api.portal.init()
+          const data = res.data || {}
+          commit('setWebInitInfo', data, {
+            root: true
+          })
+
+          // 返回网站配置信息
+          return data.config || {}
+        }
       }
     }
   },

@@ -9,6 +9,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.service.PortalService;
@@ -36,6 +37,19 @@ import java.util.Map;
 @Api(value = "PortalController", tags = { "门户管理" })
 public class PortalController {
     private final PortalService portalService;
+
+    /**
+     * 获取网站初始化信息
+     *
+     * @return WebInitInfo
+     */
+    @GetMapping("/init")
+    @ApiOperation(value = "获取网站初始化信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "获取网站初始化信息", code = "PORTQ000", level = RouterLevel.OPEN)
+    public WebInitInfo init() {
+        return portalService.init();
+    }
 
     /**
      * 获取Web端登录用户信息

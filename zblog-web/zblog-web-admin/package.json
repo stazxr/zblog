@@ -65,7 +65,7 @@
     "sortablejs": "1.8.4",
     "vue": "2.6.14",
     "vue-count-to": "^1.0.13",
-    "vue-cropper": "0.4.9",
+    "vue-cropper": "^0.4.9",
     "vue-echarts": "^5.0.0-beta.0",
     "vue-image-crop-upload": "^2.5.0",
     "vue-json-viewer": "^2.2.22",

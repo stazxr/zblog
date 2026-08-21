@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.portal.service;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
+import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 
@@ -17,6 +18,13 @@ import java.util.Map;
  * @since 2027-07-07
  */
 public interface PortalService {
+    /**
+     * 获取网站初始化信息
+     *
+     * @return WebInitInfo
+     */
+    WebInitInfo init();
+
     /**
      * 获取Web端登录用户信息
      *

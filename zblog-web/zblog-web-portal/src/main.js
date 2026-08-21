@@ -66,10 +66,82 @@ Vue.filter('hour', function(value) {
   return dayjs(value).format('HH:mm:ss')
 })
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  vuetify,
-  render: h => h(App)
-})
+/**
+ * 应用网站配置
+ */
+function applyWebsiteConfig(config) {
+  if (!config) {
+    return
+  }
+
+  // 网站标题
+  if (config.websiteTitle) {
+    document.title = config.websiteTitle
+    console.log('document.title', document.title)
+  }
+
+  // SEO
+  updateMeta('keywords', config.websiteKeywords)
+  updateMeta('description', config.websiteDescription)
+
+  // FAVICON
+  updateFavicon(config.websiteFavicon)
+}
+
+/**
+ * 更新 meta 标签
+ */
+function updateMeta(name, content) {
+  if (!content) {
+    return
+  }
+
+  let meta = document.querySelector(`meta[name="${name}"]`)
+  if (!meta) {
+    meta = document.createElement('meta')
+    meta.name = name
+    document.head.appendChild(meta)
+  }
+
+  meta.content = content
+}
+
+/**
+ * 更新 favicon
+ */
+function updateFavicon(url) {
+  if (!url) {
+    return
+  }
+
+  let link = document.querySelector('link[rel="icon"]')
+  if (!link) {
+    link = document.createElement('link')
+    link.rel = 'icon'
+    document.head.appendChild(link)
+  }
+
+  link.href = url
+}
+
+/**
+ * 启动 Vue
+ */
+async function bootstrap() {
+  try {
+    // 加载网站配置
+    const config = await store.dispatch('website/init')
+    applyWebsiteConfig(config)
+  } catch (e) {
+    console.error('加载网站配置失败', e)
+  }
+
+  new Vue({
+    router,
+    store,
+    vuetify,
+    render: h => h(App)
+  }).$mount('#app')
+}
+
+bootstrap()

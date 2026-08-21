@@ -169,6 +169,7 @@ export const get = (url, params, requestItem = {}) => {
 }
 
 export const post = (url, data, requestItem = {}) => {
+  const isFormData = data instanceof FormData
   const options = {
     method: 'post',
     url,
@@ -176,13 +177,13 @@ export const post = (url, data, requestItem = {}) => {
     // 浏览器专属: FormData, File, Blob; Node 专属: Stream, Buffer
     // 可选语法，Country=China&City=Xian，只有 value 会被发送，key 则不会
     data,
-    // 自定义请求头
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
-    },
     // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
     responseType: 'json',
-    ...requestItem
+    ...requestItem,
+    headers: {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json;charset=UTF-8' }),
+      ...(requestItem.headers || {})
+    }
   }
   return instance(options)
 }

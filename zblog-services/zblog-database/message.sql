@@ -234,6 +234,11 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 会话相关
 ('SESSION_FORBID_KICK_OUT_SELF', 'zh-CN', '无法踢出自己', 'common'),
 ('SESSION_FORBID_KICK_OUT_SELF', 'en-US', 'Can not kick out self', 'common'),
+-- 网站配置
+('WEBSITE_CONFIG_NAME_REQUIRED', 'zh-CN', '网站名称不能为空', 'common'),
+('WEBSITE_CONFIG_NAME_REQUIRED', 'en-US', 'Website name cannot be blank', 'common'),
+('WEBSITE_CONFIG_TITLE_REQUIRED', 'zh-CN', '网站标题不能为空', 'common'),
+('WEBSITE_CONFIG_TITLE_REQUIRED', 'en-US', 'Website title cannot be blank', 'common'),
 -- 页面
 ('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
 ('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),

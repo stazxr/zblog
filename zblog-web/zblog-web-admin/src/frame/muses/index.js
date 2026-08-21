@@ -3,9 +3,11 @@ import MusesSearchFormItem from './components/search-form-item/index.js'
 import MusesPagination from './components/pagination/index.js'
 import MusesEmpty from './components/empty/index.js'
 import MusesImageUpload from './components/image-upload/index.js'
+import MusesImageCropUpload from './components/image-crop-upload/index.js'
 
 const components = [
-  MusesSearchForm, MusesSearchFormItem, MusesPagination, MusesEmpty, MusesImageUpload
+  MusesSearchForm, MusesSearchFormItem, MusesPagination, MusesEmpty, MusesImageUpload,
+  MusesImageCropUpload
 ]
 
 const install = function(vue) {
@@ -24,5 +26,6 @@ export default {
   MusesSearchFormItem,
   MusesPagination,
   MusesEmpty,
-  MusesImageUpload
+  MusesImageUpload,
+  MusesImageCropUpload
 }

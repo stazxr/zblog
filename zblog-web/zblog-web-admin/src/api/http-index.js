@@ -21,6 +21,7 @@ import session from '@/api/base/maintain/session.js'
 import friendLink from '@/api/service/website/friendLink.js'
 import page from '@/api/service/website/page.js'
 import theme from '@/api/service/website/theme.js'
+import websiteConfig from '@/api/service/website/websiteConfig.js'
 
 // content
 import category from '@/api/service/content/category.js'
@@ -51,7 +52,7 @@ export default {
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,
-  friendLink, page, theme,
+  friendLink, page, theme, websiteConfig,
   category, tag, article,
   // 内容审核
   autoAudit, sensitiveWord,

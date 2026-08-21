@@ -6,7 +6,7 @@
       :style="footerStyle"
     >
       <!-- 第一行：网站签名 -->
-      <div class="footer-signature">
+      <div v-if="websiteConfig.websiteSignature" class="footer-signature">
         {{ websiteConfig.websiteSignature }}
       </div>
 
@@ -18,6 +18,9 @@
         <router-link to="/message">留言</router-link>
         <a v-if="websiteConfig.documentUrl" :href="websiteConfig.documentUrl" target="_blank" rel="noopener noreferrer">
           文档
+        </a>
+        <a v-if="websiteConfig.giteeUrl" :href="websiteConfig.giteeUrl" target="_blank" rel="noopener noreferrer">
+          Gitee
         </a>
         <a v-if="websiteConfig.githubUrl" :href="websiteConfig.githubUrl" target="_blank" rel="noopener noreferrer">
           Github
@@ -60,15 +63,7 @@ export default {
      * 网站配置信息
      */
     websiteConfig() {
-      return {
-        footerBackground: null,
-        websiteAuthor: '孙涛',
-        websiteSignature: '大浪淘沙，荣辱不惊',
-        websiteCreateTime: '2021-03-21',
-        documentUrl: 'https://doc.suntaoblog.com',
-        githubUrl: 'https://github.com',
-        websiteRecordNo: '陕ICP备2026001026号-1'
-      }
+      return this.$store.state.websiteConfig
     },
     /**
      * 当前年份

@@ -63,8 +63,6 @@ export default {
     }
   },
   created() {
-    // 获取网站配置信息
-    this.getWebsiteConfig()
     // 获取当前登录用户信息
     this.getUserInfo()
     this.interval = window.setInterval(() => {
@@ -74,8 +72,6 @@ export default {
     this.recordVisitor()
     // 初始化 Socket
     this.initWebSocket()
-    // 获取页面信息
-    this.getPageInfo()
   },
   beforeDestroy() {
     const stomp = this.$store.state.ws.stomp
@@ -91,11 +87,6 @@ export default {
     }
   },
   methods: {
-    getWebsiteConfig() {
-      this.$mapi.portal.getWebsiteConfig().then(res => {
-        // TODO
-      })
-    },
     getUserInfo() {
       this.$mapi.portal.webLoginId().then(res => {
         this.$store.commit('setUserInfo', res.data)
@@ -110,11 +101,6 @@ export default {
       } catch (e) {
         console.error('websocket init failed', e)
       }
-    },
-    getPageInfo() {
-      this.$mapi.portal.queryPageInfo().then(res => {
-        this.$store.commit('setPageInfo', res.data)
-      })
     }
   }
 }

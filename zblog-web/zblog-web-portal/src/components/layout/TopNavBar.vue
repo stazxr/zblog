@@ -394,6 +394,7 @@ ul {
   height: 40px;
   width: 40px;
   margin: auto;
+  vertical-align: middle;
   border-radius: 15%;
 }
 </style>

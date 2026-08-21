@@ -4,6 +4,10 @@ import api from './custom-axios'
 const portalApi = '/api/portal'
 
 export default {
+  // 获取网站初始化信息
+  init: params => {
+    return api.httpRequest().get(`${portalApi}/init`, params)
+  },
   // 查询网站配置信息
   getWebsiteConfig: params => {
     return api.httpRequest().get(`${portalApi}/getWebsiteConfig`, params)

@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
-    <title>Z-BLOG</title>
+    <!-- 默认网站标题 -->
+    <title></title>
+
+    <!-- 编码 -->
     <meta charset="utf-8">
+
+    <!-- IE 兼容 -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- 移动端适配 -->
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <!-- HTTPS --> <!-- TODO 配置了 HTTPS 则放开注释 -->
+
+    <!-- HTTPS -->
     <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
+
+    <!-- 网站图标 -->
     <link rel="icon" href="./favicon.ico">
     <script>
         // const _hmt = [];
@@ -14,18 +24,13 @@
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %>
+        doesn't work properly without JavaScript enabled.
+        Please enable it to continue.
+      </strong>
     </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
 
-    <script>
-      (function() {
-        const hm = document.createElement('script')
-        hm.src = "https://hm.baidu.com/hm.js?a3188680577ffbbb44c54684f78b9e1a"
-        const s = document.getElementsByTagName('script')[0]
-        s.parentNode.insertBefore(hm, s)
-      })()
-    </script>
+    <div id="app"></div>
   </body>
 </html>
