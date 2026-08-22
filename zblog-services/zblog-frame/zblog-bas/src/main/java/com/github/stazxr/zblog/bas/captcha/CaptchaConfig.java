@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.bas.captcha;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,10 +49,5 @@ public class CaptchaConfig {
 
     public void setDuration(int duration) {
         this.duration = Math.max(duration, 0);
-    }
-
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
     }
 }

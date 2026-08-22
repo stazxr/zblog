@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.bas.file.path;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -105,10 +104,5 @@ public class FilePathContext {
      */
     public static FilePathContext empty() {
         return new FilePathContext();
-    }
-
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
     }
 }

@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.content.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -138,7 +138,7 @@ public class ArticleDto extends BaseDto {
     /**
      * 文章发布时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("文章发布时间")
     private LocalDateTime publishTime;
 }

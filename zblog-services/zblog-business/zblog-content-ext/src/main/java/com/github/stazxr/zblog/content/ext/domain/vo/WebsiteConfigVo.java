@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.content.ext.domain.vo;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 网站配置信息
@@ -83,6 +85,7 @@ public class WebsiteConfigVo implements Serializable {
     /**
      * 网站创建日期
      */
+    @JSONField(format = "yyyy-MM-dd")
     @ApiModelProperty("网站创建日期")
     private LocalDate websiteCreateTime;
 
@@ -121,4 +124,18 @@ public class WebsiteConfigVo implements Serializable {
      */
     @ApiModelProperty("版本号")
     private Integer version;
+
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty("创建时间")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    @ApiModelProperty("更新时间")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
 }

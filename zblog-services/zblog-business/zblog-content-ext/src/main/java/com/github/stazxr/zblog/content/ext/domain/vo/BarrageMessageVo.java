@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.content.ext.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.github.stazxr.zblog.audit.model.AuditRecord;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -104,7 +104,7 @@ public class BarrageMessageVo implements Serializable {
      * 审核时间
      */
     @ApiModelProperty("审核时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime auditTime;
 
     /**
@@ -123,7 +123,7 @@ public class BarrageMessageVo implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /**

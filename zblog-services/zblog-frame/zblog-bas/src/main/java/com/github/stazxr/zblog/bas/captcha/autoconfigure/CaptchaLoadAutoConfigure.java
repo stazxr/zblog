@@ -1,8 +1,8 @@
 package com.github.stazxr.zblog.bas.captcha.autoconfigure;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.github.stazxr.zblog.bas.captcha.CaptchaConfig;
 import com.github.stazxr.zblog.bas.captcha.factory.CacheCaptchaFactory;
 import com.github.stazxr.zblog.bas.captcha.factory.CaptchaFactory;

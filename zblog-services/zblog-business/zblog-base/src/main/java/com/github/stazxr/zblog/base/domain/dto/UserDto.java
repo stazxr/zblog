@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
@@ -65,7 +65,7 @@ public class UserDto extends BaseDto {
      * 临时用户账户过期时间
      */
     @ApiModelProperty("临时用户账户过期时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expireTime;
 
     /**

@@ -1,11 +1,8 @@
 package com.github.stazxr.zblog.web.serializer;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
-import com.alibaba.fastjson.serializer.SerializeWriter;
 import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.writer.ObjectWriter;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 
@@ -17,7 +14,7 @@ import java.math.BigInteger;
  * @author SunTao
  * @since 2022-04-18
  */
-public class LongToStringSerializer implements ObjectSerializer {
+public class LongToStringSerializer implements ObjectWriter<Long> {
     public static final LongToStringSerializer INSTANCE = new LongToStringSerializer();
 
     private static final long JS_IEEE_754_MIN = -9007199254740992L;
@@ -38,24 +35,6 @@ public class LongToStringSerializer implements ObjectSerializer {
                 }
             } catch (Exception ignored) { }
             jsonWriter.writeString(object.toString());
-        }
-    }
-
-    @Override
-    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
-        SerializeWriter writer = serializer.out;
-        if (object == null) {
-            writer.writeNull();
-        } else {
-            try {
-                // 判断 long 的范围是否在 IEEE 754 标准范围内，在则不转换
-                long value = Long.parseLong(object.toString());
-                if (value >= JS_IEEE_754_MIN && value < JS_IEEE_754_MAX) {
-                    writer.writeLong(value);
-                    return;
-                }
-            } catch (Exception ignored) { }
-            writer.writeString(object.toString());
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.content.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.github.stazxr.zblog.core.base.BaseVo;
+import com.alibaba.fastjson2.annotation.JSONField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -138,7 +137,7 @@ public class ArticleVo {
     /**
      * 是否置顶
      */
-    @ApiModelProperty("")
+    @ApiModelProperty("是否置顶")
     private Boolean topFlag;
 
     /**
@@ -188,28 +187,28 @@ public class ArticleVo {
     /**
      * 文章创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("文章创建时间")
     private LocalDateTime createTime;
 
     /**
      * 文章发布时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("文章发布时间")
     private LocalDateTime publishTime;
 
     /**
      * 文章更新时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("文章更新时间")
     private LocalDateTime updateTime;
 
     /**
      * 文章下线时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("文章下线时间")
     private LocalDateTime deleteTime;
 

@@ -1,7 +1,7 @@
 package com.github.stazxr.zblog.bas.router;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -73,6 +73,6 @@ public class Resource implements Serializable {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this, SerializerFeature.WriteMapNullValue);
+        return JSON.toJSONString(this, JSONWriter.Feature.WriteMapNullValue);
     }
 }

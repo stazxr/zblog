@@ -1,8 +1,10 @@
 package com.github.stazxr.zblog.web;
 
-import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.alibaba.fastjson2.JSONFactory;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.support.config.FastJsonConfig;
+import com.alibaba.fastjson2.writer.ObjectWriterProvider;
+import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.github.stazxr.zblog.bas.file.autoconfigure.FileAutoConfiguration;
 import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
 import com.github.stazxr.zblog.bas.log.advice.ReqLogControlAdvice;
@@ -27,9 +29,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect;
-import static com.alibaba.fastjson.serializer.SerializerFeature.WriteMapNullValue;
 
 /**
  * WebMvcConfigurer
@@ -61,59 +60,33 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         "classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"
     };
 
-    /**
-     * 配置使用 fastjson 进行 json 解析
-     *
-     * @param converters HttpMessageConverters
-     */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         // 创建 fastJson 消息转换器
-        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
+        FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
 
+        // 配置支持的 MediaType
         List<MediaType> supportedMediaTypes = new ArrayList<>();
         supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-        supportedMediaTypes.add(MediaType.APPLICATION_ATOM_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
-        supportedMediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
-        supportedMediaTypes.add(MediaType.APPLICATION_PDF);
-        supportedMediaTypes.add(MediaType.APPLICATION_RSS_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_XHTML_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_XML);
-        supportedMediaTypes.add(MediaType.IMAGE_GIF);
-        supportedMediaTypes.add(MediaType.IMAGE_JPEG);
-        supportedMediaTypes.add(MediaType.IMAGE_PNG);
-        supportedMediaTypes.add(MediaType.TEXT_EVENT_STREAM);
-        supportedMediaTypes.add(MediaType.TEXT_HTML);
-        supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
-        supportedMediaTypes.add(MediaType.TEXT_PLAIN);
-        supportedMediaTypes.add(MediaType.TEXT_XML);
-        fastConverter.setSupportedMediaTypes(supportedMediaTypes);
+        converter.setSupportedMediaTypes(supportedMediaTypes);
 
-        // 创建配置类
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        // Long 类型序列化处理
+        ObjectWriterProvider provider = JSONFactory.getDefaultObjectWriterProvider();
+        provider.register(Long.class, LongToStringSerializer.INSTANCE);
+        provider.register(Long.TYPE, LongToStringSerializer.INSTANCE);
 
-        // Long -> String
-        SerializeConfig serializeConfig = SerializeConfig.globalInstance;
-        serializeConfig.put(Long.class , LongToStringSerializer.INSTANCE);
-        serializeConfig.put(Long.TYPE , LongToStringSerializer.INSTANCE);
-        fastJsonConfig.setSerializeConfig(serializeConfig);
+        FastJsonConfig config = new FastJsonConfig();
 
-        // 修改配置返回内容的过滤
-        // WriteBigDecimalAsPlain：把大数字转换为 String
-        // WriteNullListAsEmpty：List 字段如果为 null, 输出为 [], 而非 null
-        // WriteNullStringAsEmpty：字符类型字段如果为 null, 输出为 "", 而非 null
-        // DisableCircularReferenceDetect：消除对同一对象循环引用的问题，默认为 false（如果不配置有可能会进入死循环）
-        // WriteNullBooleanAsFalse：Boolean 字段如果为 null, 输出为 false, 而非 null
-        // WriteMapNullValue：是否输出值为 null 的字段, 默认为 false
-        fastJsonConfig.setSerializerFeatures(
-                DisableCircularReferenceDetect,
-                WriteMapNullValue
+        // fastjson2 序列化特性
+        config.setWriterFeatures(
+            JSONWriter.Feature.WriteMapNullValue
         );
 
-        // 将fastjson添加到视图消息转换器列表内
-        fastConverter.setFastJsonConfig(fastJsonConfig);
-        converters.add(fastConverter);
+        // 应用 FastJson 配置
+        converter.setFastJsonConfig(config);
+
+        // 加入 Spring MVC Converter 列表
+        converters.add(0, converter);
     }
 
     @Override

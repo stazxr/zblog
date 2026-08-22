@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.base.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,7 +31,7 @@ public class UserLoginLogVo extends BaseVo {
      * 登录时间
      */
     @ApiModelProperty("登录时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime loginTime;
 
     /**

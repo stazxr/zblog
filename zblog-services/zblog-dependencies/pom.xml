@@ -49,7 +49,7 @@
         <springboot.version>2.6.3</springboot.version>
         <!-- other -->
         <hutool.version>5.8.18</hutool.version>
-        <fastjson.version>2.0.32</fastjson.version>
+        <fastjson.version>2.0.57</fastjson.version>
         <jackson.version>2.13.1</jackson.version>
         <tencentcloud.version>3.1.1493</tencentcloud.version>
         <jsch.version>0.1.55</jsch.version>
@@ -109,8 +109,18 @@
             </dependency>
             <!-- Json 相关工具包 -->
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2-extension</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2-extension-spring5</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
             <dependency>
@@ -343,11 +353,6 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok-mapstruct-binding</artifactId>
-                <version>${lombok-mapstruct.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -2,9 +2,7 @@ package com.github.stazxr.zblog.util.office;
 
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.*;
 import com.github.stazxr.zblog.util.UuidUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -131,7 +129,9 @@ public class ExcelUtils {
 
         // 导入数据
         int rowNum = 1;
-        JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONStringWithDateFormat(list, "yyyy-MM-dd HH:mm:ss"));
+        JSONWriter.Context context = JSONFactory.createWriteContext();
+        context.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(list, context));
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
             HSSFRow row1 = sheet.createRow(rowNum);

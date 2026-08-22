@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.mask;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.github.stazxr.zblog.bas.mask.core.MaskStrategy;
 import com.github.stazxr.zblog.bas.mask.filter.MaskFilter;
 import lombok.extern.slf4j.Slf4j;

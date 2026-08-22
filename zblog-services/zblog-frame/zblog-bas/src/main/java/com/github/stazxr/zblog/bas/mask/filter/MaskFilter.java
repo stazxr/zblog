@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.mask.filter;
 
-import com.alibaba.fastjson.serializer.ValueFilter;
+import com.alibaba.fastjson2.filter.ValueFilter;
 import com.github.stazxr.zblog.bas.mask.MaskUtil;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * JSON desensitization filter implementation.
  * <p>
- * This class implements the {@link com.alibaba.fastjson.serializer.ValueFilter} interface
+ * This class implements the {@link com.alibaba.fastjson2.filter.ValueFilter} interface
  * to desensitize sensitive data in JSON.
  * </p>
  *
@@ -28,7 +28,7 @@ public class MaskFilter implements ValueFilter {
      * @return Processed field value
      */
     @Override
-    public Object process(Object obj, String name, Object value) {
+    public Object apply(Object obj, String name, Object value) {
         Field field = null;
         Class<?> objClazz = obj.getClass();
         while (!Object.class.getName().equalsIgnoreCase(objClazz.getName())) {
