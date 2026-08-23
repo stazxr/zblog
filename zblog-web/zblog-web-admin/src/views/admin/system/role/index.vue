@@ -56,7 +56,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="updateUsername" label="更新用户" align="center" width="120px" />
         <el-table-column :show-overflow-tooltip="true" prop="updateTime" label="更新时间" align="center" width="160px" />
         <div slot="empty">
-          <el-empty :image="nodataImg" description=" " />
+          <muses-empty />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -96,7 +96,6 @@
 </template>
 
 <script>
-import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/system/role/template/detailDialog'
 import addOrEditDialog from '@/views/admin/system/role/template/addOrEditDialog'
 import authRoleDialog from '@/views/admin/system/role/template/authRoleDialog'
@@ -117,7 +116,6 @@ export default {
       enabledList: [],
       tableData: [],
       tableLoading: false,
-      nodataImg: nodataImg,
       row: null,
       total: 0,
       page: 1,

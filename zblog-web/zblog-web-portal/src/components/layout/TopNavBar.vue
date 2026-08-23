@@ -24,7 +24,7 @@
       <div class="float-left blog-brand">
         <img v-if="websiteConfig['websiteLogo']" class="website-logo" :src="websiteConfig['websiteLogo']" alt="">
         <router-link class="blog-title" to="/">
-          {{ websiteConfig['websiteAuthor'] }}
+          {{ websiteConfig['websiteName'] }}
         </router-link>
       </div>
       <div class="float-right nav-title">

@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import detailDialog from '@/views/admin/contentAudit/autoAudit/template/detailDialog'
+import detailDialog from '@/views/admin/audit/autoAudit/template/detailDialog'
 export default {
   name: 'Visitor',
   components: {

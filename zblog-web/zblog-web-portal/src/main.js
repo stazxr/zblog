@@ -59,10 +59,11 @@ Vue.config.productionTip = false
 
 // 过滤器
 Vue.filter('year', function(value) {
+  if (!value) return ''
   return dayjs(value).format('YYYY')
 })
-
 Vue.filter('hour', function(value) {
+  if (!value) return ''
   return dayjs(value).format('HH:mm:ss')
 })
 
@@ -77,7 +78,6 @@ function applyWebsiteConfig(config) {
   // 网站标题
   if (config.websiteTitle) {
     document.title = config.websiteTitle
-    console.log('document.title', document.title)
   }
 
   // SEO

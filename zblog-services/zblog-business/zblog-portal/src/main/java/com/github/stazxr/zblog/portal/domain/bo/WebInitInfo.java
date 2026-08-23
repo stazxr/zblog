@@ -34,4 +34,10 @@ public class WebInitInfo implements Serializable {
      */
     @ApiModelProperty("网站封面")
     private Map<String, List<ThemePageVo>> pages;
+
+    /**
+     * 网站链接
+     */
+    @ApiModelProperty("网站链接")
+    private Map<String, String> links;
 }

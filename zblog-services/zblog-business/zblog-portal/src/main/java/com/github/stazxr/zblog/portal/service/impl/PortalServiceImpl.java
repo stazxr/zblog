@@ -14,10 +14,7 @@ import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.content.ext.domain.entity.*;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
-import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
-import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
-import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
-import com.github.stazxr.zblog.content.ext.domain.vo.ThemeVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.*;
 import com.github.stazxr.zblog.content.ext.mapper.*;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.portal.domain.bo.UserBaseInfo;
@@ -58,13 +55,7 @@ public class PortalServiceImpl implements PortalService {
 
     private final WebsiteConfigMapper websiteConfigMapper;
 
-    private final AuditService auditService;
-
-    private final BarrageMessageMapper barrageMessageMapper;
-
-    private final BarrageMessageLikeMapper barrageMessageLikeMapper;
-
-    private final BarrageMessagePublisher barrageMessagePublisher;
+    private final WebsiteLinkConfigMapper websiteLinkConfigMapper;
 
     private final ThemeMapper themeMapper;
 
@@ -75,6 +66,14 @@ public class PortalServiceImpl implements PortalService {
     private final VisitorProfileMapper visitorProfileMapper;
 
     private final VisitorLogMapper visitorLogMapper;
+
+    private final AuditService auditService;
+
+    private final BarrageMessageMapper barrageMessageMapper;
+
+    private final BarrageMessageLikeMapper barrageMessageLikeMapper;
+
+    private final BarrageMessagePublisher barrageMessagePublisher;
 
     private final FriendLinkMapper friendLinkMapper;
 
@@ -90,6 +89,14 @@ public class PortalServiceImpl implements PortalService {
         webInitInfo.setConfig(config);
         Map<String, List<ThemePageVo>> pages = queryPageInfo();
         webInitInfo.setPages(pages);
+        List<WebsiteLinkConfigVo> websiteLinks = websiteLinkConfigMapper.selectPortalWebsiteLinks();
+        Map<String, String> links = new LinkedHashMap<>();
+        for (WebsiteLinkConfigVo websiteLink : websiteLinks) {
+            if (StringUtils.isNotBlank(websiteLink.getLinkUrl())) {
+                links.put(websiteLink.getLinkType(), websiteLink.getLinkUrl());
+            }
+        }
+        webInitInfo.setLinks(links);
         return webInitInfo;
     }
 

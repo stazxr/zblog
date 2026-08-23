@@ -3,12 +3,15 @@
     <div class="head-container">
       <div class="search-opts">
         <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
-          <muses-search-form-item label="" prop="search-word">
-            <el-input id="search-word" v-model="filters.word" clearable placeholder="敏感词" @keyup.enter.native="search" />
+          <muses-search-form-item label="" prop="search-linkName">
+            <el-input id="search-linkName" v-model="filters.linkName" clearable placeholder="网站链接名称" @keyup.enter.native="search" />
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-status">
-            <el-select id="search-status" v-model="filters.status" placeholder="敏感词状态" clearable @change="search">
-              <el-option v-for="item in statusList" :key="item.value" :label="item.name" :value="item.value" />
+          <muses-search-form-item label="" prop="search-linkType">
+            <el-input id="search-linkType" v-model="filters.linkType" clearable placeholder="网站链接类型" @keyup.enter.native="search" />
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-enabled">
+            <el-select id="search-enabled" v-model="filters.enabled" placeholder="网站链接状态" clearable @change="search">
+              <el-option v-for="item in enabledList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
@@ -19,15 +22,16 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['SEWDA001']" type="success" @click="addSensitiveWord">新增</el-button>
-          <el-button v-perm="['SEWDU001']" :disabled="row === null" type="primary" @click="editSensitiveWord">编辑</el-button>
-          <el-button v-perm="['SEWDD001']" :disabled="row === null" type="danger" @click="deleteSensitiveWord">删除</el-button>
+          <el-button v-perm="['WEBLA001']" type="success" @click="addWebsiteLink">新增</el-button>
+          <el-button v-perm="['WEBLQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['WEBLU001']" :disabled="row === null" type="primary" @click="editWebsiteLink">编辑</el-button>
+          <el-button v-perm="['WEBLD001']" :disabled="row === null" type="danger" @click="deleteWebsiteLink">删除</el-button>
         </span>
       </div>
     </div>
     <div class="components-container">
       <el-table
-        ref="sensitiveWordTable"
+        ref="websiteLinkTable"
         v-loading="tableLoading"
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
@@ -36,28 +40,28 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column :show-overflow-tooltip="true" prop="word" label="敏感词" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="type" label="敏感词类型" align="center" width="180px" />
-        <el-table-column label="风险等级" align="center" width="120px">
+        <el-table-column :show-overflow-tooltip="true" prop="linkName" label="链接名称" align="center" width="140" />
+        <el-table-column :show-overflow-tooltip="true" prop="linkType" label="链接类型" align="center" width="140" />
+        <el-table-column :show-overflow-tooltip="true" label="链接地址" align="center">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.level === 1">低</el-tag>
-            <el-tag v-if="scope.row.level === 2">中</el-tag>
-            <el-tag v-if="scope.row.level === 3">高</el-tag>
-            <span v-else />
+            <el-link
+              v-if="scope.row.linkUrl"
+              :href="scope.row.linkUrl"
+              type="primary"
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+            >
+              {{ scope.row.linkUrl }}
+            </el-link>
           </template>
         </el-table-column>
-        <el-table-column label="敏感词状态" align="center" width="120px">
+        <el-table-column prop="sort" label="链接排序" align="center" width="100" />
+        <el-table-column label="链接状态" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.status === 0">启用</el-tag>
-            <el-tag v-if="scope.row.status === 1">禁用</el-tag>
-            <span v-else />
+            <el-tag v-if="scope.row.enabled === true" type="success">正常</el-tag>
+            <el-tag v-else type="danger">禁用</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="remark" label="备注" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="createUsername" label="创建用户" align="center" width="120px" />
-        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="160px" />
-        <el-table-column :show-overflow-tooltip="true" prop="updateUsername" label="更新用户" align="center" width="120px" />
-        <el-table-column :show-overflow-tooltip="true" prop="updateTime" label="更新时间" align="center" width="160px" />
         <div slot="empty">
           <muses-empty />
         </div>
@@ -75,6 +79,12 @@
       </div>
     </div>
 
+    <!-- 详情 -->
+    <detailDialog
+      ref="detailDialogRef"
+      :dialog-visible="detailDialogVisible"
+      @showDetailDone="showDetailDone"
+    />
     <!-- 新增 / 编辑 -->
     <addOrEditDialog
       ref="addOrEditDialogRef"
@@ -86,19 +96,22 @@
 </template>
 
 <script>
-import addOrEditDialog from '@/views/admin/contentAudit/sensitiveWord/template/addOrEditDialog'
+import detailDialog from '@/views/admin/website/websiteLink/template/detailDialog'
+import addOrEditDialog from '@/views/admin/website/websiteLink/template/addOrEditDialog'
 export default {
-  name: 'SensitiveWord',
+  name: 'WebsiteLink',
   components: {
+    detailDialog,
     addOrEditDialog
   },
   data() {
     return {
       filters: {
-        word: null,
-        status: null
+        linkName: null,
+        linkType: null,
+        enabled: null
       },
-      statusList: [],
+      enabledList: [],
       tableData: [],
       tableLoading: false,
       row: null,
@@ -107,25 +120,23 @@ export default {
       pageSize: 10,
       detailDialogVisible: false,
       addOrEditDialogTitle: null,
-      addOrEditDialogVisible: false,
-      authRoleDialogTitle: null,
-      authRoleDialogVisible: false
+      addOrEditDialogVisible: false
     }
   },
   mounted() {
-    this.loadStatusList()
+    this.loadEnabledList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
     },
-    loadStatusList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'SENSITIVE_WORD_STATUS_CONFIG' }).then(res => {
+    loadEnabledList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
         const { data } = res
-        this.statusList = data
+        this.enabledList = data
       }).catch(_ => {
-        this.statusList = []
+        this.enabledList = []
       })
     },
     // 查询
@@ -154,7 +165,7 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.sensitiveWord.pageSensitiveWordList(param).then(res => {
+      this.$mapi.websiteLink.pageWebsiteLinkList(param).then(res => {
         const { data } = res
         this.total = data.total
         this.tableData = data.records
@@ -164,23 +175,35 @@ export default {
       }).finally(() => {
         this.tableLoading = false
         this.row = null
-        this.$refs.sensitiveWordTable.setCurrentRow()
+        this.$refs.websiteLinkTable.setCurrentRow()
       })
     },
+    // 详情
+    showDetail() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的链接')
+        return
+      }
+      this.detailDialogVisible = true
+      this.$refs.detailDialogRef.initData(this.row.id)
+    },
+    showDetailDone() {
+      this.detailDialogVisible = false
+    },
     // 新增与编辑
-    addSensitiveWord() {
+    addWebsiteLink() {
       this.addOrEditDialogVisible = true
-      this.addOrEditDialogTitle = '新增敏感词'
+      this.addOrEditDialogTitle = '新增网站链接'
       this.$refs.addOrEditDialogRef.initData()
     },
-    editSensitiveWord() {
+    editWebsiteLink() {
       if (this.row === null) {
-        this.$message.error('请选择要编辑的敏感词')
+        this.$message.error('请选择要编辑的链接')
         return
       }
       this.addOrEditDialogVisible = true
-      this.addOrEditDialogTitle = '编辑敏感词'
-      this.$refs.addOrEditDialogRef.initData(this.row)
+      this.addOrEditDialogTitle = '编辑网站链接'
+      this.$refs.addOrEditDialogRef.initData(this.row.id)
     },
     addOrEditDone(result = false) {
       this.addOrEditDialogTitle = null
@@ -190,17 +213,17 @@ export default {
       }
     },
     // 删除
-    deleteSensitiveWord() {
+    deleteWebsiteLink() {
       if (this.row === null) {
-        this.$message.error('请选择要删除的敏感词')
+        this.$message.error('请选择要删除的网站链接')
         return
       }
-      this.$confirm('此操作将永久删除敏感词【' + this.row.word + '】, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除链接【' + this.row.linkName + '】, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$mapi.sensitiveWord.deleteSensitiveWord({ sensitiveWordId: this.row.id }).then(res => {
+        this.$mapi.websiteLink.deleteWebsiteLink({ websiteLinkId: this.row.id }).then(res => {
           this.$message.success(res.message)
           this.listTableData()
         })

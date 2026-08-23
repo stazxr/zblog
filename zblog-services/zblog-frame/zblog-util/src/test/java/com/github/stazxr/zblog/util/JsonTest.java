@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.util;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import org.junit.Ignore;
 import org.junit.Test;

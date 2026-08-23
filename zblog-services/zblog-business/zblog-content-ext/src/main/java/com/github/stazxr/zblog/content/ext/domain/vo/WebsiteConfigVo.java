@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 网站配置信息
@@ -138,4 +139,10 @@ public class WebsiteConfigVo implements Serializable {
     @ApiModelProperty("更新时间")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+
+    /**
+     * 网站链接配置列表
+     */
+    @ApiModelProperty("网站链接配置列表")
+    private List<WebsiteLinkConfigVo> links;
 }

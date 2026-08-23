@@ -1,55 +1,82 @@
 <template>
   <v-footer app padless absolute>
     <div
-      class="footer-wrap"
+      class="footer-wrap footer-theme"
       :class="{ 'default-gradient': !websiteConfig.footerBackground }"
       :style="footerStyle"
     >
-      <!-- 第一行：网站签名 -->
+      <!-- 网站签名 -->
       <div v-if="websiteConfig.websiteSignature" class="footer-signature">
         {{ websiteConfig.websiteSignature }}
       </div>
-
-      <!-- 第二行：快捷导航 -->
+      <!-- 快捷导航 -->
       <nav class="footer-nav">
-        <router-link to="/">首页</router-link>
-        <router-link to="/article">文章</router-link>
-        <router-link to="/friend">友链</router-link>
-        <router-link to="/message">留言</router-link>
-        <a v-if="websiteConfig.documentUrl" :href="websiteConfig.documentUrl" target="_blank" rel="noopener noreferrer">
+        <router-link to="/">
+          首页
+        </router-link>
+        <router-link to="/friend-link">
+          申请友链
+        </router-link>
+        <router-link to="/message">
+          留言
+        </router-link>
+        <a v-if="websiteLinks['GITEE']" :href="websiteLinks['ABOUT_ME']" target="_blank">
+          关于我
+        </a>
+        <a v-if="websiteLinks['GITEE']" :href="websiteLinks['DOCUMENT']" target="_blank">
           文档
         </a>
-        <a v-if="websiteConfig.giteeUrl" :href="websiteConfig.giteeUrl" target="_blank" rel="noopener noreferrer">
+        <a v-if="websiteLinks['GITEE']" :href="websiteLinks['GITEE']" target="_blank">
           Gitee
         </a>
-        <a v-if="websiteConfig.githubUrl" :href="websiteConfig.githubUrl" target="_blank" rel="noopener noreferrer">
+        <a v-if="websiteLinks['GITHUB']" :href="websiteLinks['GITHUB']" target="_blank">
           Github
+        </a>
+        <a v-if="websiteLinks['GITEE']" :href="websiteLinks['ISSUE']" target="_blank">
+          Issue
         </a>
       </nav>
 
-      <!-- 第三行：版权 + 备案 + 网站声明 -->
+      <!-- 底部信息 -->
       <div class="footer-info">
         <!-- 版权 -->
         <span class="footer-copy">
-          © {{ websiteConfig.websiteCreateTime | year }} -
+          ©
+          <template v-if="websiteConfig.websiteCreateTime">
+            {{ websiteConfig.websiteCreateTime | year }} -
+          </template>
           {{ currentYear }}
-          {{ websiteConfig.websiteAuthor }}
+          {{ websiteConfig.websiteName }}
         </span>
-        <!-- 备案 -->
-        <template v-if="websiteConfig.websiteRecordNo">
-          <span class="footer-separator">·</span>
-          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-record">
-            {{ websiteConfig.websiteRecordNo }}
-          </a>
-        </template>
+
+        <!-- 网站备案 -->
+        <div class="footer-records">
+          <!-- ICP备案 -->
+          <template v-if="websiteConfig.websiteIcpNo">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-record">
+              {{ websiteConfig.websiteIcpNo }}
+            </a>
+          </template>
+
+          <!-- 公安备案 -->
+          <template v-if="websiteConfig.websitePoliceNo">
+            <a href="https://www.beian.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-record">
+              {{ websiteConfig.websitePoliceNo }}
+            </a>
+          </template>
+        </div>
+
         <!-- 网站声明 -->
-        <span class="footer-separator">·</span>
         <nav class="footer-notice">
-          <router-link to="/copyright" target="_blank">版权声明</router-link>
-          <span class="footer-separator">·</span>
-          <router-link to="/disclaimer">免责声明</router-link>
-          <span class="footer-separator">·</span>
-          <router-link to="/infringement">侵权联系</router-link>
+          <router-link to="/copyright">
+            版权声明
+          </router-link>
+          <router-link to="/disclaimer">
+            免责声明
+          </router-link>
+          <router-link to="/infringement">
+            侵权联系
+          </router-link>
         </nav>
       </div>
     </div>
@@ -60,10 +87,16 @@
 export default {
   computed: {
     /**
-     * 网站配置信息
+     * 网站配置
      */
     websiteConfig() {
       return this.$store.state.websiteConfig
+    },
+    /**
+     * 网站链接配置
+     */
+    websiteLinks() {
+      return this.$store.state.links
     },
     /**
      * 当前年份
@@ -72,15 +105,15 @@ export default {
       return new Date().getFullYear()
     },
     /**
-     * Footer 背景
+     * Footer背景
      */
     footerStyle() {
       if (this.websiteConfig.footerBackground) {
         return {
           backgroundImage: `
             linear-gradient(
-              rgba(0, 0, 0, .35),
-              rgba(0, 0, 0, .35)
+              rgba(0, 0, 0, .45),
+              rgba(0, 0, 0, .45)
             ),
             url(${this.websiteConfig.footerBackground})
           `,
@@ -98,12 +131,13 @@ export default {
 .footer-wrap {
   width: 100%;
   padding: 24px 20px 18px;
-  color: rgba(255, 255, 255, .82);
   font-size: 12px;
   text-align: center;
+  color: rgba(255, 255, 255, .85);
   position: relative;
   background-size: cover;
   background-position: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .65);
 }
 
 /* =========================
@@ -124,29 +158,33 @@ export default {
 
 .footer-signature {
   font-size: 17px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.6;
-  color: rgba(255, 255, 255, .95);
+  color: #fff !important;
   letter-spacing: 1px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, .6);
 }
 
 .footer-nav {
   margin-top: 14px;
   display: flex;
-  align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0;
 }
 .footer-nav a {
-  color: rgba(255, 255, 255, .82);
+  display: inline-flex;
+  align-items: center;
+}
+.footer-theme .footer-nav a {
+  color: rgba(255, 255, 255, .9) !important;
   text-decoration: none;
   line-height: 1.8;
-  transition: color .2s ease,
-  opacity .2s ease;
+  transition: color .2s ease, opacity .2s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
 }
-.footer-nav a:hover {
-  color: #fff;
+.footer-theme .footer-nav a:hover {
+  color: #fff !important;
 }
 .footer-nav a + a::before {
   content: '·';
@@ -159,24 +197,39 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   flex-wrap: wrap;
   line-height: 1.8;
-  color: rgba(255, 255, 255, .58);
+  color: rgba(255, 255, 255, .75);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+}
+
+.footer-records, .footer-notice {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-records::before, .footer-notice::before {
+  content: '·';
+  margin: 0 8px;
+  color: rgba(255, 255, 255, .35);
 }
 
 .footer-copy {
   white-space: nowrap;
 }
 
-.footer-record {
-  color: rgba(255, 255, 255, .62);
+.footer-theme .footer-record {
+  color: rgba(255, 255, 255, .75) !important;
   text-decoration: none;
   white-space: nowrap;
   transition: color .2s ease;
 }
 
-.footer-record:hover {
-  color: #fff;
+.footer-theme .footer-record:hover {
+  color: #fff !important;
 }
 
 .footer-notice {
@@ -184,19 +237,16 @@ export default {
   align-items: center;
   white-space: nowrap;
 }
-.footer-notice a {
-  color: rgba(255, 255, 255, .58);
+
+.footer-theme .footer-notice a {
+  color: rgba(255, 255, 255, .75) !important;
   text-decoration: none;
   transition: color .2s ease;
 }
-.footer-notice a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
 
-.footer-separator {
-  margin: 0 9px;
-  color: rgba(255, 255, 255, .3);
+.footer-theme .footer-notice a:hover {
+  color: #fff !important;
+  text-decoration: underline;
 }
 
 @keyframes gradient {
@@ -229,14 +279,20 @@ export default {
     padding: 0 4px;
     line-height: 2;
   }
-  .footer-nav a + a::before {
+  .footer-nav a {
     margin: 0 8px;
   }
+  .footer-nav a + a::before {
+    display: none;
+  }
   .footer-info {
+    flex-direction: column;
     margin-top: 10px;
     padding: 0 4px;
     line-height: 2;
-    justify-content: center;
+  }
+  .footer-records::before, .footer-notice::before {
+    display: none;
   }
   .footer-copy {
     white-space: normal;
@@ -246,9 +302,6 @@ export default {
   }
   .footer-notice {
     white-space: normal;
-  }
-  .footer-separator {
-    margin: 0 6px;
   }
 }
 </style>

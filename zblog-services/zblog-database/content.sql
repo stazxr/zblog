@@ -54,8 +54,7 @@ INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, 
 INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (2, 'GitHub', 'GITHUB', NULL, NULL, 2, 1);
 INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (3, 'Gitee', 'GITEE', NULL, NULL, 3, 1);
 INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (4, '关于我', 'ABOUT_ME', NULL, NULL, 4, 1);
-
-
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (4, 'Issue', 'ISSUE', NULL, NULL, 5, 1);
 
 /*Table structure for table `admin_config` */
 DROP TABLE IF EXISTS `admin_config`;

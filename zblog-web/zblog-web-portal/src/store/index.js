@@ -13,6 +13,9 @@ export default new Vuex.Store({
     // 页面信息
     pages: {},
 
+    // 链接信息
+    links: {},
+
     // 用户信息
     user: {
       id: null,
@@ -77,6 +80,7 @@ export default new Vuex.Store({
     setWebInitInfo(state, data) {
       state.websiteConfig = data['config'] || {}
       state.pages = data['pages'] || {}
+      state.links = data['links'] || {}
     },
     // 设置页面信息
     setPageInfo(state, pages) {
