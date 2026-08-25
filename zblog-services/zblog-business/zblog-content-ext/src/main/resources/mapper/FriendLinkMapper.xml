@@ -2,7 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.ext.mapper.FriendLinkMapper">
     <select id="selectFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
-        SELECT ID, NAME, URL, LOGO, DESCRIPTION, STATUS, IS_VISIBLE, ALLOW_FOLLOW, SORT, CREATE_TIME
+        SELECT
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE,
+            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.CHECK_ENABLED, fl.SORT, fl.CREATE_TIME
         FROM friend_link fl
         <where>
             <if test="query.name != null and query.name != ''">
@@ -13,6 +15,9 @@
                 <bind name="urlBind" value="'%' + query.url + '%'"/>
                 AND fl.URL LIKE #{urlBind}
             </if>
+            <if test="query.linkType != null">
+                AND t.LINK_TYPE = #{query.linkType}
+            </if>
             <if test="query.status != null">
                 AND fl.STATUS = #{query.status}
             </if>
@@ -22,15 +27,18 @@
             <if test="query.allowFollow != null">
                 AND t.ALLOW_FOLLOW = #{query.allowFollow}
             </if>
+            <if test="query.checkEnabled != null">
+                AND t.CHECK_ENABLED = #{query.checkEnabled}
+            </if>
         </where>
         ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC
     </select>
 
     <select id="selectFriendLinkDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
         SELECT
-            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.EMAIL, fl.CONTACT,
-            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.SORT,
-            fl.CREATE_TIME, UPDATE_TIME,
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.EMAIL, fl.CONTACT,
+            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.CHECK_ENABLED, fl.SORT,
+            fl.CREATE_TIME, fl.UPDATE_TIME,
             (SELECT u.USERNAME FROM user u WHERE u.ID = fl.CREATE_USER) AS CREATE_USERNAME,
             (SELECT u.USERNAME FROM user u WHERE u.ID = fl.UPDATE_USER) AS UPDATE_USERNAME
         FROM friend_link fl
@@ -38,6 +46,10 @@
     </select>
 
     <select id="selectWebFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
-        SELECT * FROM friend_link
+        SELECT
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.ALLOW_FOLLOW, fl.CREATE_TIME
+        FROM friend_link fl
+        WHERE fl.STATUS = 1 AND IS_VISIBLE = 1
+        ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC
     </select>
 </mapper>

@@ -9,7 +9,7 @@
     <div class="d-md-none nav-mobile-container">
       <div class="" style="font-size:18px;font-weight:bold;">
         <router-link to="/">
-          {{ websiteConfig['websiteAuthor'] }}
+          {{ websiteConfig['websiteName'] }}
         </router-link>
       </div>
       <div style="margin-left:auto">
@@ -82,7 +82,7 @@
             💖 社交
           </a>
           <ul class="menus-submenu">
-            <router-link to="/friendLink">
+            <router-link to="/friend-link">
               📌 友链
             </router-link>
             <router-link to="/barrageMessage">

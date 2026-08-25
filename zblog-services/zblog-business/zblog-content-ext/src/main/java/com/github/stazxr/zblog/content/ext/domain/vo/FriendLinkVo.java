@@ -49,6 +49,12 @@ public class FriendLinkVo extends BaseVo {
     private String description;
 
     /**
+     * 友链类型
+     */
+    @ApiModelProperty("友链类型")
+    private Integer linkType;
+
+    /**
      * 申请人邮箱
      */
     @ApiModelProperty("申请人邮箱")
@@ -77,6 +83,12 @@ public class FriendLinkVo extends BaseVo {
      */
     @ApiModelProperty("是否允许传递SEO权重")
     private Boolean allowFollow;
+
+    /**
+     * 是否开启健康检测
+     */
+    @ApiModelProperty("是否开启健康检测")
+    private Boolean checkEnabled;
 
     /**
      * 排序值（越大越靠前）

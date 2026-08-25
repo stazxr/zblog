@@ -45,6 +45,11 @@ public class FriendLink extends BaseEntity {
     private String description;
 
     /**
+     * 友链类型
+     */
+    private Integer linkType;
+
+    /**
      * 申请人邮箱
      */
     private String email;
@@ -68,6 +73,11 @@ public class FriendLink extends BaseEntity {
      * 是否允许传递SEO权重
      */
     private Boolean allowFollow;
+
+    /**
+     * 是否开启健康检测
+     */
+    private Boolean checkEnabled;
 
     /**
      * 排序值（越大越靠前）

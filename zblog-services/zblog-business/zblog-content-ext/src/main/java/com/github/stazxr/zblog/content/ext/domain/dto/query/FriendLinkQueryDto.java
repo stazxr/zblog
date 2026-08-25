@@ -31,6 +31,12 @@ public class FriendLinkQueryDto extends PageParam {
     private String url;
 
     /**
+     * 友链类型
+     */
+    @ApiModelProperty("友链类型")
+    private Integer linkType;
+
+    /**
      * 友链状态
      */
     @ApiModelProperty("友链状态")
@@ -47,4 +53,10 @@ public class FriendLinkQueryDto extends PageParam {
      */
     @ApiModelProperty("是否允许传递SEO权重")
     private Boolean allowFollow;
+
+    /**
+     * 是否开启健康检测
+     */
+    @ApiModelProperty("是否开启健康检测")
+    private Boolean checkEnabled;
 }

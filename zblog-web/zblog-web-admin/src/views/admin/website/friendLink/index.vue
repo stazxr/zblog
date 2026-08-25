@@ -9,6 +9,11 @@
           <muses-search-form-item label="" prop="search-url">
             <el-input id="search-url" v-model="filters.url" clearable placeholder="网站地址" @keyup.enter.native="search" />
           </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-linkType">
+            <el-select id="search-linkType" v-model="filters.linkType" placeholder="友链类型" clearable @change="search">
+              <el-option v-for="item in linkTypeList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
           <muses-search-form-item label="" prop="search-status">
             <el-select id="search-status" v-model="filters.status" placeholder="友链状态" clearable @change="search">
               <el-option v-for="item in statusList" :key="item.value" :label="item.name" :value="item.value" />
@@ -22,6 +27,11 @@
           <muses-search-form-item label="" prop="search-allowFollow">
             <el-select id="search-allowFollow" v-model="filters.allowFollow" placeholder="是否传递SEO" clearable @change="search">
               <el-option v-for="item in allowFollowList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-checkEnabled">
+            <el-select id="search-checkEnabled" v-model="filters.checkEnabled" placeholder="健康监测" clearable @change="search">
+              <el-option v-for="item in checkEnabledList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
@@ -50,10 +60,10 @@
         border
         @current-change="handleCurrentChange"
       >
-        <el-table-column prop="name" label="网站名称" align="center" width="250">
+        <el-table-column prop="name" label="网站名称" align="center">
           <template v-slot="scope">
             <div class="site-name-cell">
-              <img :src="scope.row.logo" class="site-logo" alt="">
+              <img v-if="scope.row.logo" :src="scope.row.logo" class="site-logo" alt="">
               <span class="site-text">{{ scope.row.name }}</span>
             </div>
           </template>
@@ -70,7 +80,14 @@
             </el-link>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="description" label="网站介绍" align="center" />
+        <el-table-column :show-overflow-tooltip="true" prop="linkType" label="类型" align="center" width="100">
+          <template v-slot="scope">
+            <span v-if="scope.row.linkType === 1">开源伙伴</span>
+            <span v-else-if="scope.row.linkType === 2">特别推荐</span>
+            <span v-else-if="scope.row.linkType === 3">同行友站</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="status" label="审核状态" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.status === 0" type="warning">审核中</el-tag>
@@ -82,18 +99,25 @@
         <el-table-column :show-overflow-tooltip="true" prop="isVisible" label="展示状态" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.isVisible === true" type="success">展示</el-tag>
-            <el-tag v-else type="warning">不展示</el-tag>
+            <el-tag v-else type="warning">隐藏</el-tag>
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="allowFollow" label="SEO配置" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.allowFollow === true" type="success">启用SEO</el-tag>
-            <el-tag v-else type="warning">禁用SEO</el-tag>
+            <el-tag v-if="scope.row.allowFollow === true" type="primary">启用</el-tag>
+            <el-tag v-else type="info">禁用</el-tag>
           </template>
         </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="checkEnabled" label="健康检测" align="center" width="100">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.checkEnabled === true" type="success">开启</el-tag>
+            <el-tag v-else type="warning">关闭</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="sort" label="优先级" align="center" width="100" />
         <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="150" />
         <div slot="empty">
-          <el-empty :image="nodataImg" description=" " />
+          <muses-empty />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -126,7 +150,6 @@
 </template>
 
 <script>
-import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/website/friendLink/template/detailDialog'
 import addOrEditDialog from '@/views/admin/website/friendLink/template/addOrEditDialog'
 export default {
@@ -140,16 +163,19 @@ export default {
       filters: {
         name: null,
         url: null,
+        linkType: null,
         status: null,
         isVisible: null,
-        allowFollow: null
+        allowFollow: null,
+        checkEnabled: null
       },
+      linkTypeList: [],
       statusList: [],
       visibleList: [],
       allowFollowList: [],
+      checkEnabledList: [],
       tableData: [],
       tableLoading: false,
-      nodataImg: nodataImg,
       row: null,
       total: 0,
       page: 1,
@@ -160,17 +186,27 @@ export default {
     }
   },
   mounted() {
+    this.loadLinkTypeList()
     this.loadStatusList()
     this.loadVisibleList()
     this.loadAllowFollowList()
+    this.loadCheckEnabledList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
     },
+    loadLinkTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FRIEND_LINK_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.linkTypeList = data
+      }).catch(_ => {
+        this.linkTypeList = []
+      })
+    },
     loadStatusList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'APPROVE_STATUS_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FRIEND_LINK_STATUS_CONFIG' }).then(res => {
         const { data } = res
         this.statusList = data
       }).catch(_ => {
@@ -178,7 +214,7 @@ export default {
       })
     },
     loadVisibleList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'VISIBLE_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_VISIBLE_CONFIG' }).then(res => {
         const { data } = res
         this.visibleList = data
       }).catch(_ => {
@@ -186,11 +222,19 @@ export default {
       })
     },
     loadAllowFollowList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'SEO_ALLOW_FOLLOW_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FRIEND_LINK_SEO_CONFIG' }).then(res => {
         const { data } = res
         this.allowFollowList = data
       }).catch(_ => {
         this.allowFollowList = []
+      })
+    },
+    loadCheckEnabledList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FRIEND_LINK_CHECK_ENABLED_CONFIG' }).then(res => {
+        const { data } = res
+        this.checkEnabledList = data
+      }).catch(_ => {
+        this.checkEnabledList = []
       })
     },
     // 查询

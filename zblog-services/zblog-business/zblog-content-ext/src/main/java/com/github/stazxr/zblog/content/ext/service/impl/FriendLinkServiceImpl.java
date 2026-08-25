@@ -1,6 +1,8 @@
 package com.github.stazxr.zblog.content.ext.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
@@ -9,13 +11,16 @@ import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
 import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkStatus;
+import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.mapper.FriendLinkMapper;
 import com.github.stazxr.zblog.content.ext.service.FriendLinkService;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.http.UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 友链管理业务实现层
@@ -40,6 +45,9 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
         queryDto.checkPage();
         if (StringUtils.isNotBlank(queryDto.getName())) {
             queryDto.setName(queryDto.getName().trim());
+        }
+        if (StringUtils.isNotBlank(queryDto.getUrl())) {
+            queryDto.setUrl(queryDto.getUrl().trim());
         }
 
         // 分页查询
@@ -102,14 +110,34 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
      * @param friendLinkId 友链ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteFriendLink(Long friendLinkId) {
         // 判断友链是否存在
         FriendLink dbFriendLink = baseMapper.selectById(friendLinkId);
         ThrowUtils.throwIfNull(dbFriendLink, BaseErrorCode.ECOREA001);
         // 删除友链
         ThrowUtils.when(!removeById(friendLinkId)).system(BaseErrorCode.SCOREA003);
+        // TODO 待删除关联数据
     }
 
     private void checkFriendLink(FriendLink friendLink) {
+        // URL 标准化
+        friendLink.setUrl(UrlUtils.normalize(friendLink.getUrl()));
+        ThrowUtils.throwIf(checkFriendLinkUrlExist(friendLink), FriendLinkErrorCode.ELINKA001);
+    }
+
+    private boolean checkFriendLinkUrlExist(FriendLink friendLink) {
+        if (friendLink.getUrl() != null) {
+            LambdaQueryWrapper<FriendLink> queryWrapper = queryBuild().eq(FriendLink::getUrl, friendLink.getUrl());
+            if (friendLink.getId() != null) {
+                queryWrapper.ne(FriendLink::getId, friendLink.getId());
+            }
+            return baseMapper.exists(queryWrapper);
+        }
+        return false;
+    }
+
+    private LambdaQueryWrapper<FriendLink> queryBuild() {
+        return Wrappers.lambdaQuery();
     }
 }

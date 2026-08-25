@@ -69,7 +69,7 @@ public class DictDto extends BaseDto {
      */
     @NotNull(groups = {Create.class, Update.class}, message = "{PARAM_SORT_REQUIRED}")
     @Min(value = 1, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MIN1}")
-    @Max(value =99999, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MAX99999}")
+    @Max(value = 99999, groups = {Create.class, Update.class}, message = "{PARAM_SORT_MAX99999}")
     @ApiModelProperty("字典排序")
     private Integer dictSort;
 

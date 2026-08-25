@@ -165,7 +165,7 @@ export default {
       })
     },
     loadVisibleList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'VISIBLE_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_VISIBLE_CONFIG' }).then(res => {
         const { data } = res
         this.visibleList = data
       }).catch(_ => {

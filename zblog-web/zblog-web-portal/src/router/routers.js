@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import Home from '@/views/home'
 import Copyright from '@/views/statement/Copyright'
 import Disclaimer from '@/views/statement/Disclaimer'
 import Infringement from '@/views/statement/Infringement'
+import FriendLink from '@/views/friendLink/index2'
 
 Vue.use(VueRouter)
 
@@ -11,7 +13,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: resolve => require(['../views/home/index'], resolve)
+    component: Home
   },
   {
     path: '/copyright',
@@ -35,6 +37,14 @@ const routes = [
     component: Infringement,
     meta: {
       title: '侵权联系'
+    }
+  },
+  {
+    path: '/friend-link',
+    name: 'FriendLink',
+    component: FriendLink,
+    meta: {
+      title: '友链'
     }
   },
 
@@ -115,13 +125,6 @@ const routes = [
     component: resolve => require(['../views/column/detail'], resolve),
     meta: {
       title: '专栏'
-    }
-  },
-  {
-    path: '/friendLink',
-    component: resolve => require(['../views/friendLink/index'], resolve),
-    meta: {
-      title: '友链'
     }
   },
   {

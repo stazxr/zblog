@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.util.http;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -18,6 +17,8 @@ import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.TimeValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,8 +35,9 @@ import java.util.stream.Collectors;
  * @author SunTao
  * @since 2022-09-06
  */
-@Slf4j
 public class HttpUtils {
+    private static final Logger log = LoggerFactory.getLogger(HttpUtils.class);
+
     static CloseableHttpClient httpClient;
 
     private HttpUtils() {

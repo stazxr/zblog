@@ -59,13 +59,13 @@ INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, 
 /*Table structure for table `admin_config` */
 DROP TABLE IF EXISTS `admin_config`;
 CREATE TABLE admin_config(
-  `USER_ID` BIGINT DEFAULT NULL COMMENT '登录用户ID'
+  ID BIGINT NOT NULL COMMENT '主键'
 );
 
 /*Table structure for table `system_config` */
 DROP TABLE IF EXISTS `system_config`;
 CREATE TABLE system_config(
-  `USER_ID` BIGINT DEFAULT NULL COMMENT '登录用户ID'
+  ID BIGINT NOT NULL COMMENT '主键'
 );
 
 /*Table structure for table `visitor` */
@@ -174,14 +174,16 @@ DROP TABLE IF EXISTS `friend_link`;
 CREATE TABLE `friend_link` (
   `ID` BIGINT UNSIGNED NOT NULL,
   `NAME` VARCHAR(100) NOT NULL COMMENT '网站名称',
-  `URL` VARCHAR(255) NOT NULL COMMENT '网站地址',
-  `LOGO` VARCHAR(255) DEFAULT NULL COMMENT '网站Logo',
+  `URL` VARCHAR(500) NOT NULL COMMENT '网站地址',
+  `LOGO` VARCHAR(500) DEFAULT NULL COMMENT '网站Logo',
   `DESCRIPTION` VARCHAR(255) DEFAULT NULL COMMENT '网站描述',
+  `LINK_TYPE` TINYINT NOT NULL COMMENT '友链类型',
   `EMAIL` VARCHAR(100) DEFAULT NULL COMMENT '申请人邮箱',
   `CONTACT` VARCHAR(100) DEFAULT NULL COMMENT '联系方式',
   `STATUS` TINYINT(1) DEFAULT 0 COMMENT '审批状态：0待审核 1通过 2拒绝',
   `IS_VISIBLE` TINYINT(1) DEFAULT 1 COMMENT '是否展示',
   `ALLOW_FOLLOW` TINYINT(1) DEFAULT 0 COMMENT '是否允许传递SEO权重',
+  `CHECK_ENABLED` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否开启健康检测',
   `SORT` INT DEFAULT 0 COMMENT '排序值（越大越靠前）',
   `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
   `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
@@ -191,9 +193,11 @@ CREATE TABLE `friend_link` (
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友链表';
 
-CREATE UNIQUE INDEX idx_friend_link_status ON friend_link(`STATUS`);
-CREATE UNIQUE INDEX idx_friend_link_sort ON friend_link(`SORT`);
+CREATE UNIQUE INDEX uk_friend_link_url ON friend_link (`URL`);
+CREATE INDEX idx_friend_link_query ON friend_link (`STATUS`, `IS_VISIBLE`);
+CREATE INDEX idx_friend_link_order ON friend_link (`SORT` DESC, `CREATE_TIME` DESC);
 
+/*Table structure for table `friend_link_stat` */
 DROP TABLE IF EXISTS `friend_link_stat`;
 CREATE TABLE `friend_link_stat` (
   `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
@@ -205,35 +209,49 @@ CREATE TABLE `friend_link_stat` (
   PRIMARY KEY (`LINK_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链统计表';
 
+/*Table structure for table `friend_link_click_log` */
+DROP TABLE IF EXISTS `friend_link_click_log`;
 CREATE TABLE `friend_link_click_log` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
   `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
+  `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '访客ID',
   `IP` VARCHAR(50) COMMENT '访问IP',
-  `USER_AGENT` VARCHAR(255) COMMENT '用户代理',
-  `CREATE_TIME` DATETIME NOT NULL COMMENT '访问时间'
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '访问时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_friend_link_click_log` (`LINK_ID`, `CREATE_TIME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链访问记录表';
 
-CREATE TABLE friend_link_health (
-LINK_ID BIGINT NOT NULL COMMENT '友链ID',
-STATUS TINYINT DEFAULT 1 COMMENT '检测状态 1正常 0异常',
-FAIL_COUNT INT DEFAULT 0 COMMENT '连续失败次数',
-LAST_CHECK_TIME DATETIME COMMENT '最后检测时间',
-LAST_SUCCESS_TIME DATETIME COMMENT '最后成功时间',
-LAST_FAIL_TIME DATETIME COMMENT '最后失败时间',
-RESPONSE_TIME INT COMMENT '响应耗时ms',
-HTTP_STATUS INT COMMENT 'HTTP状态码',
-ERROR_MSG VARCHAR(500) COMMENT '错误信息',
-PRIMARY KEY(LINK_ID)
+/*Table structure for table `friend_link_health` */
+DROP TABLE IF EXISTS `friend_link_health`;
+CREATE TABLE `friend_link_health` (
+  `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
+  `STATUS` TINYINT NOT NULL DEFAULT 1 COMMENT '检测状态 1正常 0异常',
+  `FAIL_COUNT` INT DEFAULT 0 COMMENT '连续失败次数',
+  `LAST_CHECK_TIME` DATETIME COMMENT '最后检测时间',
+  `LAST_SUCCESS_TIME` DATETIME COMMENT '最后成功时间',
+  `LAST_FAIL_TIME` DATETIME COMMENT '最后失败时间',
+  `RESPONSE_TIME` INT COMMENT '响应耗时ms',
+  `HTTP_STATUS` INT COMMENT 'HTTP状态码',
+  `ERROR_MSG` VARCHAR(500) COMMENT '错误信息',
+  PRIMARY KEY (`LINK_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链健康检测';
 
-CREATE TABLE friend_link_check_log(
-ID BIGINT PRIMARY KEY,
-LINK_ID BIGINT,
-SUCCESS TINYINT COMMENT '是否成功',
-HTTP_STATUS INT,
-RESPONSE_TIME INT,
-ERROR_MSG VARCHAR(500),
-CREATE_TIME DATETIME
-);
+/*Table structure for table `friend_link_check_log` */
+DROP TABLE IF EXISTS `friend_link_check_log`;
+CREATE TABLE `friend_link_check_log` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `LINK_ID` BIGINT UNSIGNED NOT NULL COMMENT '友链ID',
+  `SUCCESS` TINYINT(1) NOT NULL COMMENT '是否成功',
+  `HTTP_STATUS` INT DEFAULT NULL COMMENT 'HTTP状态码',
+  `RESPONSE_TIME` INT DEFAULT NULL COMMENT '响应耗时ms',
+  `ERROR_MSG` VARCHAR(500) DEFAULT NULL COMMENT '错误信息',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '检测时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_friend_link_check_log` (`LINK_ID`, `CREATE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链健康检测日志';
+
+
+
 
 /*Table structure for table `category` */
 DROP TABLE IF EXISTS `category`;
