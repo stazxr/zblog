@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.bas.ratelimit.annotation;
 
+import com.github.stazxr.zblog.bas.ratelimit.core.RateLimitFallback;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,12 +19,12 @@ public @interface RateLimit {
     /**
      * 时间窗口（秒）
      */
-    int time() default 1;
+    int time();
 
     /**
      * 最大访问次数
      */
-    int count() default 1;
+    int count();
 
     /**
      * 提示消息
@@ -42,5 +44,12 @@ public @interface RateLimit {
     /**
      * 是否启用接口限流
      */
-    boolean enableApi() default false;
+    boolean enableApi() default true;
+
+    /**
+     * 限流降级策略
+     *
+     * @return 默认拒绝
+     */
+    RateLimitFallback fallback() default RateLimitFallback.REJECT;
 }

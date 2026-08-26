@@ -23,17 +23,17 @@ public class RateLimitKeyBuilder {
 
         // IP 维度
         if (rule.isEnableIp()) {
-            keys.add("rl:ip:" + ip + ":" + uri);
+            keys.add("limit:ip:" + ip + ":" + uri);
         }
 
         // 用户维度
         if (rule.isEnableUser() && userId != null) {
-            keys.add("rl:user:" + userId + ":" + uri);
+            keys.add("limit:user:" + userId + ":" + uri);
         }
 
         // 接口维度
         if (rule.isEnableApi()) {
-            keys.add("rl:api:" + uri);
+            keys.add("limit:api:" + uri);
         }
 
         return keys;

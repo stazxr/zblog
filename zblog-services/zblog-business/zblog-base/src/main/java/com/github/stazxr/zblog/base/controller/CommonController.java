@@ -69,7 +69,7 @@ public class CommonController {
     })
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "发送邮箱验证码", code = "COMMQ002", level = RouterLevel.OPEN)
-    @RateLimit(time = 60, enableIp = true)
+    @RateLimit(count = 1, time = 60, enableIp = true)
     public String sendCode(@RequestParam String email, @RequestParam String scene) {
         Assert.notBlank(email, "邮箱不能为空");
         Assert.failIfFalse(RegexUtils.match(email, RegexUtils.Regex.EMAIL_REGEX), "邮箱格式不正确");

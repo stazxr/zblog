@@ -78,7 +78,7 @@ public class LogController {
     @ApiOperation(value = "导出接口日志")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "导出接口日志", code = "LOGIE001")
-    @RateLimit(time = 10, enableApi = true, message = "系统繁忙，请10秒后再试")
+    @RateLimit(count = 1, time = 10, message = "系统繁忙，请10秒后再试")
     public void exportInterfaceLog(LogQueryDto queryDto, HttpServletResponse response) {
         queryDto.setLogType(LogType.INTERFACES.getValue());
         logService.exportLogList(queryDto, response);
@@ -95,7 +95,7 @@ public class LogController {
     @ApiOperation(value = "导出操作日志")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "导出操作日志", code = "LOGOE001")
-    @RateLimit(time = 10, enableApi = true, message = "系统繁忙，请10秒后再试")
+    @RateLimit(count = 1, time = 10, message = "系统繁忙，请10秒后再试")
     public void exportOperationLog(LogQueryDto queryDto, HttpServletResponse response) {
         queryDto.setLogType(LogType.OPERATION.getValue());
         logService.exportLogList(queryDto, response);
@@ -192,7 +192,7 @@ public class LogController {
     @ApiOperation(value = "导出登录日志")
     @ApiVersion(BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "导出登录日志", code = "LOGLE001")
-    @RateLimit(time = 10, enableApi = true, message = "系统繁忙，请10秒后再试")
+    @RateLimit(count = 1, time = 10, message = "系统繁忙，请10秒后再试")
     public void exportUserLoginLog(UserLoginLogQueryDto queryDto, HttpServletResponse response) {
         userLoginLogService.exportUserLoginLog(queryDto, response);
     }
