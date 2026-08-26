@@ -8,10 +8,6 @@ export default {
   init: params => {
     return api.httpRequest().get(`${portalApi}/init`, params)
   },
-  // 查询网站配置信息
-  getWebsiteConfig: params => {
-    return api.httpRequest().get(`${portalApi}/getWebsiteConfig`, params)
-  },
   // 获取Web端登录用户信息
   webLoginId: params => {
     return api.httpRequest().get(`${portalApi}/webLoginId`, params)
@@ -23,10 +19,6 @@ export default {
   // 记录访客日志
   recordVisitorLog: params => {
     return api.httpRequest().post(`${portalApi}/recordVisitorLog`, params)
-  },
-  // 查询页面信息
-  queryPageInfo: params => {
-    return api.httpRequest().get(`${portalApi}/queryPageInfo`, params)
   },
   // 获取弹幕列表
   queryBarrageMessageList: params => {
@@ -45,6 +37,10 @@ export default {
   // 获取友链列表
   queryFriendLinkList: params => {
     return api.httpRequest().get(`${portalApi}/queryFriendLinkList`, params)
+  },
+  // 友链申请
+  applyFriendLink: params => {
+    return api.httpRequest().post(`${portalApi}/applyFriendLink`, params)
   },
 
   // 登录

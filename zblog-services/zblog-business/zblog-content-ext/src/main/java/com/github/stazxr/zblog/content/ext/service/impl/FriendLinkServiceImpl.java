@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.content.ext.converter.FriendLinkConverter;
 import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
@@ -117,12 +118,15 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
         ThrowUtils.throwIfNull(dbFriendLink, BaseErrorCode.ECOREA001);
         // 删除友链
         ThrowUtils.when(!removeById(friendLinkId)).system(BaseErrorCode.SCOREA003);
-        // TODO 待删除关联数据
     }
 
     private void checkFriendLink(FriendLink friendLink) {
         // URL 标准化
-        friendLink.setUrl(UrlUtils.normalize(friendLink.getUrl()));
+        try {
+            friendLink.setUrl(UrlUtils.normalize(friendLink.getUrl()));
+        } catch (Exception e) {
+            throw new ServiceException(FriendLinkErrorCode.ELINKA002, e);
+        }
         ThrowUtils.throwIf(checkFriendLinkUrlExist(friendLink), FriendLinkErrorCode.ELINKA001);
     }
 

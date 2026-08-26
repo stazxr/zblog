@@ -1,30 +1,37 @@
 package com.github.stazxr.zblog.portal.service.impl;
 
 import cn.hutool.http.useragent.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.stazxr.zblog.audit.api.AuditService;
 import com.github.stazxr.zblog.audit.enums.AuditScene;
 import com.github.stazxr.zblog.audit.model.AuditContext;
 import com.github.stazxr.zblog.audit.model.AuditResult;
 import com.github.stazxr.zblog.bas.context.Context;
 import com.github.stazxr.zblog.bas.encryption.util.Md5Utils;
+import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.content.ext.domain.entity.*;
 import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
+import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkStatus;
+import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkType;
 import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
+import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.*;
 import com.github.stazxr.zblog.content.ext.mapper.*;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.portal.domain.bo.UserBaseInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
+import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import com.github.stazxr.zblog.portal.util.VisitorUtil;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.http.UrlUtils;
 import com.github.stazxr.zblog.util.net.IpRegion;
 import com.github.stazxr.zblog.util.net.IpRegionUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
@@ -41,6 +48,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 门户管理业务实现层
@@ -167,85 +175,6 @@ public class PortalServiceImpl implements PortalService {
     }
 
     /**
-     * 查询最新弹幕列表
-     *
-     * @return List<BarrageMessageVo>
-     */
-    @Override
-    public List<BarrageMessageVo> queryBarrageMessageList() {
-        int size = 100; // TODO 网站配置功能待开发
-        return barrageMessageMapper.selectLastedBarrageMessageList(size);
-    }
-
-    /**
-     * 新增弹幕
-     *
-     * @param request           请求信息
-     * @param barrageMessageDto 弹幕信息
-     */
-    @Override
-    public void addBarrageMessage(HttpServletRequest request, BarrageMessageDto barrageMessageDto) {
-        // 生成弹幕id
-        Long messageId = SequenceUtils.getId();
-
-        // 1.审核
-        String content = barrageMessageDto.getContent();
-        AuditResult auditResult = auditBarrageMessage(messageId, content);
-
-        // 2.入库
-        BarrageMessage message = buildBarrageMessage(request, content, messageId, auditResult);
-        ThrowUtils.when(barrageMessageMapper.insert(message) != 1).system(BaseErrorCode.SCOREA001);
-
-        // 3.广播
-        if (BarrageMessageAuditStatus.APPROVED.getStatus().equals(message.getAuditStatus())) {
-            barrageMessagePublisher.send(barrageMessageMapper.selectBarrageMessageDetail(messageId));
-        }
-    }
-
-    /**
-     * 点赞弹幕
-     *
-     * @param request 请求信息
-     * @param barrageMessageId 弹幕id
-     * @return boolean true:点赞成功 false:已点赞
-     */
-    @Override
-    public boolean likeBarrageMessage(HttpServletRequest request, Long barrageMessageId) {
-        boolean authenticated = SecurityUtils.isAuthenticated();
-        BarrageMessageLike newLike = null;
-        if (authenticated) {
-            Long userId = SecurityUtils.getLoginId();
-            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByUserId(barrageMessageId, userId);
-            if (like == null) {
-                newLike = new BarrageMessageLike();
-                newLike.setUserId(userId);
-            }
-        } else {
-            String visitorId = Context.get("x-visitor-id");
-            if (StringUtils.isBlank(visitorId)) {
-                return false;
-            }
-            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByVisitorId(barrageMessageId, visitorId);
-            if (like == null) {
-                newLike = new BarrageMessageLike();
-                newLike.setVisitorId(visitorId);
-            }
-        }
-
-        if (newLike != null) {
-            newLike.setId(SequenceUtils.getId());
-            newLike.setBarrageMessageId(barrageMessageId);
-            newLike.setIp(IpUtils.getIp(request));
-            newLike.setUserAgent(IpUtils.getUserAgent(request));
-            newLike.setCreateTime(LocalDateTime.now());
-            barrageMessageLikeMapper.insert(newLike);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * 记录访客信息
      *
      * @param request    请求信息
@@ -340,18 +269,139 @@ public class PortalServiceImpl implements PortalService {
         fillVisitorLogIpInfo(visitorLog, IpUtils.getIp(request));
         fillVisitorLogUserAgent(visitorLog, IpUtils.getUserAgent(request));
         visitorLog.setVisitTime(LocalDateTime.now());
-        visitorLogMapper.insert(visitorLog); // TODO 异步记录
+        visitorLogMapper.insert(visitorLog);
+    }
+
+    /**
+     * 查询最新弹幕列表
+     *
+     * @return List<BarrageMessageVo>
+     */
+    @Override
+    public List<BarrageMessageVo> queryBarrageMessageList() {
+        int size = 100; // TODO 网站配置功能待开发
+        return barrageMessageMapper.selectLastedBarrageMessageList(size);
+    }
+
+    /**
+     * 新增弹幕
+     *
+     * @param request           请求信息
+     * @param barrageMessageDto 弹幕信息
+     */
+    @Override
+    public void addBarrageMessage(HttpServletRequest request, BarrageMessageDto barrageMessageDto) {
+        // 生成弹幕id
+        Long messageId = SequenceUtils.getId();
+
+        // 1.审核
+        String content = barrageMessageDto.getContent();
+        AuditResult auditResult = auditBarrageMessage(messageId, content);
+
+        // 2.入库
+        BarrageMessage message = buildBarrageMessage(request, content, messageId, auditResult);
+        ThrowUtils.when(barrageMessageMapper.insert(message) != 1).system(BaseErrorCode.SCOREA001);
+
+        // 3.广播
+        if (BarrageMessageAuditStatus.APPROVED.getStatus().equals(message.getAuditStatus())) {
+            barrageMessagePublisher.send(barrageMessageMapper.selectBarrageMessageDetail(messageId));
+        }
+    }
+
+    /**
+     * 点赞弹幕
+     *
+     * @param request 请求信息
+     * @param barrageMessageId 弹幕id
+     * @return boolean true:点赞成功 false:已点赞
+     */
+    @Override
+    public boolean likeBarrageMessage(HttpServletRequest request, Long barrageMessageId) {
+        boolean authenticated = SecurityUtils.isAuthenticated();
+        BarrageMessageLike newLike = null;
+        if (authenticated) {
+            Long userId = SecurityUtils.getLoginId();
+            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByUserId(barrageMessageId, userId);
+            if (like == null) {
+                newLike = new BarrageMessageLike();
+                newLike.setUserId(userId);
+            }
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            if (StringUtils.isBlank(visitorId)) {
+                return false;
+            }
+            BarrageMessageLike like = barrageMessageLikeMapper.selectOneByVisitorId(barrageMessageId, visitorId);
+            if (like == null) {
+                newLike = new BarrageMessageLike();
+                newLike.setVisitorId(visitorId);
+            }
+        }
+
+        if (newLike != null) {
+            newLike.setId(SequenceUtils.getId());
+            newLike.setBarrageMessageId(barrageMessageId);
+            newLike.setIp(IpUtils.getIp(request));
+            newLike.setUserAgent(IpUtils.getUserAgent(request));
+            newLike.setCreateTime(LocalDateTime.now());
+            barrageMessageLikeMapper.insert(newLike);
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * 查询前台友链列表
      *
-     * @return List<FriendLinkVo>
+     * @return Map<String, List<FriendLinkVo>>
      */
     @Override
-    public List<FriendLinkVo> queryFriendLinkList() {
-        // TODO 加缓存
-        return friendLinkMapper.selectWebFriendLinkList();
+    public Map<String, List<FriendLinkVo>> queryFriendLinkList() {
+        List<FriendLinkVo> friendLinks = friendLinkMapper.selectWebFriendLinkList();
+        return friendLinks.stream().collect(Collectors.groupingBy(
+            f -> f.getLinkType().toString(),
+            LinkedHashMap::new,
+            Collectors.collectingAndThen(
+                Collectors.toList(),
+                list -> list.stream().sorted(
+                    Comparator.comparing(FriendLinkVo::getSort).reversed()
+                            .thenComparing(FriendLinkVo::getCreateTime)
+                ).collect(Collectors.toList())
+            )
+        ));
+    }
+
+    /**
+     * 友链申请
+     *
+     * @param friendLinkDto 友链信息
+     */
+    @Override
+    public void applyFriendLink(ApplyFriendLinkDto friendLinkDto) {
+        // 获取友链信息
+        FriendLink friendLink = new FriendLink();
+        friendLink.setId(SequenceUtils.getId());
+        friendLink.setName(friendLinkDto.getName().trim());
+        try {
+            friendLink.setUrl(UrlUtils.normalize(friendLink.getUrl()));
+        } catch (Exception e) {
+            throw new ServiceException(FriendLinkErrorCode.ELINKA002, e);
+        }
+        friendLink.setLogo(friendLinkDto.getLogo());
+        friendLink.setDescription(friendLinkDto.getDescription());
+        friendLink.setEmail(friendLinkDto.getEmail());
+        friendLink.setContact(friendLinkDto.getContact());
+        friendLink.setLinkType(FriendLinkType.NORMAL.getType());
+        friendLink.setStatus(FriendLinkStatus.APPROVED.getStatus());
+        friendLink.setIsVisible(true);
+        friendLink.setAllowFollow(false);
+        friendLink.setCheckEnabled(false);
+        friendLink.setSort(0);
+        // 友链信息检查
+        ThrowUtils.throwIf(checkFriendLinkUrlExist(friendLink), FriendLinkErrorCode.ELINKA001);
+        // 新增友链
+        ThrowUtils.when(friendLinkMapper.insert(friendLink) != 1).system(BaseErrorCode.SCOREA001);
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {
@@ -531,5 +581,17 @@ public class PortalServiceImpl implements PortalService {
 
     private String generateVisitorAvatar(String visitorId) {
         return VisitorUtil.getAvatar(visitorId);
+    }
+
+    private boolean checkFriendLinkUrlExist(FriendLink friendLink) {
+        if (friendLink.getUrl() != null) {
+            LambdaQueryWrapper<FriendLink> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(FriendLink::getUrl, friendLink.getUrl());
+            if (friendLink.getId() != null) {
+                queryWrapper.ne(FriendLink::getId, friendLink.getId());
+            }
+            return friendLinkMapper.exists(queryWrapper);
+        }
+        return false;
     }
 }

@@ -7,6 +7,7 @@ import router from '@/router/routers'
 import store from './store'
 // Vuetify
 import vuetify from './plugins/vuetify'
+import '@mdi/font/css/materialdesignicons.css'
 // Api
 import api from './api/http-index'
 // WS

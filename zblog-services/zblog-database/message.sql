@@ -253,6 +253,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 友链
 ('FRIEND_LINK_EXISTS', 'zh-CN', '友链已存在', 'common'),
 ('FRIEND_LINK_EXISTS', 'en-US', 'Friend link exist', 'common'),
+('FRIEND_LINK_URL_INVALID', 'zh-CN', '网站地址解析错误，请检查您的输入', 'common'),
+('FRIEND_LINK_URL_INVALID', 'en-US', 'Friend link url invalid', 'common'),
 ('FRIEND_LINK_NAME_REQUIRED', 'zh-CN', '请填写网站名称', 'common'),
 ('FRIEND_LINK_NAME_REQUIRED', 'en-US', 'Friend link name cannot be blank', 'common'),
 ('FRIEND_LINK_URL_REQUIRED', 'zh-CN', '请填写网站链接', 'common'),

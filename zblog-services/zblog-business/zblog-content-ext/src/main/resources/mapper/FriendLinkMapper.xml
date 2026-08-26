@@ -47,7 +47,7 @@
 
     <select id="selectWebFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
         SELECT
-            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.ALLOW_FOLLOW, fl.CREATE_TIME
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.ALLOW_FOLLOW, fl.SORT, fl.CREATE_TIME
         FROM friend_link fl
         WHERE fl.STATUS = 1 AND IS_VISIBLE = 1
         ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC

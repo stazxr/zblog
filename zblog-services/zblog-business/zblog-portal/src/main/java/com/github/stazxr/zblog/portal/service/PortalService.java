@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
+import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,20 @@ public interface PortalService {
     Map<String, List<ThemePageVo>> queryPageInfo();
 
     /**
+     * 记录访客信息
+     *
+     * @param request 请求信息
+     */
+    void recordVisitor(HttpServletRequest request);
+
+    /**
+     * 记录访客日志
+     *
+     * @param request 请求信息
+     */
+    void recordVisitorLog(HttpServletRequest request);
+
+    /**
      * 查询最新弹幕列表
      *
      * @return List<BarrageMessageVo>
@@ -66,23 +81,16 @@ public interface PortalService {
     boolean likeBarrageMessage(HttpServletRequest request, Long barrageMessageId);
 
     /**
-     * 记录访客信息
-     *
-     * @param request 请求信息
-     */
-    void recordVisitor(HttpServletRequest request);
-
-    /**
-     * 记录访客日志
-     *
-     * @param request 请求信息
-     */
-    void recordVisitorLog(HttpServletRequest request);
-
-    /**
      * 查询前台友链列表
      *
-     * @return List<FriendLinkVo>
+     * @return Map<String, List<FriendLinkVo>>
      */
-    List<FriendLinkVo> queryFriendLinkList();
+    Map<String, List<FriendLinkVo>> queryFriendLinkList();
+
+    /**
+     * 友链申请
+     *
+     * @param friendLinkDto 友链信息
+     */
+    void applyFriendLink(ApplyFriendLinkDto friendLinkDto);
 }

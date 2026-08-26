@@ -5,7 +5,8 @@ import Home from '@/views/home'
 import Copyright from '@/views/statement/Copyright'
 import Disclaimer from '@/views/statement/Disclaimer'
 import Infringement from '@/views/statement/Infringement'
-import FriendLink from '@/views/friendLink/index2'
+import FriendLink from '@/views/friendLink'
+import BarrageMessage from '@/views/barrageMessage'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,14 @@ const routes = [
     component: Infringement,
     meta: {
       title: '侵权联系'
+    }
+  },
+  {
+    path: '/barrageMessage',
+    name: 'BarrageMessage',
+    component: BarrageMessage,
+    meta: {
+      title: '弹幕'
     }
   },
   {
@@ -125,13 +134,6 @@ const routes = [
     component: resolve => require(['../views/column/detail'], resolve),
     meta: {
       title: '专栏'
-    }
-  },
-  {
-    path: '/barrageMessage',
-    component: resolve => require(['../views/barrageMessage/index'], resolve),
-    meta: {
-      title: '弹幕'
     }
   },
   {

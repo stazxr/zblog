@@ -83,7 +83,7 @@
           </a>
           <ul class="menus-submenu">
             <router-link to="/friend-link">
-              📌 友链
+              💃 友人帐
             </router-link>
             <router-link to="/barrageMessage">
               💌 弹幕

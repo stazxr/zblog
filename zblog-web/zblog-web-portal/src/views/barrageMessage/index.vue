@@ -34,7 +34,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.initBarrage()
+      this.initData()
     })
   },
   beforeDestroy() {
@@ -44,7 +44,7 @@ export default {
     /**
      * 初始化弹幕
      */
-    initBarrage() {
+    initData() {
       /**
        * 加载历史弹幕
        */

@@ -10,7 +10,9 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  */
 public enum FriendLinkErrorCode implements ErrorCode {
     /** 友链已存在 */
-    ELINKA001("FRIEND_LINK_EXISTS");
+    ELINKA001("FRIEND_LINK_EXISTS"),
+    /** 网站地址解析错误 */
+    ELINKA002("FRIEND_LINK_URL_INVALID");
 
     private final String i18nKey;
 
