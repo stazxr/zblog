@@ -255,6 +255,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('FRIEND_LINK_EXISTS', 'en-US', 'Friend link exist', 'common'),
 ('FRIEND_LINK_URL_INVALID', 'zh-CN', '网站地址解析错误，请检查您的输入', 'common'),
 ('FRIEND_LINK_URL_INVALID', 'en-US', 'Friend link url invalid', 'common'),
+('FRIEND_LINK_LOGO_INVALID', 'zh-CN', '网站封面地址解析错误，请检查您的输入', 'common'),
+('FRIEND_LINK_LOGO_INVALID', 'en-US', 'Friend link logo invalid', 'common'),
 ('FRIEND_LINK_NAME_REQUIRED', 'zh-CN', '请填写网站名称', 'common'),
 ('FRIEND_LINK_NAME_REQUIRED', 'en-US', 'Friend link name cannot be blank', 'common'),
 ('FRIEND_LINK_URL_REQUIRED', 'zh-CN', '请填写网站链接', 'common'),
@@ -349,4 +351,15 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('TAG_DELETE_WITH_ARTICLE', 'en-US', 'Tag is associated with articles', 'common'),
 -- 文章
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
-('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common');
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common'),
+-- 门户
+('PORTAL_FRIEND_LINK_SWITCH_OFF', 'zh-CN', '友链申请开关已关闭，有问题请联系网站管理员', 'common'),
+('PORTAL_FRIEND_LINK_SWITCH_OFF', 'en-US', 'FriendLink apply off', 'common'),
+('PORTAL_FRIEND_LINK_NAME_REQUIRED', 'zh-CN', '请填写网站名称', 'common'),
+('PORTAL_FRIEND_LINK_NAME_REQUIRED', 'en-US', 'FriendLink name required', 'common'),
+('PORTAL_FRIEND_LINK_URL_REQUIRED', 'zh-CN', '请填写网站地址', 'common'),
+('PORTAL_FRIEND_LINK_URL_REQUIRED', 'en-US', 'FriendLink url required', 'common'),
+('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'zh-CN', '请填写网站封面', 'common'),
+('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'en-US', 'FriendLink logo required', 'common'),
+('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'zh-CN', '请填写网站简介', 'common'),
+('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'en-US', 'FriendLink description off', 'common');

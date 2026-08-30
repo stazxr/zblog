@@ -25,8 +25,13 @@ export default new Vuex.Store({
       intro: null,
       webSite: null
     },
+
     // 是否手机端
     isMobile: false,
+
+    // 模态框
+    applyFriendLinkFlag: false, // 申请友链
+
     // 社交配置信息
     socialConfig: {},
     // 其他配置信息
@@ -86,9 +91,13 @@ export default new Vuex.Store({
     setPageInfo(state, pages) {
       state.pages = pages || {}
     },
-
-    SET_MOBILE(state, value) {
+    // 设置是否手机端
+    setMobile(state, value) {
       state.isMobile = value
+    },
+    // 关闭所有模态框
+    closeAllModel(state) {
+      state.applyFriendLinkFlag = false
     },
     // 设置用户信息
     setUserInfo(state, loginUser) {

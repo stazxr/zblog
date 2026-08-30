@@ -8,12 +8,12 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to, from) => {
   const websiteConfig = store.state.websiteConfig
-  const websiteName = websiteConfig.websiteName || ''
+  const websiteTitle = websiteConfig.websiteTitle || ''
 
   if (to.meta.title) {
-    document.title = `${to.meta.title} - ${websiteName}`
+    document.title = `${to.meta.title} - ${websiteTitle}`
   } else {
-    document.title = `${websiteName}`
+    document.title = `${websiteTitle}`
   }
 
   if (to.fullPath === from.fullPath) {

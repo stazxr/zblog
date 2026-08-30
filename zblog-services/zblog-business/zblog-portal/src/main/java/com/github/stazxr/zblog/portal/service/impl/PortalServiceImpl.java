@@ -27,6 +27,7 @@ import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
+import com.github.stazxr.zblog.portal.domain.error.PortalErrorCode;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import com.github.stazxr.zblog.portal.util.VisitorUtil;
@@ -279,8 +280,8 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public List<BarrageMessageVo> queryBarrageMessageList() {
-        int size = 100; // TODO 网站配置功能待开发
-        return barrageMessageMapper.selectLastedBarrageMessageList(size);
+        WebsiteConfig websiteConfig = websiteConfigMapper.selectById(1L);
+        return barrageMessageMapper.selectLastedBarrageMessageList(websiteConfig.getBarrageMessageLoadSize());
     }
 
     /**
@@ -379,21 +380,28 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public void applyFriendLink(ApplyFriendLinkDto friendLinkDto) {
+        WebsiteConfig websiteConfig = websiteConfigMapper.selectById(1L);
+        ThrowUtils.throwIf(!websiteConfig.getFriendLinkApplySwitch(), PortalErrorCode.EPORTA001);
+
         // 获取友链信息
         FriendLink friendLink = new FriendLink();
         friendLink.setId(SequenceUtils.getId());
         friendLink.setName(friendLinkDto.getName().trim());
         try {
-            friendLink.setUrl(UrlUtils.normalize(friendLink.getUrl()));
+            friendLink.setUrl(UrlUtils.normalize(friendLinkDto.getUrl()));
         } catch (Exception e) {
             throw new ServiceException(FriendLinkErrorCode.ELINKA002, e);
         }
-        friendLink.setLogo(friendLinkDto.getLogo());
-        friendLink.setDescription(friendLinkDto.getDescription());
-        friendLink.setEmail(friendLinkDto.getEmail());
-        friendLink.setContact(friendLinkDto.getContact());
+        try {
+            friendLink.setUrl(UrlUtils.normalize(friendLinkDto.getLogo()));
+        } catch (Exception e) {
+            throw new ServiceException(FriendLinkErrorCode.ELINKA003, e);
+        }
+        friendLink.setDescription(friendLinkDto.getDescription().trim());
+        friendLink.setEmail(friendLinkDto.getEmail()); // 暂不使用
+        friendLink.setContact(friendLinkDto.getContact()); // 暂不使用
         friendLink.setLinkType(FriendLinkType.NORMAL.getType());
-        friendLink.setStatus(FriendLinkStatus.APPROVED.getStatus());
+        friendLink.setStatus(FriendLinkStatus.PENDING.getStatus());
         friendLink.setIsVisible(true);
         friendLink.setAllowFollow(false);
         friendLink.setCheckEnabled(false);

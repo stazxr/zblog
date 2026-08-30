@@ -36,10 +36,16 @@ public class WebsiteConfigVo implements Serializable {
     private String websiteName;
 
     /**
-     * 网站默认标题
+     * 网站标题
      */
-    @ApiModelProperty("网站默认标题")
+    @ApiModelProperty("网站标题")
     private String websiteTitle;
+
+    /**
+     * 网站简介
+     */
+    @ApiModelProperty("网站简介")
+    private String websiteIntro;
 
     /**
      * 网站LOGO
@@ -54,6 +60,12 @@ public class WebsiteConfigVo implements Serializable {
     private String websiteFavicon;
 
     /**
+     * 网站封面
+     */
+    @ApiModelProperty("网站封面")
+    private String websiteCover;
+
+    /**
      * 作者名称
      */
     @ApiModelProperty("作者名称")
@@ -66,10 +78,11 @@ public class WebsiteConfigVo implements Serializable {
     private String websiteAvatar;
 
     /**
-     * 网站签名
+     * 网站创建日期
      */
-    @ApiModelProperty("网站签名")
-    private String websiteSignature;
+    @JSONField(format = "yyyy-MM-dd")
+    @ApiModelProperty("网站创建日期")
+    private LocalDate websiteCreateTime;
 
     /**
      * 网站关键词
@@ -84,23 +97,16 @@ public class WebsiteConfigVo implements Serializable {
     private String websiteDescription;
 
     /**
-     * 网站创建日期
+     * 页脚签名
      */
-    @JSONField(format = "yyyy-MM-dd")
-    @ApiModelProperty("网站创建日期")
-    private LocalDate websiteCreateTime;
+    @ApiModelProperty("页脚签名")
+    private String footerSignature;
 
     /**
-     * ICP备案号
+     * 页脚导航显示开关
      */
-    @ApiModelProperty("ICP备案号")
-    private String websiteIcpNo;
-
-    /**
-     * 公安备案号
-     */
-    @ApiModelProperty("公安备案号")
-    private String websitePoliceNo;
+    @ApiModelProperty("页脚导航显示开关")
+    private Boolean footerNavbarSwitch;
 
     /**
      * 页脚背景图
@@ -113,6 +119,36 @@ public class WebsiteConfigVo implements Serializable {
      */
     @ApiModelProperty("网站字体地址")
     private String fontUrl;
+
+    /**
+     * 友链申请开关
+     */
+    @ApiModelProperty("友链申请开关")
+    private Boolean friendLinkApplySwitch;
+
+    /**
+     * 弹幕加载量
+     */
+    @ApiModelProperty("弹幕加载量")
+    private Integer barrageMessageLoadSize;
+
+    /**
+     * HTTPS 升级开关
+     */
+    @ApiModelProperty("HTTPS 升级开关")
+    private Boolean httpsSwitch;
+
+    /**
+     * ICP备案号
+     */
+    @ApiModelProperty("ICP备案号")
+    private String websiteIcpNo;
+
+    /**
+     * 公安备案号
+     */
+    @ApiModelProperty("公安备案号")
+    private String websitePoliceNo;
 
     /**
      * 网站统计代码

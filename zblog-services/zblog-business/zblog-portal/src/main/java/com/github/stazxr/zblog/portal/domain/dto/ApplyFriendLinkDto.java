@@ -23,26 +23,28 @@ public class ApplyFriendLinkDto extends BaseDto {
     /**
      * 网站名称
      */
-    @NotBlank(message = "{FRIEND_LINK_NAME_REQUIRED}")
+    @NotBlank(message = "{PORTAL_FRIEND_LINK_NAME_REQUIRED}")
     @ApiModelProperty("网站名称")
     private String name;
 
     /**
      * 网站地址
      */
-    @NotBlank(message = "{FRIEND_LINK_URL_REQUIRED}")
+    @NotBlank(message = "{PORTAL_FRIEND_LINK_URL_REQUIRED}")
     @ApiModelProperty("网站地址")
     private String url;
 
     /**
      * 网站Logo
      */
+    @NotBlank(message = "{PORTAL_FRIEND_LINK_LOGO_REQUIRED}")
     @ApiModelProperty("网站Logo")
     private String logo;
 
     /**
      * 网站描述
      */
+    @NotBlank(message = "{PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED}")
     @ApiModelProperty("网站描述")
     private String description;
 

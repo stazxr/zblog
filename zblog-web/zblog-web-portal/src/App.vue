@@ -12,6 +12,8 @@
     <BackTop />
     <!-- 侧边导航栏 -->
     <SideNavBar />
+    <!-- 申请友链模态框 -->
+    <ApplyFriendLinkModel />
     <!-- 搜索模态框 -->
     <SearchModel />
     <!-- 登录模态框 -->
@@ -36,12 +38,13 @@ import SearchModel from './components/model/SearchModel'
 import LoginModel from './components/model/LoginModel'
 import RegisterModel from './components/model/RegisterModel'
 import ForgetModel from './components/model/ForgetModel'
+import ApplyFriendLinkModel from './components/model/ApplyFriendLinkModel'
 import Player from './components/zw-player/Player'
 import Robot from './components/Robot'
 export default {
   name: 'App',
   components: {
-    TopNavBar, SideNavBar, Footer, BackTop, SearchModel, LoginModel, RegisterModel, ForgetModel, Player, Robot
+    TopNavBar, SideNavBar, Footer, BackTop, SearchModel, LoginModel, RegisterModel, ForgetModel, ApplyFriendLinkModel, Player, Robot
   },
   data() {
     return {

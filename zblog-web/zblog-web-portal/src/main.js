@@ -81,12 +81,35 @@ function applyWebsiteConfig(config) {
     document.title = config.websiteTitle
   }
 
+  // HTTPS
+  if (config.httpsSwitch) {
+    enableUpgradeInsecureRequests()
+  }
+
   // SEO
   updateMeta('keywords', config.websiteKeywords)
   updateMeta('description', config.websiteDescription)
 
   // FAVICON
   updateFavicon(config.websiteFavicon)
+}
+
+/**
+ * 启用 HTTPS 不安全请求自动升级
+ *  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+ */
+function enableUpgradeInsecureRequests() {
+  let meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
+  if (!meta) {
+    meta = document.createElement('meta')
+    meta.setAttribute('http-equiv', 'Content-Security-Policy')
+    document.head.appendChild(meta)
+  }
+
+  const content = meta.getAttribute('content') || ''
+  if (!content.includes('upgrade-insecure-requests')) {
+    meta.setAttribute('content', content ? `${content}; upgrade-insecure-requests` : 'upgrade-insecure-requests')
+  }
 }
 
 /**
@@ -130,6 +153,9 @@ function updateFavicon(url) {
  */
 async function bootstrap() {
   try {
+    // 关闭所有的模态框
+    await store.dispatch('closeAllModel')
+
     // 加载网站配置
     const config = await store.dispatch('website/init')
     applyWebsiteConfig(config)

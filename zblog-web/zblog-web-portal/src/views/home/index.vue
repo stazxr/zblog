@@ -46,9 +46,9 @@
         </v-card>
 
         <!-- 说说轮播 -->
-        <!-- <v-card v-if="talkList.length > 0" class="animated zoomIn">
+        <v-card v-if="talkList.length > 0" class="animated zoomIn">
           <Swiper :list="talkList" />
-        </v-card> -->
+        </v-card>
 
         <!-- 分界线 -->
         <div class="home-hr">
@@ -137,7 +137,7 @@
           <v-card class="animated zoomIn blog-card mt-5">
             <div class="author-wrapper">
               <v-avatar size="110">
-                <img :src="websiteConfig['websiteAvatar']" class="author-avatar" alt="404">
+                <img :src="websiteConfig['websiteAvatar']" class="author-avatar" alt="">
               </v-avatar>
               <div style="font-size: 1.375rem; margin-top:0.625rem;">
                 {{ websiteConfig['websiteAuthor'] || websiteConfig['websiteName'] }}
@@ -238,13 +238,13 @@
               </ul>
             </div>
           </v-card>
-          <!-- <v-card class="blog-card animated zoomIn mt-5 big">
+          <v-card class="blog-card animated zoomIn mt-5 big">
             <div class="blog-card-title">
               <svg class="iconfont_svg" aria-hidden="true">
                 <use xlink:href="#icon-zhuanlan" />
               </svg> 文章专栏
             </div>
-          </v-card> -->
+          </v-card>
           <v-card class="blog-card animated zoomIn mt-5 big">
             <div class="blog-card-title">
               <svg class="iconfont_svg" aria-hidden="true">
@@ -350,13 +350,13 @@
 
 <script>
 import EasyTyper from 'easy-typer-js'
-// import Swiper from '../../components/Swiper.vue'
+import Swiper from '../../components/Swiper.vue'
 import { getPageRandomCover } from '@/utils/theme'
 import TagCloud3D from '../../components/TagCloud3D.vue'
 export default {
   name: 'Home',
   components: {
-    // Swiper,
+    Swiper,
     TagCloud3D
   },
   data() {

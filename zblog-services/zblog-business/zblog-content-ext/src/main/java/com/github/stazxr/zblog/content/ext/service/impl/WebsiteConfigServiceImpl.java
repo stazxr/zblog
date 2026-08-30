@@ -44,6 +44,18 @@ public class WebsiteConfigServiceImpl implements WebsiteConfigService {
     @Override
     public void editWebsiteConfig(WebsiteConfigDto websiteConfigDto) {
         WebsiteConfig websiteConfig = websiteConfigConverter.dtoToEntity(websiteConfigDto);
+        if (websiteConfig.getFooterNavbarSwitch() == null) {
+            websiteConfig.setFooterNavbarSwitch(true);
+        }
+        if (websiteConfig.getFriendLinkApplySwitch() == null) {
+            websiteConfig.setFriendLinkApplySwitch(true);
+        }
+        if (websiteConfig.getHttpsSwitch() == null) {
+            websiteConfig.setHttpsSwitch(false);
+        }
+        if (websiteConfig.getBarrageMessageLoadSize() == null) {
+            websiteConfig.setBarrageMessageLoadSize(200); // 默认 200
+        }
         int updateRow = websiteConfigMapper.updateById(websiteConfig);
         ThrowUtils.when(updateRow != 1).system(BaseErrorCode.SCOREA002);
     }

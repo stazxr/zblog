@@ -22,9 +22,11 @@
     <!-- 电脑端导航栏 -->
     <div class="d-md-block d-none nav-container">
       <div class="float-left blog-brand">
-        <img v-if="websiteConfig['websiteLogo']" class="website-logo" :src="websiteConfig['websiteLogo']" alt="">
-        <router-link class="blog-title" to="/">
-          {{ websiteConfig['websiteName'] }}
+        <router-link to="/" class="logo-link">
+          <img v-if="websiteConfig['websiteLogo']" class="website-logo" :src="websiteConfig['websiteLogo']" alt="">
+          <span v-else class="blog-title">
+            {{ websiteConfig['websiteName'] }}
+          </span>
         </router-link>
       </div>
       <div class="float-right nav-title">
@@ -297,30 +299,24 @@ ul {
 .logo-link {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 .website-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 10px;
+  display: block;
+  max-width: 180px;
+  max-height: 42px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .blog-title {
   font-size: 20px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
-/*.blog-title, .nav-title {*/
-/*  display: flex;*/
-/*  align-items: center;*/
-/*  height: 100%;*/
-/*}*/
-/*.blog-title a {*/
-/*  font-size: 20px;*/
-/*  font-weight: bold;*/
-/*}*/
 .menus-item {
   position: relative;
   display: inline-block;

@@ -33,9 +33,14 @@ public class WebsiteConfig implements Serializable {
     private String websiteName;
 
     /**
-     * 网站默认标题
+     * 网站标题
      */
     private String websiteTitle;
+
+    /**
+     * 网站简介
+     */
+    private String websiteIntro;
 
     /**
      * 网站LOGO
@@ -48,6 +53,11 @@ public class WebsiteConfig implements Serializable {
     private String websiteFavicon;
 
     /**
+     * 网站封面
+     */
+    private String websiteCover;
+
+    /**
      * 作者名称
      */
     private String websiteAuthor;
@@ -58,9 +68,14 @@ public class WebsiteConfig implements Serializable {
     private String websiteAvatar;
 
     /**
-     * 网站签名
+     * 网站创建日期
      */
-    private String websiteSignature;
+    private LocalDate websiteCreateTime;
+
+    /**
+     * 网站创建日期
+     */
+    private String websiteNotice;
 
     /**
      * 网站关键词
@@ -73,19 +88,14 @@ public class WebsiteConfig implements Serializable {
     private String websiteDescription;
 
     /**
-     * 网站创建日期
+     * 页脚签名
      */
-    private LocalDate websiteCreateTime;
+    private String footerSignature;
 
     /**
-     * ICP备案号
+     * 页脚导航显示开关
      */
-    private String websiteIcpNo;
-
-    /**
-     * 公安备案号
-     */
-    private String websitePoliceNo;
+    private Boolean footerNavbarSwitch;
 
     /**
      * 页脚背景图
@@ -96,6 +106,31 @@ public class WebsiteConfig implements Serializable {
      * 网站字体地址
      */
     private String fontUrl;
+
+    /**
+     * 友链申请开关
+     */
+    private Boolean friendLinkApplySwitch;
+
+    /**
+     * 弹幕加载量
+     */
+    private Integer barrageMessageLoadSize;
+
+    /**
+     * HTTPS 升级开关
+     */
+    private Boolean httpsSwitch;
+
+    /**
+     * ICP备案号
+     */
+    private String websiteIcpNo;
+
+    /**
+     * 公安备案号
+     */
+    private String websitePoliceNo;
 
     /**
      * 网站统计代码

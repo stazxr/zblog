@@ -1,24 +1,20 @@
-package com.github.stazxr.zblog.content.ext.domain.error;
+package com.github.stazxr.zblog.portal.domain.error;
 
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
- * 友链错误码定义。
+ * 门户错误码定义。
  *
  * @author SunTao
- * @since 2026-04-15
+ * @since 2026-08-30
  */
-public enum FriendLinkErrorCode implements ErrorCode {
-    /** 友链已存在 */
-    ELINKA001("FRIEND_LINK_EXISTS"),
-    /** 网站地址解析错误 */
-    ELINKA002("FRIEND_LINK_URL_INVALID"),
-    /** 网站封面地址解析错误 */
-    ELINKA003("FRIEND_LINK_LOGO_INVALID");
+public enum PortalErrorCode implements ErrorCode {
+    /** 友链申请开关已关闭 */
+    EPORTA001("PORTAL_FRIEND_LINK_SWITCH_OFF");
 
     private final String i18nKey;
 
-    FriendLinkErrorCode(String i18nKey) {
+    PortalErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
 

@@ -5,12 +5,12 @@
       :class="{ 'default-gradient': !websiteConfig.footerBackground }"
       :style="footerStyle"
     >
-      <!-- 网站签名 -->
-      <div v-if="websiteConfig.websiteSignature" class="footer-signature">
-        {{ websiteConfig.websiteSignature }}
+      <!-- 页脚签名 -->
+      <div v-if="websiteConfig.footerSignature" class="footer-signature">
+        {{ websiteConfig.footerSignature }}
       </div>
       <!-- 快捷导航 -->
-      <nav class="footer-nav">
+      <nav v-if="websiteConfig.footerNavbarSwitch" class="footer-nav">
         <router-link to="/">
           首页
         </router-link>
@@ -50,7 +50,7 @@
         </span>
 
         <!-- 网站备案 -->
-        <div class="footer-records">
+        <div v-if="websiteConfig.websiteIcpNo || websiteConfig.websitePoliceNo" class="footer-records">
           <!-- ICP备案 -->
           <template v-if="websiteConfig.websiteIcpNo">
             <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-record">

@@ -1,32 +1,18 @@
-<!--
-模式一：仅固定比例
-<image-crop-upload
-  :aspect-ratio="3"
-/>
-固定比例 3:1 不固定像素大小
-
-模式二：固定比例 + 固定像素
-<image-crop-upload
-  :aspect-ratio="3.2"
-  :output-width="1920"
-  :output-height="600"
-/>
-固定比例：16:5 > 裁剪 > 严格输出：1920 × 600
--->
 <template>
   <div class="muses-image-crop-upload">
     <!-- 图片预览 -->
-    <div class="image-preview" :class="{ 'is-empty': !value }" :style="previewStyle" @click="chooseImage">
+    <div class="image-preview" :class="{ 'is-empty': !value, 'is-fixed': fixedPreview, 'is-auto': !fixedPreview }" :style="previewStyle" @click="chooseImage">
       <!-- 已上传图片 -->
       <img v-if="value" :src="value" alt="">
+
       <!-- 空图片 -->
-      <div v-else class="image-placeholder">
+      <div v-else class="image-placeholder" :class="{ 'is-compact': previewHeight < 80 }">
         <i class="el-icon-plus" />
         <span>上传图片</span>
       </div>
 
       <!-- 更换图片蒙层 -->
-      <div class="image-mask">
+      <div v-if="value" class="image-mask" :class="{ 'is-compact': previewHeight < 80 }">
         <i class="el-icon-upload2" />
         <span>更换图片</span>
       </div>
@@ -75,7 +61,7 @@
             :info="true"
             :full="true"
             :output-quality="outputQuality"
-            output-type="jpeg"
+            :output-type="cropperOutputType"
           />
         </div>
 
@@ -148,6 +134,16 @@ export default {
       default: null
     },
     /**
+     * 是否固定预览尺寸
+     *
+     * true：固定宽高
+     * false：宽度固定，高度根据图片比例自适应
+     */
+    fixedPreview: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * 图片预览宽度
      */
     previewWidth: {
@@ -215,13 +211,32 @@ export default {
     outputQuality: {
       type: Number,
       default: 1
+    },
+    /**
+     * 限制允许上传的图片类型
+     */
+    acceptImageTypes: {
+      type: Array,
+      default: () => ['image/jpeg', 'image/png']
+    },
+    /**
+     * 输出图片类型: jpeg / png
+     * null 表示保持原图片类型
+     */
+    outputType: {
+      type: String,
+      default: null
     }
   },
   data() {
     return {
       dialogVisible: false,
       cropImage: '',
-      uploadLoading: false
+      uploadLoading: false,
+      // 原始图片 MIME 类型
+      sourceImageType: 'image/jpeg',
+      // 原始图片比例
+      imageRatio: 1
     }
   },
   computed: {
@@ -247,16 +262,77 @@ export default {
      * 默认裁剪框高度
      */
     autoCropHeight() {
+      if (!this.fixed) {
+        return 300
+      }
+
       return 300 / this.aspectRatio
     },
     /**
      * 预览样式
      */
     previewStyle() {
-      return {
+      const style = {
         width: this.previewWidth + 'px',
-        height: this.previewHeight + 'px',
         borderRadius: this.circle ? '50%' : '8px'
+      }
+
+      if (this.fixedPreview) {
+        style.height = this.previewHeight + 'px'
+      } else {
+        style.height = this.previewWidth / this.imageRatio + 'px'
+      }
+
+      return style
+    },
+    /**
+     * 最终输出 MIME 类型
+     */
+    outputMimeType() {
+      if (this.outputType === 'png') {
+        return 'image/png'
+      }
+
+      if (this.outputType === 'jpeg') {
+        return 'image/jpeg'
+      }
+
+      // outputType 为空时，保持原图类型
+      return this.sourceImageType
+    },
+    /**
+     * vue-cropper 输出类型
+     */
+    cropperOutputType() {
+      return this.outputMimeType === 'image/png' ? 'png' : 'jpeg'
+    },
+    /**
+     * 输出文件扩展名
+     */
+    outputFileExtension() {
+      return this.outputMimeType === 'image/png' ? 'png' : 'jpg'
+    }
+  },
+  watch: {
+    value: {
+      immediate: true,
+      handler(value) {
+        if (!value) {
+          this.imageRatio = 1
+          return
+        }
+
+        const image = new Image()
+
+        image.onload = () => {
+          this.imageRatio = image.width / image.height
+        }
+
+        image.onerror = () => {
+          this.imageRatio = 1
+        }
+
+        image.src = value
       }
     }
   },
@@ -286,6 +362,16 @@ export default {
         this.resetFileInput()
         return
       }
+
+      // 是否允许上传该图片类型
+      if (this.acceptImageTypes && this.acceptImageTypes.length > 0 && !this.acceptImageTypes.includes(file.type)) {
+        this.$message.warning('当前图片格式不支持')
+        this.resetFileInput()
+        return
+      }
+
+      // 保存原始图片类型
+      this.sourceImageType = file.type
 
       // 文件大小检查
       if (this.maxSize > 0) {
@@ -398,7 +484,7 @@ export default {
             } else {
               reject(new Error('图片生成失败'))
             }
-          }, 'image/jpeg', this.outputQuality)
+          }, this.outputMimeType, this.outputQuality)
         }
 
         image.onerror = () => {
@@ -417,10 +503,13 @@ export default {
         return
       }
 
+      const fileName = 'image-' + Date.now() + '.' + this.outputFileExtension
       const file = new File(
         [blob],
-        'image-' + Date.now() + '.jpg',
-        { type: 'image/jpeg' }
+        fileName,
+        {
+          type: this.outputMimeType
+        }
       )
 
       const formData = new FormData()
@@ -488,7 +577,10 @@ export default {
   display: inline-block;
 }
 
-/* 图片预览 */
+/* =========================
+   图片预览
+   ========================= */
+
 .image-preview {
   position: relative;
   overflow: hidden;
@@ -503,40 +595,87 @@ export default {
   display: block;
   width: 100%;
   height: 100%;
+  /*object-fit: contain;*/
+}
+/* 固定尺寸预览 */
+.image-preview.is-fixed img {
   object-fit: cover;
 }
+/* 自适应比例预览 */
+.image-preview.is-auto img {
+  object-fit: contain;
+}
 
-/* 空图片 */
+/* =========================
+   空图片
+   ========================= */
+
 .image-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   width: 100%;
   height: 100%;
+  padding: 4px;
   color: #909399;
-}
-.image-placeholder i {
-  margin-bottom: 8px;
-  font-size: 28px;
-}
-.image-placeholder span {
-  font-size: 13px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-/* Hover 蒙层 */
+.image-placeholder i {
+  flex-shrink: 0;
+  font-size: 28px;
+}
+
+.image-placeholder span {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 高度较小时改为横向布局 */
+.image-placeholder.is-compact {
+  flex-direction: row;
+  gap: 5px;
+  padding: 4px 8px;
+}
+
+.image-placeholder.is-compact i {
+  font-size: 20px;
+}
+
+.image-placeholder.is-compact span {
+  font-size: 12px;
+}
+
+/* =========================
+   Hover 蒙层
+   ========================= */
+
 .image-mask {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+
+  padding: 4px;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  box-sizing: border-box;
+
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -544,20 +683,48 @@ export default {
 .image-preview:hover .image-mask {
   opacity: 1;
 }
+
 .image-mask i {
-  margin-bottom: 6px;
+  flex-shrink: 0;
   font-size: 24px;
 }
+
 .image-mask span {
+  max-width: 100%;
+  overflow: hidden;
   font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* 隐藏文件选择器 */
+/* 高度较小时改为横向布局 */
+.image-mask.is-compact {
+  flex-direction: row;
+  gap: 5px;
+  padding: 4px 8px;
+}
+
+.image-mask.is-compact i {
+  font-size: 18px;
+}
+
+.image-mask.is-compact span {
+  font-size: 12px;
+}
+
+/* =========================
+   隐藏文件选择器
+   ========================= */
+
 .file-input {
   display: none;
 }
 
-/* 裁剪弹窗 */
+/* =========================
+   裁剪弹窗
+   ========================= */
+
 .crop-container {
   min-height: 500px;
 }
@@ -567,7 +734,10 @@ export default {
   height: 500px;
 }
 
-/* 操作按钮 */
+/* =========================
+   操作按钮
+   ========================= */
+
 .crop-actions {
   display: flex;
   flex-wrap: wrap;
@@ -576,34 +746,48 @@ export default {
   margin-top: 16px;
 }
 
-/* 删除按钮 */
+/* =========================
+   删除按钮
+   ========================= */
+
 .remove-button {
   position: absolute;
   top: 6px;
   right: 6px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 24px;
   height: 24px;
+
   color: #ffffff;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
   cursor: pointer;
+
   opacity: 0;
   transition: all 0.2s;
 }
+
 .image-preview:hover .remove-button {
   opacity: 1;
 }
+
 .remove-button:hover {
   background: #f56c6c;
 }
+
 .remove-button i {
+  margin: 0;
   font-size: 14px;
 }
 
-/* 手机端 */
+/* =========================
+   手机端
+   ========================= */
+
 @media screen and (max-width: 768px) {
   .crop-container {
     min-height: 400px;
@@ -616,6 +800,7 @@ export default {
   .crop-actions {
     justify-content: flex-start;
   }
+
   .crop-actions .el-button {
     margin-left: 0 !important;
   }
@@ -625,7 +810,10 @@ export default {
   }
 }
 
-/* 小屏手机 */
+/* =========================
+   小屏手机
+   ========================= */
+
 @media screen and (max-width: 480px) {
   .crop-main {
     height: 350px;
@@ -635,6 +823,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
+
   .crop-actions .el-button {
     width: 100%;
   }
