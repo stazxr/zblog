@@ -134,15 +134,12 @@ export default {
 
       try {
         this.friendLinkSubmitting = true
-        const res = await this.$mapi.portal.applyFriendLink(this.friendLinkForm)
-        if (res.code === '000000000') {
-          this.$toast({ type: 'success', message: '申请已提交，请等待审核' })
-          this.applyFriendLinkFlag = false
-        } else {
-          this.$toast({ type: 'error', message: res.message })
-        }
+        await this.$mapi.portal.applyFriendLink(this.friendLinkForm)
+        this.$toast({ type: 'success', message: '申请已提交，请等待审核' })
+        this.applyFriendLinkFlag = false
       } catch (error) {
         console.error('提交友链申请失败', error)
+        this.$toast({ type: 'error', message: error.message })
       } finally {
         this.friendLinkSubmitting = false
       }

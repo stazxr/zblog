@@ -11,7 +11,7 @@ import java.io.Serializable;
  * Web用户登录信息
  *
  * @author SunTao
- * @since 2027-07-12
+ * @since 2026-07-12
  */
 @Getter
 @Setter

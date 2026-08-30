@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.content.ext.domain.dto;
 
-import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.core.base.BaseDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,7 +12,7 @@ import javax.validation.constraints.NotNull;
  * 弹幕审核信息
  *
  * @author SunTao
- * @since 2027-07-06
+ * @since 2026-07-06
  */
 @Getter
 @Setter
@@ -24,7 +23,7 @@ public class BarrageMessageAuditDto extends BaseDto {
     /**
      * 弹幕id
      */
-    @NotNull(groups = Update.class, message = "{TECH_PARAM_MISS}")
+    @NotNull(message = "{TECH_PARAM_MISS}")
     @ApiModelProperty("弹幕id")
     private Long barrageMessageId;
 

@@ -44,6 +44,7 @@
         <span class="crud-opts-left">
           <el-button v-perm="['LINKA001']" type="success" @click="addFriendLink">新增</el-button>
           <el-button v-perm="['LINKQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['LINKU002']" :disabled="row === null || row.status !== 0" type="primary" @click="auditFriendLink">审核</el-button>
           <el-button v-perm="['LINKU001']" :disabled="row === null" type="primary" @click="editFriendLink">编辑</el-button>
           <el-button v-perm="['LINKD001']" :disabled="row === null" type="danger" @click="deleteFriendLink">删除</el-button>
         </span>
@@ -114,6 +115,14 @@
             <el-tag v-else type="warning">关闭</el-tag>
           </template>
         </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="checkEnabled" label="检测结果" align="center" width="100">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.checkEnabled === true && scope.row.checkStatus === true" type="success">成功</el-tag>
+            <el-tag v-else-if="scope.row.checkEnabled === true && scope.row.checkStatus === false" type="danger">失败</el-tag>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="hotValue" label="热力值" align="center" width="100" />
         <el-table-column :show-overflow-tooltip="true" prop="sort" label="优先级" align="center" width="100" />
         <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="150" />
         <div slot="empty">
@@ -139,6 +148,12 @@
       :dialog-visible="detailDialogVisible"
       @showDetailDone="showDetailDone"
     />
+    <!-- 审核 -->
+    <auditDialog
+      ref="auditDialogRef"
+      :dialog-visible="auditDialogVisible"
+      @auditDone="auditDone"
+    />
     <!-- 新增 / 编辑 -->
     <addOrEditDialog
       ref="addOrEditDialogRef"
@@ -151,11 +166,13 @@
 
 <script>
 import detailDialog from '@/views/admin/website/friendLink/template/detailDialog'
+import auditDialog from '@/views/admin/website/friendLink/template/auditDialog'
 import addOrEditDialog from '@/views/admin/website/friendLink/template/addOrEditDialog'
 export default {
   name: 'FriendLink',
   components: {
     detailDialog,
+    auditDialog,
     addOrEditDialog
   },
   data() {
@@ -181,6 +198,7 @@ export default {
       page: 1,
       pageSize: 10,
       detailDialogVisible: false,
+      auditDialogVisible: false,
       addOrEditDialogTitle: null,
       addOrEditDialogVisible: false
     }
@@ -287,6 +305,17 @@ export default {
     },
     showDetailDone() {
       this.detailDialogVisible = false
+    },
+    // 审核
+    auditFriendLink() {
+      this.auditDialogVisible = true
+      this.$refs.auditDialogRef.initData(this.row.id)
+    },
+    auditDone(result = false) {
+      this.auditDialogVisible = false
+      if (result) {
+        this.listTableData()
+      }
     },
     // 新增与编辑
     addFriendLink() {

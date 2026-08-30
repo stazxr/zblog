@@ -39,4 +39,11 @@ public interface FriendLinkMapper extends BaseMapper<FriendLink> {
      * @return FriendLinkVoList
      */
     List<FriendLinkVo> selectWebFriendLinkList();
+
+    /**
+     * 查询健康检测友链列表
+     *
+     * @return FriendLinkVoList
+     */
+    List<FriendLinkVo> selectHealthCheckFriendLinkList();
 }

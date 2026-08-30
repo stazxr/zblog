@@ -113,6 +113,11 @@ public class WebsiteConfig implements Serializable {
     private Boolean friendLinkApplySwitch;
 
     /**
+     * 友链健康检测失败几次则下线友链
+     */
+    private Integer friendLinkCheckFailedCount;
+
+    /**
      * 弹幕加载量
      */
     private Integer barrageMessageLoadSize;

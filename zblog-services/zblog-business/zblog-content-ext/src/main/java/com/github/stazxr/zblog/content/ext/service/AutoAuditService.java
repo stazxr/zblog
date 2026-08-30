@@ -8,7 +8,7 @@ import com.github.stazxr.zblog.content.ext.domain.dto.query.AuditRecordQueryDto;
  * 自动审核管理业务层
  *
  * @author SunTao
- * @since 2027-07-23
+ * @since 2026-07-23
  */
 public interface AutoAuditService {
     /**

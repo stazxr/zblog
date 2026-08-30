@@ -8,10 +8,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.content.ext.converter.FriendLinkConverter;
+import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkAuditDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
 import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkStatus;
+import com.github.stazxr.zblog.content.ext.domain.error.BarrageMessageErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.mapper.FriendLinkMapper;
@@ -102,6 +104,25 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendL
         // 友链信息检查
         checkFriendLink(friendLink);
         // 编辑友链
+        ThrowUtils.when(!updateById(friendLink)).system(BaseErrorCode.SCOREA002);
+    }
+
+    /**
+     * 审核友链
+     *
+     * @param auditDto 友链审核信息
+     */
+    @Override
+    public void auditFriendLink(FriendLinkAuditDto auditDto) {
+        // 判断友链是否存在
+        FriendLink friendLink = baseMapper.selectById(auditDto.getFriendLinkId());
+        ThrowUtils.throwIfNull(friendLink, BaseErrorCode.ECOREA001);
+        // 判断友链状态是否为待审批
+        boolean isPending = FriendLinkStatus.PENDING.getStatus().equals(friendLink.getStatus());
+        ThrowUtils.throwIf(!isPending, BarrageMessageErrorCode.EBMESA001);
+
+        // 更新审核状态
+        friendLink.setStatus(auditDto.getStatus());
         ThrowUtils.when(!updateById(friendLink)).system(BaseErrorCode.SCOREA002);
     }
 

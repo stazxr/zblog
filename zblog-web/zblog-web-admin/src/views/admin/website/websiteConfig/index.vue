@@ -311,6 +311,12 @@
                 </span>
               </div>
             </el-form-item>
+            <el-form-item label="健康检测配置">
+              <el-input-number v-model="config.friendLinkCheckFailedCount" :min="1" :max="9999" controls-position="right" />
+              <div class="form-tip">
+                友链健康检测失败次数阙值，连续健康检测失败超过阙值后，将不在前台显示
+              </div>
+            </el-form-item>
           </div>
         </section>
 
@@ -515,6 +521,7 @@ export default {
         fontUrl: '',
         // 友链
         friendLinkApplySwitch: 1,
+        friendLinkCheckFailedCount: 3,
         // 弹幕
         barrageMessageLoadSize: 200,
         // 安全

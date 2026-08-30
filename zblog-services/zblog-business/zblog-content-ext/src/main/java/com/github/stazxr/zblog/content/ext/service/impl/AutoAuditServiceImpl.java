@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * 自动审核管理业务实现层
  *
  * @author SunTao
- * @since 2027-07-23
+ * @since 2026-07-23
  */
 @Service
 @RequiredArgsConstructor

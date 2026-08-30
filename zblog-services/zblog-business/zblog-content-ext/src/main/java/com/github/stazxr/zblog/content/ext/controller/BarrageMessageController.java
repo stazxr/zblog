@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * 弹幕管理
  *
  * @author SunTao
- * @since 2027-07-06
+ * @since 2026-07-06
  */
 @RestController
 @RequiredArgsConstructor

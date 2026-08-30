@@ -42,6 +42,12 @@ export default {
   applyFriendLink: params => {
     return api.httpRequest().post(`${portalApi}/applyFriendLink`, params)
   },
+  // 记录友链点击日志
+  recordFriendLinkClickLog: params => {
+    return api.httpRequest().post(`${portalApi}/recordFriendLinkClickLog`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
+  },
 
   // 登录
   webLogin: params => {

@@ -1,10 +1,14 @@
 package com.github.stazxr.zblog.content.ext.domain.vo;
 
+import com.github.stazxr.zblog.content.ext.util.FriendLinkHotUtils;
 import com.github.stazxr.zblog.core.base.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 /**
  * 友链信息
@@ -95,4 +99,54 @@ public class FriendLinkVo extends BaseVo {
      */
     @ApiModelProperty("排序值（越大越靠前）")
     private Integer sort;
+
+    /**
+     * 总点击数
+     */
+    @ApiModelProperty("总点击数")
+    private Long clickCount;
+
+    /**
+     * 日点击数
+     */
+    @ApiModelProperty("日点击数")
+    private Integer dayClick;
+
+    /**
+     * 周点击数
+     */
+    @ApiModelProperty("周点击数")
+    private Integer weekClick;
+
+    /**
+     * 月点击数
+     */
+    @ApiModelProperty("月点击数")
+    private Integer monthClick;
+
+    /**
+     * 上次访问时间
+     */
+    @ApiModelProperty("上次访问时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastClickTime;
+
+    /**
+     * 热力值
+     */
+    @ApiModelProperty("热力值")
+    private Long hotValue;
+
+    /**
+     * 健康检测结果
+     */
+    @ApiModelProperty("健康检测结果")
+    private Boolean checkStatus;
+
+    /**
+     * 计算友链热度
+     */
+    public Long getHotValue() {
+        return FriendLinkHotUtils.calculate(clickCount, dayClick, weekClick, monthClick);
+    }
 }

@@ -14,7 +14,9 @@ public enum FriendLinkErrorCode implements ErrorCode {
     /** 网站地址解析错误 */
     ELINKA002("FRIEND_LINK_URL_INVALID"),
     /** 网站封面地址解析错误 */
-    ELINKA003("FRIEND_LINK_LOGO_INVALID");
+    ELINKA003("FRIEND_LINK_LOGO_INVALID"),
+    /** 友链已被审核 */
+    ELINKA004("FRIEND_LINK_STATUS_INVALID");
 
     private final String i18nKey;
 

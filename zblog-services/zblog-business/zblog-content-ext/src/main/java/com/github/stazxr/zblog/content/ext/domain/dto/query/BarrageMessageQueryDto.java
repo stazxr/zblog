@@ -10,7 +10,7 @@ import lombok.Setter;
  * 弹幕查询参数
  *
  * @author SunTao
- * @since 2027-07-06
+ * @since 2026-07-06
  */
 @Getter
 @Setter

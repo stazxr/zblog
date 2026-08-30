@@ -9,7 +9,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
  * 弹幕管理业务层
  *
  * @author SunTao
- * @since 2027-07-06
+ * @since 2026-07-06
  */
 public interface BarrageMessageService {
     /**

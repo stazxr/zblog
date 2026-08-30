@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 用户基本信息
  *
  * @author SunTao
- * @since 2027-07-19
+ * @since 2026-07-19
  */
 @Getter
 @Setter

@@ -141,7 +141,7 @@
             </div>
           </div>
           <div class="apply-divider" />
-          <div class="apply-action">
+          <div v-if="websiteConfig.friendLinkApplySwitch" class="apply-action">
             <v-btn color="primary" rounded depressed @click="applyFriendLink">
               <v-icon left size="18"> mdi-link-plus</v-icon>
               申请友链
@@ -184,9 +184,15 @@
                 <div class="friend-description">
                   {{ item.description || '这个站点暂时没有留下介绍' }}
                 </div>
-                <div v-if="item.createTime" class="friend-time">
-                  <v-icon size="14">mdi-calendar-outline</v-icon>
-                  <span>{{ item.createTime }}</span>
+                <div class="friend-meta">
+                  <div v-if="item.createTime" class="friend-time">
+                    <v-icon size="14">mdi-calendar</v-icon>
+                    <span>{{ item.createTime }}</span>
+                  </div>
+                  <div class="friend-hot">
+                    <v-icon size="15">mdi-fire</v-icon>
+                    <span>{{ item.hotValue || 0 }}</span>
+                  </div>
                 </div>
               </div>
             </v-card>
@@ -302,9 +308,16 @@ export default {
     /**
      * 打开友链
      */
-    openLink(item) {
+    async openLink(item) {
       if (!item || !item.url) {
         return
+      }
+
+      try {
+        // 先记录点击
+        await this.$mapi.portal.recordFriendLinkClickLog({ friendLinkId: item.id })
+      } catch (error) {
+        console.error('记录友链点击失败', error)
       }
 
       const link = document.createElement('a')
@@ -323,7 +336,8 @@ export default {
 }
 </script>
 
-<style scoped> .friend-link-container {
+<style scoped>
+.friend-link-container {
   padding-bottom: 30px;
 }
 
@@ -533,7 +547,11 @@ export default {
   margin-bottom: 50px;
 }
 
+/* ==================== 友链卡片 ==================== */
+
 .friend-card {
+  display: flex;
+  flex-direction: column;
   height: 280px;
   overflow: hidden;
   margin-bottom: 5px;
@@ -551,6 +569,7 @@ export default {
   position: relative;
   width: 100%;
   height: 175px;
+  flex-shrink: 0;
   overflow: hidden;
   background: #f5f5f5;
 }
@@ -577,13 +596,16 @@ export default {
 
 .friend-content {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  min-height: 0;
   box-sizing: border-box;
-  height: 105px;
   padding: 11px 18px 10px;
+  overflow: hidden;
 }
 
 .friend-name {
+  flex-shrink: 0;
   overflow: hidden;
   color: #222;
   font-size: 16px;
@@ -594,26 +616,44 @@ export default {
 }
 
 .friend-description {
-  min-height: 38px;
+  flex: 1;
+  min-height: 0;
   margin-top: 4px;
   padding-right: 5px;
   overflow: hidden;
   color: #666;
   font-size: 13px;
   line-height: 19px;
+
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.friend-time {
+.friend-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.friend-time,
+.friend-hot {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: auto;
+  font-size: 12px;
   color: #999;
-  font-size: 11px;
-  line-height: 16px;
+}
+
+.friend-hot {
+  opacity: 0.85;
+}
+
+.friend-hot .v-icon {
+  color: inherit;
 }
 
 .empty-area {
@@ -657,7 +697,9 @@ export default {
     border-right: 0;
   }
 
-  .site-info-item:nth-child(3), .site-info-item:nth-child(4), .site-info-item:nth-child(5) {
+  .site-info-item:nth-child(3),
+  .site-info-item:nth-child(4),
+  .site-info-item:nth-child(5) {
     border-top: 1px solid #f2f2f2;
   }
 
@@ -756,7 +798,6 @@ export default {
   }
 
   .friend-content {
-    height: 105px;
     padding: 11px 15px 10px;
   }
 
@@ -765,3 +806,4 @@ export default {
   }
 }
 </style>
+

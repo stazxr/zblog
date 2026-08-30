@@ -4,8 +4,12 @@
     <select id="selectFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
         SELECT
             fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE,
-            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.CHECK_ENABLED, fl.SORT, fl.CREATE_TIME
+            fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.CHECK_ENABLED, fl.SORT, fl.CREATE_TIME,
+            fls.CLICK_COUNT, fls.DAY_CLICK, fls.WEEK_CLICK, fls.MONTH_CLICK, fls.LAST_CLICK_TIME,
+            flh.STATUS AS CHECK_STATUS
         FROM friend_link fl
+        LEFT JOIN friend_link_stat fls ON fls.LINK_ID = fl.ID
+        LEFT JOIN friend_link_health flh ON flh.LINK_ID = fl.ID
         <where>
             <if test="query.name != null and query.name != ''">
                 <bind name="nameBind" value="'%' + query.name + '%'"/>
@@ -16,7 +20,7 @@
                 AND fl.URL LIKE #{urlBind}
             </if>
             <if test="query.linkType != null">
-                AND t.LINK_TYPE = #{query.linkType}
+                AND fl.LINK_TYPE = #{query.linkType}
             </if>
             <if test="query.status != null">
                 AND fl.STATUS = #{query.status}
@@ -25,10 +29,10 @@
                 AND fl.IS_VISIBLE = #{query.isVisible}
             </if>
             <if test="query.allowFollow != null">
-                AND t.ALLOW_FOLLOW = #{query.allowFollow}
+                AND fl.ALLOW_FOLLOW = #{query.allowFollow}
             </if>
             <if test="query.checkEnabled != null">
-                AND t.CHECK_ENABLED = #{query.checkEnabled}
+                AND fl.CHECK_ENABLED = #{query.checkEnabled}
             </if>
         </where>
         ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC
@@ -38,18 +42,34 @@
         SELECT
             fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.EMAIL, fl.CONTACT,
             fl.STATUS, fl.IS_VISIBLE, fl.ALLOW_FOLLOW, fl.CHECK_ENABLED, fl.SORT,
-            fl.CREATE_TIME, fl.UPDATE_TIME,
+            fl.CREATE_TIME, fl.UPDATE_TIME, flh.STATUS AS CHECK_STATUS,
+            fls.CLICK_COUNT, fls.DAY_CLICK, fls.WEEK_CLICK, fls.MONTH_CLICK, fls.LAST_CLICK_TIME,
             (SELECT u.USERNAME FROM user u WHERE u.ID = fl.CREATE_USER) AS CREATE_USERNAME,
             (SELECT u.USERNAME FROM user u WHERE u.ID = fl.UPDATE_USER) AS UPDATE_USERNAME
         FROM friend_link fl
+        LEFT JOIN friend_link_stat fls ON fls.LINK_ID = fl.ID
+        LEFT JOIN friend_link_health flh ON flh.LINK_ID = fl.ID
         WHERE fl.ID = #{friendLinkId}
     </select>
 
     <select id="selectWebFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
         SELECT
-            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.ALLOW_FOLLOW, fl.SORT, fl.CREATE_TIME
+            fl.ID, fl.NAME, fl.URL, fl.LOGO, fl.DESCRIPTION, fl.LINK_TYPE, fl.ALLOW_FOLLOW, fl.SORT, fl.CREATE_TIME,
+            fls.CLICK_COUNT, fls.DAY_CLICK, fls.WEEK_CLICK, fls.MONTH_CLICK, fls.LAST_CLICK_TIME,
+            fl.CHECK_ENABLED, flh.STATUS AS CHECK_STATUS
         FROM friend_link fl
-        WHERE fl.STATUS = 1 AND IS_VISIBLE = 1
+        LEFT JOIN friend_link_stat fls ON fls.LINK_ID = fl.ID
+        LEFT JOIN friend_link_health flh ON flh.LINK_ID = fl.ID
+        WHERE fl.STATUS = 1 AND IS_VISIBLE = 1 AND (fl.CHECK_ENABLED = 0 || (
+            fl.CHECK_ENABLED = 1 AND flh.STATUS = 1
+        ))
         ORDER BY fl.SORT DESC, fl.CREATE_TIME DESC
+    </select>
+
+    <select id="selectHealthCheckFriendLinkList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo">
+        SELECT
+            fl.ID, fl.NAME, fl.URL
+        FROM friend_link fl
+        WHERE fl.STATUS = 1 AND fl.CHECK_ENABLED = 1
     </select>
 </mapper>

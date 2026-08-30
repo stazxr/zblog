@@ -25,6 +25,7 @@ CREATE TABLE website_config (
   FONT_URL VARCHAR(500) DEFAULT NULL COMMENT '网站字体地址',
   -- 友链配置
   FRIEND_LINK_APPLY_SWITCH TINYINT(1) DEFAULT 1 COMMENT '友链申请开关',
+  FRIEND_LINK_CHECK_FAILED_COUNT INT DEFAULT 3 COMMENT '友链健康检测失败阙值',
   -- 弹幕配置
   BARRAGE_MESSAGE_LOAD_SIZE INT DEFAULT 200 COMMENT '弹幕加载量',
   -- 安全配置
@@ -239,14 +240,14 @@ CREATE TABLE `friend_link_click_log` (
 DROP TABLE IF EXISTS `friend_link_health`;
 CREATE TABLE `friend_link_health` (
   `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
-  `STATUS` TINYINT NOT NULL DEFAULT 1 COMMENT '检测状态 1正常 0异常',
+  `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '检测状态 1正常 0异常',
   `FAIL_COUNT` INT DEFAULT 0 COMMENT '连续失败次数',
   `LAST_CHECK_TIME` DATETIME COMMENT '最后检测时间',
   `LAST_SUCCESS_TIME` DATETIME COMMENT '最后成功时间',
   `LAST_FAIL_TIME` DATETIME COMMENT '最后失败时间',
   `RESPONSE_TIME` INT COMMENT '响应耗时ms',
   `HTTP_STATUS` INT COMMENT 'HTTP状态码',
-  `ERROR_MSG` VARCHAR(500) COMMENT '错误信息',
+  `ERROR_MSG` VARCHAR(1000) COMMENT '错误信息',
   PRIMARY KEY (`LINK_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链健康检测';
 
@@ -258,7 +259,7 @@ CREATE TABLE `friend_link_check_log` (
   `SUCCESS` TINYINT(1) NOT NULL COMMENT '是否成功',
   `HTTP_STATUS` INT DEFAULT NULL COMMENT 'HTTP状态码',
   `RESPONSE_TIME` INT DEFAULT NULL COMMENT '响应耗时ms',
-  `ERROR_MSG` VARCHAR(500) DEFAULT NULL COMMENT '错误信息',
+  `ERROR_MSG` VARCHAR(1000) DEFAULT NULL COMMENT '错误信息',
   `CREATE_TIME` DATETIME NOT NULL COMMENT '检测时间',
   PRIMARY KEY (`ID`),
   KEY `idx_friend_link_check_log` (`LINK_ID`, `CREATE_TIME`)
@@ -584,26 +585,6 @@ CREATE TABLE `article_auto_publish_timing` (
   PRIMARY KEY (`ID`) USING BTREE,
   KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章自动发布状态记录表';
-
-/*Table structure for table `website_config` */
-DROP TABLE IF EXISTS `website_config`;
-CREATE TABLE `website_config` (
-  `ID` INT(11) NOT NULL AUTO_INCREMENT,
-  `NAME` VARCHAR(50) NOT NULL COMMENT '配置名称',
-  `CONFIG` TEXT NOT NULL COMMENT '配置信息',
-  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
-  `CREATE_USER` VARCHAR(20) NOT NULL COMMENT '创建用户',
-  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
-  `CREATE_DATE` VARCHAR(20) NOT NULL COMMENT '创建日期',
-  `UPDATE_USER` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新用户',
-  `UPDATE_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '更新时间',
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='网站配置信息表';
-
-/*Data for the table `website_config` */
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (1, '网站信息', '{"socialLoginList":[],"websiteAdminLink":"https://admin.suntaoblog.com","websiteAuthor":"恋长安兮","websiteAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565220826456260608.png","websiteCreateTime":"2021-03-21","websiteIntro":"大浪淘沙，荣辱不惊。","websiteLink":"https://www.suntaoblog.com","websiteName":"孙涛个人博客","websiteNotice":"博客问题交流群：760210629\\n仓库地址：https://github.com/stazxr/zblog\\n相关文档：建设中\\n当前进展：页面优化中，数据迁移中","websiteRecordNo":"陕ICP备2021003044号-1"}', 17, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (2, '社交信息', '{"csdn":"","gitee":"","github":"","qq":"","weChat":""}', 16, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
-INSERT INTO website_config (ID, NAME, CONFIG, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3, '其他设置', '{"alipayQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221664612417536.jpg","articleCover":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/18/3565734577953570816.jpg","articleSearchStrategy":"mysql","articleViewInterval":0,"isCommentReview":1,"isEmailNotice":0,"isMessageReview":1,"isMusicPlayer":1,"isReward":1,"touristAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221129431810048.png","userAvatar":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565220996363321344.png","weiXinQrCode":"https://suntaoblog.oss-cn-beijing.aliyuncs.com/upload/2023-02/17/3565221645289259008.jpg"}', 18, 'admin', '2022-12-08 17:06:00', '2022-12-08', '', '');
 
 /*Table structure for table `talk` */
 DROP TABLE IF EXISTS `talk`;

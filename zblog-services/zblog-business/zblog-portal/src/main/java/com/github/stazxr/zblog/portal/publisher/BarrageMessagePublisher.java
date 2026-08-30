@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * 弹幕消息推送
  *
  * @author SunTao
- * @since 2027-07-11
+ * @since 2026-07-11
  */
 @Component
 public class BarrageMessagePublisher {

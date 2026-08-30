@@ -31,7 +31,7 @@ import java.util.Map;
  * 门户管理
  *
  * @author SunTao
- * @since 2027-07-07
+ * @since 2026-07-07
  */
 @RestController
 @RequiredArgsConstructor
@@ -152,6 +152,7 @@ public class PortalController {
     })
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "点赞弹幕", code = "PORTU001", level = RouterLevel.OPEN)
+    @RateLimit(count = 60, time = 180, enableIp = true)
     public boolean likeBarrageMessage(HttpServletRequest request, @RequestParam Long barrageMessageId) {
         return portalService.likeBarrageMessage(request, barrageMessageId);
     }
@@ -179,9 +180,28 @@ public class PortalController {
     @ApiOperation(value = "友链申请")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "友链申请", code = "PORTA004", level = RouterLevel.OPEN)
-    @RateLimit(count = 1, time = 60, enableIp = true)
+    @RateLimit(count = 2, time = 60, enableIp = true)
     public void applyFriendLink(@RequestBody @Validated ApplyFriendLinkDto friendLinkDto) {
         portalService.applyFriendLink(friendLinkDto);
+    }
+
+    /**
+     * 记录友链点击日志
+     *
+     * @param request 请求信息
+     * @param friendLinkId 友链id
+     */
+    @Log
+    @PostMapping(value = "/recordFriendLinkClickLog")
+    @ApiOperation(value = "记录友链点击日志")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "friendLinkId", value = "弹幕id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "记录友链点击日志", code = "PORTA005", level = RouterLevel.OPEN)
+    @RateLimit(count = 1000, time = 86400, enableIp = true)
+    public void recordFriendLinkClickLog(HttpServletRequest request, @RequestParam Long friendLinkId) {
+        portalService.recordFriendLinkClickLog(request, friendLinkId);
     }
 
 //    /**

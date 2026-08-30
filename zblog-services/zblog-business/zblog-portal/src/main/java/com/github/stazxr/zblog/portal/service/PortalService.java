@@ -16,7 +16,7 @@ import java.util.Map;
  * 门户管理业务层
  *
  * @author SunTao
- * @since 2027-07-07
+ * @since 2026-07-07
  */
 public interface PortalService {
     /**
@@ -93,4 +93,12 @@ public interface PortalService {
      * @param friendLinkDto 友链信息
      */
     void applyFriendLink(ApplyFriendLinkDto friendLinkDto);
+
+    /**
+     * 记录友链点击日志
+     *
+     * @param request 请求信息
+     * @param friendLinkId 友链id
+     */
+    void recordFriendLinkClickLog(HttpServletRequest request, Long friendLinkId);
 }

@@ -269,6 +269,10 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('FRIEND_LINK_FOLLOW_REQUIRED', 'en-US', 'Friend link follow cannot be blank', 'common'),
 ('FRIEND_LINK_CHECK_REQUIRED', 'zh-CN', '请选择友链是否开启健康检测', 'common'),
 ('FRIEND_LINK_CHECK_REQUIRED', 'en-US', 'Friend link check cannot be blank', 'common'),
+('FRIEND_LINK_STATUS_REQUIRED', 'zh-CN', '请选择友链审核状态', 'common'),
+('FRIEND_LINK_STATUS_REQUIRED', 'en-US', 'Friend link status cannot be blank', 'common'),
+('FRIEND_LINK_STATUS_INVALID', 'zh-CN', '友链已被审核，请勿重复操作', 'common'),
+('FRIEND_LINK_STATUS_INVALID', 'en-US', 'Friend link status invalid', 'common'),
 -- 页面
 ('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
 ('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),

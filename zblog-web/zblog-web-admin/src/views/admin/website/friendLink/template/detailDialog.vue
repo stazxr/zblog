@@ -13,36 +13,54 @@
     >
       <el-descriptions direction="vertical" :column="4" border>
         <!-- 1 -->
-        <el-descriptions-item label="网址名称"> {{ dataInfo.name }} </el-descriptions-item>
-        <el-descriptions-item label="网址地址"> {{ dataInfo.url }} </el-descriptions-item>
+        <el-descriptions-item label="网站名称"> {{ dataInfo.name }} </el-descriptions-item>
+        <el-descriptions-item label="网站地址"> {{ dataInfo.url }} </el-descriptions-item>
+        <el-descriptions-item label="网站类型">
+          <span v-if="dataInfo.linkType === '1'">开源伙伴</span>
+          <span v-else-if="dataInfo.linkType === '2'">特别推荐</span>
+          <span v-else-if="dataInfo.linkType === '3'">同行友站</span>
+          <span v-else> - </span>
+        </el-descriptions-item>
+        <el-descriptions-item label="优先级"> {{ dataInfo.sort }} </el-descriptions-item>
+        <!-- 2 -->
+        <el-descriptions-item label="日访问数"> {{ dataInfo.dayClick }} </el-descriptions-item>
+        <el-descriptions-item label="周访问数"> {{ dataInfo.weekClick }} </el-descriptions-item>
+        <el-descriptions-item label="月访问数"> {{ dataInfo.monthClick }} </el-descriptions-item>
+        <el-descriptions-item label="总访问数"> {{ dataInfo.clickCount }} </el-descriptions-item>
+        <!-- 3 -->
+        <el-descriptions-item label="热力值"> {{ dataInfo.hotValue }} </el-descriptions-item>
+        <el-descriptions-item label="最近访问"> {{ dataInfo.lastClickTime }} </el-descriptions-item>
+        <el-descriptions-item label="网站邮箱"> {{ dataInfo.email }} </el-descriptions-item>
+        <el-descriptions-item label="联系方式"> {{ dataInfo.contact }} </el-descriptions-item>
+        <!-- 4 -->
         <el-descriptions-item label="审核状态">
           <el-tag v-if="dataInfo.status === '0'" type="warning">待审批</el-tag>
           <el-tag v-else-if="dataInfo.status === '1'" type="success">审批通过</el-tag>
           <el-tag v-else-if="dataInfo.status === '2'" type="danger">审批拒绝</el-tag>
           <span v-else> - </span>
         </el-descriptions-item>
-        <el-descriptions-item label="网站排序"> {{ dataInfo.sort }} </el-descriptions-item>
-        <!-- 2 -->
-        <el-descriptions-item label="网站邮箱"> {{ dataInfo.email }} </el-descriptions-item>
-        <el-descriptions-item label="联系方式"> {{ dataInfo.contact }} </el-descriptions-item>
-        <!-- 4 -->
         <el-descriptions-item label="展示状态">
           <el-tag v-if="dataInfo.isVisible === 'true'" type="success">展示</el-tag>
-          <el-tag v-else-if="dataInfo.isVisible === 'false'" type="danger">隐藏</el-tag>
+          <el-tag v-else-if="dataInfo.isVisible === 'false'" type="warning">隐藏</el-tag>
           <span v-else> - </span>
         </el-descriptions-item>
         <el-descriptions-item label="SEO配置">
-          <el-tag v-if="dataInfo.allowFollow === 'true'" type="success">允许传递SEO权重</el-tag>
-          <el-tag v-else-if="dataInfo.allowFollow === 'false'" type="danger">禁用SEO</el-tag>
+          <el-tag v-if="dataInfo.allowFollow === 'true'" type="primary">启用</el-tag>
+          <el-tag v-else-if="dataInfo.allowFollow === 'false'" type="info">禁用</el-tag>
           <span v-else> - </span>
         </el-descriptions-item>
-        <!-- 3 -->
-        <el-descriptions-item label="网站LOGO" :span="2"> {{ dataInfo.logo }} </el-descriptions-item>
-        <el-descriptions-item label="网站介绍" :span="2"> {{ dataInfo.description }} </el-descriptions-item>
-        <!-- 4 -->
+        <el-descriptions-item label="健康检测">
+          <el-tag v-if="dataInfo.checkEnabled === 'true'" type="success">开启</el-tag>
+          <el-tag v-else-if="dataInfo.checkEnabled === 'false'" type="warning">关闭</el-tag>
+          <span v-else> - </span>
+        </el-descriptions-item>
+        <!-- 5 -->
+        <el-descriptions-item label="网站封面" :span="4"> {{ dataInfo.logo }} </el-descriptions-item>
+        <el-descriptions-item label="网站介绍" :span="4"> {{ dataInfo.description }} </el-descriptions-item>
+        <!-- 6 -->
         <el-descriptions-item label="创建用户" :span="2"> {{ dataInfo.createUsername }} </el-descriptions-item>
         <el-descriptions-item label="创建时间" :span="2"> {{ dataInfo.createTime }} </el-descriptions-item>
-        <!-- 5 -->
+        <!-- 7 -->
         <el-descriptions-item label="修改用户" :span="2"> {{ dataInfo.updateUsername }} </el-descriptions-item>
         <el-descriptions-item label="修改时间" :span="2"> {{ dataInfo.updateTime }} </el-descriptions-item>
       </el-descriptions>
@@ -66,12 +84,20 @@ export default {
         url: null,
         logo: null,
         description: null,
+        linkType: null,
         email: null,
         contact: null,
         status: null,
         isVisible: null,
         allowFollow: null,
+        checkEnabled: null,
         sort: null,
+        clickCount: null,
+        dayClick: null,
+        weekClick: null,
+        monthClick: null,
+        lastClickTime: null,
+        hotValue: null,
         createUsername: null,
         createTime: null,
         updateUsername: null,

@@ -128,6 +128,12 @@ public class WebsiteConfigDto implements Serializable {
     private Boolean friendLinkApplySwitch;
 
     /**
+     * 友链健康检测失败几次则下线友链
+     */
+    @ApiModelProperty("友链健康检测失败阙值")
+    private Integer friendLinkCheckFailedCount;
+
+    /**
      * 弹幕加载量
      */
     @ApiModelProperty("弹幕加载量")

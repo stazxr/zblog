@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkAuditDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
@@ -89,6 +90,20 @@ public class FriendLinkController {
     @Router(name = "编辑友链", code = "LINKU001")
     public void editFriendLink(@RequestBody @Validated(Update.class) FriendLinkDto friendLinkDto) {
         friendLinkService.editFriendLink(friendLinkDto);
+    }
+
+    /**
+     * 审核友链
+     *
+     * @param auditDto 友链审核信息
+     */
+    @Log
+    @PostMapping(value = "/auditFriendLink")
+    @ApiOperation(value = "审核友链")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "审核友链", code = "LINKU002")
+    public void auditFriendLink(@RequestBody @Validated FriendLinkAuditDto auditDto) {
+        friendLinkService.auditFriendLink(auditDto);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.github.stazxr.zblog.content.ext.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkAuditDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.FriendLinkDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.FriendLinkQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.FriendLink;
@@ -43,6 +44,13 @@ public interface FriendLinkService extends IService<FriendLink> {
      * @param friendLinkDto 友链信息
      */
     void editFriendLink(FriendLinkDto friendLinkDto);
+
+    /**
+     * 审核友链
+     *
+     * @param auditDto 友链审核信息
+     */
+    void auditFriendLink(FriendLinkAuditDto auditDto);
 
     /**
      * 删除友链

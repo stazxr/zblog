@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * WebSocket配置
  *
  * @author SunTao
- * @since 2027-07-12
+ * @since 2026-07-12
  */
 @ConfigurationProperties(prefix = WebSocketProperties.CONFIG_PREFIX)
 public class WebSocketProperties {

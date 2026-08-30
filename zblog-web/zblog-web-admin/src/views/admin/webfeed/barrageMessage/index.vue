@@ -26,7 +26,7 @@
       <div class="crud-opts">
         <span class="crud-opts-left">
           <el-button v-perm="['BMESQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['BMESU001']" :disabled="row === null || row.auditStatus === 1 || row.auditStatus === 1" type="primary" @click="auditBarrageMessage">审核</el-button>
+          <el-button v-perm="['BMESU001']" :disabled="row === null || row.auditStatus === 1 || row.auditStatus === 2" type="primary" @click="auditBarrageMessage">审核</el-button>
           <el-button v-perm="['BMESD001']" :disabled="row === null" type="danger" @click="deleteBarrageMessage">删除</el-button>
         </span>
       </div>

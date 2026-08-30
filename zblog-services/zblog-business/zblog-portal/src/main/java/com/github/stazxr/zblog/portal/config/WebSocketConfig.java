@@ -19,7 +19,7 @@ import java.util.List;
  * WebSocket自动装配
  *
  * @author SunTao
- * @since 2027-07-11
+ * @since 2026-07-11
  */
 @Configuration
 @EnableWebSocketMessageBroker

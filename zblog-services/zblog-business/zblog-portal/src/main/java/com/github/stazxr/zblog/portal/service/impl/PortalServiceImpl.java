@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  * 门户管理业务实现层
  *
  * @author SunTao
- * @since 2027-07-07
+ * @since 2026-07-07
  */
 @Service
 @RequiredArgsConstructor
@@ -85,6 +85,10 @@ public class PortalServiceImpl implements PortalService {
     private final BarrageMessagePublisher barrageMessagePublisher;
 
     private final FriendLinkMapper friendLinkMapper;
+
+    private final FriendLinkStatMapper friendLinkStatMapper;
+
+    private final FriendLinkClickLogMapper friendLinkClickLogMapper;
 
     /**
      * 获取网站初始化信息
@@ -245,32 +249,36 @@ public class PortalServiceImpl implements PortalService {
      */
     @Override
     public void recordVisitorLog(HttpServletRequest request) {
-        String visitorId = Context.get("x-visitor-id");
-        String path = Context.get("x-page-path");
-        String title = Context.get("x-page-title");
-        String type = Context.get("x-page-type");
-        if (StringUtils.hasBlank(visitorId, path, title, type)) {
-            return;
-        }
-
         try {
-            title = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
-        } catch (Exception e) {
-            log.error("decode title error: {}", title, e);
-        }
+            String visitorId = Context.get("x-visitor-id");
+            String path = Context.get("x-page-path");
+            String title = Context.get("x-page-title");
+            String type = Context.get("x-page-type");
+            if (StringUtils.hasBlank(visitorId, path, title, type)) {
+                return;
+            }
 
-        VisitorLog visitorLog = new VisitorLog();
-        visitorLog.setId(SequenceUtils.getId());
-        visitorLog.setVisitorId(visitorId);
-        visitorLog.setUserId(SecurityUtils.isAuthenticated() ? SecurityUtils.getLoginId() : null);
-        visitorLog.setPath(path);
-        visitorLog.setTitle(title);
-        visitorLog.setType(type);
-        visitorLog.setReferer(request.getHeader("Referer"));
-        fillVisitorLogIpInfo(visitorLog, IpUtils.getIp(request));
-        fillVisitorLogUserAgent(visitorLog, IpUtils.getUserAgent(request));
-        visitorLog.setVisitTime(LocalDateTime.now());
-        visitorLogMapper.insert(visitorLog);
+            try {
+                title = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
+            } catch (Exception e) {
+                log.error("decode title error: {}", title, e);
+            }
+
+            VisitorLog visitorLog = new VisitorLog();
+            visitorLog.setId(SequenceUtils.getId());
+            visitorLog.setVisitorId(visitorId);
+            visitorLog.setUserId(SecurityUtils.isAuthenticated() ? SecurityUtils.getLoginId() : null);
+            visitorLog.setPath(path);
+            visitorLog.setTitle(title);
+            visitorLog.setType(type);
+            visitorLog.setReferer(request.getHeader("Referer"));
+            fillVisitorLogIpInfo(visitorLog, IpUtils.getIp(request));
+            fillVisitorLogUserAgent(visitorLog, IpUtils.getUserAgent(request));
+            visitorLog.setVisitTime(LocalDateTime.now());
+            visitorLogMapper.insert(visitorLog);
+        } catch (Exception e) {
+            log.error("记录访客日志失败", e);
+        }
     }
 
     /**
@@ -393,7 +401,7 @@ public class PortalServiceImpl implements PortalService {
             throw new ServiceException(FriendLinkErrorCode.ELINKA002, e);
         }
         try {
-            friendLink.setUrl(UrlUtils.normalize(friendLinkDto.getLogo()));
+            friendLink.setLogo(UrlUtils.normalize(friendLinkDto.getLogo()));
         } catch (Exception e) {
             throw new ServiceException(FriendLinkErrorCode.ELINKA003, e);
         }
@@ -410,6 +418,33 @@ public class PortalServiceImpl implements PortalService {
         ThrowUtils.throwIf(checkFriendLinkUrlExist(friendLink), FriendLinkErrorCode.ELINKA001);
         // 新增友链
         ThrowUtils.when(friendLinkMapper.insert(friendLink) != 1).system(BaseErrorCode.SCOREA001);
+    }
+
+    /**
+     * 记录友链点击日志
+     *
+     * @param request      请求信息
+     * @param friendLinkId 友链id
+     */
+    @Override
+    public void recordFriendLinkClickLog(HttpServletRequest request, Long friendLinkId) {
+        try {
+            // 查询友链信息
+            FriendLink friendLink = friendLinkMapper.selectById(friendLinkId);
+            ThrowUtils.throwIfNull(friendLink, BaseErrorCode.ECOREA001);
+
+            // 记录点击日志
+            FriendLinkClickLog clickLog = new FriendLinkClickLog();
+            clickLog.setId(SequenceUtils.getId());
+            clickLog.setLinkId(friendLinkId);
+            clickLog.setVisitorId(Context.get("x-visitor-id"));
+            clickLog.setIp(IpUtils.getIp(request));
+            clickLog.setCreateTime(LocalDateTime.now());
+            friendLinkClickLogMapper.insert(clickLog);
+            friendLinkStatMapper.incrementClickCount(friendLinkId);
+        } catch (Exception e) {
+            log.error("记录友链访问日志失败", e);
+        }
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {

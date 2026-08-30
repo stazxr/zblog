@@ -20,6 +20,10 @@ export default {
   editFriendLink: params => {
     return api.httpRequest().post(`${friendLinkApi}/editFriendLink`, params)
   },
+  // 审核友链
+  auditFriendLink: params => {
+    return api.httpRequest().post(`${friendLinkApi}/auditFriendLink`, params)
+  },
   // 删除友链
   deleteFriendLink: params => {
     return api.httpRequest().post(`${friendLinkApi}/deleteFriendLink`, qs.stringify(params), {
