@@ -35,9 +35,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -51,6 +51,15 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
+
+    private static final String IMAGE_PNG = "image/png";
+    private static final String IMAGE_JPEG = "image/jpeg";
+    private static final String IMAGE_GIF = "image/gif";
+    private static final String IMAGE_WEBP = "image/webp";
+
+    private static final Set<String> IMAGE_CONTENT_TYPES = new HashSet<>(
+        Arrays.asList(IMAGE_PNG, IMAGE_JPEG, IMAGE_GIF, IMAGE_WEBP)
+    );
 
     private final FileMapper fileMapper;
 
@@ -282,17 +291,8 @@ public class FileServiceImpl implements FileService {
                 boolean isNotWhiteList = StringUtils.isBlank(contentType) || !whiteList.contains(contentType.toLowerCase(Locale.ROOT));
                 ThrowUtils.throwIf(isNotWhiteList, FileErrorCode.EFILEB003, contentType);
                 // 图片合法性校验
-                if (contentType.startsWith("image/")) {
-                    try {
-                        BufferedImage image = ImageIO.read(multipartFile.getInputStream());
-                        ThrowUtils.throwIfNull(image, FileErrorCode.EFILEB004);
-                        /* FIX: 不检验文件分辨率 boolean imageSizeValid = image.getWidth() <= 4000 && image.getHeight() <= 4000;
-                        ThrowUtils.throwIf(!imageSizeValid, FileErrorCode.EFILEB005); */
-                    } catch (BaseException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        ThrowUtils.service(FileErrorCode.EFILEB004, e);
-                    }
+                if (IMAGE_CONTENT_TYPES.contains(contentType)) {
+                    validateImage(multipartFile);
                 }
                 // 文件大小检查
                 long maxFileSize = multipartProperties.getMaxFileSize().toBytes();
@@ -300,5 +300,119 @@ public class FileServiceImpl implements FileService {
                 ThrowUtils.throwIf(sizeInvalid, FileErrorCode.EFILEB006, maxFileSize);
             }
         }
+    }
+
+    private void validateImage(MultipartFile multipartFile) {
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            byte[] header = new byte[12];
+            int length = readFully(inputStream, header);
+            ThrowUtils.throwIf(length < 12, FileErrorCode.EFILEB004);
+            boolean valid = isPng(header) || isJpeg(header) || isGif(header) || isWebp(header);
+            ThrowUtils.throwIf(!valid, FileErrorCode.EFILEB004);
+        } catch (BaseException e) {
+            printFileHeader(multipartFile);
+            throw e;
+        } catch (Exception e) {
+            ThrowUtils.service(FileErrorCode.EFILEB004, e);
+        }
+    }
+
+    private void printFileHeader(MultipartFile multipartFile) {
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            byte[] header = new byte[16];
+            int length = inputStream.read(header);
+            StringBuilder hex = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                hex.append(String.format("%02X ", header[i] & 0xFF));
+            }
+
+            log.info("filename={}, contentType={}, size={}, header={}",
+                multipartFile.getOriginalFilename(),
+                multipartFile.getContentType(),
+                multipartFile.getSize(),
+                hex
+            );
+        } catch (Exception e) {
+            log.error("read file header error", e);
+        }
+    }
+
+    /**
+     * 读取指定长度的数据
+     */
+    private int readFully(InputStream inputStream, byte[] buffer) throws IOException {
+        int total = 0;
+        while (total < buffer.length) {
+            int count = inputStream.read(buffer, total, buffer.length - total);
+            if (count == -1) {
+                break;
+            }
+            total += count;
+        }
+        return total;
+    }
+
+    /**
+     * PNG
+     *
+     * 文件头：
+     * 89 50 4E 47 0D 0A 1A 0A
+     */
+    private boolean isPng(byte[] header) {
+        return (header[0] & 0xFF) == 0x89
+            && (header[1] & 0xFF) == 0x50
+            && (header[2] & 0xFF) == 0x4E
+            && (header[3] & 0xFF) == 0x47
+            && (header[4] & 0xFF) == 0x0D
+            && (header[5] & 0xFF) == 0x0A
+            && (header[6] & 0xFF) == 0x1A
+            && (header[7] & 0xFF) == 0x0A;
+    }
+
+    /**
+     * JPEG
+     *
+     * 文件头：
+     * FF D8 FF
+     */
+    private boolean isJpeg(byte[] header) {
+        return (header[0] & 0xFF) == 0xFF
+            && (header[1] & 0xFF) == 0xD8
+            && (header[2] & 0xFF) == 0xFF;
+    }
+
+    /**
+     * GIF
+     *
+     * 文件头：
+     * GIF87a
+     * GIF89a
+     */
+    private boolean isGif(byte[] header) {
+        return (header[0] == 'G'
+            && header[1] == 'I'
+            && header[2] == 'F'
+            && header[3] == '8'
+            && (header[4] == '7' || header[4] == '9')
+            && header[5] == 'a');
+    }
+
+    /**
+     * WebP
+     *
+     * 文件头：
+     * RIFF
+     * ...
+     * WEBP
+     */
+    private boolean isWebp(byte[] header) {
+        return header[0] == 'R'
+            && header[1] == 'I'
+            && header[2] == 'F'
+            && header[3] == 'F'
+            && header[8] == 'W'
+            && header[9] == 'E'
+            && header[10] == 'B'
+            && header[11] == 'P';
     }
 }
