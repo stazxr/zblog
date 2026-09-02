@@ -7,9 +7,19 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
  * 评论管理数据层
  *
  * @author SunTao
- * @since 2026-04-22
+ * @since 2026-08-31
  */
 public interface CommentMapper extends BaseMapper<Comment> {
+
+
+
+
+
+
+
+
+
+
 //    /**
 //     * 查询前台评论列表
 //     *

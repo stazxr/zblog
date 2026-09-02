@@ -366,4 +366,13 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'zh-CN', '请填写网站封面', 'common'),
 ('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'en-US', 'FriendLink logo required', 'common'),
 ('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'zh-CN', '请填写网站简介', 'common'),
-('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'en-US', 'FriendLink description off', 'common');
+('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'en-US', 'FriendLink description off', 'common'),
+-- 评论表情
+('COMMENT_IMAGE_NAME_REQUIRED', 'zh-CN', '表情名称不能为空', 'common'),
+('COMMENT_IMAGE_NAME_REQUIRED', 'en-US', 'Comment image name cannot be blank', 'common'),
+('COMMENT_IMAGE_NAME_INVALID', 'zh-CN', '表情名称格式不正确', 'common'),
+('COMMENT_IMAGE_NAME_INVALID', 'en-US', 'Comment image name format is invalid', 'common'),
+('COMMENT_IMAGE_URL_REQUIRED', 'zh-CN', '表情图片地址不能为空', 'common'),
+('COMMENT_IMAGE_URL_REQUIRED', 'en-US', 'Comment image URL cannot be blank', 'common'),
+('COMMENT_IMAGE_URL_INVALID', 'zh-CN', '表情图片地址格式不正确', 'common'),
+('COMMENT_IMAGE_URL_INVALID', 'en-US', 'Comment image URL format is invalid', 'common');

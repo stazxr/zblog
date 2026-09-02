@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.ext.mapper.CommentEmojiMapper">
+    <select id="selectCommentEmojis" resultType="com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo">
+        SELECT ID, NAME, CODE, URL FROM comment_emoji ORDER BY SORT
+    </select>
+
+    <insert id="insertBatch">
+        INSERT INTO comment_emoji
+            (ID, NAME, CODE, URL, SORT)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.name}, #{item.code}, #{item.url}, #{item.sort})
+        </foreach>
+    </insert>
+
+    <delete id="deleteAll">
+        DELETE FROM comment_emoji WHERE ID >= 0
+    </delete>
+</mapper>

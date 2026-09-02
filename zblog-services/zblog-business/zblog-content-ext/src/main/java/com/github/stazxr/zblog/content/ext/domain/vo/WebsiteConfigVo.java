@@ -187,4 +187,10 @@ public class WebsiteConfigVo implements Serializable {
      */
     @ApiModelProperty("网站链接配置列表")
     private List<WebsiteLinkConfigVo> links;
+
+    /**
+     * 评论表情包
+     */
+    @ApiModelProperty("评论表情包")
+    private List<CommentEmojiVo> commentEmojis;
 }

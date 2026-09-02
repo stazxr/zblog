@@ -7,7 +7,7 @@ import com.github.stazxr.zblog.content.ext.domain.entity.Comment;
  * 评论管理业务层
  *
  * @author SunTao
- * @since 2026-04-22
+ * @since 2026-09-01
  */
 public interface CommentService extends IService<Comment> {
 //    /**

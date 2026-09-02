@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 网站配置信息
@@ -168,4 +169,10 @@ public class WebsiteConfigDto implements Serializable {
      */
     @ApiModelProperty("版本号")
     private Integer version;
+
+    /**
+     * 评论表情包
+     */
+    @ApiModelProperty("评论表情包")
+    private List<CommentEmojiDto> commentEmojis;
 }

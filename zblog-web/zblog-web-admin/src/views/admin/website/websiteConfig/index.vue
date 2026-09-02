@@ -320,6 +320,79 @@
           </div>
         </section>
 
+        <section id="comment" class="config-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="el-icon-chat-line-round" />
+              <div>
+                <div class="section-name">
+                  评论配置
+                </div>
+                <div class="section-desc">
+                  配置网站评论功能及评论表情包
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-content">
+            <el-form-item label="游客评论">
+              <div class="switch-setting">
+                <el-switch v-model="config.commentGuestSwitch" :active-value="true" :inactive-value="false" />
+                <span class="switch-desc">
+                  {{ config.commentGuestSwitch ? '开启' : '关闭' }}
+                </span>
+              </div>
+              <div class="form-tip">
+                开启后，未登录用户也可以发表评论
+              </div>
+            </el-form-item>
+            <el-form-item label="表情包">
+              <div class="emoji-setting">
+                <div v-if="config.commentEmojis.length" class="emoji-list">
+                  <div v-for="(emoji, index) in config.commentEmojis" :key="emoji._key" class="emoji-item">
+                    <div class="emoji-image">
+                      <img :src="emoji.url" alt="">
+                    </div>
+                    <div class="emoji-content">
+                      <el-input v-model="emoji.name" maxlength="5" placeholder="表情名称" />
+                    </div>
+                    <el-button type="text" class="emoji-delete" @click="removeCommentEmoji(index)">删除</el-button>
+                  </div>
+                </div>
+                <div v-else class="emoji-empty">
+                  <i class="el-icon-picture-outline" />
+                  <span>暂无表情包</span>
+                </div>
+                <!-- 新增操作 -->
+                <div class="emoji-add">
+                  <el-upload
+                    class="emoji-upload"
+                    :action="$store.state.api.fileUploadApi"
+                    :multiple="true"
+                    :show-file-list="false"
+                    :accept="'.png,.jpg,.jpeg,.gif,.webp'"
+                    :with-credentials="true"
+                    :before-upload="beforeEmojiUpload"
+                    :on-success="handleEmojiUploadSuccess"
+                    :on-error="handleEmojiUploadError"
+                  >
+                    <el-button type="primary" icon="el-icon-upload2">
+                      上传
+                    </el-button>
+                  </el-upload>
+                  <el-button icon="el-icon-plus" @click="addCommentEmojiByUrl">
+                    新增
+                  </el-button>
+                </div>
+                <div class="form-tip">
+                  上传图片或通过图片 URL 新增表情，新增后可直接填写表情名称
+                </div>
+              </div>
+            </el-form-item>
+          </div>
+        </section>
+
         <section id="barrage" class="config-section">
           <div class="section-header">
             <div class="section-title">
@@ -466,6 +539,7 @@ export default {
         { id: 'footer', name: '页脚', icon: 'el-icon-bottom' },
         { id: 'style', name: '样式', icon: 'el-icon-picture-outline' },
         { id: 'friend', name: '友链', icon: 'el-icon-connection' },
+        { id: 'comment', name: '评论', icon: 'el-icon-chat-line-round' },
         { id: 'barrage', name: '弹幕', icon: 'el-icon-chat-dot-round' },
         { id: 'security', name: '安全', icon: 'el-icon-lock' },
         { id: 'record', name: '备案', icon: 'el-icon-office-building' },
@@ -515,17 +589,20 @@ export default {
         websiteDescription: '',
         // 页脚
         footerSignature: '',
-        footerNavbarSwitch: 1,
+        footerNavbarSwitch: true,
         footerBackground: '',
         // 页面样式
         fontUrl: '',
         // 友链
-        friendLinkApplySwitch: 1,
+        friendLinkApplySwitch: true,
         friendLinkCheckFailedCount: 3,
+        // 评论
+        commentGuestSwitch: true,
+        commentEmojis: [],
         // 弹幕
         barrageMessageLoadSize: 200,
         // 安全
-        httpsSwitch: 0,
+        httpsSwitch: false,
         // 网站备案
         websiteIcpNo: '',
         websitePoliceNo: '',
@@ -533,14 +610,141 @@ export default {
         statisticsCode: ''
       }
     },
+    // 新增表情（URL）
+    addCommentEmojiByUrl() {
+      this.$prompt(
+        '请输入表情图片地址',
+        'URL 新增表情',
+        {
+          confirmButtonText: '新增',
+          cancelButtonText: '取消',
+          inputPlaceholder: '请输入图片 URL',
+          inputPattern: /^https?:\/\/.+/i,
+          inputErrorMessage: '请输入正确的图片 URL'
+        }
+      ).then(({ value }) => {
+        const url = value.trim()
+        this.config.commentEmojis.push({
+          name: '',
+          url,
+          _key: this.createEmojiKey()
+        })
+      }).catch(() => {})
+    },
+    createEmojiKey() {
+      return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    },
+    removeCommentEmoji(index) {
+      const emoji = this.config.commentEmojis[index]
+      if (!emoji) {
+        return
+      }
 
+      this.$confirm(
+        '确定要删除这个表情吗？',
+        '提示',
+        {
+          type: 'warning'
+        }
+      ).then(() => {
+        this.config.commentEmojis.splice(index, 1)
+      }).catch(() => {})
+    },
+    validateCommentEmojis() {
+      for (let i = 0; i < this.config.commentEmojis.length; i++) {
+        const emoji = this.config.commentEmojis[i]
+
+        if (!emoji.name) {
+          this.$message.warning(`第 ${i + 1} 个表情未填写名称`)
+          return false
+        }
+
+        if (!/^[\u4e00-\u9fa5]{1,5}$/.test(emoji.name)) {
+          this.$message.warning(`表情「${emoji.name}」名称需为 1～5 个汉字`)
+          return false
+        }
+
+        if (!emoji.url) {
+          this.$message.warning(`第 ${i + 1} 个表情缺少图片`)
+          return false
+        }
+      }
+
+      return true
+    },
+    /**
+     * 表情上传前校验
+     */
+    beforeEmojiUpload(file) {
+      const allowTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/gif',
+        'image/webp'
+      ]
+
+      if (!allowTypes.includes(file.type)) {
+        this.$message.warning(
+          `图片「${file.name}」格式不支持，仅支持 PNG、JPG、GIF、WebP`
+        )
+        return false
+      }
+
+      // 单个文件最大 2MB
+      const maxSize = 2 * 1024 * 1024
+      if (file.size > maxSize) {
+        this.$message.warning(
+          `图片「${file.name}」不能超过 2MB`
+        )
+        return false
+      }
+
+      return true
+    },
+    /**
+     * 表情上传成功
+     */
+    handleEmojiUploadSuccess(response) {
+      console.log('response', response)
+      const uploadFiles = response && response.data
+      if (!Array.isArray(uploadFiles) || !uploadFiles.length) {
+        this.$message.error('表情上传成功，但未获取到文件信息')
+        return
+      }
+
+      uploadFiles.forEach(file => {
+        if (!file || !file.fileAccessUrL) {
+          return
+        }
+
+        this.config.commentEmojis.push({
+          name: '',
+          url: file.fileAccessUrL,
+          _key: this.createEmojiKey()
+        })
+      })
+
+      this.$message.success(
+        `成功上传 ${uploadFiles.length} 个表情`
+      )
+    },
+    /**
+     * 表情上传失败
+     */
+    handleEmojiUploadError() {
+      this.$message.error('表情上传失败，请稍后重试')
+    },
     /**
      * 查询网站配置
      */
     queryWebsiteConfig() {
       this.$mapi.websiteConfig.queryWebsiteConfigDetail().then(res => {
         const data = res.data || {}
-        this.config = Object.assign(this.createDefaultConfig(), data)
+        const config = Object.assign(this.createDefaultConfig(), data)
+        config.commentEmojis = (config.commentEmojis || []).map(item => ({
+          name: item.name, url: item.url, _key: this.createEmojiKey()
+        }))
+        this.config = config
         this.originalConfig = JSON.parse(JSON.stringify(this.config))
       })
     },
@@ -588,8 +792,19 @@ export default {
           return
         }
 
+        if (!this.validateCommentEmojis()) {
+          return
+        }
+
+        const param = {
+          ...this.config,
+          commentEmojis: this.config.commentEmojis.map(item => ({
+            name: item.name,
+            url: item.url
+          }))
+        }
         this.submitLoading = true
-        this.$mapi.websiteConfig.editWebsiteConfig(this.config).then(res => {
+        this.$mapi.websiteConfig.editWebsiteConfig(param).then(res => {
           this.$message.success(res.message)
           this.originalConfig = JSON.parse(JSON.stringify(this.config))
         }).finally(() => {
@@ -885,6 +1100,99 @@ export default {
 }
 
 /* =========================
+   评论表情包
+   ========================= */
+
+.emoji-setting {
+  width: 100%;
+}
+
+.emoji-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.emoji-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #ebeef5;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.emoji-item:hover {
+  border-color: #c6e2ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+}
+
+.emoji-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  margin-right: 8px;
+  background: #f5f7fa;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.emoji-image img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.emoji-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.emoji-content ::v-deep .el-input__inner {
+  padding: 0 8px;
+}
+
+.emoji-delete {
+  flex-shrink: 0;
+  margin-left: 4px;
+  padding: 4px;
+  color: #f56c6c !important;
+}
+
+.emoji-add {
+  display: flex;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.emoji-upload {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.emoji-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  border: 1px dashed #dcdfe6;
+  border-radius: 6px;
+  color: #909399;
+  font-size: 13px;
+}
+.emoji-empty i {
+  margin-right: 8px;
+  color: #c0c4cc;
+  font-size: 22px;
+}
+
+/* =========================
    平板
    ========================= */
 
@@ -907,6 +1215,10 @@ export default {
 
   .section-header {
     margin-bottom: 30px;
+  }
+
+  .emoji-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -994,6 +1306,10 @@ export default {
   .submit-actions .el-button {
     flex: 1;
   }
+
+  .emoji-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* =========================
@@ -1043,6 +1359,10 @@ export default {
 
   .switch-desc {
     line-height: 20px;
+  }
+
+  .emoji-list {
+    grid-template-columns: 1fr;
   }
 }
 </style>
