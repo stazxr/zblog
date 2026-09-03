@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
@@ -202,6 +203,19 @@ public class PortalController {
     @RateLimit(count = 1000, time = 86400, enableIp = true)
     public void recordFriendLinkClickLog(HttpServletRequest request, @RequestParam Long friendLinkId) {
         portalService.recordFriendLinkClickLog(request, friendLinkId);
+    }
+
+    /**
+     * 查询评论表情包
+     *
+     * @return List<CommentEmojiVo>
+     */
+    @GetMapping(value = "/queryCommentImageList")
+    @ApiOperation(value = "查询评论表情包")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询评论表情包", code = "PORTQ005", level = RouterLevel.OPEN)
+    public List<CommentEmojiVo> queryCommentImageList() {
+        return portalService.queryCommentImageList();
     }
 
 //    /**

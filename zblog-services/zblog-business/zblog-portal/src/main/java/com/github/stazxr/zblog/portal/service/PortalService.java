@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.portal.service;
 
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
+import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
@@ -101,4 +102,11 @@ public interface PortalService {
      * @param friendLinkId 友链id
      */
     void recordFriendLinkClickLog(HttpServletRequest request, Long friendLinkId);
+
+    /**
+     * 查询评论表情包
+     *
+     * @return List<CommentEmojiVo>
+     */
+    List<CommentEmojiVo> queryCommentImageList();
 }

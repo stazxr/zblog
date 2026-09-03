@@ -29,6 +29,10 @@ export default new Vuex.Store({
     // 是否手机端
     isMobile: false,
 
+    // 表情包
+    emojiList: [],
+    emojiLoading: false,
+
     // 模态框
     applyFriendLinkFlag: false, // 申请友链
 
@@ -94,6 +98,10 @@ export default new Vuex.Store({
     // 设置是否手机端
     setMobile(state, value) {
       state.isMobile = value
+    },
+    // 设置表情包
+    setEmojiList(state, list) {
+      state.emojiList = list
     },
     // 关闭所有模态框
     closeAllModel(state) {
@@ -209,6 +217,19 @@ export default new Vuex.Store({
 
           // 返回网站配置信息
           return data.config || {}
+        }
+      }
+    },
+    emoji: {
+      namespaced: true,
+      actions: {
+        /** 加载表情包 */
+        async init({ commit }) {
+          const res = await api.portal.queryCommentImageList()
+          const data = res.data || []
+          commit('setEmojiList', data, {
+            root: true
+          })
         }
       }
     }

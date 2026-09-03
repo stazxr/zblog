@@ -81,12 +81,12 @@
       </div>
       <div class="menus-item">
         <router-link to="/links">
-          <span>📌</span> 友链
+          💃 友人帐
         </router-link>
       </div>
       <div class="menus-item">
         <router-link to="/barrageMessage">
-          <span>💌</span> 弹幕
+          <span>💌</span> 留言
         </router-link>
       </div>
       <div class="menus-item">

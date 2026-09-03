@@ -41,6 +41,7 @@ import ForgetModel from './components/model/ForgetModel'
 import ApplyFriendLinkModel from './components/model/ApplyFriendLinkModel'
 import Player from './components/zw-player/Player'
 import Robot from './components/Robot'
+import store from '@/store'
 export default {
   name: 'App',
   components: {
@@ -75,6 +76,8 @@ export default {
     this.recordVisitor()
     // 初始化 Socket
     this.initWebSocket()
+    // 加载表情包
+    this.loadCommentImage()
   },
   beforeDestroy() {
     const stomp = this.$store.state.ws.stomp
@@ -104,6 +107,9 @@ export default {
       } catch (e) {
         console.error('websocket init failed', e)
       }
+    },
+    async loadCommentImage() {
+      await store.dispatch('emoji/init')
     }
   }
 }

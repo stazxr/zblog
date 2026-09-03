@@ -88,7 +88,7 @@
               💃 友人帐
             </router-link>
             <router-link to="/barrageMessage">
-              💌 弹幕
+              💌 留言
             </router-link>
           </ul>
         </div>

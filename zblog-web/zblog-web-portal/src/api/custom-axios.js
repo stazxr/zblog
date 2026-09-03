@@ -5,6 +5,19 @@ import { getVisitorId } from '@/utils/visitor'
 
 const defaultTimeout = 120000
 
+// 错误码
+const defaultStatusMessageMap = {
+  400: '请求参数错误',
+  401: '登录状态已失效，请重新登录',
+  403: '没有访问权限，请联系管理员',
+  404: '请求的资源不存在',
+  429: '请求过于频繁，请稍后再试',
+  500: '服务器内部错误，请联系管理员',
+  502: '网关异常，请稍后再试',
+  503: '系统繁忙，请稍后再试',
+  504: '服务器响应超时，请稍后重试'
+}
+
 // create instance
 const instance = axios.create()
 
@@ -84,7 +97,29 @@ instance.interceptors.response.use(response => {
     }
   }
 }, error => {
-  return Promise.reject(error)
+  const { response, request } = error
+  if (response) {
+    // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+    const status = response.status
+    const result = response.data
+    const errorMessage = result ? result.message : null
+    const _errorMessage = errorMessage || defaultStatusMessageMap[status] || `系统发生未知错误`
+    return Promise.reject(_errorMessage)
+  } else if (request) {
+    // 请求已经成功发起，但没有收到响应
+    if (!window.navigator.onLine) {
+      // 断网处理
+      return Promise.reject('网络异常，请检查网络链接')
+    } else {
+      if (error.message && error.message.includes('timeout')) {
+        return Promise.reject('请求超时，请稍后再试')
+      } else {
+        return Promise.reject('服务无响应')
+      }
+    }
+  } else {
+    return Promise.reject(new Error('服务异常，请稍后再试'))
+  }
 })
 
 export const get = (url, params, requestItem = {}) => {
@@ -105,6 +140,7 @@ export const get = (url, params, requestItem = {}) => {
 }
 
 export const post = (url, data, requestItem = {}) => {
+  const isFormData = data instanceof FormData
   const options = {
     method: 'post',
     url,
@@ -112,13 +148,13 @@ export const post = (url, data, requestItem = {}) => {
     // 浏览器专属: FormData, File, Blob; Node 专属: Stream, Buffer
     // 可选语法，Country=China&City=Xian，只有 value 会被发送，key 则不会
     data,
-    // 自定义请求头
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
-    },
     // 浏览器将要响应的数据类型，['arraybuffer', 'document', 'json', 'text', 'stream', 'blob'(浏览器专属)]
     responseType: 'json',
-    ...requestItem
+    ...requestItem,
+    headers: {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json;charset=UTF-8' }),
+      ...(requestItem.headers || {})
+    }
   }
   return instance(options)
 }

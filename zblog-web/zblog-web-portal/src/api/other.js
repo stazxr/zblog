@@ -2,6 +2,10 @@ import api from './custom-axios'
 import qs from 'qs'
 
 export default {
+  // 上传文件
+  uploadFile: params => {
+    return api.httpRequest().post(`/api/file/uploadFile`, params)
+  },
   // 发送邮箱验证码
   sendEmailCode: params => {
     return api.httpRequest().post(`/api/email/sendCode`, params)

@@ -48,6 +48,10 @@ export default {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   },
+  // 获取表情包
+  queryCommentImageList: params => {
+    return api.httpRequest().get(`${portalApi}/queryCommentImageList`, params)
+  },
 
   // 登录
   webLogin: params => {

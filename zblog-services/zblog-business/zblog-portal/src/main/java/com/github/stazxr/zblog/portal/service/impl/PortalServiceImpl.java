@@ -90,6 +90,8 @@ public class PortalServiceImpl implements PortalService {
 
     private final FriendLinkClickLogMapper friendLinkClickLogMapper;
 
+    private final CommentEmojiMapper commentEmojiMapper;
+
     /**
      * 获取网站初始化信息
      *
@@ -445,6 +447,16 @@ public class PortalServiceImpl implements PortalService {
         } catch (Exception e) {
             log.error("记录友链访问日志失败", e);
         }
+    }
+
+    /**
+     * 查询评论表情包
+     *
+     * @return List<CommentEmojiVo>
+     */
+    @Override
+    public List<CommentEmojiVo> queryCommentImageList() {
+        return commentEmojiMapper.selectCommentEmojis();
     }
 
     private AuditResult auditBarrageMessage(Long messageId, String content) {
