@@ -29,43 +29,31 @@
         </div>
         <div class="comment-toolbar-wrapper">
           <div class="comment-editor-toolbar">
-            <button
-              type="button"
-              class="toolbar-btn"
-              :class="{ active: showEmojiPicker }"
-              @click="toggleEmojiPicker"
-            >
+            <!-- 表情 -->
+            <button type="button" class="toolbar-btn" :class="{ active: showEmojiPicker }" @click="toggleEmojiPicker">
               <v-icon>mdi-emoticon-outline</v-icon>
             </button>
 
-            <button
-              type="button"
-              class="toolbar-btn"
-              :class="{ active: showImageUpload }"
-              @click="toggleImageUpload"
-            >
+            <!-- 照片 -->
+            <button type="button" class="toolbar-btn" :class="{ active: showImageUpload }" @click="toggleImageUpload">
               <v-icon>mdi-image-plus</v-icon>
             </button>
 
+            <!-- 评论字数 -->
             <span class="editor-count">
               {{ commentContent.length }}/{{ maxLength }}
             </span>
 
-            <button
-              type="button"
-              class="submit-btn"
-              :disabled="submitDisabled"
-              @click="submitComment"
-            >
-              <v-progress-circular
-                v-if="submitDisabled"
-                indeterminate
-                size="14"
-                width="2"
-                class="mr-1"
-              />
+            <!-- 提交 -->
+            <button type="button" class="submit-btn" :disabled="submitDisabled" @click="submitComment">
+              <v-progress-circular v-if="submitDisabled" indeterminate size="14" width="2" class="mr-1" />
               {{ submitDisabled ? '提交中' : '发表评论' }}
             </button>
+          </div>
+
+          <!-- 表情 -->
+          <div v-show="showEmojiPicker" class="emoji-wrapper">
+            <Emoji :show-emoji-picker="showEmojiPicker" :emoji-list="emojiList" @selectEmoji="insertEmoji" />
           </div>
 
           <!-- 图片上传面板：相对于工具栏定位 -->
@@ -76,26 +64,16 @@
             />
           </div>
         </div>
-
-        <!-- 表情 -->
-        <div v-show="showEmojiPicker" class="emoji-wrapper">
-          <Emoji :show-emoji-picker="showEmojiPicker" :emoji-list="emojiList" @selectEmoji="insertEmoji" />
-        </div>
       </div>
     </div>
 
     <!-- 回复状态 -->
     <div v-if="replyTarget" class="reply-target">
       <span>
-        回复
-        <strong>{{ replyTarget.nickname }}</strong>
+        回复 <strong>{{ replyTarget.nickname }}</strong>
       </span>
 
-      <button
-        type="button"
-        class="cancel-reply-btn"
-        @click="cancelReply"
-      >
+      <button type="button" class="cancel-reply-btn" @click="cancelReply">
         取消回复
       </button>
     </div>
@@ -569,8 +547,14 @@ export default {
     toggleImageUpload() {
       this.showImageUpload = !this.showImageUpload
       if (this.showImageUpload) {
-        // TODO 上传照片需要登录，待登录页完成适配
         this.showEmojiPicker = false
+
+        // 上传照片需要登录
+        if (!this.$store.state.authenticated) {
+          this.showImageUpload = false
+          this.$store.state.loginFlag = true
+          this.$toast({ type: 'warning', message: `上传照片需要先登录，请登录后操作` })
+        }
       }
     },
     handleImageUploadSuccess(imageId) {
@@ -615,6 +599,75 @@ export default {
         const cursorPosition = start + tag.length
         textarea.focus()
         textarea.setSelectionRange(cursorPosition, cursorPosition)
+      })
+    },
+
+    // 提交评论
+    submitComment() {
+      // if (!this.$store.state.websiteConfig.xx) {
+      //   this.showImageUpload = false
+      //   this.$store.state.loginFlag = true
+      //   this.$toast({ type: 'warning', message: `上传照片需要先登录，请登录后操作` })
+      //   return
+      // }
+
+      // 评论校验
+      const content = this.commentContent.trim()
+      if (!content) {
+        this.$toast({ type: 'error', message: '评论不能为空' })
+        return
+      }
+      if (content.length > this.maxLength) {
+        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
+        return
+      }
+
+      // 父评论id
+      const parentId = this.replyTarget ? this.replyParentId : 0
+
+      // 评论对象
+      const comment = {
+        objectId: this.objectId,
+        type: this.type,
+        content: content,
+        parentId: parentId
+      }
+
+      // 提交
+      this.submitDisabled = true
+      this.$mapi.portal.saveComment(comment).then(({ code, message }) => {
+        console.log('code', code)
+        console.log('message', message)
+
+        // if (code !== 200) {
+        //   this.$toast({ type: 'error', message: message || '评论失败' })
+        //   return
+        // }
+        //
+        // this.commentContent = ''
+        // this.showEmojiPicker = false
+        // this.cancelReply()
+        //
+        // /**
+        //  * 重新加载
+        //  */
+        // this.current = 1
+        // this.commentList = []
+        // this.loadComments()
+        // const isReview =
+        //   this.$store.state.otherConfig &&
+        //   this.$store.state.otherConfig.isCommentReview
+        // this.$toast({
+        //   type: isReview ? 'warning' : 'success',
+        //   message: isReview
+        //     ? '评论成功，正在审核中'
+        //     : '评论成功'
+        // })
+      }).catch(e => {
+        console.log('评论失败', e)
+        this.$toast({ type: 'error', message: '评论失败' })
+      }).finally(() => {
+        this.submitDisabled = false
       })
     },
 
@@ -692,113 +745,6 @@ export default {
         })
       }).finally(() => {
         this.loading = false
-      })
-    },
-    /**
-     * 提交评论
-     */
-    submitComment() {
-      if (!this.$store.state.user.id) {
-        this.$store.state.loginFlag = true
-        return
-      }
-
-      const content = this.commentContent.trim()
-
-      if (!content) {
-        this.$toast({ type: 'error', message: '评论不能为空' })
-        return
-      }
-
-      if (content.length > this.maxLength) {
-        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
-        return
-      }
-
-      const htmlContent = this.parseEmoji(content)
-
-      const comment = {
-        userId: this.$store.state.user.id,
-        objectId: this.objectId,
-        type: this.type,
-        content: htmlContent
-      }
-
-      /**
-       * 回复
-       */
-      if (this.replyTarget) {
-        comment.parentId = this.replyParentId
-        comment.replyUserId = this.replyTarget.userId
-      } else {
-        /**
-         * 一级评论
-         */
-        comment.parentId = 0
-
-        comment.replyUserId = null
-      }
-
-      this.submitDisabled = true
-
-      this.$mapi.portal.saveComment(comment)
-        .then(({ code, message }) => {
-          if (code !== 200) {
-            this.$toast({
-              type: 'error',
-              message: message || '评论失败'
-            })
-            return
-          }
-
-          this.commentContent = ''
-
-          this.showEmojiPicker = false
-
-          this.cancelReply()
-
-          /**
-           * 重新加载
-           */
-          this.current = 1
-
-          this.commentList = []
-
-          this.loadComments()
-
-          const isReview =
-            this.$store.state.otherConfig &&
-            this.$store.state.otherConfig.isCommentReview
-
-          this.$toast({
-            type: isReview ? 'warning' : 'success',
-            message: isReview
-              ? '评论成功，正在审核中'
-              : '评论成功'
-          })
-        })
-        .catch(() => {
-          this.$toast({
-            type: 'error',
-            message: '评论失败'
-          })
-        })
-        .finally(() => {
-          this.submitDisabled = false
-        })
-    },
-    /**
-     * 解析表情
-     */
-    parseEmoji(content) {
-      return content.replace(/\[.+?]/g, str => {
-        const emoji = this.emojiMap[str]
-        if (!emoji) {
-          return str
-        }
-        return (
-          "<img src='" + emoji + "' alt='' width='24' height='24' " + "style='margin:0 1px;vertical-align:text-bottom' />"
-        )
       })
     },
     /**

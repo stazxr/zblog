@@ -10,14 +10,7 @@ import com.github.stazxr.zblog.core.base.BaseMapper;
  * @since 2026-08-31
  */
 public interface CommentMapper extends BaseMapper<Comment> {
-
-
-
-
-
-
-
-
+    void incrementReplyCount(Long parentId);
 
 
 //    /**

@@ -36,20 +36,6 @@
 //@Api(value = "PortalController", tags = { "门户控制器" })
 //public class PortalController {
 //    private final PortalService portalService;
-//
-//    /**
-//     * 查询博客前台信息
-//     *
-//     * @return BlogWebVo
-//     */
-//    @GetMapping("/queryBlogInfo")
-//    @ApiOperation(value = "查询博客前台信息")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询博客前台信息", code = "queryBlogWebInfo", level = RouterLevel.OPEN)
-//    public Result queryBlogWebInfo() {
-//        return Result.success().data(portalService.queryBlogWebInfo());
-//    }
-//
 //    /**
 //     * 分页查询前台文章列表
 //     *
@@ -94,98 +80,6 @@
 //    @Router(name = "前台登录", code = "webLogin", level = RouterLevel.OPEN)
 //    public Result webLogin(HttpServletRequest request, @RequestBody UserLoginDto loginDto) {
 //        return Result.success().data(portalService.webLogin(request, loginDto));
-//    }
-//
-//    /**
-//     * 查询前台评论列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVo
-//     */
-//    @GetMapping("/queryCommentList")
-//    @ApiOperation(value = "查询前台评论列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询前台评论列表", code = "queryWebCommentList", level = RouterLevel.OPEN)
-//    public Result queryCommentList(CommentQueryDto queryDto) {
-//        return Result.success().data(portalService.queryCommentList(queryDto));
-//    }
-//
-//    /**
-//     * 获取评论回复列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVo
-//     */
-//    @GetMapping("/queryCommentReplyList")
-//    @ApiOperation(value = "获取评论回复列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "获取评论回复列表", code = "queryCommentReplyList", level = RouterLevel.OPEN)
-//    public Result queryCommentReplyList(CommentQueryDto queryDto) {
-//        return Result.success().data(portalService.queryCommentReplyList(queryDto));
-//    }
-//
-//    /**
-//     * 新增评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/saveComment")
-//    @ApiOperation(value = "新增评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "新增评论", code = "saveComment", level = RouterLevel.OPEN)
-//    public Result saveComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
-//        portalService.saveComment(request, commentDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 点赞评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @FormResubmitCheck
-//    @PostMapping(value = "/likeComment")
-//    @ApiOperation(value = "点赞评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "点赞评论", code = "likeComment", level = RouterLevel.OPEN)
-//    public Result saveComment(HttpServletRequest request, @RequestBody CommentLikeDto commentDto) {
-//        portalService.likeComment(request, commentDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 回复评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/replyComment")
-//    @ApiOperation(value = "回复评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "回复评论", code = "replyComment", level = RouterLevel.OPEN)
-//    public Result replyComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
-//        portalService.saveComment(request, commentDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 删除评论
-//     *
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/deleteComment")
-//    @ApiOperation(value = "删除评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "删除评论", code = "deleteWebComment", level = RouterLevel.OPEN)
-//    public Result deleteComment(@RequestBody CommentDeleteDto commentDto) {
-//        portalService.deleteComment(commentDto);
-//        return Result.success();
 //    }
 //
 //    /**

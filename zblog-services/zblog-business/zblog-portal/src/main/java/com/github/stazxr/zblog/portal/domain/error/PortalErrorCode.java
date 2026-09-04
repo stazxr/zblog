@@ -10,7 +10,17 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  */
 public enum PortalErrorCode implements ErrorCode {
     /** 友链申请开关已关闭 */
-    EPORTA001("PORTAL_FRIEND_LINK_SWITCH_OFF");
+    EPORTA001("PORTAL_FRIEND_LINK_SWITCH_OFF"),
+    /** 评论对象不存在 */
+    EPORTA002("PORTAL_COMMENT_OBJECT_NOT_EXIST"),
+    /** 回复的评论不存在或已被删除 */
+    EPORTA003("PORTAL_COMMENT_PARENT_NOT_EXIST"),
+    /** 回复层级错误 */
+    EPORTA004("PORTAL_COMMENT_PARENT_LEVEL_INVALID"),
+    /** 回复评论无效 */
+    EPORTA005("PORTAL_COMMENT_OBJECT_INVALID"),
+    /** 身份信息异常 */
+    EPORTA006("PORTAL_USER_INVALID");
 
     private final String i18nKey;
 

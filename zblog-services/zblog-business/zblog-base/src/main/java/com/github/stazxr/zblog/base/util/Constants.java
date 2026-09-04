@@ -23,19 +23,9 @@ public class Constants {
     public static final String TOP_PERM_NAME = "顶级菜单";
 
     /**
-     * 一时的秒数
+     * 系统用户ID
      */
-    public static final int ONE_HOUR_SEC_UNIT = 3600;
-
-    /**
-     * 一天的秒数
-     */
-    public static final int ONE_DAY_SEC_UNIT = ONE_HOUR_SEC_UNIT * 24;
-
-    /**
-     * 一周的秒数
-     */
-    public static final int ONE_WEEK_SEC_UNIT = ONE_DAY_SEC_UNIT * 7;
+    public static final Long SYSTEM_USER_ID = 1L;
 
     /**
      * 内置安全系统的角色

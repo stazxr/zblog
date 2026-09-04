@@ -135,7 +135,7 @@ public class VisitorVo implements Serializable {
      * 最后访问日期
      */
     @ApiModelProperty("最后访问日期")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd")
     private LocalDate lastVisitDate;
 
     /**

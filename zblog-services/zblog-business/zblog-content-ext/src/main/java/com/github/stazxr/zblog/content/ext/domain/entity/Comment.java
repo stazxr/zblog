@@ -32,6 +32,11 @@ public class Comment implements Serializable {
     private Long userId;
 
     /**
+     * 评论访客ID
+     */
+    private String visitorId;
+
+    /**
      * 评论对象ID
      */
     private String objectId;
@@ -52,6 +57,11 @@ public class Comment implements Serializable {
      * 回复用户ID
      */
     private Long replyUserId;
+
+    /**
+     * 回复访客ID
+     */
+    private String replyVisitorId;
 
     /**
      * 评论展示内容
@@ -84,6 +94,11 @@ public class Comment implements Serializable {
     private String ipSource;
 
     /**
+     * 用户代理
+     */
+    private String userAgent;
+
+    /**
      * 状态
      */
     private Integer status;
@@ -104,19 +119,9 @@ public class Comment implements Serializable {
     private String auditReason;
 
     /**
-     * 创建用户
-     */
-    private Long createUser;
-
-    /**
      * 创建时间
      */
     private LocalDateTime createTime;
-
-    /**
-     * 更新用户
-     */
-    private Long updateUser;
 
     /**
      * 更新时间

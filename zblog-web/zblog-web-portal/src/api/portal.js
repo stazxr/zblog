@@ -52,6 +52,30 @@ export default {
   queryCommentImageList: params => {
     return api.httpRequest().get(`${portalApi}/queryCommentImageList`, params)
   },
+  // 获取评论列表
+  queryCommentList: params => {
+    return api.httpRequest().get(`${portalApi}/queryCommentList`, params)
+  },
+  // 保存评论
+  saveComment: params => {
+    return api.httpRequest().post(`${portalApi}/saveComment`, params)
+  },
+  // 点赞评论
+  likeComment: params => {
+    return api.httpRequest().post(`${portalApi}/likeComment`, params)
+  },
+  // 回复评论
+  replyComment: params => {
+    return api.httpRequest().post(`${portalApi}/replyComment`, params)
+  },
+  // 删除评论
+  deleteComment: params => {
+    return api.httpRequest().post(`${portalApi}/deleteComment`, params)
+  },
+  // 获取评论回复列表
+  queryCommentReplyList: params => {
+    return api.httpRequest().get(`${portalApi}/queryCommentReplyList`, params)
+  },
 
   // 登录
   webLogin: params => {
@@ -76,30 +100,6 @@ export default {
   // 获取文章详情
   queryArticleDetail: params => {
     return api.httpRequest().get(`${portalApi}/queryArticleDetail`, params)
-  },
-  // 获取评论列表
-  queryCommentList: params => {
-    return api.httpRequest().get(`${portalApi}/queryCommentList`, params)
-  },
-  // 保存评论
-  saveComment: params => {
-    return api.httpRequest().post(`${portalApi}/saveComment`, params)
-  },
-  // 点赞评论
-  likeComment: params => {
-    return api.httpRequest().post(`${portalApi}/likeComment`, params)
-  },
-  // 回复评论
-  replyComment: params => {
-    return api.httpRequest().post(`${portalApi}/replyComment`, params)
-  },
-  // 删除评论
-  deleteComment: params => {
-    return api.httpRequest().post(`${portalApi}/deleteComment`, params)
-  },
-  // 获取评论回复列表
-  queryCommentReplyList: params => {
-    return api.httpRequest().get(`${portalApi}/queryCommentReplyList`, params)
   },
   // 获取轮播的说说列表
   queryBoardTalkList: params => {

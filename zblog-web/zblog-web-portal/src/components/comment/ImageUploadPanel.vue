@@ -89,13 +89,7 @@ export default {
       this.previewUrl = URL.createObjectURL(file)
     },
     validate(file) {
-      const allowTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/webp'
-      ]
-
+      const allowTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
       if (!allowTypes.includes(file.type)) {
         this.$toast({ type: 'warning', message: '只支持 JPG、PNG、GIF、WEBP 图片' })
         return false

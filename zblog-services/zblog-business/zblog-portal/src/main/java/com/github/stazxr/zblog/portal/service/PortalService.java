@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
+import com.github.stazxr.zblog.portal.domain.dto.CommentDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -109,4 +110,12 @@ public interface PortalService {
      * @return List<CommentEmojiVo>
      */
     List<CommentEmojiVo> queryCommentImageList();
+
+    /**
+     * 新增评论
+     *
+     * @param request    请求信息
+     * @param commentDto 评论信息
+     */
+    void saveComment(HttpServletRequest request, CommentDto commentDto);
 }

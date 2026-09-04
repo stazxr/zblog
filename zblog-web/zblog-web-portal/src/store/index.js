@@ -16,6 +16,9 @@ export default new Vuex.Store({
     // 链接信息
     links: {},
 
+    // 用户是否登录
+    authenticated: false,
+
     // 用户信息
     user: {
       id: null,
@@ -34,6 +37,7 @@ export default new Vuex.Store({
     emojiLoading: false,
 
     // 模态框
+    loginFlag: false, // 登录
     applyFriendLinkFlag: false, // 申请友链
 
     // 社交配置信息
@@ -67,8 +71,6 @@ export default new Vuex.Store({
     websiteVersion: '',
     // 文章默认封面
     articleDefaultImg: '',
-    // 登录模态框是否显示
-    loginFlag: false,
     // 注册模态框是否显示
     registerFlag: false,
     // 忘记密码模态框是否显示
@@ -109,6 +111,7 @@ export default new Vuex.Store({
     },
     // 设置用户信息
     setUserInfo(state, loginUser) {
+      state.authenticated = !!(loginUser && loginUser.authenticated)
       if (loginUser == null || loginUser.user == null) {
         state.user.id = null
         state.user.nickname = null

@@ -13,11 +13,9 @@ import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.util.Constants;
 import com.github.stazxr.zblog.content.ext.domain.entity.*;
-import com.github.stazxr.zblog.content.ext.domain.enums.BarrageMessageAuditStatus;
-import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkStatus;
-import com.github.stazxr.zblog.content.ext.domain.enums.FriendLinkType;
-import com.github.stazxr.zblog.content.ext.domain.enums.ThemeType;
+import com.github.stazxr.zblog.content.ext.domain.enums.*;
 import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.*;
 import com.github.stazxr.zblog.content.ext.mapper.*;
@@ -27,8 +25,10 @@ import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
+import com.github.stazxr.zblog.portal.domain.dto.CommentDto;
 import com.github.stazxr.zblog.portal.domain.error.PortalErrorCode;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
+import com.github.stazxr.zblog.portal.service.CommentObjectService;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import com.github.stazxr.zblog.portal.util.VisitorUtil;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -92,6 +92,12 @@ public class PortalServiceImpl implements PortalService {
 
     private final CommentEmojiMapper commentEmojiMapper;
 
+    private final CommentMapper commentMapper;
+
+    private final CommentLikeMapper commentLikeMapper;
+
+    private final CommentObjectService commentObjectService;
+
     /**
      * 获取网站初始化信息
      *
@@ -126,19 +132,18 @@ public class PortalServiceImpl implements PortalService {
 
         boolean authenticated = SecurityUtils.isAuthenticated();
         webLoginUser.setAuthenticated(authenticated);
-        if (!authenticated) {
+        if (authenticated) {
+            // 查询用户信息
+            User loginUser = SecurityUtils.getLoginUser();
+            webLoginUser.setUser(new UserBaseInfo(loginUser));
+        } else {
             // 获取访客信息
             String visitorId = Context.get("x-visitor-id");
             if (StringUtils.isNotBlank(visitorId)) {
                 VisitorProfile profile = visitorProfileMapper.selectById(visitorId);
                 webLoginUser.setUser(new UserBaseInfo(profile));
             }
-            return webLoginUser;
         }
-
-        // 查询登录用户信息
-        User loginUser = SecurityUtils.getLoginUser();
-        webLoginUser.setUser(new UserBaseInfo(loginUser));
 
         return webLoginUser;
     }
@@ -229,6 +234,7 @@ public class PortalServiceImpl implements PortalService {
                 fillVisitorUserAgent(visitor, ua);
             }
             if (visitor.getUserId() == null && userId != null) {
+                // 访客ID只能绑定一次用户ID，不能切绑
                 change = true;
                 visitor.setUserId(userId);
             }
@@ -459,11 +465,128 @@ public class PortalServiceImpl implements PortalService {
         return commentEmojiMapper.selectCommentEmojis();
     }
 
+    /**
+     * 新增评论
+     *
+     * @param request    请求信息
+     * @param commentDto 评论信息
+     */
+    @Override
+    public void saveComment(HttpServletRequest request, CommentDto commentDto) {
+        // 判断用户是否登录
+        boolean isAuthenticated = SecurityUtils.isAuthenticated();
+
+        // 校验评论对象
+        commentObjectService.checkExists(commentDto.getType(), commentDto.getObjectId());
+
+        // 创建评论
+        Comment comment = new Comment();
+        comment.setId(SequenceUtils.getId());
+        comment.setType(commentDto.getType());
+        comment.setObjectId(commentDto.getObjectId());
+        comment.setContent(commentDto.getContent());
+        comment.setOriginContent(commentDto.getContent());
+        comment.setParentId(commentDto.getParentId() == null ? 0L : commentDto.getParentId());
+        if (isAuthenticated) {
+            comment.setUserId(SecurityUtils.getLoginId());
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            ThrowUtils.throwIfBlank(visitorId, PortalErrorCode.EPORTA006);
+            comment.setVisitorId(visitorId);
+        }
+
+        // 校验父评论
+        if (comment.getParentId() > 0) {
+            // 存在父评论
+            Comment parentComment = commentMapper.selectById(commentDto.getParentId());
+            ThrowUtils.throwIfNull(parentComment, PortalErrorCode.EPORTA003);
+
+            // 父评论 parentId 必须指向一级评论
+            ThrowUtils.throwIf(parentComment.getParentId() != 0L, PortalErrorCode.EPORTA004);
+
+            // 防止跨对象回复
+            boolean sameObj = parentComment.getObjectId().equals(commentDto.getObjectId());
+            boolean sameType = parentComment.getType().equals(commentDto.getType());
+            ThrowUtils.throwIf(!(sameObj && sameType), PortalErrorCode.EPORTA005);
+
+            // 设置回复用户ID
+            if (parentComment.getUserId() != null) {
+                comment.setReplyUserId(parentComment.getUserId());
+            }
+            if (StringUtils.isNotBlank(parentComment.getVisitorId())) {
+                comment.setReplyVisitorId(parentComment.getVisitorId());
+            }
+        }
+
+        // 审核评论内容
+        LocalDateTime now = LocalDateTime.now();
+        AuditResult auditResult = auditComment(comment.getId(), comment.getContent(), comment.getUserId(), comment.getVisitorId());
+        switch (auditResult.getDecision()) {
+            case PASS:
+                comment.setStatus(CommentStatus.NORMAL.getValue());
+                comment.setAuditReason("自动审核通过");
+                comment.setAuditUser(Constants.SYSTEM_USER_ID);
+                comment.setContent(auditResult.getContent());
+                comment.setAuditTime(now);
+                break;
+            case REJECT:
+                comment.setStatus(CommentStatus.REJECTED.getValue());
+                comment.setAuditReason(auditResult.getReason());
+                comment.setAuditUser(Constants.SYSTEM_USER_ID);
+                comment.setAuditTime(now);
+                break;
+            case MANUAL:
+                comment.setStatus(CommentStatus.MANUAL.getValue());
+                comment.setAuditReason(auditResult.getReason());
+                comment.setAuditUser(Constants.SYSTEM_USER_ID);
+                comment.setAuditTime(now);
+                break;
+            default:
+                // 如果存在修改内容，则人为审核
+                comment.setStatus(CommentStatus.PENDING.getValue());
+        }
+
+        // TODO 解析图片和表情，转为 img 插入评论中
+        // "<img src='" + emoji + "' alt='' width='24' height='24' " + "style='margin:0 1px;vertical-align:text-bottom' />"
+
+        // 设置其他信息并入库
+        comment.setLikeCount(0);
+        comment.setReplyCount(0);
+        comment.setIpAddress(IpUtils.getIp(request));
+        comment.setIpSource(IpRegionUtils.getRegion(comment.getIpAddress()));
+        comment.setUserAgent(IpUtils.getUserAgent(request));
+        comment.setCreateTime(now);
+        commentMapper.insert(comment);
+
+        // 更新一级评论回复数量
+        if (comment.getParentId() > 0) {
+            commentMapper.incrementReplyCount(comment.getParentId());
+        }
+    }
+
+    // 评论审核
+    private AuditResult auditComment(Long commentId, String content, Long userId, String visitorId) {
+        AuditContext auditContext = new AuditContext(content, AuditScene.COMMENT);
+        auditContext.setOid(String.valueOf(commentId));
+        if (SecurityUtils.isAuthenticated()) {
+            auditContext.setUid(String.valueOf(userId));
+        } else {
+            auditContext.setUid(visitorId);
+        }
+        return auditService.audit(auditContext);
+    }
+
+    // 留言审核
     private AuditResult auditBarrageMessage(Long messageId, String content) {
         AuditContext auditContext = new AuditContext(content, AuditScene.BARRAGE);
         auditContext.setOid(String.valueOf(messageId));
         if (SecurityUtils.isAuthenticated()) {
             auditContext.setUid(String.valueOf(SecurityUtils.getLoginId()));
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            if (StringUtils.isNotBlank(visitorId)) {
+                auditContext.setUid(visitorId);
+            }
         }
         return auditService.audit(auditContext);
     }
@@ -500,19 +623,23 @@ public class PortalServiceImpl implements PortalService {
                 message.setAuditStatus(BarrageMessageAuditStatus.APPROVED.getStatus());
                 message.setAuditReason("自动审核通过");
                 message.setContent(auditResult.getContent());
+                message.setAuditUserId(Constants.SYSTEM_USER_ID);
                 message.setAuditTime(now);
                 break;
             case REJECT:
                 message.setAuditStatus(BarrageMessageAuditStatus.REJECTED.getStatus());
                 message.setAuditReason(auditResult.getReason());
+                message.setAuditUserId(Constants.SYSTEM_USER_ID);
                 message.setAuditTime(now);
                 break;
             case MANUAL:
                 message.setAuditStatus(BarrageMessageAuditStatus.MANUAL.getStatus());
                 message.setAuditReason(auditResult.getReason());
+                message.setAuditUserId(Constants.SYSTEM_USER_ID);
                 message.setAuditTime(now);
                 break;
             default:
+                // 如果存在修改内容，则人为审核
                 message.setAuditStatus(BarrageMessageAuditStatus.PENDING.getStatus());
         }
 
@@ -649,4 +776,22 @@ public class PortalServiceImpl implements PortalService {
         }
         return false;
     }
+
+//    private List<Long> extractCommentImageIds(String content) {
+//        List<Long> imageIds = new ArrayList<>();
+//        Matcher matcher = IMAGE_PATTERN.matcher(content);
+//        while (matcher.find()) {
+//            imageIds.add(Long.valueOf(matcher.group(1)));
+//        }
+//        return imageIds;
+//    }
+//
+//    private List<Long> extractCommentEmojis(String content) {
+//        List<Long> imageIds = new ArrayList<>();
+//        Matcher matcher = IMAGE_PATTERN.matcher(content);
+//        while (matcher.find()) {
+//            imageIds.add(Long.valueOf(matcher.group(1)));
+//        }
+//        return imageIds;
+//    }
 }

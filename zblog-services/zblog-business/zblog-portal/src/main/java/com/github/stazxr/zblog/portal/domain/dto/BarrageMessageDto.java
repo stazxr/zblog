@@ -23,7 +23,7 @@ public class BarrageMessageDto extends BaseDto {
     /**
      * 弹幕内容
      */
-    @NotBlank(message = "{BARRAGE_MESSAGE_CONTENT_REQUIRED}")
+    @NotBlank(message = "{PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED}")
     @ApiModelProperty("弹幕内容")
     private String content;
 }
