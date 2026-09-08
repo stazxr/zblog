@@ -32,6 +32,11 @@ public class CommentLike implements Serializable {
     private Long userId;
 
     /**
+     * 点赞访客ID
+     */
+    private String visitorId;
+
+    /**
      * 评论ID
      */
     private Long commentId;
@@ -47,22 +52,7 @@ public class CommentLike implements Serializable {
     private String ipSource;
 
     /**
-     * 创建用户
-     */
-    private Long createUser;
-
-    /**
      * 创建时间
      */
     private LocalDateTime createTime;
-
-    /**
-     * 更新用户
-     */
-    private Long updateUser;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
 }

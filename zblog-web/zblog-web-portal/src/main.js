@@ -23,8 +23,8 @@ import './assets/styles/animation.css'
 import './assets/styles/index.css'
 import './assets/styles/variable.css'
 // 图标
-import './assets/iconfont/iconfont.js'
-import './assets/iconfont/iconfont.css'
+import Icon from '@/components/icon/Icon'
+import '@/assets/iconfont/iconfont.js'
 // 图片预览
 import VueImageSwipe from 'vue-image-swipe'
 import 'vue-image-swipe/dist/vue-image-swipe.css'
@@ -49,6 +49,9 @@ Vue.use(Confirm)
 Vue.use(VueImageSwipe)
 Vue.use(Highlight)
 Vue.use(loading)
+
+// 全局注册
+Vue.component('Icon', Icon)
 
 // 全局挂载
 Vue.prototype['$mapi'] = api

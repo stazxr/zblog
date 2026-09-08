@@ -21,7 +21,7 @@ public @interface Idempotent {
     /**
      * 过期时间
      */
-    long expire() default 5;
+    long expire() default 1;
 
     /**
      * 时间单位

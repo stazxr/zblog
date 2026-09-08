@@ -3,10 +3,10 @@
     <!-- 评论标题 -->
     <div class="comment-header">
       <div class="comment-title">
-        <v-icon class="comment-title-icon">mdi-comment-text-outline</v-icon>
+        <icon name="liuyan-" custom-class="comment-title-icon" />
         <span>{{ title }}</span>
-        <span v-if="total > 0" class="comment-total">
-          {{ total }}
+        <span v-if="realTotal > 0" class="comment-total">
+          {{ realTotal }}
         </span>
       </div>
     </div>
@@ -14,7 +14,7 @@
     <!-- 评论输入框 -->
     <div class="comment-editor">
       <v-avatar size="42" class="comment-editor-avatar">
-        <img :src="currentAvatar" alt="">
+        <img :src="$getAvatar($store.state.user.avatar)" alt="">
       </v-avatar>
       <div class="comment-editor-main">
         <div class="comment-textarea-wrapper">
@@ -24,19 +24,18 @@
             class="comment-textarea"
             :placeholder="editorPlaceholder"
             :maxlength="maxLength"
-            @focus="editorFocus = true"
           />
         </div>
         <div class="comment-toolbar-wrapper">
           <div class="comment-editor-toolbar">
             <!-- 表情 -->
             <button type="button" class="toolbar-btn" :class="{ active: showEmojiPicker }" @click="toggleEmojiPicker">
-              <v-icon>mdi-emoticon-outline</v-icon>
+              <icon name="biaoqing" />
             </button>
 
             <!-- 照片 -->
             <button type="button" class="toolbar-btn" :class="{ active: showImageUpload }" @click="toggleImageUpload">
-              <v-icon>mdi-image-plus</v-icon>
+              <icon name="tianjiatupian_huaban" />
             </button>
 
             <!-- 评论字数 -->
@@ -58,10 +57,7 @@
 
           <!-- 图片上传面板：相对于工具栏定位 -->
           <div v-show="showImageUpload" class="image-upload-wrapper">
-            <image-upload-panel
-              @success="handleImageUploadSuccess"
-              @close="showImageUpload = false"
-            />
+            <image-upload-panel @success="handleImageUploadSuccess" @close="showImageUpload = false" />
           </div>
         </div>
       </div>
@@ -72,7 +68,6 @@
       <span>
         回复 <strong>{{ replyTarget.nickname }}</strong>
       </span>
-
       <button type="button" class="cancel-reply-btn" @click="cancelReply">
         取消回复
       </button>
@@ -80,321 +75,160 @@
 
     <!-- 评论列表 -->
     <div v-if="commentList.length" class="comment-list">
-
-      <article
-        v-for="(comment) in commentList"
-        :id="'comment-' + comment.id"
-        :key="comment.id"
-        class="comment-item"
-      >
-
+      <article v-for="(comment) in commentList" :id="'comment-' + comment.id" :key="comment.id" class="comment-item">
         <!-- 一级评论 -->
         <div class="comment-main">
-
           <v-avatar size="42" class="comment-avatar">
-            <img
-              :src="getAvatar(comment.avatar)"
-              alt=""
-            >
+            <img :src="$getAvatar(comment.user.avatar)" alt="">
           </v-avatar>
-
           <div class="comment-body">
-
-            <!-- 用户信息 -->
             <div class="comment-user-row">
               <div class="comment-user-info">
-
-                <a
-                  v-if="comment.website"
-                  :href="comment.website"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="comment-user-name"
-                >
-                  {{ comment.nickname }}
-                </a>
-
-                <span
-                  v-else
-                  class="comment-user-name"
-                >
-                  {{ comment.nickname }}
+                <span class="comment-user-name">
+                  {{ comment.user.nickname }}
                 </span>
-
-                <span
-                  v-if="String(comment.userId) === '1'"
-                  class="blogger-tag"
-                >
+                <span class="blogger-tag">
                   站长
                 </span>
+                <span class="blogger-tag">
+                  LV1
+                </span>
+                <span class="blogger-tag">
+                  筑基
+                </span>
               </div>
-
-              <span class="comment-time">
-                {{ comment.createTime }}
-              </span>
+              <relative-time class="comment-time" :time="comment.createTime" />
             </div>
 
             <!-- 评论内容 -->
-            <div
-              class="comment-content"
-              v-html="comment.content"
-            />
+            <div class="comment-content" v-html="comment.content" />
 
             <!-- 操作 -->
             <div class="comment-actions">
-
-              <button
-                type="button"
-                class="action-btn"
-                :class="{ liked: isLike(comment.id) }"
-                @click="toggleLike(comment)"
-              >
-                <i class="iconfont icon-dianzan1"/>
+              <button type="button" class="action-btn" :class="{ liked: comment.liked }" @click="toggleLike(comment)">
+                <icon name="icon" :active="comment.liked" size="14" />
                 <span v-if="comment.likeCount > 0">
                   {{ comment.likeCount }}
                 </span>
               </button>
-
-              <button
-                type="button"
-                class="action-btn"
-                @click="startReply(comment)"
-              >
-                <i class="iconfont icon-pinglun1"/>
-                回复
+              <button type="button" class="action-btn" @click="startReply(comment)">
+                <icon name="huifu" size="14" />
               </button>
-
-              <button
-                v-if="isCommentOwner(comment)"
-                type="button"
-                class="action-btn delete-action"
-                @click="deleteComment(comment)"
-              >
-                删除
+              <button v-if="isCommentOwner(comment)" type="button" class="action-btn delete-action" @click="deleteComment(comment)">
+                <icon name="xingzhuangjiehe1" size="14" />
               </button>
-
-              <span
-                v-if="comment.ipSource"
-                class="comment-location"
-              >
-                {{ comment.ipSource }}
+              <span class="comment-location">
+                {{ comment.ipSource || '未知' }}
               </span>
-
             </div>
 
             <!-- 回复 -->
-            <div
-              v-if="comment.replyList && comment.replyList.length"
-              class="reply-list"
-            >
-
-              <div
-                v-for="reply in comment.replyList"
-                :id="'comment-' + reply.id"
-                :key="reply.id"
-                class="reply-item"
-              >
-
+            <div v-if="comment.replyList && comment.replyList.length" class="reply-list">
+              <div v-for="reply in comment.replyList" :id="'comment-' + reply.id" :key="reply.id" class="reply-item">
                 <v-avatar size="34" class="reply-avatar">
-                  <img
-                    :src="getAvatar(reply.avatar)"
-                    alt=""
-                  >
+                  <img :src="$getAvatar(reply.user.avatar)" alt="">
                 </v-avatar>
 
                 <div class="reply-body">
-
                   <div class="reply-user-row">
-
                     <div>
-                      <a
-                        v-if="reply.website"
-                        :href="reply.website"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="reply-user-name"
-                      >
-                        {{ reply.nickname }}
-                      </a>
-
-                      <span
-                        v-else
-                        class="reply-user-name"
-                      >
-                        {{ reply.nickname }}
+                      <span class="reply-user-name">
+                        {{ reply.user.nickname }}
                       </span>
-
-                      <span
-                        v-if="String(reply.userId) === '1'"
-                        class="blogger-tag"
-                      >
+                      <span v-if="String(reply.userId) === '1'" class="blogger-tag">
                         站长
                       </span>
                     </div>
-
-                    <span class="reply-time">
-                      {{ reply.createTime }}
-                    </span>
-
+                    <relative-time class="reply-time" :time="reply.createTime" />
                   </div>
 
                   <div class="reply-content">
-
-                    <template
-                      v-if="reply.replyUserId &&
-                        String(reply.replyUserId) !== String(reply.userId)"
-                    >
+                    <template v-if="reply.replyUser.id && String(reply.replyUser.id) !== String(reply.user.id)">
                       <span class="reply-label">
                         回复
                       </span>
-
                       <span class="reply-target-name">
-                        {{ reply.replyNickname }}
+                        {{ reply.replyUser.nickname }}
                       </span>
-
-                      <span class="reply-colon">：</span>
+                      <span class="reply-colon">: </span>
                     </template>
-
-                    <span v-html="reply.content"/>
-
+                    <span v-html="reply.content" />
                   </div>
 
                   <div class="reply-actions">
-
-                    <button
-                      type="button"
-                      class="action-btn"
-                      :class="{ liked: isLike(reply.id) }"
-                      @click="toggleLike(reply)"
-                    >
-                      <i class="iconfont icon-dianzan1"/>
-
+                    <button type="button" class="action-btn" :class="{ liked: reply.liked }" @click="toggleLike(reply)">
+                      <i class="iconfont icon-dianzan1" />
                       <span v-if="reply.likeCount > 0">
                         {{ reply.likeCount }}
                       </span>
                     </button>
-
-                    <button
-                      type="button"
-                      class="action-btn"
-                      @click="startReply(reply, comment)"
-                    >
+                    <button type="button" class="action-btn" @click="startReply(reply, comment)">
                       回复
                     </button>
-
-                    <button
-                      v-if="isCommentOwner(reply)"
-                      type="button"
-                      class="action-btn delete-action"
-                      @click="deleteReply(comment, reply)"
-                    >
+                    <button v-if="isCommentOwner(reply)" type="button" class="action-btn delete-action" @click="deleteReply(comment, reply)">
                       删除
                     </button>
-
                   </div>
-
                 </div>
               </div>
-
             </div>
 
             <!-- 回复数量 -->
-            <button
-              v-if="comment.replyCount > loadedReplyCount(comment)"
-              type="button"
-              class="more-reply-btn"
-              @click="loadReplies(comment)"
-            >
+            <button v-if="comment.replyCount > loadedReplyCount(comment)" type="button" class="more-reply-btn" @click="loadReplies(comment)">
               查看全部 {{ comment.replyCount }} 条回复
-              <i class="iconfont icon-xiangxia"/>
+              <i class="iconfont icon-xiangxia" />
             </button>
 
             <!-- 回复分页 -->
-            <div
-              v-if="comment.replyPage && comment.replyPage.totalPage > 1"
-              class="reply-pagination"
-            >
-              <button
-                type="button"
-                :disabled="comment.replyPage.current <= 1"
-                @click="changeReplyPage(comment, comment.replyPage.current - 1)"
-              >
+            <div v-if="comment.replyPage && comment.replyPage.total > 1" class="reply-pagination">
+              <button type="button" :disabled="comment.replyPage.current <= 1" @click="changeReplyPage(comment, comment.replyPage.current - 1)">
                 上一页
               </button>
-
               <span>
-                {{ comment.replyPage.current }}
-                /
-                {{ comment.replyPage.totalPage }}
+                {{ comment.replyPage.current }} / {{ comment.replyPage.pages }}
               </span>
-
-              <button
-                type="button"
-                :disabled="comment.replyPage.current >= comment.replyPage.totalPage"
-                @click="changeReplyPage(comment, comment.replyPage.current + 1)"
-              >
+              <button type="button" :disabled="comment.replyPage.current >= comment.replyPage.pages" @click="changeReplyPage(comment, comment.replyPage.current + 1)">
                 下一页
               </button>
             </div>
-
           </div>
         </div>
-
       </article>
-
     </div>
 
     <!-- 加载更多 -->
-    <div
-      v-if="total > commentList.length"
-      class="comment-load-more"
-    >
-      <button
-        type="button"
-        :disabled="loading"
-        @click="loadComments"
-      >
-        <v-progress-circular
-          v-if="loading"
-          indeterminate
-          size="16"
-          width="2"
-          class="mr-2"
-        />
-
-        {{ loading ? '加载中...' : '加载更多评论' }}
+    <div v-if="total > commentList.length" class="comment-load-more">
+      <button type="button" :disabled="commentLoading" @click="loadComments">
+        <v-progress-circular v-if="commentLoading" indeterminate size="16" width="2" class="mr-2" />
+        {{ commentLoading ? '加载中...' : '加载更多评论' }}
       </button>
     </div>
 
     <!-- 空状态 -->
-    <div
-      v-else-if="!loading && !commentList.length"
-      class="comment-empty"
-    >
+    <div v-else-if="!commentLoading && !commentList.length" class="comment-empty">
       <div class="empty-icon">
-        <i class="iconfont icon-pinglun1"/>
+        <i class="iconfont icon-pinglun1" />
       </div>
-
       <div class="empty-title">
         还没有评论
       </div>
-
       <div class="empty-text">
         留下你的第一条评论吧~
       </div>
     </div>
-
   </section>
 </template>
 
 <script>
 import Emoji from './Emoji'
-import ImageUploadPanel from './ImageUploadPanel.vue'
+import ImageUploadPanel from './ImageUploadPanel'
+import RelativeTime from './RelativeTime'
 export default {
   name: 'Comment',
   components: {
     Emoji,
-    ImageUploadPanel
+    ImageUploadPanel,
+    RelativeTime
   },
   props: {
     /**
@@ -405,19 +239,14 @@ export default {
       default: '评论'
     },
     /**
-     * 最大长度
+     * 评论最大长度
      */
     maxLength: {
       type: Number,
       default: 2000
     },
     /**
-     * 评论对象类型
-     *
-     * 1 文章
-     * 2 留言
-     * 3 说说
-     * 4 相册
+     * 评论对象类型（以后台为准）
      */
     type: {
       type: Number,
@@ -445,89 +274,166 @@ export default {
       default: 5
     }
   },
-
   data() {
     return {
-      commentContent: '',
+      current: 1, // 当前页
+      total: 0, // 评论总数
+      realTotal: 0, // 评论总数（包含一级和二级评论）
+      commentList: [], // 评论列表
+      commentLoading: false, // 是否正在加载评论
+      commentContent: '', // 评论内容
       showEmojiPicker: false, // 是否显示表情选择框
       showImageUpload: false, // 是否显示图片上传面板
-      editorFocus: false,
-      submitDisabled: false,
-      loading: false,
-      likeLoading: false,
-      current: 1,
-      total: 0,
-      commentList: [],
-      /**
-       * 当前回复对象
-       *
-       * {
-       *   nickname,
-       *   userId,
-       *   id
-       * }
-       */
-      replyTarget: null,
-      /**
-       * 当前回复所属一级评论
-       */
-      replyParentId: null
+      submitDisabled: false, // 是否正在提交评论
+      likeLoading: false, // 是否正在点赞评论
+      replyTarget: null, // 当前回复对象
+      replyParentId: null // 当前回复所属一级评论
     }
   },
-
   computed: {
     /* 表情包 */
     emojiList() {
       return this.$store.state.emojiList || []
     },
-    emojiMap() {
-      const map = {}
-      this.emojiList.forEach(emoji => {
-        map[emoji.code] = emoji.url
-      })
-      return map
-    },
-
-    /**
-     * 当前用户头像
-     */
-    currentAvatar() {
-      const avatar = this.$store.state.user.avatar
-
-      if (avatar) {
-        return avatar
-      }
-
-      return this.$store.state.otherConfig &&
-      this.$store.state.otherConfig.touristAvatar
-        ? this.$store.state.otherConfig.touristAvatar
-        : ''
-    },
-
-    /**
-     * 输入框提示
-     */
+    // 输入框提示
     editorPlaceholder() {
       if (this.replyTarget) {
         return `回复 ${this.replyTarget.nickname}...`
+      } else {
+        return '留下点什么吧...'
       }
-
-      return '留下点什么吧...'
-    },
-
-    /**
-     * 点赞集合
-     */
-    commentLikeSet() {
-      return this.$store.state.commentLikeSet || []
     }
   },
-
   created() {
     this.loadComments(true)
   },
-
   methods: {
+    // 加载评论总数
+    loadRealCommentCount() {
+      const param = {
+        objectId: this.objectId,
+        type: this.type
+      }
+      this.$mapi.portal.queryCommentTotal(param).then(res => {
+        this.realTotal = res.data
+      }).catch(() => {
+        this.realTotal = 0
+      }).finally(() => {
+        this.$emit('getCommentCount', this.realTotal)
+      })
+    },
+    // 加载一级评论列表
+    loadComments(reload = false) {
+      if (this.commentLoading) {
+        return
+      }
+
+      if (reload) {
+        // 重新加载评论列表
+        this.total = 0
+        this.realTotal = 0
+        this.current = 1
+        this.commentList = []
+        this.loadRealCommentCount()
+      }
+
+      const param = {
+        page: this.current,
+        pageSize: this.pageSize,
+        objectId: this.objectId,
+        type: this.type
+      }
+
+      this.commentLoading = true
+      this.$mapi.portal.queryCommentList(param).then(({ data }) => {
+        const list = data.records || []
+        if (reload) {
+          // 首次加载或重新加载
+          this.commentList = list
+        } else {
+          this.commentList.push(...list)
+        }
+
+        this.total = data.total || 0
+        this.current++
+      }).catch(() => {
+        this.$toast({ type: 'error', message: '评论加载失败' })
+      }).finally(() => {
+        this.commentLoading = false
+      })
+    },
+
+    // 提交评论
+    submitComment() {
+      // if (!this.$store.state.websiteConfig.xx) {
+      //   this.showImageUpload = false
+      //   this.$store.state.loginFlag = true
+      //   this.$toast({ type: 'warning', message: `上传照片需要先登录，请登录后操作` })
+      //   return
+      // }
+
+      // 评论校验
+      const content = this.commentContent.trim()
+      if (!content) {
+        this.$toast({ type: 'error', message: '评论不能为空' })
+        return
+      }
+      if (content.length > this.maxLength) {
+        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
+        return
+      }
+
+      // 父评论id
+      const parentId = this.replyTarget ? this.replyParentId : 0
+
+      // 评论对象
+      const comment = {
+        objectId: this.objectId,
+        type: this.type,
+        content: content,
+        parentId: parentId
+      }
+
+      console.log('content', content)
+
+      // 提交
+      this.submitDisabled = true
+      this.$mapi.portal.saveComment(comment).then(({ code, message }) => {
+        console.log('code', code)
+        console.log('message', message)
+
+        // if (code !== 200) {
+        //   this.$toast({ type: 'error', message: message || '评论失败' })
+        //   return
+        // }
+        //
+        // this.commentContent = ''
+        // this.showEmojiPicker = false
+        // this.cancelReply()
+        //
+        // /**
+        //  * 重新加载
+        //  */
+        // this.current = 1
+        // this.commentList = []
+        // this.loadComments()
+        // const isReview =
+        //   this.$store.state.otherConfig &&
+        //   this.$store.state.otherConfig.isCommentReview
+        // this.$toast({
+        //   type: isReview ? 'warning' : 'success',
+        //   message: isReview
+        //     ? '评论成功，正在审核中'
+        //     : '评论成功'
+        // })
+      }).catch(e => {
+        console.log('评论失败', e)
+        this.$toast({ type: 'error', message: '评论失败' })
+      }).finally(() => {
+        this.submitDisabled = false
+      })
+    },
+
     // 表情选择
     toggleEmojiPicker() {
       this.showEmojiPicker = !this.showEmojiPicker
@@ -602,95 +508,27 @@ export default {
       })
     },
 
-    // 提交评论
-    submitComment() {
-      // if (!this.$store.state.websiteConfig.xx) {
-      //   this.showImageUpload = false
-      //   this.$store.state.loginFlag = true
-      //   this.$toast({ type: 'warning', message: `上传照片需要先登录，请登录后操作` })
-      //   return
-      // }
-
-      // 评论校验
-      const content = this.commentContent.trim()
-      if (!content) {
-        this.$toast({ type: 'error', message: '评论不能为空' })
-        return
-      }
-      if (content.length > this.maxLength) {
-        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
+    /**
+     * 点赞
+     */
+    toggleLike(comment) {
+      if (this.likeLoading) {
         return
       }
 
-      // 父评论id
-      const parentId = this.replyTarget ? this.replyParentId : 0
-
-      // 评论对象
-      const comment = {
-        objectId: this.objectId,
-        type: this.type,
-        content: content,
-        parentId: parentId
-      }
-
-      // 提交
-      this.submitDisabled = true
-      this.$mapi.portal.saveComment(comment).then(({ code, message }) => {
-        console.log('code', code)
-        console.log('message', message)
-
-        // if (code !== 200) {
-        //   this.$toast({ type: 'error', message: message || '评论失败' })
-        //   return
-        // }
-        //
-        // this.commentContent = ''
-        // this.showEmojiPicker = false
-        // this.cancelReply()
-        //
-        // /**
-        //  * 重新加载
-        //  */
-        // this.current = 1
-        // this.commentList = []
-        // this.loadComments()
-        // const isReview =
-        //   this.$store.state.otherConfig &&
-        //   this.$store.state.otherConfig.isCommentReview
-        // this.$toast({
-        //   type: isReview ? 'warning' : 'success',
-        //   message: isReview
-        //     ? '评论成功，正在审核中'
-        //     : '评论成功'
-        // })
-      }).catch(e => {
-        console.log('评论失败', e)
-        this.$toast({ type: 'error', message: '评论失败' })
+      this.likeLoading = true
+      this.$mapi.portal.likeComment({ commentId: comment.id }).then(_ => {
+        const liked = comment.liked // TODO
+        const likeCount = Number(comment.likeCount || 0)
+        this.$set(comment, 'likeCount', liked ? Math.max(likeCount - 1, 0) : likeCount + 1)
+        this.$store.commit('commentLike', comment.id)
+      }).catch(error => {
+        this.$toast({ type: 'error', message: error })
       }).finally(() => {
-        this.submitDisabled = false
+        this.likeLoading = false
       })
     },
 
-    /**
-     * 获取头像
-     */
-    getAvatar(avatar) {
-      if (avatar) {
-        return avatar
-      }
-
-      return this.$store.state.otherConfig &&
-      this.$store.state.otherConfig.touristAvatar
-        ? this.$store.state.otherConfig.touristAvatar
-        : ''
-    },
-    /**
-     * 是否点赞
-     */
-    isLike(commentId) {
-      return this.commentLikeSet.indexOf(commentId) !== -1 ||
-        this.commentLikeSet.indexOf(String(commentId)) !== -1
-    },
     /**
      * 是否评论本人
      */
@@ -698,55 +536,9 @@ export default {
       if (!this.$store.state.user.id) {
         return false
       }
-      return String(this.$store.state.user.id) === String(comment.userId)
+      return String(this.$store.state.user.id) === String(comment.user.id)
     },
-    /**
-     * 加载一级评论
-     */
-    loadComments(firstLoad = false) {
-      if (this.loading) {
-        return
-      }
 
-      this.loading = true
-
-      const param = {
-        current: this.current,
-        pageSize: this.pageSize,
-        objectId: this.objectId,
-        type: this.type
-      }
-
-      this.$mapi.portal.queryCommentList(param).then(({ data }) => {
-        if (!data) {
-          return
-        }
-
-        const list = data.list || []
-        if (this.current === 1) {
-          this.commentList = list
-        } else {
-          this.commentList.push(...list)
-        }
-
-        this.total = data.total || 0
-
-        this.current++
-
-        this.$emit(
-          'getCommentCount',
-          this.total,
-          firstLoad
-        )
-      }).catch(() => {
-        this.$toast({
-          type: 'error',
-          message: '评论加载失败'
-        })
-      }).finally(() => {
-        this.loading = false
-      })
-    },
     /**
      * 开始回复
      *
@@ -760,28 +552,15 @@ export default {
       }
 
       const parentComment = parent || comment
-
       this.replyTarget = {
         id: comment.id,
-        userId: comment.userId,
-        nickname: comment.nickname
+        userId: comment.user.id,
+        nickname: comment.user.nickname
       }
 
-      /**
-       * 非常关键：
-       *
-       * 无论回复一级评论还是回复二级评论，
-       * parentId 永远指向一级评论。
-       */
       this.replyParentId = parentComment.id
-
       this.$nextTick(() => {
-        const textarea =
-          this.$el.querySelector('.comment-textarea')
-
-        if (textarea) {
-          textarea.focus()
-        }
+        this.$refs.commentContentRef.focus()
       })
     },
     /**
@@ -792,63 +571,6 @@ export default {
       this.replyParentId = null
     },
 
-    /**
-     * 点赞
-     */
-    toggleLike(comment) {
-      if (this.likeLoading) {
-        return
-      }
-
-      if (!this.$store.state.user.id) {
-        this.$store.state.loginFlag = true
-        return
-      }
-
-      this.likeLoading = true
-
-      const param = {
-        userId: this.$store.state.user.id,
-        commentId: comment.id
-      }
-
-      this.$mapi.portal.likeComment(param)
-        .then(({ code, message }) => {
-          if (code !== 200) {
-            this.$toast({
-              type: 'error',
-              message: message || '操作失败'
-            })
-            return
-          }
-
-          const liked = this.isLike(comment.id)
-
-          const likeCount = Number(comment.likeCount || 0)
-
-          this.$set(
-            comment,
-            'likeCount',
-            liked
-              ? Math.max(likeCount - 1, 0)
-              : likeCount + 1
-          )
-
-          this.$store.commit(
-            'commentLike',
-            comment.id
-          )
-        })
-        .catch(() => {
-          this.$toast({
-            type: 'error',
-            message: '操作失败'
-          })
-        })
-        .finally(() => {
-          this.likeLoading = false
-        })
-    },
     /**
      * 删除一级评论
      */
@@ -863,7 +585,6 @@ export default {
         this.doDeleteComment(comment)
       })
     },
-
     /**
      * 删除回复
      */
@@ -878,90 +599,57 @@ export default {
         this.doDeleteComment(reply, parent)
       })
     },
-
     /**
      * 执行删除
      */
     doDeleteComment(comment, parent = null) {
-      const param = {
-        userId: this.$store.state.user.id,
-        commentId: comment.id
-      }
-
-      this.$mapi.portal.deleteComment(param)
-        .then(({ code, message }) => {
-          if (code !== 200) {
-            this.$toast({
-              type: 'error',
-              message: message || '删除失败'
-            })
-            return
+      this.$mapi.portal.deleteComment({ commentId: comment.id }).then(res => {
+        this.$toast({ type: 'success', message: '删除成功' })
+        if (parent) {
+          // 删除回复
+          try {
+            const index = parent.replyList.findIndex(item => item.id === comment.id)
+            if (index !== -1) {
+              parent.replyList.splice(index, 1)
+              parent.replyCount = Math.max(Number(parent.replyCount || 0) - 1, 0)
+            }
+          } catch (e) {
+            // 兜底，如果前段删除后的逻辑失败，则后端重新加载缓存
+            console.error('删除评论后更新本地状态失败:', e)
+            this.loadReplies(parent)
           }
-
-          this.$toast({
-            type: 'success',
-            message: '删除成功'
-          })
-
-          /**
-           * 删除一级评论
-           */
-          if (!parent) {
-            const index = this.commentList.findIndex(
-              item => item.id === comment.id
-            )
-
+        } else {
+          // 删除一级评论
+          try {
+            const index = this.commentList.findIndex(item => item.id === comment.id)
             if (index !== -1) {
               this.commentList.splice(index, 1)
               this.total = Math.max(this.total - 1, 0)
             }
-
-            return
+            throw new Error('评论不存在')
+          } catch (e) {
+            // 兜底，如果前段删除后的逻辑失败，则后端重新加载缓存
+            console.error('删除评论后更新本地状态失败:', e)
+            this.loadComments(false)
           }
-
-          /**
-           * 删除回复
-           */
-          const index = parent.replyList.findIndex(
-            item => item.id === comment.id
-          )
-
-          if (index !== -1) {
-            parent.replyList.splice(index, 1)
-          }
-
-          parent.replyCount = Math.max(
-            Number(parent.replyCount || 0) - 1,
-            0
-          )
-        })
-        .catch(() => {
-          this.$toast({
-            type: 'error',
-            message: '删除失败'
-          })
-        })
+        }
+      }).catch(error => {
+        this.$toast({ type: 'error', message: error })
+      })
     },
 
     /**
      * 当前已经加载的回复数量
      */
     loadedReplyCount(comment) {
-      return comment.replyList
-        ? comment.replyList.length
-        : 0
+      return comment.replyList ? comment.replyList.length : 0
     },
 
     /**
      * 加载回复
      */
     loadReplies(comment) {
-      const current =
-        comment.replyPage &&
-        comment.replyPage.current
-          ? comment.replyPage.current
-          : 1
-
+      const current = comment.replyPage && comment.replyPage.current ? comment.replyPage.current : 1
       this.loadReplyPage(comment, current)
     },
     /**
@@ -980,38 +668,13 @@ export default {
         pageSize: this.replyPageSize
       }
 
-      this.$mapi.portal.queryCommentReplyList(param)
-        .then(({ code, data }) => {
-          if (code !== 200 || !data) {
-            return
-          }
-
-          this.$set(
-            comment,
-            'replyList',
-            data.list || []
-          )
-
-          const totalPage = Math.ceil(
-            Number(comment.replyCount || 0) /
-            this.replyPageSize
-          )
-
-          this.$set(
-            comment,
-            'replyPage',
-            {
-              current,
-              totalPage
-            }
-          )
-        })
-        .catch(() => {
-          this.$toast({
-            type: 'error',
-            message: '回复加载失败'
-          })
-        })
+      this.$mapi.portal.queryCommentReplyList(param).then(({ code, data }) => {
+        this.$set(comment, 'replyList', data.records || [])
+        const total = data.total || 0
+        this.$set(comment, 'replyPage', { current, total })
+      }).catch(() => {
+        this.$toast({ type: 'error', message: '回复加载失败' })
+      })
     }
   }
 }
@@ -1244,8 +907,6 @@ export default {
   margin-left: 12px;
 }
 
-/* 用户 */
-
 .comment-user-row {
   display: flex;
   align-items: center;
@@ -1260,16 +921,12 @@ export default {
 
 .comment-user-name {
   overflow: hidden;
-  color: #303133;
+  color: #4a4a4a;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.comment-user-name:hover {
-  color: #409eff;
 }
 
 .blogger-tag {

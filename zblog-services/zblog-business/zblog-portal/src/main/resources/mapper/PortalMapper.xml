@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.portal.mapper.PortalMapper">
+    <select id="selectCommentTotal" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM comment c WHERE c.OBJECT_ID = #{query.objectId} AND c.TYPE = #{query.type} AND c.STATUS = 1
+    </select>
+
+    <select id="selectCommentList" resultType="com.github.stazxr.zblog.portal.domain.vo.PortalCommentVo">
+        SELECT
+            c.ID, c.PARENT_ID, c.USER_ID, c.REPLY_USER_ID, c.VISITOR_ID, c.REPLY_VISITOR_ID, c.CONTENT,
+            c.LIKE_COUNT, c.REPLY_COUNT, c.IP_SOURCE, c.CREATE_TIME,
+            u.NICKNAME AS USER_NICKNAME, u.HEAD_IMG_URL AS USER_AVATAR, u.WEBSITE AS USER_WEBSITE,
+            v.NICKNAME AS VISITOR_NICKNAME, v.AVATAR AS VISITOR_AVATAR,
+            (
+                SELECT EXISTS (
+                    SELECT 1 FROM comment_like cl1 WHERE cl1.COMMENT_ID = c.ID
+                    <choose>
+                        <when test="query.userId != null">
+                            AND cl1.USER_ID = #{query.userId}
+                        </when>
+                        <when test="query.visitorId != null and query.visitorId != ''">
+                            AND cl1.VISITOR_ID = #{query.visitorId}
+                        </when>
+                        <otherwise>
+                            AND cl1.ID = 0
+                        </otherwise>
+                    </choose>
+                )
+            ) AS LIKED
+        FROM comment c
+        LEFT JOIN user u ON u.ID = c.USER_ID
+        LEFT JOIN visitor_profile v ON v.VISITOR_ID = c.VISITOR_ID
+        WHERE c.OBJECT_ID = #{query.objectId} AND c.TYPE = #{query.type} AND c.PARENT_ID = 0 AND c.STATUS = 1
+        ORDER BY c.CREATE_TIME DESC, c.ID
+    </select>
+
+    <select id="selectReplyCommentList" resultType="com.github.stazxr.zblog.portal.domain.vo.PortalCommentVo">
+        SELECT
+            c.ID, c.PARENT_ID, c.USER_ID, c.REPLY_USER_ID, c.VISITOR_ID, c.REPLY_VISITOR_ID, c.CONTENT,
+            c.LIKE_COUNT, c.REPLY_COUNT, c.IP_SOURCE, c.CREATE_TIME,
+            u1.NICKNAME AS USER_NICKNAME, u1.HEAD_IMG_URL AS USER_AVATAR, u1.WEBSITE AS USER_WEBSITE,
+            v1.NICKNAME AS VISITOR_NICKNAME, v1.AVATAR AS VISITOR_AVATAR,
+            u2.NICKNAME AS REPLY_USER_NICKNAME, u2.HEAD_IMG_URL AS REPLY_USER_AVATAR, u2.WEBSITE AS REPLY_USER_WEBSITE,
+            v2.NICKNAME AS REPLY_VISITOR_NICKNAME, v2.AVATAR AS REPLY_VISITOR_AVATAR,
+            (
+                SELECT EXISTS (
+                    SELECT 1 FROM comment_like cl WHERE cl.COMMENT_ID = c.ID
+                    <choose>
+                        <when test="query.userId != null">
+                            AND cl.USER_ID = #{query.userId}
+                        </when>
+                        <when test="query.visitorId != null and query.visitorId != ''">
+                            AND cl.VISITOR_ID = #{query.visitorId}
+                        </when>
+                        <otherwise>
+                            AND cl.ID = 0
+                        </otherwise>
+                    </choose>
+                )
+            ) AS LIKED
+        FROM comment c
+        LEFT JOIN user u1 ON u1.ID = c.USER_ID
+        LEFT JOIN visitor_profile v1 ON v1.VISITOR_ID = c.VISITOR_ID
+        LEFT JOIN user u2 ON u2.ID = c.REPLY_USER_ID
+        LEFT JOIN visitor_profile v2 ON v2.VISITOR_ID = c.REPLY_VISITOR_ID
+        WHERE c.PARENT_ID = #{query.parentId} AND c.STATUS = 1
+        ORDER BY c.CREATE_TIME DESC, c.ID
+    </select>
+</mapper>

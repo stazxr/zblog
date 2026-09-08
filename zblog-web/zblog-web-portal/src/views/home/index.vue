@@ -137,10 +137,10 @@
           <v-card class="animated zoomIn blog-card mt-5">
             <div class="author-wrapper">
               <v-avatar size="110">
-                <img :src="websiteConfig['websiteAvatar']" class="author-avatar" alt="">
+                <img :src="websiteConfig['websiteAuthorAvatar']" class="author-avatar" alt="">
               </v-avatar>
               <div style="font-size: 1.375rem; margin-top:0.625rem;">
-                {{ websiteConfig['websiteAuthor'] || websiteConfig['websiteName'] }}
+                {{ websiteConfig['websiteAuthorName'] || websiteConfig['websiteName'] }}
               </div>
               <div v-if="websiteConfig['websiteIntro'] && websiteConfig['websiteIntro'] !== ''" style="font-size: 0.875rem;">
                 {{ websiteConfig['websiteIntro'] }}

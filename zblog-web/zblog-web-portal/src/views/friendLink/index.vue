@@ -26,7 +26,7 @@
             <div class="my-site-content">
               <div class="my-site-profile">
                 <v-avatar size="72" class="my-site-avatar">
-                  <v-img :src="websiteConfig.websiteAvatar" alt="" />
+                  <v-img :src="websiteConfig.websiteAuthorAvatar" alt="" />
                 </v-avatar>
                 <div class="my-site-title">
                   <div class="my-site-name">
@@ -69,7 +69,7 @@
                 头像地址
               </div>
               <div class="site-info-value site-info-url">
-                {{ websiteConfig.websiteAvatar }}
+                {{ websiteConfig.websiteAuthorAvatar }}
               </div>
             </div>
 

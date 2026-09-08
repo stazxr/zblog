@@ -1,10 +1,13 @@
 package com.github.stazxr.zblog.portal.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.ratelimit.annotation.RateLimit;
 import com.github.stazxr.zblog.bas.ratelimit.core.RateLimitFallback;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.bas.validation.group.Group1;
+import com.github.stazxr.zblog.bas.validation.group.Group2;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
@@ -16,6 +19,8 @@ import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.domain.dto.CommentDto;
+import com.github.stazxr.zblog.portal.domain.dto.query.PortalCommentQueryDto;
+import com.github.stazxr.zblog.portal.domain.vo.PortalCommentVo;
 import com.github.stazxr.zblog.portal.service.PortalService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -220,6 +225,48 @@ public class PortalController {
     }
 
     /**
+     * 查询前台评论总数
+     *
+     * @param queryDto 查询参数
+     * @return Long 评论总数
+     */
+    @GetMapping("/queryCommentTotal")
+    @ApiOperation(value = "查询前台评论总数")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询前台评论总数", code = "PORTQ006", level = RouterLevel.OPEN)
+    public Long queryCommentTotal(@Validated(Group1.class) PortalCommentQueryDto queryDto) {
+        return portalService.queryCommentTotal(queryDto);
+    }
+
+    /**
+     * 查询前台评论列表
+     *
+     * @param queryDto 查询参数
+     * @return PageInfo<PortalCommentVo>
+     */
+    @GetMapping("/queryCommentList")
+    @ApiOperation(value = "查询前台评论列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询前台评论列表", code = "PORTQ007", level = RouterLevel.OPEN)
+    public IPage<PortalCommentVo> queryCommentList(@Validated(Group1.class) PortalCommentQueryDto queryDto) {
+        return portalService.queryCommentList(queryDto);
+    }
+
+    /**
+     * 查询前台评论回复列表
+     *
+     * @param queryDto 查询参数
+     * @return PageInfo<PortalCommentVo>
+     */
+    @GetMapping("/queryCommentReplyList")
+    @ApiOperation(value = "查询前台评论回复列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "查询前台评论回复列表", code = "PORTQ008", level = RouterLevel.OPEN)
+    public IPage<PortalCommentVo> queryCommentReplyList(@Validated(Group2.class) PortalCommentQueryDto queryDto) {
+        return portalService.queryCommentReplyList(queryDto);
+    }
+
+    /**
      * 新增评论
      *
      * @param request    请求信息
@@ -234,81 +281,43 @@ public class PortalController {
         portalService.saveComment(request, commentDto);
     }
 
-//    /**
-//     * 点赞评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @FormResubmitCheck
-//    @PostMapping(value = "/likeComment")
-//    @ApiOperation(value = "点赞评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "点赞评论", code = "likeComment", level = RouterLevel.OPEN)
-//    public Result saveComment(HttpServletRequest request, @RequestBody CommentLikeDto commentDto) {
-//        portalService.likeComment(request, commentDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 回复评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/replyComment")
-//    @ApiOperation(value = "回复评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "回复评论", code = "replyComment", level = RouterLevel.OPEN)
-//    public Result replyComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
-//        portalService.saveComment(request, commentDto);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 删除评论
-//     *
-//     * @param commentDto 评论信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/deleteComment")
-//    @ApiOperation(value = "删除评论")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "删除评论", code = "deleteWebComment", level = RouterLevel.OPEN)
-//    public Result deleteComment(@RequestBody CommentDeleteDto commentDto) {
-//        portalService.deleteComment(commentDto);
-//        return Result.success();
-//    }
+    /**
+     * 点赞评论
+     *
+     * @param request   请求信息
+     * @param commentId 评论id
+     * @return true: 点赞/取消点赞成功; false: 点赞/取消点赞失败
+     */
+    @Log
+    @PostMapping(value = "/likeComment")
+    @ApiOperation(value = "点赞评论")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "点赞评论", code = "PORTU002", level = RouterLevel.OPEN)
+    @RateLimit(count = 60, time = 120, enableIp = true)
+    public boolean saveComment(HttpServletRequest request, @RequestParam Long commentId) {
+        return portalService.likeComment(request, commentId);
+    }
 
-//    /**
-//     * 查询前台评论列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVo
-//     */
-//    @GetMapping("/queryCommentList")
-//    @ApiOperation(value = "查询前台评论列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询前台评论列表", code = "queryWebCommentList", level = RouterLevel.OPEN)
-//    public Result queryCommentList(CommentQueryDto queryDto) {
-//        return Result.success().data(portalService.queryCommentList(queryDto));
-//    }
-
-//    /**
-//     * 获取评论回复列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVo
-//     */
-//    @GetMapping("/queryCommentReplyList")
-//    @ApiOperation(value = "获取评论回复列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "获取评论回复列表", code = "queryCommentReplyList", level = RouterLevel.OPEN)
-//    public Result queryCommentReplyList(CommentQueryDto queryDto) {
-//        return Result.success().data(portalService.queryCommentReplyList(queryDto));
-//    }
+    /**
+     * 删除评论
+     *
+     * @param commentId 评论id
+     */
+    @Log
+    @PostMapping(value = "/deleteComment")
+    @ApiOperation(value = "删除评论")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "commentId", value = "评论id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
+    @Router(name = "删除评论", code = "PORTD001", level = RouterLevel.OPEN)
+    @RateLimit(count = 60, time = 120, enableIp = true)
+    public void deleteComment(@RequestParam Long commentId) {
+        portalService.deleteComment(commentId);
+    }
 
 //    /**
 //     * 前台登录

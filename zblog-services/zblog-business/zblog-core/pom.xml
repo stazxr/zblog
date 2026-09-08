@@ -40,11 +40,11 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-        <!-- Page Helper -->
+        <!-- Page Helper 剥离 Pagehelper 分页插件
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-        </dependency>
+        </dependency> -->
         <!-- MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>

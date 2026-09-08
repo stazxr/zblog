@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.ext.mapper.CommentMapper">
-<!--    <resultMap id="webCommentVoListMap" type="com.github.stazxr.zblog.domain.vo.CommentVo">-->
+    <!-- 回复数减一 -->
+    <update id="decrementReplyCount">
+        UPDATE comment SET REPLY_COUNT = GREATEST(REPLY_COUNT - 1, 0) WHERE ID = #{commentId}
+    </update>
+
+    <!-- 回复数加一 -->
+    <update id="incrementReplyCount">
+        UPDATE comment SET REPLY_COUNT = REPLY_COUNT + 1 WHERE ID = #{commentId}
+    </update>
+
+    <!-- 点赞数减一 -->
+    <update id="decrementLikeCount">
+        UPDATE comment SET LIKE_COUNT = GREATEST(LIKE_COUNT - 1, 0) WHERE ID = #{commentId}
+    </update>
+
+    <!-- 点赞数加一 -->
+    <update id="incrementLikeCount">
+        UPDATE comment SET LIKE_COUNT = LIKE_COUNT + 1 WHERE ID = #{commentId}
+    </update>
+
+    <update id="deleteComment">
+        UPDATE comment SET STATUS = 3 WHERE ID = #{commentId} AND STATUS != 3
+    </update>
+
+
+    <!--    <resultMap id="webCommentVoListMap" type="com.github.stazxr.zblog.domain.vo.CommentVo">-->
 <!--        <result property="id" column="ID" />-->
 <!--        <result property="userId" javaType="java.lang.Long" column="USER_ID" />-->
 <!--        <result property="nickname" column="NICKNAME" />-->

@@ -2,6 +2,8 @@ package com.github.stazxr.zblog.portal.service.impl;
 
 import cn.hutool.http.useragent.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.audit.api.AuditService;
 import com.github.stazxr.zblog.audit.enums.AuditScene;
 import com.github.stazxr.zblog.audit.model.AuditContext;
@@ -26,7 +28,10 @@ import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.domain.dto.CommentDto;
+import com.github.stazxr.zblog.portal.domain.dto.query.PortalCommentQueryDto;
 import com.github.stazxr.zblog.portal.domain.error.PortalErrorCode;
+import com.github.stazxr.zblog.portal.domain.vo.PortalCommentVo;
+import com.github.stazxr.zblog.portal.mapper.PortalMapper;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.CommentObjectService;
 import com.github.stazxr.zblog.portal.service.PortalService;
@@ -61,6 +66,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PortalServiceImpl implements PortalService {
     private static final Logger log = LoggerFactory.getLogger(PortalServiceImpl.class);
+
+    private final PortalMapper portalMapper;
 
     private final WebsiteConfigMapper websiteConfigMapper;
 
@@ -466,12 +473,72 @@ public class PortalServiceImpl implements PortalService {
     }
 
     /**
+     * 查询前台评论总数
+     *
+     * @param queryDto 查询参数
+     * @return Long 评论总数
+     */
+    @Override
+    public Long queryCommentTotal(PortalCommentQueryDto queryDto) {
+        return portalMapper.selectCommentTotal(queryDto);
+    }
+
+    /**
+     * 查询前台评论列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<PortalCommentVo>
+     */
+    @Override
+    public IPage<PortalCommentVo> queryCommentList(PortalCommentQueryDto queryDto) {
+        // 设置用户信息
+        if (SecurityUtils.isAuthenticated()) {
+            queryDto.setUserId(SecurityUtils.getLoginId());
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            ThrowUtils.throwIfBlank(visitorId, PortalErrorCode.EPORTA006);
+            queryDto.setVisitorId(visitorId);
+        }
+
+        // 分页查询
+        queryDto.checkPage();
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<PortalCommentVo> page =
+                new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return portalMapper.selectCommentList(page, queryDto);
+    }
+
+    /**
+     * 查询前台评论回复列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<PortalCommentVo>
+     */
+    @Override
+    public IPage<PortalCommentVo> queryCommentReplyList(PortalCommentQueryDto queryDto) {
+        // 设置用户信息
+        if (SecurityUtils.isAuthenticated()) {
+            queryDto.setUserId(SecurityUtils.getLoginId());
+        } else {
+            String visitorId = Context.get("x-visitor-id");
+            ThrowUtils.throwIfBlank(visitorId, PortalErrorCode.EPORTA006);
+            queryDto.setVisitorId(visitorId);
+        }
+
+        // 分页查询
+        queryDto.checkPage();
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<PortalCommentVo> page =
+                new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return portalMapper.selectReplyCommentList(page, queryDto);
+    }
+
+    /**
      * 新增评论
      *
      * @param request    请求信息
      * @param commentDto 评论信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveComment(HttpServletRequest request, CommentDto commentDto) {
         // 判断用户是否登录
         boolean isAuthenticated = SecurityUtils.isAuthenticated();
@@ -559,8 +626,81 @@ public class PortalServiceImpl implements PortalService {
         commentMapper.insert(comment);
 
         // 更新一级评论回复数量
-        if (comment.getParentId() > 0) {
+        if (comment.getParentId() != 0) {
             commentMapper.incrementReplyCount(comment.getParentId());
+        }
+    }
+
+    /**
+     * 点赞评论
+     *
+     * @param request   请求信息
+     * @param commentId 评论id
+     * @return true: 点赞/取消点赞成功; false: 点赞/取消点赞失败
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean likeComment(HttpServletRequest request, Long commentId) {
+        CommentLike commentLike = new CommentLike();
+        commentLike.setCommentId(commentId);
+        if (SecurityUtils.isAuthenticated()) {
+            // 登录用户
+            Long userId = SecurityUtils.getLoginId();
+            commentLike.setUserId(userId);
+        } else {
+            // 访客
+            String visitorId = Context.get("x-visitor-id");
+            ThrowUtils.throwIfBlank(visitorId, PortalErrorCode.EPORTA006);
+            commentLike.setVisitorId(visitorId);
+        }
+
+        // 没有用户信息，跳过
+        if (commentLike.getUserId() == null && StringUtils.isBlank(commentLike.getVisitorId())) {
+            return false;
+        }
+
+        if (commentLikeMapper.isLiked(commentLike)) {
+            // 取消点赞
+            commentLikeMapper.deleteCommentLike(commentLike);
+            commentMapper.decrementLikeCount(commentId);
+        } else {
+            // 点赞
+            commentLike.setId(SequenceUtils.getId());
+            String ip = IpUtils.getIp(request);
+            commentLike.setIpAddress(ip);
+            commentLike.setIpSource(IpRegionUtils.getRegion(ip));
+            commentLike.setCreateTime(LocalDateTime.now());
+            commentLikeMapper.insert(commentLike);
+            commentMapper.incrementLikeCount(commentId);
+        }
+
+        return true;
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param commentId 评论id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteComment(Long commentId) {
+        Comment comment = commentMapper.selectById(commentId);
+        boolean commentNotExist = comment == null || CommentStatus.DELETED.getValue().equals(comment.getStatus());
+        ThrowUtils.throwIf(commentNotExist, BaseErrorCode.ECOREA001);
+        if (SecurityUtils.isAuthenticated()) {
+            // 登录用户
+            Long userId = SecurityUtils.getLoginId();
+            ThrowUtils.throwIf(!userId.equals(comment.getUserId()), PortalErrorCode.EPORTA007);
+        } else {
+            // 访客
+            String visitorId = Context.get("x-visitor-id");
+            ThrowUtils.throwIfBlank(visitorId, PortalErrorCode.EPORTA006);
+            ThrowUtils.throwIf(!visitorId.equals(comment.getVisitorId()), PortalErrorCode.EPORTA007);
+        }
+        ThrowUtils.when(commentMapper.deleteComment(commentId) != 1).system(BaseErrorCode.SCOREA003);
+        if (comment.getParentId() != 0) {
+            commentMapper.decrementReplyCount(comment.getParentId());
         }
     }
 

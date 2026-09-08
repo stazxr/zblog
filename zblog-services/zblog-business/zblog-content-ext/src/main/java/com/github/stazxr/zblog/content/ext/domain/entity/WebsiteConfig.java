@@ -58,19 +58,24 @@ public class WebsiteConfig implements Serializable {
     private String websiteCover;
 
     /**
-     * 作者名称
-     */
-    private String websiteAuthor;
-
-    /**
-     * 作者头像
-     */
-    private String websiteAvatar;
-
-    /**
      * 网站创建日期
      */
     private LocalDate websiteCreateTime;
+
+    /**
+     * 站长id
+     */
+    private String websiteAuthorId;
+
+    /**
+     * 站长名称
+     */
+    private String websiteAuthorName;
+
+    /**
+     * 站长头像
+     */
+    private String websiteAuthorAvatar;
 
     /**
      * 网站创建日期
@@ -116,6 +121,11 @@ public class WebsiteConfig implements Serializable {
      * 友链健康检测失败几次则下线友链
      */
     private Integer friendLinkCheckFailedCount;
+
+    /**
+     * 访客评论开关
+     */
+    private Boolean commentGuestSwitch;
 
     /**
      * 弹幕加载量

@@ -27,26 +27,6 @@ public class Comment implements Serializable {
     private Long id;
 
     /**
-     * 评论用户ID
-     */
-    private Long userId;
-
-    /**
-     * 评论访客ID
-     */
-    private String visitorId;
-
-    /**
-     * 评论对象ID
-     */
-    private String objectId;
-
-    /**
-     * 评论类型
-     */
-    private Integer type;
-
-    /**
      * 所属一级评论ID
      *
      * <p>0表示一级评论</p>
@@ -54,9 +34,29 @@ public class Comment implements Serializable {
     private Long parentId;
 
     /**
+     * 评论类型
+     */
+    private Integer type;
+
+    /**
+     * 评论对象ID
+     */
+    private String objectId;
+
+    /**
+     * 评论用户ID
+     */
+    private Long userId;
+
+    /**
      * 回复用户ID
      */
     private Long replyUserId;
+
+    /**
+     * 评论访客ID
+     */
+    private String visitorId;
 
     /**
      * 回复访客ID

@@ -84,45 +84,6 @@
 //    UserVo webLogin(HttpServletRequest request, UserLoginDto loginDto);
 //
 //    /**
-//     * 查询前台评论列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVo
-//     */
-//    PageInfo<CommentVo> queryCommentList(CommentQueryDto queryDto);
-//
-//    /**
-//     * 获取评论回复列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentReplyVo
-//     */
-//    PageInfo<CommentReplyVo> queryCommentReplyList(CommentQueryDto queryDto);
-//
-//    /**
-//     * 新增评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     */
-//    void saveComment(HttpServletRequest request, CommentDto commentDto);
-//
-//    /**
-//     * 点赞评论
-//     *
-//     * @param request    请求信息
-//     * @param commentDto 评论信息
-//     */
-//    void likeComment(HttpServletRequest request, CommentLikeDto commentDto);
-//
-//    /**
-//     * 删除评论
-//     *
-//     * @param commentDto 评论信息
-//     */
-//    void deleteComment(CommentDeleteDto commentDto);
-//
-//    /**
 //     * 查询前台说说列表
 //     *
 //     * @param queryDto 查询参数

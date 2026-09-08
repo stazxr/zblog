@@ -3,7 +3,7 @@
     <!-- 博主介绍 -->
     <div class="blogger-info">
       <v-avatar size="110" style="margin-bottom:0.5rem">
-        <img :src="websiteConfig['websiteAvatar']" alt="">
+        <img :src="websiteConfig['websiteAuthorAvatar']" alt="">
       </v-avatar>
     </div>
     <!-- 博客信息 -->

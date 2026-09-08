@@ -52,9 +52,17 @@ export default {
   queryCommentImageList: params => {
     return api.httpRequest().get(`${portalApi}/queryCommentImageList`, params)
   },
+  // 获取评论总数
+  queryCommentTotal: params => {
+    return api.httpRequest().get(`${portalApi}/queryCommentTotal`, params)
+  },
   // 获取评论列表
   queryCommentList: params => {
     return api.httpRequest().get(`${portalApi}/queryCommentList`, params)
+  },
+  // 获取评论回复列表
+  queryCommentReplyList: params => {
+    return api.httpRequest().get(`${portalApi}/queryCommentReplyList`, params)
   },
   // 保存评论
   saveComment: params => {
@@ -62,19 +70,15 @@ export default {
   },
   // 点赞评论
   likeComment: params => {
-    return api.httpRequest().post(`${portalApi}/likeComment`, params)
-  },
-  // 回复评论
-  replyComment: params => {
-    return api.httpRequest().post(`${portalApi}/replyComment`, params)
+    return api.httpRequest().post(`${portalApi}/likeComment`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
   // 删除评论
   deleteComment: params => {
-    return api.httpRequest().post(`${portalApi}/deleteComment`, params)
-  },
-  // 获取评论回复列表
-  queryCommentReplyList: params => {
-    return api.httpRequest().get(`${portalApi}/queryCommentReplyList`, params)
+    return api.httpRequest().post(`${portalApi}/deleteComment`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
 
   // 登录

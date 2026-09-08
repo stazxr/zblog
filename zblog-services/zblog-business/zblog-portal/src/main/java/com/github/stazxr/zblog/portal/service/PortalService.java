@@ -1,5 +1,6 @@
 package com.github.stazxr.zblog.portal.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
@@ -9,6 +10,8 @@ import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
 import com.github.stazxr.zblog.portal.domain.dto.BarrageMessageDto;
 import com.github.stazxr.zblog.portal.domain.dto.CommentDto;
+import com.github.stazxr.zblog.portal.domain.dto.query.PortalCommentQueryDto;
+import com.github.stazxr.zblog.portal.domain.vo.PortalCommentVo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -112,10 +115,50 @@ public interface PortalService {
     List<CommentEmojiVo> queryCommentImageList();
 
     /**
+     * 查询前台评论总数
+     *
+     * @param queryDto 查询参数
+     * @return Long 评论总数
+     */
+    Long queryCommentTotal(PortalCommentQueryDto queryDto);
+
+    /**
+     * 查询前台评论列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<PortalCommentVo>
+     */
+    IPage<PortalCommentVo> queryCommentList(PortalCommentQueryDto queryDto);
+
+    /**
+     * 查询前台评论回复列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<PortalCommentVo>
+     */
+    IPage<PortalCommentVo> queryCommentReplyList(PortalCommentQueryDto queryDto);
+
+    /**
      * 新增评论
      *
      * @param request    请求信息
      * @param commentDto 评论信息
      */
     void saveComment(HttpServletRequest request, CommentDto commentDto);
+
+    /**
+     * 点赞评论
+     *
+     * @param request   请求信息
+     * @param commentId 评论id
+     * @return true: 点赞/取消点赞成功; false: 点赞/取消点赞失败
+     */
+    boolean likeComment(HttpServletRequest request, Long commentId);
+
+    /**
+     * 删除评论
+     *
+     * @param commentId 评论id
+     */
+    void deleteComment(Long commentId);
 }

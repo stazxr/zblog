@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.ext.mapper.CommentLikeMapper">
+    <select id="isLiked" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM comment_like WHERE COMMENT_ID = #{like.commentId}
+            <choose>
+                <when test="like.userId != null">
+                    AND USER_ID = #{like.userId}
+                </when>
+                <when test="like.visitorId != null and like.visitorId != ''">
+                    AND VISITOR_ID = #{like.visitorId}
+                </when>
+                <otherwise>
+                    AND ID = 0
+                </otherwise>
+            </choose>
+        )
+    </select>
 
+    <delete id="deleteCommentLike">
+        DELETE FROM comment_like WHERE COMMENT_ID = #{like.commentId}
+        <choose>
+            <when test="like.userId != null">
+                AND USER_ID = #{like.userId}
+            </when>
+            <when test="like.visitorId != null and like.visitorId != ''">
+                AND VISITOR_ID = #{like.visitorId}
+            </when>
+            <otherwise>
+                AND ID = 0
+            </otherwise>
+        </choose>
+    </delete>
 </mapper>

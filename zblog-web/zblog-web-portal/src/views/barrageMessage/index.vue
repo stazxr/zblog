@@ -24,7 +24,7 @@
     <!-- ==================== 评论区域 ==================== -->
     <section ref="commentSection" class="message-comment-section">
       <div class="message-comment-container">
-        <Comment title="留言" :type="2" :object-id="0" @getCommentCount="getCommentCount" />
+        <Comment title="留言" :type="2" :object-id="0" />
       </div>
     </section>
   </div>
@@ -46,8 +46,7 @@ export default {
       showSendBtn: false,
       messageContent: '',
       messageSending: false,
-      topicDestination: '/topic/barrageMessage',
-      commentCount: 0
+      topicDestination: '/topic/barrageMessage'
     }
   },
   created() {

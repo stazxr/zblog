@@ -42,13 +42,59 @@
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="12">
-                <el-form-item label="网站作者">
-                  <el-input v-model="config.websiteAuthor" maxlength="50" show-word-limit />
+                <el-form-item label="建站日期">
+                  <el-date-picker v-model="config.websiteCreateTime" type="date" value-format="yyyy-MM-dd" />
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="12">
-                <el-form-item label="建站日期">
-                  <el-date-picker v-model="config.websiteCreateTime" type="date" value-format="yyyy-MM-dd" />
+                <el-form-item label="站长" prop="websiteAuthorId">
+                  <el-select
+                    v-model="config.websiteAuthorId"
+                    class="author-select"
+                    filterable
+                    remote
+                    clearable
+                    reserve-keyword
+                    :remote-method="queryUserList"
+                    :loading="userLoading"
+                    placeholder="请输入昵称搜索"
+                    @change="handleAuthorChange"
+                  >
+                    <el-option v-for="user in userList" :key="user.id" :label="user.nickname" :value="String(user.id)">
+                      <div class="user-option">
+                        <el-avatar :size="28" :src="user.headImgUrl" />
+                        <div class="user-option-info">
+                          <span class="user-option-name">
+                            {{ user.nickname }}
+                          </span>
+                          <span class="user-option-username">
+                            {{ user.username }}
+                          </span>
+                        </div>
+                      </div>
+                    </el-option>
+                  </el-select>
+                  <div class="form-tip">
+                    输入用户昵称搜索并选择站长
+                  </div>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="config.websiteAuthorId" :xs="24">
+                <el-form-item label="站长信息">
+                  <div class="author-preview">
+                    <el-avatar :size="48" :src="config.websiteAuthorAvatar" />
+                    <div class="author-preview-info">
+                      <div class="author-preview-name">
+                        {{ config.websiteAuthorName || '未知用户' }}
+                      </div>
+                      <div class="author-preview-id">
+                        用户 ID: {{ config.websiteAuthorId }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-tip">
+                    站长名称和头像来自用户信息，不可在此处修改
+                  </div>
                 </el-form-item>
               </el-col>
               <el-col :xs="24">
@@ -113,29 +159,6 @@
                       <el-input v-model="config.websiteCover" maxlength="500" placeholder="上传图片或直接输入图片地址" />
                       <div class="form-tip">
                         建议使用 16:9 左右的横向图片
-                      </div>
-                    </div>
-                  </div>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24">
-                <el-form-item label="作者头像" class="image-form-item">
-                  <div class="image-setting">
-                    <muses-image-crop-upload
-                      v-model="config.websiteAvatar"
-                      :aspect-ratio="1"
-                      :output-width="400"
-                      :output-height="400"
-                      :preview-width="100"
-                      :preview-height="100"
-                      :min-width="200"
-                      :min-height="200"
-                      circle
-                    />
-                    <div class="image-url">
-                      <el-input v-model="config.websiteAvatar" maxlength="500" placeholder="上传图片或直接输入图片地址" />
-                      <div class="form-tip">
-                        建议使用正方形头像图片
                       </div>
                     </div>
                   </div>
@@ -530,6 +553,9 @@ export default {
   name: 'WebsiteConfig',
   data() {
     return {
+      userList: [],
+      userLoading: false,
+      userSearchTimer: null,
       submitLoading: false,
       activeSection: 'basic',
       navList: [
@@ -579,9 +605,10 @@ export default {
         websiteLogo: '',
         websiteFavicon: '',
         websiteCover: '',
-        websiteAuthor: '',
-        websiteAvatar: '',
         websiteCreateTime: '',
+        websiteAuthorId: '',
+        websiteAuthorName: '',
+        websiteAuthorAvatar: '',
         // 网站通告
         websiteNotice: '',
         // SEO
@@ -597,7 +624,7 @@ export default {
         friendLinkApplySwitch: true,
         friendLinkCheckFailedCount: 3,
         // 评论
-        commentGuestSwitch: true,
+        commentGuestSwitch: false,
         commentEmojis: [],
         // 弹幕
         barrageMessageLoadSize: 200,
@@ -609,6 +636,46 @@ export default {
         // 第三方服务
         statisticsCode: ''
       }
+    },
+    queryUserList(keyword) {
+      if (!keyword || !keyword.trim()) {
+        this.userList = []
+        return
+      }
+
+      clearTimeout(this.userSearchTimer)
+      this.userSearchTimer = setTimeout(() => {
+        this.userLoading = true
+        this.$mapi.user.pageListOfPublic({
+          nickname: keyword.trim(),
+          page: 1,
+          pageSize: 10
+        }).then(res => {
+          this.userList = res.data.records || []
+        }).catch(_ => {
+          this.userList = []
+        }).finally(() => {
+          this.userLoading = false
+        })
+      }, 300)
+    },
+    handleAuthorChange(userId) {
+      if (!userId) {
+        this.config.websiteAuthorName = ''
+        this.config.websiteAuthorAvatar = ''
+        return
+      }
+
+      const user = this.userList.find(
+        item => String(item.id) === String(userId)
+      )
+
+      if (!user) {
+        return
+      }
+
+      this.config.websiteAuthorName = user.nickname || ''
+      this.config.websiteAuthorAvatar = user.headImgUrl || ''
     },
     // 新增表情（URL）
     addCommentEmojiByUrl() {
@@ -746,6 +813,9 @@ export default {
         }))
         this.config = config
         this.originalConfig = JSON.parse(JSON.stringify(this.config))
+        if (this.config.websiteAuthorName) {
+          this.queryUserList(this.config.websiteAuthorName)
+        }
       })
     },
     /**
@@ -951,6 +1021,66 @@ export default {
 
 .section-content {
   max-width: 1000px;
+}
+
+.author-select {
+  width: 100%;
+}
+
+.user-option {
+  display: flex;
+  align-items: center;
+  height: 42px;
+}
+
+.user-option-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  margin-left: 10px;
+}
+
+.user-option-name {
+  color: #303133;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.user-option-username {
+  margin-top: 1px;
+  color: #c0c4cc;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.author-preview {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #ebeef5;
+  border-radius: 6px;
+}
+
+.author-preview-info {
+  margin-left: 12px;
+}
+
+.author-preview-name {
+  color: #303133;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.author-preview-id {
+  margin-top: 3px;
+  color: #a8abb2;
+  font-size: 11px;
+  line-height: 17px;
 }
 
 /* =========================

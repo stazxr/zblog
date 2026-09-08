@@ -13,6 +13,7 @@
 
 <script>
 export default {
+  name: 'Emoji',
   props: {
     showEmojiPicker: {
       type: Boolean,

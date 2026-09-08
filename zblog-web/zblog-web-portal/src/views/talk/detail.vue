@@ -49,18 +49,14 @@
         </div>
       </div>
 
-      <!-- 评论 -->
-      <Comment id="comment" :type="commentType" @getCommentCount="getCommentCount" />
+      <!-- 评论
+      <Comment id="comment" :type="commentType" @getCommentCount="getCommentCount" /> -->
     </v-card>
   </div>
 </template>
 
 <script>
-import Comment from '../../components/TalkComment'
 export default {
-  components: {
-    Comment
-  },
   data: function() {
     return {
       commentType: 3,

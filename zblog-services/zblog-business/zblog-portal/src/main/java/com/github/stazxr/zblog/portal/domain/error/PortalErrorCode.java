@@ -20,7 +20,9 @@ public enum PortalErrorCode implements ErrorCode {
     /** 回复评论无效 */
     EPORTA005("PORTAL_COMMENT_OBJECT_INVALID"),
     /** 身份信息异常 */
-    EPORTA006("PORTAL_USER_INVALID");
+    EPORTA006("PORTAL_USER_INVALID"),
+    /** 只允许删除自己的评论 */
+    EPORTA007("PORTAL_COMMENT_DELETE_PERM_ERROR");
 
     private final String i18nKey;
 

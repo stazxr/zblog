@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.pagehelper.PageInfo;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
 import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;

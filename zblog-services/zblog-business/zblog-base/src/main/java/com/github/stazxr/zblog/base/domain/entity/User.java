@@ -1,7 +1,6 @@
 package com.github.stazxr.zblog.base.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.github.stazxr.zblog.bas.mask.MaskType;
 import com.github.stazxr.zblog.bas.mask.core.FieldMask;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
@@ -72,7 +71,7 @@ public class User extends SecurityUser {
     /**
      * 密码修改时间
      */
-    private LocalDateTime changePwdTime;
+    private LocalDateTime changePasswordTime;
 
     /**
      * 密码到期时间
@@ -98,7 +97,6 @@ public class User extends SecurityUser {
      * 上次登录时间
      */
     @TableField(exist = false)
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginTime;
 
     /**

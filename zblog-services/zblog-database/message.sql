@@ -241,6 +241,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('WEBSITE_CONFIG_NAME_REQUIRED', 'en-US', 'Website name cannot be blank', 'common'),
 ('WEBSITE_CONFIG_TITLE_REQUIRED', 'zh-CN', '网站标题不能为空', 'common'),
 ('WEBSITE_CONFIG_TITLE_REQUIRED', 'en-US', 'Website title cannot be blank', 'common'),
+('WEBSITE_CONFIG_AUTHOR_NOT_EXISTS', 'zh-CN', '站长信息不存在，请重新填写', 'common'),
+('WEBSITE_CONFIG_AUTHOR_NOT_EXISTS', 'en-US', 'Website author not exist', 'common'),
 -- 网站链接
 ('WEBSITE_LINK_NAME_REQUIRED', 'zh-CN', '网站链接名称不能为空', 'common'),
 ('WEBSITE_LINK_NAME_REQUIRED', 'en-US', 'Website link name cannot be blank', 'common'),
@@ -384,5 +386,7 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('PORTAL_COMMENT_PARENT_LEVEL_INVALID', 'en-US', 'TODO', 'common'),
 ('PORTAL_COMMENT_OBJECT_INVALID', 'zh-CN', '回复评论无效，请稍后再试', 'common'),
 ('PORTAL_COMMENT_OBJECT_INVALID', 'en-US', 'TODO', 'common'),
+('PORTAL_COMMENT_DELETE_PERM_ERROR', 'zh-CN', '只允许删除自己的评论', 'common'),
+('PORTAL_COMMENT_DELETE_PERM_ERROR', 'en-US', 'TODO', 'common'),
 ('PORTAL_USER_INVALID', 'zh-CN', '身份信息异常，请稍后再试', 'common'),
 ('PORTAL_USER_INVALID', 'en-US', 'TODO', 'common');

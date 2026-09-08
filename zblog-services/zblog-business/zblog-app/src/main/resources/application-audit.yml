@@ -7,7 +7,7 @@ audit:
           BARRAGE:
             strategy: REJECT
           COMMENT:
-            strategy: REJECT
+            strategy: CLEAN
       sensitiveProcessor: # 敏感词处理器配置
         strategy: REPLACE # 默认执行策略: REPLACE / REJECT / MANUAL
         strategy-map:
@@ -35,7 +35,7 @@ audit:
         - name: sensitiveProcessor
           order: 2
           enabled: true
-    BARRAGE: # 弹幕审核配置
+    BARRAGE: # 留言
       processors:
         - name: xssProcessor
           order: 1
