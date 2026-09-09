@@ -1,6 +1,10 @@
 package com.github.stazxr.zblog.content.ext.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.stazxr.zblog.content.ext.domain.dto.query.CommentQueryDto;
 import com.github.stazxr.zblog.content.ext.domain.entity.Comment;
+import com.github.stazxr.zblog.content.ext.domain.vo.CommentVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -47,19 +51,19 @@ public interface CommentMapper extends BaseMapper<Comment> {
      */
     int deleteComment(@Param("commentId") Long commentId);
 
-//
-//    /**
-//     * 分页查询后台评论列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return CommentVoList
-//     */
-//    List<CommentVo> selectCommentList(CommentQueryDto queryDto);
-//
-//    /**
-//     * 审核评论
-//     *
-//     * @param commentIds 评论列表
-//     */
-//    void auditComment(List<Long> commentIds);
+    /**
+     * 分页查询评论列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<CommentVo>
+     */
+    IPage<CommentVo> selectCommentList(@Param("page") Page<CommentVo> page, @Param("query") CommentQueryDto queryDto);
+
+    /**
+     * 查询评论详情
+     *
+     * @param commentId 评论id
+     * @return CommentVo
+     */
+    CommentVo selectCommentDetail(@Param("commentId") Long commentId);
 }

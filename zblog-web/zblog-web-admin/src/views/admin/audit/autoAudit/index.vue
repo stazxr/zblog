@@ -42,7 +42,8 @@
         <el-table-column label="审核场景" align="center" width="100px">
           <template v-slot="scope">
             <el-tag v-if="scope.row.scene === 'DEFAULT'" type="primary">默认</el-tag>
-            <el-tag v-else-if="scope.row.scene === 'BARRAGE'" type="primary">弹幕</el-tag>
+            <el-tag v-else-if="scope.row.scene === 'BARRAGE'" type="primary">留言</el-tag>
+            <el-tag v-else-if="scope.row.scene === 'COMMENT'" type="primary">评论</el-tag>
             <span v-else>{{ scope.row.scene }}</span>
           </template>
         </el-table-column>

@@ -4,7 +4,7 @@
       <div class="search-opts">
         <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="140">
           <muses-search-form-item label="" prop="search-content">
-            <el-input id="search-content" v-model="filters.content" clearable placeholder="弹幕内容" @keyup.enter.native="search" />
+            <el-input id="search-content" v-model="filters.content" clearable placeholder="内容" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-nickname">
             <el-input id="search-nickname" v-model="filters.nickname" clearable placeholder="用户昵称" @keyup.enter.native="search" />
@@ -13,8 +13,8 @@
             <el-input id="search-ip" v-model="filters.ip" clearable placeholder="IP" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-auditStatus">
-            <el-select id="search-auditStatus" v-model="filters.auditStatus" placeholder="审核状态" clearable @change="search">
-              <el-option v-for="item in auditStatusList" :key="item.value" :label="item.name" :value="item.value" />
+            <el-select id="search-auditStatus" v-model="filters.auditStatus" placeholder="评论状态" clearable @change="search">
+              <el-option v-for="item in statusList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
@@ -25,15 +25,15 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['BMESQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
-          <el-button v-perm="['BMESU001']" :disabled="row === null || row.auditStatus === 1 || row.auditStatus === 2" type="primary" @click="auditBarrageMessage">审核</el-button>
-          <el-button v-perm="['BMESD001']" :disabled="row === null" type="danger" @click="deleteBarrageMessage">删除</el-button>
+          <el-button v-perm="['COMNQ002']" :disabled="row === null" type="info" @click="showDetail">详情</el-button>
+          <el-button v-perm="['COMNU001']" :disabled="row === null || row.auditStatus === 1 || row.auditStatus === 2" type="primary" @click="auditComment">审核</el-button>
+          <el-button v-perm="['COMND001']" :disabled="row === null" type="danger" @click="deleteComment">删除</el-button>
         </span>
       </div>
     </div>
     <div class="components-container">
       <el-table
-        ref="pageTable"
+        ref="commentTable"
         v-loading="tableLoading"
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
@@ -52,7 +52,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="content" label="弹幕内容" align="center">
+        <el-table-column prop="content" label="内容" align="center">
           <template v-slot="scope">
             <span class="barrage-content" :style="{ color: scope.row.color }">
               {{ scope.row.content }}
@@ -74,7 +74,7 @@
         <el-table-column prop="auditTime" label="审核时间" align="center" width="160px" />
         <el-table-column prop="createTime" label="创建时间" align="center" width="160px" />
         <div slot="empty">
-          <muses-empty description="暂无弹幕数据" />
+          <muses-empty description="暂无数据" />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -106,10 +106,10 @@
 </template>
 
 <script>
-import detailDialog from '@/views/admin/webfeed/barrageMessage/template/detailDialog'
-import auditDialog from '@/views/admin/webfeed/barrageMessage/template/auditDialog'
+import detailDialog from '@/views/admin/audit/comment/template/detailDialog'
+import auditDialog from '@/views/admin/audit/comment/template/auditDialog'
 export default {
-  name: 'BarrageMessage',
+  name: 'Comment',
   components: {
     detailDialog,
     auditDialog
@@ -122,7 +122,7 @@ export default {
         ip: null,
         auditStatus: null
       },
-      auditStatusList: [],
+      statusList: [],
       tableData: [],
       tableLoading: false,
       row: null,
@@ -134,19 +134,19 @@ export default {
     }
   },
   mounted() {
-    this.loadBarrageMessageAuditStatusList()
+    this.loadCommentStatusList()
     this.listTableData()
   },
   methods: {
     handleCurrentChange(row) {
       this.row = row
     },
-    loadBarrageMessageAuditStatusList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'BARRAGE_MESSAGE_AUDIT_STATUS_CONFIG' }).then(res => {
+    loadCommentStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMENT_STATUS_CONFIG' }).then(res => {
         const { data } = res
-        this.auditStatusList = data
+        this.statusList = data
       }).catch(_ => {
-        this.auditStatusList = []
+        this.statusList = []
       })
     },
     // 查询
@@ -175,7 +175,7 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.barrageMessage.pageBarrageMessageList(param).then(res => {
+      this.$mapi.comment.pageCommentList(param).then(res => {
         const { data } = res
         this.total = data.total
         this.tableData = data.records
@@ -185,13 +185,13 @@ export default {
       }).finally(() => {
         this.tableLoading = false
         this.row = null
-        this.$refs.pageTable.setCurrentRow()
+        this.$refs.commentTable.setCurrentRow()
       })
     },
     // 详情
     showDetail() {
       if (this.row === null) {
-        this.$message.error('请选择要查看的弹幕')
+        this.$message.error('请选择要查看的评论')
         return
       }
       this.detailDialogVisible = true
@@ -201,7 +201,7 @@ export default {
       this.detailDialogVisible = false
     },
     // 审核
-    auditBarrageMessage() {
+    auditComment() {
       this.auditDialogVisible = true
       this.$refs.auditDialogRef.initData(this.row.id)
     },
@@ -212,17 +212,17 @@ export default {
       }
     },
     // 删除
-    deleteBarrageMessage() {
+    deleteComment() {
       if (this.row === null) {
-        this.$message.error('请选择要删除的弹幕')
+        this.$message.error('请选择要删除的评论')
         return
       }
-      this.$confirm('此操作将永久删除弹幕, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除评论, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$mapi.barrageMessage.deleteBarrageMessage({ barrageMessageId: this.row.id }).then(res => {
+        this.$mapi.comment.deleteComment({ commentId: this.row.id }).then(res => {
           this.$message.success(res.message)
           this.listTableData()
         })

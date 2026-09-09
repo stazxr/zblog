@@ -14,8 +14,13 @@ import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
+import com.github.stazxr.zblog.base.domain.entity.FileRelation;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.vo.FileVo;
+import com.github.stazxr.zblog.base.mapper.FileMapper;
+import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.util.Constants;
+import com.github.stazxr.zblog.content.domain.enums.ServiceUploadBusinessType;
 import com.github.stazxr.zblog.content.ext.domain.entity.*;
 import com.github.stazxr.zblog.content.ext.domain.enums.*;
 import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
@@ -35,6 +40,7 @@ import com.github.stazxr.zblog.portal.mapper.PortalMapper;
 import com.github.stazxr.zblog.portal.publisher.BarrageMessagePublisher;
 import com.github.stazxr.zblog.portal.service.CommentObjectService;
 import com.github.stazxr.zblog.portal.service.PortalService;
+import com.github.stazxr.zblog.portal.util.CommentContentParser;
 import com.github.stazxr.zblog.portal.util.VisitorUtil;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.http.UrlUtils;
@@ -104,6 +110,10 @@ public class PortalServiceImpl implements PortalService {
     private final CommentLikeMapper commentLikeMapper;
 
     private final CommentObjectService commentObjectService;
+
+    private final FileMapper fileMapper;
+
+    private final FileRelationMapper fileRelationMapper;
 
     /**
      * 获取网站初始化信息
@@ -546,13 +556,45 @@ public class PortalServiceImpl implements PortalService {
         // 校验评论对象
         commentObjectService.checkExists(commentDto.getType(), commentDto.getObjectId());
 
+        // 评论内容解析
+        Long commentId = SequenceUtils.getId();
+        String content = CommentContentParser.parse(commentDto.getContent(),
+            emojiNames -> {
+                Map<String, String> result = new LinkedHashMap<>();
+                if (emojiNames != null && emojiNames.size() > 0) {
+                    List<CommentEmojiVo> commentEmojiVos = commentEmojiMapper.selectCommentEmojisNames(emojiNames);
+                    for (CommentEmojiVo commentEmojiVo : commentEmojiVos) {
+                        result.put(commentEmojiVo.getName(), commentEmojiVo.getUrl());
+                    }
+                }
+                return result;
+            },
+            imageIds -> {
+                Map<Long, String> result = new LinkedHashMap<>();
+                if (imageIds != null && imageIds.size() > 0) {
+                    for (Long imageId : imageIds) {
+                        FileVo fileVo = fileMapper.selectFileDetailById(imageId);
+                        if (fileVo != null) {
+                            FileRelation fileRelation = new FileRelation();
+                            fileRelation.setFileId(imageId);
+                            fileRelation.setBusinessId(commentId);
+                            fileRelation.setBusinessType(ServiceUploadBusinessType.COMMENT_IMG);
+                            fileRelationMapper.insert(fileRelation);
+                            result.put(imageId, fileVo.getFileAccessUrl());
+                        }
+                    }
+                }
+                return result;
+            }
+        );
+
         // 创建评论
         Comment comment = new Comment();
-        comment.setId(SequenceUtils.getId());
+        comment.setId(commentId);
         comment.setType(commentDto.getType());
         comment.setObjectId(commentDto.getObjectId());
-        comment.setContent(commentDto.getContent());
-        comment.setOriginContent(commentDto.getContent());
+        comment.setContent(content);
+        comment.setOriginContent(content);
         comment.setParentId(commentDto.getParentId() == null ? 0L : commentDto.getParentId());
         if (isAuthenticated) {
             comment.setUserId(SecurityUtils.getLoginId());
@@ -612,9 +654,6 @@ public class PortalServiceImpl implements PortalService {
                 // 如果存在修改内容，则人为审核
                 comment.setStatus(CommentStatus.PENDING.getValue());
         }
-
-        // TODO 解析图片和表情，转为 img 插入评论中
-        // "<img src='" + emoji + "' alt='' width='24' height='24' " + "style='margin:0 1px;vertical-align:text-bottom' />"
 
         // 设置其他信息并入库
         comment.setLikeCount(0);

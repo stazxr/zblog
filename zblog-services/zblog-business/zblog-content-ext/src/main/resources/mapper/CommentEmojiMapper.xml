@@ -5,6 +5,17 @@
         SELECT ID, NAME, CODE, URL FROM comment_emoji ORDER BY SORT
     </select>
 
+    <select id="selectCommentEmojisNames" resultType="com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo">
+        SELECT ID, NAME, CODE, URL FROM comment_emoji
+        <if test="names != null and names.size() > 0">
+            WHERE NAME IN
+            <foreach collection="names" item="name" open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+        ORDER BY SORT
+    </select>
+
     <insert id="insertBatch">
         INSERT INTO comment_emoji
             (ID, NAME, CODE, URL, SORT)

@@ -30,11 +30,10 @@ import tag from '@/api/service/content/tag.js'
 import article from '@/api/service/content/article.js'
 
 // contentAudit
+import comment from '@/api/service/contentAudit/comment.js'
+import barrageMessage from '@/api/service/contentAudit/barrageMessage.js'
 import autoAudit from '@/api/service/contentAudit/autoAudit.js'
 import sensitiveWord from '@/api/service/contentAudit/sensitiveWord.js'
-
-// webfeed
-import barrageMessage from '@/api/service/webfeed/barrageMessage.js'
 
 // analytics
 import visitor from '@/api/service/analytics/visitor.js'
@@ -42,10 +41,8 @@ import visitorLog from '@/api/service/analytics/visitorLog.js'
 
 // TODO
 import column from '@/api/service/column.js'
-import webSetting from '@/api/service/webSetting.js'
 import talk from '@/api/service/talk.js'
 import album from '@/api/service/album.js'
-import comment from '@/api/service/comment.js'
 import test from '@/api/service/test.js'
 
 export default {
@@ -55,12 +52,11 @@ export default {
   version, file, cache, session,
   // 站点配置
   websiteConfig, websiteLink, friendLink, page, theme,
+  // 内容管理
   category, tag, article,
   // 内容审核
-  autoAudit, sensitiveWord,
-  // 网站动态
-  barrageMessage,
+  comment, barrageMessage, autoAudit, sensitiveWord,
   // 运营分析
   visitor, visitorLog,
-  column, webSetting, talk, album, comment, test
+  column, talk, album, test
 }

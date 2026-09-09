@@ -326,6 +326,7 @@ CREATE TABLE `comment_emoji` (
   `URL` VARCHAR(1000) NOT NULL COMMENT '表情图片路径',
   `SORT` INT NOT NULL DEFAULT 99999 COMMENT '排序',
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `uk_comment_emoji_name` (`NAME`),
   UNIQUE KEY `uk_comment_emoji_code` (`CODE`),
   KEY `idx_comment_emoji_sort` (`SORT`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表情表';

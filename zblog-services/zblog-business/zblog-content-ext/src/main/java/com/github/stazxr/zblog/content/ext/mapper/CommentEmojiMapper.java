@@ -6,6 +6,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 评论表情管理数据层
@@ -32,4 +33,12 @@ public interface CommentEmojiMapper extends BaseMapper<CommentEmoji> {
      * @param commentEmojiList 表情包
      */
     void insertBatch(@Param("list") List<CommentEmoji> commentEmojiList);
+
+    /**
+     * 通过 name 列表查询表情包
+     *
+     * @param names 表情名称列表
+     * @return List<CommentEmojiVo>
+     */
+    List<CommentEmojiVo> selectCommentEmojisNames(@Param("names") Set<String> names);
 }

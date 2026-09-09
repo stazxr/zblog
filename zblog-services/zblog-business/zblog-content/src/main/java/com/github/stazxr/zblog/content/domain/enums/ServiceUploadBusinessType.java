@@ -21,4 +21,9 @@ public final class ServiceUploadBusinessType {
      * 主题页面图
      */
     public static final Integer THEME_PAGE_IMG = 13;
+
+    /**
+     * 评论插图
+     */
+    public static final Integer COMMENT_IMG = 14;
 }

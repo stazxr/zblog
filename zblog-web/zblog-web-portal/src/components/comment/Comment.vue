@@ -959,6 +959,23 @@ export default {
   word-break: break-word;
 }
 
+/* 评论表情 */
+.comment-content img:not(.comment-image) {
+  vertical-align: text-bottom;
+}
+
+/* 评论图片 */
+.comment-content .comment-image {
+  display: block;
+  width: auto;
+  max-width: 240px;
+  max-height: 180px;
+  margin: 8px 0;
+  border-radius: 6px;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
 /* 操作 */
 
 .comment-actions,

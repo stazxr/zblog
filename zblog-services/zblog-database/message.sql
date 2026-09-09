@@ -326,6 +326,11 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('SENSITIVE_WORD_STATUS_REQUIRED', 'en-US', 'SensitiveWord status cannot be blank', 'common'),
 ('SENSITIVE_WORD_EXISTS', 'zh-CN', '敏感词已存在', 'common'),
 ('SENSITIVE_WORD_EXISTS', 'en-US', 'SensitiveWord exist', 'common'),
+-- 评论
+('COMMENT_AUDIT_STATUS_REQUIRED', 'zh-CN', '请选择评论审核状态', 'common'),
+('COMMENT_AUDIT_STATUS_REQUIRED', 'en-US', 'Comment audit status cannot be blank', 'common'),
+('COMMENT_AUDIT_STATUS_INVALID', 'zh-CN', '评论已被审核，请勿重复操作', 'common'),
+('COMMENT_AUDIT_STATUS_INVALID', 'en-US', 'Comment audit status invalid', 'common'),
 -- 分类相关
 ('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
 ('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be blank', 'common'),

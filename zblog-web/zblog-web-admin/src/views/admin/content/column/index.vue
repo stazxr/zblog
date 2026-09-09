@@ -98,9 +98,9 @@
 </template>
 
 <script>
-import addOrEditDialog from '@/views/admin/web/column/template/addOrEditDialog'
-import configColumnDialog from '@/views/admin/web/column/template/configColumnDialog'
-import showDetailDialog from '@/views/admin/web/column/template/showDetailDialog'
+import addOrEditDialog from '@/views/admin/content/column/template/addOrEditDialog'
+import configColumnDialog from '@/views/admin/content/column/template/configColumnDialog'
+import showDetailDialog from '@/views/admin/content/column/template/showDetailDialog'
 export default {
   name: 'Column',
   components: {
