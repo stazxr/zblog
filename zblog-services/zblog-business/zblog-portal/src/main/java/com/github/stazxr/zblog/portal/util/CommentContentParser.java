@@ -106,8 +106,11 @@ public final class CommentContentParser {
     private static String buildEmojiHtml(String url) {
         return "<img src='"
                 + escapeHtmlAttribute(url)
-                + "' alt='' width='24' height='24' "
-                + "style='margin:0 1px;vertical-align:text-bottom' />";
+                + "' "
+                + "alt='' "
+                + "width='24' "
+                + "height='24' "
+                + "class='comment-emoji' />";
     }
 
     /**

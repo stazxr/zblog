@@ -198,7 +198,7 @@
 
     <!-- 加载更多 -->
     <div v-if="total > commentList.length" class="comment-load-more">
-      <button type="button" :disabled="commentLoading" @click="loadComments">
+      <button type="button" :disabled="commentLoading" @click="loadComments()">
         <v-progress-circular v-if="commentLoading" indeterminate size="16" width="2" class="mr-2" />
         {{ commentLoading ? '加载中...' : '加载更多评论' }}
       </button>
@@ -330,11 +330,7 @@ export default {
 
       if (reload) {
         // 重新加载评论列表
-        this.total = 0
-        this.realTotal = 0
         this.current = 1
-        this.commentList = []
-        this.loadRealCommentCount()
       }
 
       const param = {
@@ -393,8 +389,6 @@ export default {
         content: content,
         parentId: parentId
       }
-
-      console.log('content', content)
 
       // 提交
       this.submitDisabled = true
@@ -957,15 +951,17 @@ export default {
   font-size: 14px;
   line-height: 1.8;
   word-break: break-word;
+  white-space: pre-wrap; /* 解决评论换行失效的问题 */
 }
 
 /* 评论表情 */
-.comment-content img:not(.comment-image) {
+::v-deep .comment-content .comment-emoji {
   vertical-align: text-bottom;
+  margin: 0 1px;
 }
 
 /* 评论图片 */
-.comment-content .comment-image {
+::v-deep .comment-content .comment-image {
   display: block;
   width: auto;
   max-width: 240px;

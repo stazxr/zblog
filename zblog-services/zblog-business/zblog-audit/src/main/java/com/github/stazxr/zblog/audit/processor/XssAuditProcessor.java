@@ -26,16 +26,12 @@ import java.util.Map;
 public class XssAuditProcessor extends AbstractAuditProcessor {
     private static final Logger log = LoggerFactory.getLogger(XssAuditProcessor.class);
 
-    private static final Safelist SAFE_LIST = Safelist.relaxed()
-        // 移除高危标签
-        .removeTags("script", "iframe", "style", "object", "embed", "meta", "link")
-        // a 只允许安全属性
-        .addAttributes("a", "href", "title", "target", "rel")
-        // img 只允许安全属性
-        .addAttributes("img", "src", "alt", "title")
-        // 协议控制
-        .addProtocols("a", "href", "http", "https", "mailto")
-        .addProtocols("img", "src", "http", "https", "data");
+    private static final int MAX_DECODE_COUNT = 5;
+
+    /**
+     * XSS清洗规则，按需调整
+     */
+    private static final Safelist SAFE_LIST = Safelist.none();
 
     private static final XssStrategy DEFAULT_STRATEGY = XssStrategy.MANUAL;
 
@@ -128,9 +124,11 @@ public class XssAuditProcessor extends AbstractAuditProcessor {
     private String urlDecodeLoop(String content) {
         String result = content;
         try {
-            while (true) {
+            for (int i = 0; i < MAX_DECODE_COUNT; i++) {
                 String decoded = URLDecoder.decode(result, StandardCharsets.UTF_8.name());
-                if (decoded.equals(result)) break;
+                if (decoded.equals(result)) {
+                    break;
+                }
                 result = decoded;
             }
             return result;

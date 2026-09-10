@@ -556,45 +556,14 @@ public class PortalServiceImpl implements PortalService {
         // 校验评论对象
         commentObjectService.checkExists(commentDto.getType(), commentDto.getObjectId());
 
-        // 评论内容解析
-        Long commentId = SequenceUtils.getId();
-        String content = CommentContentParser.parse(commentDto.getContent(),
-            emojiNames -> {
-                Map<String, String> result = new LinkedHashMap<>();
-                if (emojiNames != null && emojiNames.size() > 0) {
-                    List<CommentEmojiVo> commentEmojiVos = commentEmojiMapper.selectCommentEmojisNames(emojiNames);
-                    for (CommentEmojiVo commentEmojiVo : commentEmojiVos) {
-                        result.put(commentEmojiVo.getName(), commentEmojiVo.getUrl());
-                    }
-                }
-                return result;
-            },
-            imageIds -> {
-                Map<Long, String> result = new LinkedHashMap<>();
-                if (imageIds != null && imageIds.size() > 0) {
-                    for (Long imageId : imageIds) {
-                        FileVo fileVo = fileMapper.selectFileDetailById(imageId);
-                        if (fileVo != null) {
-                            FileRelation fileRelation = new FileRelation();
-                            fileRelation.setFileId(imageId);
-                            fileRelation.setBusinessId(commentId);
-                            fileRelation.setBusinessType(ServiceUploadBusinessType.COMMENT_IMG);
-                            fileRelationMapper.insert(fileRelation);
-                            result.put(imageId, fileVo.getFileAccessUrl());
-                        }
-                    }
-                }
-                return result;
-            }
-        );
-
         // 创建评论
+        Long commentId = SequenceUtils.getId();
         Comment comment = new Comment();
         comment.setId(commentId);
         comment.setType(commentDto.getType());
         comment.setObjectId(commentDto.getObjectId());
-        comment.setContent(content);
-        comment.setOriginContent(content);
+        comment.setContent(commentDto.getContent());
+        comment.setOriginContent(commentDto.getContent());
         comment.setParentId(commentDto.getParentId() == null ? 0L : commentDto.getParentId());
         if (isAuthenticated) {
             comment.setUserId(SecurityUtils.getLoginId());
@@ -654,6 +623,38 @@ public class PortalServiceImpl implements PortalService {
                 // 如果存在修改内容，则人为审核
                 comment.setStatus(CommentStatus.PENDING.getValue());
         }
+
+        // 评论内容解析
+        String content = CommentContentParser.parse(comment.getContent(),
+            emojiNames -> {
+                Map<String, String> result = new LinkedHashMap<>();
+                if (emojiNames != null && emojiNames.size() > 0) {
+                    List<CommentEmojiVo> commentEmojiVos = commentEmojiMapper.selectCommentEmojisNames(emojiNames);
+                    for (CommentEmojiVo commentEmojiVo : commentEmojiVos) {
+                        result.put(commentEmojiVo.getName(), commentEmojiVo.getUrl());
+                    }
+                }
+                return result;
+            },
+            imageIds -> {
+                Map<Long, String> result = new LinkedHashMap<>();
+                if (imageIds != null && imageIds.size() > 0) {
+                    for (Long imageId : imageIds) {
+                        FileVo fileVo = fileMapper.selectFileDetailById(imageId);
+                        if (fileVo != null) {
+                            FileRelation fileRelation = new FileRelation();
+                            fileRelation.setFileId(imageId);
+                            fileRelation.setBusinessId(commentId);
+                            fileRelation.setBusinessType(ServiceUploadBusinessType.COMMENT_IMG);
+                            fileRelationMapper.insert(fileRelation);
+                            result.put(imageId, fileVo.getFileAccessUrl());
+                        }
+                    }
+                }
+                return result;
+            }
+        );
+        comment.setContent(content);
 
         // 设置其他信息并入库
         comment.setLikeCount(0);
