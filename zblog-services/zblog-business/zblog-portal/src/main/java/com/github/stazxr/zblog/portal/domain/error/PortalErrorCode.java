@@ -14,7 +14,7 @@ public enum PortalErrorCode implements ErrorCode {
     /** 评论对象不存在 */
     EPORTA002("PORTAL_COMMENT_OBJECT_NOT_EXIST"),
     /** 回复的评论不存在或已被删除 */
-    EPORTA003("PORTAL_COMMENT_PARENT_NOT_EXIST"),
+    EPORTA003("PORTAL_COMMENT_REPLY_NOT_EXIST"),
     /** 回复层级错误 */
     EPORTA004("PORTAL_COMMENT_PARENT_LEVEL_INVALID"),
     /** 回复评论无效 */
@@ -22,7 +22,9 @@ public enum PortalErrorCode implements ErrorCode {
     /** 身份信息异常 */
     EPORTA006("PORTAL_USER_INVALID"),
     /** 只允许删除自己的评论 */
-    EPORTA007("PORTAL_COMMENT_DELETE_PERM_ERROR");
+    EPORTA007("PORTAL_COMMENT_DELETE_PERM_ERROR"),
+    /** 评论已被删除 */
+    EPORTA008("PORTAL_COMMENT_PARENT_NOT_EXIST");
 
     private final String i18nKey;
 

@@ -3,7 +3,7 @@
     <!-- 评论标题 -->
     <div class="comment-header">
       <div class="comment-title">
-        <icon name="liuyan-" custom-class="comment-title-icon" />
+        <icon name="commenttitle" custom-class="comment-title-icon" />
         <span>{{ title }}</span>
         <span v-if="realTotal > 0" class="comment-total">
           {{ realTotal }}
@@ -35,7 +35,7 @@
 
             <!-- 照片 -->
             <button type="button" class="toolbar-btn" :class="{ active: showImageUpload }" @click="toggleImageUpload">
-              <icon name="tianjiatupian_huaban" />
+              <icon name="imageupload" />
             </button>
 
             <!-- 评论字数 -->
@@ -87,15 +87,7 @@
                 <span class="comment-user-name">
                   {{ comment.user.nickname }}
                 </span>
-                <span class="blogger-tag">
-                  站长
-                </span>
-                <span class="blogger-tag">
-                  LV1
-                </span>
-                <span class="blogger-tag">
-                  筑基
-                </span>
+                <span v-if="isBlogger(comment)" class="blogger-tag">站长</span>
               </div>
               <relative-time class="comment-time" :time="comment.createTime" />
             </div>
@@ -106,19 +98,19 @@
             <!-- 操作 -->
             <div class="comment-actions">
               <button type="button" class="action-btn" :class="{ liked: comment.liked }" @click="toggleLike(comment)">
-                <icon name="icon" :active="comment.liked" size="14" />
-                <span v-if="comment.likeCount > 0">
+                <icon name="dianzan" :color="comment.liked ? '#f56c6c' : ''" size="14" />
+                <span v-if="comment.likeCount > 0" class="like-count">
                   {{ comment.likeCount }}
                 </span>
               </button>
               <button type="button" class="action-btn" @click="startReply(comment)">
-                <icon name="huifu" size="14" />
+                <span>回复</span>
               </button>
               <button v-if="isCommentOwner(comment)" type="button" class="action-btn delete-action" @click="deleteComment(comment)">
-                <icon name="xingzhuangjiehe1" size="14" />
+                <span>删除</span>
               </button>
               <span class="comment-location">
-                {{ comment.ipSource || '未知' }}
+                {{ comment.ipSource || '' }}
               </span>
             </div>
 
@@ -131,19 +123,17 @@
 
                 <div class="reply-body">
                   <div class="reply-user-row">
-                    <div>
+                    <div class="reply-user-info">
                       <span class="reply-user-name">
                         {{ reply.user.nickname }}
                       </span>
-                      <span v-if="String(reply.userId) === '1'" class="blogger-tag">
-                        站长
-                      </span>
+                      <span v-if="isBlogger(reply)" class="blogger-tag">站长</span>
                     </div>
                     <relative-time class="reply-time" :time="reply.createTime" />
                   </div>
 
                   <div class="reply-content">
-                    <template v-if="reply.replyUser.id && String(reply.replyUser.id) !== String(reply.user.id)">
+                    <template v-if="reply.replyUser && reply.replyUser.id && String(reply.replyUser.id) !== String(reply.user.id)">
                       <span class="reply-label">
                         回复
                       </span>
@@ -157,7 +147,7 @@
 
                   <div class="reply-actions">
                     <button type="button" class="action-btn" :class="{ liked: reply.liked }" @click="toggleLike(reply)">
-                      <i class="iconfont icon-dianzan1" />
+                      <icon name="dianzan" :color="reply.liked ? '#f56c6c' : ''" size="14" />
                       <span v-if="reply.likeCount > 0">
                         {{ reply.likeCount }}
                       </span>
@@ -174,20 +164,33 @@
             </div>
 
             <!-- 回复数量 -->
-            <button v-if="comment.replyCount > loadedReplyCount(comment)" type="button" class="more-reply-btn" @click="loadReplies(comment)">
+            <button
+              v-if="comment.replyCount > 0 && !comment.replyPage"
+              type="button"
+              class="more-reply-btn"
+              @click="loadReplies(comment)"
+            >
               查看全部 {{ comment.replyCount }} 条回复
-              <i class="iconfont icon-xiangxia" />
+              <icon name="xiangxia2" size="12" style="margin-top: -2px" />
             </button>
 
             <!-- 回复分页 -->
-            <div v-if="comment.replyPage && comment.replyPage.total > 1" class="reply-pagination">
-              <button type="button" :disabled="comment.replyPage.current <= 1" @click="changeReplyPage(comment, comment.replyPage.current - 1)">
+            <div v-if="comment.replyPage && comment.replyPage.pages > 1" class="reply-pagination">
+              <button
+                type="button"
+                :disabled="comment.replyPage.current <= 1"
+                @click="changeReplyPage(comment, comment.replyPage.current - 1)"
+              >
                 上一页
               </button>
               <span>
                 {{ comment.replyPage.current }} / {{ comment.replyPage.pages }}
               </span>
-              <button type="button" :disabled="comment.replyPage.current >= comment.replyPage.pages" @click="changeReplyPage(comment, comment.replyPage.current + 1)">
+              <button
+                type="button"
+                :disabled="comment.replyPage.current >= comment.replyPage.pages"
+                @click="changeReplyPage(comment, comment.replyPage.current + 1)"
+              >
                 下一页
               </button>
             </div>
@@ -216,6 +219,9 @@
         留下你的第一条评论吧~
       </div>
     </div>
+
+    <!-- 图片预览 -->
+    <ImagePreview v-model="imagePreviewVisible" :images="previewImages" :index="previewImageIndex" />
   </section>
 </template>
 
@@ -223,12 +229,14 @@
 import Emoji from './Emoji'
 import ImageUploadPanel from './ImageUploadPanel'
 import RelativeTime from './RelativeTime'
+import ImagePreview from './ImagePreview.vue'
 export default {
   name: 'Comment',
   components: {
     Emoji,
     ImageUploadPanel,
-    RelativeTime
+    RelativeTime,
+    ImagePreview
   },
   props: {
     /**
@@ -287,7 +295,10 @@ export default {
       submitDisabled: false, // 是否正在提交评论
       likeLoading: false, // 是否正在点赞评论
       replyTarget: null, // 当前回复对象
-      replyParentId: null // 当前回复所属一级评论
+      replyParentId: null, // 当前回复所属一级评论,
+      imagePreviewVisible: false, // 图片预览是否显示
+      previewImages: [], // 当前预览图片列表
+      previewImageIndex: 0 // 当前预览图片索引
     }
   },
   computed: {
@@ -305,9 +316,44 @@ export default {
     }
   },
   created() {
+    this.loadRealCommentCount()
     this.loadComments(true)
   },
+  mounted() {
+    this.$el.addEventListener('click', this.handleContentClick)
+  },
+  beforeDestroy() {
+    this.$el.removeEventListener('click', this.handleContentClick)
+  },
   methods: {
+    // 图片预览
+    handleContentClick(event) {
+      const target = event.target
+      if (target.tagName !== 'IMG' || !target.classList.contains('comment-image')) {
+        return
+      }
+
+      this.previewImage(target)
+    },
+    previewImage(target) {
+      const container = target.closest('.comment-content, .reply-content')
+      if (!container) {
+        return
+      }
+
+      const images = Array.from(
+        container.querySelectorAll('img.comment-image')
+      )
+
+      if (!images.length) {
+        return
+      }
+
+      this.previewImages = images.map(image => image.src).filter(Boolean)
+      this.previewImageIndex = images.indexOf(target)
+      this.imagePreviewVisible = true
+    },
+
     // 加载评论总数
     loadRealCommentCount() {
       const param = {
@@ -361,12 +407,12 @@ export default {
 
     // 提交评论
     submitComment() {
-      // if (!this.$store.state.websiteConfig.xx) {
-      //   this.showImageUpload = false
-      //   this.$store.state.loginFlag = true
-      //   this.$toast({ type: 'warning', message: `上传照片需要先登录，请登录后操作` })
-      //   return
-      // }
+      // 判断是否允许访客评论
+      if (!this.$store.state.websiteConfig.commentGuestSwitch && !this.$store.state.authenticated) {
+        this.$store.state.loginFlag = true
+        this.$toast({ type: 'warning', message: `请先登录！` })
+        return
+      }
 
       // 评论校验
       const content = this.commentContent.trim()
@@ -379,15 +425,20 @@ export default {
         return
       }
 
+      console.log('this.replyTarget', this.replyTarget)
+      console.log('this.replyParentId', this.replyParentId)
+
       // 父评论id
-      const parentId = this.replyTarget ? this.replyParentId : 0
+      const parentId = this.replyTarget && this.replyParentId ? this.replyParentId : 0
+      const replyCommentId = this.replyTarget ? this.replyTarget.id : null
 
       // 评论对象
       const comment = {
         objectId: this.objectId,
         type: this.type,
         content: content,
-        parentId: parentId
+        parentId: parentId,
+        replyCommentId: replyCommentId
       }
 
       // 提交
@@ -426,6 +477,38 @@ export default {
       }).finally(() => {
         this.submitDisabled = false
       })
+    },
+
+    /**
+     * 开始回复
+     *
+     * comment 一级评论
+     * parent  所属一级评论
+     */
+    startReply(comment, parent = null) {
+      // 判断是否允许访客评论
+      if (!this.$store.state.websiteConfig.commentGuestSwitch && !this.$store.state.authenticated) {
+        this.$store.state.loginFlag = true
+        this.$toast({ type: 'warning', message: `请先登录！` })
+        return
+      }
+
+      const parentComment = parent || comment
+      this.replyTarget = {
+        id: comment.id,
+        userId: comment.user.id,
+        nickname: comment.user.nickname
+      }
+
+      this.replyParentId = parentComment.id
+      this.$nextTick(() => {
+        this.$refs.commentContentRef.focus()
+      })
+    },
+    // 取消回复
+    cancelReply() {
+      this.replyTarget = null
+      this.replyParentId = null
     },
 
     // 表情选择
@@ -502,20 +585,20 @@ export default {
       })
     },
 
-    /**
-     * 点赞
-     */
+    // 点赞
     toggleLike(comment) {
       if (this.likeLoading) {
         return
       }
 
       this.likeLoading = true
-      this.$mapi.portal.likeComment({ commentId: comment.id }).then(_ => {
-        const liked = comment.liked // TODO
-        const likeCount = Number(comment.likeCount || 0)
-        this.$set(comment, 'likeCount', liked ? Math.max(likeCount - 1, 0) : likeCount + 1)
-        this.$store.commit('commentLike', comment.id)
+      this.$mapi.portal.likeComment({ commentId: comment.id }).then(res => {
+        if (res.data) {
+          const liked = comment.liked
+          const likeCount = Number(comment.likeCount || 0)
+          this.$set(comment, 'likeCount', liked ? Math.max(likeCount - 1, 0) : likeCount + 1)
+          this.$set(comment, 'liked', !liked)
+        }
       }).catch(error => {
         this.$toast({ type: 'error', message: error })
       }).finally(() => {
@@ -523,9 +606,7 @@ export default {
       })
     },
 
-    /**
-     * 是否评论本人
-     */
+    // 是否评论本人
     isCommentOwner(comment) {
       if (!this.$store.state.user.id) {
         return false
@@ -533,41 +614,15 @@ export default {
       return String(this.$store.state.user.id) === String(comment.user.id)
     },
 
-    /**
-     * 开始回复
-     *
-     * comment     一级评论
-     * parent      所属一级评论
-     */
-    startReply(comment, parent = null) {
-      if (!this.$store.state.user.id) {
-        this.$store.state.loginFlag = true
-        return
+    // 是否站长
+    isBlogger(comment) {
+      if (!this.$store.state.websiteConfig.websiteAuthorId) {
+        return false
       }
-
-      const parentComment = parent || comment
-      this.replyTarget = {
-        id: comment.id,
-        userId: comment.user.id,
-        nickname: comment.user.nickname
-      }
-
-      this.replyParentId = parentComment.id
-      this.$nextTick(() => {
-        this.$refs.commentContentRef.focus()
-      })
-    },
-    /**
-     * 取消回复
-     */
-    cancelReply() {
-      this.replyTarget = null
-      this.replyParentId = null
+      return String(this.$store.state.websiteConfig.websiteAuthorId) === String(comment.user.id)
     },
 
-    /**
-     * 删除一级评论
-     */
+    // 删除一级评论
     deleteComment(comment) {
       this.$confirm({
         message: '确定删除这条评论吗？'
@@ -638,7 +693,6 @@ export default {
     loadedReplyCount(comment) {
       return comment.replyList ? comment.replyList.length : 0
     },
-
     /**
      * 加载回复
      */
@@ -662,10 +716,11 @@ export default {
         pageSize: this.replyPageSize
       }
 
-      this.$mapi.portal.queryCommentReplyList(param).then(({ code, data }) => {
+      this.$mapi.portal.queryCommentReplyList(param).then(({ data }) => {
         this.$set(comment, 'replyList', data.records || [])
         const total = data.total || 0
-        this.$set(comment, 'replyPage', { current, total })
+        const pages = data.pages || 0
+        this.$set(comment, 'replyPage', { current, total, pages })
       }).catch(() => {
         this.$toast({ type: 'error', message: '回复加载失败' })
       })
@@ -891,29 +946,29 @@ export default {
   display: flex;
 }
 
-.comment-avatar {
+.comment-avatar, .reply-avatar {
   flex-shrink: 0;
 }
 
-.comment-body {
+.comment-body, .reply-body {
   flex: 1;
   min-width: 0;
   margin-left: 12px;
 }
 
-.comment-user-row {
+.comment-user-row, .reply-user-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.comment-user-info {
+.comment-user-info, .reply-user-info {
   display: flex;
   align-items: center;
   min-width: 0;
 }
 
-.comment-user-name {
+.comment-user-name, .reply-user-name {
   overflow: hidden;
   color: #4a4a4a;
   font-size: 14px;
@@ -936,7 +991,7 @@ export default {
   line-height: 18px;
 }
 
-.comment-time {
+.comment-time, .reply-time {
   flex-shrink: 0;
   margin-left: 10px;
   color: #c0c4cc;
@@ -955,13 +1010,13 @@ export default {
 }
 
 /* 评论表情 */
-::v-deep .comment-content .comment-emoji {
+::v-deep .comment-content .comment-emoji, ::v-deep .reply-content .comment-emoji {
   vertical-align: text-bottom;
   margin: 0 1px;
 }
 
 /* 评论图片 */
-::v-deep .comment-content .comment-image {
+::v-deep .comment-content .comment-image, ::v-deep .reply-content .comment-image {
   display: block;
   width: auto;
   max-width: 240px;
@@ -974,20 +1029,21 @@ export default {
 
 /* 操作 */
 
-.comment-actions,
-.reply-actions {
+.comment-actions, .reply-actions {
   display: flex;
   align-items: center;
-  margin-top: 7px;
+  gap: 18px;
+  margin-top: 10px;
 }
 
 .action-btn {
   display: inline-flex;
   align-items: center;
-  margin-right: 18px;
+  gap: 3px;
   padding: 0;
   border: 0;
   outline: none;
+  line-height: 1;
   background: transparent;
   color: #a8abb2;
   cursor: pointer;
@@ -995,9 +1051,8 @@ export default {
   transition: color 0.2s;
 }
 
-.action-btn i {
-  margin-right: 4px;
-  font-size: 14px;
+.action-btn span, .like-count {
+  padding-top: 1px;
 }
 
 .action-btn:hover {
@@ -1012,10 +1067,15 @@ export default {
   color: #f56c6c;
 }
 
+.like-count {
+  line-height: 1;
+}
+
 .comment-location {
   margin-left: auto;
   color: #c0c4cc;
   font-size: 11px;
+  line-height: 1;
 }
 
 /* 回复 */
@@ -1052,22 +1112,6 @@ export default {
   justify-content: space-between;
 }
 
-.reply-user-name {
-  color: #606266;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.reply-user-name:hover {
-  color: #409eff;
-}
-
-.reply-time {
-  color: #c0c4cc;
-  font-size: 11px;
-}
-
 .reply-content {
   margin-top: 5px;
   color: #606266;
@@ -1090,12 +1134,8 @@ export default {
   color: #909399;
 }
 
-.reply-actions {
-  margin-top: 4px;
-}
-
 .more-reply-btn {
-  margin-top: 5px;
+  margin-top: 10px;
   padding: 0;
   border: 0;
   outline: none;
@@ -1228,20 +1268,20 @@ export default {
     padding: 18px 0;
   }
 
-  .comment-avatar {
+  .comment-avatar, .reply-avatar {
     width: 36px !important;
     height: 36px !important;
   }
 
-  .comment-body {
+  .comment-body, .reply-body {
     margin-left: 9px;
   }
 
-  .comment-user-row {
+  .comment-user-row, .reply-user-row {
     align-items: flex-start;
   }
 
-  .comment-time {
+  .comment-time, .reply-time {
     font-size: 10px;
   }
 

@@ -44,6 +44,11 @@ public class Comment implements Serializable {
     private String objectId;
 
     /**
+     * 回复评论ID
+     */
+    private Long replyCommentId;
+
+    /**
      * 评论用户ID
      */
     private Long userId;

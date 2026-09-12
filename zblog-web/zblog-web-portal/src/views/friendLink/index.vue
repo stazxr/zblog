@@ -140,13 +140,15 @@
               </div>
             </div>
           </div>
-          <div class="apply-divider" />
-          <div v-if="websiteConfig.friendLinkApplySwitch" class="apply-action">
-            <v-btn color="primary" rounded depressed @click="applyFriendLink">
-              <v-icon left size="18"> mdi-link-plus</v-icon>
-              申请友链
-            </v-btn>
-          </div>
+          <template v-if="websiteConfig.friendLinkApplySwitch">
+            <div class="apply-divider" />
+            <div class="apply-action">
+              <v-btn color="primary" rounded depressed @click="applyFriendLink">
+                <v-icon left size="18"> mdi-link-plus</v-icon>
+                申请友链
+              </v-btn>
+            </div>
+          </template>
         </v-card>
       </section>
       <section

@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 5231665 */
-  src: url('iconfont.woff2?t=1788873288271') format('woff2'),
-       url('iconfont.woff?t=1788873288271') format('woff'),
-       url('iconfont.ttf?t=1788873288271') format('truetype');
+  src: url('iconfont.woff2?t=1789153735525') format('woff2'),
+       url('iconfont.woff?t=1789153735525') format('woff'),
+       url('iconfont.ttf?t=1789153735525') format('truetype');
 }
 
 .iconfont {
@@ -13,43 +13,35 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-xiangxia2:before {
+  content: "\e636";
+}
+
+.icon-xiangyou1:before {
+  content: "\e775";
+}
+
+.icon-xiangzuo1:before {
+  content: "\e779";
+}
+
+.icon-guanbi:before {
+  content: "\e630";
+}
+
+.icon-dianzan:before {
+  content: "\ec8c";
+}
+
 .icon-biaoqing:before {
   content: "\e600";
 }
 
-.icon-huifu:before {
-  content: "\e7ac";
-}
-
-.icon-icon:before {
-  content: "\e651";
-}
-
-.icon-xiangxia:before {
-  content: "\e608";
-}
-
-.icon-liuyan:before {
+.icon-commenttitle:before {
   content: "\e60c";
 }
 
-.icon-tianjiatupian_huaban:before {
+.icon-imageupload:before {
   content: "\e62c";
-}
-
-.icon-zhaopian:before {
-  content: "\e609";
-}
-
-.icon-xingzhuangjiehe1:before {
-  content: "\e601";
-}
-
-.icon-biaoqing1:before {
-  content: "\e6d8";
-}
-
-.icon-arrow-down-double-fill:before {
-  content: "\e743";
 }
 

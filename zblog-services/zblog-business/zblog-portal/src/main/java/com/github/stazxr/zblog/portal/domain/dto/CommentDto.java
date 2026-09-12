@@ -46,4 +46,13 @@ public class CommentDto extends BaseDto {
      */
     @ApiModelProperty("父评论ID")
     private Long parentId;
+
+    /**
+     * 回复评论ID
+     *
+     * 新增评论：NULL
+     * 回复评论：实际回复的评论ID
+     */
+    @ApiModelProperty("回复评论ID")
+    private Long replyCommentId;
 }

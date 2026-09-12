@@ -15,9 +15,7 @@
       <!-- 向下滚动 -->
       <div class="message-scroll-down" @click="scrollToComment">
         <span>向下查看留言</span>
-        <v-icon>
-          mdi-chevron-double-down
-        </v-icon>
+        <icon name="xiangxia2" size="14" />
       </div>
     </div>
 

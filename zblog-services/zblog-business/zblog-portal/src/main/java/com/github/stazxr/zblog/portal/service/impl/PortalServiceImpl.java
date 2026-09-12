@@ -577,9 +577,10 @@ public class PortalServiceImpl implements PortalService {
         if (comment.getParentId() > 0) {
             // 存在父评论
             Comment parentComment = commentMapper.selectById(commentDto.getParentId());
-            ThrowUtils.throwIfNull(parentComment, PortalErrorCode.EPORTA003);
+            boolean parentCommentNotExist = parentComment == null || CommentStatus.DELETED.getValue().equals(parentComment.getStatus());
+            ThrowUtils.throwIf(parentCommentNotExist, PortalErrorCode.EPORTA008);
 
-            // 父评论 parentId 必须指向一级评论
+            // 一级评论才能作为回复归属
             ThrowUtils.throwIf(parentComment.getParentId() != 0L, PortalErrorCode.EPORTA004);
 
             // 防止跨对象回复
@@ -587,12 +588,32 @@ public class PortalServiceImpl implements PortalService {
             boolean sameType = parentComment.getType().equals(commentDto.getType());
             ThrowUtils.throwIf(!(sameObj && sameType), PortalErrorCode.EPORTA005);
 
-            // 设置回复用户ID
-            if (parentComment.getUserId() != null) {
-                comment.setReplyUserId(parentComment.getUserId());
+            // 回复评论 ID 默认为一级评论
+            Comment replyComment = parentComment;
+            if (commentDto.getReplyCommentId() != null) {
+                replyComment = commentMapper.selectById(commentDto.getReplyCommentId());
+                boolean replyCommentNotExist = replyComment == null || CommentStatus.DELETED.getValue().equals(replyComment.getStatus());
+                ThrowUtils.throwIf(replyCommentNotExist, PortalErrorCode.EPORTA003);
             }
-            if (StringUtils.isNotBlank(parentComment.getVisitorId())) {
-                comment.setReplyVisitorId(parentComment.getVisitorId());
+
+            // 被回复评论必须属于当前一级评论
+            boolean isBellowParent = !replyComment.getId().equals(parentComment.getId()) && !replyComment.getParentId().equals(parentComment.getId());
+            ThrowUtils.throwIf(isBellowParent, PortalErrorCode.EPORTA004);
+
+            // 防止跨对象回复
+            boolean sameObj2 = replyComment.getObjectId().equals(commentDto.getObjectId());
+            boolean sameType2 = replyComment.getType().equals(commentDto.getType());
+            ThrowUtils.throwIf(!(sameObj2 && sameType2), PortalErrorCode.EPORTA005);
+
+            // 保存实际回复的评论 ID
+            comment.setReplyCommentId(replyComment.getId());
+
+            // 设置回复用户ID
+            if (replyComment.getUserId() != null) {
+                comment.setReplyUserId(replyComment.getUserId());
+            }
+            if (StringUtils.isNotBlank(replyComment.getVisitorId())) {
+                comment.setReplyVisitorId(replyComment.getVisitorId());
             }
         }
 
