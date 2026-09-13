@@ -33,4 +33,10 @@ public class CommentAuditDto extends BaseDto {
     @NotNull(message = "{COMMENT_AUDIT_STATUS_REQUIRED}")
     @ApiModelProperty("评论审核状态")
     private Integer status;
+
+    /**
+     * 评论审核备注
+     */
+    @ApiModelProperty("评论审核备注")
+    private String reason;
 }

@@ -11,8 +11,8 @@
       width="520px"
     >
       <el-form ref="auditForm" :inline="!isMobile" :model="formData" :rules="formRules" label-width="80px">
-        <el-form-item label="弹幕内容" prop="content">
-          <el-input v-model="formData.content" :style="isMobile ? '' : 'width: 380px;'" readonly />
+        <el-form-item label="评论内容" prop="content">
+          <div class="audit-content" v-html="formData.content || '-'" />
         </el-form-item>
         <el-form-item label="审核结果" prop="auditStatus">
           <el-select v-model="formData.auditStatus" :style="isMobile ? '' : 'width: 380px;'" placeholder="审核结果">
@@ -91,8 +91,8 @@ export default {
           this.submitLoading = true
           const param = {
             commentId: this.formData.id,
-            auditStatus: this.formData.auditStatus,
-            auditReason: this.formData.auditReason
+            status: this.formData.auditStatus,
+            reason: this.formData.auditReason
           }
           this.$mapi.comment.auditComment(param).then(res => {
             this.$message.success(res.message)
@@ -129,5 +129,33 @@ export default {
 </script>
 
 <style scoped>
+.audit-content {
+  width: 380px;
+  min-height: 80px;
+  max-height: 240px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background: #f5f7fa;
+  color: #606266;
+  line-height: 24px;
+  word-break: break-word;
+}
 
+.audit-content >>> img {
+  max-width: 48px;
+  max-height: 48px;
+  margin: 2px 4px;
+  border-radius: 4px;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 768px) {
+  .audit-content {
+    width: 100%;
+  }
+}
 </style>

@@ -24,7 +24,9 @@ public enum PortalErrorCode implements ErrorCode {
     /** 只允许删除自己的评论 */
     EPORTA007("PORTAL_COMMENT_DELETE_PERM_ERROR"),
     /** 评论已被删除 */
-    EPORTA008("PORTAL_COMMENT_PARENT_NOT_EXIST");
+    EPORTA008("PORTAL_COMMENT_PARENT_NOT_EXIST"),
+    /** 未登录 */
+    EPORTA009("PORTAL_NO_LOGIN");
 
     private final String i18nKey;
 

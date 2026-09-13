@@ -14,6 +14,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
+import com.github.stazxr.zblog.portal.domain.bo.SaveCommentResBo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
@@ -271,14 +272,15 @@ public class PortalController {
      *
      * @param request    请求信息
      * @param commentDto 评论信息
+     * @return SaveCommentResBo 新增结果
      */
     @PostMapping(value = "/saveComment")
     @ApiOperation(value = "新增评论")
     @ApiVersion(value = BaseConst.ApiVersion.V_P_1_0_0)
     @Router(name = "新增评论", code = "PORTA006", level = RouterLevel.OPEN)
-    @RateLimit(count = 5, time = 60, enableIp = true)
-    public void saveComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
-        portalService.saveComment(request, commentDto);
+    @RateLimit(count = 10, time = 60, enableIp = true)
+    public SaveCommentResBo saveComment(HttpServletRequest request, @RequestBody CommentDto commentDto) {
+        return portalService.saveComment(request, commentDto);
     }
 
     /**

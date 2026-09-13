@@ -3,6 +3,8 @@ package com.github.stazxr.zblog.content.ext.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.audit.mapper.AuditRecordMapper;
+import com.github.stazxr.zblog.audit.model.AuditRecord;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.content.ext.domain.dto.CommentAuditDto;
 import com.github.stazxr.zblog.content.ext.domain.dto.query.CommentQueryDto;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
+    private final AuditRecordMapper auditRecordMapper;
+
     /**
      * 分页查询评论列表
      *
@@ -51,6 +55,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public CommentVo queryCommentDetail(Long commentId) {
         CommentVo commentVo = baseMapper.selectCommentDetail(commentId);
+        if (commentVo != null) {
+            AuditRecord auditRecord = auditRecordMapper.selectByOid(commentId);
+            commentVo.setAuditRecord(auditRecord);
+        }
         return ThrowUtils.requireNonNull(commentVo, BaseErrorCode.ECOREA001);
     }
 
@@ -69,6 +77,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         boolean isManual = CommentStatus.MANUAL.getValue().equals(dbComment.getStatus());
         ThrowUtils.throwIf(!isPending && !isManual, CommentErrorCode.ECOMNA001);
         dbComment.setStatus(auditDto.getStatus());
+        dbComment.setAuditReason(auditDto.getReason());
         ThrowUtils.when(!updateById(dbComment)).system(BaseErrorCode.SCOREA002);
         if (dbComment.getParentId() != 0 && CommentStatus.NORMAL.getValue().equals(auditDto.getStatus())) {
             baseMapper.incrementReplyCount(dbComment.getParentId());

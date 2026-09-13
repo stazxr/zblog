@@ -396,4 +396,6 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('PORTAL_COMMENT_DELETE_PERM_ERROR', 'zh-CN', '只允许删除自己的评论', 'common'),
 ('PORTAL_COMMENT_DELETE_PERM_ERROR', 'en-US', 'TODO', 'common'),
 ('PORTAL_USER_INVALID', 'zh-CN', '身份信息异常，请稍后再试', 'common'),
-('PORTAL_USER_INVALID', 'en-US', 'TODO', 'common');
+('PORTAL_USER_INVALID', 'en-US', 'TODO', 'common'),
+('PORTAL_NO_LOGIN', 'zh-CN', '请先登录', 'common'),
+('PORTAL_NO_LOGIN', 'en-US', 'TODO', 'common');

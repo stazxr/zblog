@@ -26,10 +26,74 @@
     </update>
 
     <select id="selectCommentList" resultType="com.github.stazxr.zblog.content.ext.domain.vo.CommentVo">
-        SELECT * FROM comment WHERE STATUS != 3 ORDER BY CREATE_TIME DESC
+        SELECT
+            c.ID, c.PARENT_ID, c.TYPE, c.OBJECT_ID, c.REPLY_COMMENT_ID,
+            c.USER_ID, c.REPLY_USER_ID, c.VISITOR_ID, c.REPLY_VISITOR_ID,
+            c.CONTENT, c.ORIGIN_CONTENT, c.LIKE_COUNT, c.REPLY_COUNT,
+            c.IP_ADDRESS, c.IP_SOURCE, c.USER_AGENT, c.STATUS,
+            c.AUDIT_USER, c.AUDIT_TIME, c.AUDIT_REASON, c.CREATE_TIME,
+            u.NICKNAME AS USER_NICKNAME, u.HEAD_IMG_URL AS USER_AVATAR,
+            v.NICKNAME AS VISITOR_NICKNAME, v.AVATAR AS VISITOR_AVATAR,
+            u2.NICKNAME AS REPLY_USER_NICKNAME, u2.HEAD_IMG_URL AS REPLY_USER_AVATAR,
+            v2.NICKNAME AS REPLY_VISITOR_NICKNAME, v2.AVATAR AS REPLY_VISITOR_AVATAR,
+            IF(c.PARENT_ID = 0, 1, 2) AS LEVEL
+        FROM comment c
+        LEFT JOIN user u ON u.ID = c.USER_ID
+        LEFT JOIN visitor_profile v ON v.VISITOR_ID = c.VISITOR_ID
+        LEFT JOIN user u2 ON u2.ID = c.REPLY_USER_ID
+        LEFT JOIN visitor_profile v2 ON v2.VISITOR_ID = c.REPLY_VISITOR_ID
+        WHERE c.STATUS != 3
+        <if test="query.content != null and query.content != ''">
+            <bind name="contentBind" value="'%' + query.content + '%'"/>
+            AND c.CONTENT LIKE #{contentBind}
+        </if>
+        <if test="query.nickname != null and query.nickname != ''">
+            <bind name="nicknameBind" value="'%' + query.nickname + '%'"/>
+            AND (u.NICKNAME LIKE #{nicknameBind} OR v.NICKNAME LIKE #{nicknameBind})
+        </if>
+        <if test="query.ip != null and query.ip != ''">
+            AND c.IP_ADDRESS = #{query.ip}
+        </if>
+        <if test="query.type != null">
+            AND c.TYPE = #{query.type}
+        </if>
+        <choose>
+            <when test="query.level == 1">
+                AND c.PARENT_ID = 0
+            </when>
+            <when test="query.level == 2">
+                AND c.PARENT_ID != 0
+            </when>
+        </choose>
+        <if test="query.status != null">
+            AND c.STATUS = #{query.status}
+        </if>
+        <if test="query.createStartTime != null">
+            AND c.CREATE_TIME <![CDATA[>=]]> #{query.createStartTime, jdbcType=TIMESTAMP}
+        </if>
+        <if test="query.createEndTime != null">
+            AND c.CREATE_TIME <![CDATA[<=]]> #{query.createEndTime, jdbcType=TIMESTAMP}
+        </if>
+        ORDER BY CREATE_TIME DESC
     </select>
 
     <select id="selectCommentDetail" resultType="com.github.stazxr.zblog.content.ext.domain.vo.CommentVo">
-        SELECT * FROM comment WHERE ID = #{commentId}
+        SELECT
+            c.ID, c.PARENT_ID, c.TYPE, c.OBJECT_ID, c.REPLY_COMMENT_ID,
+            c.USER_ID, c.REPLY_USER_ID, c.VISITOR_ID, c.REPLY_VISITOR_ID,
+            c.CONTENT, c.ORIGIN_CONTENT, c.LIKE_COUNT, c.REPLY_COUNT,
+            c.IP_ADDRESS, c.IP_SOURCE, c.USER_AGENT, c.STATUS,
+            c.AUDIT_USER, c.AUDIT_TIME, c.AUDIT_REASON, c.CREATE_TIME,
+            u.NICKNAME AS USER_NICKNAME, u.HEAD_IMG_URL AS USER_AVATAR,
+            v.NICKNAME AS VISITOR_NICKNAME, v.AVATAR AS VISITOR_AVATAR,
+            u2.NICKNAME AS REPLY_USER_NICKNAME, u2.HEAD_IMG_URL AS REPLY_USER_AVATAR,
+            v2.NICKNAME AS REPLY_VISITOR_NICKNAME, v2.AVATAR AS REPLY_VISITOR_AVATAR,
+            IF(c.PARENT_ID = 0, 1, 2) AS LEVEL
+        FROM comment c
+        LEFT JOIN user u ON u.ID = c.USER_ID
+        LEFT JOIN visitor_profile v ON v.VISITOR_ID = c.VISITOR_ID
+        LEFT JOIN user u2 ON u2.ID = c.REPLY_USER_ID
+        LEFT JOIN visitor_profile v2 ON v2.VISITOR_ID = c.REPLY_VISITOR_ID
+        WHERE c.ID = #{commentId} AND c.STATUS != 3
     </select>
 </mapper>

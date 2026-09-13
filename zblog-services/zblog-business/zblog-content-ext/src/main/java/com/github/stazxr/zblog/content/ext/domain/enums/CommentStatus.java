@@ -48,4 +48,13 @@ public enum CommentStatus {
     public String getName() {
         return name;
     }
+
+    public static CommentStatus of(Integer status) {
+        for (CommentStatus value : CommentStatus.values()) {
+            if (value.getValue().equals(status)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

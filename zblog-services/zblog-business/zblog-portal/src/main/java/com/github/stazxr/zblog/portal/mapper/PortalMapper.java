@@ -38,4 +38,12 @@ public interface PortalMapper {
      * @return IPage<PortalCommentVo>
      */
     IPage<PortalCommentVo> selectReplyCommentList(@Param("page") Page<PortalCommentVo> page, @Param("query") PortalCommentQueryDto queryDto);
+
+    /**
+     * 根据评论id查询评论信息
+     *
+     * @param commentId 评论id
+     * @return PortalCommentVo
+     */
+    PortalCommentVo selectCommentById(@Param("commentId") Long commentId);
 }

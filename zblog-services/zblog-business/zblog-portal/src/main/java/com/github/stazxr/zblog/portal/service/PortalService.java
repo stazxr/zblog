@@ -5,6 +5,7 @@ import com.github.stazxr.zblog.content.ext.domain.vo.BarrageMessageVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.CommentEmojiVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.FriendLinkVo;
 import com.github.stazxr.zblog.content.ext.domain.vo.ThemePageVo;
+import com.github.stazxr.zblog.portal.domain.bo.SaveCommentResBo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
 import com.github.stazxr.zblog.portal.domain.dto.ApplyFriendLinkDto;
@@ -143,8 +144,9 @@ public interface PortalService {
      *
      * @param request    请求信息
      * @param commentDto 评论信息
+     * @return SaveCommentResBo 新增结果
      */
-    void saveComment(HttpServletRequest request, CommentDto commentDto);
+    SaveCommentResBo saveComment(HttpServletRequest request, CommentDto commentDto);
 
     /**
      * 点赞评论

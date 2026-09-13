@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.portal.domain.vo;
+package com.github.stazxr.zblog.content.ext.domain.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,15 +8,15 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * 门户用户信息
+ * 评论用户VO
  *
  * @author SunTao
  * @since 2026-09-07
  */
 @Getter
 @Setter
-@ApiModel("门户用户VO")
-public class PortalUserVo implements Serializable {
+@ApiModel("评论用户VO")
+public class CommentUserVo implements Serializable {
     private static final long serialVersionUID = 5542322220751629988L;
 
     /**

@@ -39,6 +39,14 @@ public class PortalCommentVo implements Serializable {
     private Long parentId;
 
     /**
+     * 回复评论ID
+     */
+    @Getter
+    @Setter
+    @ApiModelProperty("回复评论ID")
+    private Long replyCommentId;
+
+    /**
      * 评论用户ID
      */
     @Setter

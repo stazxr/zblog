@@ -44,7 +44,7 @@
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="true" prop="createUser" label="创建用户" align="center" width="100" />
-        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="200" />
+        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="创建时间" align="center" width="160" />
         <el-table-column label="操作" align="center" width="200">
           <template v-slot="scope">
             <el-button-group>

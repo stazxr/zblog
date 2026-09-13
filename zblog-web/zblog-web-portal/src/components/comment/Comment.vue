@@ -161,6 +161,14 @@
                   </div>
                 </div>
               </div>
+              <!-- 回复列表加载遮罩 -->
+              <div v-if="comment.replyLoading" class="reply-loading">
+                <v-progress-circular
+                  indeterminate
+                  size="18"
+                  width="2"
+                />
+              </div>
             </div>
 
             <!-- 回复数量 -->
@@ -168,17 +176,32 @@
               v-if="comment.replyCount > 0 && !comment.replyPage"
               type="button"
               class="more-reply-btn"
+              :disabled="comment.replyLoading"
               @click="loadReplies(comment)"
             >
-              查看全部 {{ comment.replyCount }} 条回复
-              <icon name="xiangxia2" size="12" style="margin-top: -2px" />
+              <v-progress-circular
+                v-if="comment.replyLoading"
+                indeterminate
+                size="14"
+                width="2"
+                class="mr-1"
+              />
+              <span>
+                {{ comment.replyLoading ? '加载中...' : `查看全部 ${comment.replyCount} 条回复` }}
+              </span>
+              <icon
+                v-if="!comment.replyLoading"
+                name="xiangxia2"
+                size="12"
+                style="margin-top: -2px"
+              />
             </button>
 
             <!-- 回复分页 -->
             <div v-if="comment.replyPage && comment.replyPage.pages > 1" class="reply-pagination">
               <button
                 type="button"
-                :disabled="comment.replyPage.current <= 1"
+                :disabled="comment.replyLoading || comment.replyPage.current <= 1"
                 @click="changeReplyPage(comment, comment.replyPage.current - 1)"
               >
                 上一页
@@ -188,7 +211,7 @@
               </span>
               <button
                 type="button"
-                :disabled="comment.replyPage.current >= comment.replyPage.pages"
+                :disabled="comment.replyLoading || comment.replyPage.current >= comment.replyPage.pages"
                 @click="changeReplyPage(comment, comment.replyPage.current + 1)"
               >
                 下一页
@@ -326,32 +349,20 @@ export default {
     this.$el.removeEventListener('click', this.handleContentClick)
   },
   methods: {
-    // 图片预览
-    handleContentClick(event) {
-      const target = event.target
-      if (target.tagName !== 'IMG' || !target.classList.contains('comment-image')) {
-        return
+    // 是否评论本人
+    isCommentOwner(comment) {
+      if (!this.$store.state.user.id) {
+        return false
       }
-
-      this.previewImage(target)
+      return String(this.$store.state.user.id) === String(comment.user.id)
     },
-    previewImage(target) {
-      const container = target.closest('.comment-content, .reply-content')
-      if (!container) {
-        return
+
+    // 是否站长
+    isBlogger(comment) {
+      if (!this.$store.state.websiteConfig.websiteAuthorId) {
+        return false
       }
-
-      const images = Array.from(
-        container.querySelectorAll('img.comment-image')
-      )
-
-      if (!images.length) {
-        return
-      }
-
-      this.previewImages = images.map(image => image.src).filter(Boolean)
-      this.previewImageIndex = images.indexOf(target)
-      this.imagePreviewVisible = true
+      return String(this.$store.state.websiteConfig.websiteAuthorId) === String(comment.user.id)
     },
 
     // 加载评论总数
@@ -405,80 +416,6 @@ export default {
       })
     },
 
-    // 提交评论
-    submitComment() {
-      // 判断是否允许访客评论
-      if (!this.$store.state.websiteConfig.commentGuestSwitch && !this.$store.state.authenticated) {
-        this.$store.state.loginFlag = true
-        this.$toast({ type: 'warning', message: `请先登录！` })
-        return
-      }
-
-      // 评论校验
-      const content = this.commentContent.trim()
-      if (!content) {
-        this.$toast({ type: 'error', message: '评论不能为空' })
-        return
-      }
-      if (content.length > this.maxLength) {
-        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
-        return
-      }
-
-      console.log('this.replyTarget', this.replyTarget)
-      console.log('this.replyParentId', this.replyParentId)
-
-      // 父评论id
-      const parentId = this.replyTarget && this.replyParentId ? this.replyParentId : 0
-      const replyCommentId = this.replyTarget ? this.replyTarget.id : null
-
-      // 评论对象
-      const comment = {
-        objectId: this.objectId,
-        type: this.type,
-        content: content,
-        parentId: parentId,
-        replyCommentId: replyCommentId
-      }
-
-      // 提交
-      this.submitDisabled = true
-      this.$mapi.portal.saveComment(comment).then(({ code, message }) => {
-        console.log('code', code)
-        console.log('message', message)
-
-        // if (code !== 200) {
-        //   this.$toast({ type: 'error', message: message || '评论失败' })
-        //   return
-        // }
-        //
-        // this.commentContent = ''
-        // this.showEmojiPicker = false
-        // this.cancelReply()
-        //
-        // /**
-        //  * 重新加载
-        //  */
-        // this.current = 1
-        // this.commentList = []
-        // this.loadComments()
-        // const isReview =
-        //   this.$store.state.otherConfig &&
-        //   this.$store.state.otherConfig.isCommentReview
-        // this.$toast({
-        //   type: isReview ? 'warning' : 'success',
-        //   message: isReview
-        //     ? '评论成功，正在审核中'
-        //     : '评论成功'
-        // })
-      }).catch(e => {
-        console.log('评论失败', e)
-        this.$toast({ type: 'error', message: '评论失败' })
-      }).finally(() => {
-        this.submitDisabled = false
-      })
-    },
-
     /**
      * 开始回复
      *
@@ -509,6 +446,47 @@ export default {
     cancelReply() {
       this.replyTarget = null
       this.replyParentId = null
+    },
+    // 加载回复
+    loadReplies(comment) {
+      this.loadReplyPage(comment, 1)
+    },
+    // 回复分页
+    changeReplyPage(comment, current) {
+      this.loadReplyPage(comment, current)
+    },
+    // 加载回复分页
+    loadReplyPage(comment, current = 1) {
+      // 防止重复请求
+      if (comment.replyLoading) {
+        return
+      } else {
+        this.$set(comment, 'replyLoading', true)
+      }
+
+      this.requestReplyPage(comment, current).finally(() => {
+        this.$set(comment, 'replyLoading', false)
+      })
+    },
+    requestReplyPage(comment, current) {
+      return this.$mapi.portal.queryCommentReplyList({
+        parentId: comment.id,
+        page: current,
+        pageSize: this.replyPageSize
+      }).then(({ data }) => {
+        const total = Number(data.total || 0)
+        const pages = Number(data.pages || 0)
+
+        // 当前页已经不存在，重新请求最后一页
+        if (pages > 0 && current > pages) {
+          return this.requestReplyPage(comment, pages)
+        }
+
+        this.$set(comment, 'replyList', data.records || [])
+        this.$set(comment, 'replyPage', { current, total, pages })
+      }).catch(() => {
+        this.$toast({ type: 'error', message: '回复加载失败' })
+      })
     },
 
     // 表情选择
@@ -584,6 +562,115 @@ export default {
         textarea.setSelectionRange(cursorPosition, cursorPosition)
       })
     },
+    // 图片预览
+    handleContentClick(event) {
+      const target = event.target
+      if (target.tagName !== 'IMG' || !target.classList.contains('comment-image')) {
+        return
+      }
+
+      this.previewImage(target)
+    },
+    previewImage(target) {
+      const container = target.closest('.comment-content, .reply-content')
+      if (!container) {
+        return
+      }
+
+      const images = Array.from(
+        container.querySelectorAll('img.comment-image')
+      )
+
+      if (!images.length) {
+        return
+      }
+
+      this.previewImages = images.map(image => image.src).filter(Boolean)
+      this.previewImageIndex = images.indexOf(target)
+      this.imagePreviewVisible = true
+    },
+
+    // 提交评论
+    submitComment() {
+      // 判断是否允许访客评论
+      if (!this.$store.state.websiteConfig.commentGuestSwitch && !this.$store.state.authenticated) {
+        this.$store.state.loginFlag = true
+        this.$toast({ type: 'warning', message: `请先登录！` })
+        return
+      }
+
+      // 评论校验
+      const content = this.commentContent.trim()
+      if (!content) {
+        this.$toast({ type: 'error', message: '评论不能为空' })
+        return
+      }
+      if (content.length > this.maxLength) {
+        this.$toast({ type: 'error', message: `评论不能超过${this.maxLength}字` })
+        return
+      }
+
+      // 父评论id
+      const parentId = this.replyTarget && this.replyParentId ? this.replyParentId : 0
+      const replyCommentId = this.replyTarget ? this.replyTarget.id : null
+
+      // 评论对象
+      const param = {
+        objectId: this.objectId,
+        type: this.type,
+        content: content,
+        parentId: parentId,
+        replyCommentId: replyCommentId
+      }
+
+      // 提交
+      this.submitDisabled = true
+      this.$mapi.portal.saveComment(param).then(({ data }) => {
+        console.log('data', data)
+        const { status, comment } = data
+
+        this.commentContent = ''
+        this.showEmojiPicker = false
+        this.showImageUpload = false
+        this.cancelReply()
+
+        if (status === 'NORMAL' && comment) {
+          this.$toast({ type: 'success', message: '评论成功' })
+          if (Number(comment.parentId) === 0) {
+            // 一级评论
+            this.commentList.unshift(comment)
+            this.total++
+            this.realTotal++
+          } else {
+            // 回复
+            const parent = this.commentList.find(
+              item => String(item.id) === String(comment.parentId)
+            )
+
+            if (parent) {
+              parent.replyCount = Number(parent.replyCount || 0) + 1
+              this.realTotal++
+
+              // 只有已经展开回复列表时才刷新
+              if (parent.replyPage) {
+                this.loadReplyPage(parent, 1)
+              }
+            } else {
+              // 当前一级评论不在已加载列表中
+              // 不需要处理，realTotal 已经增加
+            }
+          }
+        } else {
+          // 其他一律按审核中处理
+          this.$toast({ type: 'warning', message: '评论成功，正在审核中' })
+        }
+      }).catch(error => {
+        console.log('评论失败', error)
+        this.$toast({ type: 'error', message: error || '评论失败' })
+      }).finally(() => {
+        this.submitDisabled = false
+      })
+    },
 
     // 点赞
     toggleLike(comment) {
@@ -606,22 +693,6 @@ export default {
       })
     },
 
-    // 是否评论本人
-    isCommentOwner(comment) {
-      if (!this.$store.state.user.id) {
-        return false
-      }
-      return String(this.$store.state.user.id) === String(comment.user.id)
-    },
-
-    // 是否站长
-    isBlogger(comment) {
-      if (!this.$store.state.websiteConfig.websiteAuthorId) {
-        return false
-      }
-      return String(this.$store.state.websiteConfig.websiteAuthorId) === String(comment.user.id)
-    },
-
     // 删除一级评论
     deleteComment(comment) {
       this.$confirm({
@@ -634,9 +705,7 @@ export default {
         this.doDeleteComment(comment)
       })
     },
-    /**
-     * 删除回复
-     */
+    // 删除回复
     deleteReply(parent, reply) {
       this.$confirm({
         message: '确定删除这条回复吗？'
@@ -648,19 +717,26 @@ export default {
         this.doDeleteComment(reply, parent)
       })
     },
-    /**
-     * 执行删除
-     */
+    // 执行删除
     doDeleteComment(comment, parent = null) {
       this.$mapi.portal.deleteComment({ commentId: comment.id }).then(res => {
         this.$toast({ type: 'success', message: '删除成功' })
         if (parent) {
           // 删除回复
           try {
-            const index = parent.replyList.findIndex(item => item.id === comment.id)
+            const index = (parent.replyList || []).findIndex(
+              item => String(item.id) === String(comment.id)
+            )
             if (index !== -1) {
               parent.replyList.splice(index, 1)
-              parent.replyCount = Math.max(Number(parent.replyCount || 0) - 1, 0)
+            }
+            parent.replyCount = Math.max(Number(parent.replyCount || 0) - 1, 0)
+
+            if (parent.replyCount === 0) {
+              this.$set(parent, 'replyList', [])
+              this.$set(parent, 'replyPage', null)
+            } else if (parent.replyPage) {
+              this.loadReplyPage(parent, Number(parent.replyPage.current || 1))
             }
           } catch (e) {
             // 兜底，如果前段删除后的逻辑失败，则后端重新加载缓存
@@ -674,55 +750,21 @@ export default {
             if (index !== -1) {
               this.commentList.splice(index, 1)
               this.total = Math.max(this.total - 1, 0)
+            } else {
+              // 本地没有找到，重新加载一级评论
+              this.loadComments(false)
             }
-            throw new Error('评论不存在')
           } catch (e) {
             // 兜底，如果前段删除后的逻辑失败，则后端重新加载缓存
             console.error('删除评论后更新本地状态失败:', e)
             this.loadComments(false)
           }
         }
+
+        // realTotal 以服务端统计为准
+        this.loadRealCommentCount()
       }).catch(error => {
         this.$toast({ type: 'error', message: error })
-      })
-    },
-
-    /**
-     * 当前已经加载的回复数量
-     */
-    loadedReplyCount(comment) {
-      return comment.replyList ? comment.replyList.length : 0
-    },
-    /**
-     * 加载回复
-     */
-    loadReplies(comment) {
-      const current = comment.replyPage && comment.replyPage.current ? comment.replyPage.current : 1
-      this.loadReplyPage(comment, current)
-    },
-    /**
-     * 回复分页
-     */
-    changeReplyPage(comment, current) {
-      this.loadReplyPage(comment, current)
-    },
-    /**
-     * 加载回复分页
-     */
-    loadReplyPage(comment, current) {
-      const param = {
-        parentId: comment.id,
-        page: current,
-        pageSize: this.replyPageSize
-      }
-
-      this.$mapi.portal.queryCommentReplyList(param).then(({ data }) => {
-        this.$set(comment, 'replyList', data.records || [])
-        const total = data.total || 0
-        const pages = data.pages || 0
-        this.$set(comment, 'replyPage', { current, total, pages })
-      }).catch(() => {
-        this.$toast({ type: 'error', message: '回复加载失败' })
       })
     }
   }
@@ -1081,10 +1123,25 @@ export default {
 /* 回复 */
 
 .reply-list {
+  position: relative;
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: 7px;
   background: #f8f9fa;
+}
+
+.reply-loading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: rgba(248, 249, 250, 0.65);
 }
 
 .reply-item {
@@ -1118,6 +1175,7 @@ export default {
   font-size: 13px;
   line-height: 1.7;
   word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .reply-label {

@@ -27,6 +27,7 @@ import com.github.stazxr.zblog.content.ext.domain.error.FriendLinkErrorCode;
 import com.github.stazxr.zblog.content.ext.domain.vo.*;
 import com.github.stazxr.zblog.content.ext.mapper.*;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
+import com.github.stazxr.zblog.portal.domain.bo.SaveCommentResBo;
 import com.github.stazxr.zblog.portal.domain.bo.UserBaseInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebInitInfo;
 import com.github.stazxr.zblog.portal.domain.bo.WebLoginUser;
@@ -546,12 +547,19 @@ public class PortalServiceImpl implements PortalService {
      *
      * @param request    请求信息
      * @param commentDto 评论信息
+     * @return SaveCommentResBo 新增结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveComment(HttpServletRequest request, CommentDto commentDto) {
+    public SaveCommentResBo saveComment(HttpServletRequest request, CommentDto commentDto) {
         // 判断用户是否登录
         boolean isAuthenticated = SecurityUtils.isAuthenticated();
+
+        if (!isAuthenticated) {
+            WebsiteConfig websiteConfig = websiteConfigMapper.selectById(1L);
+            boolean commentGuestSwitch = websiteConfig != null && Boolean.TRUE.equals(websiteConfig.getCommentGuestSwitch());
+            ThrowUtils.throwIf(!commentGuestSwitch, PortalErrorCode.EPORTA009);
+        }
 
         // 校验评论对象
         commentObjectService.checkExists(commentDto.getType(), commentDto.getObjectId());
@@ -690,6 +698,14 @@ public class PortalServiceImpl implements PortalService {
         if (comment.getParentId() != 0) {
             commentMapper.incrementReplyCount(comment.getParentId());
         }
+
+        SaveCommentResBo res = new SaveCommentResBo();
+        res.setStatus(CommentStatus.of(comment.getStatus()));
+        res.setCommentId(commentId);
+        if (CommentStatus.NORMAL.getValue().equals(comment.getStatus())) {
+            res.setComment(portalMapper.selectCommentById(commentId));
+        }
+        return res;
     }
 
     /**

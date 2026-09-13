@@ -69,7 +69,7 @@ export default {
       })
     },
     loadStatusList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'FRIEND_LINK_STATUS_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'AUDIT_STATUS_1_CONFIG' }).then(res => {
         const { data } = res
         this.statusList = data
       }).catch(_ => {
