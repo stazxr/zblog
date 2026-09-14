@@ -413,8 +413,6 @@ INSERT INTO `tag` (`ID`,`NAME`,`SLUG`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTIO
     (29,'DevOps','devops','DevOps实践','DevOps,CI/CD','DevOps实践指南',1,1,1,1,'2026-01-01 10:00:00'),
     (30,'测试','test','软件测试','测试,单元测试,自动化','软件测试方法',1,1,1,1,'2026-01-01 10:00:00');
 
--- article
-
 /*Table structure for table `article_tag_relation` */
 DROP TABLE IF EXISTS `article_tag_relation`;
 CREATE TABLE `article_tag_relation` (
@@ -441,22 +439,26 @@ CREATE TABLE `article` (
   `SEO_KEYWORDS` VARCHAR(255) COMMENT 'SEO关键词',
   `SEO_DESCRIPTION` VARCHAR(500) COMMENT 'SEO描述',
   `ARTICLE_TYPE` TINYINT(2) NOT NULL COMMENT '文章类型: 1-原创；2-转载；3-翻译',
-  `ARTICLE_STATUS` TINYINT(2) NOT NULL COMMENT '文章状态：1-草稿；2-待审核；3-待审核（定时发布）；4-待发布；5-审核不通过；6：已发布；7-临时下线；8-待整改；9-回收站；99-已删除',
+  `ARTICLE_STATUS` TINYINT(2) NOT NULL COMMENT '文章状态：1-草稿；2-待审核；3-待审核（定时发布）；4-待发布；5-审核不通过；6：已发布；7-临时下线；8-待整改',
+  `DELETE_FLAG` TINYINT NOT NULL DEFAULT 0 COMMENT '删除标记：0-正常；1-回收站；2-彻底删除',
   `ARTICLE_PERM` TINYINT(2) NOT NULL COMMENT '文章权限：1-公开；2-私密；3-密码',
-  `PASSWORD` VARCHAR(200) COMMENT '访问密码',
-  `REPRINT_LINK` VARCHAR(1000) COMMENT '原文地址',
-  `REPRINT_DESC` VARCHAR(500) COMMENT '转载说明',
+  `ACCESS_PASSWORD` VARCHAR(200) COMMENT '访问密码',
+  `SOURCE_NAME` VARCHAR(100) DEFAULT NULL COMMENT '文章来源名称',
+  `SOURCE_AUTHOR` VARCHAR(100) DEFAULT NULL COMMENT '原作者',
+  `SOURCE_URL` VARCHAR(1000) DEFAULT NULL COMMENT '原文地址',
   `COMMENT_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否允许评论',
   `TOP_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否置顶',
   `RECOMMEND_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否推荐',
   `COVER_IMAGE_TYPE` TINYINT DEFAULT 0 COMMENT '封面类型：1-单封面；2-多封面（轮询）；3-默认；4-文章标题；5-无封面；6-多封面（随机）',
-  `WORDS_COUNT` INT NOT NULL COMMENT '总字数',
-  `VIEW_COUNT` INT DEFAULT 0 COMMENT '总浏览数',
-  `LIKE_COUNT` INT DEFAULT 0 COMMENT '总点赞数',
-  `COMMENT_COUNT` INT DEFAULT 0 COMMENT '总评论数',
-  `FAVORITE_COUNT` INT DEFAULT 0 COMMENT '总收藏数',
-  `CREATE_TIME` DATETIME NOT NULL COMMENT '文章创建时间',
+  `WORDS_COUNT` INT UNSIGNED NOT NULL COMMENT '总字数',
+  `VIEW_COUNT` BIGINT DEFAULT 0 COMMENT '总浏览数',
+  `LIKE_COUNT` BIGINT DEFAULT 0 COMMENT '总点赞数',
+  `COMMENT_COUNT` BIGINT DEFAULT 0 COMMENT '总评论数',
+  `FAVORITE_COUNT` BIGINT DEFAULT 0 COMMENT '总收藏数',
   `PUBLISH_TIME` DATETIME COMMENT '文章发布时间',
+  `CREATOR_ID` BIGINT DEFAULT NULL COMMENT '创建人',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '文章创建时间',
+  `UPDATER_ID` BIGINT DEFAULT NULL COMMENT '最后修改人',
   `UPDATE_TIME` DATETIME COMMENT '文章更新时间',
   `DELETE_TIME` DATETIME COMMENT '文章下线时间',
   `VERSION` INT DEFAULT 1 COMMENT '迭代版本',
@@ -467,14 +469,10 @@ CREATE TABLE `article` (
   KEY `idx_article_type` (`ARTICLE_TYPE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章表';
 
--- 对 TITLE 和 CONTENT_MD 建立全文索引
-ALTER TABLE article ADD FULLTEXT INDEX idx_fulltext_article_title_content (`TITLE`, `CONTENT_HTML`);
+-- 对 TITLE 和 CONTENT_HTML 建立全文索引
+ALTER TABLE article ADD FULLTEXT INDEX idx_fulltext_article_title_content (`TITLE`, `CONTENT_MD`);
 CREATE INDEX idx_article_author_status_perm ON article (AUTHOR_ID, ARTICLE_STATUS, ARTICLE_PERM);
-
-
-
-
-
+CREATE INDEX idx_article_status_publish_time ON article (CATEGORY_ID, ARTICLE_STATUS, PUBLISH_TIME);
 
 /*Table structure for table `article_img_relation` */
 DROP TABLE IF EXISTS `article_img_relation`;
@@ -487,29 +485,41 @@ CREATE TABLE `article_img_relation` (
 /*Table structure for table `article_content_draft_record` */
 DROP TABLE IF EXISTS `article_content_draft_record`;
 CREATE TABLE `article_content_draft_record` (
-`ID` BIGINT(64) UNSIGNED NOT NULL,
-`ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-`REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
-`COUNT` VARCHAR(200) DEFAULT NULL COMMENT '文章字数',
-`CONTENT` TEXT NOT NULL COMMENT '文章内容: 65535 / 16,777,215',
-`SAVE_TIME` VARCHAR(50) NOT NULL COMMENT '自动保存时间',
-PRIMARY KEY (`ID`) USING BTREE,
-KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+  `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
+  `COUNT` VARCHAR(200) DEFAULT NULL COMMENT '文章字数',
+  `CONTENT` TEXT NOT NULL COMMENT '文章内容: 65535 / 16,777,215',
+  `SAVE_TIME` VARCHAR(50) NOT NULL COMMENT '自动保存时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
+
+CREATE TABLE article_content_draft_record (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
+  `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
+  `WORD_COUNT` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '文章字数',
+  `CONTENT` MEDIUMTEXT NOT NULL COMMENT '文章内容',
+  `SAVE_TIME` DATETIME NOT NULL COMMENT '自动保存时间',
+  PRIMARY KEY (ID),
+  KEY idx_article_id (ARTICLE_ID),
+  KEY idx_article_save_time (ARTICLE_ID, SAVE_TIME)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
 
 /*Table structure for table `article_auto_publish_timing` */
 DROP TABLE IF EXISTS `article_auto_publish_timing`;
 CREATE TABLE `article_auto_publish_timing` (
-`ID` BIGINT(64) UNSIGNED NOT NULL,
-`ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-`PUBLISH_TIME` VARCHAR(50) NOT NULL COMMENT '消息发布时间: yyyy-MM-dd HH:mm',
-`PRODUCER_TIME` VARCHAR(20) NOT NULL COMMENT '消息生产时间: yyyy-MM-dd HH:mm:ss',
-`CONSUMER_TIME` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '消息消费时间: yyyy-MM-dd HH:mm:ss',
-`CONSUMED` TINYINT(1) DEFAULT 0 COMMENT '消息是否被消费',
-`VALID` TINYINT(1) DEFAULT 1 COMMENT '消息是否有效',
-`DESC` VARCHAR(100) DEFAULT NULL DEFAULT '' COMMENT '备注',
-PRIMARY KEY (`ID`) USING BTREE,
-KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
+  `ID` BIGINT(64) UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+  `PUBLISH_TIME` DATETIME NOT NULL COMMENT '消息发布时间: yyyy-MM-dd HH:mm',
+  `PRODUCER_TIME` DATETIME NOT NULL COMMENT '消息生产时间: yyyy-MM-dd HH:mm:ss',
+  `CONSUMER_TIME` DATETIME NOT NULL DEFAULT '' COMMENT '消息消费时间: yyyy-MM-dd HH:mm:ss',
+  `CONSUMED` TINYINT(1) DEFAULT 0 COMMENT '消息是否被消费',
+  `VALID` TINYINT(1) DEFAULT 1 COMMENT '消息是否有效',
+  `DESCRIPTION` VARCHAR(100) DEFAULT NULL DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`ID`) USING BTREE,
+  KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章自动发布状态记录表';
 
 
@@ -534,7 +544,23 @@ CREATE TABLE `article_auto_publish_timing` (
                                                PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='定时发布';
 
+CREATE TABLE article_content_version (
+                                         ID BIGINT UNSIGNED NOT NULL,
+                                         ARTICLE_ID BIGINT UNSIGNED NOT NULL,
+                                         VERSION INT UNSIGNED NOT NULL,
+                                         TITLE VARCHAR(150) NOT NULL,
+                                         SUMMARY VARCHAR(250),
+                                         CONTENT_MD MEDIUMTEXT NOT NULL,
+                                         CONTENT_HTML MEDIUMTEXT,
+                                         WORDS_COUNT INT UNSIGNED NOT NULL DEFAULT 0,
+                                         CREATE_USER_ID BIGINT,
+                                         CREATE_TIME DATETIME NOT NULL,
 
+                                         PRIMARY KEY (ID),
+                                         UNIQUE KEY uk_article_version (ARTICLE_ID, VERSION),
+                                         KEY idx_article_id (ARTICLE_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    COMMENT='文章内容版本表';
 
 
 

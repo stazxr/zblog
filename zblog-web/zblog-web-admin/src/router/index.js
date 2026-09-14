@@ -65,7 +65,7 @@ router.beforeEach(async(to, from, next) => {
         next({ ...to, replace: true })
       } catch (e) {
         console.error('Dynamic Route Error:', e)
-        Message.error('动态路由加载失败，请检查路由配置')
+        Message.error('动态路由加载失败，请联系网站管理员')
         await store.dispatch('Logout')
         next('/login')
         NProgress.done()

@@ -26,35 +26,7 @@ import JsonViewer from 'vue-json-viewer'
 import 'vue-json-viewer/style.css'
 
 // highlightjs
-import hljs from 'highlight.js'
-import Highlight from '@/directive/highlight'
-
-// codemirror 编辑器的相关资源
-import Codemirror from 'codemirror'
-import 'codemirror/mode/markdown/markdown'
-import 'codemirror/mode/javascript/javascript'
-import 'codemirror/mode/css/css'
-import 'codemirror/mode/htmlmixed/htmlmixed'
-import 'codemirror/mode/vue/vue'
-import 'codemirror/addon/edit/closebrackets'
-import 'codemirror/addon/edit/closetag'
-import 'codemirror/addon/edit/matchbrackets'
-import 'codemirror/addon/display/placeholder'
-import 'codemirror/addon/selection/active-line'
-import 'codemirror/addon/scroll/simplescrollbars'
-import 'codemirror/addon/scroll/simplescrollbars.css'
-import 'codemirror/lib/codemirror.css'
-
-// v-md-editor 编辑器配置
-import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor'
-import '@kangc/v-md-editor/lib/style/codemirror-editor.css'
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
-import '@kangc/v-md-editor/lib/theme/style/github.css'
-VMdEditor.Codemirror = Codemirror
-VMdEditor.use(githubTheme, {
-  Hljs: hljs
-})
-Vue.use(VMdEditor)
+// import Highlight from '@/directive/highlight'
 
 // 页面插画
 Vue.prototype.$assets = {
@@ -65,7 +37,7 @@ Vue.prototype.$assets = {
 Vue.use(perm)
 Vue.use(checkPerm)
 Vue.use(preventReClick)
-Vue.use(Highlight)
+// Vue.use(Highlight)
 Vue.use(JsonViewer)
 Vue.use(ElementUI, {
   size: Cookies.get('size') || 'small',

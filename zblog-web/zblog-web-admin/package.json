@@ -32,7 +32,7 @@
     "url": "https://github.com/stazxr/zblog/issues"
   },
   "dependencies": {
-    "@kangc/v-md-editor": "^1.7.12",
+    "@kangc/v-md-editor": "1.7.12",
     "@riophae/vue-treeselect": "^0.4.0",
     "axios": "1.2.1",
     "clipboard": "2.0.4",
@@ -46,7 +46,6 @@
     "element-ui": "2.15.14",
     "file-saver": "1.3.8",
     "fuse.js": "3.4.4",
-    "highlight.js": "^11.11.1",
     "image-conversion": "^2.1.1",
     "jquery": "3.6.1",
     "js-beautify": "^1.10.2",
