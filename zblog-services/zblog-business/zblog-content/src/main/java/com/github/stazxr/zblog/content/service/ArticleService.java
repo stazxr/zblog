@@ -44,11 +44,12 @@ public interface ArticleService extends IService<Article> {
      */
     void editArticle(ArticleDto articleDto);
 
-
-
-
-
-
+    /**
+     * 查询文章默认封面
+     *
+     * @return 默认封面
+     */
+    String queryDefaultArticleCover();
 
 
 

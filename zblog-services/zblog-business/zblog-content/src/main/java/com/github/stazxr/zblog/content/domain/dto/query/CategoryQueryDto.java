@@ -25,21 +25,21 @@ public class CategoryQueryDto extends PageParam {
     private String name;
 
     /**
-     * 分类唯一标识
+     * 路径标识
      */
-    @ApiModelProperty("分类唯一标识")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @ApiModelProperty("SEO收录状态")
+    private Boolean seoSearch;
 
     /**
-     * 是否前台展示
+     * 是否展示
      */
-    @ApiModelProperty("是否前台展示")
+    @ApiModelProperty("是否展示")
     private Boolean visible;
 
     /**

@@ -46,22 +46,22 @@ public class CategoryDto extends BaseDto {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
     @NotBlank(groups = {Create.class, Update.class}, message = "{CATEGORY_SLUG_REQUIRED}")
-    @ApiModelProperty("唯一标识(URL)")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
-     * 分类图片ID
+     * 分类封面图ID
      */
-    @ApiModelProperty("分类图片ID")
+    @ApiModelProperty("分类封面图ID")
     private Long imageId;
 
     /**
-     * 分类图片
+     * 分类封面图
      */
-    @ApiModelProperty("分类图片")
+    @ApiModelProperty("分类封面图")
     private String imageUrl;
 
     /**
@@ -91,21 +91,21 @@ public class CategoryDto extends BaseDto {
     /**
      * 是否前台展示
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_VISIBLE_REQUIRED}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_VISIBILITY_REQUIRED}")
     @ApiModelProperty("是否前台展示")
     private Boolean visible;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录配置
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_ALLOWINDEX_REQUIRED}")
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_SEARCH_INDEX_REQUIRED}")
+    @ApiModelProperty("SEO收录配置")
+    private Boolean seoSearch;
 
     /**
      * 是否启用
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_ENABLED_REQUIRED}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{CATEGORY_STATUS_REQUIRED}")
     @ApiModelProperty("是否启用")
     private Boolean enabled;
 

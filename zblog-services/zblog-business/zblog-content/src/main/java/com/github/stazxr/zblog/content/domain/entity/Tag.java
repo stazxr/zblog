@@ -32,7 +32,7 @@ public class Tag extends BaseEntity {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
     private String slug;
 
@@ -52,9 +52,9 @@ public class Tag extends BaseEntity {
     private String seoDescription;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    private Boolean allowIndex;
+    private Boolean seoSearch;
 
     /**
      * 是否启用

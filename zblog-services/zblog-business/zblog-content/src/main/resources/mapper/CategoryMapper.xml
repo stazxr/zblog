@@ -4,7 +4,7 @@
     <select id="selectCategoryList" resultType="com.github.stazxr.zblog.content.domain.vo.CategoryVo">
         SELECT
             c.ID, c.PID, c.NAME, c.SLUG, c.IMAGE_URL, c.DESCRIPTION,
-            c.ALLOW_INDEX, c.ENABLED, c.VISIBLE, c.SORT, c.CREATE_TIME, c.UPDATE_TIME, COUNT(a.ID) AS ARTICLE_COUNT
+            c.SEO_SEARCH, c.ENABLED, c.VISIBLE, c.SORT, c.CREATE_TIME, c.UPDATE_TIME, COUNT(a.ID) AS ARTICLE_COUNT
         FROM category c
         LEFT JOIN category c2 ON c2.PID = c.ID
         LEFT JOIN article a ON a.ARTICLE_STATUS != 99 AND (
@@ -22,8 +22,8 @@
             <if test="pid != null">
                 AND c.PID = #{pid}
             </if>
-            <if test="allowIndex != null">
-                AND c.ALLOW_INDEX = #{allowIndex}
+            <if test="seoSearch != null">
+                AND c.SEO_SEARCH = #{seoSearch}
             </if>
             <if test="visible != null">
                 AND c.VISIBLE = #{visible}
@@ -39,7 +39,7 @@
     <select id="selectCategoryDetail" resultType="com.github.stazxr.zblog.content.domain.vo.CategoryVo">
         SELECT
             c.ID, c.PID, c.NAME, c.SLUG, c.IMAGE_URL, c.DESCRIPTION,
-            c.SEO_TITLE, c.SEO_KEYWORDS, c.SEO_DESCRIPTION, c.ALLOW_INDEX,
+            c.SEO_TITLE, c.SEO_KEYWORDS, c.SEO_DESCRIPTION, c.SEO_SEARCH,
             c.SORT, c.ENABLED, c.VISIBLE, c.CREATE_TIME, c.UPDATE_TIME,
             (SELECT cp.NAME FROM category cp WHERE cp.ID = c.PID) AS PARENT_NAME,
             (SELECT COUNT(1) FROM category c2 WHERE c2.PID = c.ID) AS subCount,

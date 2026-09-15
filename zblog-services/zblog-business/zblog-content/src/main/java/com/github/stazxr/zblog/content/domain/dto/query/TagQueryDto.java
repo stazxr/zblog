@@ -25,16 +25,16 @@ public class TagQueryDto extends PageParam {
     private String name;
 
     /**
-     * 标签唯一标识
+     * 路径标识
      */
-    @ApiModelProperty("标签唯一标识")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @ApiModelProperty("SEO收录状态")
+    private Boolean seoSearch;
 
     /**
      * 标签状态

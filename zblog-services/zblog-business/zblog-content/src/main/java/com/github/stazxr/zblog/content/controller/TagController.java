@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 标签管理
  *
@@ -44,6 +46,20 @@ public class TagController {
     @Router(name = "分页查询标签列表", code = "TAGSQ001")
     public IPage<TagVo> queryTagListByPage(TagQueryDto queryDto) {
         return tagService.queryTagListByPage(queryDto);
+    }
+
+    /**
+     * 查询标签列表（公共）
+     *
+     * @param keyword 查询参数（标签名称）
+     * @return List<TagVo>
+     */
+    @GetMapping(value = "/queryPublicTagList")
+    @ApiOperation(value = "分页查询标签列表（公共）")
+    @ApiVersion(value = BaseConst.ApiVersion.V_4_0_0)
+    @Router(name = "分页查询标签列表（公共）", code = "TAGSQ003")
+    public List<TagVo> queryPublicTagList(@RequestParam(required = false) String keyword) {
+        return tagService.queryTagList(keyword);
     }
 
     /**

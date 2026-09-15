@@ -89,7 +89,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     public List<CategoryVo> queryFirstCategoryList(CategoryQueryDto queryDto) {
         queryDto.setPid(0L);
-        queryDto.setEnabled(true);
         return baseMapper.selectCategoryList(queryDto);
     }
 
@@ -143,6 +142,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         ThrowUtils.throwIfNull(dbCategory, BaseErrorCode.ECOREA001);
         // 分类信息检查
         checkCategory(category);
+        // 上级分类校验
+        ThrowUtils.throwIf(dbCategory.getPid() == 0 && category.getPid() != 0, CategoryErrorCode.ECATEA006);
+        ThrowUtils.throwIf(dbCategory.getPid() != 0 && category.getPid() == 0, CategoryErrorCode.ECATEA006);
+
         // 检查图片
         if (categoryDto.getImageId() != null) {
             if (StringUtils.isBlank(dbCategory.getImageUrl()) || !dbCategory.getImageUrl().equals(category.getImageUrl())) {
@@ -202,9 +205,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         category.setName(category.getName().trim());
         ThrowUtils.when(checkCategoryNameExist(category)).service(CategoryErrorCode.ECATEA000);
 
-        // 检查分类编码
+        // 检查路径标识
         category.setSlug(category.getSlug().trim());
         ThrowUtils.throwIf(checkCategorySlugExist(category), CategoryErrorCode.ECATEA001);
+
+        if (category.getPid() != 0) {
+            // 非一级分类，判断上级分类是否存在
+            Category parentCategory = baseMapper.selectById(category.getPid());
+            ThrowUtils.throwIfNull(parentCategory, CategoryErrorCode.ECATEA004);
+            ThrowUtils.throwIf(parentCategory.getPid() != 0, CategoryErrorCode.ECATEA005);
+        }
     }
 
     private void insertCategoryImage(Long categoryId, Long imageId) {

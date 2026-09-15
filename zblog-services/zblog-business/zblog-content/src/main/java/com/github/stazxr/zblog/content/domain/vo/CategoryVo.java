@@ -45,15 +45,15 @@ public class CategoryVo extends BaseVo {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
-    @ApiModelProperty("唯一标识(URL)")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
-     * 分类图片
+     * 分类封面图
      */
-    @ApiModelProperty("分类图片")
+    @ApiModelProperty("分类封面图")
     private String imageUrl;
 
     /**
@@ -81,10 +81,10 @@ public class CategoryVo extends BaseVo {
     private String seoDescription;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @ApiModelProperty("SEO收录状态")
+    private Boolean seoSearch;
 
     /**
      * 排序

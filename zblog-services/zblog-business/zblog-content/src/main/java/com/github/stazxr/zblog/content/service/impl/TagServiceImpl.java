@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 文章标签业务实现层
  *
@@ -50,6 +52,17 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         // 分页查询
         Page<TagVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
         return baseMapper.selectTagList(page, queryDto);
+    }
+
+    /**
+     * 查询标签列表（公共）
+     *
+     * @param keyword 查询参数（标签名称）
+     * @return List<TagVo>
+     */
+    @Override
+    public List<TagVo> queryTagList(String keyword) {
+        return baseMapper.selectAllTagList(keyword);
     }
 
     /**
@@ -120,7 +133,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         tag.setName(tag.getName().trim());
         ThrowUtils.when(checkTagNameExist(tag)).service(TagErrorCode.ETAGSA000);
 
-        // 检查标签编码
+        // 检查路径标识
         tag.setSlug(tag.getSlug().trim());
         ThrowUtils.throwIf(checkTagSlugExist(tag), TagErrorCode.ETAGSA001);
     }

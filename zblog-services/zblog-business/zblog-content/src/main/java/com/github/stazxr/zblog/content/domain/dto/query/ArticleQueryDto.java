@@ -37,9 +37,9 @@ public class ArticleQueryDto extends PageParam {
     private String title;
 
     /**
-     * 文章唯一标识
+     * 路径标识
      */
-    @ApiModelProperty("文章唯一标识")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**

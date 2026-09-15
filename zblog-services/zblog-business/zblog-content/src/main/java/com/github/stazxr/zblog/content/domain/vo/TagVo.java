@@ -31,9 +31,9 @@ public class TagVo extends BaseVo {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
-    @ApiModelProperty("唯一标识(URL)")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
@@ -55,10 +55,10 @@ public class TagVo extends BaseVo {
     private String seoDescription;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @ApiModelProperty("SEO收录状态")
+    private Boolean seoSearch;
 
     /**
      * 是否启用

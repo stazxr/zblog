@@ -7,6 +7,8 @@ import com.github.stazxr.zblog.content.domain.dto.query.TagQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Tag;
 import com.github.stazxr.zblog.content.domain.vo.TagVo;
 
+import java.util.List;
+
 /**
  * 文章标签服务层
  *
@@ -21,6 +23,14 @@ public interface TagService extends IService<Tag> {
      * @return IPage<TagVo>
      */
     IPage<TagVo> queryTagListByPage(TagQueryDto queryDto);
+
+    /**
+     * 查询标签列表（公共）
+     *
+     * @param keyword 查询参数（标签名称）
+     * @return List<TagVo>
+     */
+    List<TagVo> queryTagList(String keyword);
 
     /**
      * 查询标签详情

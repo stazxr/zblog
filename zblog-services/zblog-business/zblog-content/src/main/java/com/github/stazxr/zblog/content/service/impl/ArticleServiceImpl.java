@@ -91,6 +91,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     }
 
+    /**
+     * 查询文章默认封面
+     *
+     * @return 默认封面
+     */
+    @Override
+    public String queryDefaultArticleCover() {
+        return null;
+    }
+
 
 //    /**
 //     * 多封面最多支持上传四个封面
@@ -379,23 +389,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //
 //        // 修改状态
 //        baseMapper.updateArticleStatus(articleId, ArticleStatus.DRAFT.getType());
-//    }
-//
-//    /**
-//     * 查询文章默认封面
-//     *
-//     * @return ArticleImg
-//     */
-//    @Override
-//    public String queryArticleDefaultImg() {
-//        Integer dbKey = WebsiteConfigType.OTHER_INFO.value();
-//        WebsiteConfig websiteConfig = webSettingMapper.selectById(dbKey);
-//        if (websiteConfig != null && StringUtils.isNotBlank(websiteConfig.getConfig())) {
-//            OtherInfo otherInfo = JSON.parseObject(websiteConfig.getConfig(), OtherInfo.class);
-//            return otherInfo.getArticleCover();
-//        }
-//
-//        return null;
 //    }
 //
 //    /**

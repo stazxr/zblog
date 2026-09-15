@@ -1,24 +1,20 @@
-package com.github.stazxr.zblog.content.domain.error;
+package com.github.stazxr.zblog.base.domain.error;
 
 import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 
 /**
- * 标签错误码定义。
+ * 版本错误码定义。
  *
  * @author SunTao
- * @since 2026-04-06
+ * @since 2026-09-16
  */
-public enum TagErrorCode implements ErrorCode {
-    /** 标签名称已存在 */
-    ETAGSA000("TAG_NAME_EXISTS"),
-    /** 标签路径标识已存在 */
-    ETAGSA001("TAG_SLUG_EXISTS"),
-    /** 标签已与文章关联 */
-    ETAGSA002("CATEGORY_HAS_ARTICLES");
+public enum SequenceErrorCode implements ErrorCode {
+    /** 序号服务异常 */
+    SSEQUA000("SEQUENCE_SERVER_ERROR");
 
     private final String i18nKey;
 
-    TagErrorCode(String i18nKey) {
+    SequenceErrorCode(String i18nKey) {
         this.i18nKey = i18nKey;
     }
 

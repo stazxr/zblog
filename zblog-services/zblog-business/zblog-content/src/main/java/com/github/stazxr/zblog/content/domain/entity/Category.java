@@ -39,12 +39,12 @@ public class Category extends BaseEntity {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
     private String slug;
 
     /**
-     * 分类图片
+     * 分类封面图
      */
     @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String imageUrl;
@@ -70,9 +70,9 @@ public class Category extends BaseEntity {
     private String seoDescription;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录配置
      */
-    private Boolean allowIndex;
+    private Boolean seoSearch;
 
     /**
      * 排序

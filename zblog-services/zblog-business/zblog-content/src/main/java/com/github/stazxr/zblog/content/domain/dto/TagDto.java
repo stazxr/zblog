@@ -38,10 +38,10 @@ public class TagDto extends BaseDto {
     private String name;
 
     /**
-     * 唯一标识(URL)
+     * 路径标识
      */
     @NotBlank(groups = {Create.class, Update.class}, message = "{TAG_SLUG_REQUIRED}")
-    @ApiModelProperty("唯一标识(URL)")
+    @ApiModelProperty("路径标识")
     private String slug;
 
     /**
@@ -63,16 +63,16 @@ public class TagDto extends BaseDto {
     private String seoDescription;
 
     /**
-     * 是否允许搜索引擎收录
+     * SEO收录状态
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{TAG_ALLOWINDEX_REQUIRED}")
-    @ApiModelProperty("是否允许搜索引擎收录")
-    private Boolean allowIndex;
+    @NotNull(groups = {Create.class, Update.class}, message = "{TAG_SEARCH_INDEX_REQUIRED}")
+    @ApiModelProperty("SEO收录状态")
+    private Boolean seoSearch;
 
     /**
      * 是否启用
      */
-    @NotNull(groups = {Create.class, Update.class}, message = "{TAG_ENABLED_REQUIRED}")
+    @NotNull(groups = {Create.class, Update.class}, message = "{TAG_STATUS_REQUIRED}")
     @ApiModelProperty("是否启用")
     private Boolean enabled;
 }
