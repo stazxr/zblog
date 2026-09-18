@@ -145,7 +145,7 @@ public class Article implements Serializable {
     /**
      * 封面类型
      *
-     * @see com.github.stazxr.zblog.content.domain.enums.ArticleCoverImgType
+     * @see com.github.stazxr.zblog.content.domain.enums.ArticleCoverImageType
      */
     private Integer coverImageType;
 

@@ -184,7 +184,6 @@
 <script>
 import NoImg from '@/assets/images/no-img-4_3.jpg'
 import AddIcon from '@/assets/images/add-icon.png'
-import { getToken } from '@/utils/token'
 import { formatMonth, formatDay } from '@/utils'
 // import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 // import { Message } from 'element-ui'
@@ -311,9 +310,6 @@ export default {
       //       server: this.$store.state.api.fileUploadApi,
       //       timeout: 120 * 1000,
       //       fieldName: 'file',
-      //       headers: {
-      //         Authorization: this.getUserToken()
-      //       },
       //       maxFileSize: 10 * 1024 * 1024,
       //       customInsert(res, file, insertFn) {
       //         const { code, data } = res
@@ -616,9 +612,6 @@ export default {
       this.formData.contentMd = text
       this.formData.contentHtml = md.render(text)
       this.totalCount = text.replace(/\s+/g, '').length
-    },
-    getUserToken() {
-      return getToken()
     },
     addBeforeunloadEventListener() {
       window.addEventListener('beforeunload', this.beforeUnloadHandler, false)

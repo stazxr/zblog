@@ -4,11 +4,6 @@ import api from '../../custom-axios'
 const articleApi = '/api/articles'
 
 export default {
-  // 查询文章默认封面
-  queryDefaultArticleCover: params => {
-    return api.httpRequest().get(`${articleApi}/queryDefaultArticleCover`, params)
-  },
-
   // 分页查询我的文章列表
   pageMyList: params => {
     return api.httpRequest().get(`${articleApi}/pageMyList`, params)

@@ -91,16 +91,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     }
 
-    /**
-     * 查询文章默认封面
-     *
-     * @return 默认封面
-     */
-    @Override
-    public String queryDefaultArticleCover() {
-        return null;
-    }
-
 
 //    /**
 //     * 多封面最多支持上传四个封面

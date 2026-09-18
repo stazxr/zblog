@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer title="图片上传" :visible.sync="dialogVisible" destroy-on-close :before-close="handleClose" size="60%">
+    <el-drawer title="封面上传" :visible.sync="dialogVisible" destroy-on-close :before-close="handleClose" size="60%">
       <div class="demo-drawer__content">
         <div style="margin: 10px 50px;">
           <el-upload
@@ -9,14 +9,15 @@
             class="avatar-uploader"
             list-type="picture-card"
             :action="$store.state.api.fileUploadApi"
-            :headers="headers"
-            :limit="isReplace ? 1 : maxUploadSize"
+            :limit="isReplace ? 1 : limit"
             :show-file-list="true"
+            :with-credentials="withCredentials"
             :before-upload="beforeUpload"
             :before-remove="beforeRemove"
             :on-exceed="handleExceed"
             :on-preview="handlePictureCardPreview"
             :on-remove="handleRemove"
+            :on-progress="handleProgress"
             :on-error="handleError"
             :on-success="handleSuccess"
           >
@@ -33,7 +34,7 @@
       </div>
     </el-drawer>
 
-    <el-dialog :visible.sync="previewDialogVisible">
+    <el-dialog title="预览" :visible.sync="previewDialogVisible">
       <img width="100%" :src="previewDialogImageUrl" alt="">
     </el-dialog>
   </div>
@@ -41,7 +42,6 @@
 
 <script>
 import * as imageConversion from 'image-conversion'
-import { getToken } from '@/utils/token'
 export default {
   name: 'UploadArticleImgDialog',
   props: {
@@ -49,9 +49,41 @@ export default {
       type: Boolean,
       default: false
     },
-    maxUploadSize: {
+    // 最大文件上传数
+    limit: {
       type: Number,
       default: 1
+    },
+    // 是否携带 Cookie
+    withCredentials: {
+      type: Boolean,
+      default: true
+    },
+    // 是否启用图片压缩
+    compress: {
+      type: Boolean,
+      default: true
+    },
+    // 原始图片最大大小，单位：MB
+    maxFileSize: {
+      type: Number,
+      default: 20
+    },
+    // 图片压缩目标大小，单位：KB
+    limitSize: {
+      type: Number,
+      default: 200
+    },
+    // 允许上传的图片MIME类型
+    accept: {
+      type: Array,
+      default() {
+        return [
+          'image/jpeg',
+          'image/png',
+          'image/webp'
+        ]
+      }
     }
   },
   data() {
@@ -60,11 +92,9 @@ export default {
       fileList: [],
       isReplace: false,
       replaceIndex: null,
+      uploadLoading: false,
       previewDialogVisible: false,
-      previewDialogImageUrl: '',
-      headers: {
-        Authorization: ''
-      }
+      previewDialogImageUrl: ''
     }
   },
   methods: {
@@ -88,6 +118,7 @@ export default {
       this.imageUrl = ''
       this.fileList = []
       this.isReplace = false
+      this.uploadLoading = false
       this.replaceIndex = null
     },
     handleClose() {
@@ -99,65 +130,65 @@ export default {
       this.handleClose()
     },
     handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 ${this.maxUploadSize} 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
+      this.$message.warning(`当前限制选择 ${this.limit} 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
     },
     handleRemove(file) {
       if (file && file.status === 'success' && file.response && file.response.code === 200) {
         const data = file.response.data
         if (data && Array.isArray(data)) {
           for (let i = 0; i < data.length; i++) {
-            this.$mapi.file.deleteFile({ fileId: data[i].id })
+            this.$mapi.file.deleteFile({ fileId: data[i].fileId })
           }
         }
       }
     },
-    handleError(err) {
-      try {
-        this.$message.error(JSON.parse(err.message.toString()).message)
-      } catch {
-        this.$message.error('系统发生未知错误')
-      }
-    },
     beforeUpload(file) {
-      if (file.name.indexOf('.') !== -1) {
-        const imgType = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase()
-        if (imgType !== 'jpg' && imgType !== 'jpeg' && imgType !== 'png' && imgType !== 'webp') {
-          this.$message.warning('上传文件只能是 jpg, jpeg, png, webp 格式!')
-          return false
-        }
-      } else {
-        this.$message.warning('上传文件只能是 jpg, jpeg, png, webp 格式!')
+      if (!this.accept.includes(file.type)) {
+        this.$message.warning('图片格式不支持')
         return false
       }
 
-      // 压缩图片
-      this.headers.Authorization = getToken()
-      return new Promise(resolve => {
-        if (file.size / 1024 < this.$config.UPLOAD_SIZE) {
-          resolve(file)
-        }
+      if (file.size > this.maxFileSize * 1024 * 1024) {
+        this.$message.warning(`图片不能超过${this.maxFileSize}MB`)
+        return false
+      }
 
-        imageConversion.compressAccurately(file, this.$config.UPLOAD_SIZE).then(res => {
-          resolve(res)
-        })
+      if (!this.compress || file.size / 1024 <= this.limitSize) {
+        return file
+      }
+
+      return imageConversion.compressAccurately(file, this.limitSize).then(blob => {
+        return new File([blob], file.name, { type: file.type })
       })
     },
     beforeRemove(file) {
       // return this.$confirm(`确定移除 ${file.name} ？`)
     },
+    // 上传进度
+    handleProgress() {
+      this.uploadLoading = true
+    },
     handleSuccess(response, file) {
-      if (response.code === 200) {
-        // success
-        if (response.data && Array.isArray(response.data)) {
-          for (let i = 0; i < response.data.length; i++) {
-            this.fileList.push(response.data[i])
-          }
+      this.uploadLoading = false
+      if (response.code === '000000000') {
+        const data = response.data && Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null
+        if (!data) {
+          this.$message.error('上传返回数据异常')
+          return
         }
 
         this.$message.success(response.message || '上传成功')
+        this.fileList.push(data)
       } else {
-        // error
-        this.$refs.upload.handleError(response, file)
+        this.$message.error(response.message || '上传失败')
+      }
+    },
+    handleError(err) {
+      try {
+        this.uploadLoading = false
+        this.$message.error(JSON.parse(err.message.toString()).message)
+      } catch {
+        this.$message.error('上传失败')
       }
     },
     handlePictureCardPreview(file) {

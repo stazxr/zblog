@@ -131,151 +131,80 @@
                 </el-radio>
               </el-radio-group>
 
+              <!-- 默认封面 -->
+              <img v-if="form.coverImageType === 0" :src="defaultArticleCoverImage || noImg" alt="" class="default-cover-img">
+              <div v-if="form.coverImageType === 0" class="form-tip">
+                使用站长配置的默认封面
+              </div>
+
               <!-- 单封面 -->
               <div v-if="form.coverImageType === 1" class="cover-img-box-flex">
-                <div
-                  v-if="form.articleImg.length < maxUploadSize"
-                  class="cover-img-box"
-                  @click="uploadCoverImg"
-                >
+                <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                   <div class="cover-img">
                     <div class="cover-img-hover">
-                      <img
-                        :src="addIcon"
-                        alt=""
-                        class="cover-img-add-icon"
-                      >
+                      <img :src="addIcon" alt="" class="cover-img-add-icon">
                     </div>
                   </div>
                 </div>
-
-                <div
-                  v-else
-                  class="cover-img-box"
-                >
+                <div v-else class="cover-img-box">
                   <div class="cover-img">
-                    <div
-                      class="cover-img-over"
-                      @mouseenter="showCoverImgIcon(0)"
-                      @mouseleave="hideCoverImgIcon(0)"
-                    >
-                      <img
-                        :src="form.articleImg[0].downloadUrl"
-                        alt=""
-                        class="cover-img-img-icon"
-                      >
-
-                      <span
-                        class="cover-img-close-icon"
-                        @click="removeCoverImg(form.articleImg[0], 0)"
-                      >
+                    <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
+                      <img :src="form.articleImages[0].fileAccessUrL" alt="" class="cover-img-img-icon">
+                      <span class="cover-img-close-icon" @click="removeCoverImg(form.articleImages[0], 0)">
                         ×
                       </span>
-
-                      <span
-                        class="cover-img-replace-icon"
-                        @click="replaceCoverImg(form.articleImg[0], 0)"
-                      >
+                      <span class="cover-img-replace-icon" @click="replaceCoverImg(form.articleImages[0], 0)">
                         替换
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <span
-                v-if="form.coverImageType === 1"
-                class="form-tip"
-              >
+              <div v-if="form.coverImageType === 1" class="form-tip">
                 支持 jpg、jpeg、png、webp，单张最大 5MB，建议尺寸 16:9
-              </span>
+              </div>
 
               <!-- 多封面 -->
-              <div
-                v-if="form.coverImageType === 2"
-                class="cover-img-box-flex cover-img-box-more"
-              >
-                <div
-                  v-if="form.articleImg.length < maxUploadSize"
-                  class="cover-img-box"
-                  @click="uploadCoverImg"
-                >
+              <div v-if="form.coverImageType === 2" class="cover-img-box-flex cover-img-box-more">
+                <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                   <div class="cover-img">
                     <div class="cover-img-hover">
-                      <img
-                        :src="addIcon"
-                        alt=""
-                        class="cover-img-add-icon"
-                      >
+                      <img :src="addIcon" alt="" class="cover-img-add-icon">
                     </div>
                   </div>
                 </div>
-
-                <div
-                  v-for="(articleImg, index) in form.articleImg"
-                  :key="articleImg.id"
-                  class="cover-img-box"
-                >
+                <div v-for="(articleImage, index) in form.articleImages" :key="articleImage.fileId" class="cover-img-box">
                   <div class="cover-img">
-                    <div
-                      class="cover-img-over"
-                      @mouseenter="showCoverImgIcon(index)"
-                      @mouseleave="hideCoverImgIcon(index)"
-                    >
-                      <img
-                        :src="articleImg.downloadUrl"
-                        alt=""
-                        class="cover-img-img-icon"
-                      >
-
-                      <span
-                        class="cover-img-close-icon"
-                        @click="removeCoverImg(articleImg, index)"
-                      >
+                    <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
+                      <img :src="articleImage.fileAccessUrL" alt="" class="cover-img-img-icon">
+                      <span class="cover-img-close-icon" @click="removeCoverImg(articleImage, index)">
                         ×
                       </span>
-
-                      <span
-                        class="cover-img-replace-icon"
-                        @click="replaceCoverImg(articleImg, index)"
-                      >
+                      <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImage, index)">
                         替换
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
+              <div v-if="form.coverImageType === 2" class="form-tip">
+                支持 jpg、jpeg、png、webp，单张最大 5MB，建议尺寸 16:9，最多支持 {{ maxUploadLimit }} 张图片
+              </div>
 
-              <span
-                v-if="form.coverImageType === 2"
-                class="form-tip"
-              >
-                建议尺寸 16:9，最多支持 4 张图片
-              </span>
+              <!-- 随机封面 -->
+              <div v-if="form.coverImageType === 3" class="form-tip">
+                前台展示时，会根据站长配置显示随机封面
+              </div>
 
-              <!-- 默认封面 -->
-              <img
-                v-if="form.coverImageType === 3"
-                :src="defaultArticleCover || noImg"
-                alt=""
-                class="default-cover-img"
-              >
-
-              <!-- 标题封面 -->
-              <span
-                v-if="form.coverImageType === 4"
-                class="form-tip"
-              >
-                后台会根据文章标题自动生成文章封面
-              </span>
+              <!-- 标题生成 -->
+              <div v-if="form.coverImageType === 4" class="form-tip">
+                后台会根据文章标题自动生成封面
+              </div>
 
               <!-- 无封面 -->
-              <span
-                v-if="form.coverImageType === 5"
-                class="form-tip"
-              >
+              <div v-if="form.coverImageType === 5" class="form-tip">
                 本文章不使用封面
-              </span>
+              </div>
             </el-form-item>
 
             <!-- 摘要 -->
@@ -562,7 +491,7 @@
     <uploadImgDialog
       ref="uploadImgDialogRef"
       :dialog-visible="uploadImgDialogVisible"
-      :max-upload-size="maxUploadSize"
+      :limit="maxUploadLimit"
       @uploadImgDone="uploadImgDone"
     />
 
@@ -580,28 +509,20 @@ import NoImg from '@/assets/images/no-img-4_3.jpg'
 import AddIcon from '@/assets/images/add-icon.png'
 import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
 import contentEditRecordDrawer from '@/views/admin/content/article/template/contentEditRecordDrawer'
-
 export default {
   name: 'AddOrEditArticle',
-
   components: {
     uploadImgDialog,
     contentEditRecordDrawer
   },
-
   data() {
     return {
-      defaultArticleCover: '', // 系统默认文章封面
-      articleCategoryTree: [], // 文章分类树
-      tagList: [], // 标签列表
-      fullTagList: [], // 全量标签列表
-      tagSearchLoading: false, // 标签列表查询状态
       coverImageTypeEnums: [ // 封面类型
-        { name: '系统默认', value: 3 },
+        { name: '系统默认', value: 0 },
         { name: '单封面', value: 1 },
         { name: '多封面', value: 2, disabled: false },
-        { name: '自动生成', value: 4 },
-        { name: '多封面随机', value: 6, disabled: false },
+        { name: '随机封面', value: 3 },
+        { name: '标题生成', value: 4, disabled: false },
         { name: '无封面', value: 5 }
       ],
       articleTypeEnums: [ // 文章类型
@@ -618,8 +539,13 @@ export default {
         { name: '开启评论', value: true },
         { name: '关闭评论', value: false }
       ],
-      totalCount: 0, // 当前编辑器字数
+      articleCategoryTree: [], // 文章分类树
+      tagList: [], // 标签列表
+      fullTagList: [], // 全量标签列表
+      tagSearchLoading: false, // 标签列表查询状态
+      uploadImgDialogVisible: false, // 封面上传模态框显示状态
 
+      totalCount: 0, // 当前编辑器字数
       pageLoading: false,
       submitLoading: false,
       draftLoading: false,
@@ -663,33 +589,24 @@ export default {
         slug: '',
         summary: '',
         contentMd: '',
-
         categoryId: '', // 文章分类
         articleTags: [], // 文章标签
-
         authorId: '',
-
         seoTitle: '',
         seoKeywords: '',
         seoDescription: '',
-
         articleType: 1,
         articleStatus: 1,
-
         articlePerm: 1,
         accessPassword: '',
-
         sourceName: '',
         sourceAuthor: '',
         sourceUrl: '',
-
         commentFlag: true,
         topFlag: false,
         recommendFlag: false,
-
-        coverImageType: 3,
-        articleImg: [],
-
+        coverImageType: 0,
+        articleImages: [],
         publishTime: ''
       },
 
@@ -698,86 +615,36 @@ export default {
        */
       rules: {
         title: [
-          {
-            required: true,
-            message: '请输入文章标题',
-            trigger: 'blur'
-          }
+          { required: true, message: '请输入文章标题', trigger: 'blur' }
         ],
-
         slug: [
-          {
-            required: true,
-            message: '请输入文章 Slug',
-            trigger: 'blur'
-          }
+          { required: true, message: '请输入文章 Slug', trigger: 'blur' }
         ],
-
         coverImageType: [
-          {
-            required: true,
-            message: '请选择封面类型',
-            trigger: 'change'
-          }
+          { required: true, message: '请选择封面类型', trigger: 'change' }
         ],
-
         articleType: [
-          {
-            required: true,
-            message: '请选择文章类型',
-            trigger: 'change'
-          }
+          { required: true, message: '请选择文章类型', trigger: 'change' }
         ],
-
         summary: [
-          {
-            required: true,
-            message: '请填写文章摘要',
-            trigger: 'blur'
-          }
+          { required: true, message: '请填写文章摘要', trigger: 'blur' }
         ],
-
         categoryId: [
           { required: true, message: '请选择文章分类', trigger: 'change' }
         ],
-
         articlePerm: [
-          {
-            required: true,
-            message: '请选择文章访问权限',
-            trigger: 'change'
-          }
+          { required: true, message: '请选择文章访问权限', trigger: 'change' }
         ],
-
         accessPassword: [
-          {
-            required: true,
-            message: '请输入访问密码',
-            trigger: 'blur'
-          }
+          { required: true, message: '请输入访问密码', trigger: 'blur' }
         ],
-
         sourceUrl: [
-          {
-            required: true,
-            message: '请填写原文地址',
-            trigger: 'blur'
-          }
+          { required: true, message: '请填写原文地址', trigger: 'blur' }
         ],
-
         commentFlag: [
-          {
-            required: true,
-            message: '请选择评论设置',
-            trigger: 'change'
-          }
+          { required: true, message: '请选择评论设置', trigger: 'change' }
         ]
       },
-
-      /**
-       * 封面上传。
-       */
-      uploadImgDialogVisible: false,
 
       /**
        * 内容版本抽屉。
@@ -832,12 +699,13 @@ export default {
   },
 
   computed: {
+    // 系统默认文章封面
+    defaultArticleCoverImage() {
+      return ''
+    },
     // 当前封面最大数量
-    maxUploadSize() {
-      if (this.form.coverImageType === 2 || this.form.coverImageType === 6) {
-        return 4
-      }
-      return 1
+    maxUploadLimit() {
+      return this.form.coverImageType === 2 ? 4 : 1
     },
 
     // 草稿按钮名称
@@ -946,8 +814,6 @@ export default {
   },
 
   mounted() {
-    // 查询文章默认封面
-    this.queryDefaultArticleCover()
     // 获取分类列表
     this.getArticleCategoryTree()
 
@@ -1026,14 +892,6 @@ export default {
       })
     },
 
-    // 获取系统默认文章封面
-    queryDefaultArticleCover() {
-      this.$mapi.article.queryDefaultArticleCover().then(({ data }) => {
-        this.defaultArticleCover = data || ''
-      }).catch(() => {
-        this.defaultArticleCover = ''
-      })
-    },
     // 获取文章分类列表
     getArticleCategoryTree() {
       this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
@@ -1076,24 +934,66 @@ export default {
       }, 200)
     },
 
-    /**
-     * 获取用户 Token。
-     *
-     * Markdown 编辑器的上传方法由 Muses 注入，
-     * 这里保留该方法，方便后续统一处理认证。
-     */
-    getUserToken() {
-      try {
-        const token = this.$store.getters.token
-
-        if (token) {
-          return token
-        }
-      } catch (e) {
-        // 忽略 getter 不存在的情况
+    // 显示封面操作按钮
+    showCoverImgIcon(index) {
+      const closeIcons = document.getElementsByClassName('cover-img-close-icon')
+      const replaceIcons = document.getElementsByClassName('cover-img-replace-icon')
+      if (closeIcons[index]) {
+        closeIcons[index].style.display = 'block'
       }
-
-      return ''
+      if (replaceIcons[index]) {
+        replaceIcons[index].style.display = 'block'
+      }
+    },
+    // 隐藏封面操作按钮
+    hideCoverImgIcon(index) {
+      const closeIcons = document.getElementsByClassName('cover-img-close-icon')
+      const replaceIcons = document.getElementsByClassName('cover-img-replace-icon')
+      if (closeIcons[index]) {
+        closeIcons[index].style.display = 'none'
+      }
+      if (replaceIcons[index]) {
+        replaceIcons[index].style.display = 'none'
+      }
+    },
+    // 删除封面
+    removeCoverImg(file, index) {
+      this.$confirm(`确定移除该封面吗？`).then(() => {
+        const param = { fileId: file.fileId }
+        return this.$mapi.file.deleteFile(param)
+      }).then(res => {
+        this.form.articleImages.splice(index, 1)
+        this.$message.success(res.message || '删除成功')
+      }).catch(() => {})
+    },
+    // 打开封面上传窗口
+    uploadCoverImg() {
+      this.uploadImgDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.uploadImgDialogRef.initData()
+      })
+    },
+    // 替换封面
+    replaceCoverImg(file, index) {
+      this.uploadImgDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.uploadImgDialogRef.initData(true, index)
+      })
+    },
+    // 封面上传完成
+    uploadImgDone(fileList, index) {
+      this.uploadImgDialogVisible = false
+      const list = Array.isArray(fileList) ? fileList : []
+      if (index != null && index >= 0 && list.length === 1 && this.form.articleImages.length > index) {
+        this.$set(this.form.articleImages, index, list[0])
+        return
+      }
+      list.forEach(file => {
+        this.form.articleImages.push(file)
+      })
+      if (this.form.articleImages.length > this.maxUploadLimit) {
+        this.form.articleImages = this.form.articleImages.slice(0, this.maxUploadLimit)
+      }
     },
 
     /**
@@ -1252,9 +1152,9 @@ export default {
             ? 3
             : data.coverImageType,
 
-        articleImg:
-          Array.isArray(data.articleImg)
-            ? data.articleImg
+        articleImages:
+          Array.isArray(data.articleImages)
+            ? data.articleImages
             : [],
 
         publishTime:
@@ -1664,7 +1564,7 @@ export default {
         topFlag: this.form.topFlag,
         recommendFlag: this.form.recommendFlag,
         coverImageType: this.form.coverImageType,
-        articleImg: this.form.articleImg,
+        articleImages: this.form.articleImages,
         wordsCount: this.totalCount,
         publishTime: this.form.publishTime || null
       }
@@ -2118,160 +2018,6 @@ export default {
     },
 
     /**
-     * 显示封面操作按钮。
-     */
-    showCoverImgIcon(index) {
-      const closeIcons =
-        document.getElementsByClassName(
-          'cover-img-close-icon'
-        )
-
-      const replaceIcons =
-        document.getElementsByClassName(
-          'cover-img-replace-icon'
-        )
-
-      if (closeIcons[index]) {
-        closeIcons[index].style.display =
-          'block'
-      }
-
-      if (replaceIcons[index]) {
-        replaceIcons[index].style.display =
-          'block'
-      }
-    },
-
-    /**
-     * 隐藏封面操作按钮。
-     */
-    hideCoverImgIcon(index) {
-      const closeIcons =
-        document.getElementsByClassName(
-          'cover-img-close-icon'
-        )
-
-      const replaceIcons =
-        document.getElementsByClassName(
-          'cover-img-replace-icon'
-        )
-
-      if (closeIcons[index]) {
-        closeIcons[index].style.display =
-          'none'
-      }
-
-      if (replaceIcons[index]) {
-        replaceIcons[index].style.display =
-          'none'
-      }
-    },
-
-    /**
-     * 删除封面。
-     */
-    removeCoverImg(file, index) {
-      this.$confirm(
-        `确定移除 ${file.originalFilename || '该图片'}？`
-      )
-        .then(() => {
-          const param = {
-            fileId: file.id
-          }
-
-          return this.$mapi.file.deleteFile(
-            param
-          )
-        })
-        .then(res => {
-          this.form.articleImg.splice(
-            index,
-            1
-          )
-
-          this.$message.success(
-            res.message ||
-            '删除成功'
-          )
-        })
-        .catch(() => {})
-    },
-
-    /**
-     * 打开封面上传窗口。
-     */
-    uploadCoverImg() {
-      this.uploadImgDialogVisible = true
-
-      this.$nextTick(() => {
-        this.$refs
-          .uploadImgDialogRef
-          .initData()
-      })
-    },
-
-    /**
-     * 替换封面。
-     */
-    replaceCoverImg(file, index) {
-      this.uploadImgDialogVisible = true
-
-      this.$nextTick(() => {
-        this.$refs
-          .uploadImgDialogRef
-          .initData(
-            true,
-            index
-          )
-      })
-    },
-
-    /**
-     * 封面上传完成。
-     */
-    uploadImgDone(fileList, index) {
-      this.uploadImgDialogVisible = false
-
-      const list =
-        Array.isArray(fileList)
-          ? fileList
-          : []
-
-      if (
-        index != null &&
-        index >= 0 &&
-        list.length === 1 &&
-        this.form.articleImg.length >
-        index
-      ) {
-        this.$set(
-          this.form.articleImg,
-          index,
-          list[0]
-        )
-
-        return
-      }
-
-      list.forEach(file => {
-        this.form.articleImg.push(
-          file
-        )
-      })
-
-      if (
-        this.form.articleImg.length >
-        this.maxUploadSize
-      ) {
-        this.form.articleImg =
-          this.form.articleImg.slice(
-            0,
-            this.maxUploadSize
-          )
-      }
-    },
-
-    /**
      * 清空页面数据。
      */
     clearData() {
@@ -2305,7 +2051,7 @@ export default {
         recommendFlag: false,
 
         coverImageType: 3,
-        articleImg: [],
+        articleImages: [],
 
         articleTags: [],
 

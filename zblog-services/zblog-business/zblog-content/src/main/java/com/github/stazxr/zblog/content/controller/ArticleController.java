@@ -88,19 +88,6 @@ public class ArticleController {
         articleService.editArticle(articleDto);
     }
 
-    /**
-     * 查询文章默认封面
-     *
-     * @return 默认封面
-     */
-    @GetMapping(value = "/queryDefaultArticleCover")
-    @ApiOperation(value = "查询文章默认封面")
-    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "查询文章默认封面", code = "ARTIQP01", level = RouterLevel.OPEN)
-    public String queryDefaultArticleCover() {
-        return articleService.queryDefaultArticleCover();
-    }
-
 
 
 
