@@ -4,6 +4,11 @@ import api from '../../custom-axios'
 const articleApi = '/api/articles'
 
 export default {
+  // 查询文章默认封面
+  queryDefaultArticleCover: params => {
+    return api.httpRequest().get(`${articleApi}/queryDefaultArticleCover`, params)
+  },
+
   // 分页查询我的文章列表
   pageMyList: params => {
     return api.httpRequest().get(`${articleApi}/pageMyList`, params)
@@ -12,7 +17,6 @@ export default {
   queryMyArticleCountInfo: params => {
     return api.httpRequest().get(`${articleApi}/queryMyArticleCountInfo`, params)
   },
-
   // 分页查询用户文章列表
   pageAuditArticleList: params => {
     return api.httpRequest().get(`${articleApi}/pagePublicList`, params)
@@ -82,17 +86,5 @@ export default {
   // 文章审核
   auditArticle: params => {
     return api.httpRequest().post(`${articleApi}/auditArticle`, params)
-  },
-  // 查询分类列表
-  queryCategoryTree: params => {
-    return api.httpRequest().get(`${articleApi}/queryCategoryTree`, params)
-  },
-  // 查询标签列表
-  queryTagList: params => {
-    return api.httpRequest().get(`${articleApi}/queryTagList`, params)
-  },
-  // 查询文章默认封面
-  queryArticleDefaultImg: params => {
-    return api.httpRequest().get(`${articleApi}/queryArticleDefaultImg`, params)
   }
 }

@@ -25,7 +25,7 @@
         <el-form-item label="链接排序" prop="sort">
           <el-input-number
             v-model.number="formData.sort"
-            :min="0"
+            :min="1"
             :max="99999"
             step-strictly
             controls-position="right"

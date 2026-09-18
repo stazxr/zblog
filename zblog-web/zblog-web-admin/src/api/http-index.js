@@ -1,5 +1,6 @@
 // base
 import communal from '@/api/communal.js'
+import sequence from '@/api/sequence.js'
 import login from '@/api/login.js'
 import home from '@/api/home.js'
 import menu from '@/api/menu.js'
@@ -46,7 +47,7 @@ import album from '@/api/service/album.js'
 import test from '@/api/service/test.js'
 
 export default {
-  communal, login, home, menu, userCenter, auth,
+  communal, sequence, login, home, menu, userCenter, auth,
   user, role, perm, dict,
   log, host, interfaces,
   version, file, cache, session,

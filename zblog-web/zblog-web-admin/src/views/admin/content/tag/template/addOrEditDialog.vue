@@ -14,7 +14,7 @@
         <el-form-item label="标签名称" prop="name">
           <el-input v-model="formData.name" :style="isMobile ? '' : 'width: 168px;'" maxlength="50" show-word-limit />
         </el-form-item>
-        <el-form-item label="SLUG" prop="slug">
+        <el-form-item label="路径标识" prop="slug">
           <el-input v-model="formData.slug" :style="isMobile ? '' : 'width: 168px;'" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="SEO标题" prop="seoTitle">
@@ -26,9 +26,9 @@
         <el-form-item label="SEO描述" prop="seoDescription">
           <el-input v-model="formData.seoDescription" :style="isMobile ? '' : 'width: 450px;'" maxlength="500" show-word-limit />
         </el-form-item>
-        <el-form-item label="收录状态" prop="allowIndex">
-          <el-select v-model="formData.allowIndex" placeholder="收录状态" :style="isMobile ? '' : 'width: 168px;'">
-            <el-option v-for="item in allowIndexEnums" :key="item.value" :label="item.name" :value="item.value" />
+        <el-form-item label="收录状态" prop="seoSearch">
+          <el-select v-model="formData.seoSearch" placeholder="SEO收录状态" :style="isMobile ? '' : 'width: 168px;'">
+            <el-option v-for="item in seoSearchEnums" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="标签状态" prop="enabled">
@@ -60,9 +60,9 @@ export default {
   data() {
     return {
       submitLoading: false,
-      allowIndexEnums: [
-        { name: '收录', value: true },
-        { name: '禁止', value: false }
+      seoSearchEnums: [
+        { name: '开启', value: true },
+        { name: '关闭', value: false }
       ],
       enabledEnums: [
         { name: '启用', value: true },
@@ -75,7 +75,7 @@ export default {
         seoTitle: null,
         seoKeywords: null,
         seoDescription: null,
-        allowIndex: false,
+        seoSearch: false,
         enabled: true
       },
       formRules: {
@@ -83,10 +83,10 @@ export default {
           { required: true, message: '请输入标签名称', trigger: 'blur' }
         ],
         slug: [
-          { required: true, message: '请输入标签唯一标识', trigger: 'blur' }
+          { required: true, message: '请输入标签路径标识', trigger: 'blur' }
         ],
-        allowIndex: [
-          { required: true, message: '请选择是否允许搜索引擎收录', trigger: 'change' }
+        seoSearch: [
+          { required: true, message: '请选择SEO收录配置', trigger: 'change' }
         ],
         enabled: [
           { required: true, message: '请选择标签状态', trigger: 'change' }
@@ -125,7 +125,7 @@ export default {
         seoTitle: null,
         seoKeywords: null,
         seoDescription: null,
-        allowIndex: false,
+        seoSearch: false,
         enabled: true
       }
       this.$refs.addOrEditForm.resetFields()

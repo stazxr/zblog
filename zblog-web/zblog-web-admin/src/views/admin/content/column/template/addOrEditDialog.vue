@@ -16,7 +16,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="专栏排序" prop="sort">
-          <el-input-number v-model.number="addForm.sort" :min="0" :max="99999" step-strictly controls-position="right" style="width: 178px" />
+          <el-input-number v-model.number="addForm.sort" :min="1" :max="99999" step-strictly controls-position="right" style="width: 178px" />
         </el-form-item>
         <el-form-item label="专栏简介">
           <el-input v-model="addForm.desc" type="textarea" rows="4" maxlength="100" show-word-limit style="width: 470px" />

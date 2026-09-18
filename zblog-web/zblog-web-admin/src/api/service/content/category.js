@@ -10,7 +10,7 @@ export default {
   },
   // 查询分类树列表（公共）
   queryPublicCategoryTree: params => {
-    return api.httpRequest().get(`${categoryApi}/queryCategoryTree`, params)
+    return api.httpRequest().get(`${categoryApi}/queryPublicCategoryTree`, params)
   },
   // 查询一级类别列表
   queryFirstCategoryList: params => {

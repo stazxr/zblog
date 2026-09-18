@@ -18,7 +18,7 @@
           <el-input-number
             v-model.number="formData.dictSort"
             :style="isMobile ? 'width: 100%;' : 'width: 152px;'"
-            :min="0"
+            :min="1"
             :max="99999"
             step-strictly
             controls-position="right"
@@ -131,7 +131,7 @@ export default {
       })
     },
     loadEnabledList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_ENABLED_CONFIG' }).then(res => {
         const { data } = res
         this.enabledList = data
       }).catch(_ => {

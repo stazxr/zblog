@@ -606,10 +606,10 @@ export default {
     console.log('beforeRouteLeave', from.path, ' -> ', to.path)
     this.preDoAutoSaveArticleContent()
 
-    // this.$confirm('确认离开当前页面？').then(_ => {
-    //   next()
-    // }).catch(_ => {})
-    next()
+    this.$confirm('确认离开当前页面？').then(_ => {
+      next()
+    }).catch(_ => {})
+    // next()
   },
   methods: {
     onContentChange(text) {
@@ -688,13 +688,13 @@ export default {
       })
     },
     getDefaultArticleImg() {
-      this.$mapi.article.queryArticleDefaultImg().then(res => {
+      this.$mapi.article.queryDefaultArticleCover().then(res => {
         const { data } = res
         this.articleDefaultImg = data || ''
       })
     },
     getArticleCategoryTree() {
-      this.$mapi.article.queryCategoryTree().then(res => {
+      this.$mapi.category.queryPublicCategoryTree().then(res => {
         const { data } = res
         if (data && data instanceof Array && data.length > 0) {
           this.articleCategoryOptions = data

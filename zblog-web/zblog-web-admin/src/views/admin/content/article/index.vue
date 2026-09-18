@@ -293,7 +293,7 @@ export default {
     },
     // TODO
     getDefaultArticleImg() {
-      this.$mapi.article.queryArticleDefaultImg().then(res => {
+      this.$mapi.article.queryDefaultArticleCover().then(res => {
         const { data } = res
         this.articleDefaultImg = data || ''
       })

@@ -121,26 +121,18 @@
             ref="articleForm"
             :model="form"
             :rules="rules"
-            label-width="100px"
+            label-width="110px"
           >
             <!-- 封面 -->
             <el-form-item label="文章封面：" prop="coverImageType">
               <el-radio-group v-model="form.coverImageType">
-                <el-radio
-                  v-for="item in coverImageTypeEnums"
-                  :key="item.value"
-                  :label="item.value"
-                  :disabled="item.disabled"
-                >
+                <el-radio v-for="item in coverImageTypeEnums" :key="item.value" :label="item.value" :disabled="item.disabled">
                   {{ item.name }}
                 </el-radio>
               </el-radio-group>
 
               <!-- 单封面 -->
-              <div
-                v-if="form.coverImageType === 1"
-                class="cover-img-box-flex"
-              >
+              <div v-if="form.coverImageType === 1" class="cover-img-box-flex">
                 <div
                   v-if="form.articleImg.length < maxUploadSize"
                   class="cover-img-box"
@@ -264,7 +256,7 @@
               <!-- 默认封面 -->
               <img
                 v-if="form.coverImageType === 3"
-                :src="articleDefaultImg || noImg"
+                :src="defaultArticleCover || noImg"
                 alt=""
                 class="default-cover-img"
               >
@@ -358,22 +350,9 @@
             </template>
 
             <!-- 分类 -->
-            <el-form-item
-              label="文章分类："
-              prop="categoryId"
-            >
-              <el-select
-                v-model="form.categoryId"
-                placeholder="请选择文章分类"
-                clearable
-                filterable
-                style="width: 300px"
-              >
-                <el-option-group
-                  v-for="group in articleCategoryOptions"
-                  :key="group.id"
-                  :label="group.name"
-                >
+            <el-form-item label="文章分类：" prop="categoryId">
+              <el-select v-model="form.categoryId" placeholder="请选择文章分类" clearable filterable style="width: 300px">
+                <el-option-group v-for="group in articleCategoryTree" :key="group.id" :label="group.name">
                   <el-option
                     v-for="item in group.children"
                     :key="item.id"
@@ -388,7 +367,7 @@
             <!-- 标签 -->
             <el-form-item label="文章标签：">
               <el-select
-                v-model="form.articleTag"
+                v-model="form.articleTags"
                 placeholder="请选择文章标签"
                 multiple
                 :multiple-limit="3"
@@ -400,12 +379,7 @@
                 clearable
                 style="width: 400px"
               >
-                <el-option
-                  v-for="item in articleTagOptions"
-                  :key="item.id"
-                  :value="item.id"
-                  :label="item.name"
-                />
+                <el-option v-for="item in tagList" :key="item.id" :value="item.id" :label="item.name" />
               </el-select>
 
               <span class="form-tip-inline">
@@ -608,7 +582,7 @@ import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDia
 import contentEditRecordDrawer from '@/views/admin/content/article/template/contentEditRecordDrawer'
 
 export default {
-  name: 'AddArticle',
+  name: 'AddOrEditArticle',
 
   components: {
     uploadImgDialog,
@@ -617,11 +591,39 @@ export default {
 
   data() {
     return {
+      defaultArticleCover: '', // 系统默认文章封面
+      articleCategoryTree: [], // 文章分类树
+      tagList: [], // 标签列表
+      fullTagList: [], // 全量标签列表
+      tagSearchLoading: false, // 标签列表查询状态
+      coverImageTypeEnums: [ // 封面类型
+        { name: '系统默认', value: 3 },
+        { name: '单封面', value: 1 },
+        { name: '多封面', value: 2, disabled: false },
+        { name: '自动生成', value: 4 },
+        { name: '多封面随机', value: 6, disabled: false },
+        { name: '无封面', value: 5 }
+      ],
+      articleTypeEnums: [ // 文章类型
+        { name: '原创', value: 1 },
+        { name: '转载', value: 2 },
+        { name: '翻译', value: 3 }
+      ],
+      articlePermEnums: [ // 文章访问权限
+        { name: '全部可见', value: 1 },
+        { name: '仅我可见', value: 2 },
+        { name: '密码访问', value: 3 }
+      ],
+      commentEnums: [ // 评论设置
+        { name: '开启评论', value: true },
+        { name: '关闭评论', value: false }
+      ],
+      totalCount: 0, // 当前编辑器字数
+
       pageLoading: false,
       submitLoading: false,
       draftLoading: false,
       submitByTimeLoading: false,
-
       noImg: NoImg,
       addIcon: AddIcon,
 
@@ -631,11 +633,6 @@ export default {
        * 用于判断自动保存时文章内容是否发生变化。
        */
       oldContent: '',
-
-      /**
-       * 当前编辑器字数。
-       */
-      totalCount: 0,
 
       /**
        * 自动保存相关状态。
@@ -659,11 +656,6 @@ export default {
         title: ''
       },
 
-      /**
-       * 当前编辑文章的表单。
-       *
-       * 字段对应新的 article 表结构。
-       */
       form: {
         action: '',
         id: '',
@@ -672,7 +664,9 @@ export default {
         summary: '',
         contentMd: '',
 
-        categoryId: '',
+        categoryId: '', // 文章分类
+        articleTags: [], // 文章标签
+
         authorId: '',
 
         seoTitle: '',
@@ -695,8 +689,6 @@ export default {
 
         coverImageType: 3,
         articleImg: [],
-
-        articleTag: [],
 
         publishTime: ''
       },
@@ -746,11 +738,7 @@ export default {
         ],
 
         categoryId: [
-          {
-            required: true,
-            message: '请选择文章分类',
-            trigger: 'change'
-          }
+          { required: true, message: '请选择文章分类', trigger: 'change' }
         ],
 
         articlePerm: [
@@ -785,105 +773,6 @@ export default {
           }
         ]
       },
-
-      /**
-       * 封面类型。
-       */
-      coverImageTypeEnums: [
-        {
-          name: '单封面',
-          value: 1
-        },
-        {
-          name: '多封面',
-          value: 2,
-          disabled: false
-        },
-        {
-          name: '系统默认',
-          value: 3
-        },
-        {
-          name: '自动生成',
-          value: 4
-        },
-        {
-          name: '无封面',
-          value: 5
-        },
-        {
-          name: '多封面随机',
-          value: 6,
-          disabled: false
-        }
-      ],
-
-      /**
-       * 文章类型。
-       */
-      articleTypeEnums: [
-        {
-          name: '原创',
-          value: 1
-        },
-        {
-          name: '转载',
-          value: 2
-        },
-        {
-          name: '翻译',
-          value: 3
-        }
-      ],
-
-      /**
-       * 文章访问权限。
-       */
-      articlePermEnums: [
-        {
-          name: '全部可见',
-          value: 1
-        },
-        {
-          name: '仅我可见',
-          value: 2
-        },
-        {
-          name: '密码访问',
-          value: 3
-        }
-      ],
-
-      /**
-       * 评论设置。
-       */
-      commentEnums: [
-        {
-          name: '开启评论',
-          value: true
-        },
-        {
-          name: '关闭评论',
-          value: false
-        }
-      ],
-
-      /**
-       * 分类。
-       */
-      articleCategoryOptions: [],
-
-      /**
-       * 标签。
-       */
-      articleTagOptions: [],
-      articleTagFullOptions: [],
-      tagSearchLoading: false,
-
-      /**
-       * 系统默认封面。
-       */
-      articleDefaultImg: '',
 
       /**
        * 封面上传。
@@ -943,23 +832,15 @@ export default {
   },
 
   computed: {
-    /**
-     * 当前封面最大数量。
-     */
+    // 当前封面最大数量
     maxUploadSize() {
-      if (
-        this.form.coverImageType === 2 ||
-        this.form.coverImageType === 6
-      ) {
+      if (this.form.coverImageType === 2 || this.form.coverImageType === 6) {
         return 4
       }
-
       return 1
     },
 
-    /**
-     * 草稿按钮名称。
-     */
+    // 草稿按钮名称
     draftBtnName() {
       if (
         this.form.articleStatus == null ||
@@ -1012,7 +893,6 @@ export default {
      */
     $route: {
       immediate: true,
-
       handler(to) {
         if (
           to.path === '/ac/article/publish' &&
@@ -1051,9 +931,7 @@ export default {
   created() {
     this.resetSaveDraftData()
     this.getArticleTagList()
-
     const articleId = this.$route.query.articleId
-
     if (articleId) {
       this.clearRecentDraft()
       this.getArticleDetail(articleId)
@@ -1068,7 +946,9 @@ export default {
   },
 
   mounted() {
-    this.getDefaultArticleImg()
+    // 查询文章默认封面
+    this.queryDefaultArticleCover()
+    // 获取分类列表
     this.getArticleCategoryTree()
 
     this.$nextTick(() => {
@@ -1120,6 +1000,82 @@ export default {
   },
 
   methods: {
+    // 新增 beforeunload 监听
+    addBeforeunloadEventListener() {
+      window.addEventListener('beforeunload', this.beforeUnloadHandler, false)
+    },
+    // 移除 beforeunload 监听
+    removeBeforeunloadEventListener() {
+      window.removeEventListener('beforeunload', this.beforeUnloadHandler, false)
+    },
+    // 浏览器关闭处理器
+    beforeUnloadHandler(event) {
+      this.preDoAutoSaveArticleContent()
+      event.returnValue = ''
+    },
+    // 自动生成文章 ID
+    autoGenerateId() {
+      this.$mapi.sequence.getId().then(({ data }) => {
+        this.form.action = 'add'
+        this.form.id = data
+      }).catch(() => {
+        this.form.action = 'error'
+        this.form.id = null
+      }).finally(() => {
+        this.pageLoading = false
+      })
+    },
+
+    // 获取系统默认文章封面
+    queryDefaultArticleCover() {
+      this.$mapi.article.queryDefaultArticleCover().then(({ data }) => {
+        this.defaultArticleCover = data || ''
+      }).catch(() => {
+        this.defaultArticleCover = ''
+      })
+    },
+    // 获取文章分类列表
+    getArticleCategoryTree() {
+      this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.articleCategoryTree = data
+        } else {
+          this.articleCategoryTree = []
+          this.$message.warning('文章分类列表为空，请先维护文章分类信息')
+        }
+      }).catch(() => {
+        this.articleCategoryTree = []
+      })
+    },
+    // 获取文章标签
+    getArticleTagList() {
+      this.$mapi.tag.queryPublicTagList().then(({ data }) => {
+        this.tagList = data || []
+        this.fullTagList = data || []
+      }).catch(() => {
+        this.tagList = []
+        this.fullTagList = []
+      })
+    },
+    // 标签搜索
+    customTagSearchWithoutCase(query) {
+      if (!query) {
+        this.tagList = this.fullTagList
+        return
+      }
+
+      this.tagSearchLoading = true
+      setTimeout(() => {
+        this.tagSearchLoading = false
+        const keyword = query.toLowerCase()
+        this.tagList = this.fullTagList.filter(item => {
+          return (
+            item.name && item.name.toLowerCase().indexOf(keyword) > -1
+          )
+        })
+      }, 200)
+    },
+
     /**
      * 获取用户 Token。
      *
@@ -1138,37 +1094,6 @@ export default {
       }
 
       return ''
-    },
-
-    /**
-     * 页面离开前保存草稿。
-     */
-    addBeforeunloadEventListener() {
-      window.addEventListener(
-        'beforeunload',
-        this.beforeUnloadHandler,
-        false
-      )
-    },
-
-    /**
-     * 移除页面离开事件。
-     */
-    removeBeforeunloadEventListener() {
-      window.removeEventListener(
-        'beforeunload',
-        this.beforeUnloadHandler,
-        false
-      )
-    },
-
-    /**
-     * 浏览器关闭前保存内容。
-     */
-    beforeUnloadHandler(event) {
-      this.preDoAutoSaveArticleContent()
-
-      event.returnValue = ''
     },
 
     /**
@@ -1208,37 +1133,7 @@ export default {
         })
     },
 
-    /**
-     * 自动生成文章 ID。
-     */
-    autoGenerateId() {
-      this.$mapi.communal.getId()
-        .then(({ data }) => {
-          this.form.action = 'add'
-          this.form.id = data
-          this.pageLoading = false
-        })
-        .catch(() => {
-          this.form.id = ''
-          this.pageLoading = false
-        })
-    },
-
-    /**
-     * 查询文章详情。
-     *
-     * 后端建议直接返回：
-     *
-     * {
-     *   id,
-     *   title,
-     *   slug,
-     *   summary,
-     *   contentMd,
-     *   categoryId,
-     *   ...
-     * }
-     */
+    // 查询文章详情
     getArticleDetail(articleId) {
       this.pageLoading = true
 
@@ -1302,7 +1197,9 @@ export default {
         summary: data.summary || data.remark || '',
         contentMd: data.contentMd || data.content || '',
 
-        categoryId: data.categoryId || '',
+        categoryId: data.categoryId || '', // 文章分类
+        articleTags: Array.isArray(data.articleTags) ? data.articleTags : [], // 文章标签
+
         authorId: data.authorId || '',
 
         seoTitle: data.seoTitle || '',
@@ -1360,11 +1257,6 @@ export default {
             ? data.articleImg
             : [],
 
-        articleTag:
-          Array.isArray(data.articleTag)
-            ? data.articleTag
-            : [],
-
         publishTime:
           data.publishTime || ''
       }
@@ -1409,89 +1301,6 @@ export default {
      */
     padZero(value) {
       return value < 10 ? '0' + value : String(value)
-    },
-
-    /**
-     * 获取系统默认文章封面。
-     */
-    getDefaultArticleImg() {
-      this.$mapi.article.queryArticleDefaultImg()
-        .then(({ data }) => {
-          this.articleDefaultImg = data || ''
-        })
-        .catch(() => {
-          this.articleDefaultImg = ''
-        })
-    },
-
-    /**
-     * 获取文章分类树。
-     */
-    getArticleCategoryTree() {
-      this.$mapi.article.queryCategoryTree()
-        .then(({ data }) => {
-          if (
-            Array.isArray(data) &&
-            data.length > 0
-          ) {
-            this.articleCategoryOptions = data
-          } else {
-            this.articleCategoryOptions = []
-
-            this.$message.warning(
-              '文章分类列表为空，请先维护文章分类信息'
-            )
-          }
-        })
-        .catch(() => {
-          this.articleCategoryOptions = []
-        })
-    },
-
-    /**
-     * 获取文章标签。
-     */
-    getArticleTagList() {
-      this.$mapi.article.queryTagList()
-        .then(({ data }) => {
-          this.articleTagOptions = data || []
-          this.articleTagFullOptions = data || []
-        })
-        .catch(() => {
-          this.articleTagOptions = []
-          this.articleTagFullOptions = []
-        })
-    },
-
-    /**
-     * 标签搜索。
-     */
-    customTagSearchWithoutCase(query) {
-      if (!query) {
-        this.articleTagOptions =
-          this.articleTagFullOptions
-
-        return
-      }
-
-      this.tagSearchLoading = true
-
-      setTimeout(() => {
-        this.tagSearchLoading = false
-
-        const keyword =
-          query.toLowerCase()
-
-        this.articleTagOptions =
-          this.articleTagFullOptions.filter(item => {
-            return (
-              item.name &&
-              item.name
-                .toLowerCase()
-                .indexOf(keyword) > -1
-            )
-          })
-      }, 200)
     },
 
     /**
@@ -1720,15 +1529,12 @@ export default {
         return
       }
 
-      const content =
-        this.form.contentMd || ''
-
+      const content = this.form.contentMd || ''
       if (!content.trim()) {
         return
       }
 
       this.updateTotalCount()
-
       if (this.oldContent === '') {
         this.oldContent = content
         return
@@ -1841,57 +1647,26 @@ export default {
         slug: this.form.slug,
         summary: this.form.summary,
         contentMd: this.form.contentMd,
-
-        categoryId: this.form.categoryId,
+        categoryId: this.form.categoryId, // 文章分类
+        articleTags: this.form.articleTags, // 文章标签
         authorId: this.form.authorId,
-
         seoTitle: this.form.seoTitle,
         seoKeywords: this.form.seoKeywords,
         seoDescription: this.form.seoDescription,
-
         articleType: this.form.articleType,
         articleStatus: this.form.articleStatus,
-
         articlePerm: this.form.articlePerm,
-        accessPassword:
-          this.form.articlePerm === 3
-            ? this.form.accessPassword
-            : '',
-
-        sourceName:
-          this.form.articleType === 1
-            ? ''
-            : this.form.sourceName,
-
-        sourceAuthor:
-          this.form.articleType === 1
-            ? ''
-            : this.form.sourceAuthor,
-
-        sourceUrl:
-          this.form.articleType === 1
-            ? ''
-            : this.form.sourceUrl,
-
+        accessPassword: this.form.articlePerm === 3 ? this.form.accessPassword : '',
+        sourceName: this.form.articleType === 1 ? '' : this.form.sourceName,
+        sourceAuthor: this.form.articleType === 1 ? '' : this.form.sourceAuthor,
+        sourceUrl: this.form.articleType === 1 ? '' : this.form.sourceUrl,
         commentFlag: this.form.commentFlag,
         topFlag: this.form.topFlag,
-        recommendFlag:
-        this.form.recommendFlag,
-
-        coverImageType:
-        this.form.coverImageType,
-
-        articleImg:
-        this.form.articleImg,
-
-        articleTag:
-        this.form.articleTag,
-
-        wordsCount:
-        this.totalCount,
-
-        publishTime:
-          this.form.publishTime || null
+        recommendFlag: this.form.recommendFlag,
+        coverImageType: this.form.coverImageType,
+        articleImg: this.form.articleImg,
+        wordsCount: this.totalCount,
+        publishTime: this.form.publishTime || null
       }
     },
 
@@ -2189,51 +1964,26 @@ export default {
           return
         }
 
-        const param =
-          this.buildSubmitData()
-
-        /*
-         * 新增文章：
-         * addArticle
-         *
-         * 编辑文章：
-         * editArticle
-         */
-        this.submitLoading = true
+        const param = this.buildSubmitData()
 
         let request
-
+        this.submitLoading = true
         if (this.form.action === 'add') {
-          request =
-            this.$mapi.article.addArticle(
-              param
-            )
-        } else if (
-          this.form.action === 'edit'
-        ) {
-          request =
-            this.$mapi.article.editArticle(
-              param
-            )
+          request = this.$mapi.article.addArticle(param)
+        } else if (this.form.action === 'edit') {
+          request = this.$mapi.article.editArticle(param)
         } else {
-          this.$message.error(
-            '系统异常，请刷新页面重试'
-          )
-
+          this.$message.error('系统异常，请刷新页面重试')
           this.submitLoading = false
           return
         }
 
-        request
-          .then(() => {
-            this.oldContent =
-              this.form.contentMd
-
-            this.publishSuccess()
-          })
-          .finally(() => {
-            this.submitLoading = false
-          })
+        request.then(() => {
+          this.oldContent = this.form.contentMd
+          this.publishSuccess()
+        }).finally(() => {
+          this.submitLoading = false
+        })
       })
     },
 
@@ -2557,7 +2307,7 @@ export default {
         coverImageType: 3,
         articleImg: [],
 
-        articleTag: [],
+        articleTags: [],
 
         publishTime: ''
       }

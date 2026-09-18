@@ -132,7 +132,7 @@ export default {
       this.row = row
     },
     loadEnabledList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_ENABLED_CONFIG' }).then(res => {
         const { data } = res
         this.enabledList = data
       }).catch(_ => {

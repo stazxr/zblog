@@ -59,7 +59,7 @@
         <el-form-item label="优先级" prop="sort">
           <el-input-number
             v-model.number="formData.sort"
-            :min="0"
+            :min="1"
             :max="99999"
             step-strictly
             controls-position="right"

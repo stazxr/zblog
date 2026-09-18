@@ -43,7 +43,7 @@
                 v-if="scope.row.index + ',' + scope.column.index === currentCell"
                 :ref="scope.row.index + ',' + scope.column.index"
                 v-model.number="scope.row.sort"
-                :min="0"
+                :min="1"
                 :max="99999"
                 :controls="false"
                 step-strictly

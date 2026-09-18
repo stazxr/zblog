@@ -15,7 +15,7 @@
         <!-- 1 -->
         <el-descriptions-item label="标签序列"> {{ dataInfo.id }} </el-descriptions-item>
         <el-descriptions-item label="标签名称"> {{ dataInfo.name }} </el-descriptions-item>
-        <el-descriptions-item label="SLUG"> {{ dataInfo.slug }} </el-descriptions-item>
+        <el-descriptions-item label="路径标识"> {{ dataInfo.slug }} </el-descriptions-item>
         <el-descriptions-item label="标签状态">
           <el-tag v-if="dataInfo.enabled === 'true'">启用</el-tag>
           <el-tag v-else-if="dataInfo.enabled === 'false'" type="warning">禁用</el-tag>
@@ -23,9 +23,9 @@
         </el-descriptions-item>
         <!-- 2 -->
         <el-descriptions-item label="文章数" :span="2"> {{ dataInfo.articleCount }} </el-descriptions-item>
-        <el-descriptions-item label="收录状态" :span="2">
-          <el-tag v-if="dataInfo.allowIndex === 'true'">收录</el-tag>
-          <el-tag v-else-if="dataInfo.allowIndex === 'false'" type="warning">禁止</el-tag>
+        <el-descriptions-item label="SEO收录状态" :span="2">
+          <el-tag v-if="dataInfo.seoSearch === 'true'">开启</el-tag>
+          <el-tag v-else-if="dataInfo.seoSearch === 'false'" type="warning">关闭</el-tag>
           <span v-else> - </span>
         </el-descriptions-item>
         <!-- 3 -->
@@ -62,7 +62,7 @@ export default {
         seoTitle: null,
         seoKeywords: null,
         seoDescription: null,
-        allowIndex: null,
+        seoSearch: null,
         enabled: null,
         createUsername: null,
         createTime: null,
@@ -101,9 +101,7 @@ export default {
       this.$emit('showDetailDone')
     },
     handleClose() {
-      this.$confirm('确认关闭？').then(_ => {
-        this.doClose()
-      }).catch(_ => {})
+      this.doClose()
     }
   }
 }

@@ -244,14 +244,14 @@ export default {
       this.filters.tagStatus = status
       this.listTableData()
     },
-    getDefaultArticleImg() {
-      this.$mapi.article.queryArticleDefaultImg().then(res => {
+    queryDefaultArticleCover() {
+      this.$mapi.article.queryDefaultArticleCover().then(res => {
         const { data } = res
         this.articleDefaultImg = data || ''
       })
     },
     queryCategoryTree() {
-      this.$mapi.article.queryCategoryTree().then(({ data }) => {
+      this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
         this.categoryList = data
       }).catch(_ => {
         this.categoryList = []

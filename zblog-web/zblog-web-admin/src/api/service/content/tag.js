@@ -8,6 +8,10 @@ export default {
   pageTagList: params => {
     return api.httpRequest().get(`${tagApi}/pageList`, params)
   },
+  // 查询标签列表（公共）
+  queryPublicTagList: params => {
+    return api.httpRequest().get(`${tagApi}/queryPublicTagList`, params)
+  },
   // 查询标签详情
   queryTagDetail: params => {
     return api.httpRequest().get(`${tagApi}/queryTagDetail`, params)

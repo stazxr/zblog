@@ -23,7 +23,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="页面排序" prop="pageSort">
-          <el-input-number v-model.number="formData.pageSort" :min="0" :max="99999" :style="isMobile ? '' : 'width: 380px;'" step-strictly controls-position="right" />
+          <el-input-number v-model.number="formData.pageSort" :min="1" :max="99999" :style="isMobile ? '' : 'width: 380px;'" step-strictly controls-position="right" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

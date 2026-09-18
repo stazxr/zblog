@@ -7,15 +7,15 @@
             <el-input id="search-name" v-model="filters.name" clearable placeholder="分类名称" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-slug">
-            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG" @keyup.enter.native="search" />
+            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="路径标识" @keyup.enter.native="search" />
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-allowIndex">
-            <el-select id="search-allowIndex" v-model="filters.allowIndex" placeholder="引擎收录" clearable @change="search">
-              <el-option v-for="item in allowIndexList" :key="item.value" :label="item.name" :value="item.value" />
+          <muses-search-form-item label="" prop="search-seoSearch">
+            <el-select id="search-seoSearch" v-model="filters.seoSearch" placeholder="SEO收录状态" clearable @change="search">
+              <el-option v-for="item in seoSearchList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-visible">
-            <el-select id="search-visible" v-model="filters.visible" placeholder="前台显示" clearable @change="search">
+            <el-select id="search-visible" v-model="filters.visible" placeholder="显示状态" clearable @change="search">
               <el-option v-for="item in visibleList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
@@ -52,8 +52,8 @@
         @current-change="handleCurrentChange"
       >
         <el-table-column :show-overflow-tooltip="true" prop="name" label="分类名称" width="200" />
-        <el-table-column :show-overflow-tooltip="true" prop="slug" label="SLUG" width="200" />
-        <el-table-column label="分类图" align="center" width="180">
+        <el-table-column :show-overflow-tooltip="true" prop="slug" label="路径标识" width="200" />
+        <el-table-column label="封面图" align="center" width="180">
           <template v-slot="scope">
             <el-image class="category-cover" :src="scope.row['imageUrl']" :preview-src-list="getPreviewList(scope.row)">
               <div slot="error" class="image-slot">
@@ -63,18 +63,18 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="desc" label="分类描述" />
+        <el-table-column :show-overflow-tooltip="true" prop="description" label="分类描述" />
         <el-table-column :show-overflow-tooltip="true" prop="articleCount" label="文章数" align="center" width="100" />
-        <el-table-column :show-overflow-tooltip="false" prop="visible" label="前台展示" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="visible" label="前台显示" align="center" width="100">
           <template v-slot="scope">
             <el-tag v-if="scope.row.visible" type="success">展示</el-tag>
-            <el-tag v-else type="danger">隐藏</el-tag>
+            <el-tag v-else type="warning">隐藏</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="false" prop="allowIndex" label="收录状态" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="seoSearch" label="SEO收录状态" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.allowIndex" type="success">收录</el-tag>
-            <el-tag v-else type="danger">禁止</el-tag>
+            <el-tag v-if="scope.row.seoSearch" type="success">开启</el-tag>
+            <el-tag v-else type="warning">关闭</el-tag>
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="false" prop="enabled" label="分类状态" align="center" width="100">
@@ -89,7 +89,7 @@
           </template>
         </el-table-column>
         <div slot="empty">
-          <el-empty :image="nodataImg" description=" " />
+          <muses-empty />
         </div>
       </el-table>
     </div>
@@ -111,7 +111,6 @@
 </template>
 
 <script>
-import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/content/category/template/detailDialog'
 import addOrEditDialog from '@/views/admin/content/category/template/addOrEditDialog'
 export default {
@@ -125,11 +124,11 @@ export default {
       filters: {
         name: null,
         slug: null,
-        allowIndex: null,
+        seoSearch: null,
         visible: null,
         enabled: null
       },
-      allowIndexList: [],
+      seoSearchList: [],
       visibleList: [],
       enabledList: [],
       tableData: [],
@@ -138,7 +137,6 @@ export default {
         children: 'children',
         hasChildren: 'hasChildren'
       },
-      nodataImg: nodataImg,
       row: null,
       detailDialogVisible: false,
       addOrEditDialogTitle: null,
@@ -148,7 +146,7 @@ export default {
   },
   mounted() {
     this.listTableData()
-    this.loadAllowIndexList()
+    this.loadSeoSearchList()
     this.loadVisibleList()
     this.loadEnabledList()
   },
@@ -156,12 +154,12 @@ export default {
     handleCurrentChange(row) {
       this.row = row
     },
-    loadAllowIndexList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ALLOW_INDEX_CONFIG' }).then(res => {
+    loadSeoSearchList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_SEO_SEARCH_CONFIG' }).then(res => {
         const { data } = res
-        this.allowIndexList = data
+        this.seoSearchList = data
       }).catch(_ => {
-        this.allowIndexList = []
+        this.seoSearchList = []
       })
     },
     loadVisibleList() {
@@ -173,7 +171,7 @@ export default {
       })
     },
     loadEnabledList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_ENABLED_CONFIG' }).then(res => {
         const { data } = res
         this.enabledList = data
       }).catch(_ => {

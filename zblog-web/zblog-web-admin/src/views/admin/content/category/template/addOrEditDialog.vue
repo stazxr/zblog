@@ -14,7 +14,7 @@
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="formData.name" :style="isMobile ? '' : 'width: 168px;'" maxlength="50" show-word-limit />
         </el-form-item>
-        <el-form-item label="SLUG" prop="slug">
+        <el-form-item label="路径标识" prop="slug">
           <el-input v-model="formData.slug" :style="isMobile ? '' : 'width: 168px;'" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="上级分类" prop="pid">
@@ -22,14 +22,15 @@
             v-model="formData.pid"
             :style="isMobile ? '' : 'width: 450px;'"
             placeholder="上级分类"
-            clearable
+            :disabled="isEditTopLevel"
           >
+            <el-option label="无（一级分类）" :value="0" :disabled="isEditSecondLevel" />
             <el-option
               v-for="item in firstCategoryList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
-              :disabled="formData.id === item.id"
+              :disabled="!item.enabled || formData.id === item.id"
             />
           </el-select>
         </el-form-item>
@@ -42,14 +43,14 @@
         <el-form-item label="SEO描述" prop="seoDescription">
           <el-input v-model="formData.seoDescription" :style="isMobile ? '' : 'width: 450px;'" maxlength="500" show-word-limit />
         </el-form-item>
-        <el-form-item label="前台展示" prop="visible">
-          <el-select v-model="formData.visible" placeholder="前台展示" :style="isMobile ? '' : 'width: 168px;'">
-            <el-option v-for="item in visibleEnums" :key="item.value" :label="item.name" :value="item.value" />
+        <el-form-item label="收录状态" prop="seoSearch">
+          <el-select v-model="formData.seoSearch" placeholder="SEO收录状态" :style="isMobile ? '' : 'width: 168px;'">
+            <el-option v-for="item in seoSearchEnums" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="收录状态" prop="allowIndex">
-          <el-select v-model="formData.allowIndex" placeholder="收录状态" :style="isMobile ? '' : 'width: 168px;'">
-            <el-option v-for="item in allowIndexEnums" :key="item.value" :label="item.name" :value="item.value" />
+        <el-form-item label="前台显示" prop="visible">
+          <el-select v-model="formData.visible" placeholder="显示状态" :style="isMobile ? '' : 'width: 168px;'">
+            <el-option v-for="item in visibleEnums" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="分类状态" prop="enabled">
@@ -60,7 +61,7 @@
         <el-form-item label="分类排序" prop="sort">
           <el-input-number
             v-model.number="formData.sort"
-            :min="0"
+            :min="1"
             :max="99999"
             step-strictly
             controls-position="right"
@@ -127,9 +128,9 @@ export default {
         { name: '展示', value: true },
         { name: '隐藏', value: false }
       ],
-      allowIndexEnums: [
-        { name: '收录', value: true },
-        { name: '禁止', value: false }
+      seoSearchEnums: [
+        { name: '开启', value: true },
+        { name: '关闭', value: false }
       ],
       enabledEnums: [
         { name: '启用', value: true },
@@ -140,6 +141,7 @@ export default {
         success: '上传成功!',
         fail: '上传失败!'
       },
+      originalPid: null,
       formData: {
         id: null,
         pid: 0,
@@ -152,7 +154,7 @@ export default {
         seoKeywords: null,
         seoDescription: null,
         visible: false,
-        allowIndex: false,
+        seoSearch: false,
         enabled: true,
         sort: 99999
       },
@@ -161,16 +163,16 @@ export default {
           { required: true, message: '请输入分类名称', trigger: 'blur' }
         ],
         slug: [
-          { required: true, message: '请输入分类唯一标识', trigger: 'blur' }
+          { required: true, message: '请输入分类路径标识', trigger: 'blur' }
         ],
         pid: [
           { required: true, message: '请选择上级分类', trigger: 'change' }
         ],
-        allowIndex: [
-          { required: true, message: '请选择是否允许搜索引擎收录', trigger: 'change' }
+        seoSearch: [
+          { required: true, message: '请选择SEO收录配置', trigger: 'change' }
         ],
         visible: [
-          { required: true, message: '请选择是否前台展示', trigger: 'change' }
+          { required: true, message: '请选择是否前台显示', trigger: 'change' }
         ],
         enabled: [
           { required: true, message: '请选择分类状态', trigger: 'change' }
@@ -184,6 +186,15 @@ export default {
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
+    },
+    isEdit() {
+      return this.formData.id != null && this.formData.id !== ''
+    },
+    isEditTopLevel() {
+      return this.isEdit && this.originalPid === 0
+    },
+    isEditSecondLevel() {
+      return this.isEdit && this.originalPid !== null && this.originalPid !== 0
     }
   },
   methods: {
@@ -198,8 +209,7 @@ export default {
     getFirstCategoryList() {
       this.firstCategoryList = []
       this.$mapi.category.queryFirstCategoryList().then(res => {
-        this.firstCategoryList = res.data ? res.data : []
-        this.firstCategoryList.push({ id: 0, name: '无' })
+        this.firstCategoryList = res.data || []
       }).catch(_ => {
         this.formData.pid = null
         this.firstCategoryList = []
@@ -208,6 +218,7 @@ export default {
     queryDetail(dataId) {
       this.$mapi.category.queryCategoryDetail({ categoryId: dataId }).then(res => {
         const { data } = res
+        this.originalPid = data.pid
         Object.keys(this.formData).forEach(key => {
           this.formData[key] = data[key]
         })
@@ -265,6 +276,7 @@ export default {
       this.formData.imageUrl = null
     },
     doClose(result = false) {
+      this.originalPid = null
       this.formData = {
         id: null,
         pid: 0,
@@ -276,7 +288,7 @@ export default {
         seoTitle: null,
         seoKeywords: null,
         seoDescription: null,
-        allowIndex: false,
+        seoSearch: false,
         visible: false,
         enabled: true,
         sort: 99999

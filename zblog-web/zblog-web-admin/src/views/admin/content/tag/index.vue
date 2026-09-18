@@ -7,11 +7,11 @@
             <el-input id="search-name" v-model="filters.name" clearable placeholder="标签名称" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-slug">
-            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG" @keyup.enter.native="search" />
+            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="路径标识" @keyup.enter.native="search" />
           </muses-search-form-item>
-          <muses-search-form-item label="" prop="search-allowIndex">
-            <el-select id="search-allowIndex" v-model="filters.allowIndex" placeholder="引擎收录" clearable @change="search">
-              <el-option v-for="item in allowIndexList" :key="item.value" :label="item.name" :value="item.value" />
+          <muses-search-form-item label="" prop="search-seoSearch">
+            <el-select id="search-seoSearch" v-model="filters.seoSearch" placeholder="SEO收录状态" clearable @change="search">
+              <el-option v-for="item in seoSearchList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-enabled">
@@ -46,15 +46,15 @@
         @current-change="handleCurrentChange"
       >
         <el-table-column :show-overflow-tooltip="true" prop="name" label="标签名称" />
-        <el-table-column :show-overflow-tooltip="true" prop="slug" label="SLUG" />
+        <el-table-column :show-overflow-tooltip="true" prop="slug" label="路径标识" />
         <el-table-column :show-overflow-tooltip="true" prop="seoTitle" label="SEO标题" />
         <el-table-column :show-overflow-tooltip="true" prop="seoKeywords" label="SEO关键字" />
         <el-table-column :show-overflow-tooltip="true" prop="seoDescription" label="SEO描述" />
         <el-table-column :show-overflow-tooltip="true" prop="articleCount" label="文章数" align="center" width="100" />
-        <el-table-column :show-overflow-tooltip="false" prop="allowIndex" label="收录状态" align="center" width="100">
+        <el-table-column :show-overflow-tooltip="false" prop="seoSearch" label="SEO收录状态" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row.allowIndex" type="success">收录</el-tag>
-            <el-tag v-else type="danger">禁止</el-tag>
+            <el-tag v-if="scope.row.seoSearch" type="success">开启</el-tag>
+            <el-tag v-else type="warning">关闭</el-tag>
           </template>
         </el-table-column>
         <el-table-column :show-overflow-tooltip="false" prop="enabled" label="标签状态" align="center" width="100">
@@ -64,7 +64,7 @@
           </template>
         </el-table-column>
         <div slot="empty">
-          <el-empty :image="nodataImg" description=" " />
+          <muses-empty />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -97,7 +97,6 @@
 </template>
 
 <script>
-import nodataImg from '@/assets/images/nodata.png'
 import detailDialog from '@/views/admin/content/tag/template/detailDialog'
 import addOrEditDialog from '@/views/admin/content/tag/template/addOrEditDialog'
 export default {
@@ -111,14 +110,13 @@ export default {
       filters: {
         name: null,
         slug: null,
-        allowIndex: null,
+        seoSearch: null,
         enabled: null
       },
-      allowIndexList: [],
+      seoSearchList: [],
       enabledList: [],
       tableData: [],
       tableLoading: false,
-      nodataImg: nodataImg,
       row: null,
       total: 0,
       page: 1,
@@ -129,7 +127,7 @@ export default {
     }
   },
   mounted() {
-    this.loadAllowIndexList()
+    this.loadSeoSearchList()
     this.loadEnabledList()
     this.listTableData()
   },
@@ -137,16 +135,16 @@ export default {
     handleCurrentChange(row) {
       this.row = row
     },
-    loadAllowIndexList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ALLOW_INDEX_CONFIG' }).then(res => {
+    loadSeoSearchList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_SEO_SEARCH_CONFIG' }).then(res => {
         const { data } = res
-        this.allowIndexList = data
+        this.seoSearchList = data
       }).catch(_ => {
-        this.allowIndexList = []
+        this.seoSearchList = []
       })
     },
     loadEnabledList() {
-      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ENABLED_CONFIG' }).then(res => {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'COMMON_ENABLED_CONFIG' }).then(res => {
         const { data } = res
         this.enabledList = data
       }).catch(_ => {
