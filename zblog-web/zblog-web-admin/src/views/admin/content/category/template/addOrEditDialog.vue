@@ -262,7 +262,7 @@ export default {
         // success
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           this.formData.imageId = response.data[0]['fileId']
-          this.formData.imageUrl = response.data[0]['fileAccessUrL']
+          this.formData.imageUrl = response.data[0]['fileAccessUrl']
         }
 
         this.$message.success('上传成功')

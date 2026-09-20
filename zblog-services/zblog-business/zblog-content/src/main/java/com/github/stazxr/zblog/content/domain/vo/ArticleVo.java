@@ -174,18 +174,6 @@ public class ArticleVo implements Serializable {
     private Boolean commentFlag;
 
     /**
-     * 是否置顶
-     */
-    @ApiModelProperty(value = "是否置顶", example = "false")
-    private Boolean topFlag;
-
-    /**
-     * 是否推荐
-     */
-    @ApiModelProperty(value = "是否推荐", example = "false")
-    private Boolean recommendFlag;
-
-    /**
      * 封面类型
      */
     @ApiModelProperty(value = "封面类型", example = "1")

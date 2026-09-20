@@ -523,7 +523,7 @@ export default {
             return
           }
 
-          const url = data.fileAccessUrL
+          const url = data.fileAccessUrl
           if (!url) {
             this.$message.error('上传文件地址为空')
             return

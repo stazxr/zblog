@@ -274,7 +274,7 @@ public class FileServiceImpl implements FileService {
         uploadFileVo.setFilename(fileStorage.getFilename());
         uploadFileVo.setFileAbsolutePath(fileStorage.getFileAbsolutePath());
         uploadFileVo.setFileRelativePath(fileStorage.getFileRelativePath());
-        uploadFileVo.setFileAccessUrL(fileStorage.getFileAccessUrl());
+        uploadFileVo.setFileAccessUrl(fileStorage.getFileAccessUrl());
         return uploadFileVo;
     }
 

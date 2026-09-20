@@ -97,7 +97,7 @@ export default {
     },
     handleUploadSuccess(file) {
       this.formData.previewCoverId = file.fileId
-      this.formData.previewCover = file.fileAccessUrL
+      this.formData.previewCover = file.fileAccessUrl
     },
     handleUploadRemove() {
       this.formData.previewCoverId = null

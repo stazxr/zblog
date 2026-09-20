@@ -470,8 +470,6 @@ CREATE TABLE `article` (
   `SOURCE_AUTHOR` VARCHAR(100) DEFAULT NULL COMMENT '原作者',
   `SOURCE_URL` VARCHAR(1000) DEFAULT NULL COMMENT '原文地址',
   `COMMENT_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否允许评论',
-  `TOP_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否置顶',
-  `RECOMMEND_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否推荐',
   `COVER_IMAGE_TYPE` TINYINT NOT NULL DEFAULT 0 COMMENT '封面类型：0-默认封面；1-单封面；2-多封面；3-随机封面；4-标题生成；5-无封面',
   `WORDS_COUNT` INT UNSIGNED NOT NULL COMMENT '总字数',
   `VIEW_COUNT` BIGINT DEFAULT 0 COMMENT '总浏览数',
@@ -501,6 +499,195 @@ CREATE TABLE `article_img_relation` (
   `FILE_ID` BIGINT NOT NULL COMMENT '文件编号',
   UNIQUE KEY `KEY_ARTICLE_TAG` (`ARTICLE_ID`, `FILE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
+
+DROP TABLE IF EXISTS `article_access_user`;
+CREATE TABLE `article_access_user` (
+                                       `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                       `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                       `USER_ID` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+                                       `EXPIRE_TIME` DATETIME DEFAULT NULL COMMENT '授权过期时间，NULL表示永久有效',
+                                       `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '授权状态：0-失效；1-有效',
+                                       `REMARK` VARCHAR(500) DEFAULT NULL COMMENT '授权备注',
+                                       `CREATE_USER` BIGINT DEFAULT NULL COMMENT '授权人',
+                                       `CREATE_TIME` DATETIME NOT NULL COMMENT '授权时间',
+                                       `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '最后修改人',
+                                       `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '最后修改时间',
+                                       PRIMARY KEY (`ID`) USING BTREE,
+                                       UNIQUE KEY `uk_article_access_user` (`ARTICLE_ID`, `USER_ID`),
+                                       KEY `idx_article_access_user_user` (`USER_ID`),
+                                       KEY `idx_article_access_user_expire` (`EXPIRE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章指定用户访问权限表';
+
+DROP TABLE IF EXISTS `article_access_verify`;
+CREATE TABLE `article_access_verify` (
+                                         `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                         `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                         `VERIFY_TYPE` TINYINT(2) NOT NULL DEFAULT 1 COMMENT '验证方式：1-公众号关注验证码',
+                                         `VERIFY_CODE` VARCHAR(100) DEFAULT NULL COMMENT '访问验证码',
+                                         `VERIFY_HINT` VARCHAR(500) DEFAULT NULL COMMENT '验证提示',
+                                         `EXPIRE_TIME` DATETIME DEFAULT NULL COMMENT '验证码过期时间',
+                                         `ENABLED` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
+                                         `VERSION` INT NOT NULL DEFAULT 1 COMMENT '乐观锁',
+                                         `CREATE_USER` BIGINT DEFAULT NULL COMMENT '创建人',
+                                         `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                         `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新人',
+                                         `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                                         PRIMARY KEY (`ID`) USING BTREE,
+                                         UNIQUE KEY `uk_article_access_verify_article` (`ARTICLE_ID`),
+                                         KEY `idx_article_access_verify_type` (`VERIFY_TYPE`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章访问验证配置表';
+
+DROP TABLE IF EXISTS `article_access_verify_record`;
+CREATE TABLE `article_access_verify_record` (
+                                                `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                                `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                                `USER_ID` BIGINT UNSIGNED DEFAULT NULL COMMENT '用户ID',
+                                                `OPEN_ID` VARCHAR(100) DEFAULT NULL COMMENT '微信公众号OpenID',
+                                                `VERIFY_CODE` VARCHAR(20) DEFAULT NULL COMMENT '本次验证码',
+                                                `VERIFY_STATUS` TINYINT(2) NOT NULL DEFAULT 0 COMMENT '验证状态：0-待验证；1-验证成功；2-验证失败；3-已过期',
+                                                `ERROR_COUNT` INT NOT NULL DEFAULT 0 COMMENT '验证失败次数',
+                                                `EXPIRE_TIME` DATETIME NOT NULL COMMENT '验证码过期时间',
+                                                `VERIFY_TIME` DATETIME DEFAULT NULL COMMENT '验证成功时间',
+                                                `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                                PRIMARY KEY (`ID`) USING BTREE,
+                                                KEY `idx_article_verify_record_article` (`ARTICLE_ID`),
+                                                KEY `idx_article_verify_record_user` (`USER_ID`),
+                                                KEY `idx_article_verify_record_open_id` (`OPEN_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章访问验证记录表';
+
+DROP TABLE IF EXISTS `article_pay_config`;
+CREATE TABLE `article_pay_config` (
+                                      `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                      `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                      `PRICE` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '文章售价',
+                                      `CURRENCY` VARCHAR(10) NOT NULL DEFAULT 'CNY' COMMENT '货币类型',
+                                      `CONTENT_TYPE` TINYINT(2) NOT NULL DEFAULT 1 COMMENT '付费内容：1-全文',
+                                      `VALID_DAYS` INT DEFAULT NULL COMMENT '购买有效期，NULL表示永久有效',
+                                      `SALE_STATUS` TINYINT(2) NOT NULL DEFAULT 1 COMMENT '销售状态：0-下架；1-销售中',
+                                      `VERSION` INT NOT NULL DEFAULT 1 COMMENT '乐观锁',
+                                      `CREATE_USER` BIGINT DEFAULT NULL COMMENT '创建人',
+                                      `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                      `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新人',
+                                      `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                                      PRIMARY KEY (`ID`) USING BTREE,
+                                      UNIQUE KEY `uk_article_pay_config_article` (`ARTICLE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章付费配置表';
+
+DROP TABLE IF EXISTS `article_order`;
+CREATE TABLE `article_order` (
+                                 `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                 `ORDER_NO` VARCHAR(64) NOT NULL COMMENT '订单号',
+                                 `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                 `USER_ID` BIGINT UNSIGNED NOT NULL COMMENT '购买用户ID',
+                                 `PRICE` DECIMAL(10,2) NOT NULL COMMENT '订单金额',
+                                 `PAY_AMOUNT` DECIMAL(10,2) NOT NULL COMMENT '实际支付金额',
+                                 `CURRENCY` VARCHAR(10) NOT NULL DEFAULT 'CNY' COMMENT '货币类型',
+                                 `ORDER_STATUS` TINYINT(2) NOT NULL DEFAULT 0 COMMENT '订单状态：0-待支付；1-已支付；2-已关闭；3-已退款',
+                                 `PAY_CHANNEL` VARCHAR(30) DEFAULT NULL COMMENT '支付渠道',
+                                 `PAY_TIME` DATETIME DEFAULT NULL COMMENT '支付时间',
+                                 `EXPIRE_TIME` DATETIME DEFAULT NULL COMMENT '订单过期时间',
+                                 `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                 `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                                 PRIMARY KEY (`ID`) USING BTREE,
+                                 UNIQUE KEY `uk_article_order_no` (`ORDER_NO`),
+                                 KEY `idx_article_order_article` (`ARTICLE_ID`),
+                                 KEY `idx_article_order_user` (`USER_ID`),
+                                 KEY `idx_article_order_status` (`ORDER_STATUS`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章购买订单表';
+
+DROP TABLE IF EXISTS `article_access_grant`;
+CREATE TABLE `article_access_grant` (
+                                        `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                        `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                        `USER_ID` BIGINT UNSIGNED DEFAULT NULL COMMENT '用户ID',
+                                        `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '访客ID',
+                                        `GRANT_TYPE` TINYINT(2) NOT NULL COMMENT '授权方式：1-密码；2-公众号验证；3-付费',
+                                        `SOURCE_ID` BIGINT UNSIGNED DEFAULT NULL COMMENT '授权来源ID，如订单ID、验证记录ID',
+                                        `GRANT_TIME` DATETIME NOT NULL COMMENT '授权时间',
+                                        `EXPIRE_TIME` DATETIME DEFAULT NULL COMMENT '授权过期时间，NULL表示永久',
+                                        `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '授权状态：0-失效；1-有效',
+                                        `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                        PRIMARY KEY (`ID`) USING BTREE,
+                                        UNIQUE KEY `uk_article_access_grant_user` (`ARTICLE_ID`, `USER_ID`, `GRANT_TYPE`),
+                                        KEY `idx_article_access_grant_visitor` (`ARTICLE_ID`, `VISITOR_ID`, `GRANT_TYPE`),
+                                        KEY `idx_article_access_grant_expire` (`EXPIRE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章访问授权表';
+
+article
+   │
+   ├── ARTICLE_PERM
+   └── ACCESS_PASSWORD
+          │
+          ├── article_access_verify       公众号验证配置
+          ├── article_access_verify_record 公众号验证记录
+          ├── article_pay_config          付费配置
+          ├── article_order               购买订单
+          └── article_access_grant        访问授权
+
+DROP TABLE IF EXISTS `article_top`;
+CREATE TABLE `article_top` (
+                               `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                               `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                               `SORT` INT NOT NULL DEFAULT 99999 COMMENT '置顶排序',
+                               `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：0-停用；1-启用',
+                               `START_TIME` DATETIME DEFAULT NULL COMMENT '开始置顶时间',
+                               `END_TIME` DATETIME DEFAULT NULL COMMENT '结束置顶时间',
+                               `CREATE_USER` BIGINT DEFAULT NULL COMMENT '创建人',
+                               `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                               `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新人',
+                               `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                               PRIMARY KEY (`ID`) USING BTREE,
+                               UNIQUE KEY `uk_article_top_article` (`ARTICLE_ID`),
+                               KEY `idx_article_top_sort` (`SORT`),
+                               KEY `idx_article_top_status_time` (`STATUS`, `START_TIME`, `END_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章置顶运营表';
+
+DROP TABLE IF EXISTS `article_recommend`;
+CREATE TABLE `article_recommend` (
+                                     `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                     `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                     `SORT` INT NOT NULL DEFAULT 99999 COMMENT '推荐排序',
+                                     `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：0-停用；1-启用',
+                                     `START_TIME` DATETIME DEFAULT NULL COMMENT '开始推荐时间',
+                                     `END_TIME` DATETIME DEFAULT NULL COMMENT '结束推荐时间',
+                                     `CREATE_USER` BIGINT DEFAULT NULL COMMENT '创建人',
+                                     `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                     `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新人',
+                                     `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                                     PRIMARY KEY (`ID`) USING BTREE,
+                                     UNIQUE KEY `uk_article_recommend_article` (`ARTICLE_ID`),
+                                     KEY `idx_article_recommend_sort` (`SORT`),
+                                     KEY `idx_article_recommend_status_time` (`STATUS`, `START_TIME`, `END_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章推荐运营表';
+
+DROP TABLE IF EXISTS `article_operation`;
+CREATE TABLE `article_operation` (
+                                     `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+                                     `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+                                     `OPERATION_TYPE` TINYINT NOT NULL COMMENT '运营类型：1-置顶；2-推荐；3-热门；4-精选',
+                                     `SORT` INT NOT NULL DEFAULT 99999 COMMENT '运营排序',
+                                     `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：0-停用；1-启用',
+                                     `START_TIME` DATETIME DEFAULT NULL COMMENT '开始时间',
+                                     `END_TIME` DATETIME DEFAULT NULL COMMENT '结束时间',
+                                     `CREATE_USER` BIGINT DEFAULT NULL COMMENT '创建人',
+                                     `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+                                     `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新人',
+                                     `UPDATE_TIME` DATETIME DEFAULT NULL COMMENT '更新时间',
+                                     PRIMARY KEY (`ID`) USING BTREE,
+                                     UNIQUE KEY `uk_article_operation` (`ARTICLE_ID`, `OPERATION_TYPE`),
+                                     KEY `idx_article_operation_type_status` (`OPERATION_TYPE`, `STATUS`),
+                                     KEY `idx_article_operation_sort` (`OPERATION_TYPE`, `SORT`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章运营表';
+
+运营管理
+├── 文章运营
+│   ├── 置顶
+│   ├── 推荐
+│   ├── 热门
+│   └── 精选
+├── 首页配置
+└── ...
+
 
 /*Table structure for table `article_content_draft_record` */
 DROP TABLE IF EXISTS `article_content_draft_record`;
@@ -541,6 +728,18 @@ CREATE TABLE `article_auto_publish_timing` (
   PRIMARY KEY (`ID`) USING BTREE,
   KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章自动发布状态记录表';
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

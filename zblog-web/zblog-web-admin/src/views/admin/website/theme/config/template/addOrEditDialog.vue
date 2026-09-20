@@ -82,7 +82,7 @@ export default {
     },
     handleUploadSuccess(file) {
       this.formData.pageCoverId = file.fileId
-      this.formData.pageCover = file.fileAccessUrL
+      this.formData.pageCover = file.fileAccessUrl
     },
     handleUploadRemove() {
       this.formData.pageCoverId = null

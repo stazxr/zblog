@@ -6,53 +6,26 @@
           <!-- 最近草稿提示 -->
           <div v-if="showRecentDraftFlag && recentDraft.id" class="recent-draft-box">
             <span class="icon-type">草稿</span>
-
             <p class="draft-title" :title="recentDraft.title">
               <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">
                 {{ recentDraft.title }}
               </a>
             </p>
-
-            <a class="draft-btn-edit" @click="openDraftPage(recentDraft.id)">
-              继续编辑
-            </a>
-
-            <a class="draft-btn-more" @click="openMoreDraftPage">
-              更多草稿
-            </a>
-
-            <button class="draft-btn-close" @click="closeDraftPage">
-              ×
-            </button>
+            <a class="draft-btn-edit" @click="openDraftPage(recentDraft.id)">继续编辑</a>
+            <a class="draft-btn-more" @click="openMoreDraftPage">更多草稿</a>
+            <button class="draft-btn-close" @click="closeDraftPage">×</button>
           </div>
 
           <!-- 标题 -->
           <div class="editor-title">
-            <input
-              v-model.trim="form.title"
-              placeholder="请输入文章标题"
-              maxlength="150"
-            >
+            <input v-model.trim="form.title" placeholder="请输入文章标题" maxlength="150">
           </div>
 
           <!-- Slug -->
           <div class="slug-row">
             <span class="slug-label">Slug：</span>
-
-            <el-input
-              v-model.trim="form.slug"
-              placeholder="用于生成文章 URL，例如 spring-boot-start"
-              maxlength="150"
-              clearable
-            />
-
-            <el-button
-              type="text"
-              :disabled="!form.title"
-              @click="generateSlug"
-            >
-              自动生成
-            </el-button>
+            <el-input v-model.trim="form.slug" placeholder="用于生成文章 URL，例如 spring-boot-start" maxlength="150" clearable />
+            <el-button type="text" :disabled="!form.title" @click="generateSlug">自动生成</el-button>
           </div>
 
           <!-- Markdown 编辑器 -->
@@ -63,66 +36,30 @@
               :height="650"
               :upload-image="uploadImage"
               :upload-video="uploadVideo"
+              :upload-start="uploadStart"
+              :upload-success="uploadSuccess"
+              :upload-error="uploadError"
             />
           </div>
 
           <!-- 编辑器底部操作 -->
           <div class="editor-content-opt">
             <div class="editor-content-opt-left">
-              <span v-if="saveDraftSpanShow" class="save-draft-span">
-                草稿已保存 {{ saveDraftTime }}
-              </span>
-
-              <span>
-                共 {{ totalCount }} 字
-              </span>
+              <span v-if="saveDraftSpanShow" class="save-draft-span">草稿已保存 {{ saveDraftTime }}</span>
+              <span>共 {{ totalCount }} 字</span>
             </div>
-
             <div class="editor-content-opt-right">
-              <el-button
-                v-if="form.id"
-                round
-                @click="showContentRecord"
-              >
-                编辑记录
-              </el-button>
-
-              <el-button
-                round
-                :loading="draftLoading"
-                @click="saveDraft"
-              >
-                {{ draftBtnName }}
-              </el-button>
-
-              <el-button
-                v-if="autoPublishBtnShow"
-                round
-                @click="openPublishArticleByTimingDialog"
-              >
-                定时发布
-              </el-button>
-
-              <el-button
-                type="danger"
-                round
-                :loading="submitLoading"
-                @click="publishArticle"
-              >
-                发布文章
-              </el-button>
+              <el-button v-if="form.id" round @click="showContentRecord">编辑记录</el-button>
+              <el-button round :loading="draftLoading" @click="saveDraft">{{ draftBtnName }}</el-button>
+              <el-button v-if="autoPublishBtnShow" round @click="openPublishArticleByTimingDialog">定时发布</el-button>
+              <el-button type="danger" round :loading="submitLoading" @click="publishArticle">发布文章</el-button>
             </div>
           </div>
         </div>
 
         <!-- 文章配置 -->
         <div class="editor-content-inner editor-content-config">
-          <el-form
-            ref="articleForm"
-            :model="form"
-            :rules="rules"
-            label-width="110px"
-          >
+          <el-form ref="articleForm" :model="form" :rules="rules" label-width="110px">
             <!-- 封面 -->
             <el-form-item label="文章封面：" prop="coverImageType">
               <el-radio-group v-model="form.coverImageType">
@@ -132,78 +69,73 @@
               </el-radio-group>
 
               <!-- 默认封面 -->
-              <img v-if="form.coverImageType === 0" :src="defaultArticleCoverImage || noImg" alt="" class="default-cover-img">
-              <div v-if="form.coverImageType === 0" class="form-tip">
-                使用站长配置的默认封面
+              <div v-if="form.coverImageType === 1" class="form-tip">
+                使用网站配置的默认封面
               </div>
 
               <!-- 单封面 -->
-              <div v-if="form.coverImageType === 1" class="cover-img-box-flex">
-                <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
-                  <div class="cover-img">
-                    <div class="cover-img-hover">
-                      <img :src="addIcon" alt="" class="cover-img-add-icon">
+              <template v-if="form.coverImageType === 2">
+                <div class="cover-img-box-flex">
+                  <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                    <div class="cover-img">
+                      <div class="cover-img-hover">
+                        <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="cover-img-box">
+                    <div class="cover-img">
+                      <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
+                        <img :src="form.articleImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
+                        <span class="cover-img-close-icon" @click="removeCoverImg(form.articleImages[0], 0)">×</span>
+                        <span class="cover-img-replace-icon" @click="replaceCoverImg(form.articleImages[0], 0)">替换</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div v-else class="cover-img-box">
-                  <div class="cover-img">
-                    <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
-                      <img :src="form.articleImages[0].fileAccessUrL" alt="" class="cover-img-img-icon">
-                      <span class="cover-img-close-icon" @click="removeCoverImg(form.articleImages[0], 0)">
-                        ×
-                      </span>
-                      <span class="cover-img-replace-icon" @click="replaceCoverImg(form.articleImages[0], 0)">
-                        替换
-                      </span>
-                    </div>
-                  </div>
+                <div class="form-tip">
+                  支持 JPG、JPEG、PNG、WebP，单张最大 5MB，建议尺寸 16:9
                 </div>
-              </div>
-              <div v-if="form.coverImageType === 1" class="form-tip">
-                支持 jpg、jpeg、png、webp，单张最大 5MB，建议尺寸 16:9
-              </div>
+              </template>
 
               <!-- 多封面 -->
-              <div v-if="form.coverImageType === 2" class="cover-img-box-flex cover-img-box-more">
-                <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
-                  <div class="cover-img">
-                    <div class="cover-img-hover">
-                      <img :src="addIcon" alt="" class="cover-img-add-icon">
+              <template v-if="form.coverImageType === 3">
+                <div class="cover-img-box-flex cover-img-box-more">
+                  <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                    <div class="cover-img">
+                      <div class="cover-img-hover">
+                        <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
+                      </div>
+                    </div>
+                  </div>
+                  <div v-for="(articleImage, index) in form.articleImages" :key="articleImage.fileId" class="cover-img-box">
+                    <div class="cover-img">
+                      <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
+                        <img :src="articleImage.fileAccessUrl" alt="" class="cover-img-img-icon">
+                        <span class="cover-img-close-icon" @click="removeCoverImg(articleImage, index)">×</span>
+                        <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImage, index)">替换</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div v-for="(articleImage, index) in form.articleImages" :key="articleImage.fileId" class="cover-img-box">
-                  <div class="cover-img">
-                    <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
-                      <img :src="articleImage.fileAccessUrL" alt="" class="cover-img-img-icon">
-                      <span class="cover-img-close-icon" @click="removeCoverImg(articleImage, index)">
-                        ×
-                      </span>
-                      <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImage, index)">
-                        替换
-                      </span>
-                    </div>
-                  </div>
+                <div v-if="form.coverImageType === 3" class="form-tip">
+                  支持 JPG、JPEG、PNG、WebP，单张最大 5MB，建议尺寸 16:9，最多 {{ maxUploadLimit }} 张
                 </div>
-              </div>
-              <div v-if="form.coverImageType === 2" class="form-tip">
-                支持 jpg、jpeg、png、webp，单张最大 5MB，建议尺寸 16:9，最多支持 {{ maxUploadLimit }} 张图片
-              </div>
+              </template>
 
               <!-- 随机封面 -->
-              <div v-if="form.coverImageType === 3" class="form-tip">
-                前台展示时，会根据站长配置显示随机封面
+              <div v-if="form.coverImageType === 4" class="form-tip">
+                从网站配置的封面中随机选择一张展示
               </div>
 
               <!-- 标题生成 -->
-              <div v-if="form.coverImageType === 4" class="form-tip">
-                后台会根据文章标题自动生成封面
+              <div v-if="form.coverImageType === 5" class="form-tip">
+                根据文章标题自动生成封面
               </div>
 
               <!-- 无封面 -->
-              <div v-if="form.coverImageType === 5" class="form-tip">
-                本文章不使用封面
+              <div v-if="form.coverImageType === 6" class="form-tip">
+                不使用文章封面
               </div>
             </el-form-item>
 
@@ -218,24 +150,13 @@
                 show-word-limit
                 placeholder="请输入文章摘要"
               />
-
-              <el-button
-                round
-                class="set-remark-btn"
-                @click="autoSetArticleSummary"
-              >
-                一键提取
-              </el-button>
+              <el-button round class="set-remark-btn" @click="generateSummary">一键提取</el-button>
             </el-form-item>
 
             <!-- 文章类型 -->
             <el-form-item label="文章类型：" prop="articleType">
               <el-radio-group v-model="form.articleType">
-                <el-radio
-                  v-for="item in articleTypeEnums"
-                  :key="item.value"
-                  :label="item.value"
-                >
+                <el-radio v-for="item in articleTypeEnums" :key="item.value" :label="item.value">
                   {{ item.name }}
                 </el-radio>
               </el-radio-group>
@@ -243,38 +164,14 @@
 
             <!-- 转载信息 -->
             <template v-if="form.articleType !== 1">
-              <el-form-item
-                label="来源名称："
-                prop="sourceName"
-              >
-                <el-input
-                  v-model.trim="form.sourceName"
-                  maxlength="100"
-                  placeholder="例如：掘金、公众号、个人博客"
-                />
+              <el-form-item label="来源名称：" prop="sourceName">
+                <el-input v-model.trim="form.sourceName" maxlength="100" placeholder="例如：掘金、公众号、个人博客" />
               </el-form-item>
-
-              <el-form-item
-                label="原作者："
-                prop="sourceAuthor"
-              >
-                <el-input
-                  v-model.trim="form.sourceAuthor"
-                  maxlength="100"
-                  placeholder="请输入原作者"
-                />
+              <el-form-item label="原作者：" prop="sourceAuthor">
+                <el-input v-model.trim="form.sourceAuthor" maxlength="100" placeholder="请输入原作者" />
               </el-form-item>
-
-              <el-form-item
-                label="原文地址："
-                prop="sourceUrl"
-              >
-                <el-input
-                  v-model.trim="form.sourceUrl"
-                  maxlength="1000"
-                  show-word-limit
-                  placeholder="请输入原文地址"
-                />
+              <el-form-item label="原文地址：" prop="sourceUrl">
+                <el-input v-model.trim="form.sourceUrl" maxlength="1000" show-word-limit placeholder="请输入原文地址" />
               </el-form-item>
             </template>
 
@@ -317,76 +214,132 @@
             </el-form-item>
 
             <!-- 访问权限 -->
-            <el-form-item
-              label="访问权限："
-              prop="articlePerm"
-            >
+            <el-form-item label="访问权限：" prop="articlePerm">
               <el-radio-group v-model="form.articlePerm">
-                <el-radio
-                  v-for="item in articlePermEnums"
-                  :key="item.value"
-                  :label="item.value"
-                >
+                <el-radio v-for="item in articlePermEnums" :key="item.value" :label="item.value">
                   {{ item.name }}
                 </el-radio>
               </el-radio-group>
+              <div class="form-tip">
+                不同访问权限需要配置对应的访问条件
+              </div>
             </el-form-item>
+
+            <!-- 公众号验证 -->
+            <template v-if="form.articlePerm === 4">
+              <el-form-item label="验证方式：" prop="verifyType">
+                <el-radio-group v-model="form.verifyType">
+                  <el-radio :label="1">公众号验证码</el-radio>
+                </el-radio-group>
+              </el-form-item>
+
+              <el-form-item label="验证码有效期：" prop="verifyExpireMinutes">
+                <el-input-number
+                  v-model="form.verifyExpireMinutes"
+                  :min="1"
+                  :max="1440"
+                  controls-position="right"
+                />
+                <span class="form-unit">分钟</span>
+              </el-form-item>
+              <el-form-item label="验证提示：" prop="verifyHint">
+                <el-input
+                  v-model="form.verifyHint"
+                  type="textarea"
+                  :rows="3"
+                  maxlength="500"
+                  show-word-limit
+                  placeholder="请输入访问验证提示"
+                  style="width: 450px"
+                />
+              </el-form-item>
+            </template>
 
             <!-- 密码 -->
-            <el-form-item
-              v-if="form.articlePerm === 3"
-              label="访问密码："
-              prop="accessPassword"
-            >
-              <el-input
-                v-model="form.accessPassword"
-                type="password"
-                maxlength="200"
-                show-password
-                placeholder="请输入文章访问密码"
-                style="width: 300px"
-              />
-            </el-form-item>
+            <template v-if="form.articlePerm === 5">
+              <el-form-item label="访问密码：" prop="accessPassword">
+                <el-input
+                  v-model="form.accessPassword"
+                  type="password"
+                  maxlength="20"
+                  show-password
+                  placeholder="请输入文章访问密码"
+                  style="width: 300px"
+                />
+                <div class="form-tip">
+                  访问者需要输入正确密码后才能查看文章
+                </div>
+              </el-form-item>
+            </template>
+
+            <!-- 付费访问 -->
+            <template v-if="form.articlePerm === 6">
+              <el-form-item label="文章售价：" prop="payPrice">
+                <el-input v-model="form.payPrice" maxlength="10" placeholder="请输入文章售价" style="width: 200px">
+                  <template slot="append">元</template>
+                </el-input>
+              </el-form-item>
+              <el-form-item label="购买有效期：" prop="payValidType">
+                <el-radio-group v-model="form.payValidType">
+                  <el-radio :label="1">永久有效</el-radio>
+                  <el-radio :label="2">限时有效</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item v-if="form.payValidType === 2" label="有效天数：" prop="payValidDays">
+                <el-input-number v-model="form.payValidDays" :min="1" :max="3650" controls-position="right" />
+                <span class="form-unit">天</span>
+              </el-form-item>
+            </template>
+
+            <!-- 指定用户 -->
+            <template v-if="form.articlePerm === 7">
+              <el-form-item label="授权用户：" prop="accessUsers">
+                <div class="access-user-list">
+                  <el-tag
+                    v-for="user in form.accessUsers"
+                    :key="user.userId"
+                    closable
+                    @close="removeAccessUser(user.userId)"
+                  >
+                    {{ user.nickname }}
+                  </el-tag>
+                  <el-button type="text" icon="el-icon-plus" @click="openUserSelector">
+                    添加用户
+                  </el-button>
+                </div>
+              </el-form-item>
+              <el-form-item label="授权有效期：" prop="userExpireType">
+                <el-radio-group v-model="form.userExpireType">
+                  <el-radio :label="1">永久有效</el-radio>
+                  <el-radio :label="2">限时有效</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item
+                v-if="form.userExpireType === 2"
+                label="有效期至："
+                prop="userExpireTime"
+              >
+                <el-date-picker
+                  v-model="form.userExpireTime"
+                  type="datetime"
+                  placeholder="请选择有效期"
+                />
+              </el-form-item>
+            </template>
 
             <!-- 评论 -->
-            <el-form-item
-              label="评论设置："
-              prop="commentFlag"
-            >
+            <el-form-item label="评论设置：" prop="commentFlag">
               <el-radio-group v-model="form.commentFlag">
-                <el-radio
-                  v-for="item in commentEnums"
-                  :key="String(item.value)"
-                  :label="item.value"
-                >
+                <el-radio v-for="item in commentEnums" :key="String(item.value)" :label="item.value">
                   {{ item.name }}
                 </el-radio>
               </el-radio-group>
-            </el-form-item>
-
-            <!-- 置顶 -->
-            <el-form-item label="文章置顶：">
-              <el-switch
-                v-model="form.topFlag"
-                active-text="置顶"
-                inactive-text="不置顶"
-              />
-            </el-form-item>
-
-            <!-- 推荐 -->
-            <el-form-item label="文章推荐：">
-              <el-switch
-                v-model="form.recommendFlag"
-                active-text="推荐"
-                inactive-text="不推荐"
-              />
             </el-form-item>
 
             <!-- SEO -->
             <el-divider content-position="left">
               SEO 设置
             </el-divider>
-
             <el-form-item label="SEO 标题：">
               <el-input
                 v-model.trim="form.seoTitle"
@@ -395,7 +348,6 @@
                 placeholder="留空时使用文章标题"
               />
             </el-form-item>
-
             <el-form-item label="SEO 关键词：">
               <el-input
                 v-model.trim="form.seoKeywords"
@@ -404,7 +356,6 @@
                 placeholder="多个关键词使用英文逗号分隔"
               />
             </el-form-item>
-
             <el-form-item label="SEO 描述：">
               <el-input
                 v-model="form.seoDescription"
@@ -505,8 +456,7 @@
 </template>
 
 <script>
-import NoImg from '@/assets/images/no-img-4_3.jpg'
-import AddIcon from '@/assets/images/add-icon.png'
+import addArticleImageIcon from '@/assets/images/add-article-image-icon.png'
 import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
 import contentEditRecordDrawer from '@/views/admin/content/article/template/contentEditRecordDrawer'
 export default {
@@ -517,13 +467,14 @@ export default {
   },
   data() {
     return {
+      addArticleImageIcon: addArticleImageIcon, // 添加封面图标
       coverImageTypeEnums: [ // 封面类型
-        { name: '系统默认', value: 0 },
-        { name: '单封面', value: 1 },
-        { name: '多封面', value: 2, disabled: false },
-        { name: '随机封面', value: 3 },
-        { name: '标题生成', value: 4, disabled: false },
-        { name: '无封面', value: 5 }
+        { name: '系统默认', value: 1 },
+        { name: '单封面', value: 2 },
+        { name: '多封面', value: 3, disabled: false },
+        { name: '随机封面', value: 4 },
+        { name: '标题生成', value: 5, disabled: false },
+        { name: '无封面', value: 6 }
       ],
       articleTypeEnums: [ // 文章类型
         { name: '原创', value: 1 },
@@ -531,9 +482,13 @@ export default {
         { name: '翻译', value: 3 }
       ],
       articlePermEnums: [ // 文章访问权限
-        { name: '全部可见', value: 1 },
-        { name: '仅我可见', value: 2 },
-        { name: '密码访问', value: 3 }
+        { name: '公开访问', value: 1 },
+        { name: '登录可见', value: 2 },
+        { name: '仅自己可见', value: 3 },
+        { name: '公众号验证', value: 4, disabled: true },
+        { name: '密码访问', value: 5, disabled: true },
+        { name: '付费访问', value: 6, disabled: true },
+        { name: '指定用户', value: 7, disabled: true }
       ],
       commentEnums: [ // 评论设置
         { name: '开启评论', value: true },
@@ -550,8 +505,6 @@ export default {
       submitLoading: false,
       draftLoading: false,
       submitByTimeLoading: false,
-      noImg: NoImg,
-      addIcon: AddIcon,
 
       /**
        * 最近一次正式保存的 Markdown 内容。
@@ -597,17 +550,31 @@ export default {
         seoDescription: '',
         articleType: 1,
         articleStatus: 1,
-        articlePerm: 1,
-        accessPassword: '',
         sourceName: '',
         sourceAuthor: '',
         sourceUrl: '',
         commentFlag: true,
-        topFlag: false,
-        recommendFlag: false,
-        coverImageType: 0,
+        coverImageType: 1,
         articleImages: [],
-        publishTime: ''
+        publishTime: '',
+        // 访问权限
+        articlePerm: 1,
+        accessPassword: '',
+
+        // 公众号验证
+        verifyType: 1,
+        verifyExpireMinutes: 10,
+        verifyHint: '',
+
+        // 付费
+        payPrice: '',
+        payValidType: 1,
+        payValidDays: null,
+
+        // 指定用户
+        accessUsers: [],
+        userExpireType: 1,
+        userExpireTime: null
       },
 
       /**
@@ -636,7 +603,22 @@ export default {
           { required: true, message: '请选择文章访问权限', trigger: 'change' }
         ],
         accessPassword: [
-          { required: true, message: '请输入访问密码', trigger: 'blur' }
+          {
+            validator: (rule, value, callback) => {
+              if (this.form.articlePerm !== 5) {
+                callback()
+                return
+              }
+
+              if (!value || !value.trim()) {
+                callback(new Error('请输入访问密码'))
+                return
+              }
+
+              callback()
+            },
+            trigger: 'blur'
+          }
         ],
         sourceUrl: [
           { required: true, message: '请填写原文地址', trigger: 'blur' }
@@ -699,13 +681,9 @@ export default {
   },
 
   computed: {
-    // 系统默认文章封面
-    defaultArticleCoverImage() {
-      return ''
-    },
     // 当前封面最大数量
     maxUploadLimit() {
-      return this.form.coverImageType === 2 ? 4 : 1
+      return this.form.coverImageType === 3 ? 4 : 1
     },
 
     // 草稿按钮名称
@@ -996,6 +974,72 @@ export default {
       }
     },
 
+    // 自动生成 Slug
+    generateSlug() {
+      if (!this.form.title) {
+        return
+      }
+
+      const slug = this.$slug(this.form.title)
+      if (!slug) {
+        this.$message.warning('当前标题无法自动生成 Slug，请手动填写')
+        return
+      }
+
+      this.form.slug = slug.substring(0, 150)
+    },
+
+    // 自动提取摘要
+    generateSummary() {
+      const content = this.form.contentMd || ''
+      const text = content
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/!\[.*?]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+        .replace(/[#>*_~`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+
+      this.form.summary = text.substring(0, 250)
+      this.$refs.articleForm.validateField('summary')
+    },
+
+    // 开始上传
+    uploadStart(file) {
+    },
+    // 上传成功
+    uploadSuccess(type, file, result) {
+    },
+    // 上传失败
+    uploadError(type, file, result) {
+    },
+    // 图片上传
+    uploadImage(file) {
+      return this.uploadEditorFile(file, 'image')
+    },
+    // 视频上传
+    uploadVideo(file) {
+      return this.uploadEditorFile(file, 'video')
+    },
+    // 编辑器文件上传
+    uploadEditorFile(file, type) {
+      const formData = new FormData()
+      formData.append('file', file)
+      return this.$mapi.file.uploadFile(formData).then(res => {
+        const data = res && res.data
+        if (!Array.isArray(data) || data.length === 0) {
+          throw new Error(type === 'image' ? '图片上传失败' : '视频上传失败')
+        }
+
+        const fileData = data[0]
+        return {
+          url: fileData.fileAccessUrl,
+          name: fileData.originalFilename,
+          id: fileData.fileId
+        }
+      })
+    },
+
     /**
      * 重置草稿保存状态。
      */
@@ -1090,75 +1134,28 @@ export default {
     normalizeArticleData(data) {
       return {
         action: 'edit',
-
         id: data.id || '',
         title: data.title || '',
         slug: data.slug || '',
         summary: data.summary || data.remark || '',
         contentMd: data.contentMd || data.content || '',
-
         categoryId: data.categoryId || '', // 文章分类
         articleTags: Array.isArray(data.articleTags) ? data.articleTags : [], // 文章标签
-
         authorId: data.authorId || '',
-
         seoTitle: data.seoTitle || '',
         seoKeywords: data.seoKeywords || '',
         seoDescription: data.seoDescription || '',
-
         articleType: data.articleType || 1,
-        articleStatus:
-          data.articleStatus == null
-            ? 1
-            : data.articleStatus,
-
-        articlePerm:
-          data.articlePerm == null
-            ? 1
-            : data.articlePerm,
-
+        articleStatus: data.articleStatus == null ? 1 : data.articleStatus,
+        articlePerm: data.articlePerm == null ? 1 : data.articlePerm,
         accessPassword: data.accessPassword || '',
-
-        sourceName:
-          data.sourceName ||
-          '',
-
-        sourceAuthor:
-          data.sourceAuthor ||
-          '',
-
-        sourceUrl:
-          data.sourceUrl ||
-          data.reprintLink ||
-          '',
-
-        commentFlag:
-          data.commentFlag == null
-            ? true
-            : Boolean(data.commentFlag),
-
-        topFlag:
-          data.topFlag == null
-            ? false
-            : Boolean(data.topFlag),
-
-        recommendFlag:
-          data.recommendFlag == null
-            ? false
-            : Boolean(data.recommendFlag),
-
-        coverImageType:
-          data.coverImageType == null
-            ? 3
-            : data.coverImageType,
-
-        articleImages:
-          Array.isArray(data.articleImages)
-            ? data.articleImages
-            : [],
-
-        publishTime:
-          data.publishTime || ''
+        sourceName: data.sourceName || '',
+        sourceAuthor: data.sourceAuthor || '',
+        sourceUrl: data.sourceUrl || '',
+        commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
+        coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
+        articleImages: Array.isArray(data.articleImages) ? data.articleImages : [],
+        publishTime: data.publishTime || ''
       }
     },
 
@@ -1204,60 +1201,6 @@ export default {
     },
 
     /**
-     * 自动生成 Slug。
-     *
-     * 这里不强制依赖第三方 slug 库，
-     * 只做简单中文/英文标题转换。
-     *
-     * 真正唯一性由后端校验。
-     */
-    generateSlug() {
-      if (!this.form.title) {
-        return
-      }
-
-      const slug = this.form.title
-        .trim()
-        .toLowerCase()
-        .replace(/[\s]+/g, '-')
-        .replace(/[^\w\u4e00-\u9fa5-]/g, '')
-        .replace(/-+/g, '-')
-
-      if (!slug) {
-        this.$message.warning(
-          '当前标题无法自动生成 Slug，请手动填写'
-        )
-        return
-      }
-
-      this.form.slug = slug.substring(0, 150)
-    },
-
-    /**
-     * 自动提取摘要。
-     *
-     * Markdown 中去除常见语法后，
-     * 截取前 250 个字符。
-     */
-    autoSetArticleSummary() {
-      const content = this.form.contentMd || ''
-
-      const text = content
-        .replace(/```[\s\S]*?```/g, '')
-        .replace(/!\[.*?]\(.*?\)/g, '')
-        .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
-        .replace(/[#>*_~`]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
-
-      this.form.summary = text.substring(0, 250)
-
-      this.$refs.articleForm.validateField(
-        'summary'
-      )
-    },
-
-    /**
      * 更新文章字数。
      */
     updateTotalCount() {
@@ -1278,92 +1221,6 @@ export default {
     onContentChange(content) {
       this.form.contentMd = content || ''
       this.updateTotalCount()
-    },
-
-    /**
-     * 图片上传。
-     *
-     * Muses Markdown Editor 不直接依赖 zblog，
-     * 由当前业务页面注入上传方法。
-     *
-     * @param file 图片文件
-     * @return Promise
-     */
-    uploadImage(file) {
-      return this.uploadEditorFile(
-        file,
-        'image'
-      )
-    },
-
-    /**
-     * 视频上传。
-     *
-     * @param file 视频文件
-     * @return Promise
-     */
-    uploadVideo(file) {
-      return this.uploadEditorFile(
-        file,
-        'video'
-      )
-    },
-
-    /**
-     * 编辑器文件上传。
-     *
-     * 这里兼容你当前 $mapi.file.upload 的返回结构。
-     */
-    uploadEditorFile(file, type) {
-      return this.$mapi.file.upload(file)
-        .then(res => {
-          const data = res && res.data
-
-          if (
-            !Array.isArray(data) ||
-            data.length === 0
-          ) {
-            throw new Error(
-              type === 'image'
-                ? '图片上传失败'
-                : '视频上传失败'
-            )
-          }
-
-          const fileData = data[0]
-
-          if (
-            type === 'image' &&
-            fileData.fileType &&
-            fileData.fileType !== '图片'
-          ) {
-            throw new Error('只能上传图片')
-          }
-
-          if (
-            type === 'video' &&
-            fileData.fileType &&
-            fileData.fileType !== '视频'
-          ) {
-            throw new Error('只能上传视频')
-          }
-
-          return {
-            url: fileData.downloadUrl,
-            name: fileData.originalFilename,
-            id: fileData.id
-          }
-        })
-        .catch(error => {
-          this.$message.error(
-            error.message ||
-            (type === 'image'
-              ? '图片上传失败'
-              : '视频上传失败')
-          )
-
-          throw error
-        })
     },
 
     /**
@@ -1561,8 +1418,6 @@ export default {
         sourceAuthor: this.form.articleType === 1 ? '' : this.form.sourceAuthor,
         sourceUrl: this.form.articleType === 1 ? '' : this.form.sourceUrl,
         commentFlag: this.form.commentFlag,
-        topFlag: this.form.topFlag,
-        recommendFlag: this.form.recommendFlag,
         coverImageType: this.form.coverImageType,
         articleImages: this.form.articleImages,
         wordsCount: this.totalCount,
@@ -1961,60 +1816,26 @@ export default {
 
       this.doAutoSaveArticleContent()
 
-      this.$mapi.article
-        .queryAutoSaveArticleContentById({
-          recordId
-        })
-        .then(({ data }) => {
-          if (!data) {
-            this.$message.error(
-              '内容恢复失败'
-            )
+      this.$mapi.article.queryAutoSaveArticleContentById({ recordId }).then(({ data }) => {
+        if (!data) {
+          this.$message.error('内容恢复失败')
+          return
+        }
 
-            return
-          }
-
-          const articleId =
-            data.articleId
-
-          if (
-            String(articleId) !==
-            String(this.form.id)
-          ) {
-            this.$message.error(
-              '内容版本与当前文章不匹配'
-            )
-
-            return
-          }
-
-          const content =
-            data.contentMd ||
-            data.content ||
-            ''
-
-          this.form.contentMd =
-            content
-
-          this.form.summary =
-            data.summary ||
-            data.remark ||
-            this.form.summary
-
-          this.oldContent =
-            content
-
-          this.updateTotalCount()
-
-          this.$message.success(
-            '内容恢复成功'
-          )
-        })
-        .catch(() => {
-          this.$message.error(
-            '内容恢复失败'
-          )
-        })
+        const articleId = data.articleId
+        if (String(articleId) !== String(this.form.id)) {
+          this.$message.error('内容版本与当前文章不匹配')
+          return
+        }
+        const content = data.contentMd || data.content || ''
+        this.form.contentMd = content
+        this.form.summary = data.summary || this.form.summary
+        this.oldContent = content
+        this.updateTotalCount()
+        this.$message.success('内容恢复成功')
+      }).catch(() => {
+        this.$message.error('内容恢复失败')
+      })
     },
 
     /**
@@ -2047,10 +1868,8 @@ export default {
         sourceUrl: '',
 
         commentFlag: true,
-        topFlag: false,
-        recommendFlag: false,
 
-        coverImageType: 3,
+        coverImageType: 1,
         articleImages: [],
 
         articleTags: [],

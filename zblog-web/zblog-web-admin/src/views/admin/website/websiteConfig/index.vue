@@ -780,13 +780,13 @@ export default {
       }
 
       uploadFiles.forEach(file => {
-        if (!file || !file.fileAccessUrL) {
+        if (!file || !file.fileAccessUrl) {
           return
         }
 
         this.config.commentEmojis.push({
           name: '',
-          url: file.fileAccessUrL,
+          url: file.fileAccessUrl,
           _key: this.createEmojiKey()
         })
       })

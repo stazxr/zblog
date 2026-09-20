@@ -53,5 +53,5 @@ public class UploadFileVo implements Serializable {
      * 访问地址
      */
     @ApiModelProperty("访问地址")
-    private String fileAccessUrL;
+    private String fileAccessUrl;
 }

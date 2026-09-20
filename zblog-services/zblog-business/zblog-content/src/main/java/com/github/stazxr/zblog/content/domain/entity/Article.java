@@ -133,16 +133,6 @@ public class Article implements Serializable {
     private Boolean commentFlag;
 
     /**
-     * 是否置顶
-     */
-    private Boolean topFlag;
-
-    /**
-     * 是否推荐
-     */
-    private Boolean recommendFlag;
-
-    /**
      * 封面类型
      *
      * @see com.github.stazxr.zblog.content.domain.enums.ArticleCoverImageType

@@ -1,34 +1,75 @@
 package com.github.stazxr.zblog.content.domain.enums;
 
 /**
- * 文章权限
+ * 文章访问权限类型
  *
- * @author SunTao
- * @since 2022-06-07
+ * @author Sun Tao
+ * @since 2026-09-19
  */
 public enum ArticlePerm {
     /**
-     * 公开
+     * 公开访问
      */
-    OPEN(1),
+    PUBLIC(1, "公开访问"),
 
     /**
-     * 私密
+     * 登录可见
      */
-    SELF(2),
+    LOGIN(2, "登录可见"),
 
     /**
-     * 密码
+     * 仅自己可见
      */
-    PASSWORD(3);
+    SELF(3, "仅自己可见"),
 
-    private final Integer type;
+    /**
+     * 公众号验证
+     */
+    WECHAT(4, "公众号验证"),
 
-    ArticlePerm(int type) {
-        this.type = type;
+    /**
+     * 密码访问
+     */
+    PASSWORD(5, "密码访问"),
+
+    /**
+     * 付费访问
+     */
+    PAY(6, "付费访问"),
+
+    /**
+     * 指定用户
+     */
+    USER(7, "指定用户");
+
+    private final int value;
+
+    private final String name;
+
+    ArticlePerm(int value, String name) {
+        this.value = value;
+        this.name = name;
     }
 
-    public Integer getType() {
-        return type;
+    public int getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static ArticlePerm of(Integer value) {
+        if (value == null) {
+            return null;
+        }
+
+        for (ArticlePerm item : values()) {
+            if (item.value == value) {
+                return item;
+            }
+        }
+
+        return null;
     }
 }
