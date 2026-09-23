@@ -8,7 +8,7 @@ const api = {
   state: {
     baseApi: baseUrl,
     // Druid
-    sqlApi: createApiUrl('/druid/index.html'),
+    druidApi: createApiUrl('/druid/index.html'),
     // 通用文件上传
     fileUploadApi: createApiUrl('/api/file/uploadFile'),
     // 测试文件上传

@@ -8,6 +8,7 @@ import com.github.stazxr.zblog.util.io.ResourceLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -62,11 +63,11 @@ public class PropsDriverManagerDataSource extends DriverManagerDataSource {
         if (StringUtils.isNotBlank(encryptorFile) && StringUtils.isNotBlank(encryptorKey)) {
             try {
                 EncryptorContext.set(encryptorKey);
-                String absolutePath = ResourceLoader.getResourceAbsolutePath(encryptorFile);
+                String absolutePath = getEncryptorFilePath(encryptorFile);
                 Encryptor encryptor = (Encryptor) ObjectStreamUtils.readFile(absolutePath);
                 password = encryptor.decrypt(password);
             } catch (Exception e) {
-                log.error("解密密码失败: {}", password, e);
+                log.error("解密密码失败, encryptorFile={}", encryptorFile, e);
             } finally {
                 EncryptorContext.remove();
             }
@@ -82,6 +83,29 @@ public class PropsDriverManagerDataSource extends DriverManagerDataSource {
      */
     public void setEncryptorFile(String encryptorFile) {
         this.encryptorFile = encryptorFile;
+    }
+
+    /**
+     * 获取加密文件绝对路径。
+     *
+     * <p>优先从外部配置目录加载，外部文件不存在时从 classpath 加载。
+     */
+    private String getEncryptorFilePath(String fileName) {
+        String configPath = System.getProperty("zblog.config.path");
+
+        // 生产环境：优先从外部配置目录加载
+        if (StringUtils.isNotBlank(configPath)) {
+            File externalFile = new File(configPath, fileName);
+            if (externalFile.isFile()) {
+                log.info("Loading encryptor file from external path [{}]", externalFile.getAbsolutePath());
+                return externalFile.getAbsolutePath();
+            }
+        }
+
+        // 开发环境：从 classpath 加载
+        String classpath = ResourceLoader.getResourceAbsolutePath(fileName);
+        log.info("Loading encryptor file from classpath [{}]", classpath);
+        return classpath;
     }
 
     /**

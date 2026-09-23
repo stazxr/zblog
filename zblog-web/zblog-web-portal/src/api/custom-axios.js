@@ -21,9 +21,6 @@ const defaultStatusMessageMap = {
 // create instance
 const instance = axios.create()
 
-// baseURL  TODO 这个是否需要，本地环境和生产环境分析
-instance.defaults.baseURL = process.env.VUE_APP_BASE_API
-
 // 超时时间
 instance.defaults.timeout = defaultTimeout
 

@@ -3,7 +3,7 @@
     <Properties>
         <!-- 应用信息 -->
         <Property name="APP_NAME">zblog</Property>
-        <Property name="LOG_PATH">/home/zblog/appLogs</Property>
+        <Property name="LOG_PATH">/appuser/appLogs</Property>
 
         <!-- 滚动策略 -->
         <Property name="LOG_MAX_HISTORY">30</Property>

@@ -7,7 +7,10 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -45,9 +48,45 @@ public class DatabasePropertySource extends PropertySource<Map<String, Object>> 
         initSource();
     }
 
+    /**
+     * 加载配置文件。
+     *
+     * <p>优先从外部配置目录加载，外部配置不存在时从 classpath 加载。
+     *
+     * <p>生产环境：
+     * /appuser/config/props-config.properties
+     *
+     * <p>开发环境：
+     * classpath:/props-config.properties
+     */
     private void loadConfigFile() {
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(PROPS_FILE)) {
-            config.load(is);
+        String externalConfigPath = System.getProperty("zblog.config.path");
+
+        try {
+            InputStream is = null;
+
+            // 优先加载外部配置文件
+            if (externalConfigPath != null && !externalConfigPath.trim().isEmpty()) {
+                File file = new File(externalConfigPath, PROPS_FILE);
+                if (file.exists() && file.isFile()) {
+                    log.info("Loading external config file [{}]", file.getAbsolutePath());
+                    is = Files.newInputStream(file.toPath());
+                }
+            }
+
+            // 外部配置不存在时，从 classpath 加载
+            if (is == null) {
+                log.info("Loading classpath config file [{}]", PROPS_FILE);
+                is = this.getClass().getClassLoader().getResourceAsStream(PROPS_FILE);
+            }
+
+            if (is == null) {
+                throw new FileNotFoundException("Config file not found: " + PROPS_FILE);
+            }
+
+            try (InputStream inputStream = is) {
+                config.load(inputStream);
+            }
         } catch (Exception e) {
             throw new IllegalStateException("Load config file catch exception[file=" + PROPS_FILE + "]", e);
         }

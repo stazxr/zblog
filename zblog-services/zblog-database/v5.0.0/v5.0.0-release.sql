@@ -656,6 +656,1050 @@ CREATE TABLE `file_relation` (
   /*UNIQUE KEY `UK_FILE_BIZ` (`FILE_ID`, `BUSINESS_ID`, `BUSINESS_TYPE`) */
 ) ENGINE=InnoDB COMMENT='文件业务关联表';
 
+-- ----------------------------
+-- Table structure for audit_record
+-- ----------------------------
+DROP TABLE IF EXISTS `audit_record`;
+CREATE TABLE `audit_record` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `UID` VARCHAR(64) DEFAULT NULL COMMENT '用户ID',
+  `OID` VARCHAR(64) DEFAULT NULL COMMENT '业务对象ID',
+  `SCENE` VARCHAR(32) NOT NULL COMMENT '审核场景 COMMENT/MESSAGE/...',
+  `ORIGINAL_CONTENT` TEXT COMMENT '原始内容',
+  `FINAL_CONTENT` TEXT COMMENT '最终内容',
+  `DECISION` VARCHAR(16) NOT NULL COMMENT '审核结果',
+  `HIT_WORDS` JSON COMMENT '命中关键词',
+  `REASON` VARCHAR(1024) COMMENT '审核原因',
+  `TRACES` JSON COMMENT '处理器执行轨迹',
+  `COST_MS` BIGINT DEFAULT 0 COMMENT '总耗时(ms)',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_audit_record_uid` (`UID`),
+  KEY `idx_audit_record_oid` (`OID`),
+  KEY `idx_audit_record_scene` (`SCENE`),
+  KEY `idx_audit_record_decision` (`DECISION`),
+  KEY `idx_audit_record_create_time` (`CREATE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='内容审核记录表';
+
+-- ----------------------------
+-- Table structure for sensitive_word
+-- ----------------------------
+DROP TABLE IF EXISTS `sensitive_word`;
+CREATE TABLE `sensitive_word` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `WORD` VARCHAR(255) NOT NULL COMMENT '敏感词',
+  `TYPE` VARCHAR(50) DEFAULT 'DEFAULT' COMMENT '词类型',
+  `LEVEL` TINYINT DEFAULT 1 COMMENT '风险等级：1-低 2-中 3-高',
+  `STATUS` TINYINT DEFAULT 1 COMMENT '状态：1启用 0禁用',
+  `REMARK` VARCHAR(200) DEFAULT NULL COMMENT '备注',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `uk_sensitive_word` (`WORD`),
+  KEY `idx_sensitive_word_status` (`STATUS`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='敏感词库表';
+
+-- ----------------------------
+-- Table structure for i18n_message
+-- ----------------------------
+DROP TABLE IF EXISTS `i18n_message`;
+CREATE TABLE `i18n_message` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `code` VARCHAR(255) NOT NULL COMMENT '消息代码，建议带前缀标识类别',
+  `locale` VARCHAR(20) NOT NULL COMMENT '语言标识，如 zh-CN、en-US',
+  `message` VARCHAR(500) NOT NULL COMMENT '国际化文本内容',
+  `type` VARCHAR(100) NOT NULL COMMENT '消息类型',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code_locale` (`code`, `locale`)
+) ENGINE=InnoDB COMMENT='国际化消息表';
+
+INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
+-- 公共错误码 >-->
+('ADD_FAILED', 'zh-CN', '新增失败', 'common'),
+('ADD_FAILED', 'en-US', 'Failed to add', 'common'),
+('EDIT_FAILED', 'zh-CN', '修改失败', 'common'),
+('EDIT_FAILED', 'en-US', 'Failed to update', 'common'),
+('DELETE_FAILED', 'zh-CN', '删除失败', 'common'),
+('DELETE_FAILED', 'en-US', 'Failed to delete', 'common'),
+('EMAIL_SEND_ERROR', 'zh-CN', '邮件发送失败', 'common'),
+('EMAIL_SEND_ERROR', 'en-US', 'Send email failed', 'common'),
+('TECH_PARAM_MISS', 'zh-CN', '技术参数缺失', 'common'),
+('TECH_PARAM_MISS', 'en-US', 'Required technical parameter missing', 'common'),
+('TECH_PARAM_INVALID1', 'zh-CN', '参数异常[PE001]，请刷新页面后重试', 'common'),
+('TECH_PARAM_INVALID1', 'en-US', 'Invalid parameter [PE001]. Please refresh the page and try again', 'common'),
+('TECH_PARAM_INVALID2', 'zh-CN', '参数异常[PE002]，请刷新页面后重试', 'common'),
+('TECH_PARAM_INVALID2', 'en-US', 'Invalid parameter [PE002]. Please refresh the page and try again', 'common'),
+('TECH_PARAM_INVALID3', 'zh-CN', '参数异常[PE003]，请重新登录后再试', 'common'),
+('TECH_PARAM_INVALID3', 'en-US', 'Invalid parameter [PE003]. Please log in again and try', 'common'),
+('DATA_ENCRYPT_FAILED', 'zh-CN', '数据加密失败', 'common'),
+('DATA_ENCRYPT_FAILED', 'en-US', 'Data encryption failed', 'common'),
+('DATA_DECRYPT_FAILED', 'zh-CN', '数据解密失败', 'common'),
+('DATA_DECRYPT_FAILED', 'en-US', 'Data decryption failed', 'common'),
+('DATA_NOT_FOUND', 'zh-CN', '数据不存在，请刷新页面后重试', 'common'),
+('DATA_NOT_FOUND', 'en-US', 'Data not found. Please refresh the page and try again', 'common'),
+('SEQUENCE_SERVER_ERROR', 'zh-CN', '序号服务异常[A000]，请稍后再试', 'common'),
+('SEQUENCE_SERVER_ERROR', 'en-US', 'Sequence server error [A000]', 'common'),
+('PARAM_SORT_REQUIRED', 'zh-CN', '请输入排序值', 'common'),
+('PARAM_SORT_REQUIRED', 'en-US', 'Please enter a sort value', 'common'),
+('PARAM_SORT_MAX99999', 'zh-CN', '排序值不能超过 99999，请重新输入', 'common'),
+('PARAM_SORT_MAX99999', 'en-US', 'Sort value cannot exceed 99999. please enter again', 'common'),
+('PARAM_SORT_MIN0', 'zh-CN', '排序值不能小于 0，请重新输入', 'common'),
+('PARAM_SORT_MIN0', 'en-US', 'Sort value cannot be less than 0. please enter again', 'common'),
+('PARAM_SORT_MIN1', 'zh-CN', '排序值不能小于 1，请重新输入', 'common'),
+('PARAM_SORT_MIN1', 'en-US', 'Sort value cannot be less than 1. please enter again', 'common'),
+-- 校验相关 >-->
+-- 用户相关
+('USER_NOT_EXISTS', 'zh-CN', '用户不存在', 'common'),
+('USER_NOT_EXISTS', 'en-US', 'User does not exist', 'common'),
+('USER_USERNAME_REQUIRED', 'zh-CN', '用户名不能为空', 'common'),
+('USER_USERNAME_REQUIRED', 'en-US', 'Username cannot be blank', 'common'),
+('USER_USERNAME_EXISTS', 'zh-CN', '用户名已存在', 'common'),
+('USER_USERNAME_EXISTS', 'en-US', 'Username already exist', 'common'),
+('USER_USERNAME_PATTERN_INVALID', 'zh-CN', '用户名格式错误', 'common'),
+('USER_USERNAME_PATTERN_INVALID', 'en-US', 'Username pattern is invalid', 'common'),
+('USER_USERNAME_IMMUTABLE', 'zh-CN', '用户名禁止修改', 'common'),
+('USER_USERNAME_IMMUTABLE', 'en-US', 'Username cannot be modified', 'common'),
+('USER_EMAIL_REQUIRED', 'zh-CN', '邮箱不能为空', 'common'),
+('USER_EMAIL_REQUIRED', 'en-US', 'Email cannot be blank', 'common'),
+('USER_EMAIL_ALREADY_EXISTS', 'zh-CN', '邮箱已注册', 'common'),
+('USER_EMAIL_ALREADY_EXISTS', 'en-US', 'Email already registered', 'common'),
+('USER_EMAIL_PATTERN_INVALID', 'zh-CN', '邮箱格式错误', 'common'),
+('USER_EMAIL_PATTERN_INVALID', 'en-US', 'Email pattern is invalid', 'common'),
+('USER_USERTYPE_REQUIRED', 'zh-CN', '用户类型不能为空', 'common'),
+('USER_USERTYPE_REQUIRED', 'en-US', 'UserType cannot be blank', 'common'),
+('USER_USERSTATUS_REQUIRED', 'zh-CN', '用户状态不能为空', 'common'),
+('USER_USERSTATUS_REQUIRED', 'en-US', 'UserStatus cannot be blank', 'common'),
+('USER_NICKNAME_ALREADY_EXISTS', 'zh-CN', '用户昵称已存在', 'common'),
+('USER_NICKNAME_ALREADY_EXISTS', 'en-US', 'Nickname already exist', 'common'),
+('USER_EXPIRETIME_REQUIRED_WITH_TEMP', 'zh-CN', '临时用户账号有效期不能为空', 'common'),
+('USER_EXPIRETIME_REQUIRED_WITH_TEMP', 'en-US', 'Temp user expireTime cannot be blank', 'common'),
+('USER_NO_DATA_OPE_PERMISSION', 'zh-CN', '没有数据操作权限', 'common'),
+('USER_NO_DATA_OPE_PERMISSION', 'en-US', 'You do not have permission to operate this user', 'common'),
+('USER_NO_PERMISSION_TO_DELETE_SELF', 'zh-CN', '无法删除自己', 'common'),
+('USER_NO_PERMISSION_TO_DELETE_SELF', 'en-US', 'Deleting your own account is not allowed', 'common'),
+-- 用户中心相关
+('USERCENTER_OLD_PASSWORD_REQUIRED', 'zh-CN', '原密码不能为空', 'common'),
+('USERCENTER_OLD_PASSWORD_REQUIRED', 'en-US', 'Current password is required', 'common'),
+('USERCENTER_NEW_PASSWORD_REQUIRED', 'zh-CN', '新密码不能为空', 'common'),
+('USERCENTER_NEW_PASSWORD_REQUIRED', 'en-US', 'New password is required', 'common'),
+('USERCENTER_CONFIRM_PASSWORD_REQUIRED', 'zh-CN', '确认密码不能为空', 'common'),
+('USERCENTER_CONFIRM_PASSWORD_REQUIRED', 'en-US', 'Confirm password is required', 'common'),
+('USERCENTER_NEW_PASSWORD_MISMATCH', 'zh-CN', '两次输入的新密码不一致', 'common'),
+('USERCENTER_NEW_PASSWORD_MISMATCH', 'en-US', 'The new passwords do not match', 'common'),
+('USERCENTER_PASSWORD_WITH_USER_MISS', 'zh-CN', '用户信息异常，请刷新页面后重试', 'common'),
+('USERCENTER_PASSWORD_WITH_USER_MISS', 'en-US', 'User information is invalid. Please log in again and try', 'common'),
+('USERCENTER_OLD_PASSWORD_MISMATCH', 'zh-CN', '原密码错误', 'common'),
+('USERCENTER_OLD_PASSWORD_MISMATCH', 'en-US', 'Current password is incorrect', 'common'),
+('USERCENTER_NEW_PASSWORD_SAMEWITHOLD', 'zh-CN', '新密码与原密码不能相同', 'common'),
+('USERCENTER_NEW_PASSWORD_SAMEWITHOLD', 'en-US', 'New password cannot be the same as the current password', 'common'),
+('USERCENTER_NEW_PASSWORD_CONTAIN_USER', 'zh-CN', '密码不能包含用户名', 'common'),
+('USERCENTER_NEW_PASSWORD_CONTAIN_USER', 'en-US', 'Password cannot contain the username', 'common'),
+('USERCENTER_NEW_PASSWORD_LOW_COMPLEXITY', 'zh-CN', '密码长度必须大于等于6位且小于等于20位，需要包含大写字母，小写字母，数字，特殊字符中的至少两种', 'common'),
+('USERCENTER_NEW_PASSWORD_LOW_COMPLEXITY', 'en-US', 'Password must be 6-20 characters long and include at least two of the following: uppercase letters, lowercase letters, numbers, special characters', 'common'),
+('USERCENTER_NEW_PASSWORD_SAMEWITHHIS', 'zh-CN', '新密码不能与最近{0}次密码重复', 'common'),
+('USERCENTER_NEW_PASSWORD_SAMEWITHHIS', 'en-US', 'New password cannot be the same as the last {0} passwords', 'common'),
+('USERCENTER_IMAGE_REQUIRED', 'zh-CN', '头像上传失败，请稍后再试', 'common'),
+('USERCENTER_IMAGE_REQUIRED', 'en-US', 'Avatar upload failed, please refresh the page and try again', 'common'),
+('USERCENTER_IMAGE_FILE_MISS', 'zh-CN', '头像上传失败，请稍后再试', 'common'),
+('USERCENTER_IMAGE_FILE_MISS', 'en-US', 'Avatar upload failed, please refresh the page and try again', 'common'),
+('USERCENTER_EMAIL_REQUIRED', 'zh-CN', '邮箱不能为空', 'common'),
+('USERCENTER_EMAIL_REQUIRED', 'en-US', 'Email cannot be blank', 'common'),
+('USERCENTER_EMAIL_CODE_REQUIRED', 'zh-CN', '邮箱验证码不能为空', 'common'),
+('USERCENTER_EMAIL_CODE_REQUIRED', 'en-US', 'Email code cannot be blank', 'common'),
+('USERCENTER_EMAIL_UUID_REQUIRED', 'zh-CN', '验证码获取失败，请稍后再试', 'common'),
+('USERCENTER_EMAIL_UUID_REQUIRED', 'en-US', 'Failed to get email code. Please try again later', 'common'),
+('USERCENTER_EMAIL_CODE_EXPIRED', 'zh-CN', '邮箱验证码已过期', 'common'),
+('USERCENTER_EMAIL_CODE_EXPIRED', 'en-US', 'Email code has expired', 'common'),
+('USERCENTER_EMAIL_CODE_INVALID', 'zh-CN', '邮箱验证码不正确', 'common'),
+('USERCENTER_EMAIL_CODE_INVALID', 'en-US', 'Email code is incorrect', 'common'),
+('USERCENTER_EMAIL_SAMEWITHOLD', 'zh-CN', '新邮箱不能与旧邮箱相同', 'common'),
+('USERCENTER_EMAIL_SAMEWITHOLD', 'en-US', 'New email cannot be the same as the old email', 'common'),
+('USERCENTER_EMAIL_PATTERN_INVALID', 'zh-CN', '邮箱格式不正确', 'common'),
+('USERCENTER_EMAIL_PATTERN_INVALID', 'en-US', 'Email pattern is invalid', 'common'),
+('USERCENTER_EMAIL_EXISTS', 'zh-CN', '邮箱已被其他账号绑定', 'common'),
+('USERCENTER_EMAIL_EXISTS', 'en-US', 'This email is already linked to another account', 'common'),
+('USERCENTER_PROFILE_NICKNAME_REQUIRED', 'zh-CN', '用户昵称不能为空', 'common'),
+('USERCENTER_PROFILE_NICKNAME_REQUIRED', 'en-US', 'Nickname cannot be blank', 'common'),
+('USERCENTER_PROFILE_NICKNAME_EXISTS', 'zh-CN', '昵称已存在，请换一个', 'common'),
+('USERCENTER_PROFILE_NICKNAME_EXISTS', 'en-US', 'Nickname already exists, please choose another', 'common'),
+('USERCENTER_PROFILE_GENDER_REQUIRED', 'zh-CN', '用户性别不能为空', 'common'),
+('USERCENTER_PROFILE_GENDER_REQUIRED', 'en-US', 'Gender cannot be empty', 'common'),
+('USERCENTER_PROFILE_GENDER_INVALID', 'zh-CN', '用户性别不合法', 'common'),
+('USERCENTER_PROFILE_GENDER_INVALID', 'en-US', 'Invalid gender value', 'common'),
+('USERCENTER_PASSWORD_FAILED', 'zh-CN', '密码修改失败', 'common'),
+('USERCENTER_PASSWORD_FAILED', 'en-US', 'Failed to update password', 'common'),
+('USERCENTER_IMAGE_FAILED', 'zh-CN', '头像修改失败', 'common'),
+('USERCENTER_IMAGE_FAILED', 'en-US', 'Failed to update image', 'common'),
+('USERCENTER_EMAIL_FAILED', 'zh-CN', '邮箱修改失败', 'common'),
+('USERCENTER_EMAIL_FAILED', 'en-US', 'Failed to update email', 'common'),
+('USERCENTER_PROFILE_FAILED', 'zh-CN', '信息修改失败', 'common'),
+('USERCENTER_PROFILE_FAILED', 'en-US', 'Failed to update profile information', 'common'),
+-- 角色相关
+('ROLE_ROLENAME_REQUIRED', 'zh-CN', '角色名称不能为空', 'common'),
+('ROLE_ROLENAME_REQUIRED', 'en-US', 'RoleName cannot be blank', 'common'),
+('ROLE_ROLENAME_EXISTS', 'zh-CN', '角色名称已存在', 'common'),
+('ROLE_ROLENAME_EXISTS', 'en-US', 'RoleName already exist', 'common'),
+('ROLE_ROLECODE_REQUIRED', 'zh-CN', '角色编码不能为空', 'common'),
+('ROLE_ROLECODE_REQUIRED', 'en-US', 'RoleCode cannot be blank', 'common'),
+('ROLE_ROLECODE_EXISTS', 'zh-CN', '角色编码已存在', 'common'),
+('ROLE_ROLECODE_EXISTS', 'en-US', 'RoleCode already exist', 'common'),
+('ROLE_ROLECODE_PATTERN_INVALID', 'zh-CN', '角色编码格式不正确', 'common'),
+('ROLE_ROLECODE_PATTERN_INVALID', 'en-US', 'RoleCode pattern is invalid', 'common'),
+('ROLE_ROLECODE_DISABLED', 'zh-CN', '角色编码不可用', 'common'),
+('ROLE_ROLECODE_DISABLED', 'en-US', 'RoleCode is disabled', 'common'),
+('ROLE_ENABLED_REQUIRED', 'zh-CN', '角色状态不能为空', 'common'),
+('ROLE_ENABLED_REQUIRED', 'en-US', 'Role status cannot be blank', 'common'),
+('ROLE_DELETE_WITH_USER', 'zh-CN', '角色已与用户关联，请解除关联后再试', 'common'),
+('ROLE_DELETE_WITH_USER', 'en-US', 'Role is associated with users. please unbind before deletion', 'common'),
+-- 权限相关
+('PERM_NAME_REQUIRED', 'zh-CN', '权限名称不能为空', 'common'),
+('PERM_NAME_REQUIRED', 'en-US', 'Permission name cannot be blank', 'common'),
+('PERM_TYPE_REQUIRED', 'zh-CN', '权限类型不能为空', 'common'),
+('PERM_TYPE_REQUIRED', 'en-US', 'Permission type cannot be blank', 'common'),
+('PERM_LEVEL_REQUIRED', 'zh-CN', '权限等级不能为空', 'common'),
+('PERM_LEVEL_REQUIRED', 'en-US', 'Permission level cannot be blank', 'common'),
+('PERM_ENABLED_REQUIRED', 'zh-CN', '权限状态不能为空', 'common'),
+('PERM_ENABLED_REQUIRED', 'en-US', 'Permission status cannot be blank', 'common'),
+('PERM_HIDDEN_REQUIRED', 'zh-CN', '菜单可见不能为空', 'common'),
+('PERM_HIDDEN_REQUIRED', 'en-US', 'Permission hidden cannot be blank', 'common'),
+('PERM_CACHEABLE_REQUIRED', 'zh-CN', '菜单缓存不能为空', 'common'),
+('PERM_CACHEABLE_REQUIRED', 'en-US', 'Permission cacheable cannot be blank', 'common'),
+('PERM_ROUTERPATH_REQUIRED', 'zh-CN', '路由地址不能为空', 'common'),
+('PERM_ROUTERPATH_REQUIRED', 'en-US', 'Permission routerPath cannot be blank', 'common'),
+('PERM_ROUTERPATH_PATTERN_INVALID', 'zh-CN', '路由地址格式不正确', 'common'),
+('PERM_ROUTERPATH_PATTERN_INVALID', 'en-US', 'Permission routerPath is invalid', 'common'),
+('PERM_ROUTERPATH_EXISTS', 'zh-CN', '路由地址已存在', 'common'),
+('PERM_ROUTERPATH_EXISTS', 'en-US', 'Permission routerPath already exist', 'common'),
+('PERM_LINKPATH_REQUIRED', 'zh-CN', '权限外链地址不能为空', 'common'),
+('PERM_LINKPATH_REQUIRED', 'en-US', 'Permission linkPath cannot be blank', 'common'),
+('PERM_LINKPATH_PATTERN_INVALID', 'zh-CN', '外链地址格式不正确', 'common'),
+('PERM_LINKPATH_PATTERN_INVALID', 'en-US', 'Permission linkPath is invalid', 'common'),
+('PERM_PERMCODE_REQUIRED', 'zh-CN', '权限编码不能为空', 'common'),
+('PERM_PERMCODE_REQUIRED', 'en-US', 'Permission permCode cannot be blank', 'common'),
+('PERM_PERMCODE_EXISTS', 'zh-CN', '权限编码已存在', 'common'),
+('PERM_PERMCODE_EXISTS', 'en-US', 'Permission permCode exist', 'common'),
+('PERM_COMPONENTNAME_REQUIRED', 'zh-CN', '权限组件名称不能为空', 'common'),
+('PERM_COMPONENTNAME_REQUIRED', 'en-US', 'Permission componentName cannot be blank', 'common'),
+('PERM_COMPONENTPATH_REQUIRED', 'zh-CN', '权限组件路径不能为空', 'common'),
+('PERM_COMPONENTPATH_REQUIRED', 'en-US', 'Permission componentPath cannot be blank', 'common'),
+('PERM_DIR_PARENT', 'zh-CN', '目录的上级只能是目录', 'common'),
+('PERM_DIR_PARENT', 'en-US', 'Parent of a directory must be a directory', 'common'),
+('PERM_LINK_PARENT', 'zh-CN', '外链的上级只能是目录', 'common'),
+('PERM_LINK_PARENT', 'en-US', 'Parent of a link must be a directory', 'common'),
+('PERM_MENU_PARENT', 'zh-CN', '菜单的上级只能是目录', 'common'),
+('PERM_MENU_PARENT', 'en-US', 'Parent of a menu must be a directory', 'common'),
+('PERM_BTN_PARENT', 'zh-CN', '按钮的上级只能是目录或菜单', 'common'),
+('PERM_BTN_PARENT', 'en-US', 'Parent of a button must be a directory or menu', 'common'),
+('PERM_PARENT_NOT_EXISTS', 'zh-CN', '上级权限不存在，请刷新页面后重试', 'common'),
+('PERM_PARENT_NOT_EXISTS', 'en-US', 'Parent permission does not exist. Please refresh the page and try again', 'common'),
+('PERM_PERMTYPE_EDIT_DISABLED', 'zh-CN', '权限类型不允许编辑', 'common'),
+('PERM_PERMTYPE_EDIT_DISABLED', 'en-US', 'Permission permType not allowed edit', 'common'),
+('PERM_DELETE_WITH_CHILDREN', 'zh-CN', '该权限存在子节点，无法被删除，请先删除子节点', 'common'),
+('PERM_DELETE_WITH_CHILDREN', 'en-US', 'Cannot delete permission because it has child nodes. Please remove the child nodes first', 'common'),
+-- 字典相关
+('DICT_DICTNAME_REQUIRED', 'zh-CN', '字典名称不能为空', 'common'),
+('DICT_DICTNAME_REQUIRED', 'en-US', 'Dict name cannot be blank', 'common'),
+('DICT_DICTKEY_REQUIRED', 'zh-CN', '字典KEY不能为空', 'common'),
+('DICT_DICTKEY_REQUIRED', 'en-US', 'Dict key cannot be blank', 'common'),
+('DICT_ENABLED_REQUIRED', 'zh-CN', '字典状态不能为空', 'common'),
+('DICT_ENABLED_REQUIRED', 'en-US', 'Dict status cannot be blank', 'common'),
+('DICT_PARENT_NOT_EXISTS', 'zh-CN', '上级字典不存在，请刷新页面后重试', 'common'),
+('DICT_PARENT_NOT_EXISTS', 'en-US', 'Parent dict does not exist. Please refresh the page and try again', 'common'),
+('DICT_PARENT_TYPE_INVALID', 'zh-CN', '上级字典类型不正确，请刷新页面后重试', 'common'),
+('DICT_PARENT_TYPE_INVALID', 'en-US', 'Parent dict type is invalid. Please refresh the page and try again', 'common'),
+('DICT_DELETE_WITH_CHILDREN', 'zh-CN', '该字典存在子节点，无法被删除', 'common'),
+('DICT_DELETE_WITH_CHILDREN', 'en-US', 'Cannot delete dict with child nodes', 'common'),
+-- 版本相关
+('VERSION_VERSIONNAME_REQUIRED', 'zh-CN', '版本名称不能为空', 'common'),
+('VERSION_VERSIONNAME_REQUIRED', 'en-US', 'Version name cannot be blank', 'common'),
+('VERSION_UPDATECONTENT_REQUIRED', 'zh-CN', '修订内容不能为空', 'common'),
+('VERSION_UPDATECONTENT_REQUIRED', 'en-US', 'Update content cannot be blank', 'common'),
+('VERSION_VERSIONNAME_EXISTS', 'zh-CN', '版本已存在', 'common'),
+('VERSION_VERSIONNAME_EXISTS', 'en-US', 'Version already exist', 'common'),
+-- 存储相关
+('FILE_NOT_EXISTS', 'zh-CN', '文件不存在或已被删除', 'common'),
+('FILE_NOT_EXISTS', 'en-US', 'The file does not exist or has already been deleted', 'common'),
+('FILE_UPLOAD_WITHOUT_FILE', 'zh-CN', '上传失败，待上传文件列表为空', 'common'),
+('FILE_UPLOAD_WITHOUT_FILE', 'en-US', 'Upload failed: no files selected for upload', 'common'),
+('FILE_UPLOAD_SWITCH_OFF', 'zh-CN', '上传失败，文件上传未启用', 'common'),
+('FILE_UPLOAD_SWITCH_OFF', 'en-US', 'Upload failed: file upload is disabled', 'common'),
+('FILE_UPLOAD_TYPE_NOT_SUPPORT', 'zh-CN', '上传失败，不支持的文件类型 {0}', 'common'),
+('FILE_UPLOAD_TYPE_NOT_SUPPORT', 'en-US', 'Upload failed: unsupported file type {0}', 'common'),
+('FILE_UPLOAD_IMAGE_INVALID', 'zh-CN', '上传失败，图片内容校验失败', 'common'),
+('FILE_UPLOAD_IMAGE_INVALID', 'en-US', 'Upload failed: image content validation failed', 'common'),
+('FILE_UPLOAD_IMAGE_RADIO_OVER_MAX', 'zh-CN', '上传失败，图片分辨率过大', 'common'),
+('FILE_UPLOAD_IMAGE_RADIO_OVER_MAX', 'en-US', 'Upload failed: image resolution is too large', 'common'),
+('FILE_UPLOAD_IMAGE_SIZE_OVER_MAX', 'zh-CN', '上传失败，文件大小不能超过 {0} kb', 'common'),
+('FILE_UPLOAD_IMAGE_SIZE_OVER_MAX', 'en-US', 'Upload failed: file size must not exceed {0} KB', 'common'),
+('FILE_UPLOAD_WITH_DB_FAILED', 'zh-CN', '上传失败，数据库异常，请稍后再试', 'common'),
+('FILE_UPLOAD_WITH_DB_FAILED', 'en-US', 'Upload failed due to a database error. Please try again later', 'common'),
+('FILE_DELETE_WITH_BUSINESS', 'zh-CN', '文件已关联业务数据，无法删除', 'common'),
+('FILE_DELETE_WITH_BUSINESS', 'en-US', 'The file is associated with business data and cannot be deleted', 'common'),
+-- 会话相关
+('SESSION_FORBID_KICK_OUT_SELF', 'zh-CN', '无法踢出自己', 'common'),
+('SESSION_FORBID_KICK_OUT_SELF', 'en-US', 'Can not kick out self', 'common'),
+-- 网站配置
+('WEBSITE_CONFIG_NAME_REQUIRED', 'zh-CN', '网站名称不能为空', 'common'),
+('WEBSITE_CONFIG_NAME_REQUIRED', 'en-US', 'Website name cannot be blank', 'common'),
+('WEBSITE_CONFIG_TITLE_REQUIRED', 'zh-CN', '网站标题不能为空', 'common'),
+('WEBSITE_CONFIG_TITLE_REQUIRED', 'en-US', 'Website title cannot be blank', 'common'),
+('WEBSITE_CONFIG_AUTHOR_NOT_EXISTS', 'zh-CN', '站长信息不存在，请重新填写', 'common'),
+('WEBSITE_CONFIG_AUTHOR_NOT_EXISTS', 'en-US', 'Website author not exist', 'common'),
+-- 网站链接
+('WEBSITE_LINK_NAME_REQUIRED', 'zh-CN', '网站链接名称不能为空', 'common'),
+('WEBSITE_LINK_NAME_REQUIRED', 'en-US', 'Website link name cannot be blank', 'common'),
+('WEBSITE_LINK_TYPE_REQUIRED', 'zh-CN', '网站链接类型不能为空', 'common'),
+('WEBSITE_LINK_TYPE_REQUIRED', 'en-US', 'Website link type cannot be blank', 'common'),
+('WEBSITE_LINK_TYPE_EXISTS', 'zh-CN', '网站链接类型已存在', 'common'),
+('WEBSITE_LINK_TYPE_EXISTS', 'en-US', 'Website link type exist', 'common'),
+('WEBSITE_LINK_ENABLED_REQUIRED', 'zh-CN', '网站链接状态不能为空', 'common'),
+('WEBSITE_LINK_ENABLED_REQUIRED', 'en-US', 'Website link enabled cannot be blank', 'common'),
+-- 友链
+('FRIEND_LINK_EXISTS', 'zh-CN', '友链已存在', 'common'),
+('FRIEND_LINK_EXISTS', 'en-US', 'Friend link exist', 'common'),
+('FRIEND_LINK_URL_INVALID', 'zh-CN', '网站地址解析错误，请检查您的输入', 'common'),
+('FRIEND_LINK_URL_INVALID', 'en-US', 'Friend link url invalid', 'common'),
+('FRIEND_LINK_LOGO_INVALID', 'zh-CN', '网站封面地址解析错误，请检查您的输入', 'common'),
+('FRIEND_LINK_LOGO_INVALID', 'en-US', 'Friend link logo invalid', 'common'),
+('FRIEND_LINK_NAME_REQUIRED', 'zh-CN', '请填写网站名称', 'common'),
+('FRIEND_LINK_NAME_REQUIRED', 'en-US', 'Friend link name cannot be blank', 'common'),
+('FRIEND_LINK_URL_REQUIRED', 'zh-CN', '请填写网站链接', 'common'),
+('FRIEND_LINK_URL_REQUIRED', 'en-US', 'Friend link url cannot be blank', 'common'),
+('FRIEND_LINK_TYPE_REQUIRED', 'zh-CN', '请选择友链类型', 'common'),
+('FRIEND_LINK_TYPE_REQUIRED', 'en-US', 'Friend link type cannot be blank', 'common'),
+('FRIEND_LINK_VISIBLE_REQUIRED', 'zh-CN', '请选择友链是否展示', 'common'),
+('FRIEND_LINK_VISIBLE_REQUIRED', 'en-US', 'Friend link visible cannot be blank', 'common'),
+('FRIEND_LINK_FOLLOW_REQUIRED', 'zh-CN', '请选择友链是否开启SEO', 'common'),
+('FRIEND_LINK_FOLLOW_REQUIRED', 'en-US', 'Friend link follow cannot be blank', 'common'),
+('FRIEND_LINK_CHECK_REQUIRED', 'zh-CN', '请选择友链是否开启健康检测', 'common'),
+('FRIEND_LINK_CHECK_REQUIRED', 'en-US', 'Friend link check cannot be blank', 'common'),
+('FRIEND_LINK_STATUS_REQUIRED', 'zh-CN', '请选择友链审核状态', 'common'),
+('FRIEND_LINK_STATUS_REQUIRED', 'en-US', 'Friend link status cannot be blank', 'common'),
+('FRIEND_LINK_STATUS_INVALID', 'zh-CN', '友链已被审核，请勿重复操作', 'common'),
+('FRIEND_LINK_STATUS_INVALID', 'en-US', 'Friend link status invalid', 'common'),
+-- 页面
+('PAGE_PAGENAME_REQUIRED', 'zh-CN', '页面名称不能为空', 'common'),
+('PAGE_PAGENAME_REQUIRED', 'en-US', 'Page name cannot be blank', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'zh-CN', '页面标签不能为空', 'common'),
+('PAGE_PAGELABEL_REQUIRED', 'en-US', 'Page label cannot be blank', 'common'),
+('PAGE_DISPLAYMODE_REQUIRED', 'zh-CN', '页面展示模式不能为空', 'common'),
+('PAGE_DISPLAYMODE_REQUIRED', 'en-US', 'Page displayMode cannot be blank', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'zh-CN', '页面标签已存在', 'common'),
+('PAGE_PAGELABEL_EXISTS', 'en-US', 'Page label exist', 'common'),
+-- 主题
+('THEME_THEMENAME_REQUIRED', 'zh-CN', '主题名称不能为空', 'common'),
+('THEME_THEMENAME_REQUIRED', 'en-US', 'Theme name cannot be blank', 'common'),
+('THEME_THEMENAME_EXISTS', 'zh-CN', '主题名称已存在', 'common'),
+('THEME_THEMENAME_EXISTS', 'en-US', 'Theme name exist', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'zh-CN', '主题类型不能为空', 'common'),
+('THEME_THEMETYPE_REQUIRED', 'en-US', 'Theme type cannot be blank', 'common'),
+('THEME_PAGE_REQUIRED', 'zh-CN', '请上传页面预览图', 'common'),
+('THEME_PAGE_REQUIRED', 'en-US', 'Theme page cannot be blank', 'common'),
+('THEME_PAGEID_REQUIRED', 'zh-CN', '请选择页面', 'common'),
+('THEME_PAGEID_REQUIRED', 'en-US', 'Theme pageId cannot be blank', 'common'),
+('THEME_STATUS_REQUIRED', 'zh-CN', '主题状态不能为空', 'common'),
+('THEME_STATUS_REQUIRED', 'en-US', 'Theme status cannot be blank', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'zh-CN', '只允许修改用户主题状态', 'common'),
+('THEME_ONLY_USER_THEME_STATUS', 'en-US', 'Only user theme status can be modified', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'zh-CN', '只允许修改系统主题状态', 'common'),
+('THEME_ONLY_SYSTEM_THEME_STATUS', 'en-US', 'Only system theme status can be modified', 'common'),
+('THEME_ONLY_OWN_THEME', 'zh-CN', '只允许操作自己创建的主题', 'common'),
+('THEME_ONLY_OWN_THEME', 'en-US', 'Only your own themes can be operated', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'zh-CN', '只允许升级用户主题', 'common'),
+('THEME_ONLY_USER_THEME_UPGRADE', 'en-US', 'Only user themes can be upgraded', 'common'),
+-- 评论表情
+('COMMENT_IMAGE_NAME_REQUIRED', 'zh-CN', '表情名称不能为空', 'common'),
+('COMMENT_IMAGE_NAME_REQUIRED', 'en-US', 'Comment image name cannot be blank', 'common'),
+('COMMENT_IMAGE_NAME_INVALID', 'zh-CN', '表情名称格式不正确', 'common'),
+('COMMENT_IMAGE_NAME_INVALID', 'en-US', 'Comment image name format is invalid', 'common'),
+('COMMENT_IMAGE_URL_REQUIRED', 'zh-CN', '表情图片地址不能为空', 'common'),
+('COMMENT_IMAGE_URL_REQUIRED', 'en-US', 'Comment image URL cannot be blank', 'common'),
+('COMMENT_IMAGE_URL_INVALID', 'zh-CN', '表情图片地址格式不正确', 'common'),
+('COMMENT_IMAGE_URL_INVALID', 'en-US', 'Comment image URL format is invalid', 'common'),
+-- 弹幕
+('BARRAGE_MESSAGE_STATUS_REQUIRED', 'zh-CN', '弹幕审核状态不能为空', 'common'),
+('BARRAGE_MESSAGE_STATUS_REQUIRED', 'en-US', 'BarrageMessage audit status cannot be blank', 'common'),
+('BARRAGE_MESSAGE_STATUS_INVALID', 'zh-CN', '弹幕已被审核，请刷新页面重试', 'common'),
+('BARRAGE_MESSAGE_STATUS_INVALID', 'en-US', 'BarrageMessage audit status invalid', 'common'),
+-- 敏感词
+('SENSITIVE_WORD_REQUIRED', 'zh-CN', '请填写敏感词', 'common'),
+('SENSITIVE_WORD_REQUIRED', 'en-US', 'SensitiveWord cannot be blank', 'common'),
+('SENSITIVE_WORD_STATUS_REQUIRED', 'zh-CN', '敏感词状态不能为空', 'common'),
+('SENSITIVE_WORD_STATUS_REQUIRED', 'en-US', 'SensitiveWord status cannot be blank', 'common'),
+('SENSITIVE_WORD_EXISTS', 'zh-CN', '敏感词已存在', 'common'),
+('SENSITIVE_WORD_EXISTS', 'en-US', 'SensitiveWord exist', 'common'),
+-- 评论
+('COMMENT_AUDIT_STATUS_REQUIRED', 'zh-CN', '请选择评论审核状态', 'common'),
+('COMMENT_AUDIT_STATUS_REQUIRED', 'en-US', 'Comment audit status cannot be blank', 'common'),
+('COMMENT_AUDIT_STATUS_INVALID', 'zh-CN', '评论已被审核，请勿重复操作', 'common'),
+('COMMENT_AUDIT_STATUS_INVALID', 'en-US', 'Comment audit status invalid', 'common'),
+-- 分类相关
+-- =========================
+('CATEGORY_NAME_REQUIRED', 'zh-CN', '分类名称不能为空', 'common'),
+('CATEGORY_NAME_REQUIRED', 'en-US', 'Category name cannot be empty', 'common'),
+('CATEGORY_SLUG_REQUIRED', 'zh-CN', '分类路径标识不能为空', 'common'),
+('CATEGORY_SLUG_REQUIRED', 'en-US', 'Category slug cannot be empty', 'common'),
+('CATEGORY_SEARCH_INDEX_REQUIRED', 'zh-CN', '搜索引擎收录设置不能为空', 'common'),
+('CATEGORY_SEARCH_INDEX_REQUIRED', 'en-US', 'Search engine indexing setting cannot be empty', 'common'),
+('CATEGORY_STATUS_REQUIRED', 'zh-CN', '分类状态不能为空', 'common'),
+('CATEGORY_STATUS_REQUIRED', 'en-US', 'Category status cannot be empty', 'common'),
+('CATEGORY_VISIBILITY_REQUIRED', 'zh-CN', '分类显示设置不能为空', 'common'),
+('CATEGORY_VISIBILITY_REQUIRED', 'en-US', 'Category visibility setting cannot be empty', 'common'),
+('CATEGORY_NAME_EXISTS', 'zh-CN', '分类名称已存在', 'common'),
+('CATEGORY_NAME_EXISTS', 'en-US', 'Category name already exists', 'common'),
+('CATEGORY_SLUG_EXISTS', 'zh-CN', '分类路径标识已存在', 'common'),
+('CATEGORY_SLUG_EXISTS', 'en-US', 'Category slug already exists', 'common'),
+('CATEGORY_HAS_CHILDREN', 'zh-CN', '存在子分类，无法删除，请先删除子分类', 'common'),
+('CATEGORY_HAS_CHILDREN', 'en-US', 'Cannot delete a category that has child categories. Please delete the child categories first', 'common'),
+('CATEGORY_HAS_ARTICLES', 'zh-CN', '分类下存在文章，无法删除，请先将文章迁移到其他分类', 'common'),
+('CATEGORY_HAS_ARTICLES', 'en-US', 'Cannot delete a category that has articles. Please move the articles to another category first', 'common'),
+('CATEGORY_PARENT_NOT_FOUND', 'zh-CN', '上级分类不存在', 'common'),
+('CATEGORY_PARENT_NOT_FOUND', 'en-US', 'Parent category does not exist', 'common'),
+('CATEGORY_PARENT_INVALID', 'zh-CN', '上级分类必须是一级分类', 'common'),
+('CATEGORY_PARENT_INVALID', 'en-US', 'Parent category must be a top-level category', 'common'),
+('CATEGORY_LEVEL_IMMUTABLE', 'zh-CN', '分类级别创建后不可修改', 'common'),
+('CATEGORY_LEVEL_IMMUTABLE', 'en-US', 'Category level cannot be changed after creation', 'common'),
+-- 标签
+('TAG_NAME_REQUIRED', 'zh-CN', '标签名称不能为空', 'common'),
+('TAG_NAME_REQUIRED', 'en-US', 'Tag name cannot be blank', 'common'),
+('TAG_SLUG_REQUIRED', 'zh-CN', '标签路径标识不能为空', 'common'),
+('TAG_SLUG_REQUIRED', 'en-US', 'Tag slug cannot be empty', 'common'),
+('TAG_SEARCH_INDEX_REQUIRED', 'zh-CN', '搜索引擎收录设置不能为空', 'common'),
+('TAG_SEARCH_INDEX_REQUIRED', 'en-US', 'Search engine indexing setting cannot be empty', 'common'),
+('TAG_STATUS_REQUIRED', 'zh-CN', '标签状态不能为空', 'common'),
+('TAG_STATUS_REQUIRED', 'en-US', 'Tag status cannot be blank', 'common'),
+('TAG_NAME_EXISTS', 'zh-CN', '标签名称已存在', 'common'),
+('TAG_NAME_EXISTS', 'en-US', 'Tag name already exists', 'common'),
+('TAG_SLUG_EXISTS', 'zh-CN', '标签路径标识已存在', 'common'),
+('TAG_SLUG_EXISTS', 'en-US', 'Tag slug already exists', 'common'),
+('TAG_HAS_ARTICLES', 'zh-CN', '标签下存在文章，无法删除', 'common'),
+('TAG_HAS_ARTICLES', 'en-US', 'Cannot delete a tag that has articles.', 'common'),
+-- 文章
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
+('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common'),
+-- 门户
+('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
+('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),
+('PORTAL_BARRAGE_MESSAGE_RATE_LIMIT', 'zh-CN', '发送太频繁啦，请休息一下再发哦~', 'common'),
+('PORTAL_BARRAGE_MESSAGE_RATE_LIMIT', 'en-US', 'You are sending barrage messages too frequently. Please wait a moment before sending another', 'common'),
+('PORTAL_FRIEND_LINK_SWITCH_OFF', 'zh-CN', '友链申请开关已关闭，有问题请联系网站管理员', 'common'),
+('PORTAL_FRIEND_LINK_SWITCH_OFF', 'en-US', 'FriendLink apply off', 'common'),
+('PORTAL_FRIEND_LINK_NAME_REQUIRED', 'zh-CN', '请填写网站名称', 'common'),
+('PORTAL_FRIEND_LINK_NAME_REQUIRED', 'en-US', 'FriendLink name required', 'common'),
+('PORTAL_FRIEND_LINK_URL_REQUIRED', 'zh-CN', '请填写网站地址', 'common'),
+('PORTAL_FRIEND_LINK_URL_REQUIRED', 'en-US', 'FriendLink url required', 'common'),
+('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'zh-CN', '请填写网站封面', 'common'),
+('PORTAL_FRIEND_LINK_LOGO_REQUIRED', 'en-US', 'FriendLink logo required', 'common'),
+('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'zh-CN', '请填写网站简介', 'common'),
+('PORTAL_FRIEND_LINK_DESCRIPTION_REQUIRED', 'en-US', 'FriendLink description off', 'common'),
+('PORTAL_COMMENT_OBJECT_NOT_EXIST', 'zh-CN', '评论对象不存在', 'common'),
+('PORTAL_COMMENT_OBJECT_NOT_EXIST', 'en-US', 'Comment object not exist', 'common'),
+('PORTAL_COMMENT_PARENT_NOT_EXIST', 'zh-CN', '评论不存在或已被删除', 'common'),
+('PORTAL_COMMENT_PARENT_NOT_EXIST', 'en-US', 'Parent comment not exist', 'common'),
+('PORTAL_COMMENT_REPLY_NOT_EXIST', 'zh-CN', '回复的评论不存在或已被删除', 'common'),
+('PORTAL_COMMENT_REPLY_NOT_EXIST', 'en-US', 'Reply comment not exist', 'common'),
+('PORTAL_COMMENT_PARENT_LEVEL_INVALID', 'zh-CN', '回复层级错误，请稍后再试', 'common'),
+('PORTAL_COMMENT_PARENT_LEVEL_INVALID', 'en-US', 'TODO', 'common'),
+('PORTAL_COMMENT_OBJECT_INVALID', 'zh-CN', '回复评论无效，请稍后再试', 'common'),
+('PORTAL_COMMENT_OBJECT_INVALID', 'en-US', 'TODO', 'common'),
+('PORTAL_COMMENT_DELETE_PERM_ERROR', 'zh-CN', '只允许删除自己的评论', 'common'),
+('PORTAL_COMMENT_DELETE_PERM_ERROR', 'en-US', 'TODO', 'common'),
+('PORTAL_USER_INVALID', 'zh-CN', '身份信息异常，请稍后再试', 'common'),
+('PORTAL_USER_INVALID', 'en-US', 'TODO', 'common'),
+('PORTAL_NO_LOGIN', 'zh-CN', '请先登录', 'common'),
+('PORTAL_NO_LOGIN', 'en-US', 'TODO', 'common');
+
+/*Table structure for table `page` */
+DROP TABLE IF EXISTS `page`;
+CREATE TABLE `page` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '页面编号',
+  `PAGE_NAME` VARCHAR(50) NOT NULL COMMENT '页面名称',
+  `PAGE_LABEL` VARCHAR(50) NOT NULL COMMENT '页面标识',
+  `DISPLAY_MODE` VARCHAR(50) NOT NULL COMMENT '页面展示模式',
+  `PAGE_SORT` INT NOT NULL DEFAULT 99999 COMMENT '页面排序',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC COMMENT='页面表';
+
+CREATE UNIQUE INDEX uk_page_label ON page(`PAGE_LABEL`);
+
+/*Data for the table `page` */
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (4131191417257070613, '默认', 'default', 'BANNER', 0, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550262842852638720, '首页', 'home', 'FULL', 1, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550263063359782912, '分类', 'category', 'BANNER', 2, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550263198819024896, '标签', 'tag', 'BANNER', 3, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550263325503782912, '专栏', 'column', 'BANNER', 4, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550302122887086080, '文章', 'article', 'BANNER', 5, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550302704641245184, '文章列表', 'articles', 'BANNER', 6, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550303326471979008, '归档', 'archive', 'BANNER', 7, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550312241301553152, '相册', 'album', 'BANNER', 8, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550312375179542528, '说说', 'talk', 'BANNER', 9, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550320281232867328, '友链', 'FriendLink', 'BANNER', 10, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3550320794401767424, '弹幕', 'BarrageMessage', 'FULL', 11, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3560832866961063936, '个人中心', 'user', 'BANNER', 12, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3562305820047704064, '404', '404', 'BANNER', 13, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3562312827270070272, '文章不存在', 'article404', 'BANNER', 14, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO page (ID, PAGE_NAME, PAGE_LABEL, DISPLAY_MODE, PAGE_SORT, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES (3570495375699615744, '统计', 'statistics', 'BANNER', 16, 1, '2021-06-10 00:02:58', NULL, NULL);
+
+/*Table structure for table `theme` */
+DROP TABLE IF EXISTS `theme`;
+CREATE TABLE `theme` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主题编号',
+  `THEME_NAME` VARCHAR(100) NOT NULL COMMENT '主题名称',
+  `THEME_TYPE` VARCHAR(50) NOT NULL COMMENT '主题类型：PC，MOBILE',
+  `OWNER_TYPE` VARCHAR(50) NOT NULL COMMENT '主题归属：SYSTEM-系统主题，USER-用户主题',
+  `OWNER_ID` BIGINT DEFAULT NULL COMMENT '所属用户',
+  `IS_DEFAULT` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否系统默认主题',
+  `IS_ACTIVE` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否当前激活主题',
+  `PREVIEW_COVER` VARCHAR(500) DEFAULT NULL COMMENT '主题预览图',
+  `DESCRIPTION` VARCHAR(200) DEFAULT NULL COMMENT '主题描述',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC COMMENT='主题表';
+
+CREATE INDEX idx_theme_owner ON theme(`OWNER_TYPE`, `OWNER_ID`);
+CREATE INDEX idx_theme_default ON theme(`THEME_TYPE`, `IS_DEFAULT`);
+CREATE UNIQUE INDEX uk_theme_name_owner ON theme(`OWNER_ID`, `THEME_TYPE`, `THEME_NAME`);
+
+/*Data for the table `theme` */
+INSERT INTO theme (`ID`, `THEME_NAME`, `THEME_TYPE`, `OWNER_TYPE`, `OWNER_ID`, `IS_DEFAULT`, `IS_ACTIVE`, `PREVIEW_COVER`, `DESCRIPTION`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`) VALUES (4136628987256373248, '默认_W', 'PC', 'SYSTEM', NULL, 1, 0, 'https://file.yiyucangji.com/common/theme/default/pc/4136904387865870336.jpg', 'WEB端系统内置主题', 1, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO theme (`ID`, `THEME_NAME`, `THEME_TYPE`, `OWNER_TYPE`, `OWNER_ID`, `IS_DEFAULT`, `IS_ACTIVE`, `PREVIEW_COVER`, `DESCRIPTION`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`) VALUES (4136877934390542336, '默认_M', 'MOBILE', 'SYSTEM', NULL, 1, 0, 'https://file.yiyucangji.com/common/theme/default/mobile/4136914500836130816.jpg', '移动端系统内置主题', 1, 1, '2021-06-10 00:02:58', NULL, NULL);
+
+/*Table structure for table `theme_page` */
+DROP TABLE IF EXISTS `theme_page`;
+CREATE TABLE `theme_page` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主题页面编号',
+  `THEME_ID` BIGINT NOT NULL COMMENT '主题编号',
+  `PAGE_ID` BIGINT NOT NULL COMMENT '页面编号',
+  `PAGE_COVER` VARCHAR(500) NOT NULL COMMENT '页面预览图',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC COMMENT='主题页面配置表';
+
+CREATE INDEX idx_theme_page ON theme_page(`THEME_ID`, `PAGE_ID`);
+
+/*Data for the table `theme_page` */
+INSERT INTO theme_page (`ID`, `THEME_ID`, `PAGE_ID`, `PAGE_COVER`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`) VALUES (4136915938010202112, 4136628987256373248, 4131191417257070613, 'https://file.yiyucangji.com/common/theme/default/pc/4136904387865870336.jpg', 1, 1, '2021-06-10 00:02:58', NULL, NULL);
+INSERT INTO theme_page (`ID`, `THEME_ID`, `PAGE_ID`, `PAGE_COVER`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`) VALUES (4136915938010202113, 4136877934390542336, 4131191417257070613, 'https://file.yiyucangji.com/common/theme/default/mobile/4136914500836130816.jpg', 1, 1, '2021-06-10 00:02:58', NULL, NULL);
+
+/*Table structure for table `website_config` */
+DROP TABLE IF EXISTS `website_config`;
+CREATE TABLE website_config (
+  ID BIGINT NOT NULL COMMENT '主键',
+  -- 网站基础
+  WEBSITE_NAME VARCHAR(100) DEFAULT NULL COMMENT '网站名称',
+  WEBSITE_TITLE VARCHAR(100) DEFAULT NULL COMMENT '网站标题',
+  WEBSITE_INTRO VARCHAR(500) DEFAULT NULL COMMENT '网站简介',
+  WEBSITE_LOGO VARCHAR(500) DEFAULT NULL COMMENT '网站LOGO',
+  WEBSITE_FAVICON VARCHAR(500) DEFAULT NULL COMMENT '网站ICON',
+  WEBSITE_COVER VARCHAR(500) DEFAULT NULL COMMENT '网站封面',
+  WEBSITE_CREATE_TIME DATE DEFAULT NULL COMMENT '建站日期',
+  WEBSITE_AUTHOR_ID VARCHAR(100) DEFAULT NULL COMMENT '站长id',
+  WEBSITE_AUTHOR_NAME VARCHAR(100) DEFAULT NULL COMMENT '站长名称',
+  WEBSITE_AUTHOR_AVATAR VARCHAR(500) DEFAULT NULL COMMENT '站长头像',
+  -- 首页通告
+  WEBSITE_NOTICE VARCHAR(1000) DEFAULT NULL COMMENT '首页通告',
+  -- SEO
+  WEBSITE_KEYWORDS VARCHAR(500) DEFAULT NULL COMMENT '网站关键词',
+  WEBSITE_DESCRIPTION VARCHAR(1000) DEFAULT NULL COMMENT '网站描述',
+  -- 页脚配置
+  FOOTER_SIGNATURE VARCHAR(124) DEFAULT NULL COMMENT '页脚签名',
+  FOOTER_NAVBAR_SWITCH TINYINT(1) DEFAULT 1 COMMENT '是否显示页脚导航栏',
+  FOOTER_BACKGROUND VARCHAR(500) DEFAULT NULL COMMENT '页脚背景图',
+  -- 页面样式
+  FONT_URL VARCHAR(500) DEFAULT NULL COMMENT '网站字体地址',
+  -- 友链配置
+  FRIEND_LINK_APPLY_SWITCH TINYINT(1) DEFAULT 1 COMMENT '友链申请开关',
+  FRIEND_LINK_CHECK_FAILED_COUNT INT DEFAULT 3 COMMENT '友链健康检测失败阙值',
+  -- 评论配置
+  COMMENT_GUEST_SWITCH TINYINT(1) DEFAULT 0 COMMENT '访客评论开关',
+  -- 弹幕配置
+  BARRAGE_MESSAGE_LOAD_SIZE INT DEFAULT 200 COMMENT '弹幕加载量',
+  -- 安全配置
+  HTTPS_SWITCH TINYINT(1) DEFAULT 0 COMMENT 'HTTPS 升级开关',
+  -- 网站备案信息
+  WEBSITE_ICP_NO VARCHAR(100) DEFAULT NULL COMMENT 'ICP备案号',
+  WEBSITE_POLICE_NO VARCHAR(100) DEFAULT NULL COMMENT '公安备案号',
+  -- 第三方服务
+  STATISTICS_CODE TEXT DEFAULT NULL COMMENT '网站统计代码',
+  -- 系统参数
+  VERSION INT DEFAULT 1 COMMENT '版本号',
+  CREATE_TIME DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  UPDATE_TIME DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (ID)
+);
+
+/*Data for table `website_config` */
+INSERT INTO website_config (ID, WEBSITE_NAME, WEBSITE_TITLE) VALUES (1, 'Z-BLOG', 'Z-BLOG');
+
+/*Table structure for table `website_link_config` */
+DROP TABLE IF EXISTS `website_link_config`;
+CREATE TABLE website_link_config (
+  ID BIGINT NOT NULL,
+  LINK_NAME VARCHAR(50) NOT NULL COMMENT '链接名称',
+  LINK_TYPE VARCHAR(30) NOT NULL COMMENT '链接类型',
+  LINK_URL VARCHAR(1000) DEFAULT NULL COMMENT '链接地址',
+  LINK_ICON VARCHAR(100) DEFAULT NULL COMMENT '图标',
+  SORT INT DEFAULT 99999 COMMENT '排序',
+  ENABLED TINYINT DEFAULT 1 COMMENT '是否启用',
+  CREATE_TIME DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UPDATE_TIME DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (ID)
+);
+
+CREATE UNIQUE INDEX uk_website_link_config ON website_link_config(`LINK_TYPE`);
+
+/*Data for table `website_link_config` */
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (1, '网站前台地址', 'WEBSITE_PORTAL_URL', 'http://localhost:31943', NULL, 1, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (2, '网站后台地址', 'WEBSITE_ADMIN_URL', 'http://localhost:31945', NULL, 2, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (3, '网站文档', 'DOCUMENT', NULL, NULL, 3, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (4, 'GitHub', 'GITHUB', NULL, NULL, 4, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (5, 'Gitee', 'GITEE', NULL, NULL, 5, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (6, '关于我', 'ABOUT_ME', NULL, NULL, 6, 1);
+INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, SORT, ENABLED) VALUES (7, 'Issue', 'ISSUE', NULL, NULL, 7, 1);
+
+/*Table structure for table `admin_config` */
+DROP TABLE IF EXISTS `admin_config`;
+CREATE TABLE admin_config(
+  ID BIGINT NOT NULL COMMENT '主键',
+  -- 内容管理配置
+  DEFAULT_ARTICLE_COVER VARCHAR(500) DEFAULT NULL COMMENT '默认文章封面',
+  MAX_ARTICLE_COVER_SIZE INT DEFAULT 4 COMMENT '文章封面数量阙值'
+  -- 上传文件白名单配置
+  -- INTERFACE_METRICS_FILTER_LOCAL
+);
+
+/*Table structure for table `system_config` */
+# DROP TABLE IF EXISTS `system_config`;
+# CREATE TABLE system_config(
+#   ID BIGINT NOT NULL COMMENT '主键'
+# );
+
+/*Table structure for table `visitor` */
+DROP TABLE IF EXISTS `visitor`;
+CREATE TABLE `visitor` (
+  `VISITOR_ID` VARCHAR(64) NOT NULL COMMENT '访客唯一标识',
+  `USER_ID` BIGINT DEFAULT NULL COMMENT '登录用户ID',
+  `IP` VARCHAR(64) DEFAULT NULL COMMENT '访问IP',
+  `COUNTRY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-国家',
+  `PROVINCE` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-省份',
+  `CITY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-城市',
+  `DISTRICT` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-区县',
+  `ISP` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-运营商',
+  `USER_AGENT` VARCHAR(512) DEFAULT NULL COMMENT '用户代理',
+  `BROWSER` VARCHAR(128) DEFAULT NULL COMMENT '浏览器名称',
+  `BROWSER_VERSION` VARCHAR(128) DEFAULT NULL COMMENT '浏览器版本',
+  `OS` VARCHAR(128) DEFAULT NULL COMMENT '操作系统',
+  `DEVICE_TYPE` VARCHAR(128) DEFAULT NULL COMMENT '设备类型',
+  `FIRST_VISIT_TIME` DATETIME NOT NULL COMMENT '首次访问时间',
+  `LAST_VISIT_DATE` DATE NOT NULL COMMENT '最后访问日期',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`VISITOR_ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客表';
+
+/*Table structure for table `visitor_profile` */
+DROP TABLE IF EXISTS `visitor_profile`;
+CREATE TABLE `visitor_profile` (
+  `VISITOR_ID` VARCHAR(64) NOT NULL COMMENT '访客唯一标识',
+  `NICKNAME` VARCHAR(50) NOT NULL COMMENT '访客昵称',
+  `AVATAR` VARCHAR(512) NOT NULL COMMENT '访客头像',
+  PRIMARY KEY (`VISITOR_ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客展示信息表';
+
+/*Table structure for table `visitor_log` */
+DROP TABLE IF EXISTS `visitor_log`;
+CREATE TABLE `visitor_log` (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `VISITOR_ID` VARCHAR(64) NOT NULL COMMENT '访客唯一标识',
+  `USER_ID` BIGINT DEFAULT NULL COMMENT '登录用户ID',
+  `PATH` VARCHAR(512) NOT NULL COMMENT '访问路径',
+  `TITLE` VARCHAR(256) DEFAULT NULL COMMENT '页面标题',
+  `REFERER` VARCHAR(512) DEFAULT NULL COMMENT '来源',
+  `TYPE` VARCHAR(32) DEFAULT NULL COMMENT '访问类型',
+  `IP` VARCHAR(64) DEFAULT NULL COMMENT '访问IP',
+  `COUNTRY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-国家',
+  `PROVINCE` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-省份',
+  `CITY` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-城市',
+  `DISTRICT` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-区县',
+  `ISP` VARCHAR(128) DEFAULT NULL COMMENT 'IP归属地-运营商',
+  `USER_AGENT` VARCHAR(512) DEFAULT NULL COMMENT '用户代理',
+  `BROWSER` VARCHAR(128) DEFAULT NULL COMMENT '浏览器名称',
+  `BROWSER_VERSION` VARCHAR(128) DEFAULT NULL COMMENT '浏览器版本',
+  `OS` VARCHAR(128) DEFAULT NULL COMMENT '操作系统',
+  `DEVICE_TYPE` VARCHAR(128) DEFAULT NULL COMMENT '设备类型',
+  `VISIT_TIME` DATETIME NOT NULL COMMENT '访问时间',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='访客日志表';
+
+CREATE INDEX idx_visitor_log_path ON visitor_log(`PATH`);
+CREATE INDEX idx_visitor_log_type ON visitor_log(`TYPE`);
+CREATE INDEX idx_visitor_log_visitor ON visitor_log(`VISITOR_ID`);
+CREATE INDEX idx_visitor_log_visit_time ON visitor_log(`VISIT_TIME`);
+
+/*Table structure for table `barrage_message` */
+DROP TABLE IF EXISTS `barrage_message`;
+CREATE TABLE `barrage_message` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `CONTENT` VARCHAR(200) NOT NULL COMMENT '弹幕内容',
+  `USER_ID` BIGINT NULL COMMENT '用户ID',
+  `VISITOR_ID` VARCHAR(64) NULL COMMENT '游客ID',
+  `NICKNAME` VARCHAR(64) NULL COMMENT '昵称（游客/登录用户）',
+  `AVATAR` VARCHAR(255) NULL COMMENT '头像',
+  `IP` VARCHAR(64) NOT NULL COMMENT '用户IP',
+  `IP_REGION` VARCHAR(128) NULL COMMENT '用户来源',
+  `USER_AGENT` VARCHAR(512) NULL COMMENT '浏览器信息',
+  `AUDIT_STATUS` TINYINT NOT NULL DEFAULT 0 COMMENT '审核状态：0待审 1通过 2拒绝',
+  `AUDIT_REASON` VARCHAR(1000) NULL COMMENT '审核拒绝原因',
+  `AUDIT_USER_ID` BIGINT NULL COMMENT '审核用户ID',
+  `AUDIT_TIME` DATETIME NULL COMMENT '审核时间',
+  `DEVICE_ID` VARCHAR(128) NULL COMMENT '设备标识（可选）',
+  `COLOR` VARCHAR(16) NULL COMMENT '字体颜色',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='弹幕';
+
+/*Table structure for table `barrage_message_like` */
+DROP TABLE IF EXISTS `barrage_message_like`;
+CREATE TABLE `barrage_message_like` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `BARRAGE_MESSAGE_ID` BIGINT NOT NULL COMMENT '弹幕ID',
+  `USER_ID` BIGINT NULL COMMENT '用户ID',
+  `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '游客唯一标识',
+  `IP` VARCHAR(50) NULL COMMENT '访问IP',
+  `USER_AGENT` VARCHAR(512) DEFAULT NULL COMMENT 'UA',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='弹幕点赞记录';
+
+CREATE UNIQUE INDEX uk_barrage_message_like_user ON barrage_message_like(`BARRAGE_MESSAGE_ID`, `USER_ID`);
+CREATE UNIQUE INDEX uk_barrage_message_like_visitor ON barrage_message_like(`BARRAGE_MESSAGE_ID`, `VISITOR_ID`);
+
+/*Table structure for table `friend_link` */
+DROP TABLE IF EXISTS `friend_link`;
+CREATE TABLE `friend_link` (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `NAME` VARCHAR(100) NOT NULL COMMENT '网站名称',
+  `URL` VARCHAR(500) NOT NULL COMMENT '网站地址',
+  `LOGO` VARCHAR(500) DEFAULT NULL COMMENT '网站Logo',
+  `DESCRIPTION` VARCHAR(255) DEFAULT NULL COMMENT '网站描述',
+  `LINK_TYPE` TINYINT NOT NULL COMMENT '友链类型',
+  `EMAIL` VARCHAR(100) DEFAULT NULL COMMENT '申请人邮箱',
+  `CONTACT` VARCHAR(100) DEFAULT NULL COMMENT '联系方式',
+  `STATUS` TINYINT(1) DEFAULT 0 COMMENT '审批状态：0待审核 1通过 2拒绝',
+  `IS_VISIBLE` TINYINT(1) DEFAULT 1 COMMENT '是否展示',
+  `ALLOW_FOLLOW` TINYINT(1) DEFAULT 0 COMMENT '是否允许传递SEO权重',
+  `CHECK_ENABLED` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否开启健康检测',
+  `SORT` INT DEFAULT 0 COMMENT '排序值（越大越靠前）',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友链表';
+
+CREATE UNIQUE INDEX uk_friend_link_url ON friend_link (`URL`);
+CREATE INDEX idx_friend_link_query ON friend_link (`STATUS`, `IS_VISIBLE`);
+CREATE INDEX idx_friend_link_order ON friend_link (`SORT` DESC, `CREATE_TIME` DESC);
+
+/*Table structure for table `friend_link_stat` */
+DROP TABLE IF EXISTS `friend_link_stat`;
+CREATE TABLE `friend_link_stat` (
+  `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
+  `CLICK_COUNT` BIGINT DEFAULT 0 COMMENT '总点击数',
+  `DAY_CLICK` INT DEFAULT 0 COMMENT '今日点击',
+  `WEEK_CLICK` INT DEFAULT 0 COMMENT '本周点击',
+  `MONTH_CLICK` INT DEFAULT 0 COMMENT '本月点击',
+  `LAST_CLICK_TIME` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`LINK_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链统计表';
+
+/*Table structure for table `friend_link_click_log` */
+DROP TABLE IF EXISTS `friend_link_click_log`;
+CREATE TABLE `friend_link_click_log` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
+  `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '访客ID',
+  `IP` VARCHAR(50) COMMENT '访问IP',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '访问时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_friend_link_click_log` (`LINK_ID`, `CREATE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链访问记录表';
+
+/*Table structure for table `friend_link_health` */
+DROP TABLE IF EXISTS `friend_link_health`;
+CREATE TABLE `friend_link_health` (
+  `LINK_ID` BIGINT NOT NULL COMMENT '友链ID',
+  `STATUS` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '检测状态 1正常 0异常',
+  `FAIL_COUNT` INT DEFAULT 0 COMMENT '连续失败次数',
+  `LAST_CHECK_TIME` DATETIME COMMENT '最后检测时间',
+  `LAST_SUCCESS_TIME` DATETIME COMMENT '最后成功时间',
+  `LAST_FAIL_TIME` DATETIME COMMENT '最后失败时间',
+  `RESPONSE_TIME` INT COMMENT '响应耗时ms',
+  `HTTP_STATUS` INT COMMENT 'HTTP状态码',
+  `ERROR_MSG` VARCHAR(1000) COMMENT '错误信息',
+  PRIMARY KEY (`LINK_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链健康检测';
+
+/*Table structure for table `friend_link_check_log` */
+DROP TABLE IF EXISTS `friend_link_check_log`;
+CREATE TABLE `friend_link_check_log` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `LINK_ID` BIGINT UNSIGNED NOT NULL COMMENT '友链ID',
+  `SUCCESS` TINYINT(1) NOT NULL COMMENT '是否成功',
+  `HTTP_STATUS` INT DEFAULT NULL COMMENT 'HTTP状态码',
+  `RESPONSE_TIME` INT DEFAULT NULL COMMENT '响应耗时ms',
+  `ERROR_MSG` VARCHAR(1000) DEFAULT NULL COMMENT '错误信息',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '检测时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_friend_link_check_log` (`LINK_ID`, `CREATE_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='友链健康检测日志';
+
+/*Table structure for table `comment` */
+DROP TABLE IF EXISTS `comment`;
+CREATE TABLE `comment` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+  `PARENT_ID` BIGINT NOT NULL DEFAULT 0 COMMENT '所属一级评论ID（0=一级评论）',
+  `TYPE` TINYINT NOT NULL COMMENT '评论类型',
+  `OBJECT_ID` VARCHAR(100) NOT NULL COMMENT '评论对象ID',
+  `REPLY_COMMENT_ID` BIGINT DEFAULT NULL COMMENT '回复评论ID',
+  `USER_ID` BIGINT DEFAULT NULL COMMENT '用户ID',
+  `REPLY_USER_ID` BIGINT DEFAULT NULL COMMENT '回复用户ID',
+  `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '访客ID',
+  `REPLY_VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '回复访客ID',
+  `CONTENT` TEXT NOT NULL COMMENT '评论内容',
+  `ORIGIN_CONTENT` TEXT NOT NULL COMMENT '评论原始内容',
+  `LIKE_COUNT` INT NOT NULL DEFAULT 0 COMMENT '点赞数',
+  `REPLY_COUNT` INT NOT NULL DEFAULT 0 COMMENT '回复数',
+  `IP_ADDRESS` VARCHAR(45) DEFAULT NULL COMMENT '评论用户IP',
+  `IP_SOURCE` VARCHAR(200) DEFAULT NULL COMMENT '评论用户来源',
+  `USER_AGENT` VARCHAR(512) DEFAULT NULL COMMENT '用户代理',
+  `STATUS` TINYINT NOT NULL DEFAULT 0 COMMENT '状态（0待审核 1正常 2拒绝 3删除 4待复核）',
+  `AUDIT_USER` BIGINT DEFAULT NULL COMMENT '审核用户',
+  `AUDIT_TIME` DATETIME DEFAULT NULL COMMENT '审核时间',
+  `AUDIT_REASON` VARCHAR(500) DEFAULT NULL COMMENT '审核原因',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`ID`),
+  KEY `idx_comment_select1` (`TYPE`, `OBJECT_ID`, `PARENT_ID`, `STATUS`, `CREATE_TIME` DESC),
+  KEY `idx_comment_select2` (`PARENT_ID`, `STATUS`, `CREATE_TIME` DESC),
+  KEY `idx_comment_user_id` (`USER_ID`),
+  KEY `idx_comment_visitor_id` (`VISITOR_ID`),
+  KEY `idx_comment_reply_user_id` (`REPLY_USER_ID`),
+  KEY `idx_comment_reply_visitor_id` (`REPLY_VISITOR_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+
+/*Table structure for table `comment_like` */
+DROP TABLE IF EXISTS `comment_like`;
+CREATE TABLE `comment_like` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+  `USER_ID` BIGINT DEFAULT NULL COMMENT '用户ID',
+  `VISITOR_ID` VARCHAR(64) DEFAULT NULL COMMENT '访客ID',
+  `COMMENT_ID` BIGINT NOT NULL COMMENT '评论ID',
+  `IP_ADDRESS` VARCHAR(45) DEFAULT NULL COMMENT '点赞IP',
+  `IP_SOURCE` VARCHAR(100) DEFAULT NULL COMMENT '点赞IP来源',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `uk_comment_like_user_comment` (`USER_ID`, `COMMENT_ID`),
+  UNIQUE KEY `uk_comment_like_visitor_comment` (`VISITOR_ID`, `COMMENT_ID`),
+  KEY `idx_comment_like_comment_id` (`COMMENT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论点赞表';
+
+/*Table structure for table `comment_emoji` */
+DROP TABLE IF EXISTS `comment_emoji`;
+CREATE TABLE `comment_emoji` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键',
+  `NAME` VARCHAR(50) NOT NULL COMMENT '表情名称',
+  `CODE` VARCHAR(50) NOT NULL COMMENT '表情编码 [名称]',
+  `URL` VARCHAR(1000) NOT NULL COMMENT '表情图片路径',
+  `SORT` INT NOT NULL DEFAULT 99999 COMMENT '排序',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `uk_comment_emoji_name` (`NAME`),
+  UNIQUE KEY `uk_comment_emoji_code` (`CODE`),
+  KEY `idx_comment_emoji_sort` (`SORT`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表情表';
+
+/*Table structure for table `category` */
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE `category` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '分类ID',
+  `PID` BIGINT UNSIGNED DEFAULT 0 COMMENT '父分类ID，一级为0',
+  `NAME` VARCHAR(50) NOT NULL COMMENT '分类名称',
+  `SLUG` VARCHAR(100) NOT NULL COMMENT '路径标识',
+  `IMAGE_URL` VARCHAR(500) COMMENT '分类封面图',
+  `DESCRIPTION` VARCHAR(1000) COMMENT '分类描述',
+  `SEO_TITLE` VARCHAR(255) COMMENT 'SEO标题',
+  `SEO_KEYWORDS` VARCHAR(255) COMMENT 'SEO关键词',
+  `SEO_DESCRIPTION` VARCHAR(500) COMMENT 'SEO描述',
+  `SEO_SEARCH` TINYINT(1) DEFAULT 0 COMMENT 'SEO收录状态：是否允许搜索引擎收录',
+  `VISIBLE` TINYINT(1) DEFAULT 1 COMMENT '是否展示',
+  `ENABLED` TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+  `SORT` INT(11) NOT NULL DEFAULT 99999 COMMENT '排序字段',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `uk_category_slug` (`SLUG`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章分类表';
+
+/*Data for table `category` */
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694913,0,'技术','technology',NULL,'技术开发与编程相关内容','技术','Java,Spring,数据库,中间件,前端','分享 Java、Spring、数据库、中间件及前端开发相关的技术文章。',1,1,1,10,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694914,4152492274342694913,'Java','java',NULL,'Java 编程语言及相关开发技术','Java','Java,Java开发,JVM','Java 编程语言、JVM 及 Java 开发相关技术文章。',1,1,1,10,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694915,4152492274342694913,'Spring','spring',NULL,'Spring 及 Spring Boot 相关技术','Spring','Spring,Spring Boot,Spring Cloud','Spring、Spring Boot 及相关生态技术文章。',1,1,1,20,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694916,4152492274342694913,'数据库','database',NULL,'MySQL、Redis 及其他数据库相关内容','数据库','MySQL,Redis,数据库','MySQL、Redis 及数据库设计、优化相关技术文章。',1,1,1,30,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694917,4152492274342694913,'中间件','middleware',NULL,'消息队列、缓存及其他中间件相关内容','中间件','中间件,Redis,消息队列','消息队列、缓存及其他中间件相关技术文章。',1,1,1,40,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694918,4152492274342694913,'前端','frontend',NULL,'Vue、JavaScript、CSS 等前端开发内容','前端开发','Vue,JavaScript,CSS,前端','Vue、JavaScript、CSS 及前端工程化相关技术文章。',1,1,1,50,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694919,0,'开发实践','development',NULL,'软件开发过程中的实践与经验','开发实践','软件开发,架构,性能优化,源码,开发工具','分享软件开发、架构设计、性能优化及工程实践经验。',1,1,1,20,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694920,4152492274342694919,'架构设计','architecture',NULL,'系统架构设计及工程实践','架构设计','架构设计,系统架构,软件架构','系统架构、软件架构及工程设计相关内容。',1,1,1,10,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694921,4152492274342694919,'性能优化','performance',NULL,'系统性能分析与优化实践','性能优化','性能优化,JVM,SQL,性能分析','Java、数据库及系统性能分析与优化相关内容。',1,1,1,20,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694923,4152492274342694919,'源码阅读','source-code',NULL,'开源项目及技术框架源码分析','源码阅读','源码,源码分析,开源项目','开源项目、Java 框架及技术组件源码分析。',1,1,1,30,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694924,4152492274342694919,'开发工具','development-tools',NULL,'开发过程中常用的工具及使用技巧','开发工具','IDEA,Git,Maven,JMeter,开发工具','IntelliJ IDEA、Git、Maven、JMeter 等开发工具使用经验。',1,1,1,40,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694925,4152492274342694919,'测试与运维','testing-ops',NULL,'软件测试、部署及运维相关内容','测试与运维','测试,JMeter,运维,部署','软件测试、性能测试、部署及运维相关实践。',1,1,1,50,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694926,0,'生活','life',NULL,'记录生活中的点滴与思考','生活','生活,随笔,旅行,摄影,读书','记录生活、旅行、摄影、读书及个人思考。',1,1,1,30,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694927,4152492274342694926,'随笔','essays',NULL,'记录日常生活与个人思考','随笔','随笔,生活感悟,个人思考','记录日常生活、个人经历与思考。',1,1,1,10,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694928,4152492274342694926,'旅行','travel',NULL,'旅行经历及沿途见闻','旅行','旅行,游记','记录旅行经历、沿途见闻及旅行感受。',1,1,1,20,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694929,4152492274342694926,'摄影','photography',NULL,'摄影作品及摄影相关记录','摄影','摄影,照片,摄影作品','分享摄影作品及摄影相关记录。',1,1,1,30,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694930,4152492274342694926,'读书','reading',NULL,'读书笔记及阅读分享','读书','读书,读书笔记,阅读','记录读书笔记、阅读心得及书籍推荐。',1,1,1,40,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694931,0,'其他','other',NULL,'其他未归类的内容','其他','其他,杂谈','记录其他类型的文章及个人杂谈。',1,1,1,40,1,1,NOW(),NULL,NULL);
+INSERT INTO `category` (`ID`,`PID`,`NAME`,`SLUG`,`IMAGE_URL`,`DESCRIPTION`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`VISIBLE`,`ENABLED`,`SORT`,`VERSION`,`CREATE_USER`,`CREATE_TIME`,`UPDATE_USER`,`UPDATE_TIME`) VALUES (4152492274342694932,4152492274342694931,'杂谈','misc',NULL,'其他主题的文章与随想','杂谈','杂谈,随想','记录其他主题的文章、随想及个人观点。',1,1,1,10,1,1,NOW(),NULL,NULL);
+
+/*Table structure for table `tag` */
+DROP TABLE IF EXISTS `tag`;
+CREATE TABLE `tag` (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `NAME` VARCHAR(50) NOT NULL COMMENT '标签名称',
+  `SLUG` VARCHAR(100) NOT NULL COMMENT '路径标识',
+  `SEO_TITLE` VARCHAR(255) COMMENT 'SEO标题',
+  `SEO_KEYWORDS` VARCHAR(255) COMMENT 'SEO关键词',
+  `SEO_DESCRIPTION` VARCHAR(500) COMMENT 'SEO描述',
+  `SEO_SEARCH` TINYINT(1) DEFAULT 0 COMMENT 'SEO收录状态：是否允许搜索引擎收录',
+  `ENABLED` TINYINT(1) DEFAULT 1 COMMENT '是否启用',
+  `VERSION` INT(11) NOT NULL DEFAULT 1 COMMENT '乐观锁',
+  `CREATE_USER` BIGINT NOT NULL COMMENT '创建用户',
+  `CREATE_TIME` VARCHAR(20) NOT NULL COMMENT '创建时间',
+  `UPDATE_USER` BIGINT DEFAULT NULL COMMENT '更新用户',
+  `UPDATE_TIME` VARCHAR(20) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `uk_tag_slug` (`SLUG`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章标签表';
+
+/*Data for table `tag` */
+INSERT INTO `tag` (`ID`,`NAME`,`SLUG`,`SEO_TITLE`,`SEO_KEYWORDS`,`SEO_DESCRIPTION`,`SEO_SEARCH`,`ENABLED`,`VERSION`,`CREATE_USER`,`CREATE_TIME`) VALUES
+    (1,'Java','java','Java技术文章','Java,后端,编程','Java开发相关技术文章',1,1,1,1,'2026-01-01 10:00:00'),
+    (2,'Spring Boot','spring-boot','Spring Boot教程','SpringBoot,Java,框架','Spring Boot开发实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (3,'MySQL','mysql','MySQL数据库','MySQL,数据库,SQL','MySQL使用与优化',1,1,1,1,'2026-01-01 10:00:00'),
+    (4,'Redis','redis','Redis缓存','Redis,缓存,NoSQL','Redis缓存实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (5,'Docker','docker','Docker容器技术','Docker,容器,DevOps','Docker部署与实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (6,'Kubernetes','kubernetes','K8s容器编排','Kubernetes,K8s,容器','Kubernetes实战指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (7,'Vue','vue','Vue前端框架','Vue,前端,JavaScript','Vue开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (8,'React','react','React前端框架','React,前端,JS','React开发实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (9,'JavaScript','javascript','JavaScript基础','JS,前端,编程','JavaScript深入解析',1,1,1,1,'2026-01-01 10:00:00'),
+    (10,'TypeScript','typescript','TypeScript开发','TS,JavaScript,类型系统','TypeScript教程',1,1,1,1,'2026-01-01 10:00:00'),
+    (11,'HTML','html','HTML基础','HTML,前端,网页','HTML开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (12,'CSS','css','CSS样式设计','CSS,前端,样式','CSS布局与优化',1,1,1,1,'2026-01-01 10:00:00'),
+    (13,'Node.js','nodejs','Node.js后端开发','Node.js,JavaScript,后端','Node开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (14,'Nginx','nginx','Nginx配置','Nginx,服务器,反向代理','Nginx实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (15,'Linux','linux','Linux系统','Linux,服务器,操作系统','Linux常用命令',1,1,1,1,'2026-01-01 10:00:00'),
+    (16,'Git','git','Git版本控制','Git,版本控制,代码管理','Git使用指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (17,'算法','algorithm','算法与数据结构','算法,数据结构,编程','算法基础与实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (18,'设计模式','design-pattern','设计模式','设计模式,架构,编程','常见设计模式解析',1,1,1,1,'2026-01-01 10:00:00'),
+    (19,'微服务','microservices','微服务架构','微服务,架构,SpringCloud','微服务架构实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (20,'Spring Cloud','spring-cloud','Spring Cloud教程','SpringCloud,微服务,Java','Spring Cloud开发指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (21,'消息队列','mq','消息队列技术','MQ,RabbitMQ,Kafka','消息队列使用',1,1,1,1,'2026-01-01 10:00:00'),
+    (22,'Kafka','kafka','Kafka消息队列','Kafka,消息队列,大数据','Kafka实战',1,1,1,1,'2026-01-01 10:00:00'),
+    (23,'RabbitMQ','rabbitmq','RabbitMQ消息队列','RabbitMQ,MQ,消息队列','RabbitMQ入门',1,1,1,1,'2026-01-01 10:00:00'),
+    (24,'Elasticsearch','elasticsearch','ES搜索引擎','ES,搜索引擎,大数据','Elasticsearch教程',1,1,1,1,'2026-01-01 10:00:00'),
+    (25,'日志','log','日志系统','日志,Logback,ELK','日志系统设计',1,1,1,1,'2026-01-01 10:00:00'),
+    (26,'安全','security','系统安全','安全,加密,认证','系统安全实践',1,1,1,1,'2026-01-01 10:00:00'),
+    (27,'性能优化','performance','性能优化','性能优化,调优','系统性能优化技巧',1,1,1,1,'2026-01-01 10:00:00'),
+    (28,'分布式','distributed','分布式系统','分布式,架构','分布式系统设计',1,1,1,1,'2026-01-01 10:00:00'),
+    (29,'DevOps','devops','DevOps实践','DevOps,CI/CD','DevOps实践指南',1,1,1,1,'2026-01-01 10:00:00'),
+    (30,'测试','test','软件测试','测试,单元测试,自动化','软件测试方法',1,1,1,1,'2026-01-01 10:00:00');
+
+/*Table structure for table `article_tag_relation` */
+DROP TABLE IF EXISTS `article_tag_relation`;
+CREATE TABLE `article_tag_relation` (
+  `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
+  `TAG_ID` BIGINT NOT NULL COMMENT '标签编号',
+  `DELETED` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除'
+) ENGINE=INNODB ROW_FORMAT=DYNAMIC COMMENT='文章标签关联表';
+
+CREATE INDEX idx_atr_article_del_tag ON article_tag_relation (`ARTICLE_ID`, `DELETED`, `TAG_ID`);
+CREATE INDEX idx_atr_tag_del_article ON article_tag_relation (`TAG_ID`, `DELETED`, `ARTICLE_ID`);
+
+/*Table structure for table `article` */
+DROP TABLE IF EXISTS `article`;
+CREATE TABLE `article` (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `TITLE` VARCHAR(150) NOT NULL COMMENT '文章标题',
+  `SLUG` VARCHAR(150) NOT NULL COMMENT '路径标识',
+  `SUMMARY` VARCHAR(250) COMMENT '文章概要',
+  `CONTENT_MD` MEDIUMTEXT NOT NULL COMMENT '文章内容（Markdown）',
+  `CONTENT_HTML` MEDIUMTEXT COMMENT '文章内容（HTML）',
+  `CATEGORY_ID` BIGINT NOT NULL COMMENT '分类ID',
+  `AUTHOR_ID` BIGINT NOT NULL COMMENT '作者ID',
+  `SEO_TITLE` VARCHAR(255) COMMENT 'SEO标题',
+  `SEO_KEYWORDS` VARCHAR(255) COMMENT 'SEO关键词',
+  `SEO_DESCRIPTION` VARCHAR(500) COMMENT 'SEO描述',
+  `ARTICLE_TYPE` TINYINT(2) NOT NULL COMMENT '文章类型: 1-原创；2-转载；3-翻译',
+  `ARTICLE_STATUS` TINYINT(2) NOT NULL COMMENT '文章状态：1-草稿；2-待审核；3-待审核（定时发布）；4-待发布；5-审核不通过；6：已发布；7-临时下线；8-待整改',
+  `DELETE_FLAG` TINYINT NOT NULL DEFAULT 0 COMMENT '删除标记：0-正常；1-回收站；2-彻底删除',
+  `ARTICLE_PERM` TINYINT(2) NOT NULL COMMENT '文章权限：1-公开；2-私密；3-密码',
+  `ACCESS_PASSWORD` VARCHAR(200) COMMENT '访问密码',
+  `SOURCE_NAME` VARCHAR(100) DEFAULT NULL COMMENT '文章来源名称',
+  `SOURCE_AUTHOR` VARCHAR(100) DEFAULT NULL COMMENT '原作者',
+  `SOURCE_URL` VARCHAR(1000) DEFAULT NULL COMMENT '原文地址',
+  `COMMENT_FLAG` TINYINT(1) DEFAULT 0 COMMENT '是否允许评论',
+  `COVER_IMAGE_TYPE` TINYINT NOT NULL DEFAULT 0 COMMENT '封面类型：0-默认封面；1-单封面；2-多封面；3-随机封面；4-标题生成；5-无封面',
+  `WORDS_COUNT` INT UNSIGNED NOT NULL COMMENT '总字数',
+  `VIEW_COUNT` BIGINT DEFAULT 0 COMMENT '总浏览数',
+  `LIKE_COUNT` BIGINT DEFAULT 0 COMMENT '总点赞数',
+  `COMMENT_COUNT` BIGINT DEFAULT 0 COMMENT '总评论数',
+  `FAVORITE_COUNT` BIGINT DEFAULT 0 COMMENT '总收藏数',
+  `PUBLISH_TIME` DATETIME COMMENT '文章发布时间',
+  `CREATOR_ID` BIGINT DEFAULT NULL COMMENT '创建人',
+  `CREATE_TIME` DATETIME NOT NULL COMMENT '文章创建时间',
+  `UPDATER_ID` BIGINT DEFAULT NULL COMMENT '最后修改人',
+  `UPDATE_TIME` DATETIME COMMENT '文章更新时间',
+  `DELETE_TIME` DATETIME COMMENT '文章下线时间',
+  `VERSION` INT DEFAULT 1 COMMENT '迭代版本',
+  `EXTRA_INFO` JSON DEFAULT NULL COMMENT '扩展字段',
+  PRIMARY KEY (`ID`) USING BTREE,
+  UNIQUE KEY `uk_article_slug` (`SLUG`),
+  KEY `idx_article_category_id` (`CATEGORY_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章表';
+
+-- 对 TITLE 和 CONTENT_HTML 建立全文索引
+ALTER TABLE article ADD FULLTEXT INDEX idx_fulltext_article_title_content (`TITLE`, `CONTENT_MD`);
+
+/*Table structure for table `article_img_relation` */
+DROP TABLE IF EXISTS `article_img_relation`;
+CREATE TABLE `article_img_relation` (
+  `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
+  `FILE_ID` BIGINT NOT NULL COMMENT '文件编号',
+  UNIQUE KEY `KEY_ARTICLE_TAG` (`ARTICLE_ID`, `FILE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

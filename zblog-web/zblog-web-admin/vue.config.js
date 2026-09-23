@@ -14,7 +14,6 @@ module.exports = {
   publicPath: process.env.NODE_ENV === 'development' ? '/' : '',
   outputDir: 'dist',
   assetsDir: 'static',
-  lintOnSave: process.env.NODE_ENV === 'development', // 只在开发环境 lint
   productionSourceMap: false, // 生产环境 不生成 sourcemap, 防止源码泄露
   devServer: {
     host: '0.0.0.0', // 支持 IP / 局域网访问

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <elFrame :src="$store.state.api.sqlApi" />
+    <elFrame :src="$store.state.api.druidApi" />
   </div>
 </template>
 
