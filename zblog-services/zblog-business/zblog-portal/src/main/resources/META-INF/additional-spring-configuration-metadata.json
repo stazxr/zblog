@@ -24,12 +24,10 @@
     },
     {
       "name": "zblog.websocket.allowed-origin-patterns",
-      "type": "java.lang.String[]",
+      "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.portal.config.properties.WebSocketProperties",
-      "defaultValue": [
-        "*"
-      ],
-      "description": "允许跨域配置."
+      "defaultValue": "*",
+      "description": "允许跨域配置，多个地址逗号分割."
     }
   ],
   "hints": []

@@ -3,9 +3,9 @@ package com.github.stazxr.zblog.base.util;
 import com.github.stazxr.zblog.bas.notify.mail.MailException;
 import com.github.stazxr.zblog.bas.notify.mail.MailReceiver;
 import com.github.stazxr.zblog.bas.notify.mail.MailService;
+import com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties;
 import com.github.stazxr.zblog.base.domain.enums.MailTemplate;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
-import com.github.stazxr.zblog.core.config.properties.WebsiteProperties;
 import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class MailTemplateSender {
 
     private final MailService mailService;
 
-    private final WebsiteProperties websiteProperties;
+    private final MailFromProperties mailFromProperties;
 
     /**
      * 通用模板邮件发送
@@ -37,8 +37,14 @@ public class MailTemplateSender {
             // 公共变量
             Context ctx = new Context();
             ctx.setVariable("year", DateUtils.formatNow("yyyy"));
-            ctx.setVariable("websiteName", websiteProperties.getName());
-            ctx.setVariable("websiteUrl", websiteProperties.getUrl());
+            MailFromProperties.Website website = mailFromProperties.getWebsite();
+            if (website != null) {
+                ctx.setVariable("websiteName", website.getName());
+                ctx.setVariable("websiteUrl", website.getUrl());
+            } else {
+                ctx.setVariable("websiteName", "");
+                ctx.setVariable("websiteUrl", "");
+            }
             ctx.setVariable("content", template.getContentTemplate());
 
             // 业务变量

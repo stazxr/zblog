@@ -1,6 +1,6 @@
 package com.github.stazxr.zblog.bas.context.util;
 
-import com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties;
+import com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.net.IpUtils;
 import org.slf4j.Logger;
@@ -13,15 +13,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>
  * Provides static access to system code, application code, and deployment code.
- * Must be initialized once at application startup via {@link #init(HeaderProperties)}.
+ * Must be initialized once at application startup via {@link #init(ContextProperties)}.
  * </p>
  *
  * <p>
  * Example usage:
  * <pre>
- *     String sysCode = ApplicationHeaderContext.getSysCode();
- *     String appCode = ApplicationHeaderContext.getAppCode();
- *     String deployCode = ApplicationHeaderContext.getDeployCode();
+ *     String sysCode = HeaderContextHolder.getSysCode();
+ *     String appCode = HeaderContextHolder.getAppCode();
+ *     String deployCode = HeaderContextHolder.getDeployCode();
  * </pre>
  * </p>
  *
@@ -32,8 +32,8 @@ public final class HeaderContextHolder {
 
     private static final Logger log = LoggerFactory.getLogger(HeaderContextHolder.class);
 
-    /** Header properties instance */
-    private static HeaderProperties headerProperties;
+    /** Context properties instance */
+    private static ContextProperties contextProperties;
 
     /** Generated deployment code */
     private static String deployCode;
@@ -46,25 +46,25 @@ public final class HeaderContextHolder {
     }
 
     /**
-     * Initialize ApplicationHeaderContext.
+     * Initialize HeaderContextHolder.
      * <p>
-     * Must be called once during application startup after HeaderProperties are loaded and validated.
+     * Must be called once during application startup after ContextProperties are loaded and validated.
      * </p>
      *
-     * @param properties HeaderProperties bean
+     * @param properties ContextProperties bean
      */
-    public static void init(HeaderProperties properties) {
+    public static void init(ContextProperties properties) {
         if (properties == null) {
-            throw new IllegalArgumentException("HeaderProperties must not be null.");
+            throw new IllegalArgumentException("ContextProperties must not be null.");
         }
 
         if (!initialized.compareAndSet(false, true)) {
-            throw new IllegalStateException("ApplicationHeaderContext has already been initialized.");
+            throw new IllegalStateException("HeaderContextHolder has already been initialized.");
         }
 
-        headerProperties = properties;
+        contextProperties = properties;
 
-        HeaderProperties.Deploy deploy = properties.getDeploy();
+        ContextProperties.Deploy deploy = properties.getDeploy();
         if (deploy != null && StringUtils.isNotBlank(deploy.getDeployIp())) {
             deployCode = IpUtils.get7CharFromIpString(deploy.getDeployIp(), deploy.getDeployUnit());
             log.info("Application deploy code initialized: {}", deployCode);
@@ -76,7 +76,7 @@ public final class HeaderContextHolder {
     private static void checkInitialized() {
         if (!initialized.get()) {
             throw new IllegalStateException(
-                "ApplicationHeaderContext is not initialized. Call init(HeaderProperties) first."
+                "HeaderContextHolder is not initialized. Call init(ContextProperties) first."
             );
         }
     }
@@ -84,13 +84,13 @@ public final class HeaderContextHolder {
     /** Get system code */
     public static String getSysCode() {
         checkInitialized();
-        return headerProperties.getSysCode();
+        return contextProperties.getSysCode();
     }
 
     /** Get application code */
     public static String getAppCode() {
         checkInitialized();
-        return headerProperties.getAppCode();
+        return contextProperties.getAppCode();
     }
 
     /** Get deployment code */

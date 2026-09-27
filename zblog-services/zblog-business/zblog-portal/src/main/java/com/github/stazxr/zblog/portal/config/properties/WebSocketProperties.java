@@ -47,7 +47,15 @@ public class WebSocketProperties {
         return allowedOriginPatterns;
     }
 
-    public void setAllowedOriginPatterns(String[] allowedOriginPatterns) {
-        this.allowedOriginPatterns = allowedOriginPatterns;
+    public void setAllowedOriginPatterns(String allowedOriginPatterns) {
+        if (allowedOriginPatterns == null || allowedOriginPatterns.trim().isEmpty()) {
+            this.allowedOriginPatterns = new String[]{ "*" };
+            return;
+        }
+
+        this.allowedOriginPatterns = java.util.Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .toArray(String[]::new);
     }
 }

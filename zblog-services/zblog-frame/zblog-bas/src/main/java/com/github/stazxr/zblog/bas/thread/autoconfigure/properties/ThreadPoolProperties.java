@@ -57,6 +57,11 @@ public class ThreadPoolProperties {
     private boolean waitForTasksToCompleteOnShutdown = true;
 
     /**
+     * 应用关闭时最多等待任务完成的时间（秒），超时后继续关闭，默认 0
+     */
+    private int awaitTerminationSeconds = 0;
+
+    /**
      * 是否开启线程池监控日志
      */
     private boolean monitorEnabled = true;
@@ -112,6 +117,14 @@ public class ThreadPoolProperties {
 
     public void setWaitForTasksToCompleteOnShutdown(boolean waitForTasksToCompleteOnShutdown) {
         this.waitForTasksToCompleteOnShutdown = waitForTasksToCompleteOnShutdown;
+    }
+
+    public int getAwaitTerminationSeconds() {
+        return awaitTerminationSeconds;
+    }
+
+    public void setAwaitTerminationSeconds(int awaitTerminationSeconds) {
+        this.awaitTerminationSeconds = awaitTerminationSeconds;
     }
 
     public boolean isMonitorEnabled() {

@@ -12,9 +12,9 @@ import java.time.Duration;
  * @author SunTao
  * @since 2024-11-08
  */
-@ConfigurationProperties(prefix = SecurityExtProperties.SECURITY_PREFIX)
+@ConfigurationProperties(prefix = SecurityExtProperties.CONFIG_PREFIX)
 public class SecurityExtProperties {
-    static final String SECURITY_PREFIX = "zblog.base.security";
+    static final String CONFIG_PREFIX = "zblog.base.security";
 
     /**
      * 登录 URL
@@ -98,7 +98,7 @@ public class SecurityExtProperties {
      */
     public void setPasswordLimitedDay(int passwordLimitedDay) {
         if (passwordLimitedDay < 0) {
-            throw new IllegalArgumentException(SECURITY_PREFIX + ".password-limited-day must not be negative.");
+            throw new IllegalArgumentException(CONFIG_PREFIX + ".password-limited-day must not be negative.");
         }
         this.passwordLimitedDay = passwordLimitedDay;
     }

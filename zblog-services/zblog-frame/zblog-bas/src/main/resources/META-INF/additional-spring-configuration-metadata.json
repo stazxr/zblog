@@ -34,7 +34,13 @@
       "name": "zblog.base.mail.from",
       "type": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
       "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
-      "description": "邮箱配置项."
+      "description": "邮箱发件人配置项."
+    },
+    {
+      "name": "zblog.base.mail.from.website",
+      "type": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties$Website",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties",
+      "description": "邮箱发件人网站配置项."
     },
     {
       "name": "zblog.base.sequence",
@@ -43,22 +49,16 @@
       "description": "序号配置项."
     },
     {
-      "name": "zblog.base.header",
-      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
-      "description": "上下文核心配置项."
-    },
-    {
-      "name": "zblog.base.header.deploy",
-      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
-      "description": "部署单元配置项."
-    },
-    {
       "name": "zblog.base.context",
       "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
       "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
       "description": "上下文配置项."
+    },
+    {
+      "name": "zblog.base.context.deploy",
+      "type": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
+      "description": "部署单元配置项."
     },
     {
       "name": "zblog.base.log.control",
@@ -95,6 +95,12 @@
       "type": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
       "description": "腾讯云存储配置项."
+    },
+    {
+      "name": "zblog.base.cors",
+      "type": "com.github.stazxr.zblog.bas.cors.CorsProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.cors.CorsProperties",
+      "description": "CORS 配置."
     },
     {
       "name": "zblog.base.rest",
@@ -193,6 +199,13 @@
       "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
       "description": "应用关闭时是否等待线程池中的任务执行完成。true: 优雅关闭，等待任务完成后再退出；false: 立即关闭，可能中断正在执行的任务.",
       "defaultValue": true
+    },
+    {
+      "name": "zblog.base.thread-pool.await-termination-seconds",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.stazxr.zblog.bas.thread.autoconfigure.properties.ThreadPoolProperties",
+      "description": "应用关闭时最多等待任务完成的时间（秒），超时后继续关闭.",
+      "defaultValue": 0
     },
     {
       "name": "zblog.base.thread-pool.monitor-enabled",
@@ -296,6 +309,20 @@
       "defaultValue": "Z-BLOG"
     },
     {
+      "name": "zblog.base.mail.from.website.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties$Website",
+      "description": "发件人站点名称.",
+      "defaultValue": "Z-BLOG"
+    },
+    {
+      "name": "zblog.base.mail.from.website.url",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.notify.mail.autoconfigure.properties.MailFromProperties$Website",
+      "description": "发件人站点地址.",
+      "defaultValue": "http://localhost:31945"
+    },
+    {
       "name": "zblog.base.sequence.datacenterId",
       "type": "java.lang.Short",
       "sourceType": "com.github.stazxr.zblog.bas.sequence.autoconfigure.properties.SequenceProperties",
@@ -310,41 +337,41 @@
       "defaultValue": 0
     },
     {
-      "name": "zblog.base.header.sysCode",
+      "name": "zblog.base.context.sysCode",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
       "description": "系统编码."
     },
     {
-      "name": "zblog.base.header.appCode",
+      "name": "zblog.base.context.appCode",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties",
       "description": "应用编码."
     },
     {
-      "name": "zblog.base.header.deploy.deployArea",
+      "name": "zblog.base.context.deploy.deploy-area",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties$Deploy",
       "description": "部署地域."
     },
     {
-      "name": "zblog.base.header.deploy.deployCenter",
+      "name": "zblog.base.context.deploy.deploy-center",
       "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties$Deploy",
       "description": "部署中心."
     },
     {
-      "name": "zblog.base.header.deploy.deployIp",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
-      "description": "部署IP."
-    },
-    {
-      "name": "zblog.base.header.deploy.deployUnit",
+      "name": "zblog.base.context.deploy.deploy-unit",
       "type": "java.lang.Integer",
-      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties$Deploy",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties$Deploy",
       "description": "部署单元.",
       "defaultValue": 0
+    },
+    {
+      "name": "zblog.base.context.deploy.deploy-ip",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties$Deploy",
+      "description": "部署IP."
     },
     {
       "name": "zblog.base.context.tags",
@@ -374,7 +401,7 @@
       "description": "路径列表配置."
     },
     {
-      "name": "zblog.base.file.model",
+      "name": "zblog.base.file.storage-type",
       "type": "java.lang.Integer",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties",
       "defaultValue": 1,
@@ -531,6 +558,13 @@
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties$TencentyunCosConfig",
       "description": "腾讯云 COS 存储桶名称."
+    },
+    {
+      "name": "zblog.base.cors.allowed-origin-patterns",
+      "type": "java.lang.String",
+      "sourceType": "com.github.stazxr.zblog.bas.cors.CorsProperties",
+      "description": "允许的跨域来源，多个逗号分割.",
+      "defaultValue": "*"
     },
     {
       "name": "zblog.base.rest.error-path",
@@ -774,7 +808,7 @@
   ],
   "hints": [
     {
-      "name": "zblog.base.header.deploy.deployUnit",
+      "name": "zblog.base.context.deploy.deploy-unit",
       "values": [
         { "value": 0, "description": "Unit 0, default." },
         { "value": 1, "description": "Unit 1." },
@@ -804,7 +838,7 @@
       ]
     },
     {
-      "name": "zblog.base.file.model",
+      "name": "zblog.base.file.storage-type",
       "values": [
         { "value": 1, "description": "本地存储." },
         { "value": 2, "description": "阿里云存储." },

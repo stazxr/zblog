@@ -4,7 +4,6 @@ import com.alibaba.ttl.TransmittableThreadLocal;
 import com.github.stazxr.zblog.bas.context.constant.TagConstants;
 import com.github.stazxr.zblog.bas.context.entity.ContextTag;
 import com.github.stazxr.zblog.bas.context.autoconfigure.properties.ContextProperties;
-import com.github.stazxr.zblog.bas.context.autoconfigure.properties.HeaderProperties;
 import com.github.stazxr.zblog.bas.context.util.HeaderContextHolder;
 import com.github.stazxr.zblog.bas.context.util.SpringContextHolder;
 
@@ -58,7 +57,7 @@ class CoreContextHolder {
 
     /** Inject system-level tags into CoreContext */
     private static void addSystemTags(CoreContext coreContext) {
-        HeaderProperties headerProperties = SpringContextHolder.getBean(HeaderProperties.class);
+        ContextProperties contextProperties = SpringContextHolder.getBean(ContextProperties.class);
 
         coreContext.put(new ContextTag(TagConstants.SYS_CODE_TAG, HeaderContextHolder.getSysCode()));
         coreContext.put(new ContextTag(TagConstants.APP_CODE_TAG, HeaderContextHolder.getAppCode()));
@@ -67,7 +66,7 @@ class CoreContextHolder {
             coreContext.put(new ContextTag(TagConstants.DEPLOY_CODE_TAG, deployCode));
         }
 
-        HeaderProperties.Deploy deploy = headerProperties.getDeploy();
+        ContextProperties.Deploy deploy = contextProperties.getDeploy();
         coreContext.put(new ContextTag(TagConstants.DEPLOY_AREA_TAG, deploy.getDeployArea()));
         coreContext.put(new ContextTag(TagConstants.DEPLOY_CENTER_TAG, deploy.getDeployCenter()));
         coreContext.put(new ContextTag(TagConstants.DEPLOY_UNIT_TAG, String.valueOf(deploy.getDeployUnit())));

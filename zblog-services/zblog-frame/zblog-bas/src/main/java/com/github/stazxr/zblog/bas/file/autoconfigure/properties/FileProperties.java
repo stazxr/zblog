@@ -17,7 +17,7 @@ public class FileProperties {
     /**
      * 文件上传模式：see {@link com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum}
      */
-    private int model = 1;
+    private int storageType = 1;
 
     /**
      * 本地配置信息
@@ -184,12 +184,12 @@ public class FileProperties {
         private String bucketName;
     }
 
-    public int getModel() {
-        return model;
+    public int getStorageType() {
+        return storageType;
     }
 
-    public void setModel(int model) {
-        this.model = model;
+    public void setStorageType(int storageType) {
+        this.storageType = storageType;
     }
 
     public LocalConfig getLocal() {

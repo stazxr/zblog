@@ -22,6 +22,11 @@ public class MailFromProperties {
      */
     private String name = "Z-BLOG";
 
+    /**
+     * 发件人站点配置
+     */
+    private Website website = new Website();
+
     public String getAddress() {
         return address;
     }
@@ -36,5 +41,41 @@ public class MailFromProperties {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Website getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(Website website) {
+        this.website = website;
+    }
+
+    public static class Website {
+        /**
+         * 站点名称
+         */
+        private String name = "Z-BLOG";
+
+        /**
+         * 站点地址
+         */
+        private String url = "http://localhost:31945";
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
     }
 }

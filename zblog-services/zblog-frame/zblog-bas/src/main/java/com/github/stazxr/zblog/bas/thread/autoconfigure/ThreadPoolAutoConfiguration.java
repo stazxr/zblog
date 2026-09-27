@@ -47,7 +47,8 @@ public class ThreadPoolAutoConfiguration {
         // DiscardOldestPolicy: 丢弃队列中最旧的任务，然后尝试提交新任务
         executor.setRejectedExecutionHandler(new FastFailRejectedExecutionHandler());
         // 等待所有任务结束后再关闭线程池
-        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setWaitForTasksToCompleteOnShutdown(properties.isWaitForTasksToCompleteOnShutdown());
+        executor.setAwaitTerminationSeconds(properties.getAwaitTerminationSeconds());
         // 初始化线程池
         executor.initialize();
         return executor;
