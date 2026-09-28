@@ -1,10 +1,10 @@
 SET NAMES utf8;
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP DATABASE /*!32312 IF EXISTS*/ `props`;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `props` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
+DROP DATABASE /*!32312 IF EXISTS*/ `zblog_props`;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `zblog_props` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
 
-USE `props`;
+USE `zblog_props`;
 
 -- ----------------------------
 -- Table structure for sys_props
@@ -135,12 +135,15 @@ INSERT INTO `sys_props` VALUES ('zblog.bas.aopLog.recordResult', 'true', 'zblog.
 INSERT INTO `sys_props` VALUES ('zblog.bas.aopLog.maxParamLength', '5000', 'zblog.service', '接口请求参数最大记录长度，超过部分将被截断');
 INSERT INTO `sys_props` VALUES ('zblog.bas.aopLog.maxResultLength', '5000', 'zblog.service', '接口返回值最大记录长度，超过部分将被截断');
 INSERT INTO `sys_props` VALUES ('zblog.bas.websocket.allowedOriginPatterns', '*', 'zblog.service', 'WebSocket允许的跨域来源，多个来源使用逗号分隔');
-
 INSERT INTO `sys_props` VALUES ('zblog.audit.tms.enabled', 'false', 'zblog.service', '是否启用腾讯云内容审核');
 INSERT INTO `sys_props` VALUES ('zblog.audit.tms.accessKey', '', 'zblog.service', '腾讯云 SecretId（访问密钥 ID）');
 INSERT INTO `sys_props` VALUES ('zblog.audit.tms.secretKey', '', 'zblog.service', '腾讯云 SecretKey（访问密钥）');
-INSERT INTO `sys_props` VALUES ('zblog.audit.tms.region', 'ap-beijing', 'zblog.service', '腾讯云 TMS 所在地域');
-INSERT INTO `sys_props` VALUES ('zblog.audit.tms.bizType', '', 'zblog.service', '腾讯云 TMS 接口地址');
-INSERT INTO `sys_props` VALUES ('zblog.audit.tms.endpoint', 'tms.tencentcloudapi.com', 'zblog.service', '识别策略编号（默认）');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.region', '', 'zblog.service', '腾讯云 TMS 所在地域');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.bizType', '', 'zblog.service', '识别策略编号（默认）');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.endpoint', '', 'zblog.service', '腾讯云 TMS 接口地址');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.connectTimeout', '1000', 'zblog.service', 'TMS 连接超时时间（毫秒）');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.readTimeout', '3000', 'zblog.service', 'TMS 读取超时时间（毫秒）');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.degradeOnFailure', 'true', 'zblog.service', 'TMS 是否开启失败降级');
+INSERT INTO `sys_props` VALUES ('zblog.audit.tms.maxTextLength', '5000', 'zblog.service', 'TMS 最大文本长度限制');
 
 SET FOREIGN_KEY_CHECKS = 1;

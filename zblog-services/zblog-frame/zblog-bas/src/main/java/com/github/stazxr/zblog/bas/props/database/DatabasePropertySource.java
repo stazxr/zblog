@@ -1,6 +1,7 @@
 package com.github.stazxr.zblog.bas.props.database;
 
 import com.github.stazxr.zblog.bas.props.datasource.PropsDriverManagerDataSource;
+import com.github.stazxr.zblog.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertySource;
@@ -128,10 +129,14 @@ public class DatabasePropertySource extends PropertySource<Map<String, Object>> 
                 jdbcTemplate.query(config.getProperty("zblog.props.load-sql"), resultSet -> {
                     String name = resultSet.getString("k");
                     String value = resultSet.getString("v");
-                    if ("true".equals(value) || "false".equals(value)) {
-                        properties.put(name, Boolean.valueOf(value));
+                    if (StringUtils.isBlank(value)) {
+                        properties.put(name, "");
                     } else {
-                        properties.put(name, value);
+                        if ("true".equals(value) || "false".equals(value)) {
+                            properties.put(name, Boolean.valueOf(value));
+                        } else {
+                            properties.put(name, value);
+                        }
                     }
                 });
             }

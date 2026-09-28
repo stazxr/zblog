@@ -22,10 +22,10 @@ audit:
         region: ${zblog.audit.tms.region} # 腾讯云 TMS 所在地域
         endpoint: ${zblog.audit.tms.endpoint} # 腾讯云 TMS 接口地址
         bizType: ${zblog.audit.tms.bizType} # 识别策略编号（默认）
-        connectTimeout: 1000 # 连接超时时间（毫秒）
-        readTimeout: 2000 # 读取超时时间（毫秒）
-        degradeOnFailure: true # 是否开启失败降级
-        maxTextLength: 5000 # 最大文本长度限制
+        connectTimeout: ${zblog.audit.tms.connectTimeout} # 连接超时时间（毫秒）
+        readTimeout: ${zblog.audit.tms.readTimeout} # 读取超时时间（毫秒）
+        degradeOnFailure: ${zblog.audit.tms.degradeOnFailure} # 是否开启失败降级
+        maxTextLength: ${zblog.audit.tms.maxTextLength} # 最大文本长度限制
   policies:
     DEFAULT: # 默认策略
       processors:
