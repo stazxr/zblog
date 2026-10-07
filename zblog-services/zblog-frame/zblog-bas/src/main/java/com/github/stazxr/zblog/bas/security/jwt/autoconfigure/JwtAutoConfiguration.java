@@ -17,10 +17,10 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 
 /**
  * JwtConfig 配置类
@@ -41,17 +41,17 @@ import java.security.KeyStoreException;
 @EnableConfigurationProperties({ JwtProperties.class, JwtCookieProperties.class })
 public class JwtAutoConfiguration {
     /**
-     * 用于加载 RSA 密钥的 JKS (Java KeyStore) 实例。
+     * JKS KeyStore 类型。
      */
-    private static final KeyStore JKS_STORE;
+    private static final String KEY_STORE_TYPE = "JKS";
 
-    static {
-        try {
-            // 初始化 JKS keystore 实例
-            JKS_STORE = KeyStore.getInstance("jks");
-        } catch (KeyStoreException e) {
-            throw new RuntimeException("can not obtain jks keystore instance");
-        }
+    /**
+     * Spring ResourceLoader。
+     */
+    private final ResourceLoader resourceLoader;
+
+    public JwtAutoConfiguration(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 
     /**
@@ -68,19 +68,36 @@ public class JwtAutoConfiguration {
         // 获取证书配置
         JwtProperties.CertInfo certInfo = jwtProperties.getCertInfo();
 
-        // 从类路径资源加载 JKS keystore 文件
-        ClassPathResource classPathResource = new ClassPathResource(certInfo.getCertLocation());
-        char[] pin = certInfo.getKeyPassword().toCharArray();
-        JKS_STORE.load(classPathResource.getInputStream(), pin);
+        // 根据配置加载密钥文件，支持 classpath 和 file
+        Resource resource = resourceLoader.getResource(certInfo.getCertLocation());
+        if (!resource.exists()) {
+            throw new IllegalStateException(
+                "JWT certificate file does not exist: " + certInfo.getCertLocation()
+            );
+        }
 
-        // 从 JKS store 中加载 RSA 密钥，使用别名和密码
-        RSAKey rsaKey = RSAKey.load(JKS_STORE, certInfo.getAlias(), pin);
+        // 证书密码字节数组
+        char[] password = certInfo.getKeyPassword().toCharArray();
 
-        // 创建包含该 RSA 密钥的 JWK 集
-        JWKSet jwkSet = new JWKSet(rsaKey);
+        try {
+            // 初始化 JKS keystore 实例
+            KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
 
-        // 返回一个不可变的 JWK 源，封装了 JWK 集
-        return new ImmutableJWKSet<>(jwkSet);
+            // 加载 JKS 文件
+            keyStore.load(resource.getInputStream(), password);
+
+            // 加载 RSA 密钥
+            RSAKey rsaKey = RSAKey.load(keyStore, certInfo.getAlias(), password);
+
+            // 创建 JWK 集
+            JWKSet jwkSet = new JWKSet(rsaKey);
+
+            // 返回一个不可变的 JWK 源，封装了 JWK 集
+            return new ImmutableJWKSet<>(jwkSet);
+        } finally {
+            // 密码使用完成后清理字符数组
+            java.util.Arrays.fill(password, '\0');
+        }
     }
 
     /**

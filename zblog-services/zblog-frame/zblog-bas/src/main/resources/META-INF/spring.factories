@@ -16,7 +16,6 @@ com.github.stazxr.zblog.bas.validation.autoconfigure.ValidationAutoConfiguration
 com.github.stazxr.zblog.bas.notify.mail.autoconfigure.MailAutoConfiguration,\
 com.github.stazxr.zblog.bas.sequence.autoconfigure.SequenceAutoConfiguration,\
 com.github.stazxr.zblog.bas.captcha.autoconfigure.CaptchaLoadAutoConfigure,\
-com.github.stazxr.zblog.bas.context.autoconfigure.HeaderAutoConfiguration,\
 com.github.stazxr.zblog.bas.context.autoconfigure.ContextAutoConfiguration,\
 com.github.stazxr.zblog.bas.context.autoconfigure.ContextFilterAutoConfiguration,\
 com.github.stazxr.zblog.bas.context.autoconfigure.SpringContextAutoConfiguration,\

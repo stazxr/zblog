@@ -121,11 +121,10 @@ zblog:
         refresh-token-ttl: ${zblog.bas.security.jwt.refreshTokenTtl} # 刷新令牌有效时间（秒），默认 604800 秒（7天）
         allowed-renew-token: ${zblog.bas.security.jwt.allowedRenewToken} # 是否允许续签，默认 false
         check-ip-change: ${zblog.bas.security.jwt.checkIpChange} # 是否检查IP变化
-        algorithm: RS256 # JWT签名算法，参考 com.nimbusds.jose.JWSAlgorithm
         cert-info: # JWT 签名证书配置
-          alias: ${zblog.bas.security.jwt.cert.alias} # 证书别名
-          key-password: ${zblog.bas.security.jwt.cert.keyPassword} # 证书密钥密码
-          cert-location: ${zblog.bas.security.jwt.cert.location} # 证书文件路径
+          alias: ${zblog.bas.security.jwt.cert.alias} # JWT证书别名
+          key-password: ${zblog.bas.security.jwt.cert.keyPassword} # JWT签名证书密钥密码
+          cert-location: ${zblog.bas.security.jwt.cert.location} # JWT签名证书文件路径，支持 Spring Resource 位置
         claims: # JWT Claims 配置
           issuer: ${zblog.bas.security.jwt.claims.issuer} # JWT签发者
           audience: ${zblog.bas.security.jwt.claims.issuer} # JWT接收方

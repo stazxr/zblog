@@ -58,8 +58,8 @@ spring:
       test-on-borrow: false # 指明是否在从池中取出连接前进行检验，如果检验失败，则从池中去除连接并尝试取出另一个，关闭可以减少检测开销
       test-on-return: false # 是否在归还到池中前进行检验
       time-between-eviction-runs-millis: 60000 # 空闲连接检测任务的执行周期（毫秒）
-      max-evictable-idle-time-millis: 300000 # 连接池的最大生存时间（毫秒）
-      min-evictable-idle-time-millis: 1800000 # 连接池的最小生存时间（毫秒），当连接池已无可用连接时，线程最多等待该时间
+      min-evictable-idle-time-millis: 300000 # 连接池的最小生存时间（毫秒），当连接池已无可用连接时，线程最多等待该时间
+      max-evictable-idle-time-millis: 1800000 # 连接池的最大生存时间（毫秒）
 
       # ============================================================
       # 连接泄漏检测

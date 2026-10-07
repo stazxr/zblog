@@ -60,9 +60,6 @@ public class JwtTokenGenerator {
         // 获取当前时间，作为 JWT 的发放时间
         Date issueTime = new Date();
 
-        // 获取签名算法
-        JWSAlgorithm algorithm = new JWSAlgorithm(jwtProperties.getAlgorithm());
-
         // 获取参数信息
         String userId = jwtContext.getUserId();
         String username = jwtContext.getUsername();
@@ -71,7 +68,7 @@ public class JwtTokenGenerator {
         // 生成访问令牌的声明集，并通过编码器编码为 access token
         String accessJwtId = "ATK_" + SequenceUtils.getId();
         JWTClaimsSet accessClaims = buildAccessJwtChaimSet(issueTime, accessJwtId, userId, loginIp);
-        String accessToken = jwtEncoder.encode(algorithm, accessClaims);
+        String accessToken = jwtEncoder.encode(JWSAlgorithm.RS256, accessClaims);
 
         String refreshToken = null;
         String refreshJwtId = null;
@@ -80,7 +77,7 @@ public class JwtTokenGenerator {
             // 生成刷新令牌的声明集，并通过编码器编码为 refresh token
             refreshJwtId = "RTK_" + SequenceUtils.getId();
             JWTClaimsSet refreshClaims = buildRefreshJwtChaimSet(issueTime, refreshJwtId, userId, loginIp);
-            refreshToken = jwtEncoder.encode(algorithm, refreshClaims);
+            refreshToken = jwtEncoder.encode(JWSAlgorithm.RS256, refreshClaims);
             cacheTtl = jwtProperties.getRefreshTokenTtl();
         }
 

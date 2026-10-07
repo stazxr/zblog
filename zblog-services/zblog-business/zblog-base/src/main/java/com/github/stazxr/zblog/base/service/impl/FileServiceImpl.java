@@ -105,10 +105,10 @@ public class FileServiceImpl implements FileService {
         }
 
         // 获取文件上传类型
-        int fileUploadType = fileProperties.getModel();
+        int storageType = fileProperties.getStorageType();
 
         // 上传操作
-        return doUploadFile(multipartFiles, fileUploadType);
+        return doUploadFile(multipartFiles, storageType);
     }
 
     /**

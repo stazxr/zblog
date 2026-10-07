@@ -658,13 +658,6 @@
       "defaultValue": true
     },
     {
-      "name": "zblog.base.security.jwt.algorithm",
-      "type": "java.lang.String",
-      "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties",
-      "description": "JWT签名算法，参考 com.nimbusds.jose.JWSAlgorithm.",
-      "defaultValue": "RS256"
-    },
-    {
       "name": "zblog.base.security.jwt.cert-info.alias",
       "type": "java.lang.String",
       "sourceType": "com.github.stazxr.zblog.bas.security.jwt.autoconfigure.properties.JwtProperties$CertInfo",
@@ -872,25 +865,6 @@
         { "value": "na-siliconvalley", "description": "美国硅谷." },
         { "value": "na-ashburn", "description": "美国弗吉尼亚." },
         { "value": "eu-frankfurt", "description": "德国法兰克福." }
-      ]
-    },
-    {
-      "name": "zblog.base.security.jwt.algorithm",
-      "values": [
-        { "value": "RS256", "description": "RS256, default." },
-        { "value": "ES256", "description": "ES256." },
-        { "value": "HS256", "description": "HS256." },
-        { "value": "HS384", "description": "HS384." },
-        { "value": "HS512", "description": "HS512." },
-        { "value": "RS384", "description": "RS384." },
-        { "value": "RS512", "description": "RS512." },
-        { "value": "ES256K", "description": "ES256K." },
-        { "value": "ES384", "description": "ES384." },
-        { "value": "ES512", "description": "ES512." },
-        { "value": "PS256", "description": "PS256." },
-        { "value": "PS384", "description": "PS384." },
-        { "value": "PS512", "description": "PS512." },
-        { "value": "EdDSA", "description": "EdDSA." }
       ]
     },
     {

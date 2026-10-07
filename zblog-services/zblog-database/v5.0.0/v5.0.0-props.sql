@@ -108,10 +108,10 @@ INSERT INTO `sys_props` VALUES ('zblog.bas.security.lock.duration', 'PT5M', 'zbl
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.accessTokenTtl', '1800', 'zblog.service', '访问令牌有效时间（秒）');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.refreshTokenTtl', '604800', 'zblog.service', '刷新令牌有效时间（秒）');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.allowedRenewToken', 'true', 'zblog.service', '是否允许访问令牌续签');
-INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.checkIpChange', 'true', 'zblog.service', '是否检查访问令牌请求IP变化');
+INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.checkIpChange', 'false', 'zblog.service', '是否检查访问令牌请求IP变化');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.cert.alias', 'zblog', 'zblog.service', 'JWT签名证书别名');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.cert.keyPassword', '123456', 'zblog.service', 'JWT签名证书密钥密码');
-INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.cert.location', 'zblog.jks', 'zblog.service', 'JWT签名证书文件路径');
+INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.cert.location', 'classpath:zblog.jks', 'zblog.service', 'JWT签名证书文件路径，支持 Spring Resource 位置');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.claims.issuer', 'zblog', 'zblog.service', 'JWT签发者');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.claims.audience', 'zblog', 'zblog.service', 'JWT接收方');
 INSERT INTO `sys_props` VALUES ('zblog.bas.security.jwt.cookie.domain', 'localhost', 'zblog.service', 'JWT Cookie域名');

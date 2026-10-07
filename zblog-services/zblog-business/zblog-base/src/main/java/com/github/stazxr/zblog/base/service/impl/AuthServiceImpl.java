@@ -145,7 +145,7 @@ public class AuthServiceImpl implements AuthService {
             String accessJwtId = "ATK_" + SequenceUtils.getId();
             String loginIp = claimsSet.getStringClaim(JwtConstants.LOGIN_IP_KEY);
             JWTClaimsSet accessClaims = buildAccessJwtChaimSet(renewTime, accessJwtId, userId, loginIp);
-            String accessToken = jwtEncoder.encode(new JWSAlgorithm(jwtProperties.getAlgorithm()), accessClaims);
+            String accessToken = jwtEncoder.encode(JWSAlgorithm.RS256, accessClaims);
 
             // 7、刷新缓存
             tokenPayload.setAccessTokenId(accessJwtId);

@@ -36,11 +36,6 @@ public class JwtProperties {
     private boolean checkIpChange = true;
 
     /**
-     * JWT 签名算法 {@link com.nimbusds.jose.JWSAlgorithm}，默认为 RS256
-     */
-    private String algorithm = "RS256";
-
-    /**
      * 证书信息
      */
     private CertInfo certInfo;
@@ -62,7 +57,15 @@ public class JwtProperties {
         private String keyPassword;
 
         /**
-         * 证书路径
+         * JWT 密钥库文件位置
+         *
+         * <p>
+         * 支持 Spring Resource 位置，例如：
+         * <ul>
+         *     <li>classpath:zblog.jks</li>
+         *     <li>file:/appuser/cert/zblog.jks</li>
+         * </ul>
+         * </p>
          */
         private String certLocation;
 
@@ -170,19 +173,6 @@ public class JwtProperties {
 
     public void setCheckIpChange(boolean checkIpChange) {
         this.checkIpChange = checkIpChange;
-    }
-
-    /**
-     * 设置 JWT 签名算法
-     *
-     * @param algorithm 签名算法，如 RS256、HS256 等
-     */
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
     }
 
     /**
