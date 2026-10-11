@@ -10,32 +10,32 @@ public enum ArticleCoverImageType {
     /**
      * 默认封面
      */
-    DEFAULT(0, "默认封面"),
+    DEFAULT(1, "默认封面"),
 
     /**
      * 单封面
      */
-    SINGLE(1, "单封面"),
+    SINGLE(2, "单封面"),
 
     /**
      * 多封面
      */
-    MULTIPLE(2, "多封面"),
+    MULTIPLE(3, "多封面"),
 
     /**
      * 随机封面
      */
-    RANDOM(3, "随机封面"),
+    RANDOM(4, "随机封面"),
 
     /**
      * 标题生成
      */
-    TITLE(4, "标题生成"),
+    TITLE(5, "标题生成"),
 
     /**
      * 无封面
      */
-    NONE(5, "无封面");
+    NONE(6, "无封面");
 
     private final Integer value;
 

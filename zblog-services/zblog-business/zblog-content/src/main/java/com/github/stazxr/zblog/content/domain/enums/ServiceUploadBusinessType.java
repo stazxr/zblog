@@ -26,4 +26,14 @@ public final class ServiceUploadBusinessType {
      * 评论插图
      */
     public static final Integer COMMENT_IMG = 14;
+
+    /**
+     * 文章封面
+     */
+    public static final Integer ARTICLE_COVER_IMG = 15;
+
+    /**
+     * 文章内容插图
+     */
+    public static final Integer ARTICLE_CONTENT_IMG = 16;
 }

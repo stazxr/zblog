@@ -41,4 +41,20 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @return TagVo
      */
     TagVo selectTagDetail(@Param("tagId") Long tagId);
+
+    /**
+     * 根据标签名称查询标签信息
+     *
+     * @param tagName 标签名称
+     * @return Tag
+     */
+    Tag selectByTagName(@Param("tagName") String tagName);
+
+    /**
+     * 根据 SLUG 查询标签信息
+     *
+     * @param slug 标签唯一标识
+     * @return Tag
+     */
+    Tag selectByTagSlug(@Param("slug") String slug);
 }

@@ -58,4 +58,12 @@
             (SELECT COUNT(ARTICLE_ID) FROM article_tag_relation atr WHERE atr.TAG_ID = t.ID AND atr.DELETED = 0) AS ARTICLE_COUNT
         FROM tag t WHERE t.ID = #{tagId}
     </select>
+
+    <select id="selectByTagName" resultType="com.github.stazxr.zblog.content.domain.entity.Tag">
+        SELECT * FROM tag t WHERE t.NAME = #{tagName}
+    </select>
+
+    <select id="selectByTagSlug" resultType="com.github.stazxr.zblog.content.domain.entity.Tag">
+        SELECT * FROM tag t WHERE t.SLUG = #{slug}
+    </select>
 </mapper>

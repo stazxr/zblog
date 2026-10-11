@@ -300,12 +300,12 @@ export default {
     },
     addArticle() {
       this.$router.push({
-        name: 'AddArticle'
+        name: 'AddOrEditArticle'
       })
     },
     editArticle(row) {
       this.$router.push({
-        name: 'AddArticle',
+        name: 'AddOrEditArticle',
         query: {
           articleId: row.id
         }

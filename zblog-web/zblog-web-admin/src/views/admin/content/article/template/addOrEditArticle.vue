@@ -76,7 +76,7 @@
               <!-- 单封面 -->
               <template v-if="form.coverImageType === 2">
                 <div class="cover-img-box-flex">
-                  <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                  <div v-if="form.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                     <div class="cover-img">
                       <div class="cover-img-hover">
                         <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
@@ -86,9 +86,9 @@
                   <div v-else class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
-                        <img :src="form.articleImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
-                        <span class="cover-img-close-icon" @click="removeCoverImg(form.articleImages[0], 0)">×</span>
-                        <span class="cover-img-replace-icon" @click="replaceCoverImg(form.articleImages[0], 0)">替换</span>
+                        <img :src="form.coverImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
+                        <span class="cover-img-close-icon" @click="removeCoverImg(form.coverImages[0], 0)">×</span>
+                        <span class="cover-img-replace-icon" @click="replaceCoverImg(form.coverImages[0], 0)">替换</span>
                       </div>
                     </div>
                   </div>
@@ -101,14 +101,14 @@
               <!-- 多封面 -->
               <template v-if="form.coverImageType === 3">
                 <div class="cover-img-box-flex cover-img-box-more">
-                  <div v-if="form.articleImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                  <div v-if="form.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                     <div class="cover-img">
                       <div class="cover-img-hover">
                         <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
                       </div>
                     </div>
                   </div>
-                  <div v-for="(articleImage, index) in form.articleImages" :key="articleImage.fileId" class="cover-img-box">
+                  <div v-for="(articleImage, index) in form.coverImages" :key="articleImage.fileId" class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
                         <img :src="articleImage.fileAccessUrl" alt="" class="cover-img-img-icon">
@@ -193,7 +193,7 @@
             <!-- 标签 -->
             <el-form-item label="文章标签：">
               <el-select
-                v-model="form.articleTags"
+                v-model="form.tags"
                 placeholder="请选择文章标签"
                 multiple
                 :multiple-limit="3"
@@ -542,25 +542,23 @@ export default {
         slug: '',
         summary: '',
         contentMd: '',
+        coverImageType: 1,
+        coverImages: [],
         categoryId: '', // 文章分类
-        articleTags: [], // 文章标签
-        authorId: '',
+        tags: [], // 文章标签
+        articleType: 1, // 文章类型
+        sourceName: '', // 文章来源名称
+        sourceAuthor: '', // 原作者
+        sourceUrl: '', // 原文地址
         seoTitle: '',
         seoKeywords: '',
         seoDescription: '',
-        articleType: 1,
         articleStatus: 1,
-        sourceName: '',
-        sourceAuthor: '',
-        sourceUrl: '',
         commentFlag: true,
-        coverImageType: 1,
-        articleImages: [],
         publishTime: '',
         // 访问权限
         articlePerm: 1,
         accessPassword: '',
-
         // 公众号验证
         verifyType: 1,
         verifyExpireMinutes: 10,
@@ -681,7 +679,7 @@ export default {
   },
 
   computed: {
-    // 当前封面最大数量
+    // TODO 当前封面最大数量，待客户化
     maxUploadLimit() {
       return this.form.coverImageType === 3 ? 4 : 1
     },
@@ -940,7 +938,7 @@ export default {
         const param = { fileId: file.fileId }
         return this.$mapi.file.deleteFile(param)
       }).then(res => {
-        this.form.articleImages.splice(index, 1)
+        this.form.coverImages.splice(index, 1)
         this.$message.success(res.message || '删除成功')
       }).catch(() => {})
     },
@@ -962,15 +960,15 @@ export default {
     uploadImgDone(fileList, index) {
       this.uploadImgDialogVisible = false
       const list = Array.isArray(fileList) ? fileList : []
-      if (index != null && index >= 0 && list.length === 1 && this.form.articleImages.length > index) {
-        this.$set(this.form.articleImages, index, list[0])
+      if (index != null && index >= 0 && list.length === 1 && this.form.coverImages.length > index) {
+        this.$set(this.form.coverImages, index, list[0])
         return
       }
       list.forEach(file => {
-        this.form.articleImages.push(file)
+        this.form.coverImages.push(file)
       })
-      if (this.form.articleImages.length > this.maxUploadLimit) {
-        this.form.articleImages = this.form.articleImages.slice(0, this.maxUploadLimit)
+      if (this.form.coverImages.length > this.maxUploadLimit) {
+        this.form.coverImages = this.form.coverImages.slice(0, this.maxUploadLimit)
       }
     },
 
@@ -1140,7 +1138,7 @@ export default {
         summary: data.summary || data.remark || '',
         contentMd: data.contentMd || data.content || '',
         categoryId: data.categoryId || '', // 文章分类
-        articleTags: Array.isArray(data.articleTags) ? data.articleTags : [], // 文章标签
+        tags: Array.isArray(data.tags) ? data.tags : [], // 文章标签
         authorId: data.authorId || '',
         seoTitle: data.seoTitle || '',
         seoKeywords: data.seoKeywords || '',
@@ -1154,7 +1152,7 @@ export default {
         sourceUrl: data.sourceUrl || '',
         commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
         coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
-        articleImages: Array.isArray(data.articleImages) ? data.articleImages : [],
+        coverImages: Array.isArray(data.coverImages) ? data.coverImages : [],
         publishTime: data.publishTime || ''
       }
     },
@@ -1405,7 +1403,7 @@ export default {
         summary: this.form.summary,
         contentMd: this.form.contentMd,
         categoryId: this.form.categoryId, // 文章分类
-        articleTags: this.form.articleTags, // 文章标签
+        tags: this.form.tags, // 文章标签
         authorId: this.form.authorId,
         seoTitle: this.form.seoTitle,
         seoKeywords: this.form.seoKeywords,
@@ -1419,7 +1417,7 @@ export default {
         sourceUrl: this.form.articleType === 1 ? '' : this.form.sourceUrl,
         commentFlag: this.form.commentFlag,
         coverImageType: this.form.coverImageType,
-        articleImages: this.form.articleImages,
+        coverImages: this.form.coverImages,
         wordsCount: this.totalCount,
         publishTime: this.form.publishTime || null
       }
@@ -1677,11 +1675,9 @@ export default {
         return
       }
 
-      this.form.publishTime =
-        this.publishDateTime
+      this.form.publishTime = this.publishDateTime
 
-      const param =
-        this.buildSubmitData()
+      const param = this.buildSubmitData()
 
       /*
        * 新表中的定时发布建议由：
@@ -1706,9 +1702,7 @@ export default {
         })
     },
 
-    /**
-     * 发布文章。
-     */
+    // 发布文章
     publishArticle() {
       if (!this.validateBasicInfo()) {
         return
@@ -1720,6 +1714,7 @@ export default {
         }
 
         const param = this.buildSubmitData()
+        console.log('param', param)
 
         let request
         this.submitLoading = true
@@ -1735,7 +1730,7 @@ export default {
 
         request.then(() => {
           this.oldContent = this.form.contentMd
-          this.publishSuccess()
+          // this.publishSuccess()
         }).finally(() => {
           this.submitLoading = false
         })
@@ -1849,31 +1844,22 @@ export default {
         slug: '',
         summary: '',
         contentMd: '',
-
         categoryId: '',
         authorId: '',
-
         seoTitle: '',
         seoKeywords: '',
         seoDescription: '',
-
         articleType: 1,
         articleStatus: 1,
-
         articlePerm: 1,
         accessPassword: '',
-
         sourceName: '',
         sourceAuthor: '',
         sourceUrl: '',
-
         commentFlag: true,
-
         coverImageType: 1,
-        articleImages: [],
-
-        articleTags: [],
-
+        coverImages: [],
+        tags: [],
         publishTime: ''
       }
 

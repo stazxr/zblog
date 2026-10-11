@@ -1,5 +1,8 @@
 package com.github.stazxr.zblog.content.domain.dto;
 
+import com.github.stazxr.zblog.bas.validation.group.Create;
+import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -25,25 +28,29 @@ public class ArticleDto implements Serializable {
     /**
      * 文章ID
      */
+    @NotNull(groups = {Create.class, Update.class}, message = "{TECH_PARAM_MISS}")
     @ApiModelProperty(value = "文章ID")
     private Long id;
 
     /**
      * 文章标题
      */
+    @NotBlank(groups = {Create.class, Update.class}, message = "{ARTICLE_TITLE_REQUIRED}")
     @ApiModelProperty(value = "文章标题", required = true)
     private String title;
 
     /**
      * 路径标识
      */
+    @NotBlank(groups = {Create.class, Update.class}, message = "{ARTICLE_SLUG_REQUIRED}")
     @ApiModelProperty(value = "路径标识", required = true)
     private String slug;
 
     /**
-     * 文章概要
+     * 文章摘要
      */
-    @ApiModelProperty(value = "文章概要")
+    @NotBlank(groups = {Create.class, Update.class}, message = "{ARTICLE_SUMMARY_REQUIRED}")
+    @ApiModelProperty(value = "文章摘要")
     private String summary;
 
     /**
@@ -53,14 +60,9 @@ public class ArticleDto implements Serializable {
     private String contentMd;
 
     /**
-     * 分类ID
-     */
-    @ApiModelProperty(value = "分类ID", required = true)
-    private Long categoryId;
-
-    /**
      * 封面类型
      */
+    @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_COVER_IMAGE_TYPE_REQUIRED}")
     @ApiModelProperty(value = "封面类型", required = true)
     private Integer coverImageType;
 
@@ -68,7 +70,64 @@ public class ArticleDto implements Serializable {
      * 封面图片列表
      */
     @ApiModelProperty(value = "封面图片")
-    private List<String> articleImages;
+    private List<UploadFileDto> coverImages;
+
+    /**
+     * 分类ID
+     */
+    @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_CATEGORY_ID_REQUIRED}")
+    @ApiModelProperty(value = "分类ID", required = true)
+    private Long categoryId;
+
+    /**
+     * 文章标签列表
+     */
+    @ApiModelProperty(value = "文章标签列表")
+    private List<String> tags;
+
+    /**
+     * 文章类型
+     */
+    @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_TYPE_REQUIRED}")
+    @ApiModelProperty(value = "文章类型", required = true)
+    private Integer articleType;
+
+    /**
+     * 文章来源名称
+     */
+    @ApiModelProperty(value = "文章来源名称")
+    private String sourceName;
+
+    /**
+     * 原作者
+     */
+    @ApiModelProperty(value = "原作者")
+    private String sourceAuthor;
+
+    /**
+     * 原文地址
+     */
+    @ApiModelProperty(value = "原文地址")
+    private String sourceUrl;
+
+    /**
+     * 文章权限
+     */
+    @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_PERM_REQUIRED}")
+    @ApiModelProperty(value = "文章权限", required = true)
+    private Integer articlePerm;
+
+    /**
+     * 访问密码
+     */
+    @ApiModelProperty(value = "访问密码")
+    private String accessPassword;
+
+    /**
+     * 是否允许评论
+     */
+    @ApiModelProperty(value = "是否允许评论", example = "true")
+    private Boolean commentFlag;
 
     /**
      * SEO标题
@@ -101,59 +160,6 @@ public class ArticleDto implements Serializable {
 
 
 
-
-
-
-    /**
-     * 作者ID
-     */
-    @ApiModelProperty(value = "作者ID", example = "1")
-    private Long authorId;
-
-    /**
-     * 文章类型
-     */
-    @ApiModelProperty(value = "文章类型", required = true)
-    private Integer articleType;
-
-    /**
-     * 文章权限
-     * <p>
-     * 1-公开；2-私密；3-密码
-     */
-    @ApiModelProperty(value = "文章权限：1-公开；2-私密；3-密码", required = true)
-    private Integer articlePerm;
-
-    /**
-     * 访问密码
-     */
-    @ApiModelProperty(value = "访问密码")
-    private String accessPassword;
-
-    /**
-     * 文章来源名称
-     */
-    @ApiModelProperty(value = "文章来源名称")
-    private String sourceName;
-
-    /**
-     * 原作者
-     */
-    @ApiModelProperty(value = "原作者")
-    private String sourceAuthor;
-
-    /**
-     * 原文地址
-     */
-    @ApiModelProperty(value = "原文地址")
-    private String sourceUrl;
-
-    /**
-     * 是否允许评论
-     */
-    @ApiModelProperty(value = "是否允许评论", example = "true")
-    private Boolean commentFlag;
-
     /**
      * 发布时间
      * <p>
@@ -161,10 +167,4 @@ public class ArticleDto implements Serializable {
      */
     @ApiModelProperty(value = "发布时间", example = "2026-09-15 10:00:00")
     private String publishTime;
-
-    /**
-     * 扩展字段
-     */
-    @ApiModelProperty(value = "扩展字段")
-    private String extraInfo;
 }

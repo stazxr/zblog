@@ -10,7 +10,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
  * @author SunTao
  * @since 2024-10-21
  */
-public class PingYinUtil {
+public final class PingYinUtils {
     /**
      * 将汉字转换为拼音
      *

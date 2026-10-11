@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleTagMapper">
+    <delete id="deleteByArticleIdSoft">
+        UPDATE article_tag_relation SET DELETED = 1 WHERE ARTICLE_ID = #{articleId} AND DELETED = 0
+    </delete>
+
+    <delete id="deleteByArticleIdHard">
+        DELETE FROM article_tag_relation WHERE ARTICLE_ID = #{articleId} AND DELETED = 0
+    </delete>
+</mapper>

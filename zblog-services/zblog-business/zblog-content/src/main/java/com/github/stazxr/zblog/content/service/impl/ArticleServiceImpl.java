@@ -3,20 +3,51 @@ package com.github.stazxr.zblog.content.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
+import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
+import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
+import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
+import com.github.stazxr.zblog.base.domain.entity.FileRelation;
+import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
+import com.github.stazxr.zblog.base.mapper.FileMapper;
+import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
+import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Article;
+import com.github.stazxr.zblog.content.domain.entity.ArticleImageRelation;
+import com.github.stazxr.zblog.content.domain.entity.ArticleTagRelation;
+import com.github.stazxr.zblog.content.domain.entity.Tag;
+import com.github.stazxr.zblog.content.domain.enums.ArticleCoverImageType;
+import com.github.stazxr.zblog.content.domain.enums.ArticleType;
+import com.github.stazxr.zblog.content.domain.enums.ServiceUploadBusinessType;
 import com.github.stazxr.zblog.content.domain.error.ArticleErrorCode;
 import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.mapper.ArticleImageMapper;
 import com.github.stazxr.zblog.content.mapper.ArticleMapper;
+import com.github.stazxr.zblog.content.mapper.ArticleTagMapper;
+import com.github.stazxr.zblog.content.mapper.TagMapper;
 import com.github.stazxr.zblog.content.service.ArticleService;
+import com.github.stazxr.zblog.util.SlugUtils;
 import com.github.stazxr.zblog.util.StringUtils;
+import com.github.stazxr.zblog.util.collection.CollectionUtils;
+import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
+import com.github.stazxr.zblog.util.io.FileUtils;
+import com.github.stazxr.zblog.util.math.MathUtils;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileInputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 文章管理业务实现层
@@ -27,6 +58,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+    private static final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
+
+    private final TagMapper tagMapper;
+
+    private final ArticleTagMapper articleTagMapper;
+
+    private final ArticleImageMapper articleImageMapper;
+
+    private final FileMapper fileMapper;
+
+    private final FileRelationMapper fileRelationMapper;
+
+    private final FileService fileService;
+
     /**
      * 分页查询我的文章列表
      *
@@ -77,7 +122,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addArticle(ArticleDto articleDto) {
-
+        // 标签校验
+        checkArticleTags(articleDto.getId(), articleDto.getTags());
+        // 封面校验
+        checkArticleCoverImages(articleDto.getId(), articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
+        // 文章类型校验
+        checkArticleType(articleDto);
     }
 
     /**
@@ -91,23 +141,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     }
 
-
-//    /**
-//     * 多封面最多支持上传四个封面
-//     */
-//    private static final int MAX_ARTICLE_IMG_SIZE = 4;
-//
-//    private final FileService fileService;
-//
-//    private final ArticleConverter articleConverter;
-//
-//    private final ArticleTagMapper articleTagMapper;
-//
-//    private final ArticleImgRelationMapper articleImgRelationMapper;
-//
-//    private final ArticleTagRelationMapper articleTagRelationMapper;
-//
-//    private final WebSettingMapper webSettingMapper;
 //
 //    /**
 //     * 分页查询用户的文章列表
@@ -465,10 +498,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        // 封面校验
 //        articleImgConfig(articleDto);
 //
-//        // 标签校验，自定义标签入库，文章关键字生成
-//        List<String> tags = articleDto.getArticleTag();
-//        Assert.isTrue(tags == null || tags.size() == 0, "文章标签不能为空");
-//        articleTagConfig(articleDto);
 //    }
 //
 //    private String checkDraftInfo(ArticleDto articleDto) {
@@ -503,7 +532,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        // 标签校验，自定义标签入库，文章关键字生成
 //        List<String> tags = articleDto.getArticleTag();
 //        if (tags != null && tags.size() != 0) {
-//            articleTagConfig(articleDto);
+//            checkArticleTagConfig(articleDto);
 //        }
 //
 //        return saveTime;
@@ -548,7 +577,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        // 标签校验，自定义标签入库，文章关键字生成
 //        List<String> tags = articleDto.getArticleTag();
 //        Assert.isTrue(tags == null || tags.size() == 0, "文章标签不能为空");
-//        articleTagConfig(articleDto);
+//        checkArticleTagConfig(articleDto);
 //
 //        // 返回发布毫秒数
 //        return (int) delay;
@@ -568,123 +597,174 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        // 检查文章是否已经被删除
 //        DataValidated.isTrue(ArticleStatus.RECYCLE.getType().equals(dbInfo.getArticleStatus()), "文章处于回收站中，不允许编辑，请先把文章移动到草稿箱在进行编辑");
 //    }
-//
-//    private void articleImgConfig(ArticleDto articleDto) {
-//        Set<Long> fileIds = new HashSet<>();
-//        List<File> files = articleDto.getArticleImg();
-//        Integer imageType = articleDto.getCoverImageType();
-//        if (ArticleImgType.SINGLE.getType().equals(imageType)) {
-//            // 单封面
-//            Assert.isTrue(files == null || files.size() == 0, "文章封面不能为空");
-//            fileIds.add(files.get(0).getId());
-//        } else if (ArticleImgType.MULTI.getType().equals(imageType)) {
-//            // 多封面
-//            Assert.isTrue(files == null || files.size() == 0, "文章封面不能为空");
-//            if (files.size() == 1) {
-//                // 只上传了一个封面则视为单封面
-//                articleDto.setCoverImageType(ArticleImgType.SINGLE.getType());
-//                fileIds.add(files.get(0).getId());
-//            } else {
-//                for (int i = 0; i < files.size() && i < MAX_ARTICLE_IMG_SIZE; i++) {
-//                    fileIds.add(files.get(i).getId());
-//                }
-//            }
-//        } else if (ArticleImgType.AUTO_GENERATE.getType().equals(imageType)) {
-//            // 自动生成封面
-//            File newFile = autoGenerateArticleImg(articleDto.getTitle());
-//            fileIds.add(newFile.getId());
-//        } else {
-//            // 默认封面、无封面、未传参（草稿）
-//            if (files != null && files.size() != 0) {
-//                // 删除图片
-//                files.forEach(file -> fileService.deleteFile(file.getId()));
-//            }
-//        }
-//
-//        // 物理删除中间数据
-//        articleImgRelationMapper.deleteByArticleId(articleDto.getId());
-//
-//        if (fileIds.size() != 0) {
-//            for (Long fileId : fileIds) {
-//                // 插入新的中间数据
-//                ArticleImgRelation relation = new ArticleImgRelation();
-//                relation.setArticleId(articleDto.getId());
-//                relation.setFileId(fileId);
-//                articleImgRelationMapper.insert(relation);
-//            }
-//        }
-//    }
-//
-//    private File autoGenerateArticleImg(String title) {
-//        try {
-//            // 本地生成封面
-//            String filePath = ImageBuilderUtils.buildFontImage(title, FileUtils.SYS_TEM_DIR);
-//
-//            // 上传至服务器
-//            java.io.File file = new java.io.File(filePath);
-//            FileInputStream fileInputStream = new FileInputStream(filePath);
-//            MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), null, fileInputStream);
-//            MultipartFile[] files = new MultipartFile[] {multipartFile};
-//
-//            int fileUploadType = fileService.getFileUploadModel();
-//            FileHandler fileHandler = FileHandlerEnum.instance(fileUploadType);
-//            List<FileInfo> fileList = new ArrayList<>();
-//            // List<File> insertFile = fileService.insertFile(UploadFileType.NORMAL.getType(), fileList);
-//            // return insertFile.get(0);
-//        } catch (Exception e) {
-//            // throw new ServiceException("封面自动生成失败，请选择其他封面类型", e);
-//        }
-//        return null;
-//    }
-//
-//    private void articleTagConfig(ArticleDto articleDto) {
-//        Set<Long> tagIds = new HashSet<>();
-//        StringBuilder keywords = new StringBuilder();
-//        for (String tag : articleDto.getArticleTag()) {
-//            if (MathUtils.isPositiveInteger(tag)) {
-//                Long tagId = Long.parseLong(tag);
-//                ArticleTag articleTag = articleTagMapper.selectById(tagId);
-//                if (articleTag != null) {
-//                    // 已有标签
-//                    tagIds.add(tagId);
-//                    keywords.append(articleTag.getName()).append(",");
-//                    continue;
-//                }
-//            }
-//
-//            // 自定义标签，或根据ID查询标签不存在
-//            ArticleTag articleTag = articleTagMapper.selectByTagName(tag);
-//            if (articleTag != null) {
-//                // 标签名称已存在，不需要再创建
-//                tagIds.add(articleTag.getId());
-//                keywords.append(articleTag.getName()).append(",");
-//            } else {
-//                // 创建自定义标签
-//                ArticleTag customTag = new ArticleTag();
-//                Long customTagId = SequenceUtils.getId();
-//                customTag.setId(customTagId);
-//                customTag.setName(tag);
-//                customTag.setType(ArticleTagType.CUSTOM.getType());
-//                customTag.setEnabled(true);
-//                articleTagMapper.insert(customTag);
-//
-//                tagIds.add(customTagId);
-//                keywords.append(tag).append(",");
-//            }
-//        }
-//
-//        // 设置关键字
-//        articleDto.setKeywords(keywords.length() > 0 ? keywords.substring(0, keywords.length() - 1) : "");
-//
-//        // 物理删除中间数据
-//        articleTagRelationMapper.deleteByArticleId(articleDto.getId());
-//
-//        for (Long tagId : tagIds) {
-//            // 插入新的中间数据
-//            ArticleTagRelation relation = new ArticleTagRelation();
-//            relation.setArticleId(articleDto.getId());
-//            relation.setTagId(tagId);
-//            articleTagRelationMapper.insert(relation);
-//        }
-//    }
+
+    private void checkArticleTags(Long articleId, List<String> tags) {
+        ThrowUtils.throwIf(tags == null || tags.size() == 0, ArticleErrorCode.EARTIA001);
+
+        Set<Long> tagIds = new HashSet<>();
+        for (String tagIdOrName : tags) {
+            if (MathUtils.isPositiveInteger(tagIdOrName)) {
+                Long tagId = Long.parseLong(tagIdOrName);
+                Tag tag = tagMapper.selectById(tagId);
+                if (tag != null) {
+                    // 已有标签
+                    tagIds.add(tagId);
+                    continue;
+                }
+            }
+
+            // 自定义标签，根据标签名称查询标签不存在
+            Tag tag = tagMapper.selectByTagName(tagIdOrName);
+            if (tag != null) {
+                // 标签名称已存在，不需要再创建
+                tagIds.add(tag.getId());
+            } else {
+                // 创建自定义标签
+                String slug = SlugUtils.toSlug(tagIdOrName);
+                String _slug = slug;
+                Tag tagBySlug = tagMapper.selectByTagSlug(_slug);
+                int count = 1;
+                while (tagBySlug != null) {
+                    _slug = slug + "-" + count++;
+                    tagBySlug = tagMapper.selectByTagSlug(_slug);
+                }
+
+                Tag customTag = new Tag();
+                Long customTagId = SequenceUtils.getId();
+                customTag.setId(customTagId);
+                customTag.setName(tagIdOrName);
+                customTag.setSlug(_slug);
+                customTag.setSeoSearch(false);
+                customTag.setEnabled(true);
+                tagMapper.insert(customTag);
+                tagIds.add(customTagId);
+            }
+        }
+
+        // 物理删除中间数据
+        articleTagMapper.deleteByArticleIdHard(articleId);
+
+        // 插入新的中间数据
+        for (Long tagId : tagIds) {
+            ArticleTagRelation relation = new ArticleTagRelation();
+            relation.setArticleId(articleId);
+            relation.setTagId(tagId);
+            relation.setDeleted(false);
+            articleTagMapper.insert(relation);
+        }
+    }
+
+    private void checkArticleCoverImages(Long articleId, String title, Integer coverImageType, List<UploadFileDto> coverImages) {
+        if (ArticleCoverImageType.DEFAULT.getValue().equals(coverImageType)) {
+            removeArticleCoverImages(articleId, coverImages);
+            return;
+        }
+        if (ArticleCoverImageType.SINGLE.getValue().equals(coverImageType)) {
+            ThrowUtils.throwIf(CollectionUtils.isEmpty(coverImages), ArticleErrorCode.EARTIA003);
+            UploadFileDto uploadFile = coverImages.get(0);
+            insertArticleCoverImage(articleId, uploadFile);
+
+            // 删除多余上传的封面
+            if (coverImages.size() > 1) {
+                for (int i = 1; i < coverImages.size(); i++) {
+                    UploadFileDto uploadFileDto = coverImages.get(i);
+                    fileMapper.deleteById(uploadFileDto.getFileId());
+                }
+            }
+            return;
+        }
+        if (ArticleCoverImageType.MULTIPLE.getValue().equals(coverImageType)) {
+            // TODO 最大上传数量待客户化
+            ThrowUtils.throwIf(CollectionUtils.isEmpty(coverImages), ArticleErrorCode.EARTIA003);
+            insertArticleCoverImages(articleId, coverImages);
+            return;
+        }
+        if (ArticleCoverImageType.RANDOM.getValue().equals(coverImageType)) {
+            removeArticleCoverImages(articleId, coverImages);
+            return;
+        }
+        if (ArticleCoverImageType.TITLE.getValue().equals(coverImageType)) {
+            removeArticleCoverImages(articleId, coverImages);
+            UploadFileVo uploadFileVo = generateArticleCoverImageByTitle(title);
+            UploadFileDto uploadFile = new UploadFileDto();
+            uploadFile.setFileId(uploadFileVo.getFileId());
+            uploadFile.setFileAccessUrl(uploadFileVo.getFileAccessUrl());
+            insertArticleCoverImage(articleId, uploadFile);
+            return;
+        }
+        if (ArticleCoverImageType.NONE.getValue().equals(coverImageType)) {
+            removeArticleCoverImages(articleId, coverImages);
+        }
+    }
+
+    private void checkArticleType(ArticleDto articleDto) {
+        if (ArticleType.ORIGINAL.getType().equals(articleDto.getArticleType())) {
+            articleDto.setSourceName(null);
+            articleDto.setSourceAuthor(null);
+            articleDto.setSourceUrl(null);
+        } else {
+            ThrowUtils.throwIfBlank(articleDto.getSourceUrl(), ArticleErrorCode.EARTIA004);
+        }
+    }
+
+    private void insertArticleCoverImage(Long articleId, UploadFileDto uploadFile) {
+        articleImageMapper.deleteByArticleId(articleId);
+        ArticleImageRelation articleImageRelation = new ArticleImageRelation();
+        articleImageRelation.setArticleId(articleId);
+        articleImageRelation.setArticleImage(uploadFile.getFileAccessUrl());
+        articleImageMapper.insert(articleImageRelation);
+
+        fileRelationMapper.deleteByBusinessInfo(articleId, ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+        FileRelation fileRelation = new FileRelation();
+        fileRelation.setFileId(articleId);
+        fileRelation.setBusinessId(uploadFile.getFileId());
+        fileRelation.setBusinessType(ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+        fileRelationMapper.insert(fileRelation);
+    }
+
+    private void insertArticleCoverImages(Long articleId, List<UploadFileDto> coverImages) {
+        articleImageMapper.deleteByArticleId(articleId);
+        fileRelationMapper.deleteByBusinessInfo(articleId, ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+
+        for (UploadFileDto coverImage : coverImages) {
+            ArticleImageRelation articleImageRelation = new ArticleImageRelation();
+            articleImageRelation.setArticleId(articleId);
+            articleImageRelation.setArticleImage(coverImage.getFileAccessUrl());
+            articleImageMapper.insert(articleImageRelation);
+
+            FileRelation fileRelation = new FileRelation();
+            fileRelation.setFileId(articleId);
+            fileRelation.setBusinessId(coverImage.getFileId());
+            fileRelation.setBusinessType(ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+            fileRelationMapper.insert(fileRelation);
+        }
+    }
+
+    private void removeArticleCoverImages(Long articleId, List<UploadFileDto> coverImages) {
+        articleImageMapper.deleteByArticleId(articleId);
+        fileRelationMapper.deleteByBusinessInfo(articleId, ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+        if (coverImages != null && coverImages.size() > 0) {
+            for (UploadFileDto coverImage : coverImages) {
+                fileMapper.deleteById(coverImage.getFileId());
+            }
+        }
+    }
+
+    private UploadFileVo generateArticleCoverImageByTitle(String title) {
+        try {
+            // 本地生成封面
+            String filePath = ImageBuilderUtils.buildFontImage(title, FileUtils.SYS_TEM_DIR);
+
+            // 上传至服务器
+            java.io.File file = new java.io.File(filePath);
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), "image/webp", fileInputStream);
+
+            List<UploadFileVo> uploadFileVoList = fileService.uploadFile(multipartFile, null);
+            return uploadFileVoList.get(0);
+        } catch (Exception e) {
+            log.error("generateArticleCoverImageByTitle error: {}", title, e);
+            throw new ServiceException(ArticleErrorCode.EARTIA002);
+        }
+    }
 }

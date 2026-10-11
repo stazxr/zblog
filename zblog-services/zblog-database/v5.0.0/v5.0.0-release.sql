@@ -1081,6 +1081,24 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 -- 文章
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'zh-CN', '请选择文章状态标签', 'common'),
 ('ARTICLE_QUERY_TAG_STATUS_EMPTY', 'en-US', 'Article query param tagStatus cannot be blank', 'common'),
+('ARTICLE_TITLE_REQUIRED', 'zh-CN', '文章标题不能为空', 'common'),
+('ARTICLE_TITLE_REQUIRED', 'en-US', 'Article title cannot be blank', 'common'),
+('ARTICLE_SLUG_REQUIRED', 'zh-CN', '文章路径标识不能为空', 'common'),
+('ARTICLE_SLUG_REQUIRED', 'en-US', 'Article slug cannot be blank', 'common'),
+('ARTICLE_SUMMARY_REQUIRED', 'zh-CN', '文章摘要不能为空', 'common'),
+('ARTICLE_SUMMARY_REQUIRED', 'en-US', 'Article summary cannot be blank', 'common'),
+('ARTICLE_CATEGORY_ID_REQUIRED', 'zh-CN', '请选择文章分类', 'common'),
+('ARTICLE_CATEGORY_ID_REQUIRED', 'en-US', 'Article categoryId cannot be blank', 'common'),
+('ARTICLE_TYPE_REQUIRED', 'zh-CN', '请选择文章类型', 'common'),
+('ARTICLE_TYPE_REQUIRED', 'en-US', 'Article type cannot be blank', 'common'),
+('ARTICLE_PERM_REQUIRED', 'zh-CN', '请选择文章权限', 'common'),
+('ARTICLE_PERM_REQUIRED', 'en-US', 'Article perm cannot be blank', 'common'),
+('ARTICLE_COVER_IMAGE_TYPE_REQUIRED', 'zh-CN', '文章封面类型不能为空', 'common'),
+('ARTICLE_COVER_IMAGE_TYPE_REQUIRED', 'en-US', 'Article coverImageType cannot be blank', 'common'),
+('ARTICLE_COVER_IMAGE_REQUIRED', 'zh-CN', '请上传文章封面', 'common'),
+('ARTICLE_COVER_IMAGE_REQUIRED', 'en-US', 'Article coverImages cannot be blank', 'common'),
+('ARTICLE_SOURCE_URL_REQUIRED', 'zh-CN', '请填写原文地址', 'common'),
+('ARTICLE_SOURCE_URL_REQUIRED', 'en-US', 'Article sourceUrl cannot be blank', 'common'),
 -- 门户
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),
@@ -1653,7 +1671,7 @@ CREATE TABLE `article` (
   `ID` BIGINT UNSIGNED NOT NULL,
   `TITLE` VARCHAR(150) NOT NULL COMMENT '文章标题',
   `SLUG` VARCHAR(150) NOT NULL COMMENT '路径标识',
-  `SUMMARY` VARCHAR(250) COMMENT '文章概要',
+  `SUMMARY` VARCHAR(250) COMMENT '文章摘要',
   `CONTENT_MD` MEDIUMTEXT NOT NULL COMMENT '文章内容（Markdown）',
   `CONTENT_HTML` MEDIUMTEXT COMMENT '文章内容（HTML）',
   `CATEGORY_ID` BIGINT NOT NULL COMMENT '分类ID',
@@ -1692,12 +1710,12 @@ CREATE TABLE `article` (
 -- 对 TITLE 和 CONTENT_HTML 建立全文索引
 ALTER TABLE article ADD FULLTEXT INDEX idx_fulltext_article_title_content (`TITLE`, `CONTENT_MD`);
 
-/*Table structure for table `article_img_relation` */
-DROP TABLE IF EXISTS `article_img_relation`;
-CREATE TABLE `article_img_relation` (
+/*Table structure for table `article_image_relation` */
+DROP TABLE IF EXISTS `article_image_relation`;
+CREATE TABLE `article_image_relation` (
   `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
-  `FILE_ID` BIGINT NOT NULL COMMENT '文件编号',
-  UNIQUE KEY `KEY_ARTICLE_TAG` (`ARTICLE_ID`, `FILE_ID`)
+  `ARTICLE_IMAGE` VARCHAR(1000) NOT NULL COMMENT '文章封面地址',
+  UNIQUE KEY `uk_article_image_relation` (`ARTICLE_ID`, `ARTICLE_IMAGE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

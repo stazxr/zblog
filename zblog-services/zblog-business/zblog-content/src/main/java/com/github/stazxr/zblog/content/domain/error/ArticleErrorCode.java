@@ -9,8 +9,14 @@ import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
  * @since 2026-04-08
  */
 public enum ArticleErrorCode implements ErrorCode {
-    /**  */
-    EARTIA001("ARTICLE_QUERY_TAG_STATUS_EMPTY");
+    /** 文章状态标签不能为空 */
+    EARTIA001("ARTICLE_QUERY_TAG_STATUS_EMPTY"),
+    /** 封面自动生成失败，请选择其他封面类型 */
+    EARTIA002("ARTICLE_TITLE_GENERATE_ERROR"),
+    /** 请上传文章封面 */
+    EARTIA003("ARTICLE_COVER_IMAGE_REQUIRED"),
+    /** 请填写原文地址 */
+    EARTIA004("ARTICLE_SOURCE_URL_REQUIRED");
 
     private final String i18nKey;
 
