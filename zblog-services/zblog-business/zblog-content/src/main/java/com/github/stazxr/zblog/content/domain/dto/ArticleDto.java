@@ -86,6 +86,13 @@ public class ArticleDto implements Serializable {
     private List<String> tags;
 
     /**
+     * 是否允许评论
+     */
+    @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_COMMENT_FLAG_REQUIRED}")
+    @ApiModelProperty(value = "是否允许评论", example = "true")
+    private Boolean commentFlag;
+
+    /**
      * 文章类型
      */
     @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_TYPE_REQUIRED}")
@@ -124,12 +131,6 @@ public class ArticleDto implements Serializable {
     private String accessPassword;
 
     /**
-     * 是否允许评论
-     */
-    @ApiModelProperty(value = "是否允许评论", example = "true")
-    private Boolean commentFlag;
-
-    /**
      * SEO标题
      */
     @ApiModelProperty(value = "SEO标题")
@@ -147,23 +148,8 @@ public class ArticleDto implements Serializable {
     @ApiModelProperty(value = "SEO描述")
     private String seoDescription;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 发布时间
-     * <p>
-     * 定时发布时使用。
      */
     @ApiModelProperty(value = "发布时间", example = "2026-09-15 10:00:00")
     private String publishTime;

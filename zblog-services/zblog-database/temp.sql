@@ -17,45 +17,19 @@ INSERT INTO permission (ID, PID, PERM_NAME, PERM_TYPE, PERM_CODE, PERM_LEVEL, CO
 INSERT INTO permission (ID, PID, PERM_NAME, PERM_TYPE, PERM_CODE, PERM_LEVEL, COMPONENT_NAME, COMPONENT_PATH, ROUTER_PATH, ICON, SORT, CACHE, HIDDEN, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3570406762722893824, 3542329017187172352, '永久删除相册照片', 3, 'deleteAlbumPhotoForever', 3, null, null, null, '', 5431, null, null, null, 1, 0, 1, 'suntao', '2023-03-03 10:41:47', '2023-03-03', '', '');
 INSERT INTO permission (ID, PID, PERM_NAME, PERM_TYPE, PERM_CODE, PERM_LEVEL, COMPONENT_NAME, COMPONENT_PATH, ROUTER_PATH, ICON, SORT, CACHE, HIDDEN, ENABLED, DELETED, VERSION, CREATE_USER, CREATE_TIME, CREATE_DATE, UPDATE_USER, UPDATE_TIME) VALUES (3570406875776163840, 3542329017187172352, '恢复相册照片', 3, 'recoverAlbumPhoto', 3, null, null, null, '', 5432, null, null, null, 1, 0, 1, 'suntao', '2023-03-03 10:42:14', '2023-03-03', '', '');
 
-
-/*Table structure for table `article_content_draft_record` */
-DROP TABLE IF EXISTS `article_content_draft_record`;
-CREATE TABLE `article_content_draft_record` (
-                                                `ID` BIGINT(64) UNSIGNED NOT NULL,
-                                                `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-                                                `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
-                                                `COUNT` VARCHAR(200) DEFAULT NULL COMMENT '文章字数',
-                                                `CONTENT` TEXT NOT NULL COMMENT '文章内容: 65535 / 16,777,215',
-                                                `SAVE_TIME` VARCHAR(50) NOT NULL COMMENT '自动保存时间',
-                                                PRIMARY KEY (`ID`) USING BTREE,
-                                                KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
-
-CREATE TABLE article_content_draft_record (
-                                              `ID` BIGINT UNSIGNED NOT NULL,
-                                              `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
-                                              `REMARK` VARCHAR(250) NOT NULL DEFAULT '' COMMENT '文章概要',
-                                              `WORD_COUNT` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '文章字数',
-                                              `CONTENT` MEDIUMTEXT NOT NULL COMMENT '文章内容',
-                                              `SAVE_TIME` DATETIME NOT NULL COMMENT '自动保存时间',
-                                              PRIMARY KEY (ID),
-                                              KEY idx_article_id (ARTICLE_ID),
-                                              KEY idx_article_save_time (ARTICLE_ID, SAVE_TIME)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
-
 /*Table structure for table `article_auto_publish_timing` */
 DROP TABLE IF EXISTS `article_auto_publish_timing`;
 CREATE TABLE `article_auto_publish_timing` (
-                                               `ID` BIGINT(64) UNSIGNED NOT NULL,
-                                               `ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
-                                               `PUBLISH_TIME` DATETIME NOT NULL COMMENT '消息发布时间: yyyy-MM-dd HH:mm',
-                                               `PRODUCER_TIME` DATETIME NOT NULL COMMENT '消息生产时间: yyyy-MM-dd HH:mm:ss',
-                                               `CONSUMER_TIME` DATETIME NOT NULL DEFAULT '' COMMENT '消息消费时间: yyyy-MM-dd HH:mm:ss',
-                                               `CONSUMED` TINYINT(1) DEFAULT 0 COMMENT '消息是否被消费',
-                                               `VALID` TINYINT(1) DEFAULT 1 COMMENT '消息是否有效',
-                                               `DESCRIPTION` VARCHAR(100) DEFAULT NULL DEFAULT '' COMMENT '备注',
-                                               PRIMARY KEY (`ID`) USING BTREE,
-                                               KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
+`ID` BIGINT(64) UNSIGNED NOT NULL,
+`ARTICLE_ID` BIGINT(64) NOT NULL COMMENT '文章编号',
+`PUBLISH_TIME` DATETIME NOT NULL COMMENT '消息发布时间: yyyy-MM-dd HH:mm',
+`PRODUCER_TIME` DATETIME NOT NULL COMMENT '消息生产时间: yyyy-MM-dd HH:mm:ss',
+`CONSUMER_TIME` DATETIME NOT NULL DEFAULT '' COMMENT '消息消费时间: yyyy-MM-dd HH:mm:ss',
+`CONSUMED` TINYINT(1) DEFAULT 0 COMMENT '消息是否被消费',
+`VALID` TINYINT(1) DEFAULT 1 COMMENT '消息是否有效',
+`DESCRIPTION` VARCHAR(100) DEFAULT NULL DEFAULT '' COMMENT '备注',
+PRIMARY KEY (`ID`) USING BTREE,
+KEY `INDEX_KEY_ARTICLE_ID` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章自动发布状态记录表';
 
 DROP TABLE IF EXISTS `article_access_user`;

@@ -1089,6 +1089,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_SUMMARY_REQUIRED', 'en-US', 'Article summary cannot be blank', 'common'),
 ('ARTICLE_CATEGORY_ID_REQUIRED', 'zh-CN', '请选择文章分类', 'common'),
 ('ARTICLE_CATEGORY_ID_REQUIRED', 'en-US', 'Article categoryId cannot be blank', 'common'),
+('ARTICLE_COMMENT_FLAG_REQUIRED', 'zh-CN', '请选择文章是否开启评论', 'common'),
+('ARTICLE_COMMENT_FLAG_REQUIRED', 'en-US', 'Article commentFlag cannot be blank', 'common'),
 ('ARTICLE_TYPE_REQUIRED', 'zh-CN', '请选择文章类型', 'common'),
 ('ARTICLE_TYPE_REQUIRED', 'en-US', 'Article type cannot be blank', 'common'),
 ('ARTICLE_PERM_REQUIRED', 'zh-CN', '请选择文章权限', 'common'),
@@ -1717,6 +1719,21 @@ CREATE TABLE `article_image_relation` (
   `ARTICLE_IMAGE` VARCHAR(1000) NOT NULL COMMENT '文章封面地址',
   UNIQUE KEY `uk_article_image_relation` (`ARTICLE_ID`, `ARTICLE_IMAGE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章封面关联表';
+
+/*Table structure for table `article_content_draft_record` */
+DROP TABLE IF EXISTS `article_content_draft_record`;
+CREATE TABLE `article_content_draft_record` (
+  `ID` BIGINT UNSIGNED NOT NULL,
+  `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
+  `TITLE` VARCHAR(150) DEFAULT NULL COMMENT '文章标题',
+  `SLUG` VARCHAR(150) DEFAULT NULL COMMENT '路径标识',
+  `SUMMARY` VARCHAR(250) DEFAULT NULL COMMENT '文章摘要',
+  `CONTENT` MEDIUMTEXT NOT NULL COMMENT '文章内容（Markdown）',
+  `WORD_COUNT` INT NOT NULL COMMENT '文章字数',
+  `SAVE_TIME` VARCHAR(50) NOT NULL COMMENT '自动保存时间',
+  PRIMARY KEY (`ID`) USING BTREE,
+  KEY `idx_acdr_article_id` (`ARTICLE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

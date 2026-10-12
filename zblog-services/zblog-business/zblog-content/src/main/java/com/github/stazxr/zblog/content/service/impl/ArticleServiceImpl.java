@@ -14,29 +14,28 @@ import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.service.FileService;
+import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
-import com.github.stazxr.zblog.content.domain.entity.Article;
-import com.github.stazxr.zblog.content.domain.entity.ArticleImageRelation;
-import com.github.stazxr.zblog.content.domain.entity.ArticleTagRelation;
-import com.github.stazxr.zblog.content.domain.entity.Tag;
+import com.github.stazxr.zblog.content.domain.entity.*;
 import com.github.stazxr.zblog.content.domain.enums.ArticleCoverImageType;
 import com.github.stazxr.zblog.content.domain.enums.ArticleType;
 import com.github.stazxr.zblog.content.domain.enums.ServiceUploadBusinessType;
 import com.github.stazxr.zblog.content.domain.error.ArticleErrorCode;
+import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
-import com.github.stazxr.zblog.content.mapper.ArticleImageMapper;
-import com.github.stazxr.zblog.content.mapper.ArticleMapper;
-import com.github.stazxr.zblog.content.mapper.ArticleTagMapper;
-import com.github.stazxr.zblog.content.mapper.TagMapper;
+import com.github.stazxr.zblog.content.mapper.*;
 import com.github.stazxr.zblog.content.service.ArticleService;
+import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.SlugUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
+import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +64,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleTagMapper articleTagMapper;
 
     private final ArticleImageMapper articleImageMapper;
+
+    private final ArticleContentDraftRecordMapper articleContentDraftRecordMapper;
 
     private final FileMapper fileMapper;
 
@@ -141,7 +142,66 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     }
 
-//
+    /**
+     * 文章内容自动保存
+     *
+     * @param autoSaveDto 文章自动保存信息
+     * @return 自动保存时间
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String autoSaveArticleContent(ArticleAutoSaveDto autoSaveDto) {
+        try {
+            String saveTime = DateUtils.formatNow("yyyy-MM-dd HH:mm:ss");
+            if (autoSaveDto.getArticleId() != null && StringUtils.isNotBlank(autoSaveDto.getContent())) {
+                ArticleContentDraftRecord record = new ArticleContentDraftRecord();
+                record.setId(SequenceUtils.getId());
+                record.setArticleId(autoSaveDto.getArticleId());
+                record.setTitle(autoSaveDto.getTitle());
+                record.setSlug(autoSaveDto.getSlug());
+                record.setSummary(autoSaveDto.getSummary());
+                record.setContent(autoSaveDto.getContent());
+                record.setWordCount(autoSaveDto.getWordCount());
+                record.setSaveTime(saveTime);
+                articleContentDraftRecordMapper.insert(record);
+                return saveTime;
+            }
+        } catch (Exception e) {
+            log.error("文章内容自动保存功能异常", e);
+        }
+
+        return null;
+    }
+
+    /**
+     * 分页查询文章内容自动保存列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleAutoSaveVo>
+     */
+    @Override
+    public IPage<ArticleAutoSaveVo> queryAutoSaveArticleContentByPage(ArticleAutoSaveQueryDto queryDto) {
+        // 参数检查
+        queryDto.checkPage();
+        ThrowUtils.throwIfNull(queryDto.getArticleId(), BaseErrorCode.SCOREB001);
+
+        // 分页查询
+        Page<ArticleAutoSaveVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return articleContentDraftRecordMapper.selectAutoSaveArticleContentList(page, queryDto);
+    }
+
+    /**
+     * 查询文章内容自动保存详情
+     *
+     * @param recordId 保存记录id
+     * @return ArticleAutoSaveVo
+     */
+    @Override
+    public ArticleAutoSaveVo queryAutoSaveArticleContentById(Long recordId) {
+        ThrowUtils.throwIfNull(recordId, BaseErrorCode.SCOREB001);
+        return articleContentDraftRecordMapper.selectAutoSaveArticleContentById(recordId);
+    }
+
 //    /**
 //     * 分页查询用户的文章列表
 //     *
@@ -260,65 +320,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //    public ArticleVo queryLastArticleDraft() {
 //        Long authorId = SecurityUtils.getLoginId();
 //        return baseMapper.selectLastArticleDraft(authorId);
-//    }
-//
-//    /**
-//     * 文章内容自动保存
-//     *
-//     * @param articleDto 文章内容信息
-//     * @return saveTime
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public String autoSaveArticleContent(ArticleDto articleDto) {
-//        try {
-//            String saveTime = DateUtils.formatNow("yyyy-MM-dd HH:mm:ss");
-//            if (articleDto.getId() != null && StringUtils.isNotBlank(articleDto.getContent())) {
-//                ArticleTmpContentVo contentVo = new ArticleTmpContentVo();
-//                contentVo.setId(SequenceUtils.getId());
-//                contentVo.setArticleId(articleDto.getId());
-//                contentVo.setContent(articleDto.getContent());
-//                contentVo.setRemark(articleDto.getRemark());
-//                contentVo.setCount(articleDto.getExtend2());
-//                contentVo.setSaveTime(saveTime);
-//                baseMapper.insertArticleTmpContent(contentVo);
-//                return saveTime;
-//            }
-//        } catch (Exception e) {
-//            // 自动保存失败，回滚事务
-//            log.error("文章内容自动保存功能异常", e);
-//            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//        }
-//
-//        return null;
-//    }
-//
-//    /**
-//     * 分页查询文章内容自动保存列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticleTmpContentVoList
-//     */
-//    @Override
-//    public PageInfo<ArticleTmpContentVo> queryAutoSaveArticleContentByPage(ArticleQueryDto queryDto) {
-//        queryDto.checkPage();
-//        Assert.notNull(queryDto.getArticleId(), "参数【articleId】不能为空");
-//        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-//        return new PageInfo<>(baseMapper.selectAutoSaveArticleContentList(queryDto.getArticleId()));
-//    }
-//
-//    /**
-//     * 查询文章内容自动保存信息
-//     *
-//     * @param recordId 记录序列
-//     * @return ArticleTmpContentVo
-//     */
-//    @Override
-//    public ArticleTmpContentVo queryAutoSaveArticleContentById(Long recordId) {
-//        if (recordId != null) {
-//            return baseMapper.selectAutoSaveArticleContentById(recordId);
-//        }
-//        return null;
 //    }
 //
 //    /**

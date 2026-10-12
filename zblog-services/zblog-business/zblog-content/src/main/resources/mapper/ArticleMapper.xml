@@ -392,14 +392,6 @@
 <!--        SELECT ID, ARTICLE_STATUS, AUTHOR_ID, DELETED FROM article WHERE ID = #{articleId}-->
 <!--    </select>-->
 
-<!--    <select id="selectAutoSaveArticleContentList" resultType="com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo">-->
-<!--        SELECT ID, ARTICLE_ID, `COUNT`, SAVE_TIME FROM article_content_draft_record WHERE ARTICLE_ID = #{articleId} ORDER BY SAVE_TIME DESC-->
-<!--    </select>-->
-
-<!--    <select id="selectAutoSaveArticleContentById" resultType="com.github.stazxr.zblog.domain.vo.ArticleTmpContentVo">-->
-<!--        SELECT ID, ARTICLE_ID, REMARK, `COUNT`, CONTENT, SAVE_TIME FROM article_content_draft_record WHERE ID = #{recordId}-->
-<!--    </select>-->
-
 <!--    <select id="selectArticleByPublishId" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
 <!--        SELECT-->
 <!--            a.ID, a.TITLE, a.ARTICLE_STATUS-->

@@ -4,21 +4,20 @@
       <div class="demo-drawer__content">
         <el-table v-loading="tableLoading" :data="tableData" border style="width: 90%;margin: 0 5%">
           <el-table-column :show-overflow-tooltip="true" prop="id" label="记录编码" align="center" />
-          <el-table-column :show-overflow-tooltip="true" prop="count" label="字数" align="center" />
+          <el-table-column :show-overflow-tooltip="true" prop="wordCount" label="字数" align="center" />
           <el-table-column :show-overflow-tooltip="true" prop="saveTime" label="保存时间" align="center" />
           <el-table-column label="操作" align="center" width="150px">
-            <template slot-scope="scope">
+            <template v-slot="scope">
               <el-button-group>
-                <el-button type="info" size="mini" @click="previewContent(scope.row.id)">预览</el-button>
-                <el-button type="warning" size="mini" @click="regainContent(scope.row.id)">恢复</el-button>
+                <el-button type="info" @click="previewContent(scope.row.id)">预览</el-button>
+                <el-button type="warning" @click="regainContent(scope.row.id)">恢复</el-button>
               </el-button-group>
             </template>
           </el-table-column>
           <div slot="empty">
-            <el-empty />
+            <muses-empty />
           </div>
         </el-table>
-
         <div style="width: 90%;margin: 0 5%">
           <el-pagination
             :total="total"
@@ -30,9 +29,8 @@
             @current-change="pageChange"
           />
         </div>
-
         <div class="demo-drawer__footer">
-          <el-button @click="cancel">取 消</el-button>
+          <el-button @click="cancel">关 闭</el-button>
         </div>
       </div>
     </el-drawer>
@@ -85,11 +83,11 @@ export default {
         }
         this.tableLoading = true
         this.$mapi.article.queryAutoSaveArticleContentByPage(param).then(({ data }) => {
-          this.tableData = data.list
+          this.tableData = data.records
           this.total = data.total
         }).catch(_ => {
-          this.tableData = []
           this.total = 0
+          this.tableData = []
         }).finally(() => {
           this.tableLoading = false
         })
@@ -107,9 +105,6 @@ export default {
     },
     handleClose() {
       this.doClose()
-      // this.$confirm('确认关闭？').then(_ => {
-      //   this.doClose()
-      // }).catch(_ => {})
     },
     cancel() {
       this.handleClose()

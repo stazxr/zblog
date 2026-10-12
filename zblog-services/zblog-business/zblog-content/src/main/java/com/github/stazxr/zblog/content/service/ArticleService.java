@@ -2,9 +2,12 @@ package com.github.stazxr.zblog.content.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Article;
+import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
 
@@ -44,6 +47,29 @@ public interface ArticleService extends IService<Article> {
      */
     void editArticle(ArticleDto articleDto);
 
+    /**
+     * 文章内容自动保存
+     *
+     * @param autoSaveDto 文章自动保存信息
+     * @return 自动保存时间
+     */
+    String autoSaveArticleContent(ArticleAutoSaveDto autoSaveDto);
+
+    /**
+     * 分页查询文章内容自动保存列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleAutoSaveVo>
+     */
+    IPage<ArticleAutoSaveVo> queryAutoSaveArticleContentByPage(ArticleAutoSaveQueryDto queryDto);
+
+    /**
+     * 查询文章内容自动保存详情
+     *
+     * @param recordId 保存记录id
+     * @return ArticleAutoSaveVo
+     */
+    ArticleAutoSaveVo queryAutoSaveArticleContentById(Long recordId);
 
 
 //    /**
@@ -98,30 +124,6 @@ public interface ArticleService extends IService<Article> {
 //     * @return ArticleVo
 //     */
 //    ArticleVo queryLastArticleDraft();
-//
-//    /**
-//     * 文章内容自动保存
-//     *
-//     * @param articleDto 文章内容信息
-//     * @return saveTime
-//     */
-//    String autoSaveArticleContent(ArticleDto articleDto);
-//
-//    /**
-//     * 分页查询文章内容自动保存列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticleTmpContentVoList
-//     */
-//    PageInfo<ArticleTmpContentVo> queryAutoSaveArticleContentByPage(ArticleQueryDto queryDto);
-//
-//    /**
-//     * 查询文章内容自动保存信息
-//     *
-//     * @param recordId 记录序列
-//     * @return ArticleTmpContentVo
-//     */
-//    ArticleTmpContentVo queryAutoSaveArticleContentById(Long recordId);
 //
 //    /**
 //     * 文章定时发布

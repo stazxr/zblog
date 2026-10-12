@@ -145,22 +145,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
 //    Article selectOneWithDeleted(@Param("articleId") Long articleId);
 //
 //    /**
-//     * 分页查询文章内容自动保存列表
-//     *
-//     * @param articleId 文章序列
-//     * @return ArticleTmpContentVoList
-//     */
-//    List<ArticleTmpContentVo> selectAutoSaveArticleContentList(@Param("articleId") Long articleId);
-//
-//    /**
-//     * 查询文章内容自动保存信息
-//     *
-//     * @param recordId 记录序列
-//     * @return ArticleTmpContentVo
-//     */
-//    ArticleTmpContentVo selectAutoSaveArticleContentById(@Param("recordId") Long recordId);
-//
-//    /**
 //     * 删除文章自动发布的消息记录
 //     *
 //     * @param articleId 文章序列

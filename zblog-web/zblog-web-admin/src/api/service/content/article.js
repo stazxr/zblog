@@ -32,10 +32,20 @@ export default {
   saveArticleDraft: params => {
     return api.httpRequest().post(`${articleApi}/saveArticleDraft`, params)
   },
+
   // 文章内容自动保存
   autoSaveArticleContent: params => {
     return api.httpRequest().post(`${articleApi}/autoSaveArticleContent`, params)
   },
+  // 分页查询文章内容自动保存列表
+  queryAutoSaveArticleContentByPage: params => {
+    return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentByPage`, params)
+  },
+  // 查询文章内容自动保存详情
+  queryAutoSaveArticleContentById: params => {
+    return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentById`, params)
+  },
+
   // 文章自动发布
   publishArticleByTiming: params => {
     return api.httpRequest().post(`${articleApi}/publishArticleByTiming`, params)
@@ -43,14 +53,6 @@ export default {
   // 查询最新的文章草稿
   queryLastArticleDraft: params => {
     return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
-  },
-  // 分页查询文章内容自动保存列表
-  queryAutoSaveArticleContentByPage: params => {
-    return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentByPage`, params)
-  },
-  // 查询文章内容自动保存信息
-  queryAutoSaveArticleContentById: params => {
-    return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentById`, params)
   },
   // 删除文章：移动至回收站
   moveToRecycleBin: params => {

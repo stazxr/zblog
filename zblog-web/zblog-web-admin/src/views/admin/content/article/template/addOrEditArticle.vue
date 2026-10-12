@@ -7,9 +7,7 @@
           <div v-if="showRecentDraftFlag && recentDraft.id" class="recent-draft-box">
             <span class="icon-type">草稿</span>
             <p class="draft-title" :title="recentDraft.title">
-              <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">
-                {{ recentDraft.title }}
-              </a>
+              <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">{{ recentDraft.title }}</a>
             </p>
             <a class="draft-btn-edit" @click="openDraftPage(recentDraft.id)">继续编辑</a>
             <a class="draft-btn-more" @click="openMoreDraftPage">更多草稿</a>
@@ -18,21 +16,21 @@
 
           <!-- 标题 -->
           <div class="editor-title">
-            <input v-model.trim="form.title" placeholder="请输入文章标题" maxlength="150">
+            <input v-model.trim="formData.title" placeholder="请输入文章标题" maxlength="150">
           </div>
 
           <!-- Slug -->
           <div class="slug-row">
             <span class="slug-label">Slug：</span>
-            <el-input v-model.trim="form.slug" placeholder="用于生成文章 URL，例如 spring-boot-start" maxlength="150" clearable />
-            <el-button type="text" :disabled="!form.title" @click="generateSlug">自动生成</el-button>
+            <el-input v-model.trim="formData.slug" placeholder="用于生成文章 URL，例如 spring-boot-start" maxlength="150" clearable />
+            <el-button type="text" :disabled="!formData.title" @click="generateSlug">自动生成</el-button>
           </div>
 
           <!-- Markdown 编辑器 -->
           <div class="editor-text-area">
             <muses-markdown-editor
               ref="markdownEditor"
-              v-model="form.contentMd"
+              v-model="formData.contentMd"
               :height="650"
               :upload-image="uploadImage"
               :upload-video="uploadVideo"
@@ -45,11 +43,11 @@
           <!-- 编辑器底部操作 -->
           <div class="editor-content-opt">
             <div class="editor-content-opt-left">
-              <span v-if="saveDraftSpanShow" class="save-draft-span">草稿已保存 {{ saveDraftTime }}</span>
+              <span v-if="showAutoSaveStatus" class="save-draft-span">草稿已保存 {{ lastAutoSaveTime }}</span>
               <span>共 {{ totalCount }} 字</span>
             </div>
             <div class="editor-content-opt-right">
-              <el-button v-if="form.id" round @click="showContentRecord">编辑记录</el-button>
+              <el-button v-if="formData.id" round @click="showAutoSaveRecord">编辑记录</el-button>
               <el-button round :loading="draftLoading" @click="saveDraft">{{ draftBtnName }}</el-button>
               <el-button v-if="autoPublishBtnShow" round @click="openPublishArticleByTimingDialog">定时发布</el-button>
               <el-button type="danger" round :loading="submitLoading" @click="publishArticle">发布文章</el-button>
@@ -59,24 +57,24 @@
 
         <!-- 文章配置 -->
         <div class="editor-content-inner editor-content-config">
-          <el-form ref="articleForm" :model="form" :rules="rules" label-width="110px">
+          <el-form ref="articleForm" :model="formData" :rules="formRules" label-width="110px">
             <!-- 封面 -->
             <el-form-item label="文章封面：" prop="coverImageType">
-              <el-radio-group v-model="form.coverImageType">
+              <el-radio-group v-model="formData.coverImageType">
                 <el-radio v-for="item in coverImageTypeEnums" :key="item.value" :label="item.value" :disabled="item.disabled">
                   {{ item.name }}
                 </el-radio>
               </el-radio-group>
 
               <!-- 默认封面 -->
-              <div v-if="form.coverImageType === 1" class="form-tip">
+              <div v-if="formData.coverImageType === 1" class="form-tip">
                 使用网站配置的默认封面
               </div>
 
               <!-- 单封面 -->
-              <template v-if="form.coverImageType === 2">
+              <template v-if="formData.coverImageType === 2">
                 <div class="cover-img-box-flex">
-                  <div v-if="form.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                  <div v-if="formData.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                     <div class="cover-img">
                       <div class="cover-img-hover">
                         <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
@@ -86,7 +84,7 @@
                   <div v-else class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
-                        <img :src="form.coverImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
+                        <img :src="formData.coverImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
                         <span class="cover-img-close-icon" @click="removeCoverImg(form.coverImages[0], 0)">×</span>
                         <span class="cover-img-replace-icon" @click="replaceCoverImg(form.coverImages[0], 0)">替换</span>
                       </div>
@@ -99,16 +97,16 @@
               </template>
 
               <!-- 多封面 -->
-              <template v-if="form.coverImageType === 3">
+              <template v-if="formData.coverImageType === 3">
                 <div class="cover-img-box-flex cover-img-box-more">
-                  <div v-if="form.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
+                  <div v-if="formData.coverImages.length < maxUploadLimit" class="cover-img-box" @click="uploadCoverImg">
                     <div class="cover-img">
                       <div class="cover-img-hover">
                         <img :src="addArticleImageIcon" alt="" class="cover-img-add-icon">
                       </div>
                     </div>
                   </div>
-                  <div v-for="(articleImage, index) in form.coverImages" :key="articleImage.fileId" class="cover-img-box">
+                  <div v-for="(articleImage, index) in formData.coverImages" :key="articleImage.fileId" class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
                         <img :src="articleImage.fileAccessUrl" alt="" class="cover-img-img-icon">
@@ -118,23 +116,23 @@
                     </div>
                   </div>
                 </div>
-                <div v-if="form.coverImageType === 3" class="form-tip">
+                <div v-if="formData.coverImageType === 3" class="form-tip">
                   支持 JPG、JPEG、PNG、WebP，单张最大 5MB，建议尺寸 16:9，最多 {{ maxUploadLimit }} 张
                 </div>
               </template>
 
               <!-- 随机封面 -->
-              <div v-if="form.coverImageType === 4" class="form-tip">
+              <div v-if="formData.coverImageType === 4" class="form-tip">
                 从网站配置的封面中随机选择一张展示
               </div>
 
               <!-- 标题生成 -->
-              <div v-if="form.coverImageType === 5" class="form-tip">
+              <div v-if="formData.coverImageType === 5" class="form-tip">
                 根据文章标题自动生成封面
               </div>
 
               <!-- 无封面 -->
-              <div v-if="form.coverImageType === 6" class="form-tip">
+              <div v-if="formData.coverImageType === 6" class="form-tip">
                 不使用文章封面
               </div>
             </el-form-item>
@@ -142,7 +140,7 @@
             <!-- 摘要 -->
             <el-form-item label="文章摘要：" prop="summary">
               <el-input
-                v-model="form.summary"
+                v-model="formData.summary"
                 type="textarea"
                 resize="none"
                 :autosize="{ minRows: 5, maxRows: 5 }"
@@ -153,9 +151,18 @@
               <el-button round class="set-remark-btn" @click="generateSummary">一键提取</el-button>
             </el-form-item>
 
+            <!-- 评论 -->
+            <el-form-item label="评论设置：" prop="commentFlag">
+              <el-radio-group v-model="formData.commentFlag">
+                <el-radio v-for="item in commentEnums" :key="String(item.value)" :label="item.value">
+                  {{ item.name }}
+                </el-radio>
+              </el-radio-group>
+            </el-form-item>
+
             <!-- 文章类型 -->
             <el-form-item label="文章类型：" prop="articleType">
-              <el-radio-group v-model="form.articleType">
+              <el-radio-group v-model="formData.articleType">
                 <el-radio v-for="item in articleTypeEnums" :key="item.value" :label="item.value">
                   {{ item.name }}
                 </el-radio>
@@ -163,21 +170,21 @@
             </el-form-item>
 
             <!-- 转载信息 -->
-            <template v-if="form.articleType !== 1">
+            <template v-if="formData.articleType !== 1">
               <el-form-item label="来源名称：" prop="sourceName">
-                <el-input v-model.trim="form.sourceName" maxlength="100" placeholder="例如：掘金、公众号、个人博客" />
+                <el-input v-model.trim="formData.sourceName" maxlength="100" placeholder="例如：掘金、公众号、个人博客" />
               </el-form-item>
               <el-form-item label="原作者：" prop="sourceAuthor">
-                <el-input v-model.trim="form.sourceAuthor" maxlength="100" placeholder="请输入原作者" />
+                <el-input v-model.trim="formData.sourceAuthor" maxlength="100" placeholder="请输入原作者" />
               </el-form-item>
               <el-form-item label="原文地址：" prop="sourceUrl">
-                <el-input v-model.trim="form.sourceUrl" maxlength="1000" show-word-limit placeholder="请输入原文地址" />
+                <el-input v-model.trim="formData.sourceUrl" maxlength="1000" show-word-limit placeholder="请输入原文地址" />
               </el-form-item>
             </template>
 
             <!-- 分类 -->
             <el-form-item label="文章分类：" prop="categoryId">
-              <el-select v-model="form.categoryId" placeholder="请选择文章分类" clearable filterable style="width: 300px">
+              <el-select v-model="formData.categoryId" placeholder="请选择文章分类" clearable filterable style="width: 400px">
                 <el-option-group v-for="group in articleCategoryTree" :key="group.id" :label="group.name">
                   <el-option
                     v-for="item in group.children"
@@ -193,7 +200,7 @@
             <!-- 标签 -->
             <el-form-item label="文章标签：">
               <el-select
-                v-model="form.tags"
+                v-model="formData.tags"
                 placeholder="请选择文章标签"
                 multiple
                 :multiple-limit="3"
@@ -213,160 +220,132 @@
               </span>
             </el-form-item>
 
-            <!-- 访问权限 -->
-            <el-form-item label="访问权限：" prop="articlePerm">
-              <el-radio-group v-model="form.articlePerm">
-                <el-radio v-for="item in articlePermEnums" :key="item.value" :label="item.value">
-                  {{ item.name }}
-                </el-radio>
-              </el-radio-group>
-              <div class="form-tip">
-                不同访问权限需要配置对应的访问条件
+            <!-- 高级配置：文章访问权限 -->
+            <el-card class="article-config-card access-config-card" shadow="never">
+              <div slot="header" class="config-card-header">
+                <div class="config-card-title">高级配置</div>
+                <div class="config-card-description">设置文章的访问范围及访问条件</div>
               </div>
-            </el-form-item>
 
-            <!-- 公众号验证 -->
-            <template v-if="form.articlePerm === 4">
-              <el-form-item label="验证方式：" prop="verifyType">
-                <el-radio-group v-model="form.verifyType">
-                  <el-radio :label="1">公众号验证码</el-radio>
+              <el-form-item label="访问权限：" prop="articlePerm">
+                <el-radio-group v-model="formData.articlePerm">
+                  <el-radio v-for="item in articlePermEnums" :key="item.value" :label="item.value" :disabled="item.disabled">
+                    {{ item.name }}
+                  </el-radio>
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item label="验证码有效期：" prop="verifyExpireMinutes">
-                <el-input-number
-                  v-model="form.verifyExpireMinutes"
-                  :min="1"
-                  :max="1440"
-                  controls-position="right"
-                />
-                <span class="form-unit">分钟</span>
+              <!-- 公众号验证 -->
+              <!-- <template v-if="formData.articlePerm === 4">
+                <el-form-item label="验证方式：" prop="verifyType">
+                  <el-radio-group v-model="formData.verifyType">
+                    <el-radio :label="1">公众号验证码</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+
+                <el-form-item label="验证码有效期：" prop="verifyExpireMinutes">
+                  <el-input-number
+                    v-model="formData.verifyExpireMinutes"
+                    :min="1"
+                    :max="1440"
+                    controls-position="right"
+                  />
+                  <span class="form-unit">分钟</span>
+                </el-form-item>
+                <el-form-item label="验证提示：" prop="verifyHint">
+                  <el-input
+                    v-model="formData.verifyHint"
+                    type="textarea"
+                    :rows="3"
+                    maxlength="500"
+                    show-word-limit
+                    placeholder="请输入访问验证提示"
+                    style="width: 450px"
+                  />
+                </el-form-item>
+              </template> -->
+
+              <!-- 密码 -->
+              <!-- <template v-if="formData.articlePerm === 5">
+                <el-form-item label="访问密码：" prop="accessPassword">
+                  <el-input
+                    v-model="formData.accessPassword"
+                    type="password"
+                    maxlength="20"
+                    show-password
+                    placeholder="请输入文章访问密码"
+                    style="width: 300px"
+                  />
+                  <div class="form-tip">
+                    访问者需要输入正确密码后才能查看文章
+                  </div>
+                </el-form-item>
+              </template> -->
+
+              <!-- 付费访问 -->
+              <!-- <template v-if="formData.articlePerm === 6">
+                <el-form-item label="文章售价：" prop="payPrice">
+                  <el-input v-model="formData.payPrice" maxlength="10" placeholder="请输入文章售价" style="width: 200px">
+                    <template slot="append">元</template>
+                  </el-input>
+                </el-form-item>
+                <el-form-item label="购买有效期：" prop="payValidType">
+                  <el-radio-group v-model="formData.payValidType">
+                    <el-radio :label="1">永久有效</el-radio>
+                    <el-radio :label="2">限时有效</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="formData.payValidType === 2" label="有效天数：" prop="payValidDays">
+                  <el-input-number v-model="formData.payValidDays" :min="1" :max="3650" controls-position="right" />
+                  <span class="form-unit">天</span>
+                </el-form-item>
+              </template> -->
+
+              <!-- 指定用户 -->
+              <!-- <template v-if="formData.articlePerm === 7">
+                <el-form-item label="授权用户：" prop="accessUsers">
+                  <div class="access-user-list">
+                    <el-tag
+                      v-for="user in formData.accessUsers"
+                      :key="user.userId"
+                      closable
+                      @close="removeAccessUser(user.userId)"
+                    >
+                      {{ user.nickname }}
+                    </el-tag>
+                    <el-button type="text" icon="el-icon-plus" @click="openUserSelector">
+                      添加用户
+                    </el-button>
+                  </div>
+                </el-form-item>
+              </template> -->
+            </el-card>
+
+            <!-- SEO 配置 -->
+            <el-card class="article-config-card seo-config-card" shadow="never">
+              <div slot="header" class="config-card-header">
+                <div class="config-card-title">SEO 配置</div>
+                <div class="config-card-description">设置搜索引擎使用的标题、关键词和描述</div>
+              </div>
+
+              <el-form-item label="SEO 标题：">
+                <el-input v-model.trim="formData.seoTitle" maxlength="255" show-word-limit placeholder="留空时使用文章标题" />
               </el-form-item>
-              <el-form-item label="验证提示：" prop="verifyHint">
+              <el-form-item label="SEO 关键词：">
+                <el-input v-model.trim="formData.seoKeywords" maxlength="255" show-word-limit placeholder="多个关键词使用英文逗号分隔" />
+              </el-form-item>
+              <el-form-item label="SEO 描述：">
                 <el-input
-                  v-model="form.verifyHint"
+                  v-model="formData.seoDescription"
                   type="textarea"
-                  :rows="3"
+                  resize="none"
+                  :autosize="{ minRows: 3, maxRows: 5 }"
                   maxlength="500"
                   show-word-limit
-                  placeholder="请输入访问验证提示"
-                  style="width: 450px"
+                  placeholder="请输入 SEO 描述"
                 />
               </el-form-item>
-            </template>
-
-            <!-- 密码 -->
-            <template v-if="form.articlePerm === 5">
-              <el-form-item label="访问密码：" prop="accessPassword">
-                <el-input
-                  v-model="form.accessPassword"
-                  type="password"
-                  maxlength="20"
-                  show-password
-                  placeholder="请输入文章访问密码"
-                  style="width: 300px"
-                />
-                <div class="form-tip">
-                  访问者需要输入正确密码后才能查看文章
-                </div>
-              </el-form-item>
-            </template>
-
-            <!-- 付费访问 -->
-            <template v-if="form.articlePerm === 6">
-              <el-form-item label="文章售价：" prop="payPrice">
-                <el-input v-model="form.payPrice" maxlength="10" placeholder="请输入文章售价" style="width: 200px">
-                  <template slot="append">元</template>
-                </el-input>
-              </el-form-item>
-              <el-form-item label="购买有效期：" prop="payValidType">
-                <el-radio-group v-model="form.payValidType">
-                  <el-radio :label="1">永久有效</el-radio>
-                  <el-radio :label="2">限时有效</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item v-if="form.payValidType === 2" label="有效天数：" prop="payValidDays">
-                <el-input-number v-model="form.payValidDays" :min="1" :max="3650" controls-position="right" />
-                <span class="form-unit">天</span>
-              </el-form-item>
-            </template>
-
-            <!-- 指定用户 -->
-            <template v-if="form.articlePerm === 7">
-              <el-form-item label="授权用户：" prop="accessUsers">
-                <div class="access-user-list">
-                  <el-tag
-                    v-for="user in form.accessUsers"
-                    :key="user.userId"
-                    closable
-                    @close="removeAccessUser(user.userId)"
-                  >
-                    {{ user.nickname }}
-                  </el-tag>
-                  <el-button type="text" icon="el-icon-plus" @click="openUserSelector">
-                    添加用户
-                  </el-button>
-                </div>
-              </el-form-item>
-              <el-form-item label="授权有效期：" prop="userExpireType">
-                <el-radio-group v-model="form.userExpireType">
-                  <el-radio :label="1">永久有效</el-radio>
-                  <el-radio :label="2">限时有效</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item
-                v-if="form.userExpireType === 2"
-                label="有效期至："
-                prop="userExpireTime"
-              >
-                <el-date-picker
-                  v-model="form.userExpireTime"
-                  type="datetime"
-                  placeholder="请选择有效期"
-                />
-              </el-form-item>
-            </template>
-
-            <!-- 评论 -->
-            <el-form-item label="评论设置：" prop="commentFlag">
-              <el-radio-group v-model="form.commentFlag">
-                <el-radio v-for="item in commentEnums" :key="String(item.value)" :label="item.value">
-                  {{ item.name }}
-                </el-radio>
-              </el-radio-group>
-            </el-form-item>
-
-            <!-- SEO -->
-            <el-divider content-position="left">
-              SEO 设置
-            </el-divider>
-            <el-form-item label="SEO 标题：">
-              <el-input
-                v-model.trim="form.seoTitle"
-                maxlength="255"
-                show-word-limit
-                placeholder="留空时使用文章标题"
-              />
-            </el-form-item>
-            <el-form-item label="SEO 关键词：">
-              <el-input
-                v-model.trim="form.seoKeywords"
-                maxlength="255"
-                show-word-limit
-                placeholder="多个关键词使用英文逗号分隔"
-              />
-            </el-form-item>
-            <el-form-item label="SEO 描述：">
-              <el-input
-                v-model="form.seoDescription"
-                type="textarea"
-                resize="none"
-                :autosize="{ minRows: 3, maxRows: 5 }"
-                maxlength="500"
-                show-word-limit
-                placeholder="请输入 SEO 描述"
-              />
-            </el-form-item>
+            </el-card>
           </el-form>
         </div>
       </div>
@@ -405,34 +384,14 @@
             style="width: 180px; margin-left: 8px"
           />
         </div>
-
-        <p
-          v-show="publishDateTimeShow"
-          class="publish-time-txt"
-        >
-          本文将于
-          <span class="publish-time">
-            {{ publishDateTime }}
-          </span>
-          发布
+        <p v-show="publishDateTimeShow" class="publish-time-txt">
+          本文将于 <span class="publish-time"> {{ publishDateTime }} </span> 发布
         </p>
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button
-          round
-          @click="cancelPublishByTime"
-        >
-          取 消
-        </el-button>
-
-        <el-button
-          round
-          type="danger"
-          :disabled="!publishDateTimeShow"
-          :loading="submitByTimeLoading"
-          @click="publishArticleByTiming"
-        >
+        <el-button round @click="cancelPublishByTime">取 消</el-button>
+        <el-button roundtype="danger" :disabled="!publishDateTimeShow" :loading="submitByTimeLoading" @click="publishArticleByTiming">
           定时发布
         </el-button>
       </div>
@@ -446,11 +405,11 @@
       @uploadImgDone="uploadImgDone"
     />
 
-    <!-- 内容版本 -->
-    <contentEditRecordDrawer
-      ref="contentEditRecordDrawerRef"
-      :dialog-visible="contentRecordDrawerVisible"
-      @chooseRecordDone="regainArticleContent"
+    <!-- 自动保存记录 -->
+    <autoSaveRecordDrawer
+      ref="autoSaveRecordDrawerRef"
+      :dialog-visible="autoSaveRecordDrawerVisible"
+      @chooseRecordDone="regainAutoSaveContent"
     />
   </div>
 </template>
@@ -458,12 +417,12 @@
 <script>
 import addArticleImageIcon from '@/assets/images/add-article-image-icon.png'
 import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
-import contentEditRecordDrawer from '@/views/admin/content/article/template/contentEditRecordDrawer'
+import autoSaveRecordDrawer from '@/views/admin/content/article/template/autoSaveRecordDrawer'
 export default {
   name: 'AddOrEditArticle',
   components: {
     uploadImgDialog,
-    contentEditRecordDrawer
+    autoSaveRecordDrawer
   },
   data() {
     return {
@@ -471,9 +430,9 @@ export default {
       coverImageTypeEnums: [ // 封面类型
         { name: '系统默认', value: 1 },
         { name: '单封面', value: 2 },
-        { name: '多封面', value: 3, disabled: false },
+        { name: '多封面', value: 3 },
         { name: '随机封面', value: 4 },
-        { name: '标题生成', value: 5, disabled: false },
+        { name: '标题生成', value: 5 },
         { name: '无封面', value: 6 }
       ],
       articleTypeEnums: [ // 文章类型
@@ -491,8 +450,8 @@ export default {
         { name: '指定用户', value: 7, disabled: true }
       ],
       commentEnums: [ // 评论设置
-        { name: '开启评论', value: true },
-        { name: '关闭评论', value: false }
+        { name: '开启', value: true },
+        { name: '关闭', value: false }
       ],
       articleCategoryTree: [], // 文章分类树
       tagList: [], // 标签列表
@@ -505,91 +464,60 @@ export default {
       submitLoading: false,
       draftLoading: false,
       submitByTimeLoading: false,
+      callActivated: false, // 是否已经完成页面初始化
 
-      /**
-       * 最近一次正式保存的 Markdown 内容。
-       *
-       * 用于判断自动保存时文章内容是否发生变化。
-       */
-      oldContent: '',
+      autoSaveTimer: null, // 自动保存定时任务
+      lastAutoSaveTime: '', // 草稿保存时间
+      lastAutoSaveContent: '', // 最近一次正式保存的内容，用于判断自动保存时文章内容是否发生变化
+      isAutoSaving: false, // 是否正在保存
+      showAutoSaveStatus: false, // 是否展示自动保存状态
+      autoSaveRecordDrawerVisible: false, // 是否展示自动保存记录列表
 
-      /**
-       * 自动保存相关状态。
-       */
-      interval: null,
-      saveDraftTime: '',
-      saveDraftSpanShow: false,
-
-      /**
-       * 是否已经完成页面初始化。
-       */
-      callActivated: false,
-
-      /**
-       * 是否显示最近草稿。
-       */
-      showRecentDraftFlag: false,
-
+      showRecentDraftFlag: false, // 是否显示最近草稿
       recentDraft: {
         id: '',
         title: ''
       },
 
-      form: {
+      formData: {
         action: '',
-        id: '',
-        title: '',
-        slug: '',
-        summary: '',
-        contentMd: '',
-        coverImageType: 1,
-        coverImages: [],
+        id: '', // 文章ID
+        title: '', // 文章标题
+        slug: '', // SLUG
+        summary: '', // 文章摘要
+        contentMd: '', // 文章内容
+        coverImageType: 1, // 封面类型
+        coverImages: [], // 封面列表
         categoryId: '', // 文章分类
         tags: [], // 文章标签
+        commentFlag: true, // 是否开启评论
         articleType: 1, // 文章类型
         sourceName: '', // 文章来源名称
         sourceAuthor: '', // 原作者
         sourceUrl: '', // 原文地址
-        seoTitle: '',
-        seoKeywords: '',
-        seoDescription: '',
+        articlePerm: 1, // 访问权限
+        seoTitle: '', // SEO 标题
+        seoKeywords: '', // SEO 关键字
+        seoDescription: '', // SEO 描述
+
+        // accessPassword: '',
+        // verifyType: 1, // 公众号验证
+        // verifyExpireMinutes: 10,
+        // verifyHint: '',
+        // payPrice: '', // 付费
+        // payValidType: 1,
+        // payValidDays: null,
+        // accessUsers: [], // 指定用户
+
         articleStatus: 1,
-        commentFlag: true,
-        publishTime: '',
-        // 访问权限
-        articlePerm: 1,
-        accessPassword: '',
-        // 公众号验证
-        verifyType: 1,
-        verifyExpireMinutes: 10,
-        verifyHint: '',
-
-        // 付费
-        payPrice: '',
-        payValidType: 1,
-        payValidDays: null,
-
-        // 指定用户
-        accessUsers: [],
-        userExpireType: 1,
-        userExpireTime: null
+        publishTime: ''
       },
-
-      /**
-       * 表单校验规则。
-       */
-      rules: {
+      formRules: {
         title: [
           { required: true, message: '请输入文章标题', trigger: 'blur' }
         ],
         slug: [
           { required: true, message: '请输入文章 Slug', trigger: 'blur' }
-        ],
-        coverImageType: [
-          { required: true, message: '请选择封面类型', trigger: 'change' }
-        ],
-        articleType: [
-          { required: true, message: '请选择文章类型', trigger: 'change' }
         ],
         summary: [
           { required: true, message: '请填写文章摘要', trigger: 'blur' }
@@ -597,13 +525,25 @@ export default {
         categoryId: [
           { required: true, message: '请选择文章分类', trigger: 'change' }
         ],
+        coverImageType: [
+          { required: true, message: '请选择封面类型', trigger: 'change' }
+        ],
+        articleType: [
+          { required: true, message: '请选择文章类型', trigger: 'change' }
+        ],
         articlePerm: [
           { required: true, message: '请选择文章访问权限', trigger: 'change' }
         ],
-        accessPassword: [
+        commentFlag: [
+          { required: true, message: '请选择评论设置', trigger: 'change' }
+        ],
+        sourceUrl: [
+          { required: true, message: '请填写原文地址', trigger: 'blur' }
+        ]
+        /* , accessPassword: [
           {
             validator: (rule, value, callback) => {
-              if (this.form.articlePerm !== 5) {
+              if (this.formData.articlePerm !== 5) {
                 callback()
                 return
               }
@@ -617,19 +557,8 @@ export default {
             },
             trigger: 'blur'
           }
-        ],
-        sourceUrl: [
-          { required: true, message: '请填写原文地址', trigger: 'blur' }
-        ],
-        commentFlag: [
-          { required: true, message: '请选择评论设置', trigger: 'change' }
-        ]
+        ] */
       },
-
-      /**
-       * 内容版本抽屉。
-       */
-      contentRecordDrawerVisible: false,
 
       /**
        * 定时发布。
@@ -681,15 +610,15 @@ export default {
   computed: {
     // TODO 当前封面最大数量，待客户化
     maxUploadLimit() {
-      return this.form.coverImageType === 3 ? 4 : 1
+      return this.formData.coverImageType === 3 ? 4 : 1
     },
 
     // 草稿按钮名称
     draftBtnName() {
       if (
-        this.form.articleStatus == null ||
-        this.form.articleStatus === '' ||
-        this.form.articleStatus === 1
+        this.formData.articleStatus == null ||
+        this.formData.articleStatus === '' ||
+        this.formData.articleStatus === 1
       ) {
         return '保存草稿'
       }
@@ -702,10 +631,10 @@ export default {
      */
     autoPublishBtnShow() {
       return (
-        this.form.articleStatus == null ||
-        this.form.articleStatus === '' ||
-        this.form.articleStatus === 1 ||
-        this.form.articleStatus === 5
+        this.formData.articleStatus == null ||
+        this.formData.articleStatus === '' ||
+        this.formData.articleStatus === 1 ||
+        this.formData.articleStatus === 5
       )
     },
 
@@ -724,57 +653,58 @@ export default {
      * 是否已经选择完整的发布时间。
      */
     publishDateTimeShow() {
-      return !!(
-        this.publishDate &&
-        this.publishTime
-      )
+      return !!(this.publishDate && this.publishTime)
     }
   },
 
-  watch: {
-    /**
-     * 处理 keep-alive 下的路由变化。
-     */
-    $route: {
-      immediate: true,
-      handler(to) {
-        if (
-          to.path === '/ac/article/publish' &&
-          to.query._f != null
-        ) {
-          const articleId = to.query.articleId
-
-          if (articleId) {
-            this.clearRecentDraft()
-            this.resetSaveDraftData()
-            this.getArticleDetail(articleId)
-
-            this.$router.push({
-              name: 'AddArticle',
-              query: {
-                articleId
-              }
-            })
-          }
-        }
-      }
-    },
-
-    /**
-     * 私密文章不允许定时发布。
-     */
-    'form.articlePerm'(value) {
-      if (value === 2 || value === 3) {
-        this.publishDate = ''
-        this.publishTime = ''
-        this.publishTimeDisabled = true
-      }
-    }
-  },
+  // watch: {
+  //   /**
+  //    * 处理 keep-alive 下的路由变化。
+  //    */
+  //   $route: {
+  //     immediate: true,
+  //     handler(to) {
+  //       if (
+  //         to.path === '/ac/article/publish' &&
+  //         to.query._f != null
+  //       ) {
+  //         const articleId = to.query.articleId
+  //
+  //         if (articleId) {
+  //           this.clearRecentDraft()
+  //           this.resetSaveDraftData()
+  //           this.getArticleDetail(articleId)
+  //
+  //           this.$router.push({
+  //             name: 'AddArticle',
+  //             query: {
+  //               articleId
+  //             }
+  //           })
+  //         }
+  //       }
+  //     }
+  //   },
+  //
+  //   /**
+  //    * 私密文章不允许定时发布。
+  //    */
+  //   'formData.articlePerm'(value) {
+  //     if (value === 2 || value === 3) {
+  //       this.publishDate = ''
+  //       this.publishTime = ''
+  //       this.publishTimeDisabled = true
+  //     }
+  //   }
+  // },
 
   created() {
-    this.resetSaveDraftData()
+    // 获取分类列表
+    this.getArticleCategoryTree()
+    // 获取标签列表
     this.getArticleTagList()
+
+    this.resetSaveDraftData()
     const articleId = this.$route.query.articleId
     if (articleId) {
       this.clearRecentDraft()
@@ -790,12 +720,9 @@ export default {
   },
 
   mounted() {
-    // 获取分类列表
-    this.getArticleCategoryTree()
-
     this.$nextTick(() => {
       this.addBeforeunloadEventListener()
-      this.openAutoSaveEvent()
+      this.startAutoSaveEvent()
     })
   },
 
@@ -806,12 +733,12 @@ export default {
       if (articleId) {
         this.clearRecentDraft()
 
-        if (articleId !== this.form.id) {
+        if (articleId !== this.formData.id) {
           this.getArticleTagList()
           this.resetSaveDraftData()
           this.getArticleDetail(articleId)
         }
-      } else if (this.form.action !== 'add') {
+      } else if (this.formData.action !== 'add') {
         this.clearData()
         this.getArticleTagList()
         this.resetSaveDraftData()
@@ -821,23 +748,23 @@ export default {
     }
 
     this.$nextTick(() => {
-      this.openAutoSaveEvent()
+      this.startAutoSaveEvent()
     })
   },
 
   deactivated() {
-    this.preDoAutoSaveArticleContent()
-    this.closeAutoSaveEvent()
+    this.autoSaveArticleContent()
+    this.stopAutoSaveEvent()
   },
 
   beforeDestroy() {
-    this.preDoAutoSaveArticleContent()
-    this.closeAutoSaveEvent()
+    this.stopAutoSaveEvent()
+    this.autoSaveArticleContent()
     this.removeBeforeunloadEventListener()
   },
 
   beforeRouteLeave(to, from, next) {
-    this.preDoAutoSaveArticleContent()
+    this.autoSaveArticleContent()
     next()
   },
 
@@ -852,17 +779,17 @@ export default {
     },
     // 浏览器关闭处理器
     beforeUnloadHandler(event) {
-      this.preDoAutoSaveArticleContent()
+      this.autoSaveArticleContent()
       event.returnValue = ''
     },
     // 自动生成文章 ID
     autoGenerateId() {
       this.$mapi.sequence.getId().then(({ data }) => {
-        this.form.action = 'add'
-        this.form.id = data
+        this.formData.action = 'add'
+        this.formData.id = data
       }).catch(() => {
-        this.form.action = 'error'
-        this.form.id = null
+        this.formData.action = 'error'
+        this.formData.id = null
       }).finally(() => {
         this.pageLoading = false
       })
@@ -910,6 +837,116 @@ export default {
       }, 200)
     },
 
+    // 开启自动保存
+    startAutoSaveEvent() {
+      this.stopAutoSaveEvent()
+      this.autoSaveTimer = window.setInterval(() => {
+        this.autoSaveArticleContent()
+      }, 60000)
+    },
+    // 关闭自动保存
+    stopAutoSaveEvent() {
+      if (this.autoSaveTimer != null) {
+        window.clearInterval(this.autoSaveTimer)
+        this.autoSaveTimer = null
+      }
+    },
+    // 自动保存前置检查
+    autoSaveArticleContent() {
+      if (!this.formData.id) {
+        return
+      }
+
+      const content = this.formData.contentMd || ''
+      if (!content.trim()) {
+        return
+      }
+
+      if (this.lastAutoSaveContent !== content) {
+        this.updateTotalCount()
+        this.doAutoSaveArticleContent()
+      }
+    },
+    // 自动保存文章内容
+    doAutoSaveArticleContent() {
+      if (!this.formData.id) {
+        return
+      }
+
+      const param = {
+        articleId: this.formData.id,
+        title: this.formData.title, // 文章标题
+        slug: this.formData.slug, // SLUG
+        summary: this.formData.summary, // 文章摘要
+        content: this.formData.contentMd, // 文章内容
+        wordCount: this.totalCount // 文章字数
+      }
+
+      this.isAutoSaving = true
+      this.$mapi.article.autoSaveArticleContent(param).then(({ data }) => {
+        if (data != null) {
+          this.lastAutoSaveContent = this.formData.contentMd
+          this.lastAutoSaveTime = data
+          this.showAutoSaveStatus = true
+        }
+      }).catch(error => {
+        console.log('auto save article content failed', error)
+      }).finally(_ => {
+        this.isAutoSaving = false
+      })
+    },
+    // 显示自动保存记录
+    showAutoSaveRecord() {
+      this.autoSaveRecordDrawerVisible = true
+      this.$nextTick(() => {
+        if (this.$refs.autoSaveRecordDrawerRef) {
+          this.$refs.autoSaveRecordDrawerRef.initData(this.formData.id)
+        }
+      })
+    },
+    // 恢复自动保存的内容
+    regainAutoSaveContent(recordId) {
+      this.autoSaveRecordDrawerVisible = false
+      if (!recordId) {
+        return
+      }
+
+      this.doAutoSaveArticleContent()
+      this.$mapi.article.queryAutoSaveArticleContentById({ recordId }).then(({ data }) => {
+        if (!data) {
+          this.$message.error('内容恢复失败')
+          return
+        }
+
+        const articleId = data.articleId
+        if (String(articleId) !== String(this.formData.id)) {
+          this.$message.error('内容版本与当前文章不匹配')
+          return
+        }
+        const content = data.contentMd || data.content || ''
+        this.formData.contentMd = content
+        this.formData.summary = data.summary || this.formData.summary
+        this.lastAutoSaveContent = content
+        this.updateTotalCount()
+        this.$message.success('内容恢复成功')
+      }).catch(() => {
+        this.$message.error('内容恢复失败')
+      })
+    },
+
+    // 更新文章字数
+    updateTotalCount() {
+      const content = this.formData.contentMd || ''
+
+      const text = content
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/!\[.*?]\(.*?\)/g, '')
+        .replace(/[#>*_~`]/g, '')
+        .replace(/\s+/g, '')
+
+      this.totalCount = text.length
+    },
+
     // 显示封面操作按钮
     showCoverImgIcon(index) {
       const closeIcons = document.getElementsByClassName('cover-img-close-icon')
@@ -938,7 +975,7 @@ export default {
         const param = { fileId: file.fileId }
         return this.$mapi.file.deleteFile(param)
       }).then(res => {
-        this.form.coverImages.splice(index, 1)
+        this.formData.coverImages.splice(index, 1)
         this.$message.success(res.message || '删除成功')
       }).catch(() => {})
     },
@@ -960,36 +997,36 @@ export default {
     uploadImgDone(fileList, index) {
       this.uploadImgDialogVisible = false
       const list = Array.isArray(fileList) ? fileList : []
-      if (index != null && index >= 0 && list.length === 1 && this.form.coverImages.length > index) {
-        this.$set(this.form.coverImages, index, list[0])
+      if (index != null && index >= 0 && list.length === 1 && this.formData.coverImages.length > index) {
+        this.$set(this.formData.coverImages, index, list[0])
         return
       }
       list.forEach(file => {
-        this.form.coverImages.push(file)
+        this.formData.coverImages.push(file)
       })
-      if (this.form.coverImages.length > this.maxUploadLimit) {
-        this.form.coverImages = this.form.coverImages.slice(0, this.maxUploadLimit)
+      if (this.formData.coverImages.length > this.maxUploadLimit) {
+        this.formData.coverImages = this.formData.coverImages.slice(0, this.maxUploadLimit)
       }
     },
 
     // 自动生成 Slug
     generateSlug() {
-      if (!this.form.title) {
+      if (!this.formData.title) {
         return
       }
 
-      const slug = this.$slug(this.form.title)
+      const slug = this.$slug(this.formData.title)
       if (!slug) {
         this.$message.warning('当前标题无法自动生成 Slug，请手动填写')
         return
       }
 
-      this.form.slug = slug.substring(0, 150)
+      this.formData.slug = slug.substring(0, 150)
     },
 
     // 自动提取摘要
     generateSummary() {
-      const content = this.form.contentMd || ''
+      const content = this.formData.contentMd || ''
       const text = content
         .replace(/```[\s\S]*?```/g, '')
         .replace(/!\[.*?]\(.*?\)/g, '')
@@ -998,7 +1035,7 @@ export default {
         .replace(/\s+/g, ' ')
         .trim()
 
-      this.form.summary = text.substring(0, 250)
+      this.formData.summary = text.substring(0, 250)
       this.$refs.articleForm.validateField('summary')
     },
 
@@ -1038,12 +1075,10 @@ export default {
       })
     },
 
-    /**
-     * 重置草稿保存状态。
-     */
+    // 重置草稿保存状态
     resetSaveDraftData() {
-      this.saveDraftTime = ''
-      this.saveDraftSpanShow = false
+      this.lastAutoSaveTime = ''
+      this.showAutoSaveStatus = false
     },
 
     /**
@@ -1059,68 +1094,45 @@ export default {
      * 查询最近草稿。
      */
     queryRecentDraft() {
-      this.$mapi.article.queryLastArticleDraft()
-        .then(({ data }) => {
-          if (!data) {
-            this.clearRecentDraft()
-            return
-          }
-
-          this.showRecentDraftFlag = true
-          this.recentDraft.id = data.id
-          this.recentDraft.title = data.title || '未命名文章'
-        })
-        .catch(() => {
+      this.$mapi.article.queryLastArticleDraft().then(({ data }) => {
+        if (!data) {
           this.clearRecentDraft()
-        })
+          return
+        }
+
+        this.showRecentDraftFlag = true
+        this.recentDraft.id = data.id
+        this.recentDraft.title = data.title || '未命名文章'
+      }).catch(() => {
+        this.clearRecentDraft()
+      })
     },
 
     // 查询文章详情
     getArticleDetail(articleId) {
       this.pageLoading = true
+      this.$mapi.article.queryArticleDetail({ articleId }).then(({ data }) => {
+        if (!data) {
+          this.$message.error('文章不存在')
+          return
+        }
 
-      this.$mapi.article.queryArticleDetail({
-        articleId
+        if (data.deleteFlag != null && data.deleteFlag !== 0) {
+          this.$message.error('文章处于回收站中，不允许编辑，请先恢复文章')
+          return
+        }
+
+        this.formData = this.normalizeArticleData(data)
+        this.formData.action = 'edit'
+        this.lastAutoSaveContent = this.formData.contentMd || ''
+        this.updateTotalCount()
+        this.initPublishTime(this.formData.publishTime)
+      }).catch(error => {
+        console.log('getArticleDetail failed', error)
+        this.$message.error('加载文章信息失败，请刷新浏览器再试！')
+      }).finally(() => {
+        this.pageLoading = false
       })
-        .then(({ data }) => {
-          if (!data) {
-            this.$message.error('文章不存在')
-            return
-          }
-
-          if (
-            data.deleteFlag != null &&
-            data.deleteFlag !== 0
-          ) {
-            this.$message.error(
-              '文章处于回收站中，不允许编辑，请先恢复文章'
-            )
-            return
-          }
-
-          this.form = this.normalizeArticleData(data)
-
-          this.form.action = 'edit'
-
-          this.oldContent = this.form.contentMd || ''
-
-          this.updateTotalCount()
-
-          this.initPublishTime(this.form.publishTime)
-        })
-        .catch(error => {
-          console.log(
-            'getArticleDetail failed',
-            error
-          )
-
-          this.$message.error(
-            '加载文章信息失败，请刷新浏览器再试！'
-          )
-        })
-        .finally(() => {
-          this.pageLoading = false
-        })
     },
 
     /**
@@ -1168,26 +1180,13 @@ export default {
         return
       }
 
-      const date = new Date(
-        String(publishTime).replace(/-/g, '/')
-      )
-
+      const date = new Date(String(publishTime).replace(/-/g, '/'))
       if (Number.isNaN(date.getTime())) {
         return
       }
 
-      this.publishDate =
-        date.getFullYear() +
-        '-' +
-        this.padZero(date.getMonth() + 1) +
-        '-' +
-        this.padZero(date.getDate())
-
-      this.publishTime =
-        this.padZero(date.getHours()) +
-        ':' +
-        this.padZero(date.getMinutes())
-
+      this.publishDate = date.getFullYear() + '-' + this.padZero(date.getMonth() + 1) + '-' + this.padZero(date.getDate())
+      this.publishTime = this.padZero(date.getHours()) + ':' + this.padZero(date.getMinutes())
       this.publishTimeDisabled = false
     },
 
@@ -1199,25 +1198,10 @@ export default {
     },
 
     /**
-     * 更新文章字数。
-     */
-    updateTotalCount() {
-      const content = this.form.contentMd || ''
-
-      const text = content
-        .replace(/```[\s\S]*?```/g, '')
-        .replace(/!\[.*?]\(.*?\)/g, '')
-        .replace(/[#>*_~`]/g, '')
-        .replace(/\s+/g, '')
-
-      this.totalCount = text.length
-    },
-
-    /**
      * Markdown 编辑器内容变化。
      */
     onContentChange(content) {
-      this.form.contentMd = content || ''
+      this.formData.contentMd = content || ''
       this.updateTotalCount()
     },
 
@@ -1254,137 +1238,27 @@ export default {
     },
 
     /**
-     * 开启自动保存。
-     *
-     * 默认每 60 秒检查一次。
-     */
-    openAutoSaveEvent() {
-      this.closeAutoSaveEvent()
-
-      this.interval = window.setInterval(() => {
-        this.preDoAutoSaveArticleContent()
-      }, 60000)
-    },
-
-    /**
-     * 关闭自动保存。
-     */
-    closeAutoSaveEvent() {
-      if (this.interval != null) {
-        window.clearInterval(this.interval)
-        this.interval = null
-      }
-    },
-
-    /**
-     * 自动保存前置检查。
-     */
-    preDoAutoSaveArticleContent() {
-      if (!this.form.id) {
-        return
-      }
-
-      const content = this.form.contentMd || ''
-      if (!content.trim()) {
-        return
-      }
-
-      this.updateTotalCount()
-      if (this.oldContent === '') {
-        this.oldContent = content
-        return
-      }
-
-      if (this.oldContent !== content) {
-        this.doAutoSaveArticleContent()
-      }
-    },
-
-    /**
-     * 自动保存文章内容。
-     *
-     * 对应：
-     * article_content_draft_record
-     */
-    doAutoSaveArticleContent() {
-      if (!this.form.id) {
-        return
-      }
-
-      const param = {
-        id: this.form.id,
-        articleId: this.form.id,
-        title: this.form.title,
-        remark: this.form.summary,
-        summary: this.form.summary,
-        content: this.form.contentMd,
-        contentMd: this.form.contentMd,
-        wordCount: this.totalCount,
-        saveTime: null
-      }
-
-      this.$mapi.article
-        .autoSaveArticleContent(param)
-        .then(({ data }) => {
-          if (data != null) {
-            this.oldContent =
-              this.form.contentMd
-
-            this.saveDraftTime =
-              data.saveTime ||
-              data.saveTimeText ||
-              data
-
-            this.saveDraftSpanShow = true
-          }
-        })
-        .catch(error => {
-          console.log(
-            'auto save article content failed',
-            error
-          )
-        })
-    },
-
-    /**
      * 保存草稿。
      */
     saveDraft() {
       this.updateTotalCount()
-
-      this.form.articleStatus = 1
-
-      const param =
-        this.buildSubmitData()
-
+      this.formData.articleStatus = 1
+      const param = this.buildSubmitData()
       param.articleStatus = 1
-
       this.draftLoading = true
-
-      this.$mapi.article.saveArticleDraft(param)
-        .then(({ data, message }) => {
-          this.$message.success(
-            message || '草稿保存成功'
-          )
-
-          this.form.action = 'edit'
-          this.form.articleStatus = 1
-
-          this.oldContent =
-            this.form.contentMd
-
-          this.saveDraftTime =
-            data || this.getCurrentTimeText()
-
-          this.saveDraftSpanShow = true
-        })
-        .catch(() => {
-          this.saveDraftTime = ''
-          this.saveDraftSpanShow = false
-        })
-        .finally(() => {
-          this.draftLoading = false
-        })
+      this.$mapi.article.saveArticleDraft(param).then(({ data, message }) => {
+        this.$message.success(message || '草稿保存成功')
+        this.formData.action = 'edit'
+        this.formData.articleStatus = 1
+        this.lastAutoSaveContent = this.formData.contentMd
+        this.lastAutoSaveTime = data || this.getCurrentTimeText()
+        this.showAutoSaveStatus = true
+      }).catch(() => {
+        this.lastAutoSaveTime = ''
+        this.showAutoSaveStatus = false
+      }).finally(() => {
+        this.draftLoading = false
+      })
     },
 
     /**
@@ -1397,29 +1271,29 @@ export default {
       this.updateTotalCount()
 
       return {
-        id: this.form.id,
-        title: this.form.title,
-        slug: this.form.slug,
-        summary: this.form.summary,
-        contentMd: this.form.contentMd,
-        categoryId: this.form.categoryId, // 文章分类
-        tags: this.form.tags, // 文章标签
-        authorId: this.form.authorId,
-        seoTitle: this.form.seoTitle,
-        seoKeywords: this.form.seoKeywords,
-        seoDescription: this.form.seoDescription,
-        articleType: this.form.articleType,
-        articleStatus: this.form.articleStatus,
-        articlePerm: this.form.articlePerm,
-        accessPassword: this.form.articlePerm === 3 ? this.form.accessPassword : '',
-        sourceName: this.form.articleType === 1 ? '' : this.form.sourceName,
-        sourceAuthor: this.form.articleType === 1 ? '' : this.form.sourceAuthor,
-        sourceUrl: this.form.articleType === 1 ? '' : this.form.sourceUrl,
-        commentFlag: this.form.commentFlag,
-        coverImageType: this.form.coverImageType,
-        coverImages: this.form.coverImages,
+        id: this.formData.id,
+        title: this.formData.title,
+        slug: this.formData.slug,
+        summary: this.formData.summary,
+        contentMd: this.formData.contentMd,
+        categoryId: this.formData.categoryId, // 文章分类
+        tags: this.formData.tags, // 文章标签
+        authorId: this.formData.authorId,
+        seoTitle: this.formData.seoTitle,
+        seoKeywords: this.formData.seoKeywords,
+        seoDescription: this.formData.seoDescription,
+        articleType: this.formData.articleType,
+        articleStatus: this.formData.articleStatus,
+        articlePerm: this.formData.articlePerm,
+        accessPassword: this.formData.articlePerm === 3 ? this.formData.accessPassword : '',
+        sourceName: this.formData.articleType === 1 ? '' : this.formData.sourceName,
+        sourceAuthor: this.formData.articleType === 1 ? '' : this.formData.sourceAuthor,
+        sourceUrl: this.formData.articleType === 1 ? '' : this.formData.sourceUrl,
+        commentFlag: this.formData.commentFlag,
+        coverImageType: this.formData.coverImageType,
+        coverImages: this.formData.coverImages,
         wordsCount: this.totalCount,
-        publishTime: this.form.publishTime || null
+        publishTime: this.formData.publishTime || null
       }
     },
 
@@ -1431,14 +1305,8 @@ export default {
         return
       }
 
-      if (
-        this.form.articlePerm === 2 ||
-        this.form.articlePerm === 3
-      ) {
-        this.$message.error(
-          '私密或密码文章暂不支持定时发布'
-        )
-
+      if (this.formData.articlePerm === 2 || this.formData.articlePerm === 3) {
+        this.$message.error('私密或密码文章暂不支持定时发布')
         return
       }
 
@@ -1665,8 +1533,8 @@ export default {
       }
 
       if (
-        this.form.articlePerm === 2 ||
-        this.form.articlePerm === 3
+        this.formData.articlePerm === 2 ||
+        this.formData.articlePerm === 3
       ) {
         this.$message.error(
           '私密或密码文章暂不支持定时发布'
@@ -1675,7 +1543,7 @@ export default {
         return
       }
 
-      this.form.publishTime = this.publishDateTime
+      this.formData.publishTime = this.publishDateTime
 
       const param = this.buildSubmitData()
 
@@ -1718,9 +1586,9 @@ export default {
 
         let request
         this.submitLoading = true
-        if (this.form.action === 'add') {
+        if (this.formData.action === 'add') {
           request = this.$mapi.article.addArticle(param)
-        } else if (this.form.action === 'edit') {
+        } else if (this.formData.action === 'edit') {
           request = this.$mapi.article.editArticle(param)
         } else {
           this.$message.error('系统异常，请刷新页面重试')
@@ -1729,7 +1597,7 @@ export default {
         }
 
         request.then(() => {
-          this.oldContent = this.form.contentMd
+          this.lastAutoSaveContent = this.formData.contentMd
           // this.publishSuccess()
         }).finally(() => {
           this.submitLoading = false
@@ -1741,7 +1609,7 @@ export default {
      * 校验标题和正文。
      */
     validateBasicInfo() {
-      if (!this.form.title) {
+      if (!this.formData.title) {
         this.$message.warning(
           '请填写文章标题'
         )
@@ -1750,8 +1618,8 @@ export default {
       }
 
       if (
-        !this.form.contentMd ||
-        !this.form.contentMd.trim()
+        !this.formData.contentMd ||
+        !this.formData.contentMd.trim()
       ) {
         this.$message.warning(
           '请填写文章内容'
@@ -1769,75 +1637,17 @@ export default {
     publishSuccess() {
       this.$router.push(
         '/publish/blog/success/' +
-        this.form.id
+        this.formData.id
       )
 
       this.clearData()
     },
 
     /**
-     * 显示内容版本。
-     */
-    showContentRecord() {
-      this.contentRecordDrawerVisible = true
-
-      this.$nextTick(() => {
-        if (
-          this.$refs
-            .contentEditRecordDrawerRef
-        ) {
-          this.$refs
-            .contentEditRecordDrawerRef
-            .initData(this.form.id)
-        }
-      })
-    },
-
-    /**
-     * 恢复内容版本。
-     *
-     * 兼容原来的 contentEditRecordDrawer。
-     *
-     * 后续切换到：
-     * article_content_version
-     * 时，只需要调整 API 返回字段。
-     */
-    regainArticleContent(recordId) {
-      this.contentRecordDrawerVisible = false
-
-      if (!recordId) {
-        return
-      }
-
-      this.doAutoSaveArticleContent()
-
-      this.$mapi.article.queryAutoSaveArticleContentById({ recordId }).then(({ data }) => {
-        if (!data) {
-          this.$message.error('内容恢复失败')
-          return
-        }
-
-        const articleId = data.articleId
-        if (String(articleId) !== String(this.form.id)) {
-          this.$message.error('内容版本与当前文章不匹配')
-          return
-        }
-        const content = data.contentMd || data.content || ''
-        this.form.contentMd = content
-        this.form.summary = data.summary || this.form.summary
-        this.oldContent = content
-        this.updateTotalCount()
-        this.$message.success('内容恢复成功')
-      }).catch(() => {
-        this.$message.error('内容恢复失败')
-      })
-    },
-
-    /**
      * 清空页面数据。
      */
     clearData() {
-      this.form = {
+      this.formData = {
         action: '',
         id: '',
         title: '',
@@ -1863,7 +1673,7 @@ export default {
         publishTime: ''
       }
 
-      this.oldContent = ''
+      this.lastAutoSaveContent = ''
       this.totalCount = 0
 
       this.publishDate = ''
@@ -2265,6 +2075,44 @@ export default {
 .publish-time {
   color: #303133;
   font-weight: 500;
+}
+
+/* 访问权限与 SEO 独立配置卡片 */
+.article-config-card {
+  margin: 28px 0;
+  border-radius: 6px;
+  border-color: #ebeef5;
+}
+
+.article-config-card ::v-deep .el-card__header {
+  padding: 16px 20px;
+  background-color: #fafafa;
+}
+
+.article-config-card ::v-deep .el-card__body {
+  padding: 24px 20px 8px;
+}
+
+.config-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.config-card-title {
+  color: #303133;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.config-card-description {
+  color: #909399;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 /* Element UI */

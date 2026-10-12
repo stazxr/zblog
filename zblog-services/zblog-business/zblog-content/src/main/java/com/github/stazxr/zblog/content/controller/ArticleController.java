@@ -6,14 +6,19 @@ import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
+import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.content.service.ArticleService;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -88,7 +93,52 @@ public class ArticleController {
         articleService.editArticle(articleDto);
     }
 
+    /**
+     * 文章内容自动保存
+     *
+     *   <p>建议接口等级为 OPEN, 可以在用户会话过期时，自动保存文章未保存内容，防止编辑内容丢失
+     *
+     * @param autoSaveDto 文章自动保存信息
+     * @return 自动保存时间
+     */
+    @PostMapping(value = "/autoSaveArticleContent")
+    @ApiOperation(value = "编辑文章")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "文章内容自动保存", code = "ARTIA002", level = RouterLevel.OPEN)
+    public String autoSaveArticleContent(@RequestBody ArticleAutoSaveDto autoSaveDto) {
+        return articleService.autoSaveArticleContent(autoSaveDto);
+    }
 
+    /**
+     * 分页查询文章内容自动保存列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleAutoSaveVo>
+     */
+    @GetMapping(value = "/queryAutoSaveArticleContentByPage")
+    @ApiOperation(value = "分页查询文章内容自动保存列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "分页查询文章内容自动保存列表", code = "ARTIQ003", level = RouterLevel.PUBLIC)
+    public IPage<ArticleAutoSaveVo> queryAutoSaveArticleContentByPage(ArticleAutoSaveQueryDto queryDto) {
+        return articleService.queryAutoSaveArticleContentByPage(queryDto);
+    }
+
+    /**
+     * 查询文章内容自动保存详情
+     *
+     * @param recordId 保存记录id
+     * @return ArticleAutoSaveVo
+     */
+    @GetMapping(value = "/queryAutoSaveArticleContentById")
+    @ApiOperation(value = "查询文章内容自动保存信息")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "recordId", value = "保存记录id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询文章内容自动保存详情", code = "ARTIQ004", level = RouterLevel.PUBLIC)
+    public ArticleAutoSaveVo queryAutoSaveArticleContentById(@RequestParam Long recordId) {
+        return articleService.queryAutoSaveArticleContentById(recordId);
+    }
 
 
 
@@ -176,53 +226,6 @@ public class ArticleController {
 //    public Result queryLastArticleDraft() {
 //        return Result.success().data(articleService.queryLastArticleDraft());
 //    }
-//
-//    /**
-//     * 文章内容自动保存
-//     *   建议接口等级为 OPEN, 可以在用户会话过期时，自动保存文章未保存内容，防止编辑内容丢失
-//     *
-//     * @param articleDto 文章内容信息
-//     * @return Result
-//     */
-//    @PostMapping(value = "/autoSaveArticleContent")
-//    @ApiOperation(value = "文章内容自动保存")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "文章内容自动保存", code = "autoSaveArticleContent", level = RouterLevel.OPEN)
-//    public Result autoSaveArticleContent(@RequestBody ArticleDto articleDto) {
-//        return Result.success().data(articleService.autoSaveArticleContent(articleDto));
-//    }
-//
-//    /**
-//     * 分页查询文章内容自动保存列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticleTmpContentVoList
-//     */
-//    @GetMapping(value = "/queryAutoSaveArticleContentByPage")
-//    @ApiOperation(value = "分页查询文章内容自动保存列表")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "分页查询文章内容自动保存列表", code = "queryAutoSaveArticleContentByPage", level = RouterLevel.PUBLIC)
-//    public Result queryAutoSaveArticleContentByPage(ArticleQueryDto queryDto) {
-//        return Result.success().data(articleService.queryAutoSaveArticleContentByPage(queryDto));
-//    }
-//
-//    /**
-//     * 查询文章内容自动保存信息
-//     *
-//     * @param recordId 保存记录id
-//     * @return ArticleTmpContentVo
-//     */
-//    @GetMapping(value = "/queryAutoSaveArticleContentById")
-//    @ApiOperation(value = "查询文章内容自动保存信息")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "recordId", value = "保存记录id", required = true, dataTypeClass = Long.class)
-//    })
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询文章内容自动保存信息", code = "queryAutoSaveArticleContentById", level = RouterLevel.PUBLIC)
-//    public Result queryAutoSaveArticleContentById(@RequestParam Long recordId) {
-//        return Result.success().data(articleService.queryAutoSaveArticleContentById(recordId));
-//    }
-//
 //    /**
 //     * 文章定时发布
 //     *

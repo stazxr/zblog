@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleContentDraftRecordMapper">
+    <select id="selectAutoSaveArticleContentList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo">
+        SELECT
+            ID, ARTICLE_ID, TITLE, SLUG, SUMMARY, CONTENT, WORD_COUNT, SAVE_TIME
+        FROM article_content_draft_record
+        WHERE ARTICLE_ID = #{query.articleId}
+        ORDER BY ID DESC
+    </select>
+
+    <select id="selectAutoSaveArticleContentById" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo">
+        SELECT
+            ID, ARTICLE_ID, TITLE, SLUG, SUMMARY, CONTENT, WORD_COUNT, SAVE_TIME
+        FROM article_content_draft_record
+        WHERE ID = #{recordId}
+    </select>
+</mapper>
