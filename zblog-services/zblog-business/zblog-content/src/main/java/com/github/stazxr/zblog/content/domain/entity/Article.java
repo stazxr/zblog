@@ -108,11 +108,6 @@ public class Article implements Serializable {
     private Integer articlePerm;
 
     /**
-     * 访问密码
-     */
-    private String accessPassword;
-
-    /**
      * 文章来源名称
      */
     private String sourceName;

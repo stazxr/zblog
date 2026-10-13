@@ -15,4 +15,8 @@
         FROM article_content_draft_record
         WHERE ID = #{recordId}
     </select>
+
+    <delete id="deleteByArticleId">
+        DELETE FROM article_content_draft_record WHERE ARTICLE_ID = #{articleId}
+    </delete>
 </mapper>

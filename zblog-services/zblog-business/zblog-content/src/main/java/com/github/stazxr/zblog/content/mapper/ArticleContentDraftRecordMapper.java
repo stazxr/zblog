@@ -31,4 +31,11 @@ public interface ArticleContentDraftRecordMapper extends BaseMapper<ArticleConte
      * @return ArticleAutoSaveVo
      */
     ArticleAutoSaveVo selectAutoSaveArticleContentById(@Param("recordId") Long recordId);
+
+    /**
+     * 根据文章id删除临时保存记录
+     *
+     * @param articleId 文章id
+     */
+    void deleteByArticleId(@Param("articleId") Long articleId);
 }

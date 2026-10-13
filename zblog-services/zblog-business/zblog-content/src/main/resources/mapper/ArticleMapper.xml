@@ -82,9 +82,9 @@
         WHERE ARTICLE_STATUS != 99 AND AUTHOR_ID = #{authorId}
     </select>
 
-
-
-
+    <select id="selectLastArticleDraft" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
+    </select>
 
 
 
@@ -242,10 +242,6 @@
 <!--        UPDATE article SET `DESC` = #{desc} WHERE ID = #{articleId}-->
 <!--    </update>-->
 
-<!--    <delete id="deleteArticleTmpContent">-->
-<!--        DELETE FROM article_content_draft_record WHERE ARTICLE_ID = #{articleId}-->
-<!--    </delete>-->
-
 <!--    <delete id="deleteArticlePublishTiming">-->
 <!--        DELETE FROM article_auto_publish_timing WHERE ARTICLE_ID = #{articleId}-->
 <!--    </delete>-->
@@ -256,14 +252,6 @@
 <!--        FROM article_tag_relation atr-->
 <!--        LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID-->
 <!--        WHERE ata.DELETED = 0 AND atr.ARTICLE_ID = #{ID}-->
-<!--    </select>-->
-
-<!--    <select id="selectArticleImgList" resultType="com.github.stazxr.zblog.base.domain.entity.File">-->
-<!--        SELECT-->
-<!--            f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--        FROM article_img_relation air-->
-<!--        LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        WHERE air.ARTICLE_ID = #{ID}-->
 <!--    </select>-->
 
 <!--    <select id="selectPublicArticleList" resultMap="articleVoListMap">-->
@@ -377,15 +365,6 @@
 <!--            )-->
 <!--        </if>-->
 <!--        ORDER BY a.CREATE_TIME DESC-->
-<!--    </select>-->
-
-<!--    <select id="selectLastArticleDraft" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        SELECT-->
-<!--            ID, TITLE-->
-<!--        FROM article-->
-<!--        WHERE DELETED = 0 AND ARTICLE_STATUS = 1 AND AUTHOR_ID = #{authorId}-->
-<!--        ORDER BY IF(UPDATE_TIME = '', CREATE_TIME, UPDATE_TIME) DESC-->
-<!--        LIMIT 1-->
 <!--    </select>-->
 
 <!--    <select id="selectOneWithDeleted" resultType="com.github.stazxr.zblog.domain.entity.Article">-->

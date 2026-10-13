@@ -14,14 +14,14 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 文章新增/编辑信息
+ * 文章信息
  *
  * @author SunTao
  * @since 2026-09-15
  */
 @Getter
 @Setter
-@ApiModel(value = "文章DTO", description = "文章新增/编辑参数")
+@ApiModel(value = "文章DTO")
 public class ArticleDto implements Serializable {
     private static final long serialVersionUID = 5062863709675309457L;
 
@@ -123,12 +123,6 @@ public class ArticleDto implements Serializable {
     @NotNull(groups = {Create.class, Update.class}, message = "{ARTICLE_PERM_REQUIRED}")
     @ApiModelProperty(value = "文章权限", required = true)
     private Integer articlePerm;
-
-    /**
-     * 访问密码
-     */
-    @ApiModelProperty(value = "访问密码")
-    private String accessPassword;
 
     /**
      * SEO标题

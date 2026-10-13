@@ -3,6 +3,7 @@ package com.github.stazxr.zblog.content.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
+import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -70,6 +71,20 @@ public interface ArticleService extends IService<Article> {
      * @return ArticleAutoSaveVo
      */
     ArticleAutoSaveVo queryAutoSaveArticleContentById(Long recordId);
+
+    /**
+     * 保存文章草稿
+     *
+     * @param articleDto 文章信息
+     */
+    void saveArticleDraft(ArticleDraftDto articleDto);
+
+    /**
+     * 查询最新的文章草稿
+     *
+     * @return ArticleVo
+     */
+    ArticleVo queryLastArticleDraft();
 
 
 //    /**

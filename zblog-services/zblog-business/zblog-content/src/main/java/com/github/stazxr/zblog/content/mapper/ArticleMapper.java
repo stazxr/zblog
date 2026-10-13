@@ -33,6 +33,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      */
     ArticleCountVo selectMyArticleCountInfo(@Param("authorId") Long authorId);
 
+    /**
+     * 查询最新的文章草稿
+     *
+     * @return ArticleVo
+     */
+    ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
 
 
 //    /**
@@ -106,28 +112,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
 //     * @return ArticleList
 //     */
 //    List<ArticleVo> selectWebArticleList(ArticleQueryDto queryDto);
-//
-//    /**
-//     * 查询最新的文章草稿
-//     *
-//     * @param authorId 作者
-//     * @return ArticleVo
-//     */
-//    ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
-//
-//    /**
-//     * 删除文章内容临时记录
-//     *
-//     * @param articleId 文章序列
-//     */
-//    void deleteArticleTmpContent(@Param("articleId") Long articleId);
-//
-//    /**
-//     * 新增文章内容临时记录
-//     *
-//     * @param articleTmpContent 内容信息
-//     */
-//    void insertArticleTmpContent(ArticleTmpContentVo articleTmpContent);
 //
 //    /**
 //     * 清空回收站

@@ -923,9 +923,12 @@ export default {
           this.$message.error('内容版本与当前文章不匹配')
           return
         }
-        const content = data.contentMd || data.content || ''
-        this.formData.contentMd = content
+        this.formData.title = data.title || this.formData.title
+        this.formData.slug = data.slug || this.formData.slug
         this.formData.summary = data.summary || this.formData.summary
+
+        const content = data.content || ''
+        this.formData.contentMd = content
         this.lastAutoSaveContent = content
         this.updateTotalCount()
         this.$message.success('内容恢复成功')
@@ -1075,39 +1078,6 @@ export default {
       })
     },
 
-    // 重置草稿保存状态
-    resetSaveDraftData() {
-      this.lastAutoSaveTime = ''
-      this.showAutoSaveStatus = false
-    },
-
-    /**
-     * 清除最近草稿提示。
-     */
-    clearRecentDraft() {
-      this.recentDraft.id = ''
-      this.recentDraft.title = ''
-      this.showRecentDraftFlag = false
-    },
-
-    /**
-     * 查询最近草稿。
-     */
-    queryRecentDraft() {
-      this.$mapi.article.queryLastArticleDraft().then(({ data }) => {
-        if (!data) {
-          this.clearRecentDraft()
-          return
-        }
-
-        this.showRecentDraftFlag = true
-        this.recentDraft.id = data.id
-        this.recentDraft.title = data.title || '未命名文章'
-      }).catch(() => {
-        this.clearRecentDraft()
-      })
-    },
-
     // 查询文章详情
     getArticleDetail(articleId) {
       this.pageLoading = true
@@ -1230,6 +1200,39 @@ export default {
       })
     },
 
+    // 重置草稿保存状态
+    resetSaveDraftData() {
+      this.lastAutoSaveTime = ''
+      this.showAutoSaveStatus = false
+    },
+
+    /**
+     * 清除最近草稿提示。
+     */
+    clearRecentDraft() {
+      this.recentDraft.id = ''
+      this.recentDraft.title = ''
+      this.showRecentDraftFlag = false
+    },
+
+    /**
+     * 查询最近草稿。
+     */
+    queryRecentDraft() {
+      this.$mapi.article.queryLastArticleDraft().then(({ data }) => {
+        if (!data) {
+          this.clearRecentDraft()
+          return
+        }
+
+        this.showRecentDraftFlag = true
+        this.recentDraft.id = data.id
+        this.recentDraft.title = data.title || '未命名文章'
+      }).catch(() => {
+        this.clearRecentDraft()
+      })
+    },
+
     /**
      * 关闭最近草稿提示。
      */
@@ -1246,12 +1249,12 @@ export default {
       const param = this.buildSubmitData()
       param.articleStatus = 1
       this.draftLoading = true
-      this.$mapi.article.saveArticleDraft(param).then(({ data, message }) => {
-        this.$message.success(message || '草稿保存成功')
+      this.$mapi.article.saveArticleDraft(param).then(_ => {
+        this.$message.success('草稿保存成功')
         this.formData.action = 'edit'
         this.formData.articleStatus = 1
         this.lastAutoSaveContent = this.formData.contentMd
-        this.lastAutoSaveTime = data || this.getCurrentTimeText()
+        this.lastAutoSaveTime = this.getCurrentTimeText()
         this.showAutoSaveStatus = true
       }).catch(() => {
         this.lastAutoSaveTime = ''

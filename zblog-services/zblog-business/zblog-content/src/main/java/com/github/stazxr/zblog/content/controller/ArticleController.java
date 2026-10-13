@@ -7,6 +7,7 @@ import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.bas.validation.group.Create;
 import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
+import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -140,17 +141,33 @@ public class ArticleController {
         return articleService.queryAutoSaveArticleContentById(recordId);
     }
 
+    /**
+     * 保存文章草稿
+     *
+     * @param articleDto 文章信息
+     */
+    @Log
+    @PostMapping(value = "/saveArticleDraft")
+    @ApiOperation(value = "保存文章草稿")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "保存文章草稿", code = "ARTIA003", level = RouterLevel.PUBLIC)
+    public void saveArticleDraft(@RequestBody @Validated ArticleDraftDto articleDto) {
+        articleService.saveArticleDraft(articleDto);
+    }
 
+    /**
+     * 查询最新的文章草稿
+     *
+     * @return ArticleVo
+     */
+    @GetMapping(value = "/queryLastArticleDraft")
+    @ApiOperation(value = "查询最新的文章草稿")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询最新的文章草稿", code = "ARTIQ005", level = RouterLevel.PUBLIC)
+    public ArticleVo queryLastArticleDraft() {
+        return articleService.queryLastArticleDraft();
+    }
 
-
-
-
-
-
-
-
-//    private final ArticleTagService articleTagService;
-//    private final ArticleCategoryService articleCategoryService;
 
 //    /**
 //     * 分页查询可见的文章列表
@@ -197,34 +214,6 @@ public class ArticleController {
 //    public Result editArticle(@RequestBody ArticleDto articleDto) {
 //        articleService.editArticle(articleDto);
 //        return Result.success();
-//    }
-//
-//    /**
-//     * 保存文章草稿
-//     *
-//     * @param articleDto 文章信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/saveArticleDraft")
-//    @ApiOperation(value = "保存文章草稿")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "保存文章草稿", code = "saveArticleDraft", level = RouterLevel.PUBLIC)
-//    public Result saveArticleDraft(@RequestBody ArticleDto articleDto) {
-//        return Result.success().data(articleService.saveArticleDraft(articleDto));
-//    }
-//
-//    /**
-//     * 查询最新的文章草稿
-//     *
-//     * @return ArticleVo
-//     */
-//    @GetMapping(value = "/queryLastArticleDraft")
-//    @ApiOperation(value = "查询最新的文章草稿")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询最新的文章草稿", code = "queryLastArticleDraft", level = RouterLevel.PUBLIC)
-//    public Result queryLastArticleDraft() {
-//        return Result.success().data(articleService.queryLastArticleDraft());
 //    }
 //    /**
 //     * 文章定时发布
