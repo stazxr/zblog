@@ -8,4 +8,8 @@
     <delete id="deleteByArticleIdHard">
         DELETE FROM article_tag_relation WHERE ARTICLE_ID = #{articleId} AND DELETED = 0
     </delete>
+
+    <select id="selectTagIdsByArticleId" resultType="java.lang.Long">
+        SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID = #{articleId} AND DELETED = 0
+    </select>
 </mapper>

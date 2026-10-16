@@ -4,4 +4,8 @@
     <delete id="deleteByArticleId">
         DELETE FROM article_image_relation WHERE ARTICLE_ID = #{articleId}
     </delete>
+
+    <select id="selectArticleCoverImages" resultType="java.lang.String">
+        SELECT ARTICLE_IMAGE FROM article_image_relation WHERE ARTICLE_ID = #{articleId}
+    </select>
 </mapper>

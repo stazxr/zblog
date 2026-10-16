@@ -34,12 +34,19 @@ public interface ArticleMapper extends BaseMapper<Article> {
     ArticleCountVo selectMyArticleCountInfo(@Param("authorId") Long authorId);
 
     /**
+     * 查询文章详情
+     *
+     * @param articleId 文章id
+     * @return ArticleVo
+     */
+    ArticleVo selectArticleDetail(@Param("articleId") Long articleId);
+
+    /**
      * 查询最新的文章草稿
      *
      * @return ArticleVo
      */
     ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
-
 
 //    /**
 //     * 查询用户文章列表
@@ -71,14 +78,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
 //     * @return ArticleCountData
 //     */
 //    ArticleCountData selectPublicArticleCountData();
-//
-//    /**
-//     * 查询文章详情
-//     *
-//     * @param articleId 文章ID
-//     * @return ArticleVo
-//     */
-//    ArticleVo selectArticleDetail(@Param("articleId") Long articleId);
 //
 //    /**
 //     * 修改文章状态

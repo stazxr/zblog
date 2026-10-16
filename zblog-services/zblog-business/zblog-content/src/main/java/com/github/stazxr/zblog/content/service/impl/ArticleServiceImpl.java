@@ -117,6 +117,35 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
+     * 查询我的文章详情
+     *
+     * @param articleId 文章id
+     * @return ArticleVo
+     */
+    @Override
+    public ArticleVo queryMyArticleDetail(Long articleId) {
+        Long loginId = SecurityUtils.getLoginId();
+        ArticleVo articleVo = baseMapper.selectArticleDetail(articleId);
+        if (articleVo != null) {
+            // 只能查询自己的文章
+            ThrowUtils.throwIf(!loginId.equals(articleVo.getAuthorId()), ArticleErrorCode.EARTIA005);
+
+            // 查询标签列表
+            List<Long> tagIds = articleTagMapper.selectTagIdsByArticleId(articleVo.getId());
+            articleVo.setTags(tagIds);
+
+            // 查询封面列表
+            if (ArticleCoverImageType.SINGLE.getValue().equals(articleVo.getCoverImageType()) ||
+                    ArticleCoverImageType.MULTIPLE.getValue().equals(articleVo.getCoverImageType()) ||
+                    ArticleCoverImageType.TITLE.getValue().equals(articleVo.getCoverImageType())) {
+                List<UploadFileVo> coverImages = fileRelationMapper.selectByBusinessInfo(articleId, ServiceUploadBusinessType.ARTICLE_COVER_IMG);
+                articleVo.setCoverImages(coverImages);
+            }
+        }
+        return ThrowUtils.requireNonNull(articleVo, BaseErrorCode.ECOREA001);
+    }
+
+    /**
      * 新增文章
      *
      * @param articleDto 文章信息
@@ -222,10 +251,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article = new Article();
             article.setId(articleId);
             if (StringUtils.isBlank(articleDto.getTitle())) {
-                articleDto.setTitle("系统自动生成_" + DateUtils.formatNow("yyyyMMddHHmmss"));
+                article.setTitle("未命名文章");
+            } else {
+                article.setTitle(articleDto.getTitle());
             }
-            article.setTitle(articleDto.getTitle());
-            article.setSlug(articleDto.getSlug());
             article.setSlug(articleDto.getSlug());
             article.setSummary(articleDto.getSummary());
             article.setContentMd(articleDto.getContentMd());
@@ -268,9 +297,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setCreateTime(now);
             article.setUpdaterId(loginId);
             article.setUpdateTime(now);
+            baseMapper.insert(article);
         } else {
-            // 修改场景 TODO
-
+            // 修改场景 TODO 后续完善修改逻辑
+//            if (article != null && !loginId.equals(article.getAuthorId())) {
+//                throw new BusinessException("无权操作该文章");
+//            }
         }
 
         // 删除临时保存记录
@@ -774,8 +806,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         fileRelationMapper.deleteByBusinessInfo(articleId, ServiceUploadBusinessType.ARTICLE_COVER_IMG);
         FileRelation fileRelation = new FileRelation();
-        fileRelation.setFileId(articleId);
-        fileRelation.setBusinessId(uploadFile.getFileId());
+        fileRelation.setFileId(uploadFile.getFileId());
+        fileRelation.setBusinessId(articleId);
         fileRelation.setBusinessType(ServiceUploadBusinessType.ARTICLE_COVER_IMG);
         fileRelationMapper.insert(fileRelation);
     }
@@ -791,8 +823,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             articleImageMapper.insert(articleImageRelation);
 
             FileRelation fileRelation = new FileRelation();
-            fileRelation.setFileId(articleId);
-            fileRelation.setBusinessId(coverImage.getFileId());
+            fileRelation.setFileId(coverImage.getFileId());
+            fileRelation.setBusinessId(articleId);
             fileRelation.setBusinessType(ServiceUploadBusinessType.ARTICLE_COVER_IMG);
             fileRelationMapper.insert(fileRelation);
         }

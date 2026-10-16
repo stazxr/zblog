@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.base.mapper.FileRelationMapper">
+    <select id="selectByBusinessInfo" resultType="com.github.stazxr.zblog.base.domain.vo.UploadFileVo">
+        SELECT
+            f.ID AS fileId, fs.FILENAME AS filename, f.ORIGINAL_FILENAME AS originalFilename,
+            fs.FILE_ABSOLUTE_PATH AS fileAbsolutePath, fs.FILE_RELATIVE_PATH AS fileRelativePath, fs.FILE_ACCESS_URL AS fileAccessUrl
+        FROM file_storage fs
+        INNER JOIN file f ON f.STORAGE_ID = fs.ID
+        INNER JOIN file_relation fr ON fr.FILE_ID = f.ID
+        WHERE fr.BUSINESS_ID = #{businessId} AND fr.BUSINESS_TYPE = #{businessType}
+    </select>
+
     <delete id="deleteByBusinessInfo">
         DELETE FROM file_relation WHERE BUSINESS_ID = #{businessId} AND BUSINESS_TYPE = #{businessType}
     </delete>

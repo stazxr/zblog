@@ -67,6 +67,23 @@ public class ArticleController {
     }
 
     /**
+     * 查询我的文章详情
+     *
+     * @param articleId 文章id
+     * @return ArticleVo
+     */
+    @GetMapping(value = "/queryMyArticleDetail")
+    @ApiOperation(value = "查询我的文章详情")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询我的文章详情", code = "ARTIQ006", level = RouterLevel.PUBLIC)
+    public ArticleVo queryMyArticleDetail(@RequestParam Long articleId) {
+        return articleService.queryMyArticleDetail(articleId);
+    }
+
+    /**
      * 新增文章
      *
      * @param articleDto 文章信息
@@ -183,38 +200,6 @@ public class ArticleController {
 //        return Result.success().data(articleService.queryPublicArticleListByPage(queryDto));
 //    }
 //
-//    /**
-//     * 查询文章详情
-//     *
-//     * @param articleId 文章ID
-//     * @return ArticleVo
-//     */
-//    @GetMapping(value = "/queryArticleDetail")
-//    @ApiOperation(value = "查询文章详情")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
-//    })
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "查询文章详情", code = "queryArticleDetail", level = RouterLevel.PUBLIC)
-//    public Result queryArticleDetail(@RequestParam Long articleId) {
-//        return Result.success().data(articleService.queryArticleDetail(articleId));
-//    }
-//
-//    /**
-//     * 编辑文章
-//     *
-//     * @param articleDto 文章信息
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/editArticle")
-//    @ApiOperation(value = "编辑文章")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "编辑文章", code = "editArticle", level = RouterLevel.PUBLIC)
-//    public Result editArticle(@RequestBody ArticleDto articleDto) {
-//        articleService.editArticle(articleDto);
-//        return Result.success();
-//    }
 //    /**
 //     * 文章定时发布
 //     *

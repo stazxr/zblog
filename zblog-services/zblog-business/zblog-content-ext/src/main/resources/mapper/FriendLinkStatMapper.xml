@@ -15,7 +15,7 @@
             LAST_CLICK_TIME = NOW()
     </insert>
 
-    <update id="resetDayClick">
+    <update id="resetDayClick"> <!-- TODO 待修复 -->
         UPDATE friend_link_stat SET DAY_CLICK = 0 WHERE DAY_CLICK != 0
     </update>
 

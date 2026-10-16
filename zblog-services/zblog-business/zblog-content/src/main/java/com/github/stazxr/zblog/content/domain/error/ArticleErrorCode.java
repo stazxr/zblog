@@ -16,7 +16,9 @@ public enum ArticleErrorCode implements ErrorCode {
     /** 请上传文章封面 */
     EARTIA003("ARTICLE_COVER_IMAGE_REQUIRED"),
     /** 请填写原文地址 */
-    EARTIA004("ARTICLE_SOURCE_URL_REQUIRED");
+    EARTIA004("ARTICLE_SOURCE_URL_REQUIRED"),
+    /** 没有查看权限 */
+    EARTIA005("ARTICLE_READ_NO_PERMISSION");
 
     private final String i18nKey;
 

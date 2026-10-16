@@ -6,9 +6,7 @@
           <!-- 最近草稿提示 -->
           <div v-if="showRecentDraftFlag && recentDraft.id" class="recent-draft-box">
             <span class="icon-type">草稿</span>
-            <p class="draft-title" :title="recentDraft.title">
-              <a class="draft-title-link" @click="openDraftPage(recentDraft.id)">{{ recentDraft.title }}</a>
-            </p>
+            <p class="draft-title" :title="recentDraft.title">{{ recentDraft.title }}</p>
             <a class="draft-btn-edit" @click="openDraftPage(recentDraft.id)">继续编辑</a>
             <a class="draft-btn-more" @click="openMoreDraftPage">更多草稿</a>
             <button class="draft-btn-close" @click="closeDraftPage">×</button>
@@ -43,7 +41,7 @@
           <!-- 编辑器底部操作 -->
           <div class="editor-content-opt">
             <div class="editor-content-opt-left">
-              <span v-if="showAutoSaveStatus" class="save-draft-span">草稿已保存 {{ lastAutoSaveTime }}</span>
+              <span v-if="showSaveTimeStatus" class="save-draft-span">草稿已保存 {{ saveTime }}</span>
               <span>共 {{ totalCount }} 字</span>
             </div>
             <div class="editor-content-opt-right">
@@ -234,91 +232,6 @@
                   </el-radio>
                 </el-radio-group>
               </el-form-item>
-
-              <!-- 公众号验证 -->
-              <!-- <template v-if="formData.articlePerm === 4">
-                <el-form-item label="验证方式：" prop="verifyType">
-                  <el-radio-group v-model="formData.verifyType">
-                    <el-radio :label="1">公众号验证码</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-
-                <el-form-item label="验证码有效期：" prop="verifyExpireMinutes">
-                  <el-input-number
-                    v-model="formData.verifyExpireMinutes"
-                    :min="1"
-                    :max="1440"
-                    controls-position="right"
-                  />
-                  <span class="form-unit">分钟</span>
-                </el-form-item>
-                <el-form-item label="验证提示：" prop="verifyHint">
-                  <el-input
-                    v-model="formData.verifyHint"
-                    type="textarea"
-                    :rows="3"
-                    maxlength="500"
-                    show-word-limit
-                    placeholder="请输入访问验证提示"
-                    style="width: 450px"
-                  />
-                </el-form-item>
-              </template> -->
-
-              <!-- 密码 -->
-              <!-- <template v-if="formData.articlePerm === 5">
-                <el-form-item label="访问密码：" prop="accessPassword">
-                  <el-input
-                    v-model="formData.accessPassword"
-                    type="password"
-                    maxlength="20"
-                    show-password
-                    placeholder="请输入文章访问密码"
-                    style="width: 300px"
-                  />
-                  <div class="form-tip">
-                    访问者需要输入正确密码后才能查看文章
-                  </div>
-                </el-form-item>
-              </template> -->
-
-              <!-- 付费访问 -->
-              <!-- <template v-if="formData.articlePerm === 6">
-                <el-form-item label="文章售价：" prop="payPrice">
-                  <el-input v-model="formData.payPrice" maxlength="10" placeholder="请输入文章售价" style="width: 200px">
-                    <template slot="append">元</template>
-                  </el-input>
-                </el-form-item>
-                <el-form-item label="购买有效期：" prop="payValidType">
-                  <el-radio-group v-model="formData.payValidType">
-                    <el-radio :label="1">永久有效</el-radio>
-                    <el-radio :label="2">限时有效</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-                <el-form-item v-if="formData.payValidType === 2" label="有效天数：" prop="payValidDays">
-                  <el-input-number v-model="formData.payValidDays" :min="1" :max="3650" controls-position="right" />
-                  <span class="form-unit">天</span>
-                </el-form-item>
-              </template> -->
-
-              <!-- 指定用户 -->
-              <!-- <template v-if="formData.articlePerm === 7">
-                <el-form-item label="授权用户：" prop="accessUsers">
-                  <div class="access-user-list">
-                    <el-tag
-                      v-for="user in formData.accessUsers"
-                      :key="user.userId"
-                      closable
-                      @close="removeAccessUser(user.userId)"
-                    >
-                      {{ user.nickname }}
-                    </el-tag>
-                    <el-button type="text" icon="el-icon-plus" @click="openUserSelector">
-                      添加用户
-                    </el-button>
-                  </div>
-                </el-form-item>
-              </template> -->
             </el-card>
 
             <!-- SEO 配置 -->
@@ -466,18 +379,22 @@ export default {
       submitByTimeLoading: false,
       callActivated: false, // 是否已经完成页面初始化
 
+      saveTime: '', // 文章保存时间
+      showSaveTimeStatus: false, // 是否展示自动保存状态
       autoSaveTimer: null, // 自动保存定时任务
-      lastAutoSaveTime: '', // 草稿保存时间
       lastAutoSaveContent: '', // 最近一次正式保存的内容，用于判断自动保存时文章内容是否发生变化
       isAutoSaving: false, // 是否正在保存
-      showAutoSaveStatus: false, // 是否展示自动保存状态
       autoSaveRecordDrawerVisible: false, // 是否展示自动保存记录列表
-
       showRecentDraftFlag: false, // 是否显示最近草稿
       recentDraft: {
-        id: '',
-        title: ''
+        id: '', // 最近草稿ID
+        title: '' // 最近草稿标题
       },
+
+      choosePublishTimeDialogVisible: false, // 定时发布
+      publishDate: '',
+      publishTime: '',
+      publishTimeDisabled: true,
 
       formData: {
         action: '',
@@ -499,15 +416,6 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-
-        // accessPassword: '',
-        // verifyType: 1, // 公众号验证
-        // verifyExpireMinutes: 10,
-        // verifyHint: '',
-        // payPrice: '', // 付费
-        // payValidType: 1,
-        // payValidDays: null,
-        // accessUsers: [], // 指定用户
 
         articleStatus: 1,
         publishTime: ''
@@ -540,33 +448,7 @@ export default {
         sourceUrl: [
           { required: true, message: '请填写原文地址', trigger: 'blur' }
         ]
-        /* , accessPassword: [
-          {
-            validator: (rule, value, callback) => {
-              if (this.formData.articlePerm !== 5) {
-                callback()
-                return
-              }
-
-              if (!value || !value.trim()) {
-                callback(new Error('请输入访问密码'))
-                return
-              }
-
-              callback()
-            },
-            trigger: 'blur'
-          }
-        ] */
       },
-
-      /**
-       * 定时发布。
-       */
-      choosePublishTimeDialogVisible: false,
-      publishDate: '',
-      publishTime: '',
-      publishTimeDisabled: true,
 
       publishDateRange: {
         disabledDate(time) {
@@ -672,7 +554,7 @@ export default {
   //
   //         if (articleId) {
   //           this.clearRecentDraft()
-  //           this.resetSaveDraftData()
+  //           this.resetAutoSaveStatus()
   //           this.getArticleDetail(articleId)
   //
   //           this.$router.push({
@@ -684,33 +566,23 @@ export default {
   //         }
   //       }
   //     }
-  //   },
-  //
-  //   /**
-  //    * 私密文章不允许定时发布。
-  //    */
-  //   'formData.articlePerm'(value) {
-  //     if (value === 2 || value === 3) {
-  //       this.publishDate = ''
-  //       this.publishTime = ''
-  //       this.publishTimeDisabled = true
-  //     }
   //   }
   // },
 
   created() {
-    // 获取分类列表
+    // 查询分类列表
     this.getArticleCategoryTree()
-    // 获取标签列表
+    // 查询标签列表
     this.getArticleTagList()
+    // 查询最近的草稿
+    this.queryRecentDraft()
+    // 重置自动保存状态
+    this.resetAutoSaveStatus()
 
-    this.resetSaveDraftData()
     const articleId = this.$route.query.articleId
     if (articleId) {
-      this.clearRecentDraft()
       this.getArticleDetail(articleId)
     } else {
-      this.queryRecentDraft()
       this.autoGenerateId()
     }
 
@@ -735,13 +607,13 @@ export default {
 
         if (articleId !== this.formData.id) {
           this.getArticleTagList()
-          this.resetSaveDraftData()
+          this.resetAutoSaveStatus()
           this.getArticleDetail(articleId)
         }
       } else if (this.formData.action !== 'add') {
         this.clearData()
         this.getArticleTagList()
-        this.resetSaveDraftData()
+        this.resetAutoSaveStatus()
         this.queryRecentDraft()
         this.autoGenerateId()
       }
@@ -837,6 +709,56 @@ export default {
       }, 200)
     },
 
+    // 查询文章详情
+    getArticleDetail(articleId) {
+      this.pageLoading = true
+      this.$mapi.article.queryMyArticleDetail({ articleId }).then(({ data }) => {
+        if (!data) {
+          this.$message.error('文章不存在')
+          return
+        }
+
+        if (data.deleteFlag != null && data.deleteFlag !== 0) {
+          this.$message.error('文章处于回收站中，不允许编辑，请先恢复文章')
+          return
+        }
+
+        this.formData = this.normalizeArticleData(data)
+        this.formData.action = 'edit'
+        this.lastAutoSaveContent = this.formData.contentMd || ''
+        this.updateTotalCount()
+      }).catch(error => {
+        console.log('get article detail failed', error)
+        this.$message.error('加载文章信息失败，请刷新浏览器再试！')
+      }).finally(() => {
+        this.pageLoading = false
+      })
+    },
+    // 将后端返回的数据转换成页面模型
+    normalizeArticleData(data) {
+      return {
+        id: data.id,
+        title: data.title,
+        slug: data.slug,
+        summary: data.summary,
+        contentMd: data.contentMd,
+        categoryId: data.categoryId,
+        tags: Array.isArray(data.tags) ? data.tags : [],
+        seoTitle: data.seoTitle || '',
+        seoKeywords: data.seoKeywords || '',
+        seoDescription: data.seoDescription || '',
+        articleType: data.articleType || 1,
+        articlePerm: data.articlePerm == null ? 1 : data.articlePerm,
+        sourceName: data.sourceName || '',
+        sourceAuthor: data.sourceAuthor || '',
+        sourceUrl: data.sourceUrl || '',
+        commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
+        coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
+        coverImages: Array.isArray(data.coverImages) ? data.coverImages : [],
+        publishTime: data.publishTime || ''
+      }
+    },
+
     // 开启自动保存
     startAutoSaveEvent() {
       this.stopAutoSaveEvent()
@@ -850,6 +772,11 @@ export default {
         window.clearInterval(this.autoSaveTimer)
         this.autoSaveTimer = null
       }
+    },
+    // 重置自动保存状态
+    resetAutoSaveStatus() {
+      this.saveTime = ''
+      this.showSaveTimeStatus = false
     },
     // 自动保存前置检查
     autoSaveArticleContent() {
@@ -886,8 +813,8 @@ export default {
       this.$mapi.article.autoSaveArticleContent(param).then(({ data }) => {
         if (data != null) {
           this.lastAutoSaveContent = this.formData.contentMd
-          this.lastAutoSaveTime = data
-          this.showAutoSaveStatus = true
+          this.saveTime = data
+          this.showSaveTimeStatus = true
         }
       }).catch(error => {
         console.log('auto save article content failed', error)
@@ -935,6 +862,93 @@ export default {
       }).catch(() => {
         this.$message.error('内容恢复失败')
       })
+    },
+
+    // 查询最近草稿
+    queryRecentDraft() {
+      this.$mapi.article.queryLastArticleDraft().then(({ data }) => {
+        if (!data) {
+          this.clearRecentDraft()
+          return
+        }
+
+        this.recentDraft.id = data.id
+        this.recentDraft.title = data.title || '未命名文章'
+        this.showRecentDraftFlag = true
+      }).catch(() => {
+        this.clearRecentDraft()
+      })
+    },
+    // 清除最近草稿提示
+    clearRecentDraft() {
+      this.showRecentDraftFlag = false
+      this.recentDraft.id = ''
+      this.recentDraft.title = ''
+    },
+    // 关闭最近草稿提示
+    closeDraftPage() {
+      this.showRecentDraftFlag = false
+    },
+    // 查询最近草稿
+    openDraftPage(articleId) {
+      if (!articleId) {
+        this.$message.warning('草稿 ID 不存在')
+        return
+      }
+
+      // 清除最近草稿提示及自动保存状态
+      this.clearRecentDraft()
+      this.resetAutoSaveStatus()
+
+      // 加载目标草稿详情
+      this.getArticleDetail(articleId)
+    },
+    // 打开更多草稿列表
+    openMoreDraftPage() {
+      this.$router.push({ name: 'Article', query: { _ts: '7' }})
+    },
+    // 保存草稿
+    saveDraft() {
+      this.updateTotalCount()
+      const param = this.buildCommonSubmitData()
+      this.draftLoading = true
+      this.$mapi.article.saveArticleDraft(param).then(_ => {
+        this.$message.success('草稿保存成功')
+        this.formData.action = 'edit'
+        this.formData.articleStatus = 1 // 草稿
+        this.lastAutoSaveContent = this.formData.contentMd
+        this.saveTime = this.getCurrentTimeText()
+        this.showSaveTimeStatus = true
+      }).catch(() => {
+        this.saveTime = ''
+        this.showSaveTimeStatus = false
+      }).finally(() => {
+        this.draftLoading = false
+      })
+    },
+
+    // 构造文章提交参数
+    buildCommonSubmitData() {
+      return {
+        id: this.formData.id,
+        title: this.formData.title,
+        slug: this.formData.slug,
+        summary: this.formData.summary,
+        contentMd: this.formData.contentMd,
+        categoryId: this.formData.categoryId,
+        tags: this.formData.tags,
+        seoTitle: this.formData.seoTitle,
+        seoKeywords: this.formData.seoKeywords,
+        seoDescription: this.formData.seoDescription,
+        articlePerm: this.formData.articlePerm,
+        articleType: this.formData.articleType,
+        sourceName: this.formData.sourceName,
+        sourceAuthor: this.formData.sourceAuthor,
+        sourceUrl: this.formData.sourceUrl,
+        commentFlag: this.formData.commentFlag,
+        coverImageType: this.formData.coverImageType,
+        coverImages: this.formData.coverImages
+      }
     },
 
     // 更新文章字数
@@ -1012,7 +1026,7 @@ export default {
       }
     },
 
-    // 自动生成 Slug
+    // 自动生成 SLUG
     generateSlug() {
       if (!this.formData.title) {
         return
@@ -1078,67 +1092,6 @@ export default {
       })
     },
 
-    // 查询文章详情
-    getArticleDetail(articleId) {
-      this.pageLoading = true
-      this.$mapi.article.queryArticleDetail({ articleId }).then(({ data }) => {
-        if (!data) {
-          this.$message.error('文章不存在')
-          return
-        }
-
-        if (data.deleteFlag != null && data.deleteFlag !== 0) {
-          this.$message.error('文章处于回收站中，不允许编辑，请先恢复文章')
-          return
-        }
-
-        this.formData = this.normalizeArticleData(data)
-        this.formData.action = 'edit'
-        this.lastAutoSaveContent = this.formData.contentMd || ''
-        this.updateTotalCount()
-        this.initPublishTime(this.formData.publishTime)
-      }).catch(error => {
-        console.log('getArticleDetail failed', error)
-        this.$message.error('加载文章信息失败，请刷新浏览器再试！')
-      }).finally(() => {
-        this.pageLoading = false
-      })
-    },
-
-    /**
-     * 将后端返回的数据转换成页面模型。
-     *
-     * 兼容旧接口中的部分字段名称，
-     * 方便数据库/后端逐步迁移。
-     */
-    normalizeArticleData(data) {
-      return {
-        action: 'edit',
-        id: data.id || '',
-        title: data.title || '',
-        slug: data.slug || '',
-        summary: data.summary || data.remark || '',
-        contentMd: data.contentMd || data.content || '',
-        categoryId: data.categoryId || '', // 文章分类
-        tags: Array.isArray(data.tags) ? data.tags : [], // 文章标签
-        authorId: data.authorId || '',
-        seoTitle: data.seoTitle || '',
-        seoKeywords: data.seoKeywords || '',
-        seoDescription: data.seoDescription || '',
-        articleType: data.articleType || 1,
-        articleStatus: data.articleStatus == null ? 1 : data.articleStatus,
-        articlePerm: data.articlePerm == null ? 1 : data.articlePerm,
-        accessPassword: data.accessPassword || '',
-        sourceName: data.sourceName || '',
-        sourceAuthor: data.sourceAuthor || '',
-        sourceUrl: data.sourceUrl || '',
-        commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
-        coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
-        coverImages: Array.isArray(data.coverImages) ? data.coverImages : [],
-        publishTime: data.publishTime || ''
-      }
-    },
-
     /**
      * 初始化发布时间。
      */
@@ -1167,137 +1120,10 @@ export default {
       return value < 10 ? '0' + value : String(value)
     },
 
-    /**
-     * Markdown 编辑器内容变化。
-     */
+    // Markdown 编辑器内容变化
     onContentChange(content) {
       this.formData.contentMd = content || ''
       this.updateTotalCount()
-    },
-
-    /**
-     * 查询最近草稿。
-     */
-    openDraftPage(articleId) {
-      this.$router.push({
-        name: 'AddArticle',
-        query: {
-          articleId,
-          _f: ''
-        }
-      })
-    },
-
-    /**
-     * 打开草稿列表。
-     */
-    openMoreDraftPage() {
-      this.$router.push({
-        name: 'Article',
-        query: {
-          _ts: 7
-        }
-      })
-    },
-
-    // 重置草稿保存状态
-    resetSaveDraftData() {
-      this.lastAutoSaveTime = ''
-      this.showAutoSaveStatus = false
-    },
-
-    /**
-     * 清除最近草稿提示。
-     */
-    clearRecentDraft() {
-      this.recentDraft.id = ''
-      this.recentDraft.title = ''
-      this.showRecentDraftFlag = false
-    },
-
-    /**
-     * 查询最近草稿。
-     */
-    queryRecentDraft() {
-      this.$mapi.article.queryLastArticleDraft().then(({ data }) => {
-        if (!data) {
-          this.clearRecentDraft()
-          return
-        }
-
-        this.showRecentDraftFlag = true
-        this.recentDraft.id = data.id
-        this.recentDraft.title = data.title || '未命名文章'
-      }).catch(() => {
-        this.clearRecentDraft()
-      })
-    },
-
-    /**
-     * 关闭最近草稿提示。
-     */
-    closeDraftPage() {
-      this.showRecentDraftFlag = false
-    },
-
-    /**
-     * 保存草稿。
-     */
-    saveDraft() {
-      this.updateTotalCount()
-      this.formData.articleStatus = 1
-      const param = this.buildSubmitData()
-      param.articleStatus = 1
-      this.draftLoading = true
-      this.$mapi.article.saveArticleDraft(param).then(_ => {
-        this.$message.success('草稿保存成功')
-        this.formData.action = 'edit'
-        this.formData.articleStatus = 1
-        this.lastAutoSaveContent = this.formData.contentMd
-        this.lastAutoSaveTime = this.getCurrentTimeText()
-        this.showAutoSaveStatus = true
-      }).catch(() => {
-        this.lastAutoSaveTime = ''
-        this.showAutoSaveStatus = false
-      }).finally(() => {
-        this.draftLoading = false
-      })
-    },
-
-    /**
-     * 构造文章提交参数。
-     *
-     * 页面模型和后端 DTO 解耦，
-     * 后续后端字段调整时只修改这里。
-     */
-    buildSubmitData() {
-      this.updateTotalCount()
-
-      return {
-        id: this.formData.id,
-        title: this.formData.title,
-        slug: this.formData.slug,
-        summary: this.formData.summary,
-        contentMd: this.formData.contentMd,
-        categoryId: this.formData.categoryId, // 文章分类
-        tags: this.formData.tags, // 文章标签
-        authorId: this.formData.authorId,
-        seoTitle: this.formData.seoTitle,
-        seoKeywords: this.formData.seoKeywords,
-        seoDescription: this.formData.seoDescription,
-        articleType: this.formData.articleType,
-        articleStatus: this.formData.articleStatus,
-        articlePerm: this.formData.articlePerm,
-        accessPassword: this.formData.articlePerm === 3 ? this.formData.accessPassword : '',
-        sourceName: this.formData.articleType === 1 ? '' : this.formData.sourceName,
-        sourceAuthor: this.formData.articleType === 1 ? '' : this.formData.sourceAuthor,
-        sourceUrl: this.formData.articleType === 1 ? '' : this.formData.sourceUrl,
-        commentFlag: this.formData.commentFlag,
-        coverImageType: this.formData.coverImageType,
-        coverImages: this.formData.coverImages,
-        wordsCount: this.totalCount,
-        publishTime: this.formData.publishTime || null
-      }
     },
 
     /**
@@ -1548,7 +1374,7 @@ export default {
 
       this.formData.publishTime = this.publishDateTime
 
-      const param = this.buildSubmitData()
+      const param = this.buildCommonSubmitData()
 
       /*
        * 新表中的定时发布建议由：
@@ -1584,8 +1410,7 @@ export default {
           return
         }
 
-        const param = this.buildSubmitData()
-        console.log('param', param)
+        const param = this.buildCommonSubmitData()
 
         let request
         this.submitLoading = true
@@ -1683,7 +1508,7 @@ export default {
       this.publishTime = ''
       this.publishTimeDisabled = true
 
-      this.resetSaveDraftData()
+      this.resetAutoSaveStatus()
 
       if (this.$refs.articleForm) {
         this.$refs.articleForm.resetFields()
@@ -2010,16 +1835,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.draft-title-link {
-  color: #303133;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.draft-title-link:hover {
-  color: #409eff;
 }
 
 .draft-btn-edit,

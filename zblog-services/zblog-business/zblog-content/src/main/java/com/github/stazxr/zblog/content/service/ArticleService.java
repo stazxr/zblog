@@ -35,6 +35,14 @@ public interface ArticleService extends IService<Article> {
     ArticleCountVo queryMyArticleCountInfo();
 
     /**
+     * 查询我的文章详情
+     *
+     * @param articleId 文章id
+     * @return ArticleVo
+     */
+    ArticleVo queryMyArticleDetail(Long articleId);
+
+    /**
      * 新增文章
      *
      * @param articleDto 文章信息
@@ -104,43 +112,6 @@ public interface ArticleService extends IService<Article> {
 //    ArticlePageData queryPublicArticleListByPage(ArticleQueryDto queryDto);
 //
 //    /**
-//     * 查询文章详情
-//     *
-//     * @param articleId 文章ID
-//     * @return ArticleVo
-//     */
-//    ArticleVo queryArticleDetail(Long articleId);
-//
-//    /**
-//     * 新增文章
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    void addArticle(ArticleDto articleDto);
-//
-//    /**
-//     * 编辑文章
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    void editArticle(ArticleDto articleDto);
-//
-//    /**
-//     * 保存文章草稿
-//     *
-//     * @param articleDto 文章信息
-//     * @return 保存时间
-//     */
-//    String saveArticleDraft(ArticleDto articleDto);
-//
-//    /**
-//     * 查询最新的文章草稿
-//     *
-//     * @return ArticleVo
-//     */
-//    ArticleVo queryLastArticleDraft();
-//
-//    /**
 //     * 文章定时发布
 //     *
 //     * @param articleDto 文章信息
@@ -179,13 +150,6 @@ public interface ArticleService extends IService<Article> {
 //     * @param articleId 文章ID
 //     */
 //    void recycleToDraftBox(Long articleId);
-//
-//    /**
-//     * 查询文章默认封面
-//     *
-//     * @return ArticleImg
-//     */
-//    String queryArticleDefaultImg();
 //
 //    /**
 //     * 审核文章

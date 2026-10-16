@@ -82,13 +82,22 @@
         WHERE ARTICLE_STATUS != 99 AND AUTHOR_ID = #{authorId}
     </select>
 
+    <select id="selectArticleDetail" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        SELECT
+            a.ID, a.TITLE, a.SLUG, a.SUMMARY, a.CONTENT_MD, a.CONTENT_HTML, a.CATEGORY_ID, a.AUTHOR_ID,
+            a.SEO_TITLE, a.SEO_KEYWORDS, a.SEO_DESCRIPTION, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.DELETE_FLAG,
+            a.ARTICLE_PERM, a.SOURCE_NAME, a.SOURCE_AUTHOR, a.SOURCE_URL, a.COMMENT_FLAG, a.COVER_IMAGE_TYPE,
+            a.WORDS_COUNT, a.VIEW_COUNT, a.LIKE_COUNT, a.COMMENT_COUNT, a.FAVORITE_COUNT, a.PUBLISH_TIME
+        FROM article a
+        WHERE a.DELETE_FLAG != 2 AND a.ID = #{articleId}
+    </select>
+
     <select id="selectLastArticleDraft" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
         SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
     </select>
 
 
-
-<!--    <resultMap id="articleVoListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
+    <!--    <resultMap id="articleVoListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
 <!--        <result property="id" column="ID" />-->
 <!--        <result property="title" column="TITLE" />-->
 <!--        <result property="articleType" column="ARTICLE_TYPE" />-->
@@ -319,30 +328,6 @@
 <!--            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS IN (4, 6, 7) AND ARTICLE_PERM = 1) AS dealCount,-->
 <!--            (SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 9 AND ARTICLE_PERM = 1) AS publishCount-->
 <!--        FROM DUAL-->
-<!--    </select>-->
-
-<!--    <select id="selectArticleDetail" resultMap="articleVoDetailMap">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.REMARK, a.CONTENT, a.CATEGORY_ID, c.NAME CATEGORY_NAME, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.EXTEND2,-->
-<!--            a.ARTICLE_PERM, a.COVER_IMAGE_TYPE, a.REPRINT_LINK, a.REPRINT_DESC, a.AUTHOR_ID, a.COMMENT_FLAG, u.GENDER AUTHOR_GENDER, u.NICKNAME AUTHOR_NICKNAME,-->
-<!--            a.CREATE_TIME, a.UPDATE_TIME, tag.ID TAG_ID, tag.NAME TAG_NAME, tag.TYPE TAG_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME,-->
-<!--            (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT,-->
-<!--            (SELECT COUNT(1) FROM article_like WHERE ARTICLE_ID = a.ID) LIKE_COUNT,-->
-<!--            (SELECT COUNT(1) FROM comment WHERE DELETED = 0 AND TYPE = 1 AND OBJECT_ID = a.ID) COMMENT_COUNT-->
-<!--        FROM-->
-<!--            article a-->
-<!--        LEFT JOIN (-->
-<!--            SELECT ata.ID, ata.NAME, ata.TYPE, atr.ARTICLE_ID, ata.DELETED FROM article_tag_relation atr LEFT JOIN article_tag ata ON ata.ID = atr.TAG_ID-->
-<!--        ) tag ON tag.ARTICLE_ID = a.ID AND tag.DELETED = 0-->
-<!--        LEFT JOIN (-->
-<!--            SELECT-->
-<!--                air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--            FROM article_img_relation air-->
-<!--            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        ) img ON img.ARTICLE_ID = a.ID-->
-<!--        LEFT JOIN user u ON u.ID = a.AUTHOR_ID-->
-<!--        LEFT JOIN article_category c ON c.ID = a.CATEGORY_ID-->
-<!--        WHERE a.DELETED = 0 AND a.ID = #{articleId}-->
 <!--    </select>-->
 
 <!--    <select id="selectWebArticleList" resultMap="articleVoWebListMap">-->

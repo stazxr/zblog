@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.content.domain.vo;
 
+import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
+import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -7,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 文章信息
@@ -59,25 +62,31 @@ public class ArticleVo implements Serializable {
     /**
      * 分类ID
      */
-    @ApiModelProperty(value = "分类ID", example = "10001")
+    @ApiModelProperty(value = "分类ID")
     private Long categoryId;
 
     /**
      * 分类名称
      */
-    @ApiModelProperty(value = "分类名称", example = "Java")
+    @ApiModelProperty(value = "分类名称")
     private String categoryName;
+
+    /**
+     * 标签id列表
+     */
+    @ApiModelProperty(value = "标签id列表")
+    private List<Long> tags;
 
     /**
      * 作者ID
      */
-    @ApiModelProperty(value = "作者ID", example = "1")
+    @ApiModelProperty(value = "作者ID")
     private Long authorId;
 
     /**
      * 作者名称
      */
-    @ApiModelProperty(value = "作者名称", example = "SunTao")
+    @ApiModelProperty(value = "作者名称")
     private String authorName;
 
     /**
@@ -100,54 +109,27 @@ public class ArticleVo implements Serializable {
 
     /**
      * 文章类型
-     * <p>
-     * 1-原创；2-转载；3-翻译
      */
-    @ApiModelProperty(value = "文章类型：1-原创；2-转载；3-翻译", example = "1")
+    @ApiModelProperty(value = "文章类型")
     private Integer articleType;
 
     /**
-     * 文章类型名称
-     */
-    @ApiModelProperty(value = "文章类型名称", example = "原创")
-    private String articleTypeName;
-
-    /**
      * 文章状态
-     * <p>
-     * 1-草稿；2-待审核；3-待审核（定时发布）；4-待发布；
-     * 5-审核不通过；6-已发布；7-临时下线；8-待整改
      */
-    @ApiModelProperty(value = "文章状态", example = "6")
+    @ApiModelProperty(value = "文章状态")
     private Integer articleStatus;
 
     /**
-     * 文章状态名称
-     */
-    @ApiModelProperty(value = "文章状态名称", example = "已发布")
-    private String articleStatusName;
-
-    /**
      * 删除标记
-     * <p>
-     * 0-正常；1-回收站；2-彻底删除
      */
-    @ApiModelProperty(value = "删除标记：0-正常；1-回收站；2-彻底删除", example = "0")
+    @ApiModelProperty(value = "删除标记：0-正常；1-回收站；2-彻底删除")
     private Integer deleteFlag;
 
     /**
      * 文章权限
-     * <p>
-     * 1-公开；2-私密；3-密码
      */
-    @ApiModelProperty(value = "文章权限：1-公开；2-私密；3-密码", example = "1")
+    @ApiModelProperty(value = "文章权限")
     private Integer articlePerm;
-
-    /**
-     * 访问密码
-     */
-    @ApiModelProperty(value = "访问密码")
-    private String accessPassword;
 
     /**
      * 文章来源名称
@@ -170,91 +152,91 @@ public class ArticleVo implements Serializable {
     /**
      * 是否允许评论
      */
-    @ApiModelProperty(value = "是否允许评论", example = "true")
+    @ApiModelProperty(value = "是否允许评论")
     private Boolean commentFlag;
 
     /**
      * 封面类型
      */
-    @ApiModelProperty(value = "封面类型", example = "1")
+    @ApiModelProperty(value = "封面类型")
     private Integer coverImageType;
 
     /**
-     * 封面图片
+     * 封面图片列表
      */
     @ApiModelProperty(value = "封面图片")
-    private String coverImage;
+    private List<UploadFileVo> coverImages;
 
     /**
      * 总字数
      */
-    @ApiModelProperty(value = "总字数", example = "3500")
+    @ApiModelProperty(value = "总字数")
     private Integer wordsCount;
 
     /**
      * 总浏览数
      */
-    @ApiModelProperty(value = "总浏览数", example = "1000")
+    @ApiModelProperty(value = "总浏览数")
     private Long viewCount;
 
     /**
      * 总点赞数
      */
-    @ApiModelProperty(value = "总点赞数", example = "100")
+    @ApiModelProperty(value = "总点赞数")
     private Long likeCount;
 
     /**
      * 总评论数
      */
-    @ApiModelProperty(value = "总评论数", example = "20")
+    @ApiModelProperty(value = "总评论数")
     private Long commentCount;
 
     /**
      * 总收藏数
      */
-    @ApiModelProperty(value = "总收藏数", example = "30")
+    @ApiModelProperty(value = "总收藏数")
     private Long favoriteCount;
 
     /**
      * 文章发布时间
      */
-    @ApiModelProperty(value = "文章发布时间", example = "2026-09-15 10:00:00")
+    @ApiModelProperty(value = "文章发布时间")
     private LocalDateTime publishTime;
 
     /**
      * 创建人
      */
-    @ApiModelProperty(value = "创建人ID", example = "1")
+    @ApiModelProperty(value = "创建人ID")
     private Long creatorId;
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "创建时间", example = "2026-09-15 10:00:00")
+    @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;
 
     /**
      * 最后修改人
      */
-    @ApiModelProperty(value = "最后修改人ID", example = "1")
+    @ApiModelProperty(value = "最后修改人ID")
     private Long updaterId;
 
     /**
      * 更新时间
      */
-    @ApiModelProperty(value = "更新时间", example = "2026-09-15 10:00:00")
+    @ApiModelProperty(value = "更新时间")
     private LocalDateTime updateTime;
 
     /**
      * 文章下线时间
      */
-    @ApiModelProperty(value = "文章下线时间", example = "2026-09-15 10:00:00")
+    @ApiModelProperty(value = "文章下线时间")
     private LocalDateTime deleteTime;
 
     /**
      * 迭代版本
      */
-    @ApiModelProperty(value = "迭代版本", example = "1")
+    @ApiModelProperty(value = "迭代版本")
     private Integer version;
 
     /**

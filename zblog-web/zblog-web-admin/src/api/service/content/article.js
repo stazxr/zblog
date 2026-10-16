@@ -12,13 +12,9 @@ export default {
   queryMyArticleCountInfo: params => {
     return api.httpRequest().get(`${articleApi}/queryMyArticleCountInfo`, params)
   },
-  // 分页查询用户文章列表
-  pageAuditArticleList: params => {
-    return api.httpRequest().get(`${articleApi}/pagePublicList`, params)
-  },
-  // 查询文章详情
-  queryArticleDetail: params => {
-    return api.httpRequest().get(`${articleApi}/queryArticleDetail`, params)
+  // 查询我的文章详情
+  queryMyArticleDetail: params => {
+    return api.httpRequest().get(`${articleApi}/queryMyArticleDetail`, params)
   },
   // 新增文章
   addArticle: params => {
@@ -32,7 +28,10 @@ export default {
   saveArticleDraft: params => {
     return api.httpRequest().post(`${articleApi}/saveArticleDraft`, params)
   },
-
+  // 查询最新的文章草稿
+  queryLastArticleDraft: params => {
+    return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
+  },
   // 文章内容自动保存
   autoSaveArticleContent: params => {
     return api.httpRequest().post(`${articleApi}/autoSaveArticleContent`, params)
@@ -46,13 +45,13 @@ export default {
     return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentById`, params)
   },
 
+  // 分页查询用户文章列表
+  pageAuditArticleList: params => {
+    return api.httpRequest().get(`${articleApi}/pagePublicList`, params)
+  },
   // 文章自动发布
   publishArticleByTiming: params => {
     return api.httpRequest().post(`${articleApi}/publishArticleByTiming`, params)
-  },
-  // 查询最新的文章草稿
-  queryLastArticleDraft: params => {
-    return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
   },
   // 删除文章：移动至回收站
   moveToRecycleBin: params => {
