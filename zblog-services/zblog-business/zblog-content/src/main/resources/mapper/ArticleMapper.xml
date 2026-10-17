@@ -1,12 +1,83 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleMapper">
-    <select id="selectMyArticleList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+    <resultMap id="articleVoListMap" type="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="summary" column="SUMMARY" />
+        <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="authorId" column="AUTHOR_ID" />
+        <result property="authorName" column="AUTHOR_NAME" />
+        <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="articleStatus" column="ARTICLE_STATUS" />
+        <result property="deleteFlag" column="DELETE_FLAG" />
+        <result property="articlePerm" column="ARTICLE_PERM" />
+        <result property="commentFlag" column="COMMENT_FLAG" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="wordsCount" column="WORDS_COUNT" />
+        <result property="viewCount" column="VIEW_COUNT" />
+        <result property="commentCount" column="COMMENT_COUNT" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="version" column="VERSION" />
+        <collection property="tagNames" ofType="java.lang.String">
+            <result column="TAG_NAME" />
+        </collection>
+        <collection property="coverImageList" ofType="java.lang.String">
+            <result column="ARTICLE_IMAGE" />
+        </collection>
+        <!-- <collection property="tagNames" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleTagNameList" column="ID" />
+        <collection property="coverImageList" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleCoverImageList" column="ID" /> -->
+    </resultMap>
+
+    <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        <result property="id" column="ID" />
+        <result property="title" column="TITLE" />
+        <result property="slug" column="SLUG" />
+        <result property="summary" column="SUMMARY" />
+        <result property="contentMd" column="CONTENT_MD" />
+        <result property="categoryId" column="CATEGORY_ID" />
+        <result property="categoryName" column="CATEGORY_NAME" />
+        <result property="authorId" column="AUTHOR_ID" />
+        <result property="authorName" column="AUTHOR_NAME" />
+        <result property="seoTitle" column="SEO_TITLE" />
+        <result property="seoKeywords" column="SEO_KEYWORDS" />
+        <result property="seoDescription" column="SEO_DESCRIPTION" />
+        <result property="articleType" column="ARTICLE_TYPE" />
+        <result property="articleStatus" column="ARTICLE_STATUS" />
+        <result property="deleteFlag" column="DELETE_FLAG" />
+        <result property="articlePerm" column="ARTICLE_PERM" />
+        <result property="sourceName" column="SOURCE_NAME" />
+        <result property="sourceAuthor" column="SOURCE_AUTHOR" />
+        <result property="sourceUrl" column="SOURCE_URL" />
+        <result property="commentFlag" column="COMMENT_FLAG" />
+        <result property="coverImageType" column="COVER_IMAGE_TYPE" />
+        <result property="wordsCount" column="WORDS_COUNT" />
+        <result property="viewCount" column="VIEW_COUNT" />
+        <result property="likeCount" column="LIKE_COUNT" />
+        <result property="commentCount" column="COMMENT_COUNT" />
+        <result property="favoriteCount" column="FAVORITE_COUNT" />
+        <result property="creatorId" column="CREATE_ID" />
+        <result property="createTime" column="CREATE_TIME" />
+        <result property="updaterId" column="UPDATE_ID" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="updateTime" column="UPDATE_TIME" />
+        <result property="deleteTime" column="DELETE_TIME" />
+        <result property="version" column="VERSION" />
+        <collection property="tagNames" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleTagNameList" column="ID" />
+        <collection property="coverImageList" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleCoverImageList" column="ID" />
+    </resultMap>
+
+    <select id="selectMyArticleList" resultMap="articleVoListMap">
         SELECT
-            a.ID, a.TITLE, c.NAME AS categoryName, u.NICKNAME AS authorName
+            a.ID, a.TITLE, a.ARTICLE_TYPE, c.NAME AS CATEGORY_NAME, a.ARTICLE_PERM, a.ARTICLE_STATUS, a.COMMENT_FLAG,
+            a.WORDS_COUNT, a.VIEW_COUNT, a.COMMENT_COUNT, u.NICKNAME AS AUTHOR_NAME, a.UPDATE_TIME, a.VERSION,
+            air.ARTICLE_IMAGE, t.NAME AS TAG_NAME
         FROM article a
         LEFT JOIN category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        LEFT JOIN article_image_relation air on air.ARTICLE_ID = a.ID
+        LEFT JOIN article_tag_relation atr on atr.ARTICLE_ID = a.ID
+        LEFT JOIN tag t on t.ID = atr.TAG_ID
         WHERE a.ARTICLE_STATUS != 99 AND a.AUTHOR_ID = #{query.authorId}
         <choose>
             <!-- 全部 -->
@@ -96,30 +167,25 @@
         SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
     </select>
 
+    <select id="selectArticleTagNameList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
+    </select>
+    <select id="selectArticleCoverImageList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
+    </select>
 
-    <!--    <resultMap id="articleVoListMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        <result property="id" column="ID" />-->
-<!--        <result property="title" column="TITLE" />-->
-<!--        <result property="articleType" column="ARTICLE_TYPE" />-->
-<!--        <result property="categoryId" column="CATEGORY_ID" />-->
-<!--        <result property="categoryName" column="CATEGORY_NAME" />-->
-<!--        <result property="commentFlag" column="COMMENT_FLAG" />-->
-<!--        <result property="articlePerm" column="ARTICLE_PERM" />-->
-<!--        <result property="articleStatus" column="ARTICLE_STATUS" />-->
-<!--        <result property="coverImageType" column="COVER_IMAGE_TYPE" />-->
-<!--        <result property="reprintLink" column="REPRINT_LINK" />-->
-<!--        <result property="reprintDesc" column="REPRINT_DESC" />-->
-<!--        <result property="authorId" column="AUTHOR_ID" />-->
-<!--        <result property="authorNickname" column="AUTHOR_NICKNAME" />-->
-<!--        <result property="createTime" column="CREATE_TIME" />-->
-<!--        <result property="updateTime" column="UPDATE_TIME" />-->
-<!--        <result property="desc" column="DESC" />-->
-<!--        <result property="wordCount" column="WORD_COUNT" />-->
-<!--        <result property="viewCount" column="VIEW_COUNT" />-->
-<!--        <result property="likeCount" column="LIKE_COUNT" />-->
-<!--        <collection property="tagList" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.domain.vo.TagVo" select="selectArticleTagList" column="ID" />-->
-<!--        <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />-->
-<!--    </resultMap>-->
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!--    <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
 <!--        <result property="id" column="ID" />-->
@@ -187,14 +253,6 @@
 <!--        <collection property="articleImg" javaType="java.util.ArrayList" ofType="com.github.stazxr.zblog.base.domain.entity.File" select="selectArticleImgList" column="ID" />-->
 <!--    </resultMap>-->
 
-<!--    <insert id="insertArticleTmpContent">-->
-<!--        INSERT INTO article_content_draft_record (-->
-<!--            ID, ARTICLE_ID, CONTENT, REMARK, `COUNT`, SAVE_TIME-->
-<!--        ) VALUES (-->
-<!--            #{id}, #{articleId}, #{content}, #{remark}, #{count}, #{saveTime}-->
-<!--        )-->
-<!--    </insert>-->
-
 <!--    <insert id="insertArticlePublishTiming">-->
 <!--        INSERT INTO article_auto_publish_timing (-->
 <!--            ID, ARTICLE_ID, PUBLISH_TIME, PRODUCER_TIME-->
@@ -205,20 +263,6 @@
 
 <!--    <update id="updateArticleStatus">-->
 <!--        UPDATE article SET ARTICLE_STATUS = #{status} WHERE ID = #{articleId}-->
-<!--    </update>-->
-
-<!--    <update id="batchUpdateArticleStatus">-->
-<!--        UPDATE article SET ARTICLE_STATUS = #{status}, `DESC` = #{desc} WHERE ID IN-->
-<!--        <choose>-->
-<!--            <when test="articleIds != null and articleIds.size() > 0">-->
-<!--                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">-->
-<!--                    #{articleId}-->
-<!--                </foreach>-->
-<!--            </when>-->
-<!--            <otherwise>-->
-<!--                ('no delete')-->
-<!--            </otherwise>-->
-<!--        </choose>-->
 <!--    </update>-->
 
 <!--    <update id="clearArticleRecycleBin">-->
@@ -350,10 +394,6 @@
 <!--            )-->
 <!--        </if>-->
 <!--        ORDER BY a.CREATE_TIME DESC-->
-<!--    </select>-->
-
-<!--    <select id="selectOneWithDeleted" resultType="com.github.stazxr.zblog.domain.entity.Article">-->
-<!--        SELECT ID, ARTICLE_STATUS, AUTHOR_ID, DELETED FROM article WHERE ID = #{articleId}-->
 <!--    </select>-->
 
 <!--    <select id="selectArticleByPublishId" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->

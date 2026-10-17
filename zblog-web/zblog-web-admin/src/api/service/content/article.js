@@ -5,7 +5,7 @@ const articleApi = '/api/articles'
 
 export default {
   // 分页查询我的文章列表
-  pageMyList: params => {
+  pageMyArticleList: params => {
     return api.httpRequest().get(`${articleApi}/pageMyList`, params)
   },
   // 查询我的文章数量统计信息

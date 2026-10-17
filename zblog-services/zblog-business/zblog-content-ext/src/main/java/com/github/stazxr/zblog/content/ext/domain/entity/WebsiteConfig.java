@@ -133,6 +133,11 @@ public class WebsiteConfig implements Serializable {
     private Integer barrageMessageLoadSize;
 
     /**
+     * 默认文章封面
+     */
+    private String defaultArticleCover;
+
+    /**
      * HTTPS 升级开关
      */
     private Boolean httpsSwitch;

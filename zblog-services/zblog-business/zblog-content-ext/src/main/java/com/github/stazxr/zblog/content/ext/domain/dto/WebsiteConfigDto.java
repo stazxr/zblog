@@ -153,6 +153,12 @@ public class WebsiteConfigDto implements Serializable {
     private Integer barrageMessageLoadSize;
 
     /**
+     * 默认文章封面
+     */
+    @ApiModelProperty("默认文章封面")
+    private String defaultArticleCover;
+
+    /**
      * HTTPS 升级开关
      */
     @ApiModelProperty("HTTPS 升级开关")

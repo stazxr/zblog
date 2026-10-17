@@ -119,18 +119,13 @@
                 </div>
               </template>
 
-              <!-- 随机封面 -->
-              <div v-if="formData.coverImageType === 4" class="form-tip">
-                从网站配置的封面中随机选择一张展示
-              </div>
-
               <!-- 标题生成 -->
-              <div v-if="formData.coverImageType === 5" class="form-tip">
+              <div v-if="formData.coverImageType === 4" class="form-tip">
                 根据文章标题自动生成封面
               </div>
 
               <!-- 无封面 -->
-              <div v-if="formData.coverImageType === 6" class="form-tip">
+              <div v-if="formData.coverImageType === 5" class="form-tip">
                 不使用文章封面
               </div>
             </el-form-item>
@@ -341,12 +336,11 @@ export default {
     return {
       addArticleImageIcon: addArticleImageIcon, // 添加封面图标
       coverImageTypeEnums: [ // 封面类型
-        { name: '系统默认', value: 1 },
+        { name: '默认封面', value: 1 },
         { name: '单封面', value: 2 },
         { name: '多封面', value: 3 },
-        { name: '随机封面', value: 4 },
-        { name: '标题生成', value: 5 },
-        { name: '无封面', value: 6 }
+        { name: '标题生成', value: 4 },
+        { name: '无封面', value: 5 }
       ],
       articleTypeEnums: [ // 文章类型
         { name: '原创', value: 1 },
@@ -356,7 +350,7 @@ export default {
       articlePermEnums: [ // 文章访问权限
         { name: '公开访问', value: 1 },
         { name: '登录可见', value: 2 },
-        { name: '仅自己可见', value: 3 },
+        { name: '仅作者可见', value: 3 },
         { name: '公众号验证', value: 4, disabled: true },
         { name: '密码访问', value: 5, disabled: true },
         { name: '付费访问', value: 6, disabled: true },
@@ -490,9 +484,9 @@ export default {
   },
 
   computed: {
-    // TODO 当前封面最大数量，待客户化
+    // 最大上传封面数
     maxUploadLimit() {
-      return this.formData.coverImageType === 3 ? 4 : 1
+      return this.formData.coverImageType === 3 ? 3 : 1
     },
 
     // 草稿按钮名称
@@ -508,9 +502,7 @@ export default {
       return '移至草稿箱'
     },
 
-    /**
-     * 是否显示定时发布。
-     */
+    // 是否显示定时发布
     autoPublishBtnShow() {
       return (
         this.formData.articleStatus == null ||
@@ -520,9 +512,7 @@ export default {
       )
     },
 
-    /**
-     * 定时发布时间。
-     */
+    // 定时发布时间
     publishDateTime() {
       if (!this.publishDate || !this.publishTime) {
         return ''
@@ -531,9 +521,7 @@ export default {
       return this.publishDate + ' ' + this.publishTime
     },
 
-    /**
-     * 是否已经选择完整的发布时间。
-     */
+    // 是否已经选择完整的发布时间
     publishDateTimeShow() {
       return !!(this.publishDate && this.publishTime)
     }

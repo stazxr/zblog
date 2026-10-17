@@ -1104,6 +1104,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_SOURCE_URL_REQUIRED', 'en-US', 'Article sourceUrl cannot be blank', 'common'),
 ('ARTICLE_READ_NO_PERMISSION', 'zh-CN', '没有权限，只允许编辑自己的文章', 'common'),
 ('ARTICLE_READ_NO_PERMISSION', 'en-US', 'No Permission', 'common'),
+('ARTICLE_COVER_IMAGE_OVER_MAX', 'zh-CN', '超过最大文章封面上传限制', 'common'),
+('ARTICLE_COVER_IMAGE_OVER_MAX', 'en-US', 'Article cover image size over max', 'common'),
 -- 门户
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),
@@ -1254,6 +1256,8 @@ CREATE TABLE website_config (
   COMMENT_GUEST_SWITCH TINYINT(1) DEFAULT 0 COMMENT '访客评论开关',
   -- 弹幕配置
   BARRAGE_MESSAGE_LOAD_SIZE INT DEFAULT 200 COMMENT '弹幕加载量',
+  -- 内容管理配置
+  DEFAULT_ARTICLE_COVER VARCHAR(1000) DEFAULT NULL COMMENT '默认文章封面',
   -- 安全配置
   HTTPS_SWITCH TINYINT(1) DEFAULT 0 COMMENT 'HTTPS 升级开关',
   -- 网站备案信息
@@ -1300,10 +1304,7 @@ INSERT INTO website_link_config (ID, LINK_NAME, LINK_TYPE, LINK_URL, LINK_ICON, 
 /*Table structure for table `admin_config` */
 DROP TABLE IF EXISTS `admin_config`;
 CREATE TABLE admin_config(
-  ID BIGINT NOT NULL COMMENT '主键',
-  -- 内容管理配置
-  DEFAULT_ARTICLE_COVER VARCHAR(500) DEFAULT NULL COMMENT '默认文章封面',
-  MAX_ARTICLE_COVER_SIZE INT DEFAULT 4 COMMENT '文章封面数量阙值'
+  ID BIGINT NOT NULL COMMENT '主键'
   -- 上传文件白名单配置
   -- INTERFACE_METRICS_FILTER_LOCAL
 );

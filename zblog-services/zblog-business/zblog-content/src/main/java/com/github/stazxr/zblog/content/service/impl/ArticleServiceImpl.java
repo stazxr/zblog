@@ -27,6 +27,7 @@ import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.content.mapper.*;
 import com.github.stazxr.zblog.content.service.ArticleService;
+import com.github.stazxr.zblog.content.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
 import com.github.stazxr.zblog.util.SlugUtils;
 import com.github.stazxr.zblog.util.StringUtils;
@@ -45,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -255,7 +257,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             } else {
                 article.setTitle(articleDto.getTitle());
             }
-            article.setSlug(articleDto.getSlug());
+            if (StringUtils.isBlank(articleDto.getSlug())) {
+                article.setSlug(null);
+            } else {
+                article.setSlug(articleDto.getSlug());
+            }
             article.setSummary(articleDto.getSummary());
             article.setContentMd(articleDto.getContentMd());
             article.setCategoryId(articleDto.getCategoryId());
@@ -726,13 +732,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return;
         }
         if (ArticleCoverImageType.MULTIPLE.getValue().equals(coverImageType)) {
-            // TODO 最大上传数量待客户化
             ThrowUtils.throwIf(CollectionUtils.isEmpty(coverImages), ArticleErrorCode.EARTIA003);
+            ThrowUtils.throwIf(coverImages.size() > Constants.MAX_ARTICLE_COVER_IMAGE_SIZE, ArticleErrorCode.EARTIA006);
             insertArticleCoverImages(articleId, coverImages);
-            return;
-        }
-        if (ArticleCoverImageType.RANDOM.getValue().equals(coverImageType)) {
-            removeArticleCoverImages(articleId, coverImages);
             return;
         }
         if (ArticleCoverImageType.TITLE.getValue().equals(coverImageType)) {
@@ -769,14 +771,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 return;
             }
             if (ArticleCoverImageType.MULTIPLE.getValue().equals(coverImageType)) {
-                // TODO 最大上传数量待客户化
+                List<UploadFileDto> _coverImages = new ArrayList<>();
+                for (UploadFileDto uploadFileDto : coverImages) {
+                    if (_coverImages.size() < Constants.MAX_ARTICLE_COVER_IMAGE_SIZE) {
+                        _coverImages.add(uploadFileDto);
+                    } else {
+                        fileMapper.deleteById(uploadFileDto.getFileId());
+                    }
+                }
+
                 insertArticleCoverImages(articleId, coverImages);
                 return;
             }
-        }
-        if (ArticleCoverImageType.RANDOM.getValue().equals(coverImageType)) {
-            removeArticleCoverImages(articleId, coverImages);
-            return;
         }
         if (ArticleCoverImageType.TITLE.getValue().equals(coverImageType)) {
             removeArticleCoverImages(articleId, coverImages);

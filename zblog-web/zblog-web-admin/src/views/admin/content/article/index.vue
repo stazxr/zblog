@@ -17,7 +17,7 @@
             <el-input id="search-title" v-model="filters.title" clearable placeholder="文章标题" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item label="" prop="search-slug">
-            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG" @keyup.enter.native="search" />
+            <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG（精确匹配）" @keyup.enter.native="search" />
           </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
             <el-button type="success" @click="search()">查 询</el-button>
@@ -27,7 +27,9 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['TAGSA001']" type="success" @click="addArticle">新增</el-button>
+          <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
+          <el-button v-perm="['ARTIU001']" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
+          <el-button v-perm="['ARTID001']" :disabled="row === null" type="danger" @click="deleteArticle">删除</el-button>
         </span>
       </div>
     </div>
@@ -37,104 +39,85 @@
         v-loading="tableLoading"
         :data="tableData"
         :header-cell-style="{background:'#FAFAFA'}"
+        highlight-current-row
         row-key="id"
         border
-        @selection-change="handleSelectionChange"
+        @current-change="handleCurrentChange"
       >
-        <el-table-column type="selection" width="45" />
-        <el-table-column :show-overflow-tooltip="true" prop="articleImgLinkList" label="文章封面" align="center" width="180" fixed="left">
-          <template slot-scope="scope">
-            <el-image
-              class="article-cover"
-              :src="scope.row['coverImageType'] === 3 ? articleDefaultImg : scope.row['articleImgLinkList'] && scope.row['articleImgLinkList'].length > 0 ? scope.row['articleImgLinkList'][0] : ''"
-              :preview-src-list="scope.row['articleImgLinkList']"
-            >
+        <el-table-column label="文章封面" align="center" width="180" fixed="left">
+          <template v-slot="scope">
+            <el-image class="article-cover" :src="getArticleCoverImage(scope.row.coverImageType, scope.row.coverImageList)" :preview-src-list="scope.row.coverImageList">
               <div slot="error" class="image-slot">
-                <span v-if="scope.row['coverImageType'] === 5">无封面</span>
+                <span v-if="scope.row.coverImageType === 1">默认封面</span>
+                <span v-if="scope.row.coverImageType === 5">无封面</span>
+                <span v-if="scope.row.coverImageType !== 1 && scope.row.coverImageType !== 5 && scope.row.coverImageList.length === 0">未配置</span>
                 <span v-else>加载失败</span>
               </div>
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="title" label="文章标题" align="left" width="200" fixed="left">
-          <template slot-scope="scope">
-            {{ scope.row['title'] }}
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="articleType" label="文章类型" width="80" align="center">
-          <template slot-scope="scope">
-            <span v-if="scope.row['articleType'] === 1" style="font-size: 12px">原创</span>
-            <span v-else-if="scope.row['articleType'] === 2">
-              <el-tooltip :content="scope.row['reprintLink']" placement="top" effect="light">
-                <el-link type="primary" :href="scope.row['reprintLink']" :disabled="scope.row['reprintLink'] === ''" :title="scope.row['reprintLink']" :underline="true" target="_blank" style="font-size: 12px">
-                  转载
-                </el-link>
-              </el-tooltip>
-            </span>
-            <span v-else-if="scope.row['articleType'] === 3">
-              <el-tooltip :content="scope.row['reprintLink']" placement="top" effect="light">
-                <el-link type="primary" :href="scope.row['reprintLink']" :disabled="scope.row['reprintLink'] === ''" :underline="true" target="_blank" style="font-size: 12px">
-                  翻译
-                </el-link>
-              </el-tooltip>
-            </span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="categoryName" label="文章分类" width="100" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="tagList" label="文章标签" width="250" align="center">
-          <template slot-scope="scope">
-            <el-tag v-for="item of scope.row['tagList']" :key="item.id" :type="item.type === 2 ? 'info' : ''" style="margin-right:0.2rem;margin-top:0.2rem;">
-              {{ item.name }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="articleStatus" label="文章状态" width="100" align="center">
-          <template slot-scope="scope">
-            <el-tag v-if="scope.row['articleStatus'] === 1" type="info" effect="dark">草稿</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 2" effect="dark">待审核</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 3" effect="dark">待审核</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 4" type="warning" effect="dark">
-              {{ '审核拒绝：' + scope.row['desc'] }}
-            </el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 5" type="success" effect="dark">
-              {{ scope.row['articlePerm'] === 3 ? '私密文章' : '已发布' }}
-            </el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 6" type="danger" effect="dark">临时下线</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 7" type="danger" effect="dark">待整改</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 8" type="info" effect="dark">回收站</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 9" effect="dark">待发布</el-tag>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="articleStatus" label="发布范围" width="100" align="center">
+        <el-table-column prop="title" label="文章标题" align="left" width="200" fixed="left" />
+        <el-table-column label="文章类型" align="center" width="100">
           <template v-slot="scope">
-            <el-tag v-if="scope.row['articlePerm'] === 1" effect="dark">全部可见</el-tag>
-            <!-- <el-tag v-else-if="scope.row['articlePerm'] === 2">登录可见</el-tag> -->
-            <el-tag v-else-if="scope.row['articlePerm'] === 3" type="warning" effect="dark">仅我可见</el-tag>
+            <span v-if="scope.row.articleType === 1">原创</span>
+            <span v-else-if="scope.row.articleType === 2">转载</span>
+            <span v-else-if="scope.row.articleType === 3">翻译</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="tagList" label="评论状态" width="100" align="center">
+        <el-table-column prop="categoryName" label="文章分类" width="100" align="center" />
+        <el-table-column label="文章标签" width="250" align="center">
           <template v-slot="scope">
-            <el-tag v-if="scope.row['commentFlag']" effect="dark">开启评论</el-tag>
+            <el-tag v-for="(item, index) in scope.row.tagNames" :key="index" type="info" style="margin-right:0.2rem;margin-top:0.2rem;">
+              {{ item }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="文章权限" width="100" align="center">
+          <template v-slot="scope">
+            <span v-if="scope.row.articlePerm === 1">公开访问</span>
+            <span v-else-if="scope.row.articlePerm === 2">登录可见</span>
+            <span v-else-if="scope.row.articlePerm === 3">仅作者可见</span>
+            <span v-else-if="scope.row.articlePerm === 4">公众号验证</span>
+            <span v-else-if="scope.row.articlePerm === 5">密码访问</span>
+            <span v-else-if="scope.row.articlePerm === 6">付费访问</span>
+            <span v-else-if="scope.row.articlePerm === 7">指定用户</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="评论状态" width="100" align="center">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row.commentFlag" effect="dark">开启评论</el-tag>
             <el-tag v-else type="warning" effect="dark">关闭评论</el-tag>
           </template>
         </el-table-column>
-        <!-- <el-table-column :show-overflow-tooltip="true" prop="authorNickname" label="作者" width="100" align="center" /> -->
-        <el-table-column :show-overflow-tooltip="true" prop="createTime" label="最后修改时间" width="150" align="center">
-          <template v-slot="scope">
-            <span v-if="scope.row['updateTime'] !== ''">{{ scope.row['updateTime'] }}</span>
-            <span v-else>{{ scope.row['createTime'] }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="wordCount" label="字数" width="70" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="viewCount" label="浏览量" width="70" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="likeCount" label="点赞量" width="70" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="commentCount" label="评论数" width="70" align="center" />
-        <el-table-column :show-overflow-tooltip="true" prop="desc" label="备注" width="150" align="center" />
+        <el-table-column prop="wordsCount" label="字数" width="70" align="center" />
+        <el-table-column prop="viewCount" label="浏览量" width="70" align="center" />
+        <el-table-column prop="commentCount" label="评论数" width="70" align="center" />
+        <el-table-column prop="authorName" label="作者" width="100" align="center" />
+        <el-table-column prop="updateTime" label="更新时间" width="100" align="center" />
+
+        <!--        <el-table-column :show-overflow-tooltip="true" prop="articleStatus" label="文章状态" width="100" align="center">-->
+        <!--          <template v-slot="scope">-->
+        <!--            <el-tag v-if="scope.row['articleStatus'] === 1" type="info" effect="dark">草稿</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 2" effect="dark">待审核</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 3" effect="dark">待审核</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 4" type="warning" effect="dark">-->
+        <!--              {{ '审核拒绝：' + scope.row['desc'] }}-->
+        <!--            </el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 5" type="success" effect="dark">-->
+        <!--              {{ scope.row['articlePerm'] === 3 ? '私密文章' : '已发布' }}-->
+        <!--            </el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 6" type="danger" effect="dark">临时下线</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 7" type="danger" effect="dark">待整改</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 8" type="info" effect="dark">回收站</el-tag>-->
+        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 9" effect="dark">待发布</el-tag>-->
+        <!--            <span v-else>-</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
+        <!--        <el-table-column :show-overflow-tooltip="true" prop="desc" label="备注" width="150" align="center" />-->
         <div slot="empty">
-          <el-empty :image="nodataImg" description=" " />
+          <muses-empty />
         </div>
       </el-table>
       <div class="pagination-container">
@@ -153,11 +136,11 @@
 </template>
 
 <script>
-import nodataImg from '@/assets/images/nodata.png'
 export default {
   name: 'Article',
   data() {
     return {
+
       statusTabs: [
         { key: 1, label: '全部', field: 'totalCount' },
         { key: 2, label: '公开', field: 'publicCount' },
@@ -189,20 +172,16 @@ export default {
       filters: {
         tagStatus: 1,
         title: null,
-        categoryId: null,
-        tagId: null,
-        articleType: null,
-        commentFlag: null
+        slug: null
       },
       categoryList: [],
-      articleDefaultImg: '',
       tableData: [],
       tableLoading: false,
-      nodataImg: nodataImg,
-      rows: [],
+      row: null,
       total: 0,
       page: 1,
       pageSize: 5,
+
       previewArticleDialogVisible: false
     }
   },
@@ -212,9 +191,8 @@ export default {
     }
   },
   mounted() {
+    this.loadCategoryTree()
     this.listTableData()
-    this.queryCategoryTree()
-    // this.getDefaultArticleImg()
   },
   activated() {
     if (this.$route.query._ts && this.$route.query._ts !== '') {
@@ -227,8 +205,24 @@ export default {
     }
   },
   methods: {
-    handleSelectionChange(val) {
-      this.rows = val
+    handleCurrentChange(row) {
+      this.row = row
+    },
+    loadCategoryTree() {
+      this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
+        this.categoryList = data
+      }).catch(_ => {
+        this.categoryList = []
+      })
+    },
+    getArticleCoverImage(coverImageType, coverImageList) {
+      if (coverImageType === 1 || coverImageType === 5) {
+        return ''
+      }
+      if (Array.isArray(coverImageList) && coverImageList.length > 0) {
+        return coverImageList[0]
+      }
+      return ''
     },
     // 查询
     statusTabChange(status) {
@@ -262,7 +256,7 @@ export default {
         pageSize: this.pageSize
       }
       this.tableLoading = true
-      this.$mapi.article.pageMyList(param).then(res => {
+      this.$mapi.article.pageMyArticleList(param).then(res => {
         const { data } = res
         this.total = data.total
         this.tableData = data.records
@@ -270,8 +264,8 @@ export default {
         this.total = 0
         this.tableData = []
       }).finally(() => {
-        this.rows = []
         this.tableLoading = false
+        this.row = null
         this.$refs.articleTable.setCurrentRow()
         this.loadMyArticleCountInfo()
       })
@@ -284,33 +278,7 @@ export default {
         })
       })
     },
-    queryCategoryTree() {
-      this.$mapi.category.queryPublicCategoryTree().then(({ data }) => {
-        this.categoryList = data
-      }).catch(_ => {
-        this.categoryList = []
-      })
-    },
-    // TODO
-    getDefaultArticleImg() {
-      this.$mapi.article.queryDefaultArticleCover().then(res => {
-        const { data } = res
-        this.articleDefaultImg = data || ''
-      })
-    },
-    addArticle() {
-      this.$router.push({
-        name: 'AddOrEditArticle'
-      })
-    },
-    editArticle(row) {
-      this.$router.push({
-        name: 'AddOrEditArticle',
-        query: {
-          articleId: row.id
-        }
-      })
-    },
+    // 详情
     showArticleDetail(row) {
       this.previewArticleDialogVisible = true
       this.$nextTick(() => {
@@ -320,6 +288,14 @@ export default {
     closePreviewArticleDialog() {
       this.previewArticleDialogVisible = false
     },
+    // 新增与编辑
+    addArticle() {
+      this.$router.push({ name: 'AddOrEditArticle' })
+    },
+    editArticle(row) {
+      this.$router.push({ name: 'AddOrEditArticle', query: { articleId: row.id }})
+    },
+    // 删除 TODO
     recycleToDraftBox(row) {
       this.$mapi.article.recycleToDraftBox({ articleId: row.id }).then(res => {
         this.$message.success(res.message)
@@ -359,15 +335,6 @@ export default {
         this.$message.success(res.message)
         this.listTableData()
       })
-    },
-    sizeChange(size) {
-      this.page = 1
-      this.pageSize = size
-      this.listTableData()
-    },
-    pageChange(page) {
-      this.page = page
-      this.listTableData()
     }
   }
 }

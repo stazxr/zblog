@@ -378,7 +378,7 @@
                       <img :src="emoji.url" alt="">
                     </div>
                     <div class="emoji-content">
-                      <el-input v-model="emoji.name" maxlength="5" placeholder="表情名称" />
+                      <el-input v-model="emoji.name" maxlength="20" placeholder="表情名称" />
                     </div>
                     <el-button type="text" class="emoji-delete" @click="removeCommentEmoji(index)">删除</el-button>
                   </div>
@@ -435,6 +435,45 @@
               <el-input-number v-model="config.barrageMessageLoadSize" :min="1" :max="9999" controls-position="right" />
               <div class="form-tip">
                 每次加载弹幕消息的数量，建议设置为 200
+              </div>
+            </el-form-item>
+          </div>
+        </section>
+
+        <section id="content" class="config-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="el-icon-s-data" />
+              <div>
+                <div class="section-name">
+                  内容配置
+                </div>
+                <div class="section-desc">
+                  配置文章默认封面等
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="section-content">
+            <el-form-item label="文章默认封面" class="image-form-item">
+              <div class="image-setting">
+                <muses-image-crop-upload
+                  v-model="config.defaultArticleCover"
+                  :aspect-ratio="1.8"
+                  :output-width="720"
+                  :output-height="400"
+                  :preview-width="260"
+                  :preview-height="145"
+                  :min-width="360"
+                  :min-height="200"
+                  :max-size="20"
+                />
+                <div class="image-url">
+                  <el-input v-model="config.defaultArticleCover" maxlength="500" placeholder="上传图片或直接输入图片地址" />
+                  <div class="form-tip">
+                    建议使用 16:9 左右的横向图片
+                  </div>
+                </div>
               </div>
             </el-form-item>
           </div>
@@ -567,6 +606,7 @@ export default {
         { id: 'friend', name: '友链', icon: 'el-icon-connection' },
         { id: 'comment', name: '评论', icon: 'el-icon-chat-line-round' },
         { id: 'barrage', name: '弹幕', icon: 'el-icon-chat-dot-round' },
+        { id: 'content', name: '内容', icon: 'el-icon-s-data' },
         { id: 'security', name: '安全', icon: 'el-icon-lock' },
         { id: 'record', name: '备案', icon: 'el-icon-office-building' },
         { id: 'third-party', name: '服务', icon: 'el-icon-data-analysis' }
@@ -628,6 +668,8 @@ export default {
         commentEmojis: [],
         // 弹幕
         barrageMessageLoadSize: 200,
+        // 文章默认封面
+        defaultArticleCover: '',
         // 安全
         httpsSwitch: false,
         // 网站备案
@@ -698,6 +740,14 @@ export default {
         })
       }).catch(() => {})
     },
+    createEmojiName(filename) {
+      if (!filename) {
+        return ''
+      }
+
+      const index = filename.lastIndexOf('.')
+      return index > 0 ? filename.substring(0, index) : filename
+    },
     createEmojiKey() {
       return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     },
@@ -726,10 +776,10 @@ export default {
           return false
         }
 
-        if (!/^[\u4e00-\u9fa5]{1,5}$/.test(emoji.name)) {
-          this.$message.warning(`表情「${emoji.name}」名称需为 1～5 个汉字`)
-          return false
-        }
+        // if (!/^[\u4e00-\u9fa5]{1,5}$/.test(emoji.name)) {
+        //   this.$message.warning(`表情「${emoji.name}」名称需为 1～5 个汉字`)
+        //   return false
+        // }
 
         if (!emoji.url) {
           this.$message.warning(`第 ${i + 1} 个表情缺少图片`)
@@ -785,7 +835,7 @@ export default {
         }
 
         this.config.commentEmojis.push({
-          name: '',
+          name: this.createEmojiName(file.originalFilename),
           url: file.fileAccessUrl,
           _key: this.createEmojiKey()
         })

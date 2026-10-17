@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.content.domain.vo;
 
-import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,19 +25,19 @@ public class ArticleVo implements Serializable {
     /**
      * 文章ID
      */
-    @ApiModelProperty(value = "文章ID", example = "10001")
+    @ApiModelProperty(value = "文章ID")
     private Long id;
 
     /**
      * 文章标题
      */
-    @ApiModelProperty(value = "文章标题", example = "Spring Boot 开发实践")
+    @ApiModelProperty(value = "文章标题")
     private String title;
 
     /**
      * 路径标识
      */
-    @ApiModelProperty(value = "路径标识", example = "spring-boot-development")
+    @ApiModelProperty(value = "路径标识")
     private String slug;
 
     /**
@@ -76,6 +75,12 @@ public class ArticleVo implements Serializable {
      */
     @ApiModelProperty(value = "标签id列表")
     private List<Long> tags;
+
+    /**
+     * 标签名称列表
+     */
+    @ApiModelProperty(value = "标签名称列表")
+    private List<String> tagNames;
 
     /**
      * 作者ID
@@ -160,6 +165,12 @@ public class ArticleVo implements Serializable {
      */
     @ApiModelProperty(value = "封面类型")
     private Integer coverImageType;
+
+    /**
+     * 封面图片列表
+     */
+    @ApiModelProperty(value = "封面图片")
+    private List<String> coverImageList;
 
     /**
      * 封面图片列表
