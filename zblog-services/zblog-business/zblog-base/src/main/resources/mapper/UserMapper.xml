@@ -16,10 +16,7 @@
         <result property="loginAddress" column="LOGIN_ADDRESS" />
         <result property="successLoginTime" column="SUCCESS_LOGIN_TIME" />
         <result property="createTime" column="CREATE_TIME" />
-        <collection property="roleIds" ofType="Long">
-            <result column="ROLE_ID" />
-        </collection>
-        <!-- <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" /> -->
+        <collection property="roleIds" javaType="java.util.ArrayList" ofType="Long" select="selectUserRoleIdList" column="ID" />
     </resultMap>
 
     <resultMap id="userVoDetailMap" type="com.github.stazxr.zblog.base.domain.vo.UserVo">
@@ -149,12 +146,9 @@
         SELECT
             u.ID, u.HEAD_IMG_URL, u.USERNAME, u.NICKNAME, u.EMAIL, u.USER_TYPE, u.USER_STATUS, u.GENDER,
             DATE_FORMAT(u.SUCCESS_LOGIN_TIME, '%Y-%m-%d %H:%i:%s') AS SUCCESS_LOGIN_TIME, u.CREATE_TIME,
-            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_PLATFORM, ull.LOGIN_ADDRESS, ur.ROLE_ID
+            ull.LOGIN_TYPE, ull.LOGIN_CHAN, ull.LOGIN_PLATFORM, ull.LOGIN_ADDRESS
         FROM user u
         LEFT JOIN user_login_log ull ON ull.USER_ID = u.ID AND ull.LOGIN_TIME = u.SUCCESS_LOGIN_TIME AND ull.IS_SUCCESS = 1
-        LEFT JOIN (
-            SELECT USER_ID, ROLE_ID FROM user_role_relation WHERE DELETED = 0
-        ) ur ON ur.USER_ID = u.ID
         WHERE u.DELETED = 0
         <if test="query.username != null and query.username != ''">
             <bind name="usernameBind" value="'%' + query.username + '%'"/>
@@ -212,9 +206,9 @@
         WHERE u.ID = #{userId}
     </select>
 
-    <!-- <select id="selectUserRoleIdList" resultType="java.lang.Long">
+    <select id="selectUserRoleIdList" resultType="java.lang.Long">
         SELECT urr.ROLE_ID FROM user_role_relation urr WHERE urr.USER_ID = #{ID} AND urr.DELETED = 0
-    </select> -->
+    </select>
 
     <select id="selectUserLogList" resultType="com.github.stazxr.zblog.log.domain.vo.LogVo">
         SELECT

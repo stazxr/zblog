@@ -348,13 +348,13 @@ export default {
         { name: '翻译', value: 3 }
       ],
       articlePermEnums: [ // 文章访问权限
-        { name: '公开访问', value: 1 },
+        { name: '公开', value: 1 },
         { name: '登录可见', value: 2 },
         { name: '仅作者可见', value: 3 },
         { name: '公众号验证', value: 4, disabled: true },
-        { name: '密码访问', value: 5, disabled: true },
-        { name: '付费访问', value: 6, disabled: true },
-        { name: '指定用户', value: 7, disabled: true }
+        { name: '密码验证', value: 5, disabled: true },
+        { name: '付费阅读', value: 6, disabled: true },
+        { name: '指定用户可见', value: 7, disabled: true }
       ],
       commentEnums: [ // 评论设置
         { name: '开启', value: true },

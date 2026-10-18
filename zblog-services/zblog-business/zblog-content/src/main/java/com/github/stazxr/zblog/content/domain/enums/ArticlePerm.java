@@ -8,9 +8,9 @@ package com.github.stazxr.zblog.content.domain.enums;
  */
 public enum ArticlePerm {
     /**
-     * 公开访问
+     * 公开
      */
-    PUBLIC(1, "公开访问"),
+    PUBLIC(1, "公开"),
 
     /**
      * 登录可见
@@ -18,9 +18,9 @@ public enum ArticlePerm {
     LOGIN(2, "登录可见"),
 
     /**
-     * 仅自己可见
+     * 仅作者可见
      */
-    SELF(3, "仅自己可见"),
+    SELF(3, "仅作者可见"),
 
     /**
      * 公众号验证
@@ -28,19 +28,19 @@ public enum ArticlePerm {
     WECHAT(4, "公众号验证"),
 
     /**
-     * 密码访问
+     * 密码验证
      */
-    PASSWORD(5, "密码访问"),
+    PASSWORD(5, "密码验证"),
 
     /**
-     * 付费访问
+     * 付费阅读
      */
-    PAY(6, "付费访问"),
+    PAY(6, "付费阅读"),
 
     /**
-     * 指定用户
+     * 指定用户可见
      */
-    USER(7, "指定用户");
+    USER(7, "指定用户可见");
 
     private final int value;
 

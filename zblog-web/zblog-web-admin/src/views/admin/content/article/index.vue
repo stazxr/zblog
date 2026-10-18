@@ -46,17 +46,41 @@
       >
         <el-table-column label="文章封面" align="center" width="180" fixed="left">
           <template v-slot="scope">
-            <el-image class="article-cover" :src="getArticleCoverImage(scope.row.coverImageType, scope.row.coverImageList)" :preview-src-list="scope.row.coverImageList">
-              <div slot="error" class="image-slot">
-                <span v-if="scope.row.coverImageType === 1">默认封面</span>
-                <span v-if="scope.row.coverImageType === 5">无封面</span>
-                <span v-if="scope.row.coverImageType !== 1 && scope.row.coverImageType !== 5 && scope.row.coverImageList.length === 0">未配置</span>
-                <span v-else>加载失败</span>
-              </div>
-            </el-image>
+            <div class="article-cover-wrapper">
+              <el-image
+                class="article-cover"
+                :src="getArticleCoverImage(scope.row.coverImageType, scope.row.coverImageList)"
+                :preview-src-list="scope.row.coverImageList"
+                fit="cover"
+              >
+                <div slot="error" class="image-slot">
+                  <span v-if="scope.row.coverImageType === 1">默认封面</span>
+                  <span v-else-if="scope.row.coverImageType === 5">无封面</span>
+                  <span v-else-if="!scope.row.coverImageList || scope.row.coverImageList.length === 0">未配置</span>
+                  <span v-else>加载失败</span>
+                </div>
+              </el-image>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="文章标题" align="left" width="200" fixed="left" />
+        <el-table-column label="文章标题" align="left" width="200" fixed="left">
+          <template v-slot="scope">
+            <div class="article-text-wrapper">
+              <div class="article-title" :title="scope.row.title">
+                {{ scope.row.title }}
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="文章摘要" align="left" width="250">
+          <template v-slot="scope">
+            <div class="article-text-wrapper">
+              <div class="article-summary" :title="scope.row.summary">
+                {{ scope.row.summary }}
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="文章类型" align="center" width="100">
           <template v-slot="scope">
             <span v-if="scope.row.articleType === 1">原创</span>
@@ -66,11 +90,29 @@
           </template>
         </el-table-column>
         <el-table-column prop="categoryName" label="文章分类" width="100" align="center" />
-        <el-table-column label="文章标签" width="250" align="center">
+        <el-table-column label="文章标签" width="200" align="center">
           <template v-slot="scope">
             <el-tag v-for="(item, index) in scope.row.tagNames" :key="index" type="info" style="margin-right:0.2rem;margin-top:0.2rem;">
               {{ item }}
             </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="文章状态" width="100" align="center">
+          <template v-slot="scope">
+            <el-tag v-if="scope.row['articleStatus'] === 1" type="info" effect="dark">草稿</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 2" effect="dark">待审核</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 3" effect="dark">待审核</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 4" type="warning" effect="dark">
+              {{ '审核拒绝：' + scope.row['desc'] }}
+            </el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 5" type="success" effect="dark">
+              {{ scope.row['articlePerm'] === 3 ? '私密文章' : '已发布' }}
+            </el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 6" type="danger" effect="dark">临时下线</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 7" type="danger" effect="dark">待整改</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 8" type="info" effect="dark">回收站</el-tag>
+            <el-tag v-else-if="scope.row['articleStatus'] === 9" effect="dark">待发布</el-tag>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column label="文章权限" width="100" align="center">
@@ -94,28 +136,9 @@
         <el-table-column prop="wordsCount" label="字数" width="70" align="center" />
         <el-table-column prop="viewCount" label="浏览量" width="70" align="center" />
         <el-table-column prop="commentCount" label="评论数" width="70" align="center" />
+        <el-table-column prop="version" label="版本" width="70" align="center" />
         <el-table-column prop="authorName" label="作者" width="100" align="center" />
-        <el-table-column prop="updateTime" label="更新时间" width="100" align="center" />
-
-        <!--        <el-table-column :show-overflow-tooltip="true" prop="articleStatus" label="文章状态" width="100" align="center">-->
-        <!--          <template v-slot="scope">-->
-        <!--            <el-tag v-if="scope.row['articleStatus'] === 1" type="info" effect="dark">草稿</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 2" effect="dark">待审核</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 3" effect="dark">待审核</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 4" type="warning" effect="dark">-->
-        <!--              {{ '审核拒绝：' + scope.row['desc'] }}-->
-        <!--            </el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 5" type="success" effect="dark">-->
-        <!--              {{ scope.row['articlePerm'] === 3 ? '私密文章' : '已发布' }}-->
-        <!--            </el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 6" type="danger" effect="dark">临时下线</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 7" type="danger" effect="dark">待整改</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 8" type="info" effect="dark">回收站</el-tag>-->
-        <!--            <el-tag v-else-if="scope.row['articleStatus'] === 9" effect="dark">待发布</el-tag>-->
-        <!--            <span v-else>-</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column :show-overflow-tooltip="true" prop="desc" label="备注" width="150" align="center" />-->
+        <el-table-column prop="updateTime" label="更新时间" width="160" align="center" />
         <div slot="empty">
           <muses-empty />
         </div>
@@ -192,6 +215,9 @@ export default {
   },
   mounted() {
     this.loadCategoryTree()
+    this.loadArticleTypeList()
+    this.loadArticlePermList()
+    this.loadArticleStatusList()
     this.listTableData()
   },
   activated() {
@@ -400,17 +426,60 @@ export default {
   cursor: pointer;
 }
 
+/* 封面容器：水平、垂直居中 */
+.article-cover-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 90px;
+}
+
+/* 文章封面 */
 .article-cover {
-  position: relative;
+  display: block;
   width: 100%;
   height: 90px;
   border-radius: 4px;
 }
 
-::v-deep .image-slot, .demo-image__placeholder .image-slot {
+/* 标题和摘要容器：垂直居中 */
+.article-text-wrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
+  width: 100%;
+  min-height: 90px;
+}
+
+/* 文章标题 */
+.article-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  width: 100%;
+  line-height: 20px;
+  max-height: 80px;
+}
+
+/* 文章摘要 */
+.article-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  width: 100%;
+  line-height: 20px;
+  max-height: 80px;
+}
+
+/* 封面加载失败时的占位区域 */
+::v-deep .article-cover .image-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
   background: #f5f7fa;

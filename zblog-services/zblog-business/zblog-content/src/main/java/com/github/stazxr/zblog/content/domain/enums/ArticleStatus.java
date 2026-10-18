@@ -6,64 +6,77 @@ package com.github.stazxr.zblog.content.domain.enums;
  * @author SunTao
  * @since 2021-07-31
  */
+/**
+ * 文章发布状态。
+ *
+ * @author Sun Tao
+ * @since 2026-10-18
+ */
 public enum ArticleStatus {
     /**
-     * 草稿
+     * 草稿。
      */
-    DRAFT(1),
+    DRAFT(1, "草稿"),
 
     /**
-     * 待审核（下一个状态为 -> 已发布）
+     * 待审核。
      */
-    REVIEW(2),
+    PENDING_REVIEW(2, "待审核"),
 
     /**
-     * 待审核（自动发布的待审核，下一个状态为 -> 待发布）
+     * 已审核通过，等待计划发布时间。
      */
-    PUBLISH_REVIEW(3),
+    SCHEDULED(3, "待发布"),
 
     /**
-     * 待发布（定时）
+     * 审核未通过。
      */
-    TIME_PUBLISH(4),
+    REVIEW_REJECTED(4, "审核未通过"),
 
     /**
-     * 审核不通过
+     * 已发布。
      */
-    FAILED_REVIEW(5),
+    PUBLISHED(5, "已发布"),
 
     /**
-     * 已发布
+     * 已下线。
      */
-    PUBLISHED(6),
+    OFFLINE(91, "已下线");
 
-    /**
-     * 临时下线（已发布的文章由于某些原因临时下线）
-     */
-    TEMP_DOWN(7),
+    private final Integer value;
 
-    /**
-     * 待整改（已发布的文章由于某些原因需要内容调整）
-     */
-    TO_CHANGE(8),
+    private final String name;
 
-    /**
-     * 回收站
-     */
-    RECYCLE(9),
-
-    /**
-     * 已删除
-     */
-    DELETED(99);
-
-    private final Integer type;
-
-    ArticleStatus(Integer type) {
-        this.type = type;
+    ArticleStatus(Integer value, String name) {
+        this.value = value;
+        this.name = name;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 根据状态值获取枚举。
+     *
+     * @param value 状态值
+     * @return 对应枚举，不存在或参数为空时返回 null
+     */
+    public static ArticleStatus of(Integer value) {
+        if (value == null) {
+            return null;
+        }
+
+        for (ArticleStatus status : values()) {
+            if (status.value.equals(value)) {
+                return status;
+            }
+        }
+
+        return null;
     }
 }

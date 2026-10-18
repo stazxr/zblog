@@ -19,14 +19,6 @@
         <result property="commentCount" column="COMMENT_COUNT" />
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="version" column="VERSION" />
-        <collection property="tagNames" ofType="java.lang.String">
-            <result column="TAG_NAME" />
-        </collection>
-        <collection property="coverImageList" ofType="java.lang.String">
-            <result column="ARTICLE_IMAGE" />
-        </collection>
-        <!-- <collection property="tagNames" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleTagNameList" column="ID" />
-        <collection property="coverImageList" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleCoverImageList" column="ID" /> -->
     </resultMap>
 
     <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
@@ -63,21 +55,23 @@
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="deleteTime" column="DELETE_TIME" />
         <result property="version" column="VERSION" />
-        <collection property="tagNames" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleTagNameList" column="ID" />
-        <collection property="coverImageList" javaType="java.util.ArrayList" ofType="java.lang.String" select="selectArticleCoverImageList" column="ID" />
+        <collection property="tagNames" ofType="java.lang.String">
+            <result column="TAG_NAME" />
+        </collection>
+        <collection property="coverImageList" ofType="java.lang.String">
+            <result column="ARTICLE_IMAGE" />
+        </collection>
     </resultMap>
 
     <select id="selectMyArticleList" resultMap="articleVoListMap">
         SELECT
-            a.ID, a.TITLE, a.ARTICLE_TYPE, c.NAME AS CATEGORY_NAME, a.ARTICLE_PERM, a.ARTICLE_STATUS, a.COMMENT_FLAG,
-            a.WORDS_COUNT, a.VIEW_COUNT, a.COMMENT_COUNT, u.NICKNAME AS AUTHOR_NAME, a.UPDATE_TIME, a.VERSION,
-            air.ARTICLE_IMAGE, t.NAME AS TAG_NAME
+            a.ID, a.TITLE, a.SUMMARY, a.ARTICLE_TYPE, a.ARTICLE_PERM, a.ARTICLE_STATUS,
+            a.COMMENT_FLAG, a.WORDS_COUNT, a.VIEW_COUNT, a.COMMENT_COUNT, a.AUTHOR_ID,
+            a.UPDATE_TIME, a.VERSION, a.DELETE_FLAG, a.COVER_IMAGE_TYPE,
+            u.NICKNAME AS AUTHOR_NAME, c.NAME AS CATEGORY_NAME
         FROM article a
         LEFT JOIN category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
-        LEFT JOIN article_image_relation air on air.ARTICLE_ID = a.ID
-        LEFT JOIN article_tag_relation atr on atr.ARTICLE_ID = a.ID
-        LEFT JOIN tag t on t.ID = atr.TAG_ID
         WHERE a.ARTICLE_STATUS != 99 AND a.AUTHOR_ID = #{query.authorId}
         <choose>
             <!-- 全部 -->
@@ -139,6 +133,29 @@
         ORDER BY IF(a.UPDATE_TIME IS NULL, a.CREATE_TIME, a.UPDATE_TIME) DESC
     </select>
 
+    <select id="selectArticleTagNamesByArticleIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo">
+        SELECT
+            atr.ARTICLE_ID AS articleId, t.NAME AS tagName
+        FROM article_tag_relation atr
+        INNER JOIN tag t ON t.ID = atr.TAG_ID
+        WHERE atr.DELETED = 0 AND atr.ARTICLE_ID IN
+        <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        ORDER BY atr.ARTICLE_ID, atr.TAG_ID
+    </select>
+
+    <select id="selectArticleCoverImagesByArticleIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCoverImageVo">
+        SELECT
+            air.ARTICLE_ID AS articleId, air.ARTICLE_IMAGE AS coverImage
+        FROM article_image_relation air
+        WHERE air.ARTICLE_ID IN
+        <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        ORDER BY air.ARTICLE_ID, air.ARTICLE_IMAGE
+    </select>
+
     <select id="selectMyArticleCountInfo" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCountVo">
         SELECT
             SUM(ARTICLE_STATUS != 9) AS totalCount,
@@ -158,8 +175,12 @@
             a.ID, a.TITLE, a.SLUG, a.SUMMARY, a.CONTENT_MD, a.CONTENT_HTML, a.CATEGORY_ID, a.AUTHOR_ID,
             a.SEO_TITLE, a.SEO_KEYWORDS, a.SEO_DESCRIPTION, a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.DELETE_FLAG,
             a.ARTICLE_PERM, a.SOURCE_NAME, a.SOURCE_AUTHOR, a.SOURCE_URL, a.COMMENT_FLAG, a.COVER_IMAGE_TYPE,
-            a.WORDS_COUNT, a.VIEW_COUNT, a.LIKE_COUNT, a.COMMENT_COUNT, a.FAVORITE_COUNT, a.PUBLISH_TIME
+            a.WORDS_COUNT, a.VIEW_COUNT, a.LIKE_COUNT, a.COMMENT_COUNT, a.FAVORITE_COUNT, a.PUBLISH_TIME,
+            air.ARTICLE_IMAGE, t.NAME AS TAG_NAME
         FROM article a
+        LEFT JOIN article_image_relation air on air.ARTICLE_ID = a.ID
+        LEFT JOIN article_tag_relation atr on atr.ARTICLE_ID = a.ID
+        LEFT JOIN tag t on t.ID = atr.TAG_ID
         WHERE a.DELETE_FLAG != 2 AND a.ID = #{articleId}
     </select>
 
@@ -167,12 +188,6 @@
         SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
     </select>
 
-    <select id="selectArticleTagNameList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
-        SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
-    </select>
-    <select id="selectArticleCoverImageList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
-        SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
-    </select>
 
 
 
@@ -183,11 +198,7 @@
 
 
 
-
-
-
-
-<!--    <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
+    <!--    <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
 <!--        <result property="id" column="ID" />-->
 <!--        <result property="title" column="TITLE" />-->
 <!--        <result property="remark" column="REMARK" />-->

@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Article;
 import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
+import com.github.stazxr.zblog.content.domain.vo.ArticleCoverImageVo;
+import com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo;
 import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
 import com.github.stazxr.zblog.core.base.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 文章管理数据层
@@ -24,6 +28,22 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return IPage<ArticleVo>
      */
     IPage<ArticleVo> selectMyArticleList(@Param("page") Page<ArticleVo> page, @Param("query") ArticleQueryDto queryDto);
+
+    /**
+     * 批次查询文章标签名称列表
+     *
+     * @param articleIds 文章id列表
+     * @return List<ArticleTagNameVo>
+     */
+    List<ArticleTagNameVo> selectArticleTagNamesByArticleIds(@Param("articleIds") List<Long> articleIds);
+
+    /**
+     * 批次查询文章封面列表
+     *
+     * @param articleIds 文章id列表
+     * @return List<ArticleCoverImageVo>
+     */
+    List<ArticleCoverImageVo> selectArticleCoverImagesByArticleIds(@Param("articleIds") List<Long> articleIds);
 
     /**
      * 查询我的文章数量统计信息

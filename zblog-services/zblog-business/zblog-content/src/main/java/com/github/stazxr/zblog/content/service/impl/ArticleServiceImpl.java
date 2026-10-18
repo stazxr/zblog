@@ -22,9 +22,7 @@ import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.*;
 import com.github.stazxr.zblog.content.domain.enums.*;
 import com.github.stazxr.zblog.content.domain.error.ArticleErrorCode;
-import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.domain.vo.*;
 import com.github.stazxr.zblog.content.mapper.*;
 import com.github.stazxr.zblog.content.service.ArticleService;
 import com.github.stazxr.zblog.content.util.Constants;
@@ -46,10 +44,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 文章管理业务实现层
@@ -100,7 +96,32 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 分页查询
         Page<ArticleVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
-        return baseMapper.selectMyArticleList(page, queryDto);
+        IPage<ArticleVo> articlePageList = baseMapper.selectMyArticleList(page, queryDto);
+
+        // 当前页文章 ID
+        List<ArticleVo> records = articlePageList.getRecords();
+        List<Long> articleIds = records.stream().map(ArticleVo::getId).collect(Collectors.toList());
+        if (!articleIds.isEmpty()) {
+            // 批量查询标签
+            List<ArticleTagNameVo> tagRows = baseMapper.selectArticleTagNamesByArticleIds(articleIds);
+            Map<Long, List<String>> tagMap = tagRows.stream().collect(Collectors.groupingBy(
+                    ArticleTagNameVo::getArticleId, Collectors.mapping(ArticleTagNameVo::getTagName, Collectors.toList())
+            ));
+
+            // 批量查询封面
+            List<ArticleCoverImageVo> imageRows = baseMapper.selectArticleCoverImagesByArticleIds(articleIds);
+            Map<Long, List<String>> imageMap = imageRows.stream().collect(Collectors.groupingBy(
+                ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
+            ));
+
+            // 回填文章标签和封面
+            for (ArticleVo article : records) {
+                article.setTagNames(tagMap.getOrDefault(article.getId(), Collections.emptyList()));
+                article.setCoverImageList(imageMap.getOrDefault(article.getId(), Collections.emptyList()));
+            }
+        }
+
+        return articlePageList;
     }
 
     /**

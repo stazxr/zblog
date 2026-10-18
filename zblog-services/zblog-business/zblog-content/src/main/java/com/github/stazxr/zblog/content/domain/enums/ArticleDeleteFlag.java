@@ -18,9 +18,9 @@ public enum ArticleDeleteFlag {
     RECYCLE(1, "回收站"),
 
     /**
-     * 彻底删除
+     * 已删除
      */
-    DELETED(2, "彻底删除");
+    DELETED(2, "已删除");
 
     private final Integer value;
 
