@@ -19,6 +19,33 @@
           <muses-search-form-item label="" prop="search-slug">
             <el-input id="search-slug" v-model="filters.slug" clearable placeholder="SLUG（精确匹配）" @keyup.enter.native="search" />
           </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-categoryId">
+            <el-select id="search-categoryId" v-model="filters.categoryId" placeholder="文章分类" clearable filterable @change="search">
+              <el-option-group v-for="group in categoryList" :key="group.id" :label="group.name">
+                <el-option v-for="item in group.children" :key="item.id" :value="item.id" :label="item.name" />
+              </el-option-group>
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-tagId">
+            <el-select id="search-tagId" v-model="filters.tagId" placeholder="文章标签" clearable filterable @change="search">
+              <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-articleType">
+            <el-select id="search-articleType" v-model="filters.articleType" placeholder="文章类型" clearable @change="search">
+              <el-option v-for="item in articleTypeList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-articlePerm">
+            <el-select id="search-articlePerm" v-model="filters.articlePerm" placeholder="文章权限" clearable @change="search">
+              <el-option v-for="item in articlePermList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-commentFlag">
+            <el-select id="search-commentFlag" v-model="filters.commentFlag" placeholder="评论状态" clearable @change="search">
+              <el-option v-for="item in commentFlagList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
           <muses-search-form-item btn btn-open-name="" btn-close-name="">
             <el-button type="success" @click="search()">查 询</el-button>
             <el-button type="warning" @click="resetSearch()">重 置</el-button>
@@ -163,24 +190,23 @@ export default {
   name: 'Article',
   data() {
     return {
-
       statusTabs: [
-        { key: 1, label: '全部', field: 'totalCount' },
-        { key: 2, label: '公开', field: 'publicCount' },
-        { key: 3, label: '私密', field: 'privateCount' },
-        { key: 4, label: '待审核', field: 'pendingAuditCount' },
-        { key: 5, label: '待发布', field: 'pendingPublishCount' },
-        { key: 6, label: '待处理', field: 'pendingDealCount' },
-        { key: 7, label: '草稿箱', field: 'draftCount' },
-        { key: 8, label: '回收站', field: 'recycleCount' }
+        { key: '1', label: '全部', field: 'totalCount' },
+        { key: '3', label: '私密', field: 'privateCount' },
+        { key: '2', label: '已发布', field: 'publicCount' },
+        { key: '4', label: '待审核', field: 'pendingAuditCount' },
+        { key: '5', label: '待发布', field: 'pendingPublishCount' },
+        { key: '6', label: '待处理', field: 'pendingDealCount' },
+        { key: '7', label: '草稿箱', field: 'draftCount' },
+        { key: '7', label: '回收站', field: 'recycleCount' }
       ],
       articleCountInfo: {
         // 全部
         totalCount: 0,
-        // 公开
-        publicCount: 0,
         // 私密
         privateCount: 0,
+        // 已发布
+        publicCount: 0,
         // 待审核
         pendingAuditCount: 0,
         // 待发布
@@ -193,11 +219,20 @@ export default {
         recycleCount: 0
       },
       filters: {
-        tagStatus: 1,
+        tagStatus: '1',
         title: null,
-        slug: null
+        slug: null,
+        categoryId: null,
+        tagId: null,
+        articleType: null,
+        articlePerm: null,
+        commentFlag: null
       },
       categoryList: [],
+      tagList: [],
+      articleTypeList: [],
+      articlePermList: [],
+      commentFlagList: [],
       tableData: [],
       tableLoading: false,
       row: null,
@@ -215,9 +250,10 @@ export default {
   },
   mounted() {
     this.loadCategoryTree()
+    this.loadTagList()
     this.loadArticleTypeList()
     this.loadArticlePermList()
-    this.loadArticleStatusList()
+    this.loadCommentFlagList()
     this.listTableData()
   },
   activated() {
@@ -239,6 +275,37 @@ export default {
         this.categoryList = data
       }).catch(_ => {
         this.categoryList = []
+      })
+    },
+    loadTagList() {
+      this.$mapi.tag.queryPublicTagList().then(({ data }) => {
+        this.tagList = data
+      }).catch(_ => {
+        this.tagList = []
+      })
+    },
+    loadArticleTypeList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ARTICLE_TYPE_CONFIG' }).then(res => {
+        const { data } = res
+        this.articleTypeList = data
+      }).catch(_ => {
+        this.articleTypeList = []
+      })
+    },
+    loadArticlePermList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ARTICLE_PERM_CONFIG' }).then(res => {
+        const { data } = res
+        this.articlePermList = data
+      }).catch(_ => {
+        this.articlePermList = []
+      })
+    },
+    loadCommentFlagList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ARTICLE_COMMENT_FLAG_CONFIG' }).then(res => {
+        const { data } = res
+        this.commentFlagList = data
+      }).catch(_ => {
+        this.commentFlagList = []
       })
     },
     getArticleCoverImage(coverImageType, coverImageList) {

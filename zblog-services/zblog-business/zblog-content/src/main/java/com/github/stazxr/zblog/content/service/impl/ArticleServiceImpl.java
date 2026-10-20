@@ -86,7 +86,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 参数检查
         queryDto.checkPage();
-        ThrowUtils.throwIfNull(queryDto.getTagStatus(), ArticleErrorCode.EARTIA001);
+        ThrowUtils.throwIfBlank(queryDto.getTagStatus(), ArticleErrorCode.EARTIA001);
         if (StringUtils.isNotBlank(queryDto.getTitle())) {
             queryDto.setTitle(queryDto.getTitle().trim());
         }
@@ -298,7 +298,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setSourceName(articleDto.getSourceName());
             article.setSourceAuthor(articleDto.getSourceAuthor());
             article.setSourceUrl(articleDto.getSourceUrl());
-            article.setArticleStatus(ArticleStatus.DRAFT.getType());
+            article.setArticleStatus(ArticleStatus.DRAFT.getValue());
             article.setDeleteFlag(ArticleDeleteFlag.DEFAULT.getValue());
             if (articleDto.getCommentFlag() == null) {
                 article.setCommentFlag(true);

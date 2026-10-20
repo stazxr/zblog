@@ -52,7 +52,6 @@
         <result property="createTime" column="CREATE_TIME" />
         <result property="updaterId" column="UPDATE_ID" />
         <result property="updateTime" column="UPDATE_TIME" />
-        <result property="updateTime" column="UPDATE_TIME" />
         <result property="deleteTime" column="DELETE_TIME" />
         <result property="version" column="VERSION" />
         <collection property="tagNames" ofType="java.lang.String">
@@ -72,15 +71,15 @@
         FROM article a
         LEFT JOIN category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
-        WHERE a.ARTICLE_STATUS != 99 AND a.AUTHOR_ID = #{query.authorId}
+        WHERE a.AUTHOR_ID = #{query.authorId}
         <choose>
             <!-- 全部 -->
-            <when test="query.tagStatus == 1">
-                AND a.ARTICLE_STATUS != 9
+            <when test="query.tagStatus == '1'">
+                AND a.DELETE_FLAG != 2
             </when>
             <!-- 公开 -->
             <when test="query.tagStatus == 2">
-                AND a.ARTICLE_STATUS != 9 AND a.ARTICLE_PERM = 1
+                AND a.DELETE_FLAG == 5 AND a.ARTICLE_PERM = 1
             </when>
             <!-- 私密 -->
             <when test="query.tagStatus == 3">
@@ -115,8 +114,7 @@
             AND a.TITLE LIKE #{titleBind}
         </if>
         <if test="query.slug != null and query.slug != ''">
-            <bind name="slugBind" value="'%' + query.slug + '%'"/>
-            AND a.SLUG LIKE #{slugBind}
+            AND a.SLUG = #{query.slug}
         </if>
         <if test="query.categoryId != null">
             AND a.CATEGORY_ID = #{query.categoryId}
@@ -130,7 +128,7 @@
         <if test="query.commentFlag != null">
             AND a.COMMENT_FLAG = #{query.commentFlag}
         </if>
-        ORDER BY IF(a.UPDATE_TIME IS NULL, a.CREATE_TIME, a.UPDATE_TIME) DESC
+        ORDER BY a.UPDATE_TIME DESC
     </select>
 
     <select id="selectArticleTagNamesByArticleIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo">

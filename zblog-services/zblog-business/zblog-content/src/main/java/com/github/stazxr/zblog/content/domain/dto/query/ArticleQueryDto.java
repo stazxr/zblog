@@ -19,16 +19,16 @@ public class ArticleQueryDto extends PageParam {
     private static final long serialVersionUID = 6190775176041347791L;
 
     /**
-     * 作者ID
+     * 作者id
      */
-    @ApiModelProperty("作者ID")
+    @ApiModelProperty("作者id")
     private Long authorId;
 
     /**
      * 状态查询
      */
     @ApiModelProperty("状态查询")
-    private Integer tagStatus;
+    private String tagStatus;
 
     /**
      * 文章标题
@@ -43,53 +43,32 @@ public class ArticleQueryDto extends PageParam {
     private String slug;
 
     /**
-     * 分类ID
+     * 分类id
      */
-    @ApiModelProperty("分类ID")
+    @ApiModelProperty("分类id")
     private Long categoryId;
 
     /**
-     * 标签ID
+     * 标签id
      */
-    @ApiModelProperty("标签ID")
+    @ApiModelProperty("标签id")
     private Long tagId;
 
     /**
      * 文章类型
      */
-    @ApiModelProperty("文章类型，1：原创、2：转载、3：翻译")
+    @ApiModelProperty("文章类型")
     private Integer articleType;
+
+    /**
+     * 文章权限
+     */
+    @ApiModelProperty("文章权限")
+    private Integer articlePerm;
 
     /**
      * 评论状态
      */
     @ApiModelProperty("评论状态")
     private Boolean commentFlag;
-
-
-
-
-
-
-
-
-    // TODO
-
-    /**
-     * 文章id
-     */
-    @ApiModelProperty("文章id")
-    private Long articleId;
-
-    /**
-     * 文章专栏
-     */
-    @ApiModelProperty("文章专栏")
-    private Long columnId;
-
-    /**
-     * 作者用户名、昵称
-     */
-    @ApiModelProperty("作者用户名、昵称")
-    private String author;
 }
