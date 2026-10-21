@@ -145,22 +145,18 @@ public class ArticleController {
         articleService.deleteArticle2(articleId);
     }
 
+    /**
+     * 删除文章（清空回收站）
+     */
+    @Log
+    @PostMapping(value = "/deleteArticle3")
+    @ApiOperation(value = "删除文章（清空回收站）")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "删除文章（清空回收站）", code = "ARTID003", level = RouterLevel.PUBLIC)
+    public void deleteArticle3() {
+        articleService.deleteArticle3();
+    }
 
-//    /**
-//     * 清空回收站
-//     *
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/clearRecycleBin")
-//    @ApiOperation(value = "清空回收站")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "清空回收站", code = "clearArticleRecycleBin", level = RouterLevel.PUBLIC)
-//    public Result clearArticleRecycleBin() {
-//        articleService.clearArticleRecycleBin();
-//        return Result.success();
-//    }
-//
 //    /**
 //     * 将文章回收至草稿箱
 //     *

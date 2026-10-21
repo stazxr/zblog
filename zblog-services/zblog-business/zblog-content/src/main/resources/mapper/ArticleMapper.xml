@@ -194,6 +194,10 @@
         UPDATE article SET DELETE_FLAG = #{deleteType} WHERE ID = #{articleId}
     </update>
 
+    <delete id="deleteArticle3">
+        UPDATE article SET DELETE_FLAG = 2 WHERE AUTHOR_ID = #{authorId} AND DELETE_FLAG = 1
+    </delete>
+
 
 
 
@@ -280,10 +284,6 @@
 <!--        UPDATE article SET ARTICLE_STATUS = #{status} WHERE ID = #{articleId}-->
 <!--    </update>-->
 
-<!--    <update id="clearArticleRecycleBin">-->
-<!--        UPDATE article SET DELETED = 1 WHERE DELETED = 0 AND ARTICLE_STATUS = 8 AND AUTHOR_ID = #{authorId}-->
-<!--    </update>-->
-
 <!--    <update id="invalidateArticlePublishTiming">-->
 <!--        UPDATE article_auto_publish_timing SET VALID = 0, `DESC` = #{desc} WHERE VALID = 1 AND ARTICLE_ID = #{articleId}-->
 <!--    </update>-->
@@ -300,10 +300,6 @@
 <!--                ('no delete')-->
 <!--            </otherwise>-->
 <!--        </choose>-->
-<!--    </update>-->
-
-<!--    <update id="deleteArticleByAuthor">-->
-<!--        UPDATE article SET ARTICLE_STATUS = 10 WHERE ARTICLE_STATUS = 8 AND AUTHOR_ID = #{authorId}-->
 <!--    </update>-->
 
 <!--    <update id="updateArticleDesc">-->

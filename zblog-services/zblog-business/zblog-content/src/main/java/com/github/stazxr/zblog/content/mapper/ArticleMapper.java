@@ -64,6 +64,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
     /**
      * 查询最新的文章草稿
      *
+     * @param authorId 作者id
      * @return ArticleVo
      */
     ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
@@ -75,6 +76,13 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param deleteType 删除类型
      */
     void deleteArticle(@Param("articleId") Long articleId, @Param("deleteType") Integer deleteType);
+
+    /**
+     * 删除文章（清空回收站）
+     *
+     * @param authorId 作者id
+     */
+    void deleteArticle3(@Param("authorId") Long authorId);
 
 //    /**
 //     * 查询用户文章列表

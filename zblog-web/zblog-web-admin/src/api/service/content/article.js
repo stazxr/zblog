@@ -35,6 +35,9 @@ export default {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   },
+  deleteArticle3: params => {
+    return api.httpRequest().post(`${articleApi}/deleteArticle3`, params)
+  },
   // 保存草稿
   saveArticleDraft: params => {
     return api.httpRequest().post(`${articleApi}/saveArticleDraft`, params)

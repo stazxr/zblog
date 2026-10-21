@@ -235,8 +235,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
         // 彻底删除文章
         baseMapper.deleteArticle(articleId, ArticleDeleteFlag.DELETED.getValue());
-        // TODO
-        // baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
+    }
+
+    /**
+     * 删除文章（清空回收站）
+     */
+    @Override
+    public void deleteArticle3() {
+        Long loginId = SecurityUtils.getLoginId();
+        baseMapper.deleteArticle3(loginId);
     }
 
     /**
@@ -501,43 +508,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        Long publishId = SequenceUtils.getId();
 //        baseMapper.insertArticlePublishTiming(publishId, articleDto.getId(), articleDto.getAutoPublishTime(), nowTime);
 //        // throw new ServiceException("功能已关闭，优化中");
-//    }
-//
-//    /**
-//     * 彻底删除文章
-//     *
-//     * @param articleId 文章ID
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void deleteArticle(Long articleId) {
-//        Assert.notNull(articleId, "参数【articleId】不能为空");
-//        Assert.isTrue(baseMapper.deleteById(articleId) != 1, "删除失败");
-//    }
-//
-//    /**
-//     * 批量删除文章
-//     *
-//     * @param articleIds 文章编号列表
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void batchDeleteArticle(List<Long> articleIds) {
-//        if (articleIds != null && articleIds.size() > 0) {
-//            baseMapper.batchInvalidateArticlePublishTiming(articleIds, "文章移至回收站【" + DateUtils.formatNow() + "】");
-//            baseMapper.batchUpdateArticleStatus(articleIds, ArticleStatus.RECYCLE.getType(), "文章被批量移至回收站");
-//        }
-//    }
-//
-//    /**
-//     * 清空回收站
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void clearArticleRecycleBin() {
-//        Long authorId = SecurityUtils.getLoginId();
-//        baseMapper.clearArticleRecycleBin(authorId);
-//        baseMapper.deleteArticleByAuthor(authorId);
 //    }
 //
 //    /**

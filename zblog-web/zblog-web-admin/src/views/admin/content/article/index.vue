@@ -73,21 +73,13 @@
           <el-button
             v-show="filters.tagStatus === '8'"
             v-perm="['ARTID002']"
-            :disabled="row === null || row.deleteFlag === 1"
+            :disabled="row === null || row.deleteFlag !== 1"
             type="danger"
             @click="deleteArticle2"
           >
             删除
           </el-button>
-          <el-button
-            v-show="filters.tagStatus === '8'"
-            v-perm="['ARTIU002']"
-            :disabled="row === null || row.deleteFlag === 1"
-            type="danger"
-            @click="deleteArticle2"
-          >
-            还原
-          </el-button>
+          <el-button v-show="filters.tagStatus === '8'" v-perm="['ARTID003']" type="danger" @click="deleteArticle3">清空回收站</el-button>
         </span>
       </div>
     </div>
@@ -451,6 +443,18 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$mapi.article.deleteArticle2({ articleId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
+    },
+    deleteArticle3() {
+      this.$confirm('此操作将彻底删除回收站的文章, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.article.deleteArticle3().then(res => {
           this.$message.success(res.message)
           this.listTableData()
         })

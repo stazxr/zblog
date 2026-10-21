@@ -71,6 +71,11 @@ public interface ArticleService extends IService<Article> {
     void deleteArticle2(Long articleId);
 
     /**
+     * 删除文章（清空回收站）
+     */
+    void deleteArticle3();
+
+    /**
      * 文章内容自动保存
      *
      * @param autoSaveDto 文章自动保存信息
