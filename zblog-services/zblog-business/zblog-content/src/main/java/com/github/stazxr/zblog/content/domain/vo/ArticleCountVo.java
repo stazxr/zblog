@@ -26,14 +26,19 @@ public class ArticleCountVo implements Serializable {
     private int totalCount;
 
     /**
-     * 公开文章数量
+     * 草稿箱数量
      */
-    private int publicCount;
+    private int draftCount;
 
     /**
      * 私密文章数量
      */
     private int privateCount;
+
+    /**
+     * 已发布文章数量
+     */
+    private int publicCount;
 
     /**
      * 待审核数量
@@ -49,11 +54,6 @@ public class ArticleCountVo implements Serializable {
      * 待处理数量（如审核不通过、待整改）
      */
     private int pendingDealCount;
-
-    /**
-     * 草稿箱数量
-     */
-    private int draftCount;
 
     /**
      * 回收站数量

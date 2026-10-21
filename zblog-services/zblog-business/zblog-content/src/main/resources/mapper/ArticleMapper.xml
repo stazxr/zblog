@@ -73,40 +73,41 @@
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
         WHERE a.AUTHOR_ID = #{query.authorId}
         <choose>
-            <!-- 全部 -->
-            <when test="query.tagStatus == '1'">
-                AND a.DELETE_FLAG != 2
+            <!-- 1: 全部 -->
+            <when test='query.tagStatus == "1"'>
+                AND a.DELETE_FLAG = 0
             </when>
-            <!-- 公开 -->
-            <when test="query.tagStatus == 2">
-                AND a.DELETE_FLAG == 5 AND a.ARTICLE_PERM = 1
+            <!-- 2: 草稿 -->
+            <when test='query.tagStatus == "2"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 1
             </when>
-            <!-- 私密 -->
-            <when test="query.tagStatus == 3">
-                AND a.ARTICLE_STATUS != 9 AND a.ARTICLE_PERM = 2
+            <!-- 3: 私密 -->
+            <when test='query.tagStatus == "3"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_PERM = 3
             </when>
-            <!-- 待审核 -->
-            <when test="query.tagStatus == 4">
-                AND a.ARTICLE_STATUS IN (2, 3)
+            <!-- 4: 已发布（不包含私密文章） -->
+            <when test='query.tagStatus == "4"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 5 AND a.ARTICLE_PERM != 3
             </when>
-            <!-- 待发布 -->
-            <when test="query.tagStatus == 5">
-                AND a.ARTICLE_STATUS = 4
+            <!-- 5: 待审核 -->
+            <when test='query.tagStatus == "5"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 2
             </when>
-            <!-- 待处理 -->
-            <when test="query.tagStatus == 6">
-                AND a.ARTICLE_STATUS IN (5, 8)
+            <!-- 6: 待发布 -->
+            <when test='query.tagStatus == "6"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 3
             </when>
-            <!-- 草稿箱 -->
-            <when test="query.tagStatus == 7">
-                AND a.ARTICLE_STATUS = 1
+            <!-- 7: 待处理 -->
+            <when test='query.tagStatus == "7"'>
+                AND a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS IN (4, 91)
             </when>
-            <!-- 回收站 -->
-            <when test="query.tagStatus == 8">
-                AND a.ARTICLE_STATUS = 9
+            <!-- 8: 回收站 -->
+            <when test='query.tagStatus == "8"'>
+                AND a.DELETE_FLAG = 1
             </when>
             <otherwise>
-                AND a.ARTICLE_STATUS = 99
+                <!-- 返回空列表 -->
+                AND a.ARTICLE_STATUS = -1
             </otherwise>
         </choose>
         <if test="query.title != null and query.title != ''">
@@ -124,6 +125,9 @@
         </if>
         <if test="query.articleType != null">
             AND a.ARTICLE_TYPE = #{query.articleType}
+        </if>
+        <if test="query.articleStatus != null">
+            AND a.ARTICLE_STATUS = #{query.articleStatus}
         </if>
         <if test="query.commentFlag != null">
             AND a.COMMENT_FLAG = #{query.commentFlag}
@@ -156,16 +160,16 @@
 
     <select id="selectMyArticleCountInfo" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCountVo">
         SELECT
-            SUM(ARTICLE_STATUS != 9) AS totalCount,
-            SUM(ARTICLE_STATUS != 9 AND ARTICLE_PERM = 1) AS publicCount,
-            SUM(ARTICLE_STATUS != 9 AND ARTICLE_PERM = 2) AS privateCount,
-            SUM(ARTICLE_STATUS IN (2, 3)) AS pendingAuditCount,
-            SUM(ARTICLE_STATUS = 4) AS pendingPublishCount,
-            SUM(ARTICLE_STATUS IN (5, 8)) AS pendingDealCount,
-            SUM(ARTICLE_STATUS = 1) AS draftCount,
-            SUM(ARTICLE_STATUS = 9) AS recycleCount
-        FROM article
-        WHERE ARTICLE_STATUS != 99 AND AUTHOR_ID = #{authorId}
+            SUM(a.DELETE_FLAG = 0) AS totalCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 1) AS draftCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_PERM = 3) AS privateCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 5 AND a.ARTICLE_PERM != 3) AS publicCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 2) AS pendingAuditCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS = 3) AS pendingPublishCount,
+            SUM(a.DELETE_FLAG = 0 AND a.ARTICLE_STATUS IN (4, 91)) AS pendingDealCount,
+            SUM(a.DELETE_FLAG = 1) AS recycleCount
+        FROM article a
+        WHERE AUTHOR_ID = #{authorId} AND a.DELETE_FLAG != 2
     </select>
 
     <select id="selectArticleDetail" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">

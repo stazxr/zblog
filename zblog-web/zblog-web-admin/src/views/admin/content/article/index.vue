@@ -36,6 +36,11 @@
               <el-option v-for="item in articleTypeList" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </muses-search-form-item>
+          <muses-search-form-item label="" prop="search-articleStatus">
+            <el-select id="search-articleStatus" v-model="filters.articleStatus" placeholder="文章状态" clearable @change="search">
+              <el-option v-for="item in articleStatusList" :key="item.value" :label="item.name" :value="item.value" />
+            </el-select>
+          </muses-search-form-item>
           <muses-search-form-item label="" prop="search-articlePerm">
             <el-select id="search-articlePerm" v-model="filters.articlePerm" placeholder="文章权限" clearable @change="search">
               <el-option v-for="item in articlePermList" :key="item.value" :label="item.name" :value="item.value" />
@@ -126,19 +131,12 @@
         </el-table-column>
         <el-table-column label="文章状态" width="100" align="center">
           <template v-slot="scope">
-            <el-tag v-if="scope.row['articleStatus'] === 1" type="info" effect="dark">草稿</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 2" effect="dark">待审核</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 3" effect="dark">待审核</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 4" type="warning" effect="dark">
-              {{ '审核拒绝：' + scope.row['desc'] }}
-            </el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 5" type="success" effect="dark">
-              {{ scope.row['articlePerm'] === 3 ? '私密文章' : '已发布' }}
-            </el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 6" type="danger" effect="dark">临时下线</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 7" type="danger" effect="dark">待整改</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 8" type="info" effect="dark">回收站</el-tag>
-            <el-tag v-else-if="scope.row['articleStatus'] === 9" effect="dark">待发布</el-tag>
+            <el-tag v-if="scope.row.articleStatus === 1" type="info" effect="dark">草稿</el-tag>
+            <el-tag v-else-if="scope.row.articleStatus === 2" type="primary" effect="dark">待审核</el-tag>
+            <el-tag v-else-if="scope.row.articleStatus === 3" type="primary" effect="dark">待发布</el-tag>
+            <el-tag v-else-if="scope.row.articleStatus === 4" type="danger" effect="dark">审核未通过</el-tag>
+            <el-tag v-else-if="scope.row.articleStatus === 5" type="success" effect="dark">已发布</el-tag>
+            <el-tag v-else-if="scope.row.articleStatus === 91" type="warning" effect="dark">已下线</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -192,17 +190,19 @@ export default {
     return {
       statusTabs: [
         { key: '1', label: '全部', field: 'totalCount' },
+        { key: '2', label: '草稿', field: 'draftCount' },
         { key: '3', label: '私密', field: 'privateCount' },
-        { key: '2', label: '已发布', field: 'publicCount' },
-        { key: '4', label: '待审核', field: 'pendingAuditCount' },
-        { key: '5', label: '待发布', field: 'pendingPublishCount' },
-        { key: '6', label: '待处理', field: 'pendingDealCount' },
-        { key: '7', label: '草稿箱', field: 'draftCount' },
-        { key: '7', label: '回收站', field: 'recycleCount' }
+        { key: '4', label: '已发布', field: 'publicCount' },
+        { key: '5', label: '待审核', field: 'pendingAuditCount' },
+        { key: '6', label: '待发布', field: 'pendingPublishCount' },
+        { key: '7', label: '待处理', field: 'pendingDealCount' },
+        { key: '8', label: '回收站', field: 'recycleCount' }
       ],
       articleCountInfo: {
         // 全部
         totalCount: 0,
+        // 草稿
+        draftCount: 0,
         // 私密
         privateCount: 0,
         // 已发布
@@ -213,8 +213,6 @@ export default {
         pendingPublishCount: 0,
         // 待处理（比如审核不通过 / 待整改）
         pendingDealCount: 0,
-        // 草稿箱
-        draftCount: 0,
         // 回收站
         recycleCount: 0
       },
@@ -225,12 +223,14 @@ export default {
         categoryId: null,
         tagId: null,
         articleType: null,
+        articleStatus: null,
         articlePerm: null,
         commentFlag: null
       },
       categoryList: [],
       tagList: [],
       articleTypeList: [],
+      articleStatusList: [],
       articlePermList: [],
       commentFlagList: [],
       tableData: [],
@@ -252,6 +252,7 @@ export default {
     this.loadCategoryTree()
     this.loadTagList()
     this.loadArticleTypeList()
+    this.loadArticleStatusList()
     this.loadArticlePermList()
     this.loadCommentFlagList()
     this.listTableData()
@@ -290,6 +291,14 @@ export default {
         this.articleTypeList = data
       }).catch(_ => {
         this.articleTypeList = []
+      })
+    },
+    loadArticleStatusList() {
+      this.$mapi.communal.queryConfListByDictKey({ dictKey: 'ARTICLE_STATUS_CONFIG' }).then(res => {
+        const { data } = res
+        this.articleStatusList = data
+      }).catch(_ => {
+        this.articleStatusList = []
       })
     },
     loadArticlePermList() {

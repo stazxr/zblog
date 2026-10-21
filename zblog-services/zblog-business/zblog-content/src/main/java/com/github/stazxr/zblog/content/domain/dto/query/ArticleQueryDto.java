@@ -61,6 +61,12 @@ public class ArticleQueryDto extends PageParam {
     private Integer articleType;
 
     /**
+     * 文章状态
+     */
+    @ApiModelProperty("文章状态")
+    private Integer articleStatus;
+
+    /**
      * 文章权限
      */
     @ApiModelProperty("文章权限")

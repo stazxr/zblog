@@ -95,7 +95,6 @@
     </Appenders>
 
     <Loggers>
-
         <!-- 请求响应日志 -->
         <Logger name="___flowLog___" level="INFO" additivity="false">
             <AppenderRef ref="FlowFile"/>
@@ -111,12 +110,23 @@
             <AppenderRef ref="ThreadErrorMonitorFile"/>
         </Logger>
 
-        <Logger name="com.github.stazxr.zblog.bas.validation.ValidatorExceptionHandler" level="WARN"/>
-        <Logger name="com.github.stazxr.zblog.bas.context.Context" level="DEBUG"/>
+        <!-- MyBatis SQL -->
+        <Logger name="org.apache.ibatis" level="INFO"/>
+        <Logger name="com.baomidou.mybatisplus" level="INFO"/>
+
+        <!-- Mapper -->
+        <Logger name="com.github.stazxr.zblog.base.mapper" level="INFO"/>
+        <Logger name="com.github.stazxr.zblog.log.mapper" level="INFO"/>
+        <Logger name="com.github.stazxr.zblog.audit.mapper" level="INFO"/>
+        <Logger name="com.github.stazxr.zblog.content.mapper" level="INFO"/>
+        <Logger name="com.github.stazxr.zblog.content.ext.mapper" level="INFO"/>
+        <Logger name="com.github.stazxr.zblog.portal.mapper" level="INFO"/>
+
+        <Logger name="com.github.stazxr.zblog.bas.validation.ValidatorExceptionHandler" level="DEBUG"/>
+        <Logger name="com.github.stazxr.zblog.bas.context.Context" level="INFO"/>
 
         <!-- Spring 日志 -->
         <Logger name="org.springframework" level="INFO"/>
-        <Logger name="com" level="INFO"/>
 
         <!-- ⭐ 默认 Root Logger（新增标准出口） -->
         <Root level="INFO">

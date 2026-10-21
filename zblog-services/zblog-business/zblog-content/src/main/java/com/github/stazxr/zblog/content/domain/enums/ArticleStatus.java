@@ -1,13 +1,7 @@
 package com.github.stazxr.zblog.content.domain.enums;
 
 /**
- * 文章状态
- *
- * @author SunTao
- * @since 2021-07-31
- */
-/**
- * 文章发布状态。
+ * 文章状态。
  *
  * @author Sun Tao
  * @since 2026-10-18
@@ -24,7 +18,7 @@ public enum ArticleStatus {
     PENDING_REVIEW(2, "待审核"),
 
     /**
-     * 已审核通过，等待计划发布时间。
+     * 待发布，已审核通过，等待计划发布时间。
      */
     SCHEDULED(3, "待发布"),
 
