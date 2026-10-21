@@ -196,6 +196,50 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
+     * 删除文章（移动到回收站）
+     *
+     * @param articleId 文章id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteArticle(Long articleId) {
+        // 查询文章信息
+        Article dbArticle = baseMapper.selectById(articleId);
+        ThrowUtils.requireNonNull(dbArticle, BaseErrorCode.ECOREA001);
+        // 文章作者判断
+        Long loginId = SecurityUtils.getLoginId();
+        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), ArticleErrorCode.EARTIA007);
+        // 文章状态校验
+        ThrowUtils.throwIf(!ArticleDeleteFlag.DEFAULT.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
+        // 第一次删除文章，将文章移动到回收站
+        baseMapper.deleteArticle(articleId, ArticleDeleteFlag.RECYCLE.getValue());
+        // TODO
+        // baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
+    }
+
+    /**
+     * 删除文章（彻底删除）
+     *
+     * @param articleId 文章id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteArticle2(Long articleId) {
+        // 查询文章信息
+        Article dbArticle = baseMapper.selectById(articleId);
+        ThrowUtils.requireNonNull(dbArticle, BaseErrorCode.ECOREA001);
+        // 文章作者判断
+        Long loginId = SecurityUtils.getLoginId();
+        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), ArticleErrorCode.EARTIA007);
+        // 文章状态校验
+        ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
+        // 彻底删除文章
+        baseMapper.deleteArticle(articleId, ArticleDeleteFlag.DELETED.getValue());
+        // TODO
+        // baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
+    }
+
+    /**
      * 文章内容自动保存
      *
      * @param autoSaveDto 文章自动保存信息
@@ -457,19 +501,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        Long publishId = SequenceUtils.getId();
 //        baseMapper.insertArticlePublishTiming(publishId, articleDto.getId(), articleDto.getAutoPublishTime(), nowTime);
 //        // throw new ServiceException("功能已关闭，优化中");
-//    }
-//
-//    /**
-//     * 删除文章
-//     *
-//     * @param articleId 文章ID
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void moveArticleToRecycleBin(Long articleId) {
-//        Assert.notNull(articleId, "参数【articleId】不能为空");
-//        baseMapper.updateArticleStatus(articleId, ArticleStatus.RECYCLE.getType());
-//        baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
 //    }
 //
 //    /**
@@ -754,7 +785,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         if (ArticleCoverImageType.MULTIPLE.getValue().equals(coverImageType)) {
             ThrowUtils.throwIf(CollectionUtils.isEmpty(coverImages), ArticleErrorCode.EARTIA003);
-            ThrowUtils.throwIf(coverImages.size() > Constants.MAX_ARTICLE_COVER_IMAGE_SIZE, ArticleErrorCode.EARTIA006);
+            ThrowUtils.throwIf(coverImages.size() > Constants.MAX_ARTICLE_COVER_IMAGE_SIZE, ArticleErrorCode.EARTIA008);
             insertArticleCoverImages(articleId, coverImages);
             return;
         }

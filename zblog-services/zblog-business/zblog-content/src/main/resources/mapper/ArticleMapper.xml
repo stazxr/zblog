@@ -190,7 +190,9 @@
         SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
     </select>
 
-
+    <update id="deleteArticle">
+        UPDATE article SET DELETE_FLAG = #{deleteType} WHERE ID = #{articleId}
+    </update>
 
 
 

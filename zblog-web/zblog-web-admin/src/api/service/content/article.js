@@ -24,6 +24,17 @@ export default {
   editArticle: params => {
     return api.httpRequest().post(`${articleApi}/editArticle`, params)
   },
+  // 删除文章
+  deleteArticle: params => {
+    return api.httpRequest().post(`${articleApi}/deleteArticle`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
+  },
+  deleteArticle2: params => {
+    return api.httpRequest().post(`${articleApi}/deleteArticle2`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
+  },
   // 保存草稿
   saveArticleDraft: params => {
     return api.httpRequest().post(`${articleApi}/saveArticleDraft`, params)
@@ -62,12 +73,6 @@ export default {
   // 将文章回收至草稿箱
   recycleToDraftBox: params => {
     return api.httpRequest().post(`${articleApi}/recycleToDraftBox`, qs.stringify(params), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
-  },
-  // 彻底删除文章
-  deleteArticle: params => {
-    return api.httpRequest().post(`${articleApi}/deleteArticle`, qs.stringify(params), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
     })
   },

@@ -1136,6 +1136,12 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_SOURCE_URL_REQUIRED', 'en-US', 'Article sourceUrl cannot be blank', 'common'),
 ('ARTICLE_READ_NO_PERMISSION', 'zh-CN', '没有权限，只允许编辑自己的文章', 'common'),
 ('ARTICLE_READ_NO_PERMISSION', 'en-US', 'No Permission', 'common'),
+('ARTICLE_EDIT_NO_PERMISSION', 'zh-CN', '没有权限，只允许编辑自己的文章', 'common'),
+('ARTICLE_EDIT_NO_PERMISSION', 'en-US', 'No Permission', 'common'),
+('ARTICLE_DELETE_NO_PERMISSION', 'zh-CN', '没有权限，只允许删除自己的文章', 'common'),
+('ARTICLE_DELETE_NO_PERMISSION', 'en-US', 'No Permission', 'common'),
+('ARTICLE_X_STATUS_INVALID', 'zh-CN', '文章状态异常，请刷新页面重试', 'common'),
+('ARTICLE_X_STATUS_INVALID', 'en-US', 'TODO', 'common'),
 ('ARTICLE_COVER_IMAGE_OVER_MAX', 'zh-CN', '超过最大文章封面上传限制', 'common'),
 ('ARTICLE_COVER_IMAGE_OVER_MAX', 'en-US', 'Article cover image size over max', 'common'),
 -- 门户

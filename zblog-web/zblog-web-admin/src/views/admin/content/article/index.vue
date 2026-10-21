@@ -61,7 +61,33 @@
         <span class="crud-opts-left">
           <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
           <el-button v-perm="['ARTIU001']" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
-          <el-button v-perm="['ARTID001']" :disabled="row === null" type="danger" @click="deleteArticle">删除</el-button>
+          <el-button
+            v-show="filters.tagStatus !== '8'"
+            v-perm="['ARTID001']"
+            :disabled="row === null || row.deleteFlag !== 0"
+            type="danger"
+            @click="deleteArticle"
+          >
+            删除
+          </el-button>
+          <el-button
+            v-show="filters.tagStatus === '8'"
+            v-perm="['ARTID002']"
+            :disabled="row === null || row.deleteFlag === 1"
+            type="danger"
+            @click="deleteArticle2"
+          >
+            删除
+          </el-button>
+          <el-button
+            v-show="filters.tagStatus === '8'"
+            v-perm="['ARTIU002']"
+            :disabled="row === null || row.deleteFlag === 1"
+            type="danger"
+            @click="deleteArticle2"
+          >
+            还原
+          </el-button>
         </span>
       </div>
     </div>
@@ -397,7 +423,40 @@ export default {
     editArticle(row) {
       this.$router.push({ name: 'AddOrEditArticle', query: { articleId: row.id }})
     },
-    // 删除 TODO
+    // 删除
+    deleteArticle() {
+      if (this.row === null) {
+        this.$message.error('请选择要删除的文章')
+        return
+      }
+      this.$confirm('此操作将移动文章【' + this.row.title + '】到回收站, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.article.deleteArticle({ articleId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
+    },
+    deleteArticle2() {
+      if (this.row === null) {
+        this.$message.error('请选择要删除的文章')
+        return
+      }
+      this.$confirm('此操作将永久删除文章【' + this.row.title + '】, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$mapi.article.deleteArticle2({ articleId: this.row.id }).then(res => {
+          this.$message.success(res.message)
+          this.listTableData()
+        })
+      })
+    },
+    // TODO
     recycleToDraftBox(row) {
       this.$mapi.article.recycleToDraftBox({ articleId: row.id }).then(res => {
         this.$message.success(res.message)
@@ -422,12 +481,6 @@ export default {
       }
 
       this.$mapi.article.batchMoveToRecycleBin(articleIds).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
-      })
-    },
-    deleteArticle(row) {
-      this.$mapi.article.deleteArticle({ articleId: row.id }).then(res => {
         this.$message.success(res.message)
         this.listTableData()
       })

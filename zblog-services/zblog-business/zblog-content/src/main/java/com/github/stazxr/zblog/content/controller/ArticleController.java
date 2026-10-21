@@ -112,6 +112,76 @@ public class ArticleController {
     }
 
     /**
+     * 删除文章（移动到回收站）
+     *
+     * @param articleId 文章id
+     */
+    @Log
+    @PostMapping(value = "/deleteArticle")
+    @ApiOperation(value = "删除文章（移动到回收站）")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "删除文章（移动到回收站）", code = "ARTID001", level = RouterLevel.PUBLIC)
+    public void deleteArticle(@RequestParam Long articleId) {
+        articleService.deleteArticle(articleId);
+    }
+
+    /**
+     * 删除文章（彻底删除）
+     *
+     * @param articleId 文章id
+     */
+    @Log
+    @PostMapping(value = "/deleteArticle2")
+    @ApiOperation(value = "删除文章（彻底删除）")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
+    })
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "删除文章（彻底删除）", code = "ARTID002", level = RouterLevel.PUBLIC)
+    public void deleteArticle2(@RequestParam Long articleId) {
+        articleService.deleteArticle2(articleId);
+    }
+
+
+//    /**
+//     * 清空回收站
+//     *
+//     * @return Result
+//     */
+//    @Log
+//    @PostMapping(value = "/clearRecycleBin")
+//    @ApiOperation(value = "清空回收站")
+//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+//    @Router(name = "清空回收站", code = "clearArticleRecycleBin", level = RouterLevel.PUBLIC)
+//    public Result clearArticleRecycleBin() {
+//        articleService.clearArticleRecycleBin();
+//        return Result.success();
+//    }
+//
+//    /**
+//     * 将文章回收至草稿箱
+//     *
+//     * @param articleId 文章ID
+//     * @return Result
+//     */
+//    @Log
+//    @PostMapping(value = "/recycleToDraftBox")
+//    @ApiOperation(value = "将文章回收至草稿箱")
+//    @ApiImplicitParams({
+//        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
+//    })
+//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
+//    @Router(name = "将文章回收至草稿箱", code = "recycleToDraftBox", level = RouterLevel.PUBLIC)
+//    public Result recycleToDraftBox(@RequestParam Long articleId) {
+//        articleService.recycleToDraftBox(articleId);
+//        return Result.success();
+//    }
+//
+
+    /**
      * 文章内容自动保存
      *
      *   <p>建议接口等级为 OPEN, 可以在用户会话过期时，自动保存文章未保存内容，防止编辑内容丢失
@@ -215,95 +285,6 @@ public class ArticleController {
 //        articleService.publishArticleByTiming(articleDto);
 //        return Result.success();
 //    }
-//
-//    /**
-//     * 删除文章
-//     *
-//     * @param articleId 文章ID
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/moveToRecycleBin")
-//    @ApiOperation(value = "查询文章内容自动保存信息")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
-//    })
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "删除文章", code = "moveArticleToRecycleBin", level = RouterLevel.PUBLIC)
-//    public Result moveArticleToRecycleBin(@RequestParam Long articleId) {
-//        articleService.moveArticleToRecycleBin(articleId);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 彻底删除文章
-//     *
-//     * @param articleId 文章ID
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/deleteArticle")
-//    @ApiOperation(value = "彻底删除文章")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
-//    })
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "彻底删除文章", code = "deleteArticle", level = RouterLevel.PUBLIC)
-//    public Result deleteArticle(@RequestParam Long articleId) {
-//        articleService.deleteArticle(articleId);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 批量删除文章
-//     *
-//     * @param articleIds 文章编号列表
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/batchMoveToRecycleBin")
-//    @ApiOperation(value = "批量删除文章")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "批量删除文章", code = "batchMoveArticleToRecycleBin", level = RouterLevel.PUBLIC)
-//    public Result batchDeleteArticle(@RequestBody List<Long> articleIds) {
-//        articleService.batchDeleteArticle(articleIds);
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 清空回收站
-//     *
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/clearRecycleBin")
-//    @ApiOperation(value = "清空回收站")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "清空回收站", code = "clearArticleRecycleBin", level = RouterLevel.PUBLIC)
-//    public Result clearArticleRecycleBin() {
-//        articleService.clearArticleRecycleBin();
-//        return Result.success();
-//    }
-//
-//    /**
-//     * 将文章回收至草稿箱
-//     *
-//     * @param articleId 文章ID
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/recycleToDraftBox")
-//    @ApiOperation(value = "将文章回收至草稿箱")
-//    @ApiImplicitParams({
-//        @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
-//    })
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "将文章回收至草稿箱", code = "recycleToDraftBox", level = RouterLevel.PUBLIC)
-//    public Result recycleToDraftBox(@RequestParam Long articleId) {
-//        articleService.recycleToDraftBox(articleId);
-//        return Result.success();
-//    }
-//
 //    /**
 //     * 审核文章
 //     *

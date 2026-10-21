@@ -57,6 +57,20 @@ public interface ArticleService extends IService<Article> {
     void editArticle(ArticleDto articleDto);
 
     /**
+     * 删除文章（移动到回收站）
+     *
+     * @param articleId 文章id
+     */
+    void deleteArticle(Long articleId);
+
+    /**
+     * 删除文章（彻底删除）
+     *
+     * @param articleId 文章id
+     */
+    void deleteArticle2(Long articleId);
+
+    /**
      * 文章内容自动保存
      *
      * @param autoSaveDto 文章自动保存信息
@@ -117,14 +131,6 @@ public interface ArticleService extends IService<Article> {
 //     * @param articleDto 文章信息
 //     */
 //    void publishArticleByTiming(ArticleDto articleDto);
-//
-//    /**
-//     * 删除文章
-//     *
-//     * @param articleId 文章ID
-//     */
-//    void moveArticleToRecycleBin(@Param("articleId") Long articleId);
-//
 //    /**
 //     * 彻底删除文章
 //     *
