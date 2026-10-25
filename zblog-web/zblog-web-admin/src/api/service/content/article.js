@@ -16,13 +16,21 @@ export default {
   queryMyArticleDetail: params => {
     return api.httpRequest().get(`${articleApi}/queryMyArticleDetail`, params)
   },
-  // 新增文章
-  addArticle: params => {
-    return api.httpRequest().post(`${articleApi}/addArticle`, params)
+  // 初始化文章
+  initArticle: params => {
+    return api.httpRequest().post(`${articleApi}/initArticle`, params)
   },
-  // 编辑文章
-  editArticle: params => {
-    return api.httpRequest().post(`${articleApi}/editArticle`, params)
+  // 保存文章
+  saveArticle: params => {
+    return api.httpRequest().post(`${articleApi}/saveArticle`, params)
+  },
+  // 发布文章
+  publishArticle: params => {
+    return api.httpRequest().post(`${articleApi}/publishArticle`, params)
+  },
+  // 定时发布文章
+  autoPublishArticle: params => {
+    return api.httpRequest().post(`${articleApi}/autoPublishArticle`, params)
   },
   // 删除文章
   deleteArticle: params => {
@@ -38,13 +46,11 @@ export default {
   deleteArticle3: params => {
     return api.httpRequest().post(`${articleApi}/deleteArticle3`, params)
   },
-  // 保存草稿
-  saveArticleDraft: params => {
-    return api.httpRequest().post(`${articleApi}/saveArticleDraft`, params)
-  },
-  // 查询最新的文章草稿
-  queryLastArticleDraft: params => {
-    return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
+  // 还原文章（移至草稿箱）
+  resetArticle: params => {
+    return api.httpRequest().post(`${articleApi}/resetArticle`, qs.stringify(params), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+    })
   },
   // 文章内容自动保存
   autoSaveArticleContent: params => {
@@ -58,37 +64,8 @@ export default {
   queryAutoSaveArticleContentById: params => {
     return api.httpRequest().get(`${articleApi}/queryAutoSaveArticleContentById`, params)
   },
-
-  // 分页查询用户文章列表
-  pageAuditArticleList: params => {
-    return api.httpRequest().get(`${articleApi}/pagePublicList`, params)
-  },
-  // 文章自动发布
-  publishArticleByTiming: params => {
-    return api.httpRequest().post(`${articleApi}/publishArticleByTiming`, params)
-  },
-  // 删除文章：移动至回收站
-  moveToRecycleBin: params => {
-    return api.httpRequest().post(`${articleApi}/moveToRecycleBin`, qs.stringify(params), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
-  },
-  // 将文章回收至草稿箱
-  recycleToDraftBox: params => {
-    return api.httpRequest().post(`${articleApi}/recycleToDraftBox`, qs.stringify(params), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
-    })
-  },
-  // 删除文章：批量移动至回收站
-  batchMoveToRecycleBin: params => {
-    return api.httpRequest().post(`${articleApi}/batchMoveToRecycleBin`, params)
-  },
-  // 清空回收站
-  clearRecycleBin: params => {
-    return api.httpRequest().post(`${articleApi}/clearRecycleBin`, params)
-  },
-  // 文章审核
-  auditArticle: params => {
-    return api.httpRequest().post(`${articleApi}/auditArticle`, params)
+  // 查询最新的文章草稿
+  queryLastArticleDraft: params => {
+    return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
   }
 }

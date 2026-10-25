@@ -42,16 +42,16 @@ public enum ArticlePerm {
      */
     USER(7, "指定用户可见");
 
-    private final int value;
+    private final Integer value;
 
     private final String name;
 
-    ArticlePerm(int value, String name) {
+    ArticlePerm(Integer value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
@@ -65,7 +65,7 @@ public enum ArticlePerm {
         }
 
         for (ArticlePerm item : values()) {
-            if (item.value == value) {
+            if (item.value.equals(value)) {
                 return item;
             }
         }

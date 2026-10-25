@@ -13,6 +13,12 @@ public enum BaseErrorCode implements ErrorCode {
 
     /** 数据不存在 */
     ECOREA001("DATA_NOT_FOUND"),
+    /** 没有数据查看权限 */
+    ECOREA002("NO_DATA_READ_PERMISSION"),
+    /** 没有数据编辑权限 */
+    ECOREA003("NO_DATA_EDIT_PERMISSION"),
+    /** 没有数据删除权限 */
+    ECOREA004("NO_DATA_DELETE_PERMISSION"),
 
     /* ***** 技术异常 ***** */
 

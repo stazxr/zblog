@@ -43,18 +43,30 @@ public interface ArticleService extends IService<Article> {
     ArticleVo queryMyArticleDetail(Long articleId);
 
     /**
-     * 新增文章
-     *
-     * @param articleDto 文章信息
+     * 初始化文章
      */
-    void addArticle(ArticleDto articleDto);
+    ArticleVo initArticle();
 
     /**
-     * 编辑文章
+     * 保存文章
      *
      * @param articleDto 文章信息
      */
-    void editArticle(ArticleDto articleDto);
+    void saveArticle(ArticleDraftDto articleDto);
+
+    /**
+     * 发布文章
+     *
+     * @param articleDto 文章信息
+     */
+    void publishArticle(ArticleDto articleDto);
+
+    /**
+     * 定时发布文章
+     *
+     * @param articleDto 文章信息
+     */
+    void autoPublishArticle(ArticleDto articleDto);
 
     /**
      * 删除文章（移动到回收站）
@@ -74,6 +86,13 @@ public interface ArticleService extends IService<Article> {
      * 删除文章（清空回收站）
      */
     void deleteArticle3();
+
+    /**
+     * 还原文章（移至草稿箱）
+     *
+     * @param articleId 文章id
+     */
+    void resetArticle(Long articleId);
 
     /**
      * 文章内容自动保存
@@ -100,19 +119,11 @@ public interface ArticleService extends IService<Article> {
     ArticleAutoSaveVo queryAutoSaveArticleContentById(Long recordId);
 
     /**
-     * 保存文章草稿
-     *
-     * @param articleDto 文章信息
-     */
-    void saveArticleDraft(ArticleDraftDto articleDto);
-
-    /**
      * 查询最新的文章草稿
      *
      * @return ArticleVo
      */
     ArticleVo queryLastArticleDraft();
-
 
 //    /**
 //     * 分页查询用户的文章列表

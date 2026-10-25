@@ -111,6 +111,11 @@
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>
+        <!-- flexmark -->
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+        </dependency>
         <!-- servlet api -->
         <dependency>
             <groupId>javax.servlet</groupId>

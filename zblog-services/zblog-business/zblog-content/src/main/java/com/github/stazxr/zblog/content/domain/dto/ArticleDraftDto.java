@@ -1,7 +1,5 @@
 package com.github.stazxr.zblog.content.domain.dto;
 
-import com.github.stazxr.zblog.bas.validation.group.Create;
-import com.github.stazxr.zblog.bas.validation.group.Update;
 import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -34,13 +32,13 @@ public class ArticleDraftDto implements Serializable {
     /**
      * 文章标题
      */
-    @ApiModelProperty(value = "文章标题", required = true)
+    @ApiModelProperty(value = "文章标题")
     private String title;
 
     /**
      * 路径标识
      */
-    @ApiModelProperty(value = "路径标识", required = true)
+    @ApiModelProperty(value = "路径标识")
     private String slug;
 
     /**
@@ -52,13 +50,13 @@ public class ArticleDraftDto implements Serializable {
     /**
      * 文章内容（Markdown）
      */
-    @ApiModelProperty(value = "文章内容（Markdown）", required = true)
+    @ApiModelProperty(value = "文章内容（Markdown）")
     private String contentMd;
 
     /**
      * 封面类型
      */
-    @ApiModelProperty(value = "封面类型", required = true)
+    @ApiModelProperty(value = "封面类型")
     private Integer coverImageType;
 
     /**
@@ -70,7 +68,7 @@ public class ArticleDraftDto implements Serializable {
     /**
      * 分类ID
      */
-    @ApiModelProperty(value = "分类ID", required = true)
+    @ApiModelProperty(value = "分类ID")
     private Long categoryId;
 
     /**
@@ -82,13 +80,13 @@ public class ArticleDraftDto implements Serializable {
     /**
      * 是否允许评论
      */
-    @ApiModelProperty(value = "是否允许评论", example = "true")
+    @ApiModelProperty(value = "是否允许评论")
     private Boolean commentFlag;
 
     /**
      * 文章类型
      */
-    @ApiModelProperty(value = "文章类型", required = true)
+    @ApiModelProperty(value = "文章类型")
     private Integer articleType;
 
     /**
@@ -112,7 +110,7 @@ public class ArticleDraftDto implements Serializable {
     /**
      * 文章权限
      */
-    @ApiModelProperty(value = "文章权限", required = true)
+    @ApiModelProperty(value = "文章权限")
     private Integer articlePerm;
 
     /**

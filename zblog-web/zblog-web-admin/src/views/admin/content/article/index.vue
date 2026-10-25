@@ -59,8 +59,11 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
-          <el-button v-perm="['ARTIU001']" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
+          <template v-perm="['ARTIQ003', 'ARTIU001', 'ARTIU002']">
+            <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
+            <el-button v-perm="['ARTIQ003']" type="info" @click="showArticleDetail">详情</el-button>
+            <el-button v-show="filters.tagStatus !== '8'" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
+          </template>
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTID001']"
@@ -79,7 +82,23 @@
           >
             删除
           </el-button>
-          <el-button v-show="filters.tagStatus === '8'" v-perm="['ARTID003']" type="danger" @click="deleteArticle3">清空回收站</el-button>
+          <el-button
+            v-show="filters.tagStatus === '8' && tableData.length > 0"
+            v-perm="['ARTID003']"
+            type="danger"
+            @click="deleteArticle3"
+          >
+            清空回收站
+          </el-button>
+          <el-button
+            v-show="filters.tagStatus === '8'"
+            v-perm="['ARTIU004']"
+            :disabled="row === null || row.deleteFlag !== 1"
+            type="primary"
+            @click="resetArticle"
+          >
+            还原
+          </el-button>
         </span>
       </div>
     </div>
@@ -117,7 +136,7 @@
           <template v-slot="scope">
             <div class="article-text-wrapper">
               <div class="article-title" :title="scope.row.title">
-                {{ scope.row.title }}
+                {{ scope.row.title || '未命名文章' }}
               </div>
             </div>
           </template>
@@ -399,10 +418,10 @@ export default {
       })
     },
     // 详情
-    showArticleDetail(row) {
+    showArticleDetail() {
       this.previewArticleDialogVisible = true
       this.$nextTick(() => {
-        this.$refs.previewArticleRef.initData(2, row.id)
+        this.$refs.previewArticleRef.initData(2, this.row.id)
       })
     },
     closePreviewArticleDialog() {
@@ -412,8 +431,12 @@ export default {
     addArticle() {
       this.$router.push({ name: 'AddOrEditArticle' })
     },
-    editArticle(row) {
-      this.$router.push({ name: 'AddOrEditArticle', query: { articleId: row.id }})
+    editArticle() {
+      if (this.row === null) {
+        this.$message.error('请选择要编辑的文章')
+        return
+      }
+      this.$router.push({ name: 'AddOrEditArticle', query: { articleId: this.row.id }})
     },
     // 删除
     deleteArticle() {
@@ -460,37 +483,9 @@ export default {
         })
       })
     },
-    // TODO
-    recycleToDraftBox(row) {
-      this.$mapi.article.recycleToDraftBox({ articleId: row.id }).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
-      })
-    },
-    moveToRecycleBin(row) {
-      this.$mapi.article.moveToRecycleBin({ articleId: row.id }).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
-      })
-    },
-    batchMoveToRecycleBin() {
-      const articleIds = []
-      this.rows.forEach(row => {
-        articleIds.push(row.id)
-      })
-
-      if (articleIds.length === 0) {
-        this.$message.warning('请选择要删除的文章列表')
-        return
-      }
-
-      this.$mapi.article.batchMoveToRecycleBin(articleIds).then(res => {
-        this.$message.success(res.message)
-        this.listTableData()
-      })
-    },
-    clearRecycleBin() {
-      this.$mapi.article.clearRecycleBin().then(res => {
+    // 还原文章
+    resetArticle(row) {
+      this.$mapi.article.resetArticle({ articleId: row.id }).then(res => {
         this.$message.success(res.message)
         this.listTableData()
       })

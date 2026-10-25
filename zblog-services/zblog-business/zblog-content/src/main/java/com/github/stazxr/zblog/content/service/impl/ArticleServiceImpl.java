@@ -27,10 +27,11 @@ import com.github.stazxr.zblog.content.mapper.*;
 import com.github.stazxr.zblog.content.service.ArticleService;
 import com.github.stazxr.zblog.content.util.Constants;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
-import com.github.stazxr.zblog.util.SlugUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.collection.CollectionUtils;
 import com.github.stazxr.zblog.util.graphics.ImageBuilderUtils;
+import com.github.stazxr.zblog.util.html.MarkdownHtmlUtils;
+import com.github.stazxr.zblog.util.html.SlugUtils;
 import com.github.stazxr.zblog.util.http.MarkdownWordCountUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
@@ -151,7 +152,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleVo articleVo = baseMapper.selectArticleDetail(articleId);
         if (articleVo != null) {
             // 只能查询自己的文章
-            ThrowUtils.throwIf(!loginId.equals(articleVo.getAuthorId()), ArticleErrorCode.EARTIA005);
+            ThrowUtils.throwIf(!loginId.equals(articleVo.getAuthorId()), BaseErrorCode.ECOREA002);
 
             // 查询标签列表
             List<Long> tagIds = articleTagMapper.selectTagIdsByArticleId(articleVo.getId());
@@ -169,29 +170,171 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
-     * 新增文章
+     * 初始化文章
+     */
+    @Override
+    public ArticleVo initArticle() {
+        Long loginId = SecurityUtils.getLoginId();
+        ArticleVo articleVo = baseMapper.selectLastArticleEmptyDraft(loginId);
+        if (articleVo == null) {
+            LocalDateTime now = LocalDateTime.now();
+            Article article = new Article();
+            article.setId(SequenceUtils.getId());
+            article.setTitle("");
+            article.setContentMd("");
+            article.setContentHtml("");
+            article.setAuthorId(loginId);
+            article.setArticleType(ArticleType.ORIGINAL.getType());
+            article.setArticleStatus(ArticleStatus.DRAFT.getValue());
+            article.setDeleteFlag(ArticleDeleteFlag.DEFAULT.getValue());
+            article.setCommentFlag(true);
+            article.setArticlePerm(ArticlePerm.PUBLIC.getValue());
+            article.setCoverImageType(ArticleCoverImageType.DEFAULT.getValue());
+            article.setWordsCount(0);
+            article.setCreatorId(loginId);
+            article.setCreateTime(now);
+            article.setUpdaterId(loginId);
+            article.setUpdateTime(now);
+            baseMapper.insert(article);
+            articleVo = baseMapper.selectLastArticleEmptyDraft(loginId);
+        }
+
+        ThrowUtils.throwSystemIf(articleVo == null, ArticleErrorCode.SARTIA001);
+        return articleVo;
+    }
+
+    /**
+     * 保存文章
      *
      * @param articleDto 文章信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addArticle(ArticleDto articleDto) {
+    public void saveArticle(ArticleDraftDto articleDto) {
+        // 获取文章信息
+        Long articleId = articleDto.getId(); // 文章ID
+        Article article = baseMapper.selectById(articleId);
+
+        // 检查文章是否允许编辑
+        checkArticleEditable(article);
+
+        // 刷新文章信息并保存
+        if (articleDto.getTitle() == null) {
+            article.setTitle("");
+        } else {
+            article.setTitle(articleDto.getTitle().trim());
+        }
+        if (article.getSlug() == null || article.getVersion() == 0) {
+            // 文章已发布过，则 SLUG 不允许修改
+            if (StringUtils.isBlank(articleDto.getSlug())) {
+                article.setSlug(null);
+            } else {
+                article.setSlug(articleDto.getSlug());
+            }
+        }
+        if (articleDto.getContentMd() == null) {
+            article.setContentMd("");
+            article.setContentHtml("");
+            article.setWordsCount(0);
+        } else {
+            article.setContentMd(articleDto.getContentMd());
+            article.setContentHtml(MarkdownHtmlUtils.toHtml(articleDto.getContentMd()));
+            article.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
+        }
+        article.setSummary(articleDto.getSummary());
+        article.setCategoryId(articleDto.getCategoryId());
+        article.setSeoTitle(articleDto.getSeoTitle());
+        article.setSeoKeywords(articleDto.getSeoKeywords());
+        article.setSeoDescription(articleDto.getSeoDescription());
+        if (articleDto.getArticleType() == null) {
+            article.setArticleType(ArticleType.ORIGINAL.getType());
+        } else {
+            article.setArticleType(articleDto.getArticleType());
+        }
+        article.setSourceName(articleDto.getSourceName());
+        article.setSourceAuthor(articleDto.getSourceAuthor());
+        article.setSourceUrl(articleDto.getSourceUrl());
+        if (articleDto.getArticlePerm() == null) {
+            article.setArticlePerm(ArticlePerm.PUBLIC.getValue());
+        } else {
+            article.setArticlePerm(articleDto.getArticlePerm());
+        }
+        if (articleDto.getCommentFlag() == null) {
+            article.setCommentFlag(true);
+        } else {
+            article.setCommentFlag(articleDto.getCommentFlag());
+        }
+        // 保存文章标签
+        if (articleDto.getTags() != null && articleDto.getTags().size() > 0) {
+            checkArticleTags(articleId, articleDto.getTags());
+        } else {
+            articleTagMapper.deleteByArticleIdHard(articleId);
+        }
+        // 保存文章封面
+        if (articleDto.getCoverImageType() == null) {
+            article.setCoverImageType(ArticleCoverImageType.DEFAULT.getValue());
+        } else {
+            article.setCoverImageType(articleDto.getCoverImageType());
+        }
+        checkArticleCoverImagesWeak(articleDto.getId(), article.getCoverImageType(), articleDto.getCoverImages());
+        // 只要触发保存，文章状态就变为草稿态
+        if (ArticleStatus.SCHEDULED.getValue().equals(article.getArticleStatus())) {
+            // TODO 如果原文章状态为待发布，则删除自动发布记录
+        }
+        article.setArticleStatus(ArticleStatus.DRAFT.getValue());
+        article.setUpdaterId(SecurityUtils.getLoginId());
+        article.setUpdateTime(LocalDateTime.now());
+        baseMapper.updateArticleById(article);
+
+        // 删除临时保存记录
+        articleContentDraftRecordMapper.deleteByArticleId(articleDto.getId());
+    }
+
+    /**
+     * 发布文章
+     *
+     * @param articleDto 文章信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void publishArticle(ArticleDto articleDto) {
+        // 获取文章信息
+        Long articleId = articleDto.getId(); // 文章ID
+        Article article = baseMapper.selectById(articleId);
+        // 检查文章是否允许编辑
+        checkArticleEditable(article);
         // 标签校验
         checkArticleTags(articleDto.getId(), articleDto.getTags());
         // 封面校验
         checkArticleCoverImages(articleDto.getId(), articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
         // 文章类型校验
         checkArticleType(articleDto);
+        // SLUG 校验
+        checkArticleSlug(article.getVersion(), article.getSlug(), articleDto.getSlug());
+        // 填充文章信息
+        fillArticle(article, articleDto);
+        if (ArticlePerm.SELF.getValue().equals(article.getArticlePerm())) {
+            // 私密文章直接发布
+            article.setArticleStatus(ArticleStatus.PUBLISHED.getValue());
+            // 记录文章发布版本信息
+            article.setVersion(article.getVersion() + 1); // 每次发布文章版本号 + 1
+            // TODO
+        } else {
+            // 非私密文章审核通过后发布
+            article.setArticleStatus(ArticleStatus.PENDING_REVIEW.getValue());
+        }
+        // 保存文章内容
+        baseMapper.updateArticleById(article);
     }
 
     /**
-     * 编辑文章
+     * 定时发布文章
      *
      * @param articleDto 文章信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void editArticle(ArticleDto articleDto) {
+    public void autoPublishArticle(ArticleDto articleDto) {
 
     }
 
@@ -208,7 +351,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.requireNonNull(dbArticle, BaseErrorCode.ECOREA001);
         // 文章作者判断
         Long loginId = SecurityUtils.getLoginId();
-        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), ArticleErrorCode.EARTIA007);
+        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), BaseErrorCode.ECOREA004);
         // 文章状态校验
         ThrowUtils.throwIf(!ArticleDeleteFlag.DEFAULT.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
         // 第一次删除文章，将文章移动到回收站
@@ -230,7 +373,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.requireNonNull(dbArticle, BaseErrorCode.ECOREA001);
         // 文章作者判断
         Long loginId = SecurityUtils.getLoginId();
-        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), ArticleErrorCode.EARTIA007);
+        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), BaseErrorCode.ECOREA004);
         // 文章状态校验
         ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
         // 彻底删除文章
@@ -244,6 +387,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public void deleteArticle3() {
         Long loginId = SecurityUtils.getLoginId();
         baseMapper.deleteArticle3(loginId);
+    }
+
+    /**
+     * 还原文章（移至草稿箱）
+     *
+     * @param articleId 文章id
+     */
+    @Override
+    public void resetArticle(Long articleId) {
+
     }
 
     /**
@@ -307,87 +460,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
-     * 保存文章草稿
-     *
-     * @param articleDto 文章信息
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveArticleDraft(ArticleDraftDto articleDto) {
-        Long articleId = articleDto.getId(); // 文章ID
-        Long loginId = SecurityUtils.getLoginId(); // 当前登录用户
-        LocalDateTime now = LocalDateTime.now(); // 当前时间
-
-        // 判断是新增场景还是保存场景
-        Article article = baseMapper.selectById(articleId);
-        if (article == null) {
-            // 新增场景
-            article = new Article();
-            article.setId(articleId);
-            if (StringUtils.isBlank(articleDto.getTitle())) {
-                article.setTitle("未命名文章");
-            } else {
-                article.setTitle(articleDto.getTitle());
-            }
-            if (StringUtils.isBlank(articleDto.getSlug())) {
-                article.setSlug(null);
-            } else {
-                article.setSlug(articleDto.getSlug());
-            }
-            article.setSummary(articleDto.getSummary());
-            article.setContentMd(articleDto.getContentMd());
-            article.setCategoryId(articleDto.getCategoryId());
-            article.setAuthorId(loginId);
-            article.setSeoTitle(articleDto.getSeoTitle());
-            article.setSeoKeywords(articleDto.getSeoKeywords());
-            article.setSeoDescription(articleDto.getSeoDescription());
-            if (articleDto.getArticleType() == null) {
-                article.setArticleType(ArticleType.ORIGINAL.getType());
-            } else {
-                article.setArticleType(articleDto.getArticleType());
-            }
-            article.setSourceName(articleDto.getSourceName());
-            article.setSourceAuthor(articleDto.getSourceAuthor());
-            article.setSourceUrl(articleDto.getSourceUrl());
-            article.setArticleStatus(ArticleStatus.DRAFT.getValue());
-            article.setDeleteFlag(ArticleDeleteFlag.DEFAULT.getValue());
-            if (articleDto.getCommentFlag() == null) {
-                article.setCommentFlag(true);
-            } else {
-                article.setCommentFlag(articleDto.getCommentFlag());
-            }
-            if (articleDto.getArticlePerm() == null) {
-                article.setArticlePerm(ArticlePerm.PUBLIC.getValue());
-            } else {
-                article.setArticlePerm(articleDto.getArticlePerm());
-            }
-            if (articleDto.getTags() != null && articleDto.getTags().size() > 0) {
-                checkArticleTags(articleId, articleDto.getTags());
-            }
-            if (articleDto.getCoverImageType() == null) {
-                article.setCoverImageType(ArticleCoverImageType.DEFAULT.getValue());
-            } else {
-                article.setCoverImageType(articleDto.getCoverImageType());
-            }
-            checkArticleCoverImagesWeak(articleDto.getId(), article.getCoverImageType(), articleDto.getCoverImages());
-            article.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
-            article.setCreatorId(loginId);
-            article.setCreateTime(now);
-            article.setUpdaterId(loginId);
-            article.setUpdateTime(now);
-            baseMapper.insert(article);
-        } else {
-            // 修改场景 TODO 后续完善修改逻辑
-//            if (article != null && !loginId.equals(article.getAuthorId())) {
-//                throw new BusinessException("无权操作该文章");
-//            }
-        }
-
-        // 删除临时保存记录
-        articleContentDraftRecordMapper.deleteByArticleId(articleDto.getId());
-    }
-
-    /**
      * 查询最新的文章草稿
      *
      * @return ArticleVo
@@ -398,62 +470,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return baseMapper.selectLastArticleDraft(authorId);
     }
 
-//    /**
-//     * 分页查询用户的文章列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticleVoList
-//     */
-//    @Override
-//    public ArticlePageData queryArticleListByPage(ArticleQueryDto queryDto) {
-//        // 查询当前用户信息
-//        Long loginId = SecurityUtils.getLoginId();
-//        queryDto.setLoginUser(loginId);
-//
-//        queryDto.checkPage();
-//        Assert.notNull(queryDto.getTagStatus(), "参数【tagStatus】不能为空");
-//        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-//        PageInfo<ArticleVo> dataList = new PageInfo<>(baseMapper.selectUserArticleList(queryDto));
-//        ArticleCountData countData = baseMapper.selectUserArticleCountData(loginId);
-//        return ArticlePageData.builder().dataList(dataList).countInfo(countData).build();
-//    }
-//
-//    /**
-//     * 分页查询可见的文章列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticlePageData
-//     */
-//    @Override
-//    public ArticlePageData queryPublicArticleListByPage(ArticleQueryDto queryDto) {
-//        queryDto.checkPage();
-//        Assert.notNull(queryDto.getTagStatus(), "参数【tagStatus】不能为空");
-//        PageHelper.startPage(queryDto.getPage(), queryDto.getPageSize());
-//        PageInfo<ArticleVo> dataList = new PageInfo<>(baseMapper.selectPublicArticleList(queryDto));
-//        ArticleCountData countData = baseMapper.selectPublicArticleCountData();
-//        return ArticlePageData.builder().dataList(dataList).countInfo(countData).build();
-//    }
-//
-//    /**
-//     * 查询文章详情
-//     *
-//     * @param articleId 文章ID
-//     * @return ArticleVo
-//     */
-//    @Override
-//    public ArticleVo queryArticleDetail(Long articleId) {
-//        Assert.notNull(articleId, "参数【articleId】不能为空");
-//        ArticleVo articleVo = baseMapper.selectArticleDetail(articleId);
-//        Assert.notNull(articleVo, "文章不存在");
-//
-//        if (ArticlePerm.SELF_SHOW.getType().equals(articleVo.getArticlePerm())) {
-//            // 私密文章，非作者不能查看
-//            Long loginId = SecurityUtils.getLoginId();
-//            DataValidated.isTrue(!loginId.equals(articleVo.getAuthorId()), "文章是私密文章，禁止查看");
-//        }
-//        return articleVo;
-//    }
-//
 //    /**
 //     * 新增文章
 //     *
@@ -472,23 +488,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        Assert.isTrue(baseMapper.insert(article) != 1, "新增失败");
 //        baseMapper.deleteArticleTmpContent(articleDto.getId());
 //    }
-//
-//    /**
-//     * 编辑文章
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void editArticle(ArticleDto articleDto) {
-//        // 编辑文章
-//        checkArticle(articleDto);
-//        Article article = articleConverter.dtoToEntity(articleDto);
-//        Assert.isTrue(baseMapper.updateById(article) != 1, "修改失败");
-//        baseMapper.deleteArticleTmpContent(articleDto.getId());
-//        baseMapper.invalidateArticlePublishTiming(articleDto.getId(), "重新编辑文章【" + DateUtils.formatNow() + "】");
-//    }
-//
 //    /**
 //     * 文章定时发布
 //     *
@@ -561,35 +560,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //            baseMapper.batchUpdateArticleStatus(auditIds2, status, auditDto.getOpinion());
 //        }
 //    }
-//
-//    private void emptyCheck(ArticleDto articleDto) {
-//        Assert.notNull(articleDto.getId(), "文章序列不能为空");
-//        Assert.isTrue(StringUtils.isBlank(articleDto.getAction()), "操作类型不能为空");
-//        Assert.isTrue(StringUtils.isBlank(articleDto.getTitle()), "文章标题不能为空");
-//        Assert.isTrue(StringUtils.isBlank(articleDto.getContent()), "文章内容不能为空");
-//        Assert.isTrue(StringUtils.isBlank(articleDto.getRemark()), "文章摘要不能为空");
-//        Assert.isTrue(StringUtils.isBlank(articleDto.getExtend1()), "编辑器类型不能为空");
-//        Assert.notNull(articleDto.getCategoryId(), "文章分类不能为空");
-//        Assert.notNull(articleDto.getArticlePerm(), "发布范围不能为空");
-//        Assert.notNull(articleDto.getCommentFlag(), "评论设置不能为空");
-//        Assert.notNull(articleDto.getCoverImageType(), "封面类型不能为空");
-//        articleDto.setTitle(articleDto.getTitle().trim());
-//    }
-//
-//    private void actionCheck(ArticleDto articleDto) {
-//        Long loginId = SecurityUtils.getLoginId();
-//        if (BaseConst.Action.ADD.equals(articleDto.getAction())) {
-//            // 新增
-//            articleDto.setAuthorId(loginId);
-//        } else if (BaseConst.Action.EDIT.equals(articleDto.getAction())) {
-//            // 编辑
-//            Article dbInfo = baseMapper.selectOneWithDeleted(articleDto.getId());
-//            checkArticleIsAllowEdit(dbInfo);
-//        } else {
-//            // throw new ServiceException("无法处理的操作类型：" + articleDto.getAction());
-//        }
-//    }
-//
+
 //    private void checkArticle(ArticleDto articleDto) {
 //        // 非空校验
 //        emptyCheck(articleDto);
@@ -663,20 +634,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        return (int) delay;
 //    }
 //
-//    private void checkArticleIsAllowEdit(Article dbInfo) {
-//        // 检查文章是否存在
-//        Assert.notNull(dbInfo, "操作失败，文章不存在");
-//
-//        // 检查文章是否被删除
-//        Assert.isTrue(dbInfo.getDeleted(), "操作失败，文章已被删除");
-//
-//        // 检查作者
-//        Long loginId = SecurityUtils.getLoginId();
-//        DataValidated.isTrue(!dbInfo.getAuthorId().equals(loginId), "没有权限修改其他作者的文章");
-//
-//        // 检查文章是否已经被删除
-//        DataValidated.isTrue(ArticleStatus.RECYCLE.getType().equals(dbInfo.getArticleStatus()), "文章处于回收站中，不允许编辑，请先把文章移动到草稿箱在进行编辑");
-//    }
+    // 检查文件是否允许编辑
+    private void checkArticleEditable(Article article) {
+        // 检查文章是否存在
+        ThrowUtils.throwIfNull(article, BaseErrorCode.ECOREA001);
+
+        // 检查文章状态是否正常
+        ThrowUtils.throwIf(!ArticleDeleteFlag.DEFAULT.getValue().equals(article.getDeleteFlag()), BaseErrorCode.ECOREA001);
+
+        // 检查是否作者编辑
+        Long loginId = SecurityUtils.getLoginId(); // 当前登录用户
+        ThrowUtils.throwIf(!loginId.equals(article.getAuthorId()), BaseErrorCode.ECOREA003);
+    }
 
     private void checkArticleTags(Long articleId, List<String> tags) {
         ThrowUtils.throwIf(tags == null || tags.size() == 0, ArticleErrorCode.EARTIA001);
@@ -815,6 +784,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
     }
 
+    // 检查文章类型
     private void checkArticleType(ArticleDto articleDto) {
         if (ArticleType.ORIGINAL.getType().equals(articleDto.getArticleType())) {
             articleDto.setSourceName(null);
@@ -823,6 +793,38 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         } else {
             ThrowUtils.throwIfBlank(articleDto.getSourceUrl(), ArticleErrorCode.EARTIA004);
         }
+    }
+
+    // 检查文章 SLUG
+    private void checkArticleSlug(Integer version, String dbSlug, String newSlug) {
+        if (version > 0) {
+            // 文章发布后，SLUG 不允许变更
+            ThrowUtils.throwIf(!newSlug.equals(dbSlug), ArticleErrorCode.EARTIA010);
+        }
+    }
+
+    // 填充文章信息
+    private void fillArticle(Article article, ArticleDto articleDto) {
+        article.setTitle(articleDto.getTitle().trim());
+        if (article.getVersion() == 0) {
+            article.setSlug(articleDto.getSlug());
+        }
+        article.setContentMd(articleDto.getContentMd());
+        article.setContentHtml(MarkdownHtmlUtils.toHtml(articleDto.getContentMd()));
+        article.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
+        article.setSummary(articleDto.getSummary());
+        article.setCategoryId(articleDto.getCategoryId());
+        article.setSeoTitle(articleDto.getSeoTitle());
+        article.setSeoKeywords(articleDto.getSeoKeywords());
+        article.setSeoDescription(articleDto.getSeoDescription());
+        article.setArticleType(articleDto.getArticleType());
+        article.setSourceName(articleDto.getSourceName());
+        article.setSourceAuthor(articleDto.getSourceAuthor());
+        article.setSourceUrl(articleDto.getSourceUrl());
+        article.setArticlePerm(articleDto.getArticlePerm());
+        article.setCommentFlag(articleDto.getCommentFlag());
+        article.setUpdaterId(SecurityUtils.getLoginId());
+        article.setUpdateTime(LocalDateTime.now());
     }
 
     private void insertArticleCoverImage(Long articleId, UploadFileDto uploadFile) {

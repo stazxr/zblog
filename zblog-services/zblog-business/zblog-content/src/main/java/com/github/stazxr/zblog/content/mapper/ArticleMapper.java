@@ -62,12 +62,27 @@ public interface ArticleMapper extends BaseMapper<Article> {
     ArticleVo selectArticleDetail(@Param("articleId") Long articleId);
 
     /**
+     * 查询最新的空文章草稿
+     *
+     * @param authorId 作者id
+     * @return ArticleVo
+     */
+    ArticleVo selectLastArticleEmptyDraft(@Param("authorId") Long authorId);
+
+    /**
      * 查询最新的文章草稿
      *
      * @param authorId 作者id
      * @return ArticleVo
      */
     ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
+
+    /**
+     * 更新文章信息
+     *
+     * @param article 文章信息
+     */
+    void updateArticleById(@Param("a") Article article);
 
     /**
      * 删除文章

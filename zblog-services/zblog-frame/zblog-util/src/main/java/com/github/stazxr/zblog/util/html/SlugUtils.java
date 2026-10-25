@@ -1,4 +1,4 @@
-package com.github.stazxr.zblog.util;
+package com.github.stazxr.zblog.util.html;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;

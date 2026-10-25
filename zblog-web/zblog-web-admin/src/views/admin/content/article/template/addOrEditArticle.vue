@@ -38,17 +38,38 @@
             />
           </div>
 
-          <!-- 编辑器底部操作 -->
           <div class="editor-content-opt">
             <div class="editor-content-opt-left">
-              <span v-if="showSaveTimeStatus" class="save-draft-span">草稿已保存 {{ saveTime }}</span>
-              <span>共 {{ totalCount }} 字</span>
+              <span v-if="showSaveTimeStatus" class="save-draft-span">
+                <i class="el-icon-circle-check" />
+                已保存 {{ saveTime }}
+              </span>
+              <span class="editor-word-count">
+                共 {{ totalCount }} 字
+              </span>
             </div>
             <div class="editor-content-opt-right">
-              <el-button v-if="formData.id" round @click="showAutoSaveRecord">编辑记录</el-button>
-              <el-button round :loading="draftLoading" @click="saveDraft">{{ draftBtnName }}</el-button>
-              <el-button v-if="autoPublishBtnShow" round @click="openPublishArticleByTimingDialog">定时发布</el-button>
-              <el-button type="danger" round :loading="submitLoading" @click="publishArticle">发布文章</el-button>
+              <el-dropdown
+                split-button
+                :loading="draftLoading"
+                :disabled="draftLoading || submitLoading"
+                @click="saveDraft"
+                @command="handleSaveCommand"
+              >
+                保存
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="timing">定时发布</el-dropdown-item>
+                  <el-dropdown-item command="history">编辑记录</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <el-button
+                type="primary"
+                :loading="submitLoading"
+                :disabled="draftLoading || submitLoading"
+                @click="publishArticle"
+              >
+                保存并发布
+              </el-button>
             </div>
           </div>
         </div>
@@ -82,9 +103,9 @@
                   <div v-else class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(0)" @mouseleave="hideCoverImgIcon(0)">
-                        <img :src="formData.coverImages[0].fileAccessUrl" alt="" class="cover-img-img-icon">
-                        <span class="cover-img-close-icon" @click="removeCoverImg(form.coverImages[0], 0)">×</span>
-                        <span class="cover-img-replace-icon" @click="replaceCoverImg(form.coverImages[0], 0)">替换</span>
+                        <img :src="formData.coverImages[0]['fileAccessUrl']" alt="" class="cover-img-img-icon">
+                        <span class="cover-img-close-icon" @click="removeCoverImg(formData.coverImages[0], 0)">×</span>
+                        <span class="cover-img-replace-icon" @click="replaceCoverImg(formData.coverImages[0], 0)">替换</span>
                       </div>
                     </div>
                   </div>
@@ -107,7 +128,7 @@
                   <div v-for="(articleImage, index) in formData.coverImages" :key="articleImage.fileId" class="cover-img-box">
                     <div class="cover-img">
                       <div class="cover-img-over" @mouseenter="showCoverImgIcon(index)" @mouseleave="hideCoverImgIcon(index)">
-                        <img :src="articleImage.fileAccessUrl" alt="" class="cover-img-img-icon">
+                        <img :src="articleImage['fileAccessUrl']" alt="" class="cover-img-img-icon">
                         <span class="cover-img-close-icon" @click="removeCoverImg(articleImage, index)">×</span>
                         <span class="cover-img-replace-icon" @click="replaceCoverImg(articleImage, index)">替换</span>
                       </div>
@@ -237,10 +258,20 @@
               </div>
 
               <el-form-item label="SEO 标题：">
-                <el-input v-model.trim="formData.seoTitle" maxlength="255" show-word-limit placeholder="留空时使用文章标题" />
+                <el-input
+                  v-model.trim="formData.seoTitle"
+                  maxlength="255"
+                  show-word-limit
+                  placeholder="留空时使用文章标题"
+                />
               </el-form-item>
               <el-form-item label="SEO 关键词：">
-                <el-input v-model.trim="formData.seoKeywords" maxlength="255" show-word-limit placeholder="多个关键词使用英文逗号分隔" />
+                <el-input
+                  v-model.trim="formData.seoKeywords"
+                  maxlength="255"
+                  show-word-limit
+                  placeholder="多个关键词使用英文逗号分隔，留空时使用文章标签"
+                />
               </el-form-item>
               <el-form-item label="SEO 描述：">
                 <el-input
@@ -250,7 +281,7 @@
                   :autosize="{ minRows: 3, maxRows: 5 }"
                   maxlength="500"
                   show-word-limit
-                  placeholder="请输入 SEO 描述"
+                  placeholder="留空时使用文章摘要"
                 />
               </el-form-item>
             </el-card>
@@ -260,50 +291,50 @@
     </div>
 
     <!-- 定时发布 -->
-    <el-dialog
-      append-to-body
-      title="定时发布"
-      :close-on-click-modal="false"
-      :visible.sync="choosePublishTimeDialogVisible"
-      width="430px"
-    >
-      <div class="publish-timer-content">
-        <p class="publish-time-desc">
-          请选择当前时间后 1 小时至 3 天进行定时发布
-        </p>
+    <!--    <el-dialog-->
+    <!--      append-to-body-->
+    <!--      title="定时发布"-->
+    <!--      :close-on-click-modal="false"-->
+    <!--      :visible.sync="choosePublishTimeDialogVisible"-->
+    <!--      width="430px"-->
+    <!--    >-->
+    <!--      <div class="publish-timer-content">-->
+    <!--        <p class="publish-time-desc">-->
+    <!--          请选择当前时间后 1 小时至 3 天进行定时发布-->
+    <!--        </p>-->
 
-        <div class="publish-ipt-date-box">
-          <el-date-picker
-            v-model="publishDate"
-            :picker-options="publishDateRange"
-            value-format="yyyy-MM-dd"
-            type="date"
-            placeholder="选择日期"
-            style="width: 180px"
-            @change="changeDatePicker"
-          />
+    <!--        <div class="publish-ipt-date-box">-->
+    <!--          <el-date-picker-->
+    <!--            v-model="publishDate"-->
+    <!--            :picker-options="publishDateRange"-->
+    <!--            value-format="yyyy-MM-dd"-->
+    <!--            type="date"-->
+    <!--            placeholder="选择日期"-->
+    <!--            style="width: 180px"-->
+    <!--            @change="changeDatePicker"-->
+    <!--          />-->
 
-          <el-time-select
-            v-model="publishTime"
-            :picker-options="publishTimeRange"
-            :disabled="publishTimeDisabled"
-            value-format="HH:mm"
-            placeholder="选择时间"
-            style="width: 180px; margin-left: 8px"
-          />
-        </div>
-        <p v-show="publishDateTimeShow" class="publish-time-txt">
-          本文将于 <span class="publish-time"> {{ publishDateTime }} </span> 发布
-        </p>
-      </div>
+    <!--          <el-time-select-->
+    <!--            v-model="publishTime"-->
+    <!--            :picker-options="publishTimeRange"-->
+    <!--            :disabled="publishTimeDisabled"-->
+    <!--            value-format="HH:mm"-->
+    <!--            placeholder="选择时间"-->
+    <!--            style="width: 180px; margin-left: 8px"-->
+    <!--          />-->
+    <!--        </div>-->
+    <!--        <p v-show="publishDateTimeShow" class="publish-time-txt">-->
+    <!--          本文将于 <span class="publish-time"> {{ publishDateTime }} </span> 发布-->
+    <!--        </p>-->
+    <!--      </div>-->
 
-      <div slot="footer" class="dialog-footer">
-        <el-button round @click="cancelPublishByTime">取 消</el-button>
-        <el-button roundtype="danger" :disabled="!publishDateTimeShow" :loading="submitByTimeLoading" @click="publishArticleByTiming">
-          定时发布
-        </el-button>
-      </div>
-    </el-dialog>
+    <!--      <div slot="footer" class="dialog-footer">-->
+    <!--        <el-button round @click="cancelPublishByTime">取 消</el-button>-->
+    <!--        <el-button roundtype="danger" :disabled="!publishDateTimeShow" :loading="submitByTimeLoading" @click="publishArticleByTiming">-->
+    <!--          定时发布-->
+    <!--        </el-button>-->
+    <!--      </div>-->
+    <!--    </el-dialog>-->
 
     <!-- 封面上传 -->
     <uploadImgDialog
@@ -371,7 +402,7 @@ export default {
       submitLoading: false,
       draftLoading: false,
       submitByTimeLoading: false,
-      callActivated: false, // 是否已经完成页面初始化
+      callActivated: false, // 是否已经完成页面初始化（首次进入页面不调用 activated）
 
       saveTime: '', // 文章保存时间
       showSaveTimeStatus: false, // 是否展示自动保存状态
@@ -391,7 +422,6 @@ export default {
       publishTimeDisabled: true,
 
       formData: {
-        action: '',
         id: '', // 文章ID
         title: '', // 文章标题
         slug: '', // SLUG
@@ -410,9 +440,7 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-
-        articleStatus: 1,
-        publishTime: ''
+        publishTime: '' // TODO
       },
       formRules: {
         title: [
@@ -489,29 +517,6 @@ export default {
       return this.formData.coverImageType === 3 ? 3 : 1
     },
 
-    // 草稿按钮名称
-    draftBtnName() {
-      if (
-        this.formData.articleStatus == null ||
-        this.formData.articleStatus === '' ||
-        this.formData.articleStatus === 1
-      ) {
-        return '保存草稿'
-      }
-
-      return '移至草稿箱'
-    },
-
-    // 是否显示定时发布
-    autoPublishBtnShow() {
-      return (
-        this.formData.articleStatus == null ||
-        this.formData.articleStatus === '' ||
-        this.formData.articleStatus === 1 ||
-        this.formData.articleStatus === 5
-      )
-    },
-
     // 定时发布时间
     publishDateTime() {
       if (!this.publishDate || !this.publishTime) {
@@ -566,46 +571,47 @@ export default {
     this.queryRecentDraft()
     // 重置自动保存状态
     this.resetAutoSaveStatus()
-
+    // 加载文章信息
     const articleId = this.$route.query.articleId
     if (articleId) {
       this.getArticleDetail(articleId)
     } else {
-      this.autoGenerateId()
+      this.initArticle()
     }
-
+    // 标记 callActivated 为 true
     this.$nextTick(() => {
       this.callActivated = true
     })
   },
-
   mounted() {
     this.$nextTick(() => {
+      // 添加浏览器离开事件
       this.addBeforeunloadEventListener()
+      // 开启自动保存事件
       this.startAutoSaveEvent()
     })
   },
 
   activated() {
-    if (this.callActivated) {
-      const articleId = this.$route.query.articleId
-
-      if (articleId) {
-        this.clearRecentDraft()
-
-        if (articleId !== this.formData.id) {
-          this.getArticleTagList()
-          this.resetAutoSaveStatus()
-          this.getArticleDetail(articleId)
-        }
-      } else if (this.formData.action !== 'add') {
-        this.clearData()
-        this.getArticleTagList()
-        this.resetAutoSaveStatus()
-        this.queryRecentDraft()
-        this.autoGenerateId()
-      }
-    }
+    // if (this.callActivated) {
+    //   const articleId = this.$route.query.articleId
+    //
+    //   if (articleId) {
+    //     this.clearRecentDraft()
+    //
+    //     if (articleId !== this.formData.id) {
+    //       this.getArticleTagList()
+    //       this.resetAutoSaveStatus()
+    //       this.getArticleDetail(articleId)
+    //     }
+    //   } else if (this.formData.action !== 'add') {
+    //     this.clearData()
+    //     this.getArticleTagList()
+    //     this.resetAutoSaveStatus()
+    //     this.queryRecentDraft()
+    //     this.autoGenerateId()
+    //   }
+    // }
 
     this.$nextTick(() => {
       this.startAutoSaveEvent()
@@ -642,17 +648,14 @@ export default {
       this.autoSaveArticleContent()
       event.returnValue = ''
     },
-    // 自动生成文章 ID
-    autoGenerateId() {
-      this.$mapi.sequence.getId().then(({ data }) => {
-        this.formData.action = 'add'
-        this.formData.id = data
-      }).catch(() => {
-        this.formData.action = 'error'
-        this.formData.id = null
-      }).finally(() => {
-        this.pageLoading = false
-      })
+
+    // 保存按钮更多选择
+    handleSaveCommand(command) {
+      if (command === 'timing') {
+        this.openPublishArticleByTimingDialog()
+      } else if (command === 'history') {
+        this.showAutoSaveRecord()
+      }
     },
 
     // 获取文章分类列表
@@ -697,6 +700,18 @@ export default {
       }, 200)
     },
 
+    // 初始化文章信息
+    initArticle() {
+      this.$mapi.article.initArticle().then(({ data }) => {
+        this.formData = this.normalizeArticleData(data)
+        this.lastAutoSaveContent = this.formData.contentMd || ''
+        this.updateTotalCount()
+      }).catch(error => {
+        console.log('init article failed', error)
+      }).finally(() => {
+        this.pageLoading = false
+      })
+    },
     // 查询文章详情
     getArticleDetail(articleId) {
       this.pageLoading = true
@@ -712,7 +727,6 @@ export default {
         }
 
         this.formData = this.normalizeArticleData(data)
-        this.formData.action = 'edit'
         this.lastAutoSaveContent = this.formData.contentMd || ''
         this.updateTotalCount()
       }).catch(error => {
@@ -893,17 +907,15 @@ export default {
     },
     // 打开更多草稿列表
     openMoreDraftPage() {
-      this.$router.push({ name: 'Article', query: { _ts: '7' }})
+      this.$router.push({ name: 'Article', query: { _ts: '1' }})
     },
     // 保存草稿
     saveDraft() {
       this.updateTotalCount()
       const param = this.buildCommonSubmitData()
       this.draftLoading = true
-      this.$mapi.article.saveArticleDraft(param).then(_ => {
+      this.$mapi.article.saveArticle(param).then(_ => {
         this.$message.success('草稿保存成功')
-        this.formData.action = 'edit'
-        this.formData.articleStatus = 1 // 草稿
         this.lastAutoSaveContent = this.formData.contentMd
         this.saveTime = this.getCurrentTimeText()
         this.showSaveTimeStatus = true
@@ -1389,82 +1401,62 @@ export default {
 
     // 发布文章
     publishArticle() {
-      if (!this.validateBasicInfo()) {
-        return
-      }
-
-      this.$refs.articleForm.validate(valid => {
-        if (!valid) {
-          return
-        }
-
-        const param = this.buildCommonSubmitData()
-
-        let request
-        this.submitLoading = true
-        if (this.formData.action === 'add') {
-          request = this.$mapi.article.addArticle(param)
-        } else if (this.formData.action === 'edit') {
-          request = this.$mapi.article.editArticle(param)
-        } else {
-          this.$message.error('系统异常，请刷新页面重试')
-          this.submitLoading = false
-          return
-        }
-
-        request.then(() => {
-          this.lastAutoSaveContent = this.formData.contentMd
-          // this.publishSuccess()
-        }).finally(() => {
-          this.submitLoading = false
-        })
-      })
+      // if (!this.validateBasicInfo()) {
+      //   return
+      // }
+      //
+      // this.$refs.articleForm.validate(valid => {
+      //   if (!valid) {
+      //     return
+      //   }
+      //
+      //   const param = this.buildCommonSubmitData()
+      //
+      //   let request
+      //   this.submitLoading = true
+      //   if (this.formData.action === 'add') {
+      //     request = this.$mapi.article.addArticle(param)
+      //   } else if (this.formData.action === 'edit') {
+      //     request = this.$mapi.article.editArticle(param)
+      //   } else {
+      //     this.$message.error('系统异常，请刷新页面重试')
+      //     this.submitLoading = false
+      //     return
+      //   }
+      //
+      //   request.then(() => {
+      //     this.lastAutoSaveContent = this.formData.contentMd
+      //     // this.publishSuccess()
+      //   }).finally(() => {
+      //     this.submitLoading = false
+      //   })
+      // })
     },
 
-    /**
-     * 校验标题和正文。
-     */
+    // 校验标题和正文
     validateBasicInfo() {
       if (!this.formData.title) {
-        this.$message.warning(
-          '请填写文章标题'
-        )
-
+        this.$message.warning('请填写文章标题')
         return false
       }
 
-      if (
-        !this.formData.contentMd ||
-        !this.formData.contentMd.trim()
-      ) {
-        this.$message.warning(
-          '请填写文章内容'
-        )
-
+      if (!this.formData.contentMd || !this.formData.contentMd.trim()) {
+        this.$message.warning('请填写文章内容')
         return false
       }
 
       return true
     },
 
-    /**
-     * 发布成功。
-     */
+    // 发布成功
     publishSuccess() {
-      this.$router.push(
-        '/publish/blog/success/' +
-        this.formData.id
-      )
-
+      this.$router.push('/publish/blog/success/' + this.formData.id)
       this.clearData()
     },
 
-    /**
-     * 清空页面数据。
-     */
+    // 清空页面数据
     clearData() {
       this.formData = {
-        action: '',
         id: '',
         title: '',
         slug: '',
@@ -1476,7 +1468,6 @@ export default {
         seoKeywords: '',
         seoDescription: '',
         articleType: 1,
-        articleStatus: 1,
         articlePerm: 1,
         accessPassword: '',
         sourceName: '',
@@ -1627,44 +1618,39 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 64px;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #ebeef5;
 }
 
 .editor-content-opt-left {
   display: flex;
   align-items: center;
-  min-width: 0;
-  color: #555;
-  font-size: 14px;
-}
-
-.editor-content-opt-left > span {
-  margin-right: 15px;
+  gap: 16px;
+  flex-shrink: 0;
+  color: #909399;
+  font-size: 13px;
 }
 
 .editor-content-opt-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editor-content-opt-right .el-button + .el-button {
+  margin-left: 0;
 }
 
 .save-draft-span {
-  position: relative;
-  padding-left: 20px;
+  color: #67c23a;
+  white-space: nowrap;
 }
 
-.save-draft-span::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 14px;
-  height: 14px;
-  transform: translateY(-50%);
-  background-image: url('../../../../../assets/images/icon-autosave.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
+.editor-word-count {
+  white-space: nowrap;
 }
 
 /* 配置区域 */
@@ -1946,5 +1932,18 @@ export default {
  * 小屏幕
  */
 @media screen and (max-width: 768px) {
+  .editor-content-opt {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editor-content-opt-left {
+    flex-wrap: wrap;
+  }
+
+  .editor-content-opt-right {
+    justify-content: flex-start;
+    width: 100%;
+  }
 }
 </style>
