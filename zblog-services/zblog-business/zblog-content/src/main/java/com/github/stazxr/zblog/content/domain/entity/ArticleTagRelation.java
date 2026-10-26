@@ -20,12 +20,12 @@ public class ArticleTagRelation implements Serializable {
     private static final long serialVersionUID = -2064419960199959545L;
 
     /**
-     * 文章序列
+     * 文章id
      */
     private Long articleId;
 
     /**
-     * 标签序列
+     * 标签id
      */
     private Long tagId;
 

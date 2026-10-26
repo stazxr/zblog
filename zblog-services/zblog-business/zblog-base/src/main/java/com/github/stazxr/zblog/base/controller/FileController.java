@@ -81,7 +81,7 @@ public class FileController {
         @ApiImplicitParam(name = "uploadType", value = "上传方式，1：本地存储、2：阿里云OSS、3：七牛云OSS", required = true, dataTypeClass = Integer.class)
     })
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
-    @Router(name = "测试文件上传", code = "FILEA002")
+    @Router(name = "测试文件上传", code = "FILEA002", remark = "正式环境不建议开启")
     public UploadFileVo uploadFileTest(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Integer uploadType) throws Exception {
         return fileService.uploadFileTest(multipartFile, uploadType);
     }
@@ -130,7 +130,7 @@ public class FileController {
     @PostMapping("/deleteFileTest")
     @ApiOperation(value = "测试文件删除")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
-    @Router(name = "测试文件删除", code = "FILED002")
+    @Router(name = "测试文件删除", code = "FILED002", remark = "正式环境不建议开启，防止误删")
     public void deleteFileTest(@RequestParam Long fileId) {
         fileService.deleteFile(fileId);
     }

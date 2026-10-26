@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
+import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
 import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
@@ -66,6 +67,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleImageMapper articleImageMapper;
 
     private final ArticleContentDraftRecordMapper articleContentDraftRecordMapper;
+
+    private final ArticleVersionMapper articleVersionMapper;
+
+    private final ArticleVersionTagMapper articleVersionTagMapper;
+
+    private final ArticleVersionImageMapper articleVersionImageMapper;
+
+    private final ArticleOperationLogMapper articleOperationLogMapper;
 
     private final FileMapper fileMapper;
 
@@ -173,10 +182,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * 初始化文章
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ArticleVo initArticle() {
         Long loginId = SecurityUtils.getLoginId();
         ArticleVo articleVo = baseMapper.selectLastArticleEmptyDraft(loginId);
         if (articleVo == null) {
+            // 初始化文章信息
             LocalDateTime now = LocalDateTime.now();
             Article article = new Article();
             article.setId(SequenceUtils.getId());
@@ -197,6 +208,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setUpdateTime(now);
             baseMapper.insert(article);
             articleVo = baseMapper.selectLastArticleEmptyDraft(loginId);
+
+            // 记录文章操作日志
+            recordArticleLog(article, null, ArticleOperationType.INIT, null);
         }
 
         ThrowUtils.throwSystemIf(articleVo == null, ArticleErrorCode.SARTIA001);
@@ -217,6 +231,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 检查文章是否允许编辑
         checkArticleEditable(article);
+
+        // 查询历史文章内容（用于记录日志）
+        Article dbArticle = baseMapper.selectById(articleId);
 
         // 刷新文章信息并保存
         if (articleDto.getTitle() == null) {
@@ -286,6 +303,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setUpdateTime(LocalDateTime.now());
         baseMapper.updateArticleById(article);
 
+        // 记录文章操作日志
+        recordArticleLog(article, dbArticle, ArticleOperationType.UPDATE, null);
+
         // 删除临时保存记录
         articleContentDraftRecordMapper.deleteByArticleId(articleDto.getId());
     }
@@ -294,19 +314,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * 发布文章
      *
      * @param articleDto 文章信息
+     * @return ArticleVo 发布文章信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void publishArticle(ArticleDto articleDto) {
+    public ArticleVo publishArticle(ArticleDto articleDto) {
         // 获取文章信息
         Long articleId = articleDto.getId(); // 文章ID
+        Article dbArticle = baseMapper.selectById(articleId);
         Article article = baseMapper.selectById(articleId);
         // 检查文章是否允许编辑
         checkArticleEditable(article);
         // 标签校验
-        checkArticleTags(articleDto.getId(), articleDto.getTags());
+        checkArticleTags(articleId, articleDto.getTags());
         // 封面校验
-        checkArticleCoverImages(articleDto.getId(), articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
+        checkArticleCoverImages(articleId, articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
         // 文章类型校验
         checkArticleType(articleDto);
         // SLUG 校验
@@ -318,13 +340,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setArticleStatus(ArticleStatus.PUBLISHED.getValue());
             // 记录文章发布版本信息
             article.setVersion(article.getVersion() + 1); // 每次发布文章版本号 + 1
-            // TODO
+            publishArticleVersion(article);
+
+            // 记录文章操作日志
+            recordArticleLog(article, dbArticle, ArticleOperationType.PUBLISH, "私密文章自动发布");
         } else {
             // 非私密文章审核通过后发布
             article.setArticleStatus(ArticleStatus.PENDING_REVIEW.getValue());
+
+            // 记录文章操作日志
+            recordArticleLog(article, dbArticle, ArticleOperationType.PUBLISH, "非私密文章需要审核");
         }
         // 保存文章内容
         baseMapper.updateArticleById(article);
+        // 删除临时保存记录
+        articleContentDraftRecordMapper.deleteByArticleId(articleId);
+        // 返回文章信息
+        return queryMyArticleDetail(articleId);
     }
 
     /**
@@ -358,6 +390,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         baseMapper.deleteArticle(articleId, ArticleDeleteFlag.RECYCLE.getValue());
         // TODO
         // baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
+        // 删除临时保存记录
+        articleContentDraftRecordMapper.deleteByArticleId(articleId);
+        // 记录文章操作日志
+        Article newArticle = baseMapper.selectById(articleId);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE1, null);
     }
 
     /**
@@ -378,15 +415,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
         // 彻底删除文章
         baseMapper.deleteArticle(articleId, ArticleDeleteFlag.DELETED.getValue());
+        // 删除临时保存记录
+        articleContentDraftRecordMapper.deleteByArticleId(articleId);
+        // 记录文章操作日志
+        Article newArticle = baseMapper.selectById(articleId);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE2, null);
     }
 
     /**
      * 删除文章（清空回收站）
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteArticle3() {
         Long loginId = SecurityUtils.getLoginId();
         baseMapper.deleteArticle3(loginId);
+        // TODO 记录操作日志
+        // 删除临时保存记录
     }
 
     /**
@@ -395,8 +440,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @param articleId 文章id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void resetArticle(Long articleId) {
-
+        // 查询文章信息
+        Article dbArticle = baseMapper.selectById(articleId);
+        ThrowUtils.requireNonNull(dbArticle, BaseErrorCode.ECOREA001);
+        // 文章作者判断
+        Long loginId = SecurityUtils.getLoginId();
+        ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), CommonErrorCode.EBASEA000);
+        // 文章状态校验
+        ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
+        baseMapper.updateArticleStatus(articleId, ArticleStatus.DRAFT.getValue());
+        // 记录文章操作日志
+        Article newArticle = baseMapper.selectById(articleId);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.RESET, null);
     }
 
     /**
@@ -471,24 +528,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
 //    /**
-//     * 新增文章
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void addArticle(ArticleDto articleDto) {
-//        // 操作类型检查
-//        boolean isAction = StringUtils.isBlank(articleDto.getAction()) || !BaseConst.Action.ADD.equals(articleDto.getAction());
-//        Assert.isTrue(isAction, "参数【action】不正确，理论为：" + BaseConst.Action.ADD);
-//
-//        // 新增文章
-//        checkArticle(articleDto);
-//        Article article = articleConverter.dtoToEntity(articleDto);
-//        Assert.isTrue(baseMapper.insert(article) != 1, "新增失败");
-//        baseMapper.deleteArticleTmpContent(articleDto.getId());
-//    }
-//    /**
 //     * 文章定时发布
 //     *
 //     * @param articleDto 文章信息
@@ -561,33 +600,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        }
 //    }
 
-//    private void checkArticle(ArticleDto articleDto) {
-//        // 非空校验
-//        emptyCheck(articleDto);
-//
-//        // 文章类型校验
-//        Integer articleType = articleDto.getArticleType();
-//        Assert.notNull(articleType, "文章类型不能为空");
-//        if (!ArticleType.ORIGINAL.getType().equals(articleType)) {
-//            Assert.isTrue(StringUtils.isBlank(articleDto.getReprintLink()), "原文链接不能为空");
-//        }
-//
-//        // 操作状态校验
-//        actionCheck(articleDto);
-//
-//        // 设置文章内容（去除标签）
-//        articleDto.setContentMd(HtmlContentUtils.getTextFromHtml(articleDto.getContent()).replaceAll("&nbsp;", ""));
-//
-//        // 设置文章状态（对外不可见的文章无须审批）
-//        Integer articlePerm = articleDto.getArticlePerm();
-//        boolean isSelfShow = articlePerm.equals(ArticlePerm.SELF_SHOW.getType());
-//        Integer status = isSelfShow ? ArticleStatus.PUBLISHED.getType() : ArticleStatus.REVIEW.getType();
-//        articleDto.setArticleStatus(status);
-//
-//        // 封面校验
-//        articleImgConfig(articleDto);
-//
-//    }
 //
 //    private int checkAutoPublishInfo(ArticleDto articleDto) {
 //        // 非空校验
@@ -823,8 +835,36 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setSourceUrl(articleDto.getSourceUrl());
         article.setArticlePerm(articleDto.getArticlePerm());
         article.setCommentFlag(articleDto.getCommentFlag());
+        article.setCoverImageType(articleDto.getCoverImageType());
         article.setUpdaterId(SecurityUtils.getLoginId());
         article.setUpdateTime(LocalDateTime.now());
+    }
+
+    private ArticleVersion parseArticleVersion(Article article) {
+        ArticleVersion articleVersion = new ArticleVersion();
+        articleVersion.setArticleId(article.getId());
+        articleVersion.setVersion(article.getVersion());
+        articleVersion.setTitle(article.getTitle());
+        articleVersion.setSlug(article.getSlug());
+        articleVersion.setSummary(article.getSummary());
+        articleVersion.setContentMd(article.getContentMd());
+        articleVersion.setContentHtml(MarkdownHtmlUtils.toHtml(article.getContentMd()));
+        articleVersion.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
+        articleVersion.setCategoryId(article.getCategoryId());
+        articleVersion.setSeoTitle(article.getSeoTitle());
+        articleVersion.setSeoKeywords(article.getSeoKeywords());
+        articleVersion.setSeoDescription(article.getSeoDescription());
+        articleVersion.setArticleType(article.getArticleType());
+        articleVersion.setSourceName(article.getSourceName());
+        articleVersion.setSourceAuthor(article.getSourceAuthor());
+        articleVersion.setSourceUrl(article.getSourceUrl());
+        articleVersion.setArticlePerm(article.getArticlePerm());
+        articleVersion.setCommentFlag(article.getCommentFlag());
+        articleVersion.setCoverImageType(article.getCoverImageType());
+        articleVersion.setExtraInfo(article.getExtraInfo());
+        articleVersion.setPublishUserId(SequenceUtils.getId());
+        articleVersion.setPublishTime(LocalDateTime.now());
+        return articleVersion;
     }
 
     private void insertArticleCoverImage(Long articleId, UploadFileDto uploadFile) {
@@ -886,5 +926,47 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             log.error("generateArticleCoverImageByTitle error: {}", title, e);
             throw new ServiceException(ArticleErrorCode.EARTIA002);
         }
+    }
+
+    // 发布文章版本
+    private void publishArticleVersion(Article article) {
+        // 获取发布版本ID
+        Long versionId = SequenceUtils.getId();
+
+        // 新增文章发布版本
+        ArticleVersion articleVersion = parseArticleVersion(article);
+        articleVersion.setId(versionId);
+        articleVersionMapper.insert(articleVersion);
+
+        // 记录正式发布的文章标签
+        articleVersionTagMapper.insertVersionTag(versionId, article.getId());
+
+        // 记录正式发布的文章封面
+        articleVersionImageMapper.insertVersionImage(versionId, article.getId());
+    }
+
+    // 记录文章操作日志
+    private void recordArticleLog(Article newArticle, Article oldArticle, ArticleOperationType type, String remark) {
+        if (newArticle == null) {
+            return;
+        }
+
+        ArticleOperationLog operationLog = new ArticleOperationLog();
+        operationLog.setId(SequenceUtils.getId());
+        operationLog.setArticleId(newArticle.getId());
+        operationLog.setOperatorId(SecurityUtils.getLoginId());
+        operationLog.setOperationType(type.getValue());
+        operationLog.setAfterType(newArticle.getArticleType());
+        operationLog.setAfterPerm(newArticle.getArticlePerm());
+        operationLog.setAfterStatus(newArticle.getArticleStatus());
+        if (oldArticle != null) {
+            operationLog.setBeforeType(oldArticle.getArticleType());
+            operationLog.setBeforePerm(oldArticle.getArticlePerm());
+            operationLog.setBeforeStatus(oldArticle.getArticleStatus());
+        }
+        operationLog.setVersion(newArticle.getVersion());
+        operationLog.setRemark(remark);
+        operationLog.setCreateTime(LocalDateTime.now());
+        articleOperationLogMapper.insert(operationLog);
     }
 }

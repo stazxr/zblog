@@ -58,8 +58,9 @@ public interface ArticleService extends IService<Article> {
      * 发布文章
      *
      * @param articleDto 文章信息
+     * @return ArticleVo 发布文章信息
      */
-    void publishArticle(ArticleDto articleDto);
+    ArticleVo publishArticle(ArticleDto articleDto);
 
     /**
      * 定时发布文章

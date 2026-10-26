@@ -19,12 +19,12 @@ public class ArticleImageRelation implements Serializable {
     private static final long serialVersionUID = -6026000270110491394L;
 
     /**
-     * 文章序列
+     * 文章id
      */
     private Long articleId;
 
     /**
-     * 文件序列
+     * 封面访问地址
      */
     private String articleImage;
 }

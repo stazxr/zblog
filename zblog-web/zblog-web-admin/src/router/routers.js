@@ -1,26 +1,30 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
+// 组件清单
 import Layout from '../layout/index'
+import _403 from '@/views/features/403'
+import _404 from '@/views/features/404'
+import _redirect from '@/views/features/redirect'
+import Home from '@/views/admin/home'
+import Login from '@/views/login'
+import UserCenter from '@/views/admin/components/userCenter'
+import UserSearch from '@/views/admin/components/userSearch'
+import ForceUpdatePass from '@/views/admin/components/forceUpdatePass'
+import PublishSuccess from '@/views/admin/content/article/template/publishSuccess'
 
 Vue.use(VueRouter)
 
 // 默认路由
 export const defaultRouterMap = [
   {
-    path: '/login',
-    meta: { title: '登录', cache: false },
-    name: 'Login',
-    component: (resolve) => require(['@/views/login'], resolve),
-    show: false
-  },
-  {
     path: '/403',
-    component: (resolve) => require(['@/views/features/403'], resolve),
+    component: _403,
     show: false
   },
   {
     path: '/404',
-    component: (resolve) => require(['@/views/features/404'], resolve),
+    component: _404,
     show: false
   },
   {
@@ -30,7 +34,7 @@ export const defaultRouterMap = [
     children: [
       {
         path: '/redirect/:path*',
-        component: (resolve) => require(['@/views/features/redirect'], resolve)
+        component: _redirect
       }
     ]
   },
@@ -44,11 +48,18 @@ export const defaultRouterMap = [
       {
         show: true,
         path: 'dashboard',
-        component: (resolve) => require(['@/views/admin/home'], resolve),
+        component: Home,
         name: 'Dashboard',
         meta: { title: '首页', icon: 'icon-home', affix: true, cache: false, breadcrumb: true }
       }
     ]
+  },
+  {
+    path: '/login',
+    meta: { title: '登录', cache: false },
+    name: 'Login',
+    component: Login,
+    show: false
   },
   {
     path: '/user',
@@ -58,13 +69,13 @@ export const defaultRouterMap = [
     children: [
       {
         path: 'center',
-        component: (resolve) => require(['@/views/admin/components/userCenter'], resolve),
+        component: UserCenter,
         name: 'UserCenter',
         meta: { title: '个人中心' }
       },
       {
         path: 'search',
-        component: (resolve) => require(['@/views/admin/components/userSearch'], resolve),
+        component: UserSearch,
         name: 'UserSearch',
         meta: { title: '用户查询', hideTag: true }
       }
@@ -72,25 +83,17 @@ export const defaultRouterMap = [
   },
   {
     path: '/forceUpdatePass',
-    component: (resolve) => require(['@/views/features/forceUpdatePass'], resolve),
+    component: ForceUpdatePass,
     meta: { title: '修改密码', cache: false },
     show: false
-  }
-  /*
+  },
   {
-    path: '/publish',
-    component: Layout,
-    show: false,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'blog/success/:articleId',
-        component: (resolve) => require(['@/views/admin/web/article/template/publishArticleSuccess'], resolve),
-        name: 'PublishSuccess',
-        meta: { title: '发布成功' }
-      }
-    ]
-  },*/
+    name: 'PublishSuccess',
+    path: '/article/publish/success/:articleId',
+    component: PublishSuccess,
+    meta: { title: '发布完成', hideTag: true, cache: false },
+    show: false
+  }
 ]
 
 export default new VueRouter({

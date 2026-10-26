@@ -111,14 +111,15 @@ public class ArticleController {
      * 发布文章
      *
      * @param articleDto 文章信息
+     * @return ArticleVo 发布文章信息
      */
     @Log
     @PostMapping(value = "/publishArticle")
     @ApiOperation(value = "发布文章")
     @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "发布文章", code = "ARTIU002")
-    public void publishArticle(@RequestBody @Validated ArticleDto articleDto) {
-        articleService.publishArticle(articleDto);
+    public ArticleVo publishArticle(@RequestBody @Validated ArticleDto articleDto) {
+        return articleService.publishArticle(articleDto);
     }
 
     /**

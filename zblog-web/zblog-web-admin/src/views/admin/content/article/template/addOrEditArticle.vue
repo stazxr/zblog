@@ -443,12 +443,6 @@ export default {
         publishTime: '' // TODO
       },
       formRules: {
-        title: [
-          { required: true, message: '请输入文章标题', trigger: 'blur' }
-        ],
-        slug: [
-          { required: true, message: '请输入文章 Slug', trigger: 'blur' }
-        ],
         summary: [
           { required: true, message: '请填写文章摘要', trigger: 'blur' }
         ],
@@ -1085,11 +1079,108 @@ export default {
 
         const fileData = data[0]
         return {
-          url: fileData.fileAccessUrl,
-          name: fileData.originalFilename,
+          url: fileData['fileAccessUrl'],
+          name: fileData['originalFilename'],
           id: fileData.fileId
         }
       })
+    },
+
+    // 发布文章
+    publishArticle() {
+      if (!this.validateBasicInfo()) {
+        return
+      }
+
+      this.$refs.articleForm.validate(valid => {
+        if (!valid) {
+          return
+        }
+
+        // 构造参数
+        const param = this.buildCommonSubmitData()
+
+        // 发送请求
+        this.submitLoading = true
+        this.$mapi.article.publishArticle(param).then(res => {
+          this.$message.success(res.message || '发布成功')
+          this.lastAutoSaveContent = this.formData.contentMd
+          this.publishSuccess(res.data)
+        }).finally(() => {
+          this.submitLoading = false
+        })
+      })
+    },
+    // 校验标题和正文
+    validateBasicInfo() {
+      if (!this.formData.title || !this.formData.title.trim()) {
+        this.$message.warning('请填写文章标题')
+        return false
+      }
+
+      if (!this.formData.contentMd || !this.formData.contentMd.trim()) {
+        this.$message.warning('请填写文章内容')
+        return false
+      }
+
+      if (!this.formData.slug || !this.formData.slug.trim()) {
+        this.$message.warning('请填写文章 Slug')
+        return false
+      }
+
+      return true
+    },
+    // 发布成功
+    publishSuccess(result) {
+      const articleId = result.id
+      const articleStatus = result.articleStatus
+      this.clearData()
+
+      this.$router.push({
+        name: 'PublishSuccess',
+        params: {
+          articleId: String(articleId)
+        },
+        query: {
+          status: String(articleStatus)
+        }
+      })
+    },
+    // 清空页面数据
+    clearData() {
+      this.formData = {
+        id: '', // 文章ID
+        title: '', // 文章标题
+        slug: '', // SLUG
+        summary: '', // 文章摘要
+        contentMd: '', // 文章内容
+        coverImageType: 1, // 封面类型
+        coverImages: [], // 封面列表
+        categoryId: '', // 文章分类
+        tags: [], // 文章标签
+        commentFlag: true, // 是否开启评论
+        articleType: 1, // 文章类型
+        sourceName: '', // 文章来源名称
+        sourceAuthor: '', // 原作者
+        sourceUrl: '', // 原文地址
+        articlePerm: 1, // 访问权限
+        seoTitle: '', // SEO 标题
+        seoKeywords: '', // SEO 关键字
+        seoDescription: '', // SEO 描述
+        publishTime: '' // TODO
+      }
+
+      if (this.$refs.articleForm) {
+        this.$refs.articleForm.resetFields()
+      }
+
+      // TODO
+      this.lastAutoSaveContent = ''
+      this.totalCount = 0
+      this.publishDate = ''
+      this.publishTime = ''
+      this.publishTimeDisabled = true
+      this.resetAutoSaveStatus()
     },
 
     /**
@@ -1178,60 +1269,24 @@ export default {
 
       const now = new Date()
 
-      const startTime = new Date(
-        now.getTime() +
-        60 * 60 * 1000
-      )
-
-      const endTime = new Date(
-        now.getTime() +
-        72 * 60 * 60 * 1000
-      )
-
-      const startDate =
-        this.formatDate(startTime)
-
-      const endDate =
-        this.formatDate(endTime)
+      const startTime = new Date(now.getTime() + 60 * 60 * 1000)
+      const endTime = new Date(now.getTime() + 72 * 60 * 60 * 1000)
+      const startDate = this.formatDate(startTime)
+      const endDate = this.formatDate(endTime)
 
       if (date === startDate) {
-        this.publishTimeRange.start =
-          this.calculateTime(
-            true,
-            startTime.getHours(),
-            startTime.getMinutes()
-          )
-
-        this.publishTimeRange.end =
-          '23:45'
+        this.publishTimeRange.start = this.calculateTime(true, startTime.getHours(), startTime.getMinutes())
+        this.publishTimeRange.end = '23:45'
       } else if (date === endDate) {
-        this.publishTimeRange.start =
-          '00:00'
-
-        this.publishTimeRange.end =
-          this.calculateTime(
-            false,
-            endTime.getHours(),
-            endTime.getMinutes()
-          )
+        this.publishTimeRange.start = '00:00'
+        this.publishTimeRange.end = this.calculateTime(false, endTime.getHours(), endTime.getMinutes())
       } else {
-        this.publishTimeRange.start =
-          '00:00'
-
-        this.publishTimeRange.end =
-          '23:45'
+        this.publishTimeRange.start = '00:00'
+        this.publishTimeRange.end = '23:45'
       }
 
       this.publishTimeDisabled = false
-
-      if (
-        this.publishTime &&
-        !this.isTimeInRange(
-          this.publishTime,
-          this.publishTimeRange.start,
-          this.publishTimeRange.end
-        )
-      ) {
+      if (this.publishTime && !this.isTimeInRange(this.publishTime, this.publishTimeRange.start, this.publishTimeRange.end)) {
         this.publishTime = ''
       }
     },
@@ -1255,24 +1310,15 @@ export default {
     calculateTime(isStart, hour, minute) {
       if (isStart) {
         if (minute < 15) {
-          return (
-            this.padZero(hour) +
-            ':15'
-          )
+          return (this.padZero(hour) + ':15')
         }
 
         if (minute < 30) {
-          return (
-            this.padZero(hour) +
-            ':30'
-          )
+          return (this.padZero(hour) + ':30')
         }
 
         if (minute < 45) {
-          return (
-            this.padZero(hour) +
-            ':45'
-          )
+          return (this.padZero(hour) + ':45')
         }
 
         hour++
@@ -1281,60 +1327,32 @@ export default {
           return '23:45'
         }
 
-        return (
-          this.padZero(hour) +
-          ':00'
-        )
+        return (this.padZero(hour) + ':00')
       }
 
       if (minute < 15) {
-        return (
-          this.padZero(hour) +
-          ':00'
-        )
+        return (this.padZero(hour) + ':00')
       }
 
       if (minute < 30) {
-        return (
-          this.padZero(hour) +
-          ':15'
-        )
+        return (this.padZero(hour) + ':15')
       }
 
       if (minute < 45) {
-        return (
-          this.padZero(hour) +
-          ':30'
-        )
+        return (this.padZero(hour) + ':30')
       }
 
-      return (
-        this.padZero(hour) +
-        ':45'
-      )
+      return (this.padZero(hour) + ':45')
     },
 
     /**
      * 判断时间是否在范围内。
      */
-    isTimeInRange(
-      time,
-      start,
-      end
-    ) {
-      const value =
-        this.timeToMinutes(time)
-
-      const startValue =
-        this.timeToMinutes(start)
-
-      const endValue =
-        this.timeToMinutes(end)
-
-      return (
-        value >= startValue &&
-        value <= endValue
-      )
+    isTimeInRange(time, start, end) {
+      const value = this.timeToMinutes(time)
+      const startValue = this.timeToMinutes(start)
+      const endValue = this.timeToMinutes(end)
+      return (value >= startValue && value <= endValue)
     },
 
     /**
@@ -1357,141 +1375,26 @@ export default {
         this.$message.warning(
           '请选择发布时间'
         )
-
         return
       }
 
-      if (
-        this.formData.articlePerm === 2 ||
-        this.formData.articlePerm === 3
-      ) {
+      if (this.formData.articlePerm === 2 || this.formData.articlePerm === 3) {
         this.$message.error(
           '私密或密码文章暂不支持定时发布'
         )
-
         return
       }
 
       this.formData.publishTime = this.publishDateTime
-
       const param = this.buildCommonSubmitData()
 
-      /*
-       * 新表中的定时发布建议由：
-       *
-       * article_auto_publish_timing
-       *
-       * 负责维护，而不是长期把状态塞在 article 中。
-       *
-       * 当前继续复用原接口，
-       * 后续后端实现调整即可。
-       */
       this.submitByTimeLoading = true
-
-      this.$mapi.article
-        .publishArticleByTiming(param)
-        .then(() => {
-          this.cancelPublishByTime()
-          this.publishSuccess()
-        })
-        .finally(() => {
-          this.submitByTimeLoading = false
-        })
-    },
-
-    // 发布文章
-    publishArticle() {
-      // if (!this.validateBasicInfo()) {
-      //   return
-      // }
-      //
-      // this.$refs.articleForm.validate(valid => {
-      //   if (!valid) {
-      //     return
-      //   }
-      //
-      //   const param = this.buildCommonSubmitData()
-      //
-      //   let request
-      //   this.submitLoading = true
-      //   if (this.formData.action === 'add') {
-      //     request = this.$mapi.article.addArticle(param)
-      //   } else if (this.formData.action === 'edit') {
-      //     request = this.$mapi.article.editArticle(param)
-      //   } else {
-      //     this.$message.error('系统异常，请刷新页面重试')
-      //     this.submitLoading = false
-      //     return
-      //   }
-      //
-      //   request.then(() => {
-      //     this.lastAutoSaveContent = this.formData.contentMd
-      //     // this.publishSuccess()
-      //   }).finally(() => {
-      //     this.submitLoading = false
-      //   })
-      // })
-    },
-
-    // 校验标题和正文
-    validateBasicInfo() {
-      if (!this.formData.title) {
-        this.$message.warning('请填写文章标题')
-        return false
-      }
-
-      if (!this.formData.contentMd || !this.formData.contentMd.trim()) {
-        this.$message.warning('请填写文章内容')
-        return false
-      }
-
-      return true
-    },
-
-    // 发布成功
-    publishSuccess() {
-      this.$router.push('/publish/blog/success/' + this.formData.id)
-      this.clearData()
-    },
-
-    // 清空页面数据
-    clearData() {
-      this.formData = {
-        id: '',
-        title: '',
-        slug: '',
-        summary: '',
-        contentMd: '',
-        categoryId: '',
-        authorId: '',
-        seoTitle: '',
-        seoKeywords: '',
-        seoDescription: '',
-        articleType: 1,
-        articlePerm: 1,
-        accessPassword: '',
-        sourceName: '',
-        sourceAuthor: '',
-        sourceUrl: '',
-        commentFlag: true,
-        coverImageType: 1,
-        coverImages: [],
-        tags: [],
-        publishTime: ''
-      }
-
-      this.lastAutoSaveContent = ''
-      this.totalCount = 0
-
-      this.publishDate = ''
-      this.publishTime = ''
-      this.publishTimeDisabled = true
-
-      this.resetAutoSaveStatus()
-
-      if (this.$refs.articleForm) {
-        this.$refs.articleForm.resetFields()
-      }
+      this.$mapi.article.autoPublishArticle(param).then(() => {
+        this.cancelPublishByTime()
+        this.publishSuccess()
+      }).finally(() => {
+        this.submitByTimeLoading = false
+      })
     },
 
     /**
@@ -1499,7 +1402,6 @@ export default {
      */
     getCurrentTimeText() {
       const date = new Date()
-
       return (
         this.padZero(date.getHours()) +
         ':' +

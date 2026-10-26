@@ -85,6 +85,14 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void updateArticleById(@Param("a") Article article);
 
     /**
+     * 更新文章状态
+     *
+     * @param articleId 文章id
+     * @param status    文章状态
+     */
+    void updateArticleStatus(@Param("articleId") Long articleId, @Param("status") Integer status);
+
+    /**
      * 删除文章
      *
      * @param articleId  文章id
