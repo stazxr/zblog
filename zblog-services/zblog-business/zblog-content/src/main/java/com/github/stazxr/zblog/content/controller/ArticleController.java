@@ -8,10 +8,10 @@ import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
-import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleVersionQueryDto;
+import com.github.stazxr.zblog.content.domain.vo.*;
 import com.github.stazxr.zblog.content.service.ArticleService;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -259,35 +259,44 @@ public class ArticleController {
         return articleService.queryLastArticleDraft();
     }
 
-//    /**
-//     * 百度推送文章
-//     *
-//     * @param articleIds 文章编号列表
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/pushArticle")
-//    @ApiOperation(value = "百度推送文章")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "百度推送文章", code = "pushArticle")
-//    public Result pushArticle(@RequestBody List<Long> articleIds) {
-//        log.info("articleIds: {}", articleIds);
-//        return Result.failure();
-//    }
-//
-//    /**
-//     * 下线文章
-//     *
-//     * @param articleIds 文章编号列表
-//     * @return Result
-//     */
-//    @Log
-//    @PostMapping(value = "/offlineArticle")
-//    @ApiOperation(value = "下线文章")
-//    @ApiVersion(group = { BaseConst.ApiVersion.V_4_0_0 })
-//    @Router(name = "下线文章", code = "offlineArticle")
-//    public Result offlineArticle(@RequestBody List<Long> articleIds) {
-//        log.info("articleIds: {}", articleIds);
-//        return Result.failure();
-//    }
+    /**
+     * 分页查询文章操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleOperationLogVo>
+     */
+    @GetMapping(value = "/pageArticleOperationLogList")
+    @ApiOperation(value = "分页查询文章操作日志列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "分页查询文章操作日志列表", code = "ARTIQ007")
+    public IPage<ArticleOperationLogVo> queryArticleOperationLogListByPage(@Validated ArticleOperationLogQueryDto queryDto) {
+        return articleService.queryArticleOperationLogListByPage(queryDto);
+    }
+
+    /**
+     * 分页查询文章发布版本列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVersionVo>
+     */
+    @GetMapping(value = "/pageArticleVersionList")
+    @ApiOperation(value = "分页查询文章发布版本列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "分页查询文章发布版本列表", code = "ARTIQ008")
+    public IPage<ArticleVersionVo> queryArticleVersionByPage(@Validated ArticleVersionQueryDto queryDto) {
+        return articleService.queryArticleVersionByPage(queryDto);
+    }
+
+    /**
+     * 微信公众号推送文章
+     *
+     * @param articleId 文章id
+     */
+    @Log
+    @PostMapping(value = "/publishWeChat")
+    @ApiOperation(value = "微信公众号推送文章")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "微信公众号推送文章", code = "ARTIA003")
+    public void publishWeChat(@RequestParam Long articleId) {
+    }
 }

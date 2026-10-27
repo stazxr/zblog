@@ -81,10 +81,8 @@
 </template>
 
 <script>
-import PublishSuccess from '@/assets/images/publish-success.png'
 import previewArticle from '@/views/admin/content/article/template/previewArticle'
 
-// 请根据项目实际 ArticleStatus 枚举值调整
 const ARTICLE_STATUS = {
   PENDING_REVIEW: 2,
   PUBLISHED: 5
@@ -99,7 +97,6 @@ export default {
     return {
       articleId: '',
       articleStatus: null,
-      publishSuccessImg: PublishSuccess,
       previewArticleDialogVisible: false,
       previewInitialized: false
     }

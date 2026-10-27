@@ -2,8 +2,9 @@ package com.github.stazxr.zblog.util.time;
 
 import cn.hutool.core.lang.Assert;
 import com.github.stazxr.zblog.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,8 +19,9 @@ import java.util.*;
  * @author SunTao
  * @since 2020-11-15
  */
-@Slf4j
 public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+    private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
+
     /**
      * yyyy-MM-dd HH:mm:ss
      */
@@ -801,5 +803,21 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         calendar.setTime(date);
         int monthIndex = calendar.get(Calendar.MONTH);
         return MONTH_ZH[monthIndex];
+    }
+
+    /**
+     * 判断日期字符串是否满足格式
+     *
+     * @param dateStr 日期字符串
+     * @param format  日期格式
+     * @return 满足返回 true, 否则返回 false
+     */
+    public static boolean checkDateFormat(String dateStr, String format) {
+        try {
+            parseDate(dateStr, format);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

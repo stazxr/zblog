@@ -209,12 +209,6 @@ public class ArticleVo implements Serializable {
     private Long favoriteCount;
 
     /**
-     * 文章发布时间
-     */
-    @ApiModelProperty(value = "文章发布时间")
-    private LocalDateTime publishTime;
-
-    /**
      * 创建人
      */
     @ApiModelProperty(value = "创建人ID")
@@ -255,4 +249,10 @@ public class ArticleVo implements Serializable {
      */
     @ApiModelProperty(value = "扩展字段")
     private String extraInfo;
+
+    /**
+     * 文章发布时间
+     */
+    @ApiModelProperty(value = "文章发布时间")
+    private LocalDateTime publishTime;
 }

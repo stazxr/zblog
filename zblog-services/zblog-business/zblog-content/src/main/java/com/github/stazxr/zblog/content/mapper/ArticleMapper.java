@@ -78,6 +78,14 @@ public interface ArticleMapper extends BaseMapper<Article> {
     ArticleVo selectLastArticleDraft(@Param("authorId") Long authorId);
 
     /**
+     * 查询回收站的文章id列表
+     *
+     * @param authorId 作者id
+     * @return List<Long>
+     */
+    List<Long> selectRecycleArticleIdList(@Param("authorId") Long authorId);
+
+    /**
      * 更新文章信息
      *
      * @param article 文章信息
@@ -106,6 +114,14 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param authorId 作者id
      */
     void deleteArticle3(@Param("authorId") Long authorId);
+
+    /**
+     * 还原文章
+     *
+     * @param articleId 文章id
+     * @return int 影响行数
+     */
+    int resetArticle(@Param("articleId") Long articleId);
 
 //    /**
 //     * 查询用户文章列表

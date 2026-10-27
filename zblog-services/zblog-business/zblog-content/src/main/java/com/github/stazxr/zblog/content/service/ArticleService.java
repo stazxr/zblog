@@ -6,11 +6,11 @@ import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleVersionQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Article;
-import com.github.stazxr.zblog.content.domain.vo.ArticleAutoSaveVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleCountVo;
-import com.github.stazxr.zblog.content.domain.vo.ArticleVo;
+import com.github.stazxr.zblog.content.domain.vo.*;
 
 /**
  * 文章管理业务层
@@ -126,58 +126,19 @@ public interface ArticleService extends IService<Article> {
      */
     ArticleVo queryLastArticleDraft();
 
-//    /**
-//     * 分页查询用户的文章列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticlePageData
-//     */
-//    ArticlePageData queryArticleListByPage(ArticleQueryDto queryDto);
-//
-//    /**
-//     * 分页查询可见的文章列表
-//     *
-//     * @param queryDto 查询参数
-//     * @return ArticlePageData
-//     */
-//    ArticlePageData queryPublicArticleListByPage(ArticleQueryDto queryDto);
-//
-//    /**
-//     * 文章定时发布
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    void publishArticleByTiming(ArticleDto articleDto);
-//    /**
-//     * 彻底删除文章
-//     *
-//     * @param articleId 文章ID
-//     */
-//    void deleteArticle(Long articleId);
-//
-//    /**
-//     * 批量删除文章
-//     *
-//     * @param articleIds 文章编号列表
-//     */
-//    void batchDeleteArticle(List<Long> articleIds);
-//
-//    /**
-//     * 清空回收站
-//     */
-//    void clearArticleRecycleBin();
-//
-//    /**
-//     * 将文章回收至草稿箱
-//     *
-//     * @param articleId 文章ID
-//     */
-//    void recycleToDraftBox(Long articleId);
-//
-//    /**
-//     * 审核文章
-//     *
-//     * @param auditDto 审核信息
-//     */
-//    void auditArticle(ArticleAuditDto auditDto);
+    /**
+     * 分页查询文章操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleOperationLogVo>
+     */
+    IPage<ArticleOperationLogVo> queryArticleOperationLogListByPage(ArticleOperationLogQueryDto queryDto);
+
+    /**
+     * 分页查询文章发布版本列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVersionVo>
+     */
+    IPage<ArticleVersionVo> queryArticleVersionByPage(ArticleVersionQueryDto queryDto);
 }

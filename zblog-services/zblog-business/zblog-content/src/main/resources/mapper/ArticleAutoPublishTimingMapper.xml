@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleAutoPublishTimingMapper">
+    <update id="invalidHistoryRecord">
+        UPDATE article_auto_publish_timing SET
+            STATUS = 4, ERROR_MSG = #{remark}, UPDATE_TIME = CURRENT_TIMESTAMP
+        WHERE ARTICLE_ID = #{articleId} AND STATUS = 0
+    </update>
+</mapper>

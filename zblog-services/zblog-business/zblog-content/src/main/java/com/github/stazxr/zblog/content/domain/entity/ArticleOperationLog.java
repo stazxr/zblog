@@ -32,7 +32,7 @@ public class ArticleOperationLog implements Serializable {
     private Long articleId;
 
     /**
-     * 操作人编号
+     * 操作人id
      */
     private Long operatorId;
 

@@ -290,52 +290,6 @@
       </div>
     </div>
 
-    <!-- 定时发布 -->
-    <!--    <el-dialog-->
-    <!--      append-to-body-->
-    <!--      title="定时发布"-->
-    <!--      :close-on-click-modal="false"-->
-    <!--      :visible.sync="choosePublishTimeDialogVisible"-->
-    <!--      width="430px"-->
-    <!--    >-->
-    <!--      <div class="publish-timer-content">-->
-    <!--        <p class="publish-time-desc">-->
-    <!--          请选择当前时间后 1 小时至 3 天进行定时发布-->
-    <!--        </p>-->
-
-    <!--        <div class="publish-ipt-date-box">-->
-    <!--          <el-date-picker-->
-    <!--            v-model="publishDate"-->
-    <!--            :picker-options="publishDateRange"-->
-    <!--            value-format="yyyy-MM-dd"-->
-    <!--            type="date"-->
-    <!--            placeholder="选择日期"-->
-    <!--            style="width: 180px"-->
-    <!--            @change="changeDatePicker"-->
-    <!--          />-->
-
-    <!--          <el-time-select-->
-    <!--            v-model="publishTime"-->
-    <!--            :picker-options="publishTimeRange"-->
-    <!--            :disabled="publishTimeDisabled"-->
-    <!--            value-format="HH:mm"-->
-    <!--            placeholder="选择时间"-->
-    <!--            style="width: 180px; margin-left: 8px"-->
-    <!--          />-->
-    <!--        </div>-->
-    <!--        <p v-show="publishDateTimeShow" class="publish-time-txt">-->
-    <!--          本文将于 <span class="publish-time"> {{ publishDateTime }} </span> 发布-->
-    <!--        </p>-->
-    <!--      </div>-->
-
-    <!--      <div slot="footer" class="dialog-footer">-->
-    <!--        <el-button round @click="cancelPublishByTime">取 消</el-button>-->
-    <!--        <el-button roundtype="danger" :disabled="!publishDateTimeShow" :loading="submitByTimeLoading" @click="publishArticleByTiming">-->
-    <!--          定时发布-->
-    <!--        </el-button>-->
-    <!--      </div>-->
-    <!--    </el-dialog>-->
-
     <!-- 封面上传 -->
     <uploadImgDialog
       ref="uploadImgDialogRef"
@@ -350,17 +304,28 @@
       :dialog-visible="autoSaveRecordDrawerVisible"
       @chooseRecordDone="regainAutoSaveContent"
     />
+
+    <!-- 定时发布时间选择 -->
+    <publish-time-dialog
+      :visible.sync="publishTimeChooseDialogVisible"
+      :confirm-loading="autoSubmitLoading"
+      @confirm="doAutoPublishArticle"
+      @cancel="cancelAutoPublish"
+    />
   </div>
 </template>
 
 <script>
 import addArticleImageIcon from '@/assets/images/add-article-image-icon.png'
 import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
+import publishTimeDialog from '@/views/admin/content/article/template/publishTimeDialog'
 import autoSaveRecordDrawer from '@/views/admin/content/article/template/autoSaveRecordDrawer'
+
 export default {
   name: 'AddOrEditArticle',
   components: {
     uploadImgDialog,
+    publishTimeDialog,
     autoSaveRecordDrawer
   },
   data() {
@@ -398,11 +363,12 @@ export default {
       uploadImgDialogVisible: false, // 封面上传模态框显示状态
 
       totalCount: 0, // 当前编辑器字数
-      pageLoading: false,
-      submitLoading: false,
-      draftLoading: false,
-      submitByTimeLoading: false,
+      pageLoading: false, // 页面是否正在加载
+      draftLoading: false, // 是否正在保存草稿
+      submitLoading: false, // 是否正在发布文章
+      autoSubmitLoading: false, // 是否正在自动发布文章
       callActivated: false, // 是否已经完成页面初始化（首次进入页面不调用 activated）
+      publishTimeChooseDialogVisible: false, // 定时发布事件选择模态框是否显示
 
       saveTime: '', // 文章保存时间
       showSaveTimeStatus: false, // 是否展示自动保存状态
@@ -415,11 +381,6 @@ export default {
         id: '', // 最近草稿ID
         title: '' // 最近草稿标题
       },
-
-      choosePublishTimeDialogVisible: false, // 定时发布
-      publishDate: '',
-      publishTime: '',
-      publishTimeDisabled: true,
 
       formData: {
         id: '', // 文章ID
@@ -440,7 +401,7 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-        publishTime: '' // TODO
+        publishTime: '' // 自动发布时间（仅自动发布支持）
       },
       formRules: {
         summary: [
@@ -464,43 +425,6 @@ export default {
         sourceUrl: [
           { required: true, message: '请填写原文地址', trigger: 'blur' }
         ]
-      },
-
-      publishDateRange: {
-        disabledDate(time) {
-          const now = new Date()
-
-          const start = new Date(
-            now.getTime() + 60 * 60 * 1000
-          )
-
-          const end = new Date(
-            now.getTime() + 72 * 60 * 60 * 1000
-          )
-
-          const startDate = new Date(
-            start.getFullYear(),
-            start.getMonth(),
-            start.getDate()
-          )
-
-          const endDate = new Date(
-            end.getFullYear(),
-            end.getMonth(),
-            end.getDate()
-          )
-
-          return (
-            time.getTime() < startDate.getTime() ||
-            time.getTime() > endDate.getTime()
-          )
-        }
-      },
-
-      publishTimeRange: {
-        start: '00:00',
-        step: '15:00',
-        end: '23:45'
       }
     }
   },
@@ -509,20 +433,6 @@ export default {
     // 最大上传封面数
     maxUploadLimit() {
       return this.formData.coverImageType === 3 ? 3 : 1
-    },
-
-    // 定时发布时间
-    publishDateTime() {
-      if (!this.publishDate || !this.publishTime) {
-        return ''
-      }
-
-      return this.publishDate + ' ' + this.publishTime
-    },
-
-    // 是否已经选择完整的发布时间
-    publishDateTimeShow() {
-      return !!(this.publishDate && this.publishTime)
     }
   },
 
@@ -646,7 +556,7 @@ export default {
     // 保存按钮更多选择
     handleSaveCommand(command) {
       if (command === 'timing') {
-        this.openPublishArticleByTimingDialog()
+        this.autoPublishArticle()
       } else if (command === 'history') {
         this.showAutoSaveRecord()
       }
@@ -1088,6 +998,10 @@ export default {
 
     // 发布文章
     publishArticle() {
+      if (this.draftLoading || this.submitLoading || this.autoSubmitLoading) {
+        return
+      }
+
       if (!this.validateBasicInfo()) {
         return
       }
@@ -1111,6 +1025,85 @@ export default {
         })
       })
     },
+
+    // 定时发布文章
+    autoPublishArticle() {
+      if (this.draftLoading || this.submitLoading || this.autoSubmitLoading) {
+        return
+      }
+
+      if (!this.validateBasicInfo()) {
+        return
+      }
+
+      if (this.formData.articlePerm === 3) {
+        this.$message.warning('仅作者可见的文章暂不支持定时发布')
+        return
+      }
+
+      this.$refs.articleForm.validate(valid => {
+        if (!valid) {
+          return
+        }
+
+        this.openPublishTimeChooseDialog()
+      })
+    },
+    // 打开自动发布时间选择模态框
+    openPublishTimeChooseDialog() {
+      this.publishTimeChooseDialogVisible = true
+    },
+    // 取消定时发布
+    cancelAutoPublish() {
+      this.publishTimeChooseDialogVisible = false
+    },
+    // 提交定时发布请求
+    doAutoPublishArticle(publishTime) {
+      if (!publishTime) {
+        this.$message.warning('请选择发布时间')
+        return
+      }
+
+      if (this.draftLoading || this.submitLoading || this.autoSubmitLoading) {
+        return
+      }
+
+      // 再次检查权限，避免绕过弹窗流程调用。
+      if (this.formData.articlePerm === 3) {
+        this.$message.warning('仅作者可见的文章暂不支持定时发布')
+        return
+      }
+
+      // 记录本次提交的发布时间。
+      this.formData.publishTime = publishTime
+
+      // 公共提交参数中原本没有 publishTime，因此在这里显式补充。
+      const param = this.buildCommonSubmitData()
+      param.publishTime = publishTime
+
+      this.autoSubmitLoading = true
+      this.$mapi.article.autoPublishArticle(param).then(() => {
+        // 只有接口成功后才关闭弹窗和清理编辑数据。
+        this.publishTimeChooseDialogVisible = false
+        this.$message.success('定时发布设置成功')
+
+        this.clearData()
+
+        // 定时发布只是创建了定时任务，不应直接提示为已公开发布。
+        this.$router.push({
+          name: 'Article',
+          query: {
+            _ts: '3'
+          }
+        })
+      }).catch(error => {
+        console.error('schedule article publish failed', error)
+        this.$message.error('定时发布设置失败，请稍后重试')
+      }).finally(() => {
+        this.autoSubmitLoading = false
+      })
+    },
+
     // 校验标题和正文
     validateBasicInfo() {
       if (!this.formData.title || !this.formData.title.trim()) {
@@ -1167,7 +1160,7 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-        publishTime: '' // TODO
+        publishTime: '' // 自动发布时间（仅自动发布支持）
       }
 
       if (this.$refs.articleForm) {
@@ -1178,37 +1171,7 @@ export default {
       this.lastAutoSaveContent = ''
       this.totalCount = 0
       this.publishDate = ''
-      this.publishTime = ''
-      this.publishTimeDisabled = true
       this.resetAutoSaveStatus()
-    },
-
-    /**
-     * 初始化发布时间。
-     */
-    initPublishTime(publishTime) {
-      if (!publishTime) {
-        this.publishDate = ''
-        this.publishTime = ''
-        this.publishTimeDisabled = true
-        return
-      }
-
-      const date = new Date(String(publishTime).replace(/-/g, '/'))
-      if (Number.isNaN(date.getTime())) {
-        return
-      }
-
-      this.publishDate = date.getFullYear() + '-' + this.padZero(date.getMonth() + 1) + '-' + this.padZero(date.getDate())
-      this.publishTime = this.padZero(date.getHours()) + ':' + this.padZero(date.getMinutes())
-      this.publishTimeDisabled = false
-    },
-
-    /**
-     * 数字补零。
-     */
-    padZero(value) {
-      return value < 10 ? '0' + value : String(value)
     },
 
     // Markdown 编辑器内容变化
@@ -1217,189 +1180,7 @@ export default {
       this.updateTotalCount()
     },
 
-    /**
-     * 打开定时发布窗口。
-     */
-    openPublishArticleByTimingDialog() {
-      if (!this.validateBasicInfo()) {
-        return
-      }
-
-      if (this.formData.articlePerm === 2 || this.formData.articlePerm === 3) {
-        this.$message.error('私密或密码文章暂不支持定时发布')
-        return
-      }
-
-      this.$refs.articleForm.validate(valid => {
-        if (!valid) {
-          return
-        }
-
-        this.openPublishTimeDialog()
-      })
-    },
-
-    /**
-     * 打开时间选择窗口。
-     */
-    openPublishTimeDialog() {
-      this.submitByTimeLoading = false
-      this.choosePublishTimeDialogVisible = true
-    },
-
-    /**
-     * 取消定时发布。
-     */
-    cancelPublishByTime() {
-      this.publishDate = ''
-      this.publishTime = ''
-      this.publishTimeDisabled = true
-      this.choosePublishTimeDialogVisible = false
-    },
-
-    /**
-     * 日期变化。
-     */
-    changeDatePicker(date) {
-      if (!date) {
-        this.publishTime = ''
-        this.publishTimeDisabled = true
-        return
-      }
-
-      const now = new Date()
-
-      const startTime = new Date(now.getTime() + 60 * 60 * 1000)
-      const endTime = new Date(now.getTime() + 72 * 60 * 60 * 1000)
-      const startDate = this.formatDate(startTime)
-      const endDate = this.formatDate(endTime)
-
-      if (date === startDate) {
-        this.publishTimeRange.start = this.calculateTime(true, startTime.getHours(), startTime.getMinutes())
-        this.publishTimeRange.end = '23:45'
-      } else if (date === endDate) {
-        this.publishTimeRange.start = '00:00'
-        this.publishTimeRange.end = this.calculateTime(false, endTime.getHours(), endTime.getMinutes())
-      } else {
-        this.publishTimeRange.start = '00:00'
-        this.publishTimeRange.end = '23:45'
-      }
-
-      this.publishTimeDisabled = false
-      if (this.publishTime && !this.isTimeInRange(this.publishTime, this.publishTimeRange.start, this.publishTimeRange.end)) {
-        this.publishTime = ''
-      }
-    },
-
-    /**
-     * 计算日期。
-     */
-    formatDate(date) {
-      return (
-        date.getFullYear() +
-        '-' +
-        this.padZero(date.getMonth() + 1) +
-        '-' +
-        this.padZero(date.getDate())
-      )
-    },
-
-    /**
-     * 计算时间选择器边界。
-     */
-    calculateTime(isStart, hour, minute) {
-      if (isStart) {
-        if (minute < 15) {
-          return (this.padZero(hour) + ':15')
-        }
-
-        if (minute < 30) {
-          return (this.padZero(hour) + ':30')
-        }
-
-        if (minute < 45) {
-          return (this.padZero(hour) + ':45')
-        }
-
-        hour++
-
-        if (hour >= 24) {
-          return '23:45'
-        }
-
-        return (this.padZero(hour) + ':00')
-      }
-
-      if (minute < 15) {
-        return (this.padZero(hour) + ':00')
-      }
-
-      if (minute < 30) {
-        return (this.padZero(hour) + ':15')
-      }
-
-      if (minute < 45) {
-        return (this.padZero(hour) + ':30')
-      }
-
-      return (this.padZero(hour) + ':45')
-    },
-
-    /**
-     * 判断时间是否在范围内。
-     */
-    isTimeInRange(time, start, end) {
-      const value = this.timeToMinutes(time)
-      const startValue = this.timeToMinutes(start)
-      const endValue = this.timeToMinutes(end)
-      return (value >= startValue && value <= endValue)
-    },
-
-    /**
-     * 时间转分钟。
-     */
-    timeToMinutes(time) {
-      const arr = time.split(':')
-
-      return (
-        parseInt(arr[0], 10) * 60 +
-        parseInt(arr[1], 10)
-      )
-    },
-
-    /**
-     * 定时发布。
-     */
-    publishArticleByTiming() {
-      if (!this.publishDateTimeShow) {
-        this.$message.warning(
-          '请选择发布时间'
-        )
-        return
-      }
-
-      if (this.formData.articlePerm === 2 || this.formData.articlePerm === 3) {
-        this.$message.error(
-          '私密或密码文章暂不支持定时发布'
-        )
-        return
-      }
-
-      this.formData.publishTime = this.publishDateTime
-      const param = this.buildCommonSubmitData()
-
-      this.submitByTimeLoading = true
-      this.$mapi.article.autoPublishArticle(param).then(() => {
-        this.cancelPublishByTime()
-        this.publishSuccess()
-      }).finally(() => {
-        this.submitByTimeLoading = false
-      })
-    },
-
-    /**
-     * 获取当前时间文本。
-     */
+    // 获取当前时间文本
     getCurrentTimeText() {
       const date = new Date()
       return (
@@ -1409,6 +1190,10 @@ export default {
         ':' +
         this.padZero(date.getSeconds())
       )
+    },
+    // 数字补零
+    padZero(value) {
+      return value < 10 ? '0' + value : String(value)
     }
   }
 }

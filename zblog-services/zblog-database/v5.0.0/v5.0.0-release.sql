@@ -1132,6 +1132,10 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_SLUG_REQUIRED', 'en-US', 'Article slug cannot be blank', 'common'),
 ('ARTICLE_SUMMARY_REQUIRED', 'zh-CN', '文章摘要不能为空', 'common'),
 ('ARTICLE_SUMMARY_REQUIRED', 'en-US', 'Article summary cannot be blank', 'common'),
+('ARTICLE_PUBLISH_TIME_REQUIRED', 'zh-CN', '文章自动发布时间不允许为空', 'common'),
+('ARTICLE_PUBLISH_TIME_REQUIRED', 'en-US', 'TODO', 'common'),
+('ARTICLE_PUBLISH_TIME_INVALID', 'zh-CN', '文章自动发布时间格式错误', 'common'),
+('ARTICLE_PUBLISH_TIME_INVALID', 'en-US', 'TODO', 'common'),
 ('ARTICLE_CATEGORY_ID_REQUIRED', 'zh-CN', '请选择文章分类', 'common'),
 ('ARTICLE_CATEGORY_ID_REQUIRED', 'en-US', 'Article categoryId cannot be blank', 'common'),
 ('ARTICLE_COMMENT_FLAG_REQUIRED', 'zh-CN', '请选择文章是否开启评论', 'common'),
@@ -1154,6 +1158,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_INIT_DRAFT_FAILED', 'en-US', 'TODO', 'common'),
 ('ARTICLE_COVER_IMAGE_OVER_MAX', 'zh-CN', '超过最大文章封面上传限制', 'common'),
 ('ARTICLE_COVER_IMAGE_OVER_MAX', 'en-US', 'Article cover image size over max', 'common'),
+('ARTICLE_AUTO_PUBLISH_WITH_SELF', 'zh-CN', '私密文章不允许自动发布', 'common'),
+('ARTICLE_AUTO_PUBLISH_WITH_SELF', 'en-US', 'TODO', 'common'),
 -- 门户
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),
@@ -1747,7 +1753,6 @@ CREATE TABLE `article` (
   `LIKE_COUNT` BIGINT DEFAULT 0 COMMENT '总点赞数',
   `COMMENT_COUNT` BIGINT DEFAULT 0 COMMENT '总评论数',
   `FAVORITE_COUNT` BIGINT DEFAULT 0 COMMENT '总收藏数',
-  `PUBLISH_TIME` DATETIME DEFAULT NULL COMMENT '文章发布时间',
   `CREATOR_ID` BIGINT DEFAULT NULL COMMENT '创建人',
   `CREATE_TIME` DATETIME NOT NULL COMMENT '文章创建时间',
   `UPDATER_ID` BIGINT DEFAULT NULL COMMENT '最后修改人',
@@ -1785,6 +1790,25 @@ CREATE TABLE `article_content_draft_record` (
   PRIMARY KEY (`ID`) USING BTREE,
   KEY `idx_acdr_article_id` (`ARTICLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='文章内容草稿记录表';
+
+/*Table structure for table `article_auto_publish_timing` */
+DROP TABLE IF EXISTS `article_auto_publish_timing`;
+CREATE TABLE `article_auto_publish_timing` (
+  `ID` BIGINT UNSIGNED NOT NULL COMMENT '主键ID',
+  `ARTICLE_ID` BIGINT UNSIGNED NOT NULL COMMENT '文章ID',
+  `VERSION` INT NOT NULL COMMENT '文章当前已发布版本号',
+  `PUBLISH_TIME` DATETIME NOT NULL COMMENT '计划发布时间',
+  `STATUS` TINYINT NOT NULL DEFAULT 0 COMMENT '任务状态：0待发布 1执行中 2已发布 3失败 4已取消',
+  `RETRY_COUNT` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '已重试次数',
+  `ERROR_MSG` VARCHAR(1000) DEFAULT NULL COMMENT '最近一次执行失败原因',
+  `CREATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UPDATE_TIME` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `EXECUTE_TIME` DATETIME DEFAULT NULL COMMENT '最后执行时间',
+  `FINISH_TIME` DATETIME DEFAULT NULL COMMENT '任务完成时间',
+  PRIMARY KEY (`ID`),
+  KEY `IDX_STATUS_PUBLISH_TIME` (`STATUS`, `PUBLISH_TIME`),
+  KEY `IDX_ARTICLE_ID_STATUS` (`ARTICLE_ID`, `STATUS`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='文章定时发布任务记录表';
 
 /*Table structure for table `article_version` */
 DROP TABLE IF EXISTS `article_version`;
@@ -1840,7 +1864,7 @@ CREATE TABLE `article_operation_log` (
   `ID` BIGINT UNSIGNED NOT NULL,
   `ARTICLE_ID` BIGINT NOT NULL COMMENT '文章编号',
   `OPERATION_TYPE` TINYINT NOT NULL COMMENT '操作类型',
-  `OPERATOR_ID` BIGINT DEFAULT NULL COMMENT '操作人编号',
+  `OPERATOR_ID` BIGINT DEFAULT NULL COMMENT '操作人id',
   `BEFORE_TYPE` TINYINT DEFAULT NULL COMMENT '操作前文章类型',
   `AFTER_TYPE` TINYINT DEFAULT NULL COMMENT '操作后文章类型',
   `BEFORE_PERM` TINYINT DEFAULT NULL COMMENT '操作前文章权限',

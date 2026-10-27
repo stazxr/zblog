@@ -61,9 +61,20 @@
         <span class="crud-opts-left">
           <template v-perm="['ARTIQ003', 'ARTIU001', 'ARTIU002']">
             <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
-            <el-button v-perm="['ARTIQ003']" type="info" @click="showArticleDetail">详情</el-button>
             <el-button v-show="filters.tagStatus !== '8'" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
+            <el-button v-perm="['ARTIQ003']" type="info" @click="showArticleDetail">详情</el-button>
           </template>
+          <el-button v-perm="['ARTIQ007']" type="info" @click="showArticleLog">操作日志</el-button>
+          <el-button v-perm="['ARTIQ008']" type="info" @click="showArticleVersion">历史版本</el-button>
+          <el-button
+            v-show="filters.tagStatus !== '8'"
+            v-perm="['ARTIA003']"
+            :disabled="row === null || row.deleteFlag !== 0"
+            type="primary"
+            @click="publishWeChat"
+          >
+            发布公众号
+          </el-button>
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTID001']"
@@ -438,6 +449,26 @@ export default {
       }
       this.$router.push({ name: 'AddOrEditArticle', query: { articleId: this.row.id }})
     },
+    showArticleLog() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的文章')
+        return
+      }
+    },
+    showArticleVersion() {
+      if (this.row === null) {
+        this.$message.error('请选择要查看的文章')
+        return
+      }
+    },
+    publishWeChat() {
+      if (this.row === null) {
+        this.$message.error('请选择要发布的文章')
+        return
+      }
+
+      this.$message.warning('暂不支持，功能完善中')
+    },
     // 删除
     deleteArticle() {
       if (this.row === null) {
@@ -484,8 +515,8 @@ export default {
       })
     },
     // 还原文章
-    resetArticle(row) {
-      this.$mapi.article.resetArticle({ articleId: row.id }).then(res => {
+    resetArticle() {
+      this.$mapi.article.resetArticle({ articleId: this.row.id }).then(res => {
         this.$message.success(res.message)
         this.listTableData()
       })

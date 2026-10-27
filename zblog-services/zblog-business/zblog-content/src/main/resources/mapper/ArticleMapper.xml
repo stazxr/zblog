@@ -67,10 +67,11 @@
             a.ID, a.TITLE, a.SUMMARY, a.ARTICLE_TYPE, a.ARTICLE_PERM, a.ARTICLE_STATUS,
             a.COMMENT_FLAG, a.WORDS_COUNT, a.VIEW_COUNT, a.COMMENT_COUNT, a.AUTHOR_ID,
             a.UPDATE_TIME, a.VERSION, a.DELETE_FLAG, a.COVER_IMAGE_TYPE,
-            u.NICKNAME AS AUTHOR_NAME, c.NAME AS CATEGORY_NAME
+            u.NICKNAME AS AUTHOR_NAME, c.NAME AS CATEGORY_NAME, av.PUBLISH_TIME
         FROM article a
         LEFT JOIN category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        LEFT JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
         WHERE a.AUTHOR_ID = #{query.authorId}
         <choose>
             <!-- 1: 全部 -->
@@ -178,10 +179,11 @@
             a.AUTHOR_ID, u.NICKNAME AS AUTHOR_NAME, a.SEO_TITLE, a.SEO_KEYWORDS, a.SEO_DESCRIPTION,
             a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.DELETE_FLAG, a.ARTICLE_PERM, a.SOURCE_NAME, a.SOURCE_AUTHOR, a.SOURCE_URL,
             a.COMMENT_FLAG, a.COVER_IMAGE_TYPE, a.WORDS_COUNT, a.VIEW_COUNT, a.LIKE_COUNT, a.COMMENT_COUNT, a.FAVORITE_COUNT,
-            a.PUBLISH_TIME, a.CREATE_TIME, a.UPDATE_TIME, a.DELETE_TIME, a.VERSION, a.EXTRA_INFO
+            a.CREATE_TIME, a.UPDATE_TIME, a.DELETE_TIME, a.VERSION, a.EXTRA_INFO, av.PUBLISH_TIME
         FROM article a
         LEFT JOIN category c ON c.ID = a.CATEGORY_ID
         LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        LEFT JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
         WHERE a.DELETE_FLAG != 2 AND a.ID = #{articleId}
     </select>
 
@@ -191,7 +193,7 @@
             a.SEO_TITLE, a.SEO_KEYWORDS, a.SEO_DESCRIPTION,
             a.ARTICLE_TYPE, a.ARTICLE_STATUS, a.ARTICLE_PERM, a.SOURCE_NAME, a.SOURCE_AUTHOR, a.SOURCE_URL,
             a.COMMENT_FLAG, a.COVER_IMAGE_TYPE, a.WORDS_COUNT, a.VIEW_COUNT, a.LIKE_COUNT, a.COMMENT_COUNT, a.FAVORITE_COUNT,
-            a.PUBLISH_TIME, a.CREATE_TIME, a.UPDATE_TIME, a.DELETE_TIME, a.VERSION, a.EXTRA_INFO
+            a.CREATE_TIME, a.UPDATE_TIME, a.DELETE_TIME, a.VERSION, a.EXTRA_INFO
         FROM article a
         WHERE
             a.AUTHOR_ID = #{authorId} AND a.ARTICLE_STATUS = 1 AND a.DELETE_FLAG = 0 AND
@@ -202,6 +204,10 @@
 
     <select id="selectLastArticleDraft" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
         SELECT ID, TITLE FROM article WHERE AUTHOR_ID = #{authorId} AND ARTICLE_STATUS = 1 ORDER BY UPDATE_TIME DESC LIMIT 1
+    </select>
+
+    <select id="selectRecycleArticleIdList" resultType="java.lang.Long">
+        SELECT ID FROM article WHERE AUTHOR_ID = #{authorId} AND DELETE_FLAG = 1
     </select>
 
     <update id="updateArticleById">
@@ -242,147 +248,7 @@
         UPDATE article SET DELETE_FLAG = 2 WHERE AUTHOR_ID = #{authorId} AND DELETE_FLAG = 1
     </update>
 
-
-<!--    <insert id="insertArticlePublishTiming">-->
-<!--        INSERT INTO article_auto_publish_timing (-->
-<!--            ID, ARTICLE_ID, PUBLISH_TIME, PRODUCER_TIME-->
-<!--        ) VALUES (-->
-<!--            #{id}, #{articleId}, #{publishTime}, #{producerTime}-->
-<!--        )-->
-<!--    </insert>-->
-
-<!--    <update id="invalidateArticlePublishTiming">-->
-<!--        UPDATE article_auto_publish_timing SET VALID = 0, `DESC` = #{desc} WHERE VALID = 1 AND ARTICLE_ID = #{articleId}-->
-<!--    </update>-->
-
-<!--    <update id="batchInvalidateArticlePublishTiming">-->
-<!--        UPDATE article_auto_publish_timing SET VALID = 0, `DESC` = #{desc} WHERE VALID = 1 AND ARTICLE_ID IN-->
-<!--        <choose>-->
-<!--            <when test="articleIds != null and articleIds.size() > 0">-->
-<!--                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">-->
-<!--                    #{articleId}-->
-<!--                </foreach>-->
-<!--            </when>-->
-<!--            <otherwise>-->
-<!--                ('no delete')-->
-<!--            </otherwise>-->
-<!--        </choose>-->
-<!--    </update>-->
-
-<!--    <update id="updateArticleDesc">-->
-<!--        UPDATE article SET `DESC` = #{desc} WHERE ID = #{articleId}-->
-<!--    </update>-->
-
-<!--    <delete id="deleteArticlePublishTiming">-->
-<!--        DELETE FROM article_auto_publish_timing WHERE ARTICLE_ID = #{articleId}-->
-<!--    </delete>-->
-<!--    <select id="selectArticleByPublishId" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.ARTICLE_STATUS-->
-<!--        FROM-->
-<!--            article_auto_publish_timing timing-->
-<!--        LEFT JOIN article a ON a.ID = timing.ARTICLE_ID-->
-<!--        WHERE timing.VALID = 1 AND timing.CONSUMED = 0 AND timing.ID = #{publishId}-->
-<!--    </select>-->
-<!--    <select id="checkNoAuditCount" resultType="java.lang.Integer">-->
-<!--        SELECT COUNT(1) FROM article WHERE DELETED = 0 AND ARTICLE_STATUS NOT IN (2, 3) AND ID IN-->
-<!--        <choose>-->
-<!--            <when test="articleIds != null and articleIds.size() > 0">-->
-<!--                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">-->
-<!--                    #{articleId}-->
-<!--                </foreach>-->
-<!--            </when>-->
-<!--            <otherwise>-->
-<!--                ('no choose')-->
-<!--            </otherwise>-->
-<!--        </choose>-->
-<!--    </select>-->
-<!--    <select id="splitAuditArticleIds" resultType="java.lang.Long">-->
-<!--        SELECT ID FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = #{status} AND ID IN-->
-<!--        <choose>-->
-<!--            <when test="articleIds != null and articleIds.size() > 0">-->
-<!--                <foreach collection="articleIds" item="articleId" index="index" open="(" separator="," close=")">-->
-<!--                    #{articleId}-->
-<!--                </foreach>-->
-<!--            </when>-->
-<!--            <otherwise>-->
-<!--                ('no choose')-->
-<!--            </otherwise>-->
-<!--        </choose>-->
-<!--    </select>-->
-<!--    <select id="selectArchiveList" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        SELECT ID, TITLE, CREATE_TIME FROM article WHERE DELETED = 0 AND ARTICLE_STATUS = 5 AND ARTICLE_PERM = 1 ORDER BY CREATE_TIME DESC-->
-<!--    </select>-->
-<!--    <select id="selectLastArticle" resultMap="articleVoSimpleMap">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME-->
-<!--        FROM article a-->
-<!--        LEFT JOIN (-->
-<!--            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--            FROM article_img_relation air-->
-<!--            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        ) img ON img.ARTICLE_ID = a.ID-->
-<!--        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND a.ID &lt; #{articleId}-->
-<!--        ORDER BY a.ID DESC LIMIT 1-->
-<!--    </select>-->
-<!--    <select id="selectNextArticle" resultMap="articleVoSimpleMap">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME-->
-<!--        FROM article a-->
-<!--        LEFT JOIN (-->
-<!--            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--            FROM article_img_relation air-->
-<!--            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        ) img ON img.ARTICLE_ID = a.ID-->
-<!--        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND a.ID &gt; #{articleId}-->
-<!--        ORDER BY a.ID LIMIT 1-->
-<!--    </select>-->
-<!--    <select id="selectRecommendList" resultMap="articleVoSimpleMap">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.CREATE_TIME, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME-->
-<!--        FROM article a-->
-<!--        LEFT JOIN (-->
-<!--            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--            FROM article_img_relation air-->
-<!--            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        ) img ON img.ARTICLE_ID = a.ID-->
-<!--        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5 AND (-->
-<!--            a.CATEGORY_ID IN (-->
-<!--                SELECT CATEGORY_ID FROM article WHERE ID = #{articleId}-->
-<!--            ) OR a.ID IN (-->
-<!--                SELECT ARTICLE_ID FROM article_tag_relation WHERE TAG_ID IN (-->
-<!--                    SELECT TAG_ID FROM article_tag_relation WHERE ARTICLE_ID = #{articleId}-->
-<!--                )-->
-<!--            )-->
-<!--        ) AND a.ID != #{articleId}-->
-<!--        ORDER BY RAND() limit 6-->
-<!--    </select>-->
-<!--    <select id="selectNewestList" resultMap="articleVoSimpleMap">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.CREATE_TIME, a.COVER_IMAGE_TYPE, img.ID FILE_ID, img.DOWNLOAD_URL, img.ORIGINAL_FILENAME-->
-<!--        FROM article a-->
-<!--        LEFT JOIN (-->
-<!--            SELECT air.ARTICLE_ID, f.ID, f.DOWNLOAD_URL, f.ORIGINAL_FILENAME-->
-<!--            FROM article_img_relation air-->
-<!--            LEFT JOIN file f ON f.ID = air.FILE_ID AND f.DELETED = 0-->
-<!--        ) img ON img.ARTICLE_ID = a.ID-->
-<!--        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5-->
-<!--        ORDER BY CREATE_TIME DESC LIMIT 10-->
-<!--    </select>-->
-<!--    <select id="selectArticleByKeywords" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        SELECT-->
-<!--            a.ID, a.TITLE, a.CONTENT_MD AS CONTENT-->
-<!--        FROM article a-->
-<!--        WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5-->
-<!--        AND (a.TITLE LIKE CONCAT('%', #{keywords}, '%') OR a.CONTENT_MD LIKE CONCAT('%', #{keywords}, '%'))-->
-<!--        ORDER BY CREATE_TIME DESC LIMIT 10-->
-<!--    </select>-->
-<!--    <select id="selectWebBoardHotArticleList" resultType="com.github.stazxr.zblog.domain.vo.ArticleVo">-->
-<!--        SELECT ID, TITLE, VIEW_COUNT FROM (-->
-<!--            SELECT-->
-<!--                a.ID, a.TITLE, (SELECT COUNT(1) FROM article_view WHERE ARTICLE_ID = a.ID) VIEW_COUNT-->
-<!--            FROM article a-->
-<!--            WHERE a.DELETED = 0 AND a.ARTICLE_PERM = 1 AND a.ARTICLE_STATUS = 5-->
-<!--        ) tmp ORDER BY VIEW_COUNT DESC LIMIT 5-->
-<!--    </select>-->
+    <update id="resetArticle">
+        UPDATE article SET DELETE_FLAG = 0, ARTICLE_STATUS = 1 WHERE ID = #{articleId} AND DELETE_FLAG = 1
+    </update>
 </mapper>

@@ -23,6 +23,12 @@ public enum ArticleErrorCode implements ErrorCode {
     EARTIA009("ARTICLE_X_STATUS_INVALID"),
     /** 文章 SLUG 不允许变更 */
     EARTIA010("ARTICLE_SLUG_FORBIDDEN_EDIT"),
+    /** 文章自动发布时间不允许为空 */
+    EARTIA011("ARTICLE_PUBLISH_TIME_REQUIRED"),
+    /** 文章发布时间格式不正确 */
+    EARTIA012("ARTICLE_PUBLISH_TIME_INVALID"),
+    /** 私密文章不允许自动发布 */
+    EARTIA013("ARTICLE_AUTO_PUBLISH_WITH_SELF"),
     /** 文章草稿初始化失败 */
     SARTIA001("ARTICLE_INIT_DRAFT_FAILED");
 

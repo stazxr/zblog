@@ -19,7 +19,9 @@ import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
+import com.github.stazxr.zblog.content.domain.dto.query.ArticleVersionQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.*;
 import com.github.stazxr.zblog.content.domain.enums.*;
 import com.github.stazxr.zblog.content.domain.error.ArticleErrorCode;
@@ -75,6 +77,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleVersionImageMapper articleVersionImageMapper;
 
     private final ArticleOperationLogMapper articleOperationLogMapper;
+
+    private final ArticleAutoPublishTimingMapper articleAutoPublishTimingMapper;
 
     private final FileMapper fileMapper;
 
@@ -296,7 +300,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         checkArticleCoverImagesWeak(articleDto.getId(), article.getCoverImageType(), articleDto.getCoverImages());
         // 只要触发保存，文章状态就变为草稿态
         if (ArticleStatus.SCHEDULED.getValue().equals(article.getArticleStatus())) {
-            // TODO 如果原文章状态为待发布，则删除自动发布记录
+            articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "文章被重新编辑");
         }
         article.setArticleStatus(ArticleStatus.DRAFT.getValue());
         article.setUpdaterId(SecurityUtils.getLoginId());
@@ -323,16 +327,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long articleId = articleDto.getId(); // 文章ID
         Article dbArticle = baseMapper.selectById(articleId);
         Article article = baseMapper.selectById(articleId);
-        // 检查文章是否允许编辑
-        checkArticleEditable(article);
-        // 标签校验
-        checkArticleTags(articleId, articleDto.getTags());
-        // 封面校验
-        checkArticleCoverImages(articleId, articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
-        // 文章类型校验
-        checkArticleType(articleDto);
-        // SLUG 校验
-        checkArticleSlug(article.getVersion(), article.getSlug(), articleDto.getSlug());
+        // 发布文章校验
+        commonPublishCheck(article, articleDto);
         // 填充文章信息
         fillArticle(article, articleDto);
         if (ArticlePerm.SELF.getValue().equals(article.getArticlePerm())) {
@@ -344,6 +340,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
             // 记录文章操作日志
             recordArticleLog(article, dbArticle, ArticleOperationType.PUBLISH, "私密文章自动发布");
+
+            // 取消文章的自动发布任务
+            articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "文章已主动发布");
         } else {
             // 非私密文章审核通过后发布
             article.setArticleStatus(ArticleStatus.PENDING_REVIEW.getValue());
@@ -367,7 +366,36 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void autoPublishArticle(ArticleDto articleDto) {
+        String publishTime = articleDto.getPublishTime();
+        ThrowUtils.throwIfBlank(publishTime, ArticleErrorCode.EARTIA011);
+        ThrowUtils.throwIf(!DateUtils.checkDateFormat(publishTime, "yyyy-MM-dd HH:mm"), ArticleErrorCode.EARTIA012);
+        ThrowUtils.throwIf(ArticlePerm.SELF.getValue().equals(articleDto.getArticlePerm()), ArticleErrorCode.EARTIA013);
 
+        // 获取文章信息
+        Long articleId = articleDto.getId(); // 文章ID
+        Article article = baseMapper.selectById(articleId);
+
+        // 再次查询文章信息（用于记录操作日志）
+        Article dbArticle = baseMapper.selectById(articleId);
+
+        // 发布文章校验
+        commonPublishCheck(article, articleDto);
+
+        // 填充文章信息
+        fillArticle(article, articleDto);
+        article.setArticleStatus(ArticleStatus.SCHEDULED.getValue());
+
+        // 保存文章内容
+        baseMapper.updateArticleById(article);
+
+        // 自动发布文章
+        doAutoPublishArticle(articleId, article.getVersion(), publishTime);
+
+        // 记录文章操作日志
+        recordArticleLog(article, dbArticle, ArticleOperationType.SCHEDULE, publishTime);
+
+        // 删除临时保存记录
+        articleContentDraftRecordMapper.deleteByArticleId(articleId);
     }
 
     /**
@@ -388,13 +416,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.throwIf(!ArticleDeleteFlag.DEFAULT.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
         // 第一次删除文章，将文章移动到回收站
         baseMapper.deleteArticle(articleId, ArticleDeleteFlag.RECYCLE.getValue());
-        // TODO
-        // baseMapper.invalidateArticlePublishTiming(articleId, "文章移至回收站【" + DateUtils.formatNow() + "】");
+        // 取消文章的自动发布任务
+        articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "删除文章");
         // 删除临时保存记录
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE1, null);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE1, "移至回收站");
     }
 
     /**
@@ -419,7 +447,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE2, null);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE2, "彻底删除文章");
     }
 
     /**
@@ -429,9 +457,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Transactional(rollbackFor = Exception.class)
     public void deleteArticle3() {
         Long loginId = SecurityUtils.getLoginId();
+        List<Long> articleIds = baseMapper.selectRecycleArticleIdList(loginId);
+        for (Long articleId : articleIds) {
+            Article article = baseMapper.selectById(articleId);
+            recordArticleLogWithDelete3(article);
+        }
         baseMapper.deleteArticle3(loginId);
-        // TODO 记录操作日志
-        // 删除临时保存记录
     }
 
     /**
@@ -450,10 +481,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.throwIf(!loginId.equals(dbArticle.getAuthorId()), CommonErrorCode.EBASEA000);
         // 文章状态校验
         ThrowUtils.throwIf(!ArticleDeleteFlag.RECYCLE.getValue().equals(dbArticle.getDeleteFlag()), ArticleErrorCode.EARTIA009);
-        baseMapper.updateArticleStatus(articleId, ArticleStatus.DRAFT.getValue());
+        ThrowUtils.throwIf(baseMapper.resetArticle(articleId) != 1, BaseErrorCode.SCOREA002);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.RESET, null);
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.RESET, "还原文章");
     }
 
     /**
@@ -527,125 +558,47 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return baseMapper.selectLastArticleDraft(authorId);
     }
 
-//    /**
-//     * 文章定时发布
-//     *
-//     * @param articleDto 文章信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void publishArticleByTiming(ArticleDto articleDto) {
-//        String nowTime = DateUtils.formatNow();
-//        int delay = checkAutoPublishInfo(articleDto);
-//        Article article = articleConverter.dtoToEntity(articleDto);
-//        article.setDesc("文章将于 ".concat(articleDto.getAutoPublishTime()).concat(" 自动发布"));
-//        boolean isAdd = BaseConst.Action.ADD.equals(articleDto.getAction());
-//        Assert.isTrue(isAdd ? baseMapper.insert(article) != 1 : baseMapper.updateById(article) != 1, "保存失败");
-//        baseMapper.deleteArticleTmpContent(articleDto.getId());
-//        baseMapper.invalidateArticlePublishTiming(articleDto.getId(), "重新定时发布【" + nowTime + "】");
-//        Long publishId = SequenceUtils.getId();
-//        baseMapper.insertArticlePublishTiming(publishId, articleDto.getId(), articleDto.getAutoPublishTime(), nowTime);
-//        // throw new ServiceException("功能已关闭，优化中");
-//    }
-//
-//    /**
-//     * 将文章回收至草稿箱
-//     *
-//     * @param articleId 文章ID
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void recycleToDraftBox(Long articleId) {
-//        Assert.notNull(articleId, "参数【articleId】不能为空");
-//
-//        // 是否允许操作
-//        ArticleVo dbInfo = baseMapper.selectArticleDetail(articleId);
-//        Long authorId = SecurityUtils.getLoginId();
-//        DataValidated.isTrue(!dbInfo.getAuthorId().equals(authorId), "没有权限操作其他作者的文章");
-//
-//        // 状态检查
-//        DataValidated.isTrue(!ArticleStatus.RECYCLE.getType().equals(dbInfo.getArticleStatus()), "文章状态无效，刷新页面重试");
-//
-//        // 修改状态
-//        baseMapper.updateArticleStatus(articleId, ArticleStatus.DRAFT.getType());
-//    }
-//
-//    /**
-//     * 审核文章
-//     *
-//     * @param auditDto 审核信息
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void auditArticle(ArticleAuditDto auditDto) {
-//        Assert.notNull(auditDto.getStatus(), "审核状态不能为空");
-//        Assert.isTrue(StringUtils.isBlank(auditDto.getOpinion()), "审核意见不能为空");
-//        Assert.isTrue(auditDto.getArticleIds() == null || auditDto.getArticleIds().size() == 0, "文章列表不能为空");
-//
-//        int noAuditCount = baseMapper.checkNoAuditCount(auditDto.getArticleIds());
-//        Assert.isTrue(noAuditCount > 0, "只能选择待审核状态的文章");
-//
-//        // 待审核 => 已发布
-//        List<Long> auditIds1 = baseMapper.splitAuditArticleIds(auditDto.getArticleIds(), ArticleStatus.REVIEW.getType());
-//        if (auditIds1.size() > 0) {
-//            Integer status = auditDto.getStatus() ? ArticleStatus.PUBLISHED.getType() : ArticleStatus.FAILED_REVIEW.getType();
-//            baseMapper.batchUpdateArticleStatus(auditIds1, status, auditDto.getOpinion());
-//        }
-//
-//        // 待审核 => 待发布
-//        List<Long> auditIds2 = baseMapper.splitAuditArticleIds(auditDto.getArticleIds(), ArticleStatus.PUBLISH_REVIEW.getType());
-//        if (auditIds2.size() > 0) {
-//            Integer status = auditDto.getStatus() ? ArticleStatus.TIME_PUBLISH.getType() : ArticleStatus.FAILED_REVIEW.getType();
-//            baseMapper.batchUpdateArticleStatus(auditIds2, status, auditDto.getOpinion());
-//        }
-//    }
+    /**
+     * 分页查询文章操作日志列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleOperationLogVo>
+     */
+    @Override
+    public IPage<ArticleOperationLogVo> queryArticleOperationLogListByPage(ArticleOperationLogQueryDto queryDto) {
+        // 权限校验
+        Article article = baseMapper.selectById(queryDto.getArticleId());
+        ThrowUtils.throwIf(ArticleDeleteFlag.DELETED.getValue().equals(article.getDeleteFlag()), BaseErrorCode.ECOREA001);
+        ThrowUtils.throwIf(!SecurityUtils.getLoginId().equals(article.getAuthorId()), BaseErrorCode.ECOREA002);
 
-//
-//    private int checkAutoPublishInfo(ArticleDto articleDto) {
-//        // 非空校验
-//        emptyCheck(articleDto);
-//        Assert.notNull(articleDto.getAutoPublishTime(), "发布时间不能为空");
-//
-//        // 文章类型校验
-//        Integer articleType = articleDto.getArticleType();
-//        Assert.notNull(articleType, "文章类型不能为空");
-//        if (!ArticleType.ORIGINAL.getType().equals(articleType)) {
-//            Assert.isTrue(StringUtils.isBlank(articleDto.getReprintLink()), "原文链接不能为空");
-//        }
-//
-//        // 发布时间校验
-//        Date nowDate = new Date();
-//        Date publishDate = new Date();
-//        try {
-//            publishDate = DateUtils.parseDate(articleDto.getAutoPublishTime(), "yyyy-MM-dd HH:mm");
-//        } catch (Exception e) {
-//            // throw new ServiceException("发布时间格式不正确", e);
-//        }
-//        long delay = publishDate.getTime() - nowDate.getTime();
-//        Assert.isTrue(delay <= 0 || delay > Integer.MAX_VALUE, "发布时间无效");
-//
-//        // 新增编辑校验
-//        actionCheck(articleDto);
-//
-//        // 发布类型校验
-//        Integer articlePerm = articleDto.getArticlePerm();
-//        Assert.isTrue(ArticlePerm.SELF_SHOW.getType().equals(articlePerm), "私密文章暂不支持定时发布");
-//
-//        // 设置文章状态
-//        articleDto.setArticleStatus(ArticleStatus.PUBLISH_REVIEW.getType());
-//
-//        // 封面校验
-//        articleImgConfig(articleDto);
-//
-//        // 标签校验，自定义标签入库，文章关键字生成
-//        List<String> tags = articleDto.getArticleTag();
-//        Assert.isTrue(tags == null || tags.size() == 0, "文章标签不能为空");
-//        checkArticleTagConfig(articleDto);
-//
-//        // 返回发布毫秒数
-//        return (int) delay;
-//    }
-//
+        // 参数检查
+        queryDto.checkPage();
+
+        // 分页查询
+        Page<ArticleOperationLogVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        return articleOperationLogMapper.selectLogList(page, queryDto);
+    }
+
+    /**
+     * 分页查询文章发布版本列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVersionVo>
+     */
+    @Override
+    public IPage<ArticleVersionVo> queryArticleVersionByPage(ArticleVersionQueryDto queryDto) {
+        // 权限校验
+        Article article = baseMapper.selectById(queryDto.getArticleId());
+        ThrowUtils.throwIf(ArticleDeleteFlag.DELETED.getValue().equals(article.getDeleteFlag()), BaseErrorCode.ECOREA001);
+        ThrowUtils.throwIf(!SecurityUtils.getLoginId().equals(article.getAuthorId()), BaseErrorCode.ECOREA002);
+
+        // 参数检查
+        queryDto.checkPage();
+
+        // 分页查询
+        return null;
+    }
+
     // 检查文件是否允许编辑
     private void checkArticleEditable(Article article) {
         // 检查文章是否存在
@@ -657,6 +610,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 检查是否作者编辑
         Long loginId = SecurityUtils.getLoginId(); // 当前登录用户
         ThrowUtils.throwIf(!loginId.equals(article.getAuthorId()), BaseErrorCode.ECOREA003);
+    }
+
+    private void commonPublishCheck(Article article, ArticleDto articleDto) {
+        Long articleId = articleDto.getId(); // 文章ID
+        // 检查文章是否允许编辑
+        checkArticleEditable(article);
+        // 标签校验
+        checkArticleTags(articleId, articleDto.getTags());
+        // 封面校验
+        checkArticleCoverImages(articleId, articleDto.getTitle(), articleDto.getCoverImageType(), articleDto.getCoverImages());
+        // 文章类型校验
+        checkArticleType(articleDto);
+        // SLUG 校验
+        checkArticleSlug(article.getVersion(), article.getSlug(), articleDto.getSlug());
     }
 
     private void checkArticleTags(Long articleId, List<String> tags) {
@@ -945,6 +912,22 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleVersionImageMapper.insertVersionImage(versionId, article.getId());
     }
 
+    private void doAutoPublishArticle(Long articleId, Integer version, String publishTime) {
+        // 无效历史记录
+        articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "新增定时发布");
+
+        // 新增记录
+        ArticleAutoPublishTiming timing = new ArticleAutoPublishTiming();
+        timing.setId(SequenceUtils.getId());
+        timing.setArticleId(articleId);
+        timing.setVersion(version);
+        timing.setPublishTime(DateUtils.parseLocalDateTimeFormat(publishTime, "yyyy-MM-dd HH:mm"));
+        timing.setStatus(ArticleAutoPublishTimingStatus.TODO.getValue());
+        timing.setRetryCount(0);
+        timing.setCreateTime(LocalDateTime.now());
+        articleAutoPublishTimingMapper.insert(timing);
+    }
+
     // 记录文章操作日志
     private void recordArticleLog(Article newArticle, Article oldArticle, ArticleOperationType type, String remark) {
         if (newArticle == null) {
@@ -966,6 +949,28 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         operationLog.setVersion(newArticle.getVersion());
         operationLog.setRemark(remark);
+        operationLog.setCreateTime(LocalDateTime.now());
+        articleOperationLogMapper.insert(operationLog);
+    }
+
+    private void recordArticleLogWithDelete3(Article article) {
+        if (article == null) {
+            return;
+        }
+
+        ArticleOperationLog operationLog = new ArticleOperationLog();
+        operationLog.setId(SequenceUtils.getId());
+        operationLog.setArticleId(article.getId());
+        operationLog.setOperatorId(SecurityUtils.getLoginId());
+        operationLog.setOperationType(ArticleOperationType.DELETE2.getValue());
+        operationLog.setAfterType(article.getArticleType());
+        operationLog.setAfterPerm(article.getArticlePerm());
+        operationLog.setAfterStatus(article.getArticleStatus());
+        operationLog.setBeforeType(article.getArticleType());
+        operationLog.setBeforePerm(article.getArticlePerm());
+        operationLog.setBeforeStatus(article.getArticleStatus());
+        operationLog.setVersion(article.getVersion());
+        operationLog.setRemark("清空回收站");
         operationLog.setCreateTime(LocalDateTime.now());
         articleOperationLogMapper.insert(operationLog);
     }
