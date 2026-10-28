@@ -1,6 +1,5 @@
 package com.github.stazxr.zblog.content.domain.vo;
 
-import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -23,10 +22,22 @@ public class ArticleVersionVo implements Serializable {
     private static final long serialVersionUID = -8970244640576138977L;
 
     /**
-     * 文章ID
+     * 文章版本id
      */
-    @ApiModelProperty(value = "文章ID")
+    @ApiModelProperty(value = "文章版本id")
     private Long id;
+
+    /**
+     * 文章id
+     */
+    @ApiModelProperty(value = "文章id")
+    private Long articleId;
+
+    /**
+     * 发布版本
+     */
+    @ApiModelProperty(value = "发布版本")
+    private Integer version;
 
     /**
      * 文章标题
@@ -59,9 +70,9 @@ public class ArticleVersionVo implements Serializable {
     private String contentHtml;
 
     /**
-     * 分类ID
+     * 分类id
      */
-    @ApiModelProperty(value = "分类ID")
+    @ApiModelProperty(value = "分类id")
     private Long categoryId;
 
     /**
@@ -71,28 +82,10 @@ public class ArticleVersionVo implements Serializable {
     private String categoryName;
 
     /**
-     * 标签id列表
-     */
-    @ApiModelProperty(value = "标签id列表")
-    private List<Long> tags;
-
-    /**
      * 标签名称列表
      */
     @ApiModelProperty(value = "标签名称列表")
     private List<String> tagNames;
-
-    /**
-     * 作者ID
-     */
-    @ApiModelProperty(value = "作者ID")
-    private Long authorId;
-
-    /**
-     * 作者名称
-     */
-    @ApiModelProperty(value = "作者名称")
-    private String authorName;
 
     /**
      * SEO标题
@@ -117,18 +110,6 @@ public class ArticleVersionVo implements Serializable {
      */
     @ApiModelProperty(value = "文章类型")
     private Integer articleType;
-
-    /**
-     * 文章状态
-     */
-    @ApiModelProperty(value = "文章状态")
-    private Integer articleStatus;
-
-    /**
-     * 删除标记
-     */
-    @ApiModelProperty(value = "删除标记：0-正常；1-回收站；2-彻底删除")
-    private Integer deleteFlag;
 
     /**
      * 文章权限
@@ -173,82 +154,16 @@ public class ArticleVersionVo implements Serializable {
     private List<String> coverImageList;
 
     /**
-     * 封面图片列表
-     */
-    @ApiModelProperty(value = "封面图片")
-    private List<UploadFileVo> coverImages;
-
-    /**
      * 总字数
      */
     @ApiModelProperty(value = "总字数")
     private Integer wordsCount;
 
     /**
-     * 总浏览数
+     * 版本发布时间
      */
-    @ApiModelProperty(value = "总浏览数")
-    private Long viewCount;
-
-    /**
-     * 总点赞数
-     */
-    @ApiModelProperty(value = "总点赞数")
-    private Long likeCount;
-
-    /**
-     * 总评论数
-     */
-    @ApiModelProperty(value = "总评论数")
-    private Long commentCount;
-
-    /**
-     * 总收藏数
-     */
-    @ApiModelProperty(value = "总收藏数")
-    private Long favoriteCount;
-
-    /**
-     * 文章发布时间
-     */
-    @ApiModelProperty(value = "文章发布时间")
+    @ApiModelProperty(value = "版本发布时间")
     private LocalDateTime publishTime;
-
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(value = "创建人ID")
-    private Long creatorId;
-
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
-
-    /**
-     * 最后修改人
-     */
-    @ApiModelProperty(value = "最后修改人ID")
-    private Long updaterId;
-
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
-
-    /**
-     * 文章下线时间
-     */
-    @ApiModelProperty(value = "文章下线时间")
-    private LocalDateTime deleteTime;
-
-    /**
-     * 迭代版本
-     */
-    @ApiModelProperty(value = "迭代版本")
-    private Integer version;
 
     /**
      * 扩展字段

@@ -62,10 +62,10 @@
           <template v-perm="['ARTIA001', 'ARTIU001', 'ARTIU002', 'ARTIU003', 'ARTIQ003']">
             <el-button type="success" @click="addArticle">新增</el-button>
             <el-button v-show="filters.tagStatus !== '8'" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
-            <el-button type="info" :disabled="row === null" @click="showArticleDetail">详情</el-button>
+            <el-button type="info" :disabled="row === null" @click="showArticleDetail">预览</el-button>
           </template>
           <el-button v-perm="['ARTIQ007']" type="info" :disabled="row === null" @click="showArticleLog">操作日志</el-button>
-          <el-button v-perm="['ARTIQ008']" type="info" :disabled="row === null" @click="showArticleVersion">历史版本</el-button>
+          <el-button v-perm="['ARTIQ008']" type="info" :disabled="row === null" @click="showArticleVersion">版本记录</el-button>
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTIA003']"
@@ -129,14 +129,14 @@
             <div class="article-cover-wrapper">
               <el-image
                 class="article-cover"
-                :src="getArticleCoverImage(scope.row.coverImageType, scope.row.coverImageList)"
-                :preview-src-list="scope.row.coverImageList"
+                :src="getArticleCoverImage(scope.row.coverImageType, scope.row['coverImageList'])"
+                :preview-src-list="scope.row['coverImageList']"
                 fit="cover"
               >
                 <div slot="error" class="image-slot">
                   <span v-if="scope.row.coverImageType === 1">默认封面</span>
                   <span v-else-if="scope.row.coverImageType === 5">无封面</span>
-                  <span v-else-if="!scope.row.coverImageList || scope.row.coverImageList.length === 0">未配置</span>
+                  <span v-else-if="!scope.row['coverImageList'] || scope.row['coverImageList'].length === 0">未配置</span>
                   <span v-else>加载失败</span>
                 </div>
               </el-image>
@@ -243,15 +243,24 @@
       :dialog-visible="operationLogDialogVisible"
       @showOperationLogDone="showOperationLogDone"
     />
+
+    <!-- 版本记录 -->
+    <version-dialog
+      ref="versionDialog"
+      :dialog-visible="versionDialogVisible"
+      @showVersionDone="showVersionDone"
+    />
   </div>
 </template>
 
 <script>
 import operationLogDialog from '@/views/admin/content/article/template/operationLogDialog'
+import versionDialog from '@/views/admin/content/article/template/versionDialog'
 export default {
   name: 'Article',
   components: {
-    operationLogDialog
+    operationLogDialog,
+    versionDialog
   },
   data() {
     return {
@@ -449,7 +458,7 @@ export default {
         })
       })
     },
-    // 详情
+    // 预览
     showArticleDetail() {
       this.previewArticleDialogVisible = true
       this.$nextTick(() => {
@@ -483,7 +492,7 @@ export default {
     showOperationLogDone() {
       this.operationLogDialogVisible = false
     },
-    // 查看发布版本
+    // 查看版本记录
     showArticleVersion() {
       if (this.row === null) {
         this.$message.error('请选择要查看的文章')
@@ -493,9 +502,10 @@ export default {
       this.versionDialogVisible = true
       this.$refs.versionDialog.initData(this.row.id)
     },
-    showArticleVersionDone() {
+    showVersionDone() {
       this.versionDialogVisible = false
     },
+    // 发布微信公众号
     publishWeChat() {
       if (this.row === null) {
         this.$message.error('请选择要发布的文章')

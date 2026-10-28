@@ -245,14 +245,14 @@ public class ArticleVo implements Serializable {
     private Integer version;
 
     /**
-     * 扩展字段
-     */
-    @ApiModelProperty(value = "扩展字段")
-    private String extraInfo;
-
-    /**
      * 文章发布时间
      */
     @ApiModelProperty(value = "文章发布时间")
     private LocalDateTime publishTime;
+
+    /**
+     * 扩展字段
+     */
+    @ApiModelProperty(value = "扩展字段")
+    private String extraInfo;
 }

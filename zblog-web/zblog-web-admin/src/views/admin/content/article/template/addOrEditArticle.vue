@@ -20,8 +20,20 @@
           <!-- Slug -->
           <div class="slug-row">
             <span class="slug-label">Slug：</span>
-            <el-input v-model.trim="formData.slug" placeholder="用于生成文章 URL，例如 spring-boot-start" maxlength="150" clearable />
-            <el-button type="text" :disabled="!formData.title" @click="generateSlug">自动生成</el-button>
+            <el-input
+              v-model.trim="formData.slug"
+              :disabled="isPublished"
+              placeholder="用于生成文章 URL，例如 spring-boot-start"
+              maxlength="150"
+            />
+            <el-button
+              v-if="!isPublished"
+              type="text"
+              :disabled="!formData.title"
+              @click="generateSlug"
+            >
+              自动生成
+            </el-button>
           </div>
 
           <!-- Markdown 编辑器 -->
@@ -400,7 +412,8 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-        publishTime: '' // 自动发布时间（仅自动发布支持）
+        publishTime: '', // 自动发布时间（仅自动发布支持）
+        version: 0 // 发布版本
       },
       formRules: {
         summary: [
@@ -432,6 +445,10 @@ export default {
     // 最大上传封面数
     maxUploadLimit() {
       return this.formData.coverImageType === 3 ? 3 : 1
+    },
+    // 文章是否已发布
+    isPublished() {
+      return this.formData.version !== null && this.formData.version !== '' && this.formData.version > 0
     }
   },
 
@@ -660,7 +677,8 @@ export default {
         commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
         coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
         coverImages: Array.isArray(data.coverImages) ? data.coverImages : [],
-        publishTime: data.publishTime || ''
+        publishTime: data.publishTime || '',
+        version: data.version || 0
       }
     },
 
@@ -1159,7 +1177,8 @@ export default {
         seoTitle: '', // SEO 标题
         seoKeywords: '', // SEO 关键字
         seoDescription: '', // SEO 描述
-        publishTime: '' // 自动发布时间（仅自动发布支持）
+        publishTime: '', // 自动发布时间（仅自动发布支持）
+        version: 0 // 发布版本
       }
 
       if (this.$refs.articleForm) {

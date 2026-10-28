@@ -611,7 +611,33 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         queryDto.checkPage();
 
         // 分页查询
-        return null;
+        Page<ArticleVersionVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        IPage<ArticleVersionVo> articlePageList = articleVersionMapper.selectArticleVersionList(page, queryDto);
+
+        // 当前页文章 ID
+        List<ArticleVersionVo> records = articlePageList.getRecords();
+        List<Long> articleVersionIds = records.stream().map(ArticleVersionVo::getId).collect(Collectors.toList());
+        if (!articleVersionIds.isEmpty()) {
+            // 批量查询标签
+            List<ArticleTagNameVo> tagRows = articleVersionMapper.selectArticleTagNamesByArticleVersionIds(articleVersionIds);
+            Map<Long, List<String>> tagMap = tagRows.stream().collect(Collectors.groupingBy(
+                    ArticleTagNameVo::getArticleId, Collectors.mapping(ArticleTagNameVo::getTagName, Collectors.toList())
+            ));
+
+            // 批量查询封面
+            List<ArticleCoverImageVo> imageRows = articleVersionMapper.selectArticleCoverImagesByArticleVersionIds(articleVersionIds);
+            Map<Long, List<String>> imageMap = imageRows.stream().collect(Collectors.groupingBy(
+                ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
+            ));
+
+            // 回填文章标签和封面
+            for (ArticleVersionVo articleVersion : records) {
+                articleVersion.setTagNames(tagMap.getOrDefault(articleVersion.getId(), Collections.emptyList()));
+                articleVersion.setCoverImageList(imageMap.getOrDefault(articleVersion.getId(), Collections.emptyList()));
+            }
+        }
+
+        return articlePageList;
     }
 
     // 检查文件是否允许编辑
@@ -915,7 +941,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 获取发布版本ID
         Long versionId = SequenceUtils.getId();
 
-        // 新增文章发布版本
+        // 新增发布版本
         ArticleVersion articleVersion = parseArticleVersion(article);
         articleVersion.setId(versionId);
         articleVersionMapper.insert(articleVersion);

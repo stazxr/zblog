@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleVersionMapper">
+    <select id="selectArticleVersionList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVersionVo">
+        SELECT
+            av.ID, av.ARTICLE_ID, av.VERSION, av.TITLE, av.SLUG, av.SUMMARY, av.CATEGORY_ID, c.NAME AS CATEGORY_NAME,
+            av.ARTICLE_TYPE, av.ARTICLE_PERM, av.COMMENT_FLAG, av.COVER_IMAGE_TYPE, av.WORDS_COUNT, av.PUBLISH_TIME
+        FROM article_version av
+        LEFT JOIN category c ON c.ID = av.CATEGORY_ID
+        WHERE av.ARTICLE_ID = #{query.articleId}
+        ORDER BY PUBLISH_TIME DESC
+    </select>
 
+    <select id="selectArticleTagNamesByArticleVersionIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo">
+        SELECT
+            atr.ARTICLE_VERSION_ID AS articleId, t.NAME AS tagName
+        FROM article_version_tag_relation atr
+        INNER JOIN tag t ON t.ID = atr.TAG_ID
+        WHERE atr.ARTICLE_VERSION_ID IN
+        <foreach collection="articleVersionIds" item="articleVersionId" open="(" separator="," close=")">
+            #{articleVersionId}
+        </foreach>
+        ORDER BY atr.ARTICLE_VERSION_ID, atr.TAG_ID
+    </select>
+
+    <select id="selectArticleCoverImagesByArticleVersionIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCoverImageVo">
+        SELECT
+            air.ARTICLE_VERSION_ID AS articleId, air.ARTICLE_IMAGE AS coverImage
+        FROM article_version_image_relation air
+        WHERE air.ARTICLE_VERSION_ID IN
+        <foreach collection="articleVersionIds" item="articleVersionId" open="(" separator="," close=")">
+            #{articleVersionId}
+        </foreach>
+        ORDER BY air.ARTICLE_VERSION_ID, air.ARTICLE_IMAGE
+    </select>
 </mapper>

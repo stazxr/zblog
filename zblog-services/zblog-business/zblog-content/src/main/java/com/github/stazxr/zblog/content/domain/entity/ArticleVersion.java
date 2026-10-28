@@ -24,13 +24,13 @@ public class ArticleVersion implements Serializable {
     private static final long serialVersionUID = -5231723418387374948L;
 
     /**
-     * 文章版本ID
+     * 文章版本id
      */
     @TableId
     private Long id;
 
     /**
-     * 文章ID
+     * 文章id
      */
     private Long articleId;
 
@@ -65,7 +65,7 @@ public class ArticleVersion implements Serializable {
     private String contentHtml;
 
     /**
-     * 分类ID
+     * 分类id
      */
     private Long categoryId;
 
@@ -131,12 +131,12 @@ public class ArticleVersion implements Serializable {
     private Integer wordsCount;
 
     /**
-     * 文章发布人
+     * 发布人
      */
     private Long publishUserId;
 
     /**
-     * 文章发布时间
+     * 版本发布时间
      */
     private LocalDateTime publishTime;
 
