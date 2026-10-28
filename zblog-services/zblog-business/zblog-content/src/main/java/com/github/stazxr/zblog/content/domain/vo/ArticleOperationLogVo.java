@@ -42,7 +42,7 @@ public class ArticleOperationLogVo implements Serializable {
      * 操作人昵称
      */
     @ApiModelProperty(value = "操作人昵称")
-    private Long operatorUserNickname;
+    private String operatorUserNickname;
 
     /**
      * 操作类型

@@ -160,11 +160,6 @@ public class Article implements Serializable {
     private Long favoriteCount;
 
     /**
-     * 文章发布时间
-     */
-    private LocalDateTime publishTime;
-
-    /**
      * 创建人
      */
     private Long creatorId;

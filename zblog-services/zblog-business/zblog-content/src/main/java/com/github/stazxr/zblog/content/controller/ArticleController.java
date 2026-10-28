@@ -183,18 +183,18 @@ public class ArticleController {
     }
 
     /**
-     * 还原文章（移至草稿箱）
+     * 恢复文章
      *
      * @param articleId 文章id
      */
     @Log
     @PostMapping(value = "/resetArticle")
-    @ApiOperation(value = "还原文章（移至草稿箱）")
+    @ApiOperation(value = "恢复文章")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "articleId", value = "文章id", required = true, dataTypeClass = Long.class)
     })
     @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
-    @Router(name = "还原文章（移至草稿箱）", code = "ARTIU004")
+    @Router(name = "恢复文章", code = "ARTIU004")
     public void resetArticle(@RequestParam Long articleId) {
         articleService.resetArticle(articleId);
     }

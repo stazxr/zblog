@@ -67,5 +67,17 @@ export default {
   // 查询最新的文章草稿
   queryLastArticleDraft: params => {
     return api.httpRequest().get(`${articleApi}/queryLastArticleDraft`, params)
+  },
+  // 分页查询文章操作日志列表
+  pageArticleOperationLogList: params => {
+    return api.httpRequest().get(`${articleApi}/pageArticleOperationLogList`, params)
+  },
+  // 分页查询文章发布版本列表
+  pageArticleVersionList: params => {
+    return api.httpRequest().get(`${articleApi}/pageArticleVersionList`, params)
+  },
+  // 微信公众号推送文章
+  publishWeChat: params => {
+    return api.httpRequest().post(`${articleApi}/publishWeChat`, params)
   }
 }

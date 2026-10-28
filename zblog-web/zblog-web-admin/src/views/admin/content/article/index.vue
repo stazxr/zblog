@@ -59,13 +59,13 @@
       </div>
       <div class="crud-opts">
         <span class="crud-opts-left">
-          <template v-perm="['ARTIQ003', 'ARTIU001', 'ARTIU002']">
-            <el-button v-perm="['ARTIA001']" type="success" @click="addArticle">新增</el-button>
+          <template v-perm="['ARTIA001', 'ARTIU001', 'ARTIU002', 'ARTIU003', 'ARTIQ003']">
+            <el-button type="success" @click="addArticle">新增</el-button>
             <el-button v-show="filters.tagStatus !== '8'" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
-            <el-button v-perm="['ARTIQ003']" type="info" @click="showArticleDetail">详情</el-button>
+            <el-button type="info" :disabled="row === null" @click="showArticleDetail">详情</el-button>
           </template>
-          <el-button v-perm="['ARTIQ007']" type="info" @click="showArticleLog">操作日志</el-button>
-          <el-button v-perm="['ARTIQ008']" type="info" @click="showArticleVersion">历史版本</el-button>
+          <el-button v-perm="['ARTIQ007']" type="info" :disabled="row === null" @click="showArticleLog">操作日志</el-button>
+          <el-button v-perm="['ARTIQ008']" type="info" :disabled="row === null" @click="showArticleVersion">历史版本</el-button>
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTIA003']"
@@ -209,8 +209,16 @@
         <el-table-column prop="wordsCount" label="字数" width="70" align="center" />
         <el-table-column prop="viewCount" label="浏览量" width="70" align="center" />
         <el-table-column prop="commentCount" label="评论数" width="70" align="center" />
-        <el-table-column prop="version" label="版本" width="70" align="center" />
         <el-table-column prop="authorName" label="作者" width="100" align="center" />
+        <el-table-column prop="version" label="版本" width="70" align="center">
+          <template v-slot="{ row }">
+            <span v-if="row.version !== null && row.version !== undefined && row.version !== 0">
+              V{{ row.version }}
+            </span>
+            <span v-else />
+          </template>
+        </el-table-column>
+        <el-table-column prop="publishTime" label="最新发布时间" width="160" align="center" />
         <el-table-column prop="updateTime" label="更新时间" width="160" align="center" />
         <div slot="empty">
           <muses-empty />
@@ -228,12 +236,23 @@
         />
       </div>
     </div>
+
+    <!-- 操作日志 -->
+    <operation-log-dialog
+      ref="operationLogDialog"
+      :dialog-visible="operationLogDialogVisible"
+      @showOperationLogDone="showOperationLogDone"
+    />
   </div>
 </template>
 
 <script>
+import operationLogDialog from '@/views/admin/content/article/template/operationLogDialog'
 export default {
   name: 'Article',
+  components: {
+    operationLogDialog
+  },
   data() {
     return {
       statusTabs: [
@@ -287,6 +306,8 @@ export default {
       total: 0,
       page: 1,
       pageSize: 5,
+      operationLogDialogVisible: false,
+      versionDialogVisible: false,
 
       previewArticleDialogVisible: false
     }
@@ -449,17 +470,31 @@ export default {
       }
       this.$router.push({ name: 'AddOrEditArticle', query: { articleId: this.row.id }})
     },
+    // 查看操作日志
     showArticleLog() {
       if (this.row === null) {
         this.$message.error('请选择要查看的文章')
         return
       }
+
+      this.operationLogDialogVisible = true
+      this.$refs.operationLogDialog.initData(this.row.id)
     },
+    showOperationLogDone() {
+      this.operationLogDialogVisible = false
+    },
+    // 查看发布版本
     showArticleVersion() {
       if (this.row === null) {
         this.$message.error('请选择要查看的文章')
         return
       }
+
+      this.versionDialogVisible = true
+      this.$refs.versionDialog.initData(this.row.id)
+    },
+    showArticleVersionDone() {
+      this.versionDialogVisible = false
     },
     publishWeChat() {
       if (this.row === null) {

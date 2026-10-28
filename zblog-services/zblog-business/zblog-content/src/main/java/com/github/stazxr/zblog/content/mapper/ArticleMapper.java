@@ -116,7 +116,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void deleteArticle3(@Param("authorId") Long authorId);
 
     /**
-     * 还原文章
+     * 恢复文章
      *
      * @param articleId 文章id
      * @return int 影响行数

@@ -58,8 +58,8 @@
               >
                 保存
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="timing">定时发布</el-dropdown-item>
-                  <el-dropdown-item command="history">编辑记录</el-dropdown-item>
+                  <el-dropdown-item v-perm="['ARTIU003']" command="timing">定时发布</el-dropdown-item>
+                  <el-dropdown-item command="history">临时记录</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
               <el-button
@@ -320,7 +320,6 @@ import addArticleImageIcon from '@/assets/images/add-article-image-icon.png'
 import uploadImgDialog from '@/views/admin/content/article/template/uploadImgDialog'
 import publishTimeDialog from '@/views/admin/content/article/template/publishTimeDialog'
 import autoSaveRecordDrawer from '@/views/admin/content/article/template/autoSaveRecordDrawer'
-
 export default {
   name: 'AddOrEditArticle',
   components: {
@@ -818,8 +817,8 @@ export default {
       this.updateTotalCount()
       const param = this.buildCommonSubmitData()
       this.draftLoading = true
-      this.$mapi.article.saveArticle(param).then(_ => {
-        this.$message.success('草稿保存成功')
+      this.$mapi.article.saveArticle(param).then(res => {
+        this.$message.success(res.message)
         this.lastAutoSaveContent = this.formData.contentMd
         this.saveTime = this.getCurrentTimeText()
         this.showSaveTimeStatus = true

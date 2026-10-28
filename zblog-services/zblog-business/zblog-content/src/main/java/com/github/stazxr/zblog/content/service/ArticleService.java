@@ -89,7 +89,7 @@ public interface ArticleService extends IService<Article> {
     void deleteArticle3();
 
     /**
-     * 还原文章（移至草稿箱）
+     * 恢复文章
      *
      * @param articleId 文章id
      */

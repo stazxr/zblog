@@ -19,6 +19,7 @@
         <result property="commentCount" column="COMMENT_COUNT" />
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="version" column="VERSION" />
+        <result property="publishTime" column="PUBLISH_TIME" />
     </resultMap>
 
     <resultMap id="articleVoDetailMap" type="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
@@ -54,12 +55,7 @@
         <result property="updateTime" column="UPDATE_TIME" />
         <result property="deleteTime" column="DELETE_TIME" />
         <result property="version" column="VERSION" />
-        <collection property="tagNames" ofType="java.lang.String">
-            <result column="TAG_NAME" />
-        </collection>
-        <collection property="coverImageList" ofType="java.lang.String">
-            <result column="ARTICLE_IMAGE" />
-        </collection>
+        <result property="publishTime" column="PUBLISH_TIME" />
     </resultMap>
 
     <select id="selectMyArticleList" resultMap="articleVoListMap">
@@ -173,7 +169,7 @@
         WHERE AUTHOR_ID = #{authorId} AND a.DELETE_FLAG != 2
     </select>
 
-    <select id="selectArticleDetail" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+    <select id="selectArticleDetail" resultMap="articleVoDetailMap">
         SELECT
             a.ID, a.TITLE, a.SLUG, a.SUMMARY, a.CONTENT_MD, a.CONTENT_HTML, a.CATEGORY_ID, c.NAME AS CATEGORY_NAME,
             a.AUTHOR_ID, u.NICKNAME AS AUTHOR_NAME, a.SEO_TITLE, a.SEO_KEYWORDS, a.SEO_DESCRIPTION,

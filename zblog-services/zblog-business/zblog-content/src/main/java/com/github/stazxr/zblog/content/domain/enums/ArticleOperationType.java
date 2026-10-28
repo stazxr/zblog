@@ -8,44 +8,54 @@ package com.github.stazxr.zblog.content.domain.enums;
  */
 public enum ArticleOperationType {
     /**
-     * 初始化
+     * 创建文章
      */
-    INIT(1, "初始化"),
+    CREATE(1, "创建文章"),
 
     /**
-     * 修改
+     * 保存文章
      */
-    UPDATE(2, "修改"),
+    SAVE(2, "保存文章"),
 
     /**
-     * 发布
+     * 提交审核
      */
-    PUBLISH(3, "发布"),
+    REVIEW(3, "提交审核"),
+
+    /**
+     * 发布文章
+     */
+    PUBLISH(4, "发布文章"),
 
     /**
      * 定时发布
      */
-    SCHEDULE(4, "定时发布"),
+    SCHEDULE(5, "定时发布"),
 
     /**
-     * 审核
+     * 审核拒绝
      */
-    REVIEW(5, "审核"),
+    REJECT(6, "审核拒绝"),
 
     /**
      * 移至回收站
      */
-    DELETE1(6, "移至回收站"),
+    DELETE1(7, "移至回收站"),
 
     /**
-     * 彻底删除
+     * 删除文章
      */
-    DELETE2(7, "彻底删除"),
+    DELETE2(8, "删除文章"),
 
     /**
-     * 还原
+     * 清空回收站
      */
-    RESET(8, "还原");
+    DELETE3(9, "清空回收站"),
+
+    /**
+     * 恢复文章
+     */
+    RESET(10, "恢复文章");
 
     private final Integer value;
 

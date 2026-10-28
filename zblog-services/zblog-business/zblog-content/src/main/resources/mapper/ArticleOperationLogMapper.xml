@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleOperationLogMapper">
-    <select id="selectLogList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleOperationLogVo">
+    <select id="selectOperationLogList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleOperationLogVo">
         SELECT
             aol.ID, aol.ARTICLE_ID, aol.OPERATION_TYPE, aol.OPERATOR_ID, u.NICKNAME AS operatorUserNickname,
             aol.BEFORE_TYPE, aol.AFTER_TYPE, aol.BEFORE_PERM, aol.AFTER_PERM, aol.BEFORE_STATUS, aol.AFTER_STATUS,
@@ -9,5 +9,6 @@
         FROM article_operation_log aol
         LEFT JOIN user u ON aol.OPERATOR_ID = u.ID
         WHERE aol.ARTICLE_ID = #{query.articleId}
+        ORDER BY aol.CREATE_TIME DESC
     </select>
 </mapper>

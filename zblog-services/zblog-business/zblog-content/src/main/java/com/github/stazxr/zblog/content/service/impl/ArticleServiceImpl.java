@@ -42,6 +42,7 @@ import com.github.stazxr.zblog.util.time.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -214,7 +215,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             articleVo = baseMapper.selectLastArticleEmptyDraft(loginId);
 
             // 记录文章操作日志
-            recordArticleLog(article, null, ArticleOperationType.INIT, null);
+            recordArticleLog(article, null, ArticleOperationType.CREATE, "文章初始化");
         }
 
         ThrowUtils.throwSystemIf(articleVo == null, ArticleErrorCode.SARTIA001);
@@ -236,8 +237,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 检查文章是否允许编辑
         checkArticleEditable(article);
 
-        // 查询历史文章内容（用于记录日志）
-        Article dbArticle = baseMapper.selectById(articleId);
+        // 复制旧数据，用于日志记录
+        Article oldArticle = new Article();
+        BeanUtils.copyProperties(article, oldArticle);
 
         // 刷新文章信息并保存
         if (articleDto.getTitle() == null) {
@@ -285,12 +287,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         } else {
             article.setCommentFlag(articleDto.getCommentFlag());
         }
+
         // 保存文章标签
         if (articleDto.getTags() != null && articleDto.getTags().size() > 0) {
             checkArticleTags(articleId, articleDto.getTags());
         } else {
             articleTagMapper.deleteByArticleIdHard(articleId);
         }
+
         // 保存文章封面
         if (articleDto.getCoverImageType() == null) {
             article.setCoverImageType(ArticleCoverImageType.DEFAULT.getValue());
@@ -298,6 +302,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setCoverImageType(articleDto.getCoverImageType());
         }
         checkArticleCoverImagesWeak(articleDto.getId(), article.getCoverImageType(), articleDto.getCoverImages());
+
         // 只要触发保存，文章状态就变为草稿态
         if (ArticleStatus.SCHEDULED.getValue().equals(article.getArticleStatus())) {
             articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "文章被重新编辑");
@@ -308,7 +313,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         baseMapper.updateArticleById(article);
 
         // 记录文章操作日志
-        recordArticleLog(article, dbArticle, ArticleOperationType.UPDATE, null);
+        recordArticleLog(article, oldArticle, ArticleOperationType.SAVE, null);
 
         // 删除临时保存记录
         articleContentDraftRecordMapper.deleteByArticleId(articleDto.getId());
@@ -325,10 +330,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ArticleVo publishArticle(ArticleDto articleDto) {
         // 获取文章信息
         Long articleId = articleDto.getId(); // 文章ID
-        Article dbArticle = baseMapper.selectById(articleId);
         Article article = baseMapper.selectById(articleId);
+
         // 发布文章校验
         commonPublishCheck(article, articleDto);
+
+        // 复制旧数据，用于日志记录
+        Article oldArticle = new Article();
+        BeanUtils.copyProperties(article, oldArticle);
+
         // 填充文章信息
         fillArticle(article, articleDto);
         if (ArticlePerm.SELF.getValue().equals(article.getArticlePerm())) {
@@ -339,7 +349,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             publishArticleVersion(article);
 
             // 记录文章操作日志
-            recordArticleLog(article, dbArticle, ArticleOperationType.PUBLISH, "私密文章自动发布");
+            recordArticleLog(article, oldArticle, ArticleOperationType.PUBLISH, "私密文章自动发布");
 
             // 取消文章的自动发布任务
             articleAutoPublishTimingMapper.invalidHistoryRecord(articleId, "文章已主动发布");
@@ -348,13 +358,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setArticleStatus(ArticleStatus.PENDING_REVIEW.getValue());
 
             // 记录文章操作日志
-            recordArticleLog(article, dbArticle, ArticleOperationType.PUBLISH, "非私密文章需要审核");
+            recordArticleLog(article, oldArticle, ArticleOperationType.REVIEW, null);
         }
+
         // 保存文章内容
         baseMapper.updateArticleById(article);
+
         // 删除临时保存记录
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
-        // 返回文章信息
+
+        // 返回新的文章信息
         return queryMyArticleDetail(articleId);
     }
 
@@ -366,6 +379,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void autoPublishArticle(ArticleDto articleDto) {
+        // 参数校验
         String publishTime = articleDto.getPublishTime();
         ThrowUtils.throwIfBlank(publishTime, ArticleErrorCode.EARTIA011);
         ThrowUtils.throwIf(!DateUtils.checkDateFormat(publishTime, "yyyy-MM-dd HH:mm"), ArticleErrorCode.EARTIA012);
@@ -375,11 +389,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long articleId = articleDto.getId(); // 文章ID
         Article article = baseMapper.selectById(articleId);
 
-        // 再次查询文章信息（用于记录操作日志）
-        Article dbArticle = baseMapper.selectById(articleId);
-
         // 发布文章校验
         commonPublishCheck(article, articleDto);
+
+        // 复制旧数据，用于日志记录
+        Article oldArticle = new Article();
+        BeanUtils.copyProperties(article, oldArticle);
 
         // 填充文章信息
         fillArticle(article, articleDto);
@@ -392,7 +407,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         doAutoPublishArticle(articleId, article.getVersion(), publishTime);
 
         // 记录文章操作日志
-        recordArticleLog(article, dbArticle, ArticleOperationType.SCHEDULE, publishTime);
+        recordArticleLog(article, oldArticle, ArticleOperationType.SCHEDULE, publishTime);
 
         // 删除临时保存记录
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
@@ -422,7 +437,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE1, "移至回收站");
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE1, null);
     }
 
     /**
@@ -447,7 +462,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleContentDraftRecordMapper.deleteByArticleId(articleId);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE2, "彻底删除文章");
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.DELETE2, null);
     }
 
     /**
@@ -466,7 +481,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
-     * 还原文章（移至草稿箱）
+     * 恢复文章（移至草稿箱）
      *
      * @param articleId 文章id
      */
@@ -484,7 +499,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ThrowUtils.throwIf(baseMapper.resetArticle(articleId) != 1, BaseErrorCode.SCOREA002);
         // 记录文章操作日志
         Article newArticle = baseMapper.selectById(articleId);
-        recordArticleLog(newArticle, dbArticle, ArticleOperationType.RESET, "还原文章");
+        recordArticleLog(newArticle, dbArticle, ArticleOperationType.RESET, null);
     }
 
     /**
@@ -576,7 +591,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 分页查询
         Page<ArticleOperationLogVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
-        return articleOperationLogMapper.selectLogList(page, queryDto);
+        return articleOperationLogMapper.selectOperationLogList(page, queryDto);
     }
 
     /**
@@ -930,7 +945,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     // 记录文章操作日志
     private void recordArticleLog(Article newArticle, Article oldArticle, ArticleOperationType type, String remark) {
-        if (newArticle == null) {
+        if (newArticle == null || type == null) {
             return;
         }
 
@@ -941,11 +956,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         operationLog.setOperationType(type.getValue());
         operationLog.setAfterType(newArticle.getArticleType());
         operationLog.setAfterPerm(newArticle.getArticlePerm());
-        operationLog.setAfterStatus(newArticle.getArticleStatus());
+        operationLog.setAfterStatus(getOperationLogStatus(newArticle.getArticleStatus(), newArticle.getDeleteFlag()));
         if (oldArticle != null) {
             operationLog.setBeforeType(oldArticle.getArticleType());
             operationLog.setBeforePerm(oldArticle.getArticlePerm());
-            operationLog.setBeforeStatus(oldArticle.getArticleStatus());
+            operationLog.setBeforeStatus(getOperationLogStatus(oldArticle.getArticleStatus(), oldArticle.getDeleteFlag()));
         }
         operationLog.setVersion(newArticle.getVersion());
         operationLog.setRemark(remark);
@@ -962,16 +977,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         operationLog.setId(SequenceUtils.getId());
         operationLog.setArticleId(article.getId());
         operationLog.setOperatorId(SecurityUtils.getLoginId());
-        operationLog.setOperationType(ArticleOperationType.DELETE2.getValue());
+        operationLog.setOperationType(ArticleOperationType.DELETE3.getValue());
         operationLog.setAfterType(article.getArticleType());
         operationLog.setAfterPerm(article.getArticlePerm());
-        operationLog.setAfterStatus(article.getArticleStatus());
+        operationLog.setAfterStatus(102);
         operationLog.setBeforeType(article.getArticleType());
         operationLog.setBeforePerm(article.getArticlePerm());
-        operationLog.setBeforeStatus(article.getArticleStatus());
+        operationLog.setBeforeStatus(101);
         operationLog.setVersion(article.getVersion());
-        operationLog.setRemark("清空回收站");
+        operationLog.setRemark(null);
         operationLog.setCreateTime(LocalDateTime.now());
         articleOperationLogMapper.insert(operationLog);
+    }
+
+    private Integer getOperationLogStatus(Integer status, Integer deleteFlag) {
+        if (ArticleDeleteFlag.DEFAULT.getValue().equals(deleteFlag)) {
+            return status;
+        } else {
+            return 100 + deleteFlag;
+        }
     }
 }

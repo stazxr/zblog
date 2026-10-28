@@ -22,5 +22,5 @@ public interface ArticleOperationLogMapper extends BaseMapper<ArticleOperationLo
      * @param queryDto 查询参数
      * @return IPage<ArticleOperationLogVo>
      */
-    IPage<ArticleOperationLogVo> selectLogList(@Param("page") Page<ArticleOperationLogVo> page, @Param("query") ArticleOperationLogQueryDto queryDto);
+    IPage<ArticleOperationLogVo> selectOperationLogList(@Param("page") Page<ArticleOperationLogVo> page, @Param("query") ArticleOperationLogQueryDto queryDto);
 }

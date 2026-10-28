@@ -15,15 +15,15 @@
             LAST_CLICK_TIME = NOW()
     </insert>
 
-    <update id="resetDayClick"> <!-- TODO 待修复 -->
-        UPDATE friend_link_stat SET DAY_CLICK = 0 WHERE DAY_CLICK != 0
+    <update id="resetDayClick">
+        UPDATE friend_link_stat SET DAY_CLICK = 0 WHERE DAY_CLICK > 0
     </update>
 
     <update id="resetWeekClick">
-        UPDATE friend_link_stat SET WEEK_CLICK = 0 WHERE WEEK_CLICK != 0
+        UPDATE friend_link_stat SET WEEK_CLICK = 0 WHERE WEEK_CLICK > 0
     </update>
 
     <update id="resetMonthClick">
-        UPDATE friend_link_stat SET MONTH_CLICK = 0 WHERE MONTH_CLICK != 0
+        UPDATE friend_link_stat SET MONTH_CLICK = 0 WHERE MONTH_CLICK > 0
     </update>
 </mapper>
