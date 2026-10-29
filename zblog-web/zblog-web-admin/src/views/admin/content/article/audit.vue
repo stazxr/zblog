@@ -305,7 +305,7 @@
 <!--    showArticleDetail(row) {-->
 <!--      this.previewArticleDialogVisible = true-->
 <!--      this.$nextTick(() => {-->
-<!--        this.$refs.previewArticleRef.initData(2, row.id)-->
+<!--        this.$refs.previewArticleRef.initData(row.id)-->
 <!--      })-->
 <!--    },-->
 <!--    closePreviewArticleDialog() {-->

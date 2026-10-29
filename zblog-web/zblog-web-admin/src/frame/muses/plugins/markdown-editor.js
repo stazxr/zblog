@@ -5,17 +5,28 @@
  * 1. 初始化 @kangc/v-md-editor
  * 2. 配置 VuePress Markdown 主题
  * 3. 注册 Markdown 编辑器扩展插件
+ * 4. 初始化独立的 Markdown 预览组件
  *
  * @author Sun Tao
- * @date 2026-09-21
+ * @date 2026-10-30
  */
-
 import VMdEditor from '@kangc/v-md-editor'
-import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js'
 
-import '@kangc/v-md-editor/lib/style/base-editor.css'
+// 主题
+import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js'
 import '@kangc/v-md-editor/lib/theme/style/vuepress.css'
 
+// import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
+// import '@kangc/v-md-editor/lib/theme/style/github.css'
+
+// 预览
+import VMdPreview from '@kangc/v-md-editor/lib/preview'
+import '@kangc/v-md-editor/lib/style/preview.css'
+
+// 编辑器
+import '@kangc/v-md-editor/lib/style/base-editor.css'
+
+// Prism
 import Prism from 'prismjs'
 
 import 'prismjs/components/prism-markup'
@@ -36,13 +47,13 @@ import 'prismjs/components/prism-xml-doc'
 import createTipPlugin from '@kangc/v-md-editor/lib/plugins/tip/index'
 import '@kangc/v-md-editor/lib/plugins/tip/tip.css'
 
-// Emoji
-import createEmojiPlugin from '@kangc/v-md-editor/lib/plugins/emoji/index'
-import '@kangc/v-md-editor/lib/plugins/emoji/emoji.css'
-
 // To do List
 import createTodoListPlugin from '@kangc/v-md-editor/lib/plugins/todo-list/index'
 import '@kangc/v-md-editor/lib/plugins/todo-list/todo-list.css'
+
+// Emoji
+import createEmojiPlugin from '@kangc/v-md-editor/lib/plugins/emoji/index'
+import '@kangc/v-md-editor/lib/plugins/emoji/emoji.css'
 
 // Line Number
 import createLineNumberPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index'
@@ -61,7 +72,7 @@ import createAlignPlugin from '@kangc/v-md-editor/lib/plugins/align'
 let installed = false
 
 /**
- * 初始化 Muses Markdown Editor
+ * 初始化 Muses Markdown Editor 和 Markdown Preview
  *
  * @param {Object} Vue Vue 构造函数
  * @return {Object} Markdown 编辑器实例
@@ -71,34 +82,46 @@ export default function installMarkdownEditor(Vue) {
     return VMdEditor
   }
 
-  // Markdown 主题
+  // 编辑器主题
   VMdEditor.use(vuepressTheme, {
-    Prism
+    Prism,
+    extend(md) {
+      md.set({
+        quotes: '""\'\''
+      })
+    }
   })
 
-  // 提示块
+  // 编辑器扩展插件
   VMdEditor.use(createTipPlugin())
-
-  // Emoji
-  VMdEditor.use(createEmojiPlugin())
-
-  // To do List
   VMdEditor.use(createTodoListPlugin({ color: '#3eaf7c' }))
-
-  // 代码行号
+  VMdEditor.use(createEmojiPlugin())
   VMdEditor.use(createLineNumberPlugin())
-
-  // 代码高亮行
   VMdEditor.use(createHighlightLinesPlugin())
-
-  // 代码复制
   VMdEditor.use(createCopyCodePlugin())
-
-  // 内容对齐
   VMdEditor.use(createAlignPlugin())
+
+  // 配置独立预览组件的 VuePress 主题
+  VMdPreview.use(vuepressTheme, {
+    Prism,
+    extend(md) {
+      md.set({
+        quotes: '""\'\''
+      })
+    }
+  })
+
+  VMdPreview.use(createTipPlugin())
+  VMdPreview.use(createTodoListPlugin({ color: '#3eaf7c' }))
+  VMdPreview.use(createEmojiPlugin())
+  VMdPreview.use(createLineNumberPlugin())
+  VMdPreview.use(createHighlightLinesPlugin())
+  VMdPreview.use(createCopyCodePlugin())
+  VMdPreview.use(createAlignPlugin())
 
   // 注册 Vue 插件
   Vue.use(VMdEditor)
+  Vue.use(VMdPreview)
 
   installed = true
 

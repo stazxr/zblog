@@ -88,7 +88,7 @@ export default {
      */
     leftToolbar: {
       type: String,
-      default: 'undo redo clear | h bold italic strikethrough quote tip | ul ol todo-list table hr | link image video code align | emoji'
+      default: 'h bold italic strikethrough | quote tip | ul ol todo-list table hr | link image video code align | emoji | undo redo clear'
     },
     /**
      * 右侧工具栏
@@ -609,5 +609,10 @@ export default {
 
 .md-align-justify {
   text-align: justify;
+}
+
+// 给编辑器和预览区指定相同的字体
+.muses-markdown-editor textarea, .muses-markdown-editor .vuepress-markdown-body {
+  font-family: menlo,Ubuntu Mono,consolas,Courier New,Microsoft Yahei,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif !important;
 }
 </style>

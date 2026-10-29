@@ -1,21 +1,19 @@
+
 <template>
   <el-dialog
     title="文章预览"
-    :visible.sync="dialogVisible"
+    :visible="dialogVisible"
     :fullscreen="true"
     :append-to-body="true"
-    :close-on-click-modal="false"
+    :destroy-on-close="true"
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
+    :before-close="handleClose"
     custom-class="article-preview-dialog"
-    @closed="handleClose"
   >
     <div v-loading="pageLoading" class="preview-container">
       <div class="preview-paper">
         <header class="preview-header">
-          <div class="preview-badge">
-            <i class="el-icon-view" />
-            <span>预览模式</span>
-          </div>
-
           <h1 class="preview-title">
             {{ article.title || '无标题文章' }}
           </h1>
@@ -25,13 +23,15 @@
               <i class="el-icon-user" />
               {{ article.authorName }}
             </span>
+
             <span v-if="article.categoryName">
               <i class="el-icon-folder" />
               {{ article.categoryName }}
             </span>
+
             <span>
               <i class="el-icon-document" />
-              {{ article.totalCount }} 字
+              {{ article.wordsCount }} 字
             </span>
           </div>
 
@@ -40,26 +40,13 @@
             <div class="summary-content">{{ article.summary }}</div>
           </div>
         </header>
-        <main class="preview-body">
-          <div v-if="article.contentHtml" class="markdown-body" v-html="article.contentHtml" />
-          <el-empty
-            v-else
-            description="暂无文章内容"
-            :image-size="100"
-          />
-        </main>
 
-        <footer class="preview-footer">
-          <span>文章预览 · 内容尚未正式发布</span>
-        </footer>
+        <main class="preview-body">
+          <v-md-preview v-if="article.contentMd" :text="article.contentMd" class="article-markdown-preview" />
+          <el-empty v-else description="暂无文章内容" :image-size="100" />
+        </main>
       </div>
     </div>
-
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">
-        关闭预览
-      </el-button>
-    </span>
   </el-dialog>
 </template>
 
@@ -74,22 +61,40 @@ export default {
   data() {
     return {
       pageLoading: false,
-      article: {}
-    }
-  },
-  computed: {
-
-  },
-  watch: {
-    visible(value) {
-      this.dialogVisible = value
-    },
-    dialogVisible(value) {
-      this.$emit('update:visible', value)
+      article: this.createEmptyArticle(),
+      requestSequence: 0
     }
   },
   methods: {
-    // 初始化文章数据
+    // 创建默认文章模型
+    createEmptyArticle() {
+      return {
+        id: null,
+        title: '',
+        slug: '',
+        summary: '',
+        contentMd: '',
+        authorName: '',
+        categoryId: null,
+        categoryName: '',
+        tags: [],
+        seoTitle: '',
+        seoKeywords: '',
+        seoDescription: '',
+        articleType: 1,
+        articlePerm: 1,
+        sourceName: '',
+        sourceAuthor: '',
+        sourceUrl: '',
+        commentFlag: true,
+        coverImageType: 1,
+        coverImages: [],
+        publishTime: '',
+        version: 0,
+        wordsCount: 0
+      }
+    },
+    // 初始化预览数据，由父组件通过 ref 调用
     initData(articleId) {
       if (articleId === null || articleId === undefined || articleId === '') {
         this.$message.warning('请先选择文章')
@@ -100,52 +105,74 @@ export default {
     },
     // 查询文章详情
     queryArticleDetail(articleId) {
+      const sequence = ++this.requestSequence
+
       this.pageLoading = true
+      this.article = this.createEmptyArticle()
+
       this.$mapi.article.queryMyArticleDetail({ articleId }).then(({ data }) => {
+        // 忽略已经过期的请求结果
+        if (sequence !== this.requestSequence) {
+          return
+        }
+
         if (!data) {
           this.$message.error('文章不存在')
+          this.handleClose()
           return
         }
 
         this.article = this.normalizeArticleData(data)
       }).catch(error => {
-        console.log('get article detail failed', error)
+        if (sequence !== this.requestSequence) {
+          return
+        }
+
+        // eslint-disable-next-line no-console
+        console.error('Get article detail failed:', error)
+
         this.$message.error('加载文章信息失败，请刷新浏览器再试！')
-        this.doClose()
+        this.handleClose()
       }).finally(() => {
-        this.pageLoading = false
+        if (sequence === this.requestSequence) {
+          this.pageLoading = false
+        }
       })
     },
-    // 将后端返回的数据转换成页面模型
+
+    // 将后端返回的数据转换为页面模型
     normalizeArticleData(data) {
       return {
-        id: data.id,
-        title: data.title,
-        slug: data.slug,
-        summary: data.summary,
-        contentMd: data.contentMd,
-        contentHtml: data.contentHtml,
-        categoryId: data.categoryId,
+        id: data.id == null ? null : data.id,
+        title: data.title || '',
+        slug: data.slug || '',
+        summary: data.summary || '',
+        contentMd: data.contentMd || '',
+        authorName: data.authorName || '',
+        categoryId: data.categoryId == null ? null : data.categoryId,
+        categoryName: data.categoryName || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
         seoTitle: data.seoTitle || '',
         seoKeywords: data.seoKeywords || '',
         seoDescription: data.seoDescription || '',
-        articleType: data.articleType || 1,
+        articleType: data.articleType == null ? 1 : data.articleType,
         articlePerm: data.articlePerm == null ? 1 : data.articlePerm,
         sourceName: data.sourceName || '',
         sourceAuthor: data.sourceAuthor || '',
         sourceUrl: data.sourceUrl || '',
-        commentFlag: data.commentFlag == null ? true : Boolean(data.commentFlag),
-        coverImageType: data.coverImageType == null ? 1 : data.coverImageType,
+        commentFlag: data.commentFlag,
+        coverImageType: data.coverImageType,
         coverImages: Array.isArray(data.coverImages) ? data.coverImages : [],
         publishTime: data.publishTime || '',
-        version: data.version || 0
+        version: data.version || 0,
+        wordsCount: data.wordsCount || 0
       }
     },
-    // 关闭模态框
+    // 弹窗关闭后清理数据
     doClose() {
+      this.requestSequence++
       this.pageLoading = false
-      this.article = {}
+      this.article = this.createEmptyArticle()
       this.$emit('previewDone')
     },
     handleClose() {
@@ -155,6 +182,7 @@ export default {
 }
 </script>
 
+<style src="@kangc/v-md-editor/lib/style/preview.css"></style>
 <style src="@kangc/v-md-editor/lib/theme/style/vuepress.css"></style>
 
 <style>
@@ -185,14 +213,14 @@ export default {
   border-top: 1px solid #ebeef5;
 }
 
-.preview-container {
+.article-preview-dialog .preview-container {
   height: 100%;
   overflow-y: auto;
   padding: 30px 20px;
   box-sizing: border-box;
 }
 
-.preview-paper {
+.article-preview-dialog .preview-paper {
   max-width: 900px;
   min-height: 100%;
   margin: 0 auto;
@@ -202,23 +230,12 @@ export default {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-.preview-header {
+.article-preview-dialog .preview-header {
   padding-bottom: 28px;
   border-bottom: 1px solid #ebeef5;
 }
 
-.preview-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 4px;
-  background: #ecf5ff;
-  color: #409eff;
-  font-size: 12px;
-}
-
-.preview-title {
+.article-preview-dialog .preview-title {
   margin: 24px 0 18px;
   color: #303133;
   font-size: 30px;
@@ -227,7 +244,7 @@ export default {
   overflow-wrap: anywhere;
 }
 
-.preview-meta {
+.article-preview-dialog .preview-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
@@ -235,11 +252,11 @@ export default {
   font-size: 13px;
 }
 
-.preview-meta i {
+.article-preview-dialog .preview-meta i {
   margin-right: 4px;
 }
 
-.preview-summary {
+.article-preview-dialog .preview-summary {
   margin-top: 25px;
   padding: 16px 20px;
   border-left: 3px solid #409eff;
@@ -249,50 +266,56 @@ export default {
   overflow-wrap: anywhere;
 }
 
-.summary-label {
+.article-preview-dialog .summary-label {
   margin-bottom: 5px;
   color: #303133;
   font-size: 13px;
   font-weight: 600;
 }
 
-.summary-content {
+.article-preview-dialog .summary-content {
   white-space: pre-wrap;
 }
 
-.preview-body {
-  padding-top: 30px;
+.article-preview-dialog .preview-body {
+  /*padding-top: 30px;*/
   color: #303133;
 }
 
-.markdown-body {
+/* 清除预览组件自身可能产生的多余外边距 */
+.article-preview-dialog .article-markdown-preview {
+  padding: 0;
+}
+
+/* VuePress 主题的 Markdown 内容样式 */
+.article-preview-dialog .vuepress-markdown-body {
   font-size: 16px;
   line-height: 1.9;
   overflow-wrap: anywhere;
 }
 
-.markdown-body img {
+.article-preview-dialog .vuepress-markdown-body img {
   max-width: 100%;
   height: auto;
 }
 
-.markdown-body pre {
+.article-preview-dialog .vuepress-markdown-body pre {
   max-width: 100%;
   overflow-x: auto;
 }
 
-.markdown-body table {
+.article-preview-dialog .vuepress-markdown-body table {
   display: block;
   max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
 }
 
-.markdown-body iframe {
+.article-preview-dialog .vuepress-markdown-body iframe {
   max-width: 100%;
 }
 
-.preview-footer {
+.article-preview-dialog .preview-footer {
   margin-top: 60px;
   padding-top: 20px;
   border-top: 1px solid #ebeef5;
@@ -302,19 +325,19 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-  .preview-container {
+  .article-preview-dialog .preview-container {
     padding: 12px;
   }
 
-  .preview-paper {
+  .article-preview-dialog .preview-paper {
     padding: 25px 18px;
   }
 
-  .preview-title {
+  .article-preview-dialog .preview-title {
     font-size: 24px;
   }
 
-  .markdown-body {
+  .article-preview-dialog .vuepress-markdown-body {
     font-size: 15px;
   }
 }

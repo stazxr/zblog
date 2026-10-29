@@ -7,10 +7,10 @@
           <el-table-column :show-overflow-tooltip="true" prop="wordCount" label="字数" align="center" />
           <el-table-column :show-overflow-tooltip="true" prop="saveTime" label="保存时间" align="center" />
           <el-table-column label="操作" align="center" width="150px">
-            <template v-slot="scope">
+            <template v-slot="{ row }">
               <el-button-group>
-                <el-button type="info" @click="previewContent(scope.row.id)">预览</el-button>
-                <el-button type="warning" @click="regainContent(scope.row.id)">恢复</el-button>
+                <el-button type="info" @click="previewContent(row.articleId)">预览</el-button>
+                <el-button type="warning" @click="regainContent(row.id)">恢复</el-button>
               </el-button-group>
             </template>
           </el-table-column>
@@ -35,13 +35,11 @@
       </div>
     </el-drawer>
 
-    <el-dialog :visible.sync="previewArticleDialogVisible" title="预览" width="900px">
-      <previewDialog ref="previewArticleRef" />
-      <div slot="footer" class="dialog-footer">
-        <el-button type="warning" @click="regainContentByPreview">恢 复</el-button>
-        <el-button type="default" @click="closePreviewArticleDialog">关 闭</el-button>
-      </div>
-    </el-dialog>
+    <previewDialog
+      ref="previewArticleRef"
+      :dialog-visible="previewDialogVisible"
+      @previewDone="closePreviewArticleDialog"
+    />
   </div>
 </template>
 
@@ -65,8 +63,7 @@ export default {
       total: 0,
       page: 1,
       pageSize: 10,
-      previewRecordId: '',
-      previewArticleDialogVisible: false
+      previewDialogVisible: false
     }
   },
   methods: {
@@ -100,7 +97,7 @@ export default {
       this.total = 0
       this.page = 1
       this.pageSize = 10
-      this.previewArticleDialogVisible = false
+      this.previewDialogVisible = false
       this.$emit('chooseRecordDone', recordId)
     },
     handleClose() {
@@ -118,25 +115,18 @@ export default {
       this.page = page
       this.listTableData(this.articleId)
     },
-    previewContent(recordId) {
-      this.previewRecordId = recordId
-      this.previewArticleDialogVisible = true
+    previewContent(articleId) {
+      this.previewDialogVisible = true
       this.$nextTick(() => {
-        this.$refs.previewArticleRef.initData(1, recordId)
+        this.$refs.previewArticleRef.initData(articleId)
       })
     },
     closePreviewArticleDialog() {
-      this.previewArticleDialogVisible = false
+      this.previewDialogVisible = false
     },
     regainContent(recordId) {
       this.$confirm('确定要恢复这条记录吗？').then(_ => {
         this.doClose(recordId)
-      })
-    },
-    regainContentByPreview() {
-      this.$confirm('确定要恢复这条记录吗？').then(_ => {
-        this.previewArticleDialogVisible = false
-        this.doClose(this.previewRecordId)
       })
     }
   }

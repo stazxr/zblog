@@ -60,23 +60,12 @@
       </div>
     </div>
 
-    <el-dialog
-      :visible.sync="previewArticleDialogVisible"
-      title="文章预览"
-      width="900px"
-      top="5vh"
-      append-to-body
-      :close-on-click-modal="false"
-      @closed="handlePreviewDialogClosed"
-    >
-      <previewDialog ref="previewArticleRef" />
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closePreviewArticleDialog">
-          关 闭
-        </el-button>
-      </div>
-    </el-dialog>
+    <!-- 预览 -->
+    <preview-dialog
+      ref="previewDialogRef"
+      :dialog-visible="previewArticleDialogVisible"
+      @previewDone="closePreviewArticleDialog"
+    />
   </div>
 </template>
 
@@ -193,26 +182,11 @@ export default {
       }
 
       this.previewArticleDialogVisible = true
-      this.$nextTick(() => {
-        const preview = this.$refs.previewArticleRef
-        if (!preview || this.previewInitialized) {
-          return
-        }
-
-        // 保留现有预览组件的调用方式。
-        preview.initData(2, this.articleId)
-        this.previewInitialized = true
-      })
+      this.$refs.previewDialogRef.initData(this.articleId)
     },
-
     // 关闭预览窗口
     closePreviewArticleDialog() {
       this.previewArticleDialogVisible = false
-    },
-
-    // 预览弹窗关闭后重置初始化标记
-    handlePreviewDialogClosed() {
-      this.previewInitialized = false
     },
 
     // 重新编辑文章

@@ -247,7 +247,7 @@ export default {
     previewArticle(articleId) {
       this.previewArticleDialogVisible = true
       this.$nextTick(() => {
-        this.$refs.previewArticleRef.initData(2, articleId)
+        this.$refs.previewArticleRef.initData(articleId)
       })
     },
     closePreviewArticleDialog() {
