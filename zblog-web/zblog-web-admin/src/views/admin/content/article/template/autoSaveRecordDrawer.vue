@@ -36,7 +36,7 @@
     </el-drawer>
 
     <el-dialog :visible.sync="previewArticleDialogVisible" title="预览" width="900px">
-      <previewArticle ref="previewArticleRef" />
+      <previewDialog ref="previewArticleRef" />
       <div slot="footer" class="dialog-footer">
         <el-button type="warning" @click="regainContentByPreview">恢 复</el-button>
         <el-button type="default" @click="closePreviewArticleDialog">关 闭</el-button>
@@ -46,10 +46,10 @@
 </template>
 
 <script>
-import previewArticle from '@/views/admin/content/article/template/previewArticle'
+import previewDialog from '@/views/admin/content/article/template/previewDialog'
 export default {
   components: {
-    previewArticle
+    previewDialog
   },
   props: {
     dialogVisible: {

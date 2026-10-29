@@ -88,7 +88,7 @@
 
     <!-- 文章预览模态框 -->
     <el-dialog :visible.sync="previewArticleDialogVisible" title="预览" width="900px">
-      <previewArticle ref="previewArticleRef" />
+      <previewDialog ref="previewArticleRef" />
       <div slot="footer" class="dialog-footer">
         <el-button type="default" @click="closePreviewArticleDialog">关 闭</el-button>
       </div>
@@ -97,10 +97,10 @@
 </template>
 
 <script>
-import previewArticle from '@/views/admin/content/article/template/previewArticle'
+import previewDialog from '@/views/admin/content/article/template/previewDialog'
 export default {
   components: {
-    previewArticle
+    previewDialog
   },
   props: {
     dialogVisible: {

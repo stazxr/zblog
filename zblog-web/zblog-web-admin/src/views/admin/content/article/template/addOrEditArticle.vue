@@ -468,7 +468,7 @@ export default {
   //         if (articleId) {
   //           this.clearRecentDraft()
   //           this.resetAutoSaveStatus()
-  //           this.getArticleDetail(articleId)
+  //           this.queryArticleDetail(articleId)
   //
   //           this.$router.push({
   //             name: 'AddArticle',
@@ -494,7 +494,7 @@ export default {
     // 加载文章信息
     const articleId = this.$route.query.articleId
     if (articleId) {
-      this.getArticleDetail(articleId)
+      this.queryArticleDetail(articleId)
     } else {
       this.initArticle()
     }
@@ -522,7 +522,7 @@ export default {
     //     if (articleId !== this.formData.id) {
     //       this.getArticleTagList()
     //       this.resetAutoSaveStatus()
-    //       this.getArticleDetail(articleId)
+    //       this.queryArticleDetail(articleId)
     //     }
     //   } else if (this.formData.action !== 'add') {
     //     this.clearData()
@@ -633,7 +633,7 @@ export default {
       })
     },
     // 查询文章详情
-    getArticleDetail(articleId) {
+    queryArticleDetail(articleId) {
       this.pageLoading = true
       this.$mapi.article.queryMyArticleDetail({ articleId }).then(({ data }) => {
         if (!data) {
@@ -824,7 +824,7 @@ export default {
       this.resetAutoSaveStatus()
 
       // 加载目标草稿详情
-      this.getArticleDetail(articleId)
+      this.queryArticleDetail(articleId)
     },
     // 打开更多草稿列表
     openMoreDraftPage() {

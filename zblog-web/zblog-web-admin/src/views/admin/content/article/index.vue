@@ -62,14 +62,14 @@
           <template v-perm="['ARTIA001', 'ARTIU001', 'ARTIU002', 'ARTIU003', 'ARTIQ003']">
             <el-button type="success" @click="addArticle">新增</el-button>
             <el-button v-show="filters.tagStatus !== '8'" :disabled="row === null" type="primary" @click="editArticle">编辑</el-button>
-            <el-button type="info" :disabled="row === null" @click="showArticleDetail">预览</el-button>
+            <el-button type="info" :disabled="row === null" @click="previewArticle">预览</el-button>
           </template>
           <el-button v-perm="['ARTIQ007']" type="info" :disabled="row === null" @click="showArticleLog">操作日志</el-button>
           <el-button v-perm="['ARTIQ008']" type="info" :disabled="row === null" @click="showArticleVersion">版本记录</el-button>
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTIA003']"
-            :disabled="row === null || row.deleteFlag !== 0"
+            :disabled="row === null || row['deleteFlag'] !== 0"
             type="primary"
             @click="publishWeChat"
           >
@@ -78,7 +78,7 @@
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTID001']"
-            :disabled="row === null || row.deleteFlag !== 0"
+            :disabled="row === null || row['deleteFlag'] !== 0"
             type="danger"
             @click="deleteArticle"
           >
@@ -87,7 +87,7 @@
           <el-button
             v-show="filters.tagStatus === '8'"
             v-perm="['ARTID002']"
-            :disabled="row === null || row.deleteFlag !== 1"
+            :disabled="row === null || row['deleteFlag'] !== 1"
             type="danger"
             @click="deleteArticle2"
           >
@@ -104,7 +104,7 @@
           <el-button
             v-show="filters.tagStatus === '8'"
             v-perm="['ARTIU004']"
-            :disabled="row === null || row.deleteFlag !== 1"
+            :disabled="row === null || row['deleteFlag'] !== 1"
             type="primary"
             @click="resetArticle"
           >
@@ -172,7 +172,7 @@
         <el-table-column prop="categoryName" label="文章分类" width="100" align="center" />
         <el-table-column label="文章标签" width="200" align="center">
           <template v-slot="scope">
-            <el-tag v-for="(item, index) in scope.row.tagNames" :key="index" type="info" style="margin-right:0.2rem;margin-top:0.2rem;">
+            <el-tag v-for="(item, index) in scope.row['tagNames']" :key="index" type="info" style="margin-right:0.2rem;margin-top:0.2rem;">
               {{ item }}
             </el-tag>
           </template>
@@ -237,6 +237,13 @@
       </div>
     </div>
 
+    <!-- 预览 -->
+    <preview-dialog
+      ref="previewDialogRef"
+      :dialog-visible="previewDialogVisible"
+      @previewDone="previewDone"
+    />
+
     <!-- 操作日志 -->
     <operation-log-dialog
       ref="operationLogDialog"
@@ -254,11 +261,13 @@
 </template>
 
 <script>
+import previewDialog from '@/views/admin/content/article/template/previewDialog'
 import operationLogDialog from '@/views/admin/content/article/template/operationLogDialog'
 import versionDialog from '@/views/admin/content/article/template/versionDialog'
 export default {
   name: 'Article',
   components: {
+    previewDialog,
     operationLogDialog,
     versionDialog
   },
@@ -315,10 +324,9 @@ export default {
       total: 0,
       page: 1,
       pageSize: 5,
+      previewDialogVisible: false,
       operationLogDialogVisible: false,
-      versionDialogVisible: false,
-
-      previewArticleDialogVisible: false
+      versionDialogVisible: false
     }
   },
   computed: {
@@ -459,14 +467,14 @@ export default {
       })
     },
     // 预览
-    showArticleDetail() {
-      this.previewArticleDialogVisible = true
+    previewArticle() {
+      this.previewDialogVisible = true
       this.$nextTick(() => {
-        this.$refs.previewArticleRef.initData(2, this.row.id)
+        this.$refs.previewDialogRef.initData(this.row.id)
       })
     },
-    closePreviewArticleDialog() {
-      this.previewArticleDialogVisible = false
+    previewDone() {
+      this.previewDialogVisible = false
     },
     // 新增与编辑
     addArticle() {

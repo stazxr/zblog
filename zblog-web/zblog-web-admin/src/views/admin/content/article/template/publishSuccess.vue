@@ -69,7 +69,7 @@
       :close-on-click-modal="false"
       @closed="handlePreviewDialogClosed"
     >
-      <previewArticle ref="previewArticleRef" />
+      <previewDialog ref="previewArticleRef" />
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="closePreviewArticleDialog">
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import previewArticle from '@/views/admin/content/article/template/previewArticle'
+import previewDialog from '@/views/admin/content/article/template/previewDialog'
 
 const ARTICLE_STATUS = {
   PENDING_REVIEW: 2,
@@ -91,7 +91,7 @@ const ARTICLE_STATUS = {
 export default {
   name: 'PublishSuccess',
   components: {
-    previewArticle
+    previewDialog
   },
   data() {
     return {
