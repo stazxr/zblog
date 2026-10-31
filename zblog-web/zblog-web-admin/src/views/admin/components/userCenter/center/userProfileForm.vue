@@ -57,12 +57,12 @@ export default {
   },
   watch: {
     user: {
-      handler(val) {
-        this.formData.userId = val.id
-        this.formData.nickname = val.nickname
-        this.formData.gender = val.gender
-        this.formData.website = val.website
-        this.formData.signature = val.signature
+      handler(user) {
+        this.formData.userId = user.id
+        this.formData.nickname = user.nickname
+        this.formData.gender = user.gender
+        this.formData.website = user.website
+        this.formData.signature = user.signature
       },
       deep: true
     }

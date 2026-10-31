@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.base.mapper.UserWechatAccountMapper">
+    <select id="selectByUserId" resultType="com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo">
+        SELECT
+            ID, USER_ID, APP_ID, APP_SECRET, ACCOUNT_NAME, ACCOUNT_AVATAR, ENABLED,
+            VERIFY_STATUS, VERIFY_TIME, CREATE_TIME, UPDATE_TIME
+        FROM user_wechat_account
+        WHERE USER_ID = #{userId}
+    </select>
+</mapper>

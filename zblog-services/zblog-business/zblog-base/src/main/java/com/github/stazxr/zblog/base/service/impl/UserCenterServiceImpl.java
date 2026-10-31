@@ -7,27 +7,30 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.encryption.util.RsaUtils;
+import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.SystemException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
+import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
+import com.github.stazxr.zblog.bas.exception.code.ErrorCode;
 import com.github.stazxr.zblog.bas.security.SecurityExtProperties;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.security.cache.SecurityUserCache;
 import com.github.stazxr.zblog.bas.security.core.SecurityUser;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLoginLogQueryDto;
 import com.github.stazxr.zblog.base.domain.entity.FileRelation;
 import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.entity.UserPassLog;
+import com.github.stazxr.zblog.base.domain.entity.UserWechatAccount;
 import com.github.stazxr.zblog.base.domain.enums.BasUploadBusinessType;
 import com.github.stazxr.zblog.base.domain.enums.Gender;
+import com.github.stazxr.zblog.base.domain.enums.UserWechatAccountStatus;
 import com.github.stazxr.zblog.base.domain.error.UserCenterErrorCode;
 import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UserLoginLogVo;
+import com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo;
 import com.github.stazxr.zblog.base.mapper.*;
 import com.github.stazxr.zblog.base.service.UserCenterService;
 import com.github.stazxr.zblog.core.base.BaseErrorCode;
@@ -35,6 +38,7 @@ import com.github.stazxr.zblog.log.domain.vo.LogVo;
 import com.github.stazxr.zblog.util.RegexUtils;
 import com.github.stazxr.zblog.util.StringUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
+import com.github.stazxr.zblog.util.wechat.WeChatUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,11 +64,13 @@ public class UserCenterServiceImpl implements UserCenterService {
 
     private final UserPassLogMapper userPassLogMapper;
 
+    private final UserLoginLogMapper userLoginLogMapper;
+
+    private final UserWechatAccountMapper userWechatAccountMapper;
+
     private final FileMapper fileMapper;
 
     private final FileRelationMapper fileRelationMapper;
-
-    private final UserLoginLogMapper userLoginLogMapper;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -187,6 +193,59 @@ public class UserCenterServiceImpl implements UserCenterService {
     }
 
     /**
+     * 查询个人微信公众号配置信息
+     *
+     * @return UserWechatAccountVo 微信公众号配置信息
+     */
+    @Override
+    public UserWechatAccountVo queryUserWechatAccountInfo() {
+        Long loginId = SecurityUtils.getLoginId();
+        return userWechatAccountMapper.selectByUserId(loginId);
+    }
+
+    /**
+     * 修改个人微信公众号配置信息
+     *
+     * @param accountDto 微信公众号配置信息
+     */
+    @Override
+    public void updateUserWechatAccountInfo(UserUpdateWechatAccountDto accountDto) {
+        // 检查配置是否正确
+        checkWechatAccountConfig(accountDto.getAppId(), accountDto.getAppSecret());
+
+        LocalDateTime now = LocalDateTime.now();
+        Long loginId = SecurityUtils.getLoginId();
+        UserWechatAccountVo userWechatAccountVo = userWechatAccountMapper.selectByUserId(loginId);
+        if (userWechatAccountVo == null) {
+            // 新增
+            UserWechatAccount wechatAccount = new UserWechatAccount();
+            wechatAccount.setId(SequenceUtils.getId());
+            wechatAccount.setUserId(loginId);
+            wechatAccount.setAccountName(accountDto.getAccountName());
+            wechatAccount.setAppId(accountDto.getAppId());
+            wechatAccount.setAppSecret(accountDto.getAppSecret());
+            wechatAccount.setEnabled(accountDto.getEnabled());
+            wechatAccount.setVerifyStatus(UserWechatAccountStatus.SUCCESS.getStatus());
+            wechatAccount.setVerifyTime(now);
+            userWechatAccountMapper.insert(wechatAccount);
+        } else {
+            // 修改
+            ThrowUtils.throwIf(!loginId.equals(userWechatAccountVo.getUserId()), CommonErrorCode.EBASEA000);
+            UserWechatAccount wechatAccount = new UserWechatAccount();
+            wechatAccount.setId(userWechatAccountVo.getId());
+            wechatAccount.setUserId(userWechatAccountVo.getUserId());
+            wechatAccount.setAccountName(accountDto.getAccountName());
+            wechatAccount.setAppId(accountDto.getAppId());
+            wechatAccount.setAppSecret(accountDto.getAppSecret());
+            wechatAccount.setEnabled(accountDto.getEnabled());
+            wechatAccount.setVerifyStatus(UserWechatAccountStatus.SUCCESS.getStatus());
+            wechatAccount.setVerifyTime(now);
+            wechatAccount.setUpdateTime(now);
+            userWechatAccountMapper.updateById(wechatAccount);
+        }
+    }
+
+    /**
      * 分页查询用户操作日志列表
      *
      * @param queryDto 查询参数
@@ -288,6 +347,24 @@ public class UserCenterServiceImpl implements UserCenterService {
         LambdaQueryWrapper<User> queryWrapper = queryBuild().eq(User::getNickname, nickname);
         queryWrapper.ne(User::getId, userId);
         return userMapper.existsIgnoreDeleted(queryWrapper);
+    }
+
+    private void checkWechatAccountConfig(String appId, String appSecret) {
+        WeChatUtils.VerifyResult result = WeChatUtils.verifyAccount(appId, appSecret);
+        if (!result.isSuccess()) {
+            log.error("check wechat account config failed: {} {}", result.getErrCode(), result.getMessage());
+            throw new ServiceException(new ErrorCode() {
+                @Override
+                public String getCode() {
+                    return String.valueOf(result.getErrCode());
+                }
+
+                @Override
+                public String getI18nKey() {
+                    return result.getMessage();
+                }
+            });
+        }
     }
 
     private LambdaQueryWrapper<User> queryBuild() {

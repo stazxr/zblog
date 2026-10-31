@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
+import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -22,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文章管理
@@ -288,6 +291,34 @@ public class ArticleController {
     }
 
     /**
+     * 查询文章微信公众号同步配置信息
+     *
+     * @param articleId 文章id
+     * @return ArticleWechatSyncConfigVo
+     */
+    @GetMapping(value = "/queryWeChatSyncConfig")
+    @ApiOperation(value = "查询文章微信公众号同步配置信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询文章微信公众号同步配置信息", code = "ARTIQ009")
+    public ArticleWechatSyncConfigVo queryWeChatSyncConfig(@RequestParam Long articleId) {
+        return articleService.queryWeChatSyncConfig(articleId);
+    }
+
+    /**
+     * 保存文章微信公众号同步配置信息
+     *
+     * @param wechatSyncConfigDto 文章微信公众号同步配置信息
+     */
+    @Log
+    @PostMapping(value = "/publishWeChat")
+    @ApiOperation(value = "保存文章微信公众号同步配置信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "保存文章微信公众号同步配置信息", code = "ARTIA005")
+    public void saveWeChatSyncConfig(@RequestParam ArticleWechatSyncConfigDto wechatSyncConfigDto) {
+        articleService.saveWeChatSyncConfig(wechatSyncConfigDto);
+    }
+
+    /**
      * 微信公众号推送文章
      *
      * @param articleId 文章id
@@ -298,5 +329,21 @@ public class ArticleController {
     @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "微信公众号推送文章", code = "ARTIA003")
     public void publishWeChat(@RequestParam Long articleId) {
+        articleService.publishWeChat(articleId);
+    }
+
+    /**
+     * 文章内容上传
+     *
+     * @param multipartFile 上传文件
+     * @param articleId     文章id
+     * @return UploadFileVo
+     */
+    @PostMapping("/uploadFile")
+    @ApiOperation(value = "文章内容上传")
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
+    @Router(name = "文章内容上传", code = "ARTIA004")
+    public UploadFileVo uploadFile(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Long articleId) {
+        return articleService.uploadFile(multipartFile, articleId);
     }
 }

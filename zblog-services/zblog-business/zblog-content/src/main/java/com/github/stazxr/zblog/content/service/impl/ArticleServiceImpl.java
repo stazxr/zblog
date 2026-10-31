@@ -1,23 +1,36 @@
 package com.github.stazxr.zblog.content.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.stazxr.zblog.bas.cache.util.GlobalCache;
 import com.github.stazxr.zblog.bas.exception.ServiceException;
 import com.github.stazxr.zblog.bas.exception.ThrowUtils;
 import com.github.stazxr.zblog.bas.exception.code.CommonErrorCode;
+import com.github.stazxr.zblog.bas.file.UploadContext;
+import com.github.stazxr.zblog.bas.file.UploadContextFactory;
+import com.github.stazxr.zblog.bas.file.autoconfigure.properties.FileProperties;
+import com.github.stazxr.zblog.bas.file.handler.FileHandler;
+import com.github.stazxr.zblog.bas.file.handler.FileHandlerEnum;
+import com.github.stazxr.zblog.bas.file.model.FileInfo;
+import com.github.stazxr.zblog.bas.file.path.FilePathContext;
 import com.github.stazxr.zblog.bas.file.util.MockMultipartFile;
 import com.github.stazxr.zblog.bas.security.SecurityUtils;
 import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
 import com.github.stazxr.zblog.base.domain.entity.FileRelation;
+import com.github.stazxr.zblog.base.domain.entity.User;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
+import com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
+import com.github.stazxr.zblog.base.mapper.UserWechatAccountMapper;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -39,6 +52,7 @@ import com.github.stazxr.zblog.util.http.MarkdownWordCountUtils;
 import com.github.stazxr.zblog.util.io.FileUtils;
 import com.github.stazxr.zblog.util.math.MathUtils;
 import com.github.stazxr.zblog.util.time.DateUtils;
+import com.github.stazxr.zblog.util.wechat.WeChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +64,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -81,11 +96,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     private final ArticleAutoPublishTimingMapper articleAutoPublishTimingMapper;
 
+    private final ArticleWechatSyncConfigMapper articleWechatSyncConfigMapper;
+
+    private final ArticleFileStorageMapper articleFileStorageMapper;
+
+    private final ArticleFileMapper articleFileMapper;
+
+    private final UserWechatAccountMapper userWechatAccountMapper;
+
     private final FileMapper fileMapper;
 
     private final FileRelationMapper fileRelationMapper;
 
     private final FileService fileService;
+
+    private final FileProperties fileProperties;
 
     /**
      * 分页查询我的文章列表
@@ -583,6 +608,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public IPage<ArticleOperationLogVo> queryArticleOperationLogListByPage(ArticleOperationLogQueryDto queryDto) {
         // 权限校验
         Article article = baseMapper.selectById(queryDto.getArticleId());
+        ThrowUtils.throwIfNull(article, BaseErrorCode.ECOREA001);
         ThrowUtils.throwIf(ArticleDeleteFlag.DELETED.getValue().equals(article.getDeleteFlag()), BaseErrorCode.ECOREA001);
         ThrowUtils.throwIf(!SecurityUtils.getLoginId().equals(article.getAuthorId()), BaseErrorCode.ECOREA002);
 
@@ -638,6 +664,175 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         return articlePageList;
+    }
+
+    /**
+     * 查询文章微信公众号同步配置信息
+     *
+     * @param articleId 文章id
+     * @return ArticleWechatSyncConfigVo
+     */
+    @Override
+    public ArticleWechatSyncConfigVo queryWeChatSyncConfig(Long articleId) {
+        return articleWechatSyncConfigMapper.selectByArticleId(articleId);
+    }
+
+    /**
+     * 保存文章微信公众号同步配置信息
+     *
+     * @param wechatSyncConfigDto 文章微信公众号同步配置信息
+     */
+    @Override
+    public void saveWeChatSyncConfig(ArticleWechatSyncConfigDto wechatSyncConfigDto) {
+        ArticleWechatSyncConfig syncConfig = new ArticleWechatSyncConfig();
+        syncConfig.setId(SequenceUtils.getId());
+        syncConfig.setArticleId(wechatSyncConfigDto.getArticleId());
+        syncConfig.setArticleVersion(wechatSyncConfigDto.getArticleVersion());
+        syncConfig.setWechatTitle(wechatSyncConfigDto.getWechatTitle());
+        syncConfig.setWechatAuthor(wechatSyncConfigDto.getWechatAuthor());
+        syncConfig.setWechatDigest(wechatSyncConfigDto.getWechatDigest());
+        if (wechatSyncConfigDto.getWechatCoverImageId() == null) {
+            // 没有设置封面，判断 ThumbMediaId
+            // ThrowUtils.throwIfBlank(syncConfig.getThumbMediaId(), ArticleErrorCode.EARTIA018);
+        } else {
+            // 重新设置了封面，上传微信公众号
+            Long loginId = SecurityUtils.getLoginId();
+            UserWechatAccountVo userWechatAccountVo = userWechatAccountMapper.selectByUserId(loginId);
+            ThrowUtils.throwIfNull(userWechatAccountVo, ArticleErrorCode.EARTIA015);
+            String accessToken = getWechatAccessToken(userWechatAccountVo.getAppId(), userWechatAccountVo.getAppSecret());
+
+            // 封面参数
+
+            syncConfig.setThumbMediaId("");
+            syncConfig.setThumbMediaUrl("");
+        }
+
+    }
+
+    /**
+     * 微信公众号推送文章
+     *
+     * @param articleId 文章id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void publishWeChat(Long articleId) {
+        // 基础信息校验
+        Article article = baseMapper.selectById(articleId);
+        ThrowUtils.throwIfNull(article, BaseErrorCode.ECOREA001);
+        ThrowUtils.throwIf(ArticleDeleteFlag.DELETED.getValue().equals(article.getDeleteFlag()), BaseErrorCode.ECOREA001);
+        ThrowUtils.throwIf(!SecurityUtils.getLoginId().equals(article.getAuthorId()), BaseErrorCode.ECOREA002);
+        ThrowUtils.throwIf(!ArticleStatus.PUBLISHED.getValue().equals(article.getArticleStatus()), ArticleErrorCode.EARTIA014);
+
+        // 获取公众号配置
+        User user = SecurityUtils.getLoginUser();
+        UserWechatAccountVo userWechatAccountVo = userWechatAccountMapper.selectByUserId(user.getId());
+        ThrowUtils.throwIfNull(userWechatAccountVo, ArticleErrorCode.EARTIA015);
+        String appId = userWechatAccountVo.getAppId();
+        String appSecret = userWechatAccountVo.getAppSecret();
+
+        // 获取 token
+        String accessToken = getWechatAccessToken(appId, appSecret);
+
+        // 生成草稿内容
+        String content = article.getContentMd();
+
+        // 封装参数发布公众号
+
+        JSONObject articleJson = new JSONObject();
+        // news（图文消息）：标题、封面、摘要、正文，支持 HTML 富文本
+        // newspic（图片消息）：以图片为主体
+        articleJson.put("article_type", "news"); // 文章类型
+        articleJson.put("title", article.getTitle()); // 标题，总长度不超过32个字
+        articleJson.put("author", user.getNickname()); // 作者，总长度不超过16个字
+        articleJson.put("digest", article.getSummary()); // 图文消息的摘要，总长度不超过120个字
+        articleJson.put("content", content); // 图文消息的具体内容，大小不可超过2kb，支持HTML标签，必须少于2万字符，小于1M
+        articleJson.put("content_source_url", ""); // 图文消息的原文地址
+        articleJson.put("thumb_media_id", ""); // article_type为图文消息（news）时必填，图文消息的封面图片素材id（必须是永久MediaID）
+        articleJson.put("need_open_comment", 0); // 是否打开评论，0不打开(默认)，1打开
+        articleJson.put("only_fans_can_comment", 0); // 是否粉丝才可评论，0所有人可评论(默认)，1粉丝才可评论
+        articleJson.put("image_info", null); // 图片消息里的图片相关信息，图片数量最多为20张
+        articleJson.put("cover_info", null); // 封面信息，图文消息（news）和图片消息（newspic）均适用
+    }
+
+    /**
+     * 文章内容上传
+     *
+     * @param multipartFile 上传文件
+     * @param articleId     文章id
+     * @return UploadFileVo
+     */
+    @Override
+    public UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId) {
+        // 获取文件上传类型
+        int fileUploadType = fileProperties.getStorageType();
+
+        // 获取文件上传处理器
+        FileHandler fileHandler = FileHandlerEnum.instance(fileUploadType);
+
+        String uploadFilePath = null; // 上传成功的文件路径
+
+        try {
+            try (UploadContext ctx = UploadContextFactory.from(multipartFile, FilePathContext.empty())) {
+                ArticleFileStorage dbFileStorage = articleFileStorageMapper.selectFileByMd5(ctx.getMd5(), fileUploadType);
+                if (dbFileStorage != null) {
+                    // 复用已上传的文件
+                    return insertFileInfoToDb(articleId, false, dbFileStorage, ctx);
+                } else {
+                    // 上传文件
+                    FileInfo fileInfo = fileHandler.upload(ctx);
+                    uploadFilePath = fileInfo.getStorageLocation();
+                    ArticleFileStorage fileStorage = new ArticleFileStorage(fileInfo);
+                    return insertFileInfoToDb(articleId, true, fileStorage, ctx);
+                }
+            }
+        } catch (Exception e) {
+            // 文件信息入库失败，需要删除已上传成功的文件
+            if (uploadFilePath != null) {
+                try {
+                    fileHandler.delete(uploadFilePath);
+                } catch (Exception _e) {
+                    log.error("文件删除失败：{}", uploadFilePath, _e);
+                }
+            }
+            throw new ServiceException(ArticleErrorCode.EARTIA017, e);
+        }
+    }
+
+    private UploadFileVo insertFileInfoToDb(Long articleId, boolean firstUpload, ArticleFileStorage fileStorage, UploadContext uploadContext) {
+        // 获取当前登录用户信息，用户只有登录后才能上传图片
+        Long loginId = SecurityUtils.getLoginId();
+
+        if (firstUpload) {
+            // 入库 article_file_storage
+            fileStorage.setUploadUser(loginId);
+            articleFileStorageMapper.insert(fileStorage);
+        }
+
+        // 入库 file
+        ArticleFile articleFile = new ArticleFile();
+        articleFile.setId(SequenceUtils.getId());
+        articleFile.setArticleId(articleId);
+        articleFile.setStorageId(fileStorage.getId());
+        articleFile.setOriginalFilename(uploadContext.getOriginalFilename());
+        articleFile.setFileAccessUrl(fileStorage.getFileAccessUrl());
+        articleFile.setCreateUser(loginId);
+        articleFile.setCreateTime(new Date());
+        articleFileMapper.insert(articleFile);
+
+        // 返回上传文件信息
+        return newUploadFileVo(fileStorage, articleFile);
+    }
+
+    private UploadFileVo newUploadFileVo(ArticleFileStorage articleFileStorage, ArticleFile articleFile) {
+        UploadFileVo uploadFileVo = new UploadFileVo();
+        uploadFileVo.setFileId(articleFile.getId());
+        uploadFileVo.setOriginalFilename(articleFile.getOriginalFilename());
+        uploadFileVo.setFilename(articleFileStorage.getFilename());
+        uploadFileVo.setFileAbsolutePath(articleFileStorage.getFileAbsolutePath());
+        uploadFileVo.setFileRelativePath(articleFileStorage.getFileRelativePath());
+        uploadFileVo.setFileAccessUrl(articleFileStorage.getFileAccessUrl());
+        return uploadFileVo;
     }
 
     // 检查文件是否允许编辑
@@ -1022,5 +1217,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         } else {
             return 100 + deleteFlag;
         }
+    }
+
+    private String getWechatAccessToken(String appId, String appSecret) {
+        String cacheKey = "WECHAT:TOKEN:" + appId;
+        String accessToken = GlobalCache.get(cacheKey);
+        if (accessToken == null) {
+            WeChatUtils.VerifyResult result = WeChatUtils.getAccessToken(appId, appSecret);
+            ThrowUtils.throwIf(!result.isSuccess(), ArticleErrorCode.EARTIA016, result.getErrCode());
+            accessToken = result.getAccessToken();
+            Integer expiresIn = result.getExpiresIn();
+            GlobalCache.put(cacheKey, accessToken, expiresIn, TimeUnit.SECONDS);
+        }
+
+        return accessToken;
     }
 }

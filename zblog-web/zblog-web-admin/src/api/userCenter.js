@@ -23,6 +23,14 @@ export default {
   updateUserProfileInfo: params => {
     return api.httpRequest().post(`${userCenterApi}/updateUserProfileInfo`, params)
   },
+  // 查询个人微信公众号配置信息
+  queryUserWechatAccountInfo: params => {
+    return api.httpRequest().get(`${userCenterApi}/queryUserWechatAccountInfo`, params)
+  },
+  // 修改个人微信公众号配置信息
+  updateUserWechatAccountInfo: params => {
+    return api.httpRequest().post(`${userCenterApi}/updateUserWechatAccountInfo`, params)
+  },
   // 分页查询用户操作日志列表
   pageUserLogList: params => {
     return api.httpRequest().get(`${userCenterApi}/pageUserLogList`, params)

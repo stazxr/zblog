@@ -2,15 +2,18 @@ package com.github.stazxr.zblog.content.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
+import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleVersionQueryDto;
 import com.github.stazxr.zblog.content.domain.entity.Article;
 import com.github.stazxr.zblog.content.domain.vo.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文章管理业务层
@@ -141,4 +144,35 @@ public interface ArticleService extends IService<Article> {
      * @return IPage<ArticleVersionVo>
      */
     IPage<ArticleVersionVo> queryArticleVersionByPage(ArticleVersionQueryDto queryDto);
+
+    /**
+     * 查询文章微信公众号同步配置信息
+     *
+     * @param articleId 文章id
+     * @return ArticleWechatSyncConfigVo
+     */
+    ArticleWechatSyncConfigVo queryWeChatSyncConfig(Long articleId);
+
+    /**
+     * 保存文章微信公众号同步配置信息
+     *
+     * @param wechatSyncConfigDto 文章微信公众号同步配置信息
+     */
+    void saveWeChatSyncConfig(ArticleWechatSyncConfigDto wechatSyncConfigDto);
+
+    /**
+     * 微信公众号推送文章
+     *
+     * @param articleId 文章id
+     */
+    void publishWeChat(Long articleId);
+
+    /**
+     * 文章内容上传
+     *
+     * @param multipartFile 上传文件
+     * @param articleId     文章id
+     * @return UploadFileVo
+     */
+    UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId);
 }

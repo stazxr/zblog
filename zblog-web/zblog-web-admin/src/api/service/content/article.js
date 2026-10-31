@@ -79,5 +79,9 @@ export default {
   // 微信公众号推送文章
   publishWeChat: params => {
     return api.httpRequest().post(`${articleApi}/publishWeChat`, params)
+  },
+  // 文章内容上传
+  uploadFile: params => {
+    return api.httpRequest().post(`${articleApi}/uploadFile`, params)
   }
 }

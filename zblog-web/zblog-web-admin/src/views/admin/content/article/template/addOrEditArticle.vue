@@ -170,7 +170,7 @@
                 type="textarea"
                 resize="none"
                 :autosize="{ minRows: 5, maxRows: 5 }"
-                maxlength="250"
+                maxlength="120"
                 show-word-limit
                 placeholder="请输入文章摘要"
               />
@@ -998,7 +998,8 @@ export default {
     uploadEditorFile(file, type) {
       const formData = new FormData()
       formData.append('file', file)
-      return this.$mapi.file.uploadFile(formData).then(res => {
+      formData.append('articleId', this.formData.id)
+      return this.$mapi.article.uploadFile(formData).then(res => {
         const data = res && res.data
         if (!Array.isArray(data) || data.length === 0) {
           throw new Error(type === 'image' ? '图片上传失败' : '视频上传失败')

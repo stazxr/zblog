@@ -3,7 +3,7 @@
     <div>
       <muses-search-form ref="searchForm" :model="filters" label-position="right" label-width="0" :offset="0" :item-width="165">
         <muses-search-form-item label="" prop="search-loginResult">
-          <el-select id="search-loginResult" v-model="filters.loginResult" placeholder="登录结果" clearable>
+          <el-select id="search-loginResult" v-model="filters.loginResult" placeholder="登录结果" clearable @change="search">
             <el-option v-for="item in loginResultList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </muses-search-form-item>

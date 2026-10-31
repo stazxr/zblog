@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleFileStorageMapper">
+    <select id="selectFileByMd5" resultType="com.github.stazxr.zblog.content.domain.entity.ArticleFileStorage">
+        SELECT
+            ID, FILENAME, FILE_MD5, FILE_SIZE, FILE_ABSOLUTE_PATH, FILE_RELATIVE_PATH,
+            FILE_ACCESS_URL, FILE_TYPE, UPLOAD_TYPE, UPLOAD_USER, UPLOAD_TIME
+        FROM article_file_storage
+        WHERE FILE_MD5 = #{fileMd5} AND UPLOAD_TYPE = #{fileUploadType}
+    </select>
+</mapper>

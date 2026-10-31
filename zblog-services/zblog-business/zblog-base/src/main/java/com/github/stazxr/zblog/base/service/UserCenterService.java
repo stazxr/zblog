@@ -1,13 +1,11 @@
 package com.github.stazxr.zblog.base.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLoginLogQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.UserLoginLogVo;
+import com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo;
 import com.github.stazxr.zblog.log.domain.vo.LogVo;
 
 /**
@@ -51,6 +49,20 @@ public interface UserCenterService {
      * @param profileDto 用户个人信息
      */
     void updateUserProfileInfo(UserUpdateProfileDto profileDto);
+
+    /**
+     * 查询个人微信公众号配置信息
+     *
+     * @return UserWechatAccountVo 微信公众号配置信息
+     */
+    UserWechatAccountVo queryUserWechatAccountInfo();
+
+    /**
+     * 修改个人微信公众号配置信息
+     *
+     * @param accountDto 微信公众号配置信息
+     */
+    void updateUserWechatAccountInfo(UserUpdateWechatAccountDto accountDto);
 
     /**
      * 分页查询用户操作日志列表

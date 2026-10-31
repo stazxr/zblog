@@ -4,13 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateEmailDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateHeadImgDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdatePassDto;
-import com.github.stazxr.zblog.base.domain.dto.UserUpdateProfileDto;
+import com.github.stazxr.zblog.base.domain.dto.*;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLogQueryDto;
 import com.github.stazxr.zblog.base.domain.dto.query.UserLoginLogQueryDto;
 import com.github.stazxr.zblog.base.domain.vo.UserLoginLogVo;
+import com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo;
 import com.github.stazxr.zblog.base.service.UserCenterService;
 import com.github.stazxr.zblog.core.base.BaseConst;
 import com.github.stazxr.zblog.log.annotation.Log;
@@ -102,6 +100,34 @@ public class UserCenterController {
     @Router(name = "修改个人信息", code = "USECU005", level = RouterLevel.PUBLIC)
     public void updateUserProfileInfo(@RequestBody @Validated UserUpdateProfileDto profileDto) {
         userCenterService.updateUserProfileInfo(profileDto);
+    }
+
+    /**
+     * 查询个人微信公众号配置信息
+     *
+     * @return UserWechatAccountVo 微信公众号配置信息
+     */
+    @GetMapping("queryUserWechatAccountInfo")
+    @ApiOperation("查询个人微信公众号配置信息")
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
+    @Router(name = "查询个人微信公众号配置信息", code = "USECQ003", level = RouterLevel.PUBLIC)
+    public UserWechatAccountVo queryUserWechatAccountInfo() {
+        return userCenterService.queryUserWechatAccountInfo();
+    }
+
+
+    /**
+     * 修改个人微信公众号配置信息
+     *
+     * @param accountDto 微信公众号配置信息
+     */
+    @Log
+    @PostMapping("updateUserWechatAccountInfo")
+    @ApiOperation("修改个人微信公众号配置信息")
+    @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
+    @Router(name = "修改个人微信公众号配置信息", code = "USECU006", level = RouterLevel.PUBLIC)
+    public void updateUserWechatAccountInfo(@RequestBody @Validated UserUpdateWechatAccountDto accountDto) {
+        userCenterService.updateUserWechatAccountInfo(accountDto);
     }
 
     /**

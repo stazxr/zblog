@@ -29,6 +29,14 @@ public enum ArticleErrorCode implements ErrorCode {
     EARTIA012("ARTICLE_PUBLISH_TIME_INVALID"),
     /** 私密文章不允许自动发布 */
     EARTIA013("ARTICLE_AUTO_PUBLISH_WITH_SELF"),
+    /** 只有已发布的文章才能同步到微信公众号 */
+    EARTIA014("ARTICLE_PUBLISH_WECHAT_STATUS_ERROR"),
+    /** 请先前往个人用户中心配置微信公众号信息 */
+    EARTIA015("ARTICLE_PUBLISH_WECHAT_NOT_CONFIG"),
+    /** 发布微信公众号失败 */
+    EARTIA016("ARTICLE_PUBLISH_WECHAT_FAILED"),
+    /** 文章内容上传失败 */
+    EARTIA017("ARTICLE_CONTENT_UPLOAD_FAILED"),
     /** 文章草稿初始化失败 */
     SARTIA001("ARTICLE_INIT_DRAFT_FAILED");
 

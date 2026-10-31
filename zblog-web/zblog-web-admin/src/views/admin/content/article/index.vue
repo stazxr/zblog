@@ -69,9 +69,10 @@
           <el-button
             v-show="filters.tagStatus !== '8'"
             v-perm="['ARTIA003']"
-            :disabled="row === null || row['deleteFlag'] !== 0"
+            :loading="wechatPublishLoading"
+            :disabled="row === null || row['deleteFlag'] !== 0 || row['articleStatus'] !== 5"
             type="primary"
-            @click="publishWeChat"
+            @click="publishWechat"
           >
             发布公众号
           </el-button>
@@ -257,6 +258,13 @@
       :dialog-visible="versionDialogVisible"
       @showVersionDone="showVersionDone"
     />
+
+    <!-- 发布公众号 -->
+    <wechat-publish-dialog
+      ref="wechatPublishDialog"
+      :dialog-visible="publishWechatDialogVisible"
+      @publishWechatDone="publishWechatDone"
+    />
   </div>
 </template>
 
@@ -264,12 +272,14 @@
 import previewDialog from '@/views/admin/content/article/template/previewDialog'
 import operationLogDialog from '@/views/admin/content/article/template/operationLogDialog'
 import versionDialog from '@/views/admin/content/article/template/versionDialog'
+import wechatPublishDialog from '@/views/admin/content/article/template/wechatPublishDialog'
 export default {
   name: 'Article',
   components: {
     previewDialog,
     operationLogDialog,
-    versionDialog
+    versionDialog,
+    wechatPublishDialog
   },
   data() {
     return {
@@ -324,9 +334,11 @@ export default {
       total: 0,
       page: 1,
       pageSize: 5,
+      wechatPublishLoading: false,
       previewDialogVisible: false,
       operationLogDialogVisible: false,
-      versionDialogVisible: false
+      versionDialogVisible: false,
+      publishWechatDialogVisible: false
     }
   },
   computed: {
@@ -514,13 +526,22 @@ export default {
       this.versionDialogVisible = false
     },
     // 发布微信公众号
-    publishWeChat() {
+    publishWechat() {
       if (this.row === null) {
         this.$message.error('请选择要发布的文章')
         return
       }
 
-      this.$message.warning('暂不支持，功能完善中')
+      if (this.row.articleStatus !== 5) {
+        this.$message.warning('只有已发布的文章才能同步到微信公众号')
+        return
+      }
+
+      this.publishWechatDialogVisible = true
+      this.$refs.wechatPublishDialog.initData(this.row.id)
+    },
+    publishWechatDone() {
+      this.publishWechatDialogVisible = false
     },
     // 删除
     deleteArticle() {

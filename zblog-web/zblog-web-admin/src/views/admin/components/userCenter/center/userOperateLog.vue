@@ -6,7 +6,7 @@
           <el-input id="search-description" v-model="filters.description" clearable placeholder="操作描述" @keyup.enter.native="search" />
         </muses-search-form-item>
         <muses-search-form-item label="" prop="search-execResult">
-          <el-select id="search-execResult" v-model="filters.execResult" placeholder="操作结果" clearable>
+          <el-select id="search-execResult" v-model="filters.execResult" placeholder="操作结果" clearable @change="search">
             <el-option v-for="item in execResultList" :key="item.value" :label="item.name" :value="item.value" />
           </el-select>
         </muses-search-form-item>

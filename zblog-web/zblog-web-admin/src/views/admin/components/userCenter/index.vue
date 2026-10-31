@@ -81,8 +81,11 @@
         <!-- 用户资料 -->
         <el-card class="box-card">
           <el-tabs v-model="activeTabName" @tab-click="handleTabClick">
-            <el-tab-pane label="用户资料" name="userProfile">
+            <el-tab-pane label="基本信息" name="userProfile">
               <user-profile-form ref="userProfileFormRef" style="margin-top: 10px;" />
+            </el-tab-pane>
+            <el-tab-pane label="公众号配置" name="userWechatAccount">
+              <user-wechat-account-form ref="userWechatAccountFormRef" style="margin-top: 10px;" />
             </el-tab-pane>
             <el-tab-pane label="登录日志" name="userLoginLog">
               <user-login-log ref="userLoginLogRef" style="margin-top: 10px;" />
@@ -106,13 +109,22 @@ import DefaultAvatar from '@/assets/images/default-avatar.png'
 import updatePassDialog from './center/updatePassDialog'
 import updateEmailDialog from './center/updateEmailDialog'
 import userProfileForm from './center/userProfileForm'
+import userWechatAccountForm from './center/userWechatAccountForm'
 import userOperateLog from './center/userOperateLog'
 import userLoginLog from './center/userLoginLog'
 import ImgUpload from 'vue-image-crop-upload'
 import { mapGetters } from 'vuex'
 export default {
   name: 'UserCenter',
-  components: { updatePassDialog, updateEmailDialog, userProfileForm, userOperateLog, userLoginLog, ImgUpload },
+  components: {
+    updatePassDialog,
+    updateEmailDialog,
+    userProfileForm,
+    userWechatAccountForm,
+    userOperateLog,
+    userLoginLog,
+    ImgUpload
+  },
   data() {
     return {
       DefaultAvatar: DefaultAvatar,
@@ -185,6 +197,8 @@ export default {
         this.$refs.userLoginLogRef.listTableData()
       } else if (tab.name === 'userOperateLog') {
         this.$refs.userOperateLogRef.listTableData()
+      } else if (tab.name === 'userWechatAccount') {
+        this.$refs.userWechatAccountFormRef.initData()
       }
     }
   }

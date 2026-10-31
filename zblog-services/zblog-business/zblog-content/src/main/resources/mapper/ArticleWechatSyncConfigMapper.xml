@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleWechatSyncConfigMapper">
+    <select id="selectByArticleId" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleWechatSyncConfigVo">
+        SELECT
+            ID, ARTICLE_ID, ARTICLE_VERSION, MEDIA_ID, THUMB_MEDIA_ID, THUMB_MEDIA_URL,
+            WECHAT_TITLE, WECHAT_AUTHOR, WECHAT_DIGEST, SYNC_STATUS, ERROR_MSG, CREATE_TIME, UPDATE_TIME
+        FROM article_wechat_sync_config WHERE ARTICLE_ID = #{articleId}
+    </select>
+</mapper>
