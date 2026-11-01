@@ -18,7 +18,9 @@ public enum FileErrorCode implements ErrorCode {
     /** 文件下载失败 */
     SFILEA002("error.system.file.download"),
     /** 文件删除失败 */
-    SFILEA003("error.system.file.delete");
+    SFILEA003("error.system.file.delete"),
+    /** 获取文件输入流异常 */
+    SFILEA004("error.system.file.stream");
 
     private final String i18nKey;
 

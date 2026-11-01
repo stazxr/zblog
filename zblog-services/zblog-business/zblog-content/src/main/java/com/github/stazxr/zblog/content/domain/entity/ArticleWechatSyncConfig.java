@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.content.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
@@ -39,6 +41,7 @@ public class ArticleWechatSyncConfig implements Serializable {
     /**
      * 微信公众号草稿id
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String mediaId;
 
     /**
@@ -59,11 +62,13 @@ public class ArticleWechatSyncConfig implements Serializable {
     /**
      * 微信公众号文章作者
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String wechatAuthor;
 
     /**
      * 微信公众号文章摘要
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String wechatDigest;
 
     /**
@@ -74,6 +79,7 @@ public class ArticleWechatSyncConfig implements Serializable {
     /**
      * 错误信息
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private String errorMsg;
 
     /**

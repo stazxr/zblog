@@ -2,222 +2,243 @@
   <el-dialog
     title="发布微信公众号"
     :visible.sync="dialogVisible"
-    width="600px"
+    :fullscreen="isMobile"
     :close-on-click-modal="false"
-    @closed="handleClosed"
+    :close-on-press-escape="true"
+    :before-close="handleClose"
+    append-to-body
+    width="600px"
   >
-    <el-form
-      ref="publishForm"
-      :model="form"
-      :rules="rules"
-      :loading="loading"
-      label-width="90px"
-    >
-      <el-form-item label="文章标题" prop="title">
-        <el-input
-          v-model="form.title"
-          maxlength="32"
-          show-word-limit
-          placeholder="请输入微信公众号文章标题"
-        />
+    <el-form ref="syncWechatForm" :loading="pageLoading" :inline="false" :model="formData" :rules="formRules" label-width="120px">
+      <el-form-item label="文章id">
+        <el-input v-model="formData.articleId" readonly disabled />
       </el-form-item>
-
-      <el-form-item label="文章摘要" prop="digest">
-        <el-input
-          v-model="form.digest"
-          type="textarea"
-          :rows="4"
-          maxlength="128"
-          show-word-limit
-          placeholder="请输入微信公众号文章摘要，不填写时自动提取正文"
-        />
+      <el-form-item label="同步版本" prop="articleVersion">
+        <el-select v-model="formData.articleVersion" placeholder="请选择微信公众号同步版本">
+          <el-option v-for="item in articleVersionList" :key="item" :label="'V' + item" :value="item" />
+        </el-select>
       </el-form-item>
-
-      <el-form-item label="封面图片" prop="coverImageId">
-        <div class="wechat-cover">
-          <div
-            v-if="form.coverImageUrl"
-            class="wechat-cover-preview"
-          >
-            <el-image
-              :src="form.coverImageUrl"
-              fit="cover"
-              :preview-src-list="[form.coverImageUrl]"
-            />
-            <div class="wechat-cover-actions">
-              <el-button
-                type="text"
-                size="mini"
-                @click="selectCover"
-              >
-                更换封面
-              </el-button>
-            </div>
-          </div>
-
-          <el-button
-            v-else
-            icon="el-icon-plus"
-            @click="selectCover"
-          >
-            选择封面
-          </el-button>
-
-          <div class="wechat-cover-tip">
-            封面图片将上传到微信公众号素材库。
+      <el-form-item label="文章标题" prop="wechatTitle">
+        <el-input v-model="formData.wechatTitle" maxlength="32" show-word-limit placeholder="请输入微信公众号文章标题" />
+      </el-form-item>
+      <el-form-item label="作者昵称" prop="wechatAuthor">
+        <el-input v-model="formData.wechatAuthor" maxlength="16" show-word-limit placeholder="请输入微信公众号文章作者" />
+      </el-form-item>
+      <el-form-item label="文章摘要" prop="wechatDigest">
+        <el-input v-model="formData.wechatDigest" type="textarea" :rows="5" maxlength="120" show-word-limit placeholder="请输入微信公众号文章摘要，不填写时自动提取正文" />
+      </el-form-item>
+      <el-form-item label="文章封面Id">
+        <el-input v-model="formData.thumbMediaId" readonly disabled />
+      </el-form-item>
+      <el-form-item label="文章封面地址">
+        <el-input v-model="formData.thumbMediaUrl" readonly disabled />
+      </el-form-item>
+      <el-form-item label="封面图片">
+        <muses-image-crop-upload
+          v-model="formData.wechatCoverImageUrl"
+          :aspect-ratio="1.8"
+          :output-width="720"
+          :output-height="400"
+          :preview-width="260"
+          :preview-height="145"
+          :min-width="360"
+          :min-height="200"
+          :max-size="20"
+          @success="setWechatCoverImageId"
+        />
+        <div class="image-url">
+          <div class="form-tip">
+            建议比例 16:9，封面图片将上传到微信公众号素材库
           </div>
         </div>
       </el-form-item>
     </el-form>
-
     <div slot="footer">
-      <el-button @click="dialogVisible = false">
-        取消
-      </el-button>
-      <el-button
-        type="primary"
-        :loading="submitLoading"
-        @click="handleSubmit"
-      >
-        创建公众号草稿
-      </el-button>
+      <el-button @click="doClose">取消</el-button>
+      <el-button type="primary" :loading="submitLoading1" @click="handleSubmit1">保存同步配置</el-button>
+      <el-button type="primary" :loading="submitLoading2" :disabled="!step1Finish" @click="handleSubmit2">提交同步动作</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import { getWeChatPublishConfig, publishWeChatArticle } from '@/api/content/article'
-
 export default {
-  name: 'WeChatPublishDialog',
+  props: {
+    dialogVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
-      dialogVisible: false,
-      loading: false,
-      submitLoading: false,
-      articleId: null,
-      form: {
+      pageLoading: false,
+      submitLoading1: false,
+      step1Finish: false,
+      submitLoading2: false,
+      articleVersionList: [],
+      formData: {
         articleId: null,
-        title: '',
-        digest: '',
-        coverImageId: null,
-        coverImageUrl: ''
+        articleVersion: null,
+        wechatCoverImageId: null,
+        wechatCoverImageUrl: null,
+        thumbMediaId: null,
+        thumbMediaUrl: null,
+        wechatTitle: null,
+        wechatAuthor: null,
+        wechatDigest: null
       },
-      rules: {
-        title: [
+      formRules: {
+        articleVersion: [
+          { required: true, message: '请选择同步版本', trigger: 'blur' }
+        ],
+        wechatTitle: [
           { required: true, message: '请输入微信公众号文章标题', trigger: 'blur' },
           { max: 32, message: '标题不能超过32个字符', trigger: 'blur' }
         ],
-        digest: [
-          { max: 128, message: '摘要不能超过128个字符', trigger: 'blur' }
+        wechatAuthor: [
+          { max: 16, message: '标题不能超过16个字符', trigger: 'blur' }
         ],
-        coverImageId: [
-          { required: true, message: '请选择封面图片', trigger: 'change' }
+        digest: [
+          { required: true, message: '请输入微信公众号文章摘要', trigger: 'blur' },
+          { max: 120, message: '摘要不能超过120个字符', trigger: 'blur' }
         ]
       }
     }
   },
+  computed: {
+    isMobile() {
+      return this.$store.state.app.device === 'mobile'
+    }
+  },
   methods: {
     initData(articleId) {
-      this.articleId = articleId
-      this.dialogVisible = true
-      this.loadConfig()
+      try {
+        this.pageLoading = true
+        this.queryWeChatSyncConfig(articleId)
+        this.queryArticlePublishVersions(articleId)
+      } finally {
+        this.pageLoading = false
+      }
     },
-
-    // 获取公众号发布配置
-    loadConfig() {
-      this.loading = true
-
-      getWeChatPublishConfig(this.articleId).then(res => {
-        const data = res.data || {}
-
-        this.form = {
-          articleId: data.articleId,
-          title: data.title || '',
-          digest: data.digest || '',
-          coverImageId: data.coverImageId || null,
-          coverImageUrl: data.coverImageUrl || ''
+    queryWeChatSyncConfig(articleId) {
+      this.$mapi.article.queryWeChatSyncConfig({ articleId }).then(({ data }) => {
+        if (data) {
+          Object.keys(this.formData).forEach(key => { this.formData[key] = data[key] })
+        } else {
+          Object.keys(this.formData).forEach(key => { this.formData[key] = null })
+          this.formData.articleId = articleId
+          this.queryArticleCurrentDetail(articleId)
         }
-      }).finally(() => {
-        this.loading = false
+      }).catch(_ => {
+        this.doClose()
       })
     },
-
-    // 选择封面图片
-    selectCover() {
-      this.$emit('select-cover', {
-        articleId: this.articleId,
-        currentImageId: this.form.coverImageId
+    queryArticlePublishVersions(articleId) {
+      this.$mapi.article.queryArticleVersionList({ articleId }).then(({ data }) => {
+        if (data == null || !Array.isArray(data) || data.length === 0) {
+          this.$message.warning('不存在已发布版本，请先发布文章')
+          this.doClose()
+        } else {
+          this.articleVersionList = data
+        }
+      }).catch(_ => {
+        this.doClose()
       })
     },
-
-    // 设置封面图片
-    setCover(image) {
-      this.form.coverImageId = image.id
-      this.form.coverImageUrl = image.url
-
-      this.$nextTick(() => {
-        this.$refs.publishForm.validateField('coverImageId')
-      })
-    },
-
-    // 提交公众号草稿
-    handleSubmit() {
-      this.$refs.publishForm.validate(valid => {
-        if (!valid || this.submitLoading) {
+    queryArticleCurrentDetail(articleId) {
+      this.$mapi.article.queryMyArticleDetail({ articleId }).then(({ data }) => {
+        if (!data) {
+          this.$message.error('文章不存在')
           return
         }
 
-        this.submitLoading = true
+        if (data.deleteFlag != null && data.deleteFlag !== 0) {
+          this.$message.error('文章处于回收站中，不允许发布微信公众号')
+          return
+        }
 
-        publishWeChatArticle({
-          articleId: this.form.articleId,
-          title: this.form.title.trim(),
-          digest: this.form.digest.trim(),
-          coverImageId: this.form.coverImageId
-        }).then(() => {
-          this.$message.success('微信公众号草稿创建成功')
-          this.dialogVisible = false
-          this.$emit('success')
-        }).finally(() => {
-          this.submitLoading = false
-        })
+        this.formData.wechatTitle = data.title
+        this.formData.wechatDigest = data.summary
+        this.formData.wechatAuthor = data.authorName
+      }).catch(_ => {
+        this.doClose()
       })
     },
+    // 回填文章上传信息
+    setWechatCoverImageId(file) {
+      this.formData.wechatCoverImageUrl = file['fileAccessUrl']
+      this.formData.wechatCoverImageId = file['fileId']
+    },
+    // 保存公众号同步配置信息
+    handleSubmit1() {
+      if (this.submitLoading1) {
+        return
+      }
+      this.$refs.syncWechatForm.validate((valid) => {
+        if (valid) {
+          this.submitLoading1 = true
+          const param = {
+            articleId: this.formData.articleId,
+            articleVersion: this.formData.articleVersion,
+            wechatCoverImageId: this.formData.wechatCoverImageId,
+            wechatTitle: this.formData.wechatTitle,
+            wechatAuthor: this.formData.wechatAuthor,
+            wechatDigest: this.formData.wechatDigest
+          }
+          this.$mapi.article.saveWeChatSyncConfig(param).then(res => {
+            this.$message.success(res.message)
+            this.queryWeChatSyncConfig(this.formData.articleId)
+            this.step1Finish = true
+          }).finally(_ => {
+            this.submitLoading1 = false
+          })
+        }
+      })
+    },
+    // 提交公众号同步动作
+    handleSubmit2() {
+      if (this.submitLoading1) {
+        return
+      }
 
-    // 关闭弹窗
-    handleClosed() {
-      this.$refs.publishForm && this.$refs.publishForm.resetFields()
-      this.articleId = null
+      if (!this.step1Finish) {
+        this.$message.warning('请先保存公众号同步配置信息')
+        return
+      }
+
+      this.submitLoading2 = true
+      this.$mapi.article.publishWeChat({ articleId: this.formData.articleId }).then(res => {
+        this.$message.success(res.message)
+        this.doClose()
+      }).finally(_ => {
+        this.submitLoading2 = false
+      })
+    },
+    // 关闭
+    doClose() {
+      this.pageLoading = false
+      this.submitLoading1 = false
+      this.submitLoading2 = false
+      this.step1Finish = false
+      this.articleVersionList = []
+      Object.keys(this.formData).forEach(key => {
+        this.formData[key] = null
+      })
+      this.$refs.syncWechatForm && this.$refs.syncWechatForm.resetFields()
+      this.$emit('publishWechatDone')
+    },
+    handleClose() {
+      this.doClose()
     }
   }
 }
 </script>
 
 <style scoped>
-.wechat-cover {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.wechat-cover-preview {
-  width: 220px;
-}
-
-.wechat-cover-preview >>> .el-image {
-  width: 220px;
-  height: 110px;
-  border-radius: 4px;
-}
-
-.wechat-cover-actions {
-  text-align: center;
-}
-
-.wechat-cover-tip {
-  margin-top: 8px;
+.form-tip {
+  margin-top: 7px;
   color: #909399;
   font-size: 12px;
+  line-height: 18px;
 }
 </style>

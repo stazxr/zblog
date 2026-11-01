@@ -11,6 +11,10 @@
         ORDER BY PUBLISH_TIME DESC
     </select>
 
+    <select id="selectArticleVersionNumList" resultType="java.lang.Integer">
+        SELECT VERSION FROM article_version WHERE ARTICLE_ID = #{articleId} ORDER BY PUBLISH_TIME DESC
+    </select>
+
     <select id="selectArticleTagNamesByArticleVersionIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo">
         SELECT
             atr.ARTICLE_VERSION_ID AS articleId, t.NAME AS tagName

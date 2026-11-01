@@ -144,34 +144,6 @@ public abstract class AbstractFileHandler implements FileHandler {
     }
 
     /**
-     * 获取文件输入流。
-     *
-     * <p>
-     * 参数 {@code storageLocation} 表示文件在存储系统中的唯一定位标识，不同存储实现对该值的解析规则不同：
-     *
-     * <ul>
-     *   <li><b>本地存储</b>：文件系统中的绝对路径，如：
-     *     <pre>/home/zblog/file/upload/2026-01/06/xxx.png</pre>
-     *   </li>
-     *   <li><b>云存储（bucket:key）</b>：
-     *     <pre>zblog-2026-01:upload/2026/01/09/xxx.jpg</pre>
-     *   </li>
-     *   <li><b>云存储（key）</b>：
-     *     <pre>upload/2026/01/09/xxx.jpg</pre>
-     *   </li>
-     * </ul>
-     * 具体解析规则由子类实现决定。
-     * </p>
-     *
-     * @param storageLocation 文件在存储系统中的唯一定位标识
-     * @return 文件输入流
-     * @throws IOException IO 异常
-     */
-    protected InputStream getFileStream(String storageLocation) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * 构建文件相对路径。
      *
      * @param filename 文件名

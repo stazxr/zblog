@@ -530,7 +530,7 @@ export default {
           }
 
           this.$emit('input', url)
-          this.$emit('success', url)
+          this.$emit('success', data)
           this.$message.success('图片上传成功')
           this.dialogVisible = false
         } else {

@@ -78,7 +78,6 @@ const ARTICLE_STATUS = {
 }
 
 export default {
-  name: 'PublishSuccess',
   components: {
     previewDialog
   },

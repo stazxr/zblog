@@ -26,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 文章管理
  *
@@ -291,6 +293,20 @@ public class ArticleController {
     }
 
     /**
+     * 查询文章发布版本列表
+     *
+     * @param articleId 文章id
+     * @return List<Integer>
+     */
+    @GetMapping(value = "/queryArticleVersionList")
+    @ApiOperation(value = "查询文章发布版本列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询文章发布版本列表", code = "ARTIQ010", level = RouterLevel.PUBLIC)
+    public List<Integer> queryArticleVersionList(@RequestParam Long articleId) {
+        return articleService.queryArticleVersionList(articleId);
+    }
+
+    /**
      * 查询文章微信公众号同步配置信息
      *
      * @param articleId 文章id
@@ -310,11 +326,11 @@ public class ArticleController {
      * @param wechatSyncConfigDto 文章微信公众号同步配置信息
      */
     @Log
-    @PostMapping(value = "/publishWeChat")
+    @PostMapping(value = "/saveWeChatSyncConfig")
     @ApiOperation(value = "保存文章微信公众号同步配置信息")
     @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
     @Router(name = "保存文章微信公众号同步配置信息", code = "ARTIA005")
-    public void saveWeChatSyncConfig(@RequestParam ArticleWechatSyncConfigDto wechatSyncConfigDto) {
+    public void saveWeChatSyncConfig(@RequestBody ArticleWechatSyncConfigDto wechatSyncConfigDto) {
         articleService.saveWeChatSyncConfig(wechatSyncConfigDto);
     }
 

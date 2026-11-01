@@ -21,12 +21,14 @@ import com.github.stazxr.zblog.bas.sequence.util.SequenceUtils;
 import com.github.stazxr.zblog.base.domain.dto.UploadFileDto;
 import com.github.stazxr.zblog.base.domain.entity.FileRelation;
 import com.github.stazxr.zblog.base.domain.entity.User;
+import com.github.stazxr.zblog.base.domain.vo.FileVo;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
 import com.github.stazxr.zblog.base.domain.vo.UserWechatAccountVo;
 import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.mapper.UserWechatAccountMapper;
 import com.github.stazxr.zblog.base.service.FileService;
+import com.github.stazxr.zblog.content.converter.ArticleWechatSyncConfigConverter;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
@@ -62,6 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -109,6 +112,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final FileRelationMapper fileRelationMapper;
 
     private final FileService fileService;
+
+    private final ArticleWechatSyncConfigConverter articleWechatSyncConfigConverter;
 
     private final FileProperties fileProperties;
 
@@ -667,6 +672,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
+     * 查询文章发布版本列表
+     *
+     * @param articleId 文章id
+     * @return List<Integer>
+     */
+    @Override
+    public List<Integer> queryArticleVersionList(Long articleId) {
+        return articleVersionMapper.selectArticleVersionNumList(articleId);
+    }
+
+    /**
      * 查询文章微信公众号同步配置信息
      *
      * @param articleId 文章id
@@ -674,7 +690,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public ArticleWechatSyncConfigVo queryWeChatSyncConfig(Long articleId) {
-        return articleWechatSyncConfigMapper.selectByArticleId(articleId);
+        ArticleWechatSyncConfig syncConfig = articleWechatSyncConfigMapper.selectByArticleId(articleId);
+        return articleWechatSyncConfigConverter.entityToVo(syncConfig);
     }
 
     /**
@@ -684,29 +701,42 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public void saveWeChatSyncConfig(ArticleWechatSyncConfigDto wechatSyncConfigDto) {
-        ArticleWechatSyncConfig syncConfig = new ArticleWechatSyncConfig();
-        syncConfig.setId(SequenceUtils.getId());
-        syncConfig.setArticleId(wechatSyncConfigDto.getArticleId());
-        syncConfig.setArticleVersion(wechatSyncConfigDto.getArticleVersion());
-        syncConfig.setWechatTitle(wechatSyncConfigDto.getWechatTitle());
-        syncConfig.setWechatAuthor(wechatSyncConfigDto.getWechatAuthor());
-        syncConfig.setWechatDigest(wechatSyncConfigDto.getWechatDigest());
-        if (wechatSyncConfigDto.getWechatCoverImageId() == null) {
-            // 没有设置封面，判断 ThumbMediaId
-            // ThrowUtils.throwIfBlank(syncConfig.getThumbMediaId(), ArticleErrorCode.EARTIA018);
+        boolean addFlag = false;
+        LocalDateTime now = LocalDateTime.now();
+        Long articleId = wechatSyncConfigDto.getArticleId();
+        ArticleWechatSyncConfig wechatSyncConfig = articleWechatSyncConfigMapper.selectByArticleId(articleId);
+        if (wechatSyncConfig == null) {
+            ThrowUtils.throwIfNull(wechatSyncConfigDto.getWechatCoverImageId(), ArticleErrorCode.EARTIA018);
+
+            addFlag = true;
+            wechatSyncConfig = new ArticleWechatSyncConfig();
+            wechatSyncConfig.setId(SequenceUtils.getId());
+            wechatSyncConfig.setCreateTime(now);
+            setWechatThumbMedia(wechatSyncConfig, wechatSyncConfigDto.getWechatCoverImageId());
         } else {
-            // 重新设置了封面，上传微信公众号
-            Long loginId = SecurityUtils.getLoginId();
-            UserWechatAccountVo userWechatAccountVo = userWechatAccountMapper.selectByUserId(loginId);
-            ThrowUtils.throwIfNull(userWechatAccountVo, ArticleErrorCode.EARTIA015);
-            String accessToken = getWechatAccessToken(userWechatAccountVo.getAppId(), userWechatAccountVo.getAppSecret());
-
-            // 封面参数
-
-            syncConfig.setThumbMediaId("");
-            syncConfig.setThumbMediaUrl("");
+            if (wechatSyncConfigDto.getWechatCoverImageId() == null) {
+                // 没有设置封面，判断 ThumbMediaId
+                ThrowUtils.throwIfBlank(wechatSyncConfig.getThumbMediaId(), ArticleErrorCode.EARTIA018);
+            } else {
+                setWechatThumbMedia(wechatSyncConfig, wechatSyncConfigDto.getWechatCoverImageId());
+            }
         }
 
+        wechatSyncConfig.setArticleId(wechatSyncConfigDto.getArticleId());
+        wechatSyncConfig.setArticleVersion(wechatSyncConfigDto.getArticleVersion());
+        wechatSyncConfig.setWechatTitle(wechatSyncConfigDto.getWechatTitle());
+        wechatSyncConfig.setWechatAuthor(wechatSyncConfigDto.getWechatAuthor());
+        wechatSyncConfig.setWechatDigest(wechatSyncConfigDto.getWechatDigest());
+        wechatSyncConfig.setMediaId(null);
+        wechatSyncConfig.setSyncStatus(ArticleWechatSyncStatus.TODO.getValue());
+        wechatSyncConfig.setErrorMsg(null);
+        wechatSyncConfig.setUpdateTime(now);
+
+        if (addFlag) {
+            articleWechatSyncConfigMapper.insert(wechatSyncConfig);
+        } else {
+            articleWechatSyncConfigMapper.updateById(wechatSyncConfig);
+        }
     }
 
     /**
@@ -1231,5 +1261,30 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         return accessToken;
+    }
+
+    private void setWechatThumbMedia(ArticleWechatSyncConfig wechatSyncConfig, Long wechatCoverImageId) {
+        // 重新设置了封面，上传微信公众号
+        Long loginId = SecurityUtils.getLoginId();
+        UserWechatAccountVo userWechatAccountVo = userWechatAccountMapper.selectByUserId(loginId);
+        ThrowUtils.throwIfNull(userWechatAccountVo, ArticleErrorCode.EARTIA015);
+        String accessToken = getWechatAccessToken(userWechatAccountVo.getAppId(), userWechatAccountVo.getAppSecret());
+
+        // 获取上传封面信息
+        FileVo fileVo = fileMapper.selectFileDetailById(wechatCoverImageId);
+        ThrowUtils.throwIfNull(fileVo, ArticleErrorCode.EARTIA019);
+
+        // 获取文件上传处理器
+        FileHandler fileHandler = FileHandlerEnum.instance(fileVo.getUploadType());
+        InputStream fileStream = fileHandler.getFileStream(fileVo.getFileAbsolutePath());
+
+        // 上传永久图片素材
+        try {
+            JSONObject result = WeChatUtils.addMaterial(accessToken, "image", fileVo.getFilename(), fileVo.getFileType(), fileStream);
+            wechatSyncConfig.setThumbMediaId(result.getString("media_id"));
+            wechatSyncConfig.setThumbMediaUrl(result.getString("url"));
+        } catch (Exception e) {
+            throw new ServiceException(ArticleErrorCode.EARTIA020, e);
+        }
     }
 }

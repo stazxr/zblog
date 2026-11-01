@@ -29,6 +29,14 @@ public interface ArticleVersionMapper extends BaseMapper<ArticleVersion> {
     IPage<ArticleVersionVo> selectArticleVersionList(@Param("page") Page<ArticleVersionVo> page, @Param("query") ArticleVersionQueryDto queryDto);
 
     /**
+     * 查询文章发布版本列表
+     *
+     * @param articleId 文章id
+     * @return List<Integer>
+     */
+    List<Integer> selectArticleVersionNumList(@Param("articleId") Long articleId);
+
+    /**
      * 批量查询文章标签名称列表
      *
      * @param articleVersionIds 文章id列表

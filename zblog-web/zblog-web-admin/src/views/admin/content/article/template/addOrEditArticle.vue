@@ -973,7 +973,7 @@ export default {
         .replace(/\s+/g, ' ')
         .trim()
 
-      this.formData.summary = text.substring(0, 250)
+      this.formData.summary = text.substring(0, 120)
       this.$refs.articleForm.validateField('summary')
     },
 

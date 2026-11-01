@@ -1,5 +1,7 @@
 package com.github.stazxr.zblog.bas.file.handler.impl;
 
+import com.github.stazxr.zblog.bas.file.FileErrorCode;
+import com.github.stazxr.zblog.bas.file.FileException;
 import com.github.stazxr.zblog.bas.file.handler.AbstractFileHandler;
 import com.github.stazxr.zblog.bas.file.model.FileInfo;
 import com.github.stazxr.zblog.bas.file.model.StorageLocation;
@@ -93,11 +95,14 @@ public abstract class CloudFileHandler extends AbstractFileHandler {
      *
      * @param storageLocation 文件在存储系统中的唯一定位标识
      * @return 文件输入流
-     * @throws IOException IO 异常
      */
     @Override
-    protected InputStream getFileStream(String storageLocation) throws IOException {
-        return getCloudFileStream(StorageLocationParser.parse(storageLocation));
+    public InputStream getFileStream(String storageLocation) {
+        try {
+            return getCloudFileStream(StorageLocationParser.parse(storageLocation));
+        } catch (Exception e) {
+            throw new FileException(FileErrorCode.SFILEA004, e);
+        }
     }
 
     /**

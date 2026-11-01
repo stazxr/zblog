@@ -70,7 +70,6 @@
 
 <script>
 export default {
-  name: 'PublishTimeDialog',
   props: {
     visible: {
       type: Boolean,

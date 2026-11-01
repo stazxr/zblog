@@ -76,6 +76,18 @@ export default {
   pageArticleVersionList: params => {
     return api.httpRequest().get(`${articleApi}/pageArticleVersionList`, params)
   },
+  // 查询文章发布版本列表
+  queryArticleVersionList: params => {
+    return api.httpRequest().get(`${articleApi}/queryArticleVersionList`, params)
+  },
+  // 查询文章微信公众号同步配置信息
+  queryWeChatSyncConfig: params => {
+    return api.httpRequest().get(`${articleApi}/queryWeChatSyncConfig`, params)
+  },
+  // 保存文章微信公众号同步配置信息
+  saveWeChatSyncConfig: params => {
+    return api.httpRequest().post(`${articleApi}/saveWeChatSyncConfig`, params)
+  },
   // 微信公众号推送文章
   publishWeChat: params => {
     return api.httpRequest().post(`${articleApi}/publishWeChat`, params)

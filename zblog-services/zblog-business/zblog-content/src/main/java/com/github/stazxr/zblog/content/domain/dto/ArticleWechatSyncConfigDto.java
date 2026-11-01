@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -22,12 +24,14 @@ public class ArticleWechatSyncConfigDto implements Serializable {
     /**
      * 文章id
      */
+    @NotNull(message = "{TECH_PARAM_MISS}")
     @ApiModelProperty(value = "文章id")
     private Long articleId;
 
     /**
      * 同步的文章版本
      */
+    @NotNull(message = "{ARTICLE_WECHAT_ARTICLE_VERSION_REQUIRED}")
     @ApiModelProperty(value = "同步的文章版本")
     private Integer articleVersion;
 
@@ -40,6 +44,7 @@ public class ArticleWechatSyncConfigDto implements Serializable {
     /**
      * 微信公众号文章标题
      */
+    @NotBlank(message = "{ARTICLE_WECHAT_TITLE_REQUIRED}")
     @ApiModelProperty(value = "微信公众号文章标题")
     private String wechatTitle;
 

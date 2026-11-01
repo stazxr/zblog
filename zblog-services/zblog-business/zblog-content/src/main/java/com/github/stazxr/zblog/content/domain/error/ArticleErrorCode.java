@@ -37,6 +37,12 @@ public enum ArticleErrorCode implements ErrorCode {
     EARTIA016("ARTICLE_PUBLISH_WECHAT_FAILED"),
     /** 文章内容上传失败 */
     EARTIA017("ARTICLE_CONTENT_UPLOAD_FAILED"),
+    /** 请上传微信公众号文章封面 */
+    EARTIA018("ARTICLE_WECHAT_COVER_IMAGE_REQUIRED"),
+    /** 微信公众号文章封面上传失败，请重试 */
+    EARTIA019("ARTICLE_WECHAT_COVER_IMAGE_NOT_EXISTS"),
+    /** 上传文章封面素材失败，请稍后重试 */
+    EARTIA020("ARTICLE_UPLOAD_WECHAT_COVER_IMAGE_FAILED"),
     /** 文章草稿初始化失败 */
     SARTIA001("ARTICLE_INIT_DRAFT_FAILED");
 

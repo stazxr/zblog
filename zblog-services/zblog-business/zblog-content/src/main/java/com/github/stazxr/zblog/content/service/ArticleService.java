@@ -15,6 +15,8 @@ import com.github.stazxr.zblog.content.domain.entity.Article;
 import com.github.stazxr.zblog.content.domain.vo.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 文章管理业务层
  *
@@ -144,6 +146,14 @@ public interface ArticleService extends IService<Article> {
      * @return IPage<ArticleVersionVo>
      */
     IPage<ArticleVersionVo> queryArticleVersionByPage(ArticleVersionQueryDto queryDto);
+
+    /**
+     * 查询文章发布版本列表
+     *
+     * @param articleId 文章id
+     * @return List<Integer>
+     */
+    List<Integer> queryArticleVersionList(Long articleId);
 
     /**
      * 查询文章微信公众号同步配置信息
