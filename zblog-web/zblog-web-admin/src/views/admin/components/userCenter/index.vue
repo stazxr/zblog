@@ -58,7 +58,7 @@
               </li>
               <li>上次登录
                 <div class="user-right">
-                  {{ user.lastLoginAddress }} · {{ user.lastLoginTime }}
+                  <template v-if="user.lastLoginAddress">{{ user.lastLoginAddress }} ·</template> {{ user.lastLoginTime }}
                 </div>
               </li>
               <li>

@@ -42,7 +42,9 @@
         </header>
 
         <main class="preview-body">
-          <v-md-preview v-if="article.contentMd" :text="article.contentMd" class="article-markdown-preview" />
+          <div v-if="article.contentMd" ref="editorContainer">
+            <v-md-preview :text="article.contentMd" class="article-markdown-preview" />
+          </div>
           <el-empty v-else description="暂无文章内容" :image-size="100" />
         </main>
       </div>
@@ -51,6 +53,7 @@
 </template>
 
 <script>
+import CodeBlockEnhancer from '@/frame/muses/plugins/code-block-enhancer'
 export default {
   props: {
     dialogVisible: {
@@ -62,7 +65,26 @@ export default {
     return {
       pageLoading: false,
       article: this.createEmptyArticle(),
-      requestSequence: 0
+      requestSequence: 0,
+      codeBlockEnhancer: null
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      const container = this.$refs.editorContainer
+      if (!container) {
+        return
+      }
+
+      console.log('111')
+      this.codeBlockEnhancer = new CodeBlockEnhancer(container)
+      this.codeBlockEnhancer.init()
+    })
+  },
+  beforeDestroy() {
+    if (this.codeBlockEnhancer) {
+      this.codeBlockEnhancer.destroy()
+      this.codeBlockEnhancer = null
     }
   },
   methods: {
@@ -123,6 +145,11 @@ export default {
         }
 
         this.article = this.normalizeArticleData(data)
+        if (this.codeBlockEnhancer == null) {
+          console.log('222')
+          this.codeBlockEnhancer = new CodeBlockEnhancer(this.$refs.editorContainer)
+          this.codeBlockEnhancer.init()
+        }
       }).catch(error => {
         if (sequence !== this.requestSequence) {
           return

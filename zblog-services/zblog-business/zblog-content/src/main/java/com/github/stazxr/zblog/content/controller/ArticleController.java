@@ -353,13 +353,14 @@ public class ArticleController {
      *
      * @param multipartFile 上传文件
      * @param articleId     文章id
+     * @param type          上传类型
      * @return UploadFileVo
      */
     @PostMapping("/uploadFile")
     @ApiOperation(value = "文章内容上传")
     @ApiVersion(BaseConst.ApiVersion.V_4_0_0)
     @Router(name = "文章内容上传", code = "ARTIA004")
-    public UploadFileVo uploadFile(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Long articleId) {
-        return articleService.uploadFile(multipartFile, articleId);
+    public UploadFileVo uploadFile(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Long articleId, @RequestParam String type) {
+        return articleService.uploadFile(multipartFile, articleId, type);
     }
 }

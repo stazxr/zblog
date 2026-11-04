@@ -790,14 +790,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      *
      * @param multipartFile 上传文件
      * @param articleId     文章id
+     * @param type          上传类型：attachment video image
      * @return UploadFileVo
      */
     @Override
-    public UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId) {
-        // 获取文件上传类型
-        int fileUploadType = fileProperties.getStorageType();
+    public UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId, String type) {
+        // 校验上传文件类型
+        checkUploadFileType(multipartFile, type);
 
         // 获取文件上传处理器
+        int fileUploadType = fileProperties.getStorageType();
         FileHandler fileHandler = FileHandlerEnum.instance(fileUploadType);
 
         String uploadFilePath = null; // 上传成功的文件路径
@@ -827,6 +829,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             }
             throw new ServiceException(ArticleErrorCode.EARTIA017, e);
         }
+    }
+
+    private void checkUploadFileType(MultipartFile multipartFile, String type) {
+
     }
 
     private UploadFileVo insertFileInfoToDb(Long articleId, boolean firstUpload, ArticleFileStorage fileStorage, UploadContext uploadContext) {

@@ -1,27 +1,35 @@
 <template>
   <div class="muses-markdown-editor" :class="{ 'is-fullscreen': fullscreen }">
-    <v-md-editor
-      ref="editor"
-      v-model="innerValue"
-      :height="editorHeight"
-      :disabled="disabled"
-      :disabled-menus="disabledMenus"
-      :left-toolbar="leftToolbar"
-      :right-toolbar="rightToolbar"
-      :toolbar="mergedToolbar"
-      :mode="mode"
-      :include-level="includeLevel"
-      @upload-image="handleUploadImage"
-    />
+    <div ref="editorContainer">
+      <v-md-editor
+        ref="editor"
+        v-model="innerValue"
+        :height="editorHeight"
+        :disabled="disabled"
+        :disabled-menus="disabledMenus"
+        :left-toolbar="leftToolbar"
+        :right-toolbar="rightToolbar"
+        :toolbar="mergedToolbar"
+        :mode="mode"
+        :include-level="includeLevel"
+        :default-fullscreen="false"
+        @upload-image="handleUploadImage"
+        @fullscreen-change="handleFullscreenChange"
+      />
+    </div>
 
-    <!-- 视频文件选择器 -->
-    <input ref="videoInput" class="video-input" type="file" accept="video/*" @change="handleVideoFileChange">
+    <!-- 视频选择器 -->
+    <input ref="videoInput" class="video-input" type="file" accept="video/*" @change="handleUploadVideo">
+
+    <!-- 附件选择器 -->
+    <input ref="attachmentInput" class="attachment-input" type="file" @change="handleUploadAttachment">
 
     <div v-if="fullscreen" class="fullscreen-mask" />
   </div>
 </template>
 
 <script>
+import CodeBlockEnhancer from '@/frame/muses/plugins/code-block-enhancer'
 export default {
   name: 'MusesMarkdownEditor',
   props: {
@@ -56,23 +64,18 @@ export default {
       type: Boolean,
       default: false
     },
-    /**
-     * 图片上传方法
-     *
-     * @param file 图片文件
-     * @return Promise
-     */
+    // 图片上传方法
     uploadImage: {
       type: Function,
       default: null
     },
-    /**
-     * 视频上传方法
-     *
-     * @param file 视频文件
-     * @return Promise
-     */
+    // 视频上传方法
     uploadVideo: {
+      type: Function,
+      default: null
+    },
+    // 附件上传方法
+    uploadAttachment: {
       type: Function,
       default: null
     },
@@ -88,7 +91,7 @@ export default {
      */
     leftToolbar: {
       type: String,
-      default: 'h bold italic strikethrough | quote tip | ul ol todo-list table hr | link image video code align | emoji | undo redo clear'
+      default: 'h quote | bold underline italic strikethrough inlinecode | ul ol todo-list align indent | tip emoji link image video attachment table code hr | undo redo clear'
     },
     /**
      * 右侧工具栏
@@ -117,24 +120,15 @@ export default {
   data() {
     return {
       innerValue: this.value,
-      /**
-       * 是否全屏
-       */
-      fullscreen: false,
-      /**
-       * 全屏高度
-       */
-      fullscreenHeight: 0,
-      /**
-       * 当前等待插入视频的编辑器实例
-       */
-      videoEditor: null
+      fullscreen: false, // 是否全屏
+      fullscreenHeight: 0, // 全屏高度
+      videoEditor: null, // 当前等待插入视频的编辑器实例
+      attachmentEditor: null, // 当前等待插入附件的编辑器实例
+      codeBlockEnhancer: null
     }
   },
   computed: {
-    /**
-     * 编辑器最终高度
-     */
+    // 编辑器最终高度
     editorHeight() {
       if (!this.fullscreen) {
         return this.formatHeight(this.height)
@@ -142,21 +136,69 @@ export default {
 
       return `${this.fullscreenHeight}px`
     },
-    /**
-     * 最终工具栏配置
-     *
-     * 保留外部 toolbar 配置，同时提供：
-     *
-     * video：视频上传
-     * align：内容对齐
-     */
+    // 最终工具栏配置
     mergedToolbar() {
       const defaultToolbar = {
-        video: {
-          title: '视频',
-          icon: 'v-md-icon-tip',
+        underline: {
+          title: '下划线',
+          icon: 'iconfont icon-underline',
           action: editor => {
-            this.openVideoSelector(editor)
+            this.insertUnderline(editor)
+          }
+        },
+        inlinecode: {
+          title: '行内代码',
+          icon: 'iconfont icon-inlinecode',
+          action: editor => {
+            this.insertInlineCode(editor)
+          }
+        },
+        align: {
+          title: '对齐',
+          icon: 'iconfont icon-align',
+          menus: [
+            {
+              name: 'left',
+              text: '左对齐',
+              action: editor => {
+                this.insertLeftAlign(editor)
+              }
+            },
+            {
+              name: 'right',
+              text: '右对齐',
+              action: editor => {
+                this.insertRightAlign(editor)
+              }
+            },
+            {
+              name: 'center',
+              text: '居中',
+              action: editor => {
+                this.insertCenterAlign(editor)
+              }
+            }
+          ]
+        },
+        indent: {
+          title: '增加缩进',
+          icon: 'iconfont icon-indent',
+          action: editor => {
+            this.insertIndent(editor)
+          }
+        },
+        video: {
+          title: '插入视频',
+          icon: 'iconfont icon-video',
+          action: editor => {
+            this.insertVideo(editor)
+          }
+        },
+        attachment: {
+          title: '插入附件',
+          icon: 'iconfont icon-attachment',
+          action: editor => {
+            this.insertAttach(editor)
           }
         }
       }
@@ -165,17 +207,13 @@ export default {
     }
   },
   watch: {
-    /**
-     * 同步外部内容
-     */
+    // 同步外部内容
     value(value) {
       if (value !== this.innerValue) {
         this.innerValue = value
       }
     },
-    /**
-     * 向外同步 Markdown
-     */
+    // 向外同步 Markdown
     innerValue(value) {
       this.$emit('input', value)
       this.$emit('change', value)
@@ -183,18 +221,23 @@ export default {
   },
   mounted() {
     this.bindFullscreenEvent()
+    this.$nextTick(() => {
+      this.codeBlockEnhancer = new CodeBlockEnhancer(
+        this.$refs.editorContainer
+      )
+      this.codeBlockEnhancer.init()
+    })
   },
   beforeDestroy() {
     this.unbindFullscreenEvent()
     this.exitFullscreen()
+    if (this.codeBlockEnhancer) {
+      this.codeBlockEnhancer.destroy()
+      this.codeBlockEnhancer = null
+    }
   },
   methods: {
-    /**
-     * 格式化编辑器高度
-     *
-     * @param height 高度
-     * @return String ${num}px
-     */
+    // 格式化编辑器高度
     formatHeight(height) {
       if (typeof height === 'number') {
         return `${height}px`
@@ -206,20 +249,102 @@ export default {
 
       return height
     },
-    /**
-     * 图片上传
-     *
-     * v-md-editor 1.7.12：
-     * insertImage({
-     *   url,
-     *   desc
-     * })
-     *
-     * @param event 文件选择事件
-     * @param insertImage 图片插入方法
-     * @param files 文件列表
-     */
+    // 下划线
+    insertUnderline(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `<u>${content}</u>`,
+          selected: content
+        }
+      })
+    },
+    // 行内代码
+    insertInlineCode(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `\`${content}\``,
+          selected: content
+        }
+      })
+    },
+    // 向左对齐
+    insertLeftAlign(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `::: align-left\n${content}\n:::`,
+          selected: content
+        }
+      })
+    },
+    // 向右对齐
+    insertRightAlign(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `::: align-right\n${content}\n:::`,
+          selected: content
+        }
+      })
+    },
+    // 居中对齐
+    insertCenterAlign(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `::: align-center\n${content}\n:::`,
+          selected: content
+        }
+      })
+    },
+    // 增加缩进
+    insertIndent(editor) {
+      editor.insert((selected) => {
+        const content = selected || '请输入文本'
+        return {
+          text: `::: indent\n${content}\n:::\n`,
+          selected: content
+        }
+      })
+    },
+    // 插入视频
+    insertVideo(editor) {
+      if (!this.uploadVideo) {
+        this.$emit('upload-video')
+        return
+      }
+
+      this.videoEditor = editor
+      const input = this.$refs.videoInput
+      if (!input) {
+        return
+      }
+
+      input.value = ''
+      input.click()
+    },
+    // 插入附件
+    insertAttach(editor) {
+      if (!this.uploadAttachment) {
+        this.$emit('upload-attachment')
+        return
+      }
+
+      this.attachmentEditor = editor
+      const input = this.$refs.attachmentInput
+      if (!input) {
+        return
+      }
+
+      input.value = ''
+      input.click()
+    },
+
+    // 图片上传
     async handleUploadImage(event, insertImage, files) {
+      const type = 'image'
       const fileList = files || this.getFiles(event)
       if (!fileList || !fileList.length) {
         return
@@ -233,135 +358,88 @@ export default {
       }
 
       try {
-        this.$emit('upload-start', {
-          type: 'image',
-          file
-        })
-
+        this.$emit('upload-start', { type: type, file })
         const result = await this.uploadImage(file)
         const url = this.resolveUploadUrl(result)
-
         if (!url) {
-          this.$emit('upload-error', {
-            type: 'image',
-            file,
-            error: new Error('图片上传成功，但没有获取到图片地址')
-          })
+          this.$emit('upload-error', { type: type, file, error: new Error('图片上传成功，但没有获取到图片地址') })
           return
         }
 
-        insertImage({
-          url,
-          desc: file.name
-        })
-
-        this.$emit('upload-success', {
-          type: 'image',
-          file,
-          result
-        })
+        const filename = this.resolveUploadFilename(file, result)
+        insertImage({ url, desc: filename })
+        this.$emit('upload-success', { type: type, file, result })
       } catch (error) {
-        this.$emit('upload-error', {
-          type: 'image',
-          file,
-          error
-        })
+        this.$emit('upload-error', { type: type, file, error })
       }
     },
-    /**
-     * 打开视频选择器
-     *
-     * @param editor v-md-editor 编辑器实例
-     */
-    openVideoSelector(editor) {
-      if (!this.uploadVideo) {
-        this.$emit('upload-video')
+    // 视频上传
+    async handleUploadVideo(event) {
+      const type = 'video'
+      const file = event.target.files && event.target.files[0]
+      if (!file) {
         return
       }
 
-      this.videoEditor = editor
-
-      const input = this.$refs.videoInput
-
-      if (!input) {
-        return
-      }
-
-      // 允许重复选择同一个文件
-      input.value = ''
-
-      input.click()
-    },
-    /**
-     * 视频文件选择完成
-     *
-     * @param event change 事件
-     */
-    async handleVideoFileChange(event) {
-      const files = event.target.files
-
-      if (!files || !files.length) {
-        return
-      }
-
-      const file = files[0]
       const editor = this.videoEditor
-
       if (!editor) {
-        this.$emit('upload-error', {
-          type: 'video',
-          file,
-          error: new Error('未获取到 Markdown 编辑器实例')
-        })
+        this.$emit('upload-error', { type: type, file, error: new Error('未获取到 Markdown 编辑器实例') })
         return
       }
 
       try {
-        this.$emit('upload-start', {
-          type: 'video',
-          file
-        })
-
+        this.$emit('upload-start', { type: type, file })
         const result = await this.uploadVideo(file)
         const url = this.resolveUploadUrl(result)
-
         if (!url) {
-          this.$emit('upload-error', {
-            type: 'video',
-            file,
-            error: new Error('视频上传成功，但没有获取到视频地址')
-          })
+          this.$emit('upload-error', { type: type, file, error: new Error('视频上传成功，但没有获取到视频地址') })
           return
         }
 
-        this.insertVideo(editor, url)
-
-        this.$emit('upload-success', {
-          type: 'video',
-          file,
-          result
-        })
+        await this.doInsertVideo(editor, url)
+        this.$emit('upload-success', { type: type, file, result })
       } catch (error) {
-        this.$emit('upload-error', {
-          type: 'video',
-          file,
-          error
-        })
+        this.$emit('upload-error', { type: type, file, error })
       } finally {
         event.target.value = ''
         this.videoEditor = null
       }
     },
-    /**
-     * 插入视频
-     *
-     * Markdown 没有标准的视频语法，
-     * 使用 HTML video 标签。
-     *
-     * @param editor v-md-editor 编辑器实例
-     * @param url 视频地址
-     */
-    insertVideo(editor, url) {
+    // 附件上传
+    async handleUploadAttachment(event) {
+      const type = 'attachment'
+      const file = event.target.files && event.target.files[0]
+      if (!file) {
+        return
+      }
+
+      const editor = this.attachmentEditor
+      if (!editor) {
+        this.$emit('upload-error', { type: type, file, error: new Error('未获取到 Markdown 编辑器实例') })
+        return
+      }
+
+      try {
+        this.$emit('upload-start', { type: type, file })
+        const result = await this.uploadAttachment(file)
+        const url = this.resolveUploadUrl(result)
+        if (!url) {
+          this.$emit('upload-error', { type: type, file, error: new Error('附件上传成功，但没有获取到附件地址') })
+          return
+        }
+
+        const filename = this.resolveUploadFilename(file, result)
+        await this.doInsertAttachment(editor, filename, url)
+        this.$emit('upload-success', { type: type, file, result })
+      } catch (error) {
+        this.$emit('upload-error', { type: type, file, error })
+      } finally {
+        event.target.value = ''
+        this.attachmentEditor = null
+      }
+    },
+    // 插入视频
+    async doInsertVideo(editor, url) {
       const safeUrl = this.escapeHtmlAttribute(url)
       editor.insert(() => {
         return {
@@ -374,12 +452,22 @@ export default {
         }
       })
     },
-    /**
-     * 获取文件列表
-     *
-     * @param event 文件选择事件
-     * @return Array 文件列表
-     */
+    // 插入附件
+    async doInsertAttachment(editor, filename, url) {
+      const safeUrl = this.escapeHtmlAttribute(url)
+      const safeFilename = this.escapeHtmlAttribute(filename)
+      editor.insert(() => {
+        return {
+          text: [
+            '',
+            `[下载附件：${safeFilename}](${safeUrl})`,
+            ''
+          ].join('\n'),
+          selected: ''
+        }
+      })
+    },
+    // 获取文件列表
     getFiles(event) {
       if (!event || !event.target) {
         return []
@@ -387,50 +475,38 @@ export default {
 
       return Array.prototype.slice.call(event.target.files || [])
     },
-    /**
-     * 解析上传结果
-     *
-     * 支持：
-     *
-     * 1. 'https://xxx.com/a.png'
-     * 2. { url: 'https://xxx.com/a.png' }
-     * 3. { data: { url: 'https://xxx.com/a.png' } }
-     * 4. { data: 'https://xxx.com/a.png' }
-     *
-     * @param result 上传结果
-     * @return String 文件地址
-     */
+    // 解析上传文件地址
     resolveUploadUrl(result) {
       if (!result) {
         return ''
       }
-
       if (typeof result === 'string') {
         return result
       }
-
       if (result.url) {
         return result.url
       }
-
       if (result.data) {
         if (typeof result.data === 'string') {
           return result.data
         }
-
         if (result.data.url) {
           return result.data.url
         }
       }
-
       return ''
     },
-    /**
-     * 转义 HTML 属性
-     *
-     * @param value 属性值
-     * @return String 转义后的属性值
-     */
+    // 解析上传文件名称
+    resolveUploadFilename(file, result) {
+      if (result && result.name) {
+        return result.name
+      }
+      if (result && result.data && result.data.name) {
+        return result.data.name
+      }
+      return file.name.replace(/([\\[\]])/g, '\\$1')
+    },
+    // 转义 HTML 属性
     escapeHtmlAttribute(value) {
       return String(value)
         .replace(/&/g, '&amp;')
@@ -438,94 +514,69 @@ export default {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
     },
-    /**
-     * 绑定全屏事件
-     */
-    bindFullscreenEvent() {
-      window.addEventListener('resize', this.handleWindowResize)
-    },
-    /**
-     * 解绑全屏事件
-     */
-    unbindFullscreenEvent() {
-      window.removeEventListener('resize', this.handleWindowResize)
-    },
-    /**
-     * 窗口大小变化
-     */
-    handleWindowResize() {
-      if (this.fullscreen) {
-        this.updateFullscreenHeight()
-      }
-    },
-    /**
-     * 更新全屏高度
-     */
-    updateFullscreenHeight() {
-      this.fullscreenHeight = window.innerHeight
-    },
-    /**
-     * 进入全屏
-     */
-    enterFullscreen() {
-      this.fullscreen = true
-      this.updateFullscreenHeight()
-      document.body.classList.add('muses-markdown-editor-fullscreen')
-    },
-    /**
-     * 退出全屏
-     */
-    exitFullscreen() {
-      this.fullscreen = false
-      document.body.classList.remove('muses-markdown-editor-fullscreen')
-    },
-    /**
-     * 切换全屏
-     */
-    toggleFullscreen() {
+
+    // 切换全屏
+    handleFullscreenChange() {
       if (this.fullscreen) {
         this.exitFullscreen()
       } else {
         this.enterFullscreen()
       }
+      this.focus()
     },
-    /**
-     * 获取 Markdown 内容
-     *
-     * @return Markdown 内容
-     */
-    getValue() {
-      return this.innerValue
+    // 进入全屏
+    enterFullscreen() {
+      this.fullscreen = true
+      this.updateFullscreenHeight()
+      document.body.classList.add('muses-markdown-editor-fullscreen')
     },
-    /**
-     * 设置 Markdown 内容
-     *
-     * @param value Markdown 内容
-     */
-    setValue(value) {
-      this.innerValue = value || ''
+    // 退出全屏
+    exitFullscreen() {
+      this.fullscreen = false
+      document.body.classList.remove('muses-markdown-editor-fullscreen')
     },
-    /**
-     * 获取编辑器实例
-     *
-     * @return HTMLElement 编辑器实例
-     */
-    getEditor() {
-      return this.$refs.editor
+
+    // 绑定全屏事件
+    bindFullscreenEvent() {
+      window.addEventListener('resize', this.handleWindowResize)
     },
-    /**
-     * 聚焦编辑器
-     */
+    // 解绑全屏事件
+    unbindFullscreenEvent() {
+      window.removeEventListener('resize', this.handleWindowResize)
+    },
+    // 窗口大小变化
+    handleWindowResize() {
+      if (this.fullscreen) {
+        this.updateFullscreenHeight()
+      }
+    },
+    // 更新全屏高度
+    updateFullscreenHeight() {
+      this.fullscreenHeight = window.innerHeight
+    },
+
+    // 聚焦编辑器
     focus() {
       const editor = this.$refs.editor
-
       if (editor && editor.$refs && editor.$refs.editor) {
         const target = editor.$refs.editor
-
         if (target.focus) {
           target.focus()
         }
       }
+    },
+
+    // 获取 Markdown 内容
+    getValue() {
+      return this.innerValue
+    },
+    // 设置 Markdown 内容
+    setValue(value) {
+      this.innerValue = value || ''
+    },
+    // 获取编辑器实例
+    getEditor() {
+      return this.$refs.editor
     }
   }
 }
@@ -553,9 +604,16 @@ export default {
   }
 
   /**
-   * 隐藏视频文件选择器
+   * 隐藏视频选择器
    */
   .video-input {
+    display: none;
+  }
+
+  /**
+   * 隐藏附件选择器
+   */
+  .attachment-input {
     display: none;
   }
 
@@ -614,5 +672,59 @@ export default {
 // 给编辑器和预览区指定相同的字体
 .muses-markdown-editor textarea, .muses-markdown-editor .vuepress-markdown-body {
   font-family: menlo,Ubuntu Mono,consolas,Courier New,Microsoft Yahei,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif !important;
+}
+
+/**
+ * Markdown 代码块样式
+ *
+ * 保留 v-md-editor 原有的行号布局，
+ * 只优化代码块滚动条和显示效果。
+ */
+
+/* 代码块容器 */
+.muses-markdown-editor {
+  .v-md-editor {
+    pre {
+      white-space: pre !important;
+      overflow-x: auto !important;
+      overflow-y: hidden;
+
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+
+    /* Chrome / Edge 滚动条 */
+    pre::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 10px;
+    }
+
+    /* 悬停显示滚动条 */
+    pre:hover {
+      scrollbar-color: #b8b8b8 transparent;
+    }
+
+    pre:hover::-webkit-scrollbar-thumb {
+      background: #b8b8b8;
+    }
+
+    pre::-webkit-scrollbar-thumb:hover {
+      background: #888;
+    }
+
+    /* 保留代码原始格式 */
+    pre code {
+      white-space: pre !important;
+    }
+  }
 }
 </style>

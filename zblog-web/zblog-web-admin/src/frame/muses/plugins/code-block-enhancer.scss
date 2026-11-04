@@ -1,0 +1,155 @@
+/* ==================== 代码块外层 ==================== */
+.z-code-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  max-height: 488px;
+  margin: 16px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #363a42;
+  border-radius: 6px;
+  background: #1e1e1e;
+}
+
+/* ==================== 顶部工具栏 ==================== */
+.z-code-toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  background: #282c34;
+  border-bottom: 1px solid #363a42;
+}
+
+/* ==================== 语言名称 ==================== */
+.z-code-language {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #9da5b4;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.z-code-language-icon {
+  font-size: 14px;
+  color: #8b9bb4;
+}
+
+/* ==================== 操作按钮容器 ==================== */
+.z-code-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==================== 操作按钮 ==================== */
+.z-code-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #9da5b4;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.z-code-action:hover {
+  color: #ffffff;
+  background: #3b404b;
+}
+
+/* ==================== 代码区域 ==================== */
+.z-code-block > .v-md-pre-wrapper {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 450px;
+  overflow: auto;
+  border-radius: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+/* 清除原生代码块上下间距 */
+.z-code-block .v-md-pre-wrapper > pre {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: visible !important;
+  scrollbar-width: none;
+}
+
+/* 代码默认不换行 */
+.z-code-block .v-md-pre-wrapper > pre code {
+  white-space: pre !important;
+}
+
+/* ==================== 滚动条 ==================== */
+.z-code-block > .v-md-pre-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.z-code-block > .v-md-pre-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #555;
+}
+
+.z-code-block > .v-md-pre-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.z-code-block > .v-md-pre-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==================== 自动换行 ==================== */
+.z-code-block .v-md-pre-wrapper > pre.z-code-wrap,
+.z-code-block .v-md-pre-wrapper > pre.z-code-wrap code {
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ==================== 隐藏原生语言标识 ==================== */
+.z-code-block .v-md-pre-wrapper::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* ==================== 移动端 ==================== */
+@media screen and (max-width: 768px) {
+  .z-code-block {
+    max-height: 434px;
+    margin: 12px 0;
+    border-radius: 4px;
+  }
+
+  .z-code-toolbar {
+    flex-basis: 34px;
+    height: 34px;
+    padding: 0 8px;
+  }
+
+  .z-code-action {
+    height: 24px;
+    padding: 0 6px;
+  }
+
+  .z-code-block > .v-md-pre-wrapper {
+    max-height: 400px;
+  }
+}

@@ -79,7 +79,7 @@ public class ParseLoginParamFilter extends OncePerRequestFilter {
                     }
                 } catch (Exception e) {
                     log.error("解析用户登录参数失败", e);
-                    throw new AuthenticationServiceException("系统异常，请稍后再试");
+                    throw new AuthenticationServiceException("系统异常，请稍后再试"); // TODO 异常信息待优化
                 }
             }
         }

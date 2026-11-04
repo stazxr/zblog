@@ -44,6 +44,7 @@
               :height="650"
               :upload-image="uploadImage"
               :upload-video="uploadVideo"
+              :upload-attachment="uploadAttachment"
               :upload-start="uploadStart"
               :upload-success="uploadSuccess"
               :upload-error="uploadError"
@@ -978,13 +979,13 @@ export default {
     },
 
     // 开始上传
-    uploadStart(file) {
+    uploadStart(type, file) {
     },
     // 上传成功
     uploadSuccess(type, file, result) {
     },
     // 上传失败
-    uploadError(type, file, result) {
+    uploadError(type, file, error) {
     },
     // 图片上传
     uploadImage(file) {
@@ -994,22 +995,22 @@ export default {
     uploadVideo(file) {
       return this.uploadEditorFile(file, 'video')
     },
+    // 视频上传
+    uploadAttachment(file) {
+      return this.uploadEditorFile(file, 'attachment')
+    },
     // 编辑器文件上传
     uploadEditorFile(file, type) {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('articleId', this.formData.id)
+      formData.append('type', type)
       return this.$mapi.article.uploadFile(formData).then(res => {
-        const data = res && res.data
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error(type === 'image' ? '图片上传失败' : '视频上传失败')
-        }
-
-        const fileData = data[0]
+        const fileData = res && res.data
         return {
+          id: fileData.fileId,
           url: fileData['fileAccessUrl'],
-          name: fileData['originalFilename'],
-          id: fileData.fileId
+          name: fileData['originalFilename']
         }
       })
     },

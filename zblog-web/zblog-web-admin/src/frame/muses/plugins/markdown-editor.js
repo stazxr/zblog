@@ -63,11 +63,15 @@ import createHighlightLinesPlugin from '@kangc/v-md-editor/lib/plugins/highlight
 import '@kangc/v-md-editor/lib/plugins/highlight-lines/highlight-lines.css'
 
 // Copy Code
-import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index'
-import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css'
+// import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index'
+// import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css'
 
 // Align
 import createAlignPlugin from '@kangc/v-md-editor/lib/plugins/align'
+
+// markdown-container
+import { createIndentPlugin } from '../plugins/markdown-container'
+import '../plugins/markdown-container.css'
 
 let installed = false
 
@@ -86,6 +90,9 @@ export default function installMarkdownEditor(Vue) {
   VMdEditor.use(vuepressTheme, {
     Prism,
     extend(md) {
+      // 注册段落缩进容器
+      createIndentPlugin(md)
+
       md.set({
         quotes: '""\'\''
       })
@@ -98,13 +105,16 @@ export default function installMarkdownEditor(Vue) {
   VMdEditor.use(createEmojiPlugin())
   VMdEditor.use(createLineNumberPlugin())
   VMdEditor.use(createHighlightLinesPlugin())
-  VMdEditor.use(createCopyCodePlugin())
+  // VMdEditor.use(createCopyCodePlugin())
   VMdEditor.use(createAlignPlugin())
 
   // 配置独立预览组件的 VuePress 主题
   VMdPreview.use(vuepressTheme, {
     Prism,
     extend(md) {
+      // 注册段落缩进容器
+      createIndentPlugin(md)
+
       md.set({
         quotes: '""\'\''
       })
@@ -116,7 +126,7 @@ export default function installMarkdownEditor(Vue) {
   VMdPreview.use(createEmojiPlugin())
   VMdPreview.use(createLineNumberPlugin())
   VMdPreview.use(createHighlightLinesPlugin())
-  VMdPreview.use(createCopyCodePlugin())
+  // VMdPreview.use(createCopyCodePlugin())
   VMdPreview.use(createAlignPlugin())
 
   // 注册 Vue 插件

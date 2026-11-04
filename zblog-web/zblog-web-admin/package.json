@@ -54,6 +54,7 @@
     "json-bigint": "^1.0.0",
     "jszip": "^3.7.1",
     "markdown-it": "^12.3.2",
+    "markdown-it-container": "^4.0.0",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",

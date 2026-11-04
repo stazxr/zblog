@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-@TableName("file")
+@TableName("article_file")
 public class ArticleFile implements Serializable {
     private static final long serialVersionUID = 8332431022801860929L;
 

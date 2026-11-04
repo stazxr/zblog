@@ -182,7 +182,8 @@ public interface ArticleService extends IService<Article> {
      *
      * @param multipartFile 上传文件
      * @param articleId     文章id
+     * @param type          上传类型
      * @return UploadFileVo
      */
-    UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId);
+    UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId, String type);
 }

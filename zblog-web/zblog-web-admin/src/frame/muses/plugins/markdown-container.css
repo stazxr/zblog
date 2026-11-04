@@ -1,0 +1,11 @@
+/**
+ * Markdown 容器扩展样式
+ */
+
+/* Markdown 段落缩进 */
+.markdown-indent p {
+  text-indent: 2em;
+}
+.markdown-indent p + p {
+  margin-top: 0;
+}
