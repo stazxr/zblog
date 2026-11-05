@@ -1,10 +1,10 @@
 <template>
-  <div class="muses-markdown-editor" :class="{ 'is-fullscreen': fullscreen }">
+  <div class="muses-markdown-editor">
     <div ref="editorContainer">
       <v-md-editor
         ref="editor"
         v-model="innerValue"
-        :height="editorHeight"
+        :height="formatHeight(height)"
         :disabled="disabled"
         :disabled-menus="disabledMenus"
         :left-toolbar="leftToolbar"
@@ -12,9 +12,7 @@
         :toolbar="mergedToolbar"
         :mode="mode"
         :include-level="includeLevel"
-        :default-fullscreen="false"
         @upload-image="handleUploadImage"
-        @fullscreen-change="handleFullscreenChange"
       />
     </div>
 
@@ -23,8 +21,6 @@
 
     <!-- 附件选择器 -->
     <input ref="attachmentInput" class="attachment-input" type="file" @change="handleUploadAttachment">
-
-    <div v-if="fullscreen" class="fullscreen-mask" />
   </div>
 </template>
 
@@ -122,22 +118,12 @@ export default {
     return {
       innerValue: this.value,
       innerHtml: '',
-      fullscreen: false, // 是否全屏
-      fullscreenHeight: 0, // 全屏高度
       videoEditor: null, // 当前等待插入视频的编辑器实例
       attachmentEditor: null, // 当前等待插入附件的编辑器实例
       codeBlockEnhancer: null
     }
   },
   computed: {
-    // 编辑器最终高度
-    editorHeight() {
-      if (!this.fullscreen) {
-        return this.formatHeight(this.height)
-      }
-
-      return `${this.fullscreenHeight}px`
-    },
     // 最终工具栏配置
     mergedToolbar() {
       const defaultToolbar = {
@@ -223,7 +209,6 @@ export default {
   },
   mounted() {
     this.updateHtml(this.innerValue)
-    this.bindFullscreenEvent()
     this.$nextTick(() => {
       this.codeBlockEnhancer = new CodeBlockEnhancer(
         this.$refs.editorContainer
@@ -232,8 +217,6 @@ export default {
     })
   },
   beforeDestroy() {
-    this.unbindFullscreenEvent()
-    this.exitFullscreen()
     if (this.codeBlockEnhancer) {
       this.codeBlockEnhancer.destroy()
       this.codeBlockEnhancer = null
@@ -518,57 +501,6 @@ export default {
         .replace(/>/g, '&gt;')
     },
 
-    // 切换全屏
-    handleFullscreenChange() {
-      if (this.fullscreen) {
-        this.exitFullscreen()
-      } else {
-        this.enterFullscreen()
-      }
-      this.focus()
-    },
-    // 进入全屏
-    enterFullscreen() {
-      this.fullscreen = true
-      this.updateFullscreenHeight()
-      document.body.classList.add('muses-markdown-editor-fullscreen')
-    },
-    // 退出全屏
-    exitFullscreen() {
-      this.fullscreen = false
-      document.body.classList.remove('muses-markdown-editor-fullscreen')
-    },
-
-    // 绑定全屏事件
-    bindFullscreenEvent() {
-      window.addEventListener('resize', this.handleWindowResize)
-    },
-    // 解绑全屏事件
-    unbindFullscreenEvent() {
-      window.removeEventListener('resize', this.handleWindowResize)
-    },
-    // 窗口大小变化
-    handleWindowResize() {
-      if (this.fullscreen) {
-        this.updateFullscreenHeight()
-      }
-    },
-    // 更新全屏高度
-    updateFullscreenHeight() {
-      this.fullscreenHeight = window.innerHeight
-    },
-
-    // 聚焦编辑器
-    focus() {
-      const editor = this.$refs.editor
-      if (editor && editor.$refs && editor.$refs.editor) {
-        const target = editor.$refs.editor
-        if (target.focus) {
-          target.focus()
-        }
-      }
-    },
-
     // 更新 HTML 内容
     updateHtml(markdown) {
       this.innerHtml = markdownToHtml(markdown)
@@ -632,34 +564,6 @@ export default {
   .attachment-input {
     display: none;
   }
-
-  &.is-fullscreen {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 3000;
-    width: 100vw;
-    height: 100vh;
-    background: #fff;
-
-    .v-md-editor {
-      position: relative;
-      z-index: 3001;
-      width: 100%;
-      height: 100% !important;
-      border: 0;
-      border-radius: 0;
-    }
-  }
-}
-
-/**
- * 全屏时禁止页面滚动
- */
-.muses-markdown-editor-fullscreen {
-  overflow: hidden !important;
 }
 
 /**
@@ -686,8 +590,19 @@ export default {
 }
 
 // 给编辑器和预览区指定相同的字体
-.muses-markdown-editor textarea, .muses-markdown-editor .vuepress-markdown-body {
-  font-family: menlo,Ubuntu Mono,consolas,Courier New,Microsoft Yahei,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif !important;
+.muses-markdown-editor { // 编辑器字体
+  textarea,
+  .v-md-textarea-editor > pre {
+    font-family: Menlo, Ubuntu Mono, Consolas, "Courier New",
+    "Microsoft YaHei", "Hiragino Sans GB",
+    "WenQuanYi Micro Hei", monospace !important;
+  }
+}
+.muses-markdown-editor { // Markdown 预览区字体
+  .vuepress-markdown-body {
+    font-family: "Microsoft YaHei", "Hiragino Sans GB",
+    "WenQuanYi Micro Hei", Arial, sans-serif;
+  }
 }
 
 /**
@@ -700,46 +615,48 @@ export default {
 /* 代码块容器 */
 .muses-markdown-editor {
   .v-md-editor {
-    pre {
+    /**
+     * 普通代码块
+     */
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre {
       white-space: pre !important;
       overflow-x: auto !important;
       overflow-y: hidden;
-
-      /* Firefox */
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
     }
 
     /* Chrome / Edge 滚动条 */
-    pre::-webkit-scrollbar {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre::-webkit-scrollbar {
       height: 6px;
     }
-
-    pre::-webkit-scrollbar-track {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre::-webkit-scrollbar-track {
       background: transparent;
     }
-
-    pre::-webkit-scrollbar-thumb {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre::-webkit-scrollbar-thumb {
       background: transparent;
-      border-radius: 10px;
+      border-radius: 6px;
     }
 
     /* 悬停显示滚动条 */
-    pre:hover {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre:hover {
       scrollbar-color: #b8b8b8 transparent;
     }
-
-    pre:hover::-webkit-scrollbar-thumb {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre:hover::-webkit-scrollbar-thumb {
       background: #b8b8b8;
     }
-
-    pre::-webkit-scrollbar-thumb:hover {
+    .v-md-pre-wrapper:not(.z-code-block > .v-md-pre-wrapper) > pre::-webkit-scrollbar-thumb:hover {
       background: #888;
     }
 
     /* 保留代码原始格式 */
     pre code {
       white-space: pre !important;
+    }
+
+    /* 增强代码块由 v-md-pre-wrapper 负责滚动，避免 pre 内部产生第二层滚动条 */
+    .z-code-block > .v-md-pre-wrapper > pre {
+      overflow: visible !important;
     }
   }
 }
