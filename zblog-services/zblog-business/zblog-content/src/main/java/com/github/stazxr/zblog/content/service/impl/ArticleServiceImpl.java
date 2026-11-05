@@ -28,6 +28,7 @@ import com.github.stazxr.zblog.base.mapper.FileMapper;
 import com.github.stazxr.zblog.base.mapper.FileRelationMapper;
 import com.github.stazxr.zblog.base.mapper.UserWechatAccountMapper;
 import com.github.stazxr.zblog.base.service.FileService;
+import com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties;
 import com.github.stazxr.zblog.content.converter.ArticleWechatSyncConfigConverter;
 import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
 import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
@@ -116,6 +117,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleWechatSyncConfigConverter articleWechatSyncConfigConverter;
 
     private final FileProperties fileProperties;
+
+    private final ArticleUploadProperties articleUploadProperties;
 
     /**
      * 分页查询我的文章列表
@@ -832,7 +835,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     private void checkUploadFileType(MultipartFile multipartFile, String type) {
-        // TODO  附件，图片，视频支持的格式隔离配置
+        // 校验文件是否为空
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            throw new ServiceException(ArticleErrorCode.EARTIA017);
+        }
+
+        // 获取允许上传的 Content-Type
+        Set<String> allowedContentTypes = articleUploadProperties.getAllowedContentTypes(type);
+        if (CollectionUtils.isEmpty(allowedContentTypes)) {
+            throw new ServiceException(ArticleErrorCode.EARTIA021, type);
+        }
+
+        // 获取文件 Content-Type
+        String contentType = multipartFile.getContentType();
+        if (StringUtils.isBlank(contentType)) {
+            throw new ServiceException(ArticleErrorCode.EARTIA021, "null");
+        }
+
+        // 校验 Content-Type
+        if (!allowedContentTypes.contains(contentType.toLowerCase(Locale.ROOT))) {
+            throw new ServiceException(ArticleErrorCode.EARTIA021, contentType);
+        }
     }
 
     private UploadFileVo insertFileInfoToDb(Long articleId, boolean firstUpload, ArticleFileStorage fileStorage, UploadContext uploadContext) {

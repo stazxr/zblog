@@ -43,6 +43,8 @@ public enum ArticleErrorCode implements ErrorCode {
     EARTIA019("ARTICLE_WECHAT_COVER_IMAGE_NOT_EXISTS"),
     /** 上传文章封面素材失败，请稍后重试 */
     EARTIA020("ARTICLE_UPLOAD_WECHAT_COVER_IMAGE_FAILED"),
+    /** 不支持的文件格式 */
+    EARTIA021("ARTICLE_CONTENT_UPLOAD_TYPE_NOT_SUPPORT"),
     /** 文章草稿初始化失败 */
     SARTIA001("ARTICLE_INIT_DRAFT_FAILED");
 

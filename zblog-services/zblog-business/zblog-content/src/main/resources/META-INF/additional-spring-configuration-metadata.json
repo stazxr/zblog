@@ -1,0 +1,30 @@
+{
+  "groups": [
+    {
+      "name": "zblog.article.upload",
+      "type": "com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties",
+      "sourceType": "com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties",
+      "description": "文章上传配置."
+    }
+  ],
+  "properties": [
+    {
+      "name": "zblog.article.upload.attachment",
+      "type": "java.util.Set<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties",
+      "description": "附件允许上传的 Content-Type 白名单."
+    },
+    {
+      "name": "zblog.article.upload.video",
+      "type": "java.util.Set<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties",
+      "description": "视频允许上传的 Content-Type 白名单."
+    },
+    {
+      "name": "zblog.article.upload.image",
+      "type": "java.util.Set<java.lang.String>",
+      "sourceType": "com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties",
+      "description": "图片允许上传的 Content-Type 白名单."
+    }
+  ]
+}

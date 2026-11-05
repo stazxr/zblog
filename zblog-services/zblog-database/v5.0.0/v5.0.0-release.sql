@@ -1199,6 +1199,8 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_PUBLISH_WECHAT_FAILED', 'en-US', 'TODO: {0}', 'common'),
 ('ARTICLE_CONTENT_UPLOAD_FAILED', 'zh-CN', '文章内容上传失败', 'common'),
 ('ARTICLE_CONTENT_UPLOAD_FAILED', 'en-US', 'TODO', 'common'),
+('ARTICLE_CONTENT_UPLOAD_TYPE_NOT_SUPPORT', 'zh-CN', '不支持的文件格式：{0}', 'common'),
+('ARTICLE_CONTENT_UPLOAD_TYPE_NOT_SUPPORT', 'en-US', 'TODO', 'common'),
 ('ARTICLE_WECHAT_COVER_IMAGE_REQUIRED', 'zh-CN', '请上传微信公众号文章封面', 'common'),
 ('ARTICLE_WECHAT_COVER_IMAGE_REQUIRED', 'en-US', 'TODO', 'common'),
 ('ARTICLE_WECHAT_COVER_IMAGE_NOT_EXISTS', 'zh-CN', '微信公众号文章封面上传失败，请重试', 'common'),
