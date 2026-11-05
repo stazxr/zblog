@@ -54,6 +54,12 @@ public class ArticleDraftDto implements Serializable {
     private String contentMd;
 
     /**
+     * 文章内容（Html）
+     */
+    @ApiModelProperty(value = "文章内容（Html）")
+    private String contentHtml;
+
+    /**
      * 封面类型
      */
     @ApiModelProperty(value = "封面类型")

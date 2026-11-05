@@ -291,7 +291,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setWordsCount(0);
         } else {
             article.setContentMd(articleDto.getContentMd());
-            article.setContentHtml(MarkdownHtmlUtils.toHtml(articleDto.getContentMd()));
+            article.setContentHtml(articleDto.getContentHtml());
             article.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
         }
         article.setSummary(articleDto.getSummary());
@@ -832,7 +832,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     private void checkUploadFileType(MultipartFile multipartFile, String type) {
-
+        // TODO  附件，图片，视频支持的格式隔离配置
     }
 
     private UploadFileVo insertFileInfoToDb(Long articleId, boolean firstUpload, ArticleFileStorage fileStorage, UploadContext uploadContext) {
@@ -1061,7 +1061,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             article.setSlug(articleDto.getSlug());
         }
         article.setContentMd(articleDto.getContentMd());
-        article.setContentHtml(MarkdownHtmlUtils.toHtml(articleDto.getContentMd()));
+        article.setContentHtml(articleDto.getContentHtml());
         article.setWordsCount(MarkdownWordCountUtils.countMarkdownWords(article.getContentMd()));
         article.setSummary(articleDto.getSummary());
         article.setCategoryId(articleDto.getCategoryId());

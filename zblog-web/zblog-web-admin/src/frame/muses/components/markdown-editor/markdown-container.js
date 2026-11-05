@@ -2,6 +2,7 @@
  * Markdown 容器扩展
  */
 
+import './markdown-container.css'
 import markdownItContainer from 'markdown-it-container'
 
 /**

@@ -34,14 +34,14 @@ public class ArticleDto implements Serializable {
      * 文章标题
      */
     @NotBlank(message = "{ARTICLE_TITLE_REQUIRED}")
-    @ApiModelProperty(value = "文章标题", required = true)
+    @ApiModelProperty(value = "文章标题")
     private String title;
 
     /**
      * 路径标识
      */
     @NotBlank(message = "{ARTICLE_SLUG_REQUIRED}")
-    @ApiModelProperty(value = "路径标识", required = true)
+    @ApiModelProperty(value = "路径标识")
     private String slug;
 
     /**
@@ -54,14 +54,20 @@ public class ArticleDto implements Serializable {
     /**
      * 文章内容（Markdown）
      */
-    @ApiModelProperty(value = "文章内容（Markdown）", required = true)
+    @ApiModelProperty(value = "文章内容（Markdown）")
     private String contentMd;
+
+    /**
+     * 文章内容（Html）
+     */
+    @ApiModelProperty(value = "文章内容（Html）")
+    private String contentHtml;
 
     /**
      * 封面类型
      */
     @NotNull(message = "{ARTICLE_COVER_IMAGE_TYPE_REQUIRED}")
-    @ApiModelProperty(value = "封面类型", required = true)
+    @ApiModelProperty(value = "封面类型")
     private Integer coverImageType;
 
     /**
@@ -74,7 +80,7 @@ public class ArticleDto implements Serializable {
      * 分类ID
      */
     @NotNull(message = "{ARTICLE_CATEGORY_ID_REQUIRED}")
-    @ApiModelProperty(value = "分类ID", required = true)
+    @ApiModelProperty(value = "分类ID")
     private Long categoryId;
 
     /**
@@ -87,14 +93,14 @@ public class ArticleDto implements Serializable {
      * 是否允许评论
      */
     @NotNull(message = "{ARTICLE_COMMENT_FLAG_REQUIRED}")
-    @ApiModelProperty(value = "是否允许评论", example = "true")
+    @ApiModelProperty(value = "是否允许评论")
     private Boolean commentFlag;
 
     /**
      * 文章类型
      */
     @NotNull(message = "{ARTICLE_TYPE_REQUIRED}")
-    @ApiModelProperty(value = "文章类型", required = true)
+    @ApiModelProperty(value = "文章类型")
     private Integer articleType;
 
     /**
@@ -119,7 +125,7 @@ public class ArticleDto implements Serializable {
      * 文章权限
      */
     @NotNull(message = "{ARTICLE_PERM_REQUIRED}")
-    @ApiModelProperty(value = "文章权限", required = true)
+    @ApiModelProperty(value = "文章权限")
     private Integer articlePerm;
 
     /**

@@ -48,6 +48,7 @@
               :upload-start="uploadStart"
               :upload-success="uploadSuccess"
               :upload-error="uploadError"
+              @change="handleContentChange"
             />
           </div>
 
@@ -400,6 +401,7 @@ export default {
         slug: '', // SLUG
         summary: '', // 文章摘要
         contentMd: '', // 文章内容
+        contentHtml: '', // 文章内容
         coverImageType: 1, // 封面类型
         coverImages: [], // 封面列表
         categoryId: '', // 文章分类
@@ -857,6 +859,7 @@ export default {
         slug: this.formData.slug,
         summary: this.formData.summary,
         contentMd: this.formData.contentMd,
+        contentHtml: this.formData.contentHtml,
         categoryId: this.formData.categoryId,
         tags: this.formData.tags,
         seoTitle: this.formData.seoTitle,
@@ -978,13 +981,19 @@ export default {
       this.$refs.articleForm.validateField('summary')
     },
 
-    // 开始上传
+    // 编辑器内容变化
+    handleContentChange(markdown, html) {
+      this.formData.contentHtml = html
+      this.updateTotalCount()
+    },
+
+    // 开始上传文件
     uploadStart(type, file) {
     },
-    // 上传成功
+    // 文件上传成功
     uploadSuccess(type, file, result) {
     },
-    // 上传失败
+    // 文件上传失败
     uploadError(type, file, error) {
     },
     // 图片上传

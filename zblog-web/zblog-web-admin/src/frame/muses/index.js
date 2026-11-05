@@ -4,9 +4,9 @@ import MusesPagination from './components/pagination/index.js'
 import MusesEmpty from './components/empty/index.js'
 import MusesImageUpload from './components/image-upload/index.js'
 import MusesImageCropUpload from './components/image-crop-upload/index.js'
-import MusesMarkdownEditor from './components/markdown-editor/index.js'
+import { MusesMarkdownEditor, MusesMarkdownPreview } from './components/markdown-editor/index.js'
 
-import installMarkdownEditor from './plugins/markdown-editor'
+import installMarkdownEditor from './components/markdown-editor/plugins/markdown-editor'
 
 const components = [
   MusesSearchForm,
@@ -15,7 +15,8 @@ const components = [
   MusesEmpty,
   MusesImageUpload,
   MusesImageCropUpload,
-  MusesMarkdownEditor
+  MusesMarkdownEditor,
+  MusesMarkdownPreview
 ]
 
 const install = function(Vue) {

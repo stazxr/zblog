@@ -13,6 +13,7 @@
   >
     <div v-loading="pageLoading" class="preview-container">
       <div class="preview-paper">
+        <!-- 文章头部 -->
         <header class="preview-header">
           <h1 class="preview-title">
             {{ article.title || '无标题文章' }}
@@ -41,11 +42,18 @@
           </div>
         </header>
 
+        <!-- 文章正文 -->
         <main class="preview-body">
-          <div v-if="article.contentMd" ref="editorContainer">
-            <v-md-preview :text="article.contentMd" class="article-markdown-preview" />
-          </div>
-          <el-empty v-else description="暂无文章内容" :image-size="100" />
+          <muses-markdown-preview
+            v-if="article.contentHtml"
+            :html="article.contentHtml"
+          />
+
+          <el-empty
+            v-else
+            description="暂无文章内容"
+            :image-size="100"
+          />
         </main>
       </div>
     </div>
@@ -53,8 +61,8 @@
 </template>
 
 <script>
-import CodeBlockEnhancer from '@/frame/muses/plugins/code-block-enhancer'
 export default {
+  name: 'PreviewDialog',
   props: {
     dialogVisible: {
       type: Boolean,
@@ -65,26 +73,7 @@ export default {
     return {
       pageLoading: false,
       article: this.createEmptyArticle(),
-      requestSequence: 0,
-      codeBlockEnhancer: null
-    }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      const container = this.$refs.editorContainer
-      if (!container) {
-        return
-      }
-
-      console.log('111')
-      this.codeBlockEnhancer = new CodeBlockEnhancer(container)
-      this.codeBlockEnhancer.init()
-    })
-  },
-  beforeDestroy() {
-    if (this.codeBlockEnhancer) {
-      this.codeBlockEnhancer.destroy()
-      this.codeBlockEnhancer = null
+      requestSequence: 0
     }
   },
   methods: {
@@ -96,6 +85,7 @@ export default {
         slug: '',
         summary: '',
         contentMd: '',
+        contentHtml: '',
         authorName: '',
         categoryId: null,
         categoryName: '',
@@ -131,7 +121,6 @@ export default {
 
       this.pageLoading = true
       this.article = this.createEmptyArticle()
-
       this.$mapi.article.queryMyArticleDetail({ articleId }).then(({ data }) => {
         // 忽略已经过期的请求结果
         if (sequence !== this.requestSequence) {
@@ -140,16 +129,11 @@ export default {
 
         if (!data) {
           this.$message.error('文章不存在')
-          this.handleClose()
+          this.doClose()
           return
         }
 
         this.article = this.normalizeArticleData(data)
-        if (this.codeBlockEnhancer == null) {
-          console.log('222')
-          this.codeBlockEnhancer = new CodeBlockEnhancer(this.$refs.editorContainer)
-          this.codeBlockEnhancer.init()
-        }
       }).catch(error => {
         if (sequence !== this.requestSequence) {
           return
@@ -157,16 +141,14 @@ export default {
 
         // eslint-disable-next-line no-console
         console.error('Get article detail failed:', error)
-
         this.$message.error('加载文章信息失败，请刷新浏览器再试！')
-        this.handleClose()
+        this.doClose()
       }).finally(() => {
         if (sequence === this.requestSequence) {
           this.pageLoading = false
         }
       })
     },
-
     // 将后端返回的数据转换为页面模型
     normalizeArticleData(data) {
       return {
@@ -175,6 +157,7 @@ export default {
         slug: data.slug || '',
         summary: data.summary || '',
         contentMd: data.contentMd || '',
+        contentHtml: data.contentHtml || '',
         authorName: data.authorName || '',
         categoryId: data.categoryId == null ? null : data.categoryId,
         categoryName: data.categoryName || '',
@@ -200,8 +183,10 @@ export default {
       this.requestSequence++
       this.pageLoading = false
       this.article = this.createEmptyArticle()
+      // 通知父组件关闭预览弹窗
       this.$emit('previewDone')
     },
+    // 关闭弹窗
     handleClose() {
       this.doClose()
     }
@@ -209,7 +194,7 @@ export default {
 }
 </script>
 
-<style src="@kangc/v-md-editor/lib/style/preview.css"></style>
+<style src="@kangc/v-md-editor/lib/style/preview-html.css"></style>
 <style src="@kangc/v-md-editor/lib/theme/style/vuepress.css"></style>
 
 <style>
@@ -233,11 +218,6 @@ export default {
   padding: 0;
   overflow: hidden;
   background: #f5f6f8;
-}
-
-.article-preview-dialog .el-dialog__footer {
-  flex-shrink: 0;
-  border-top: 1px solid #ebeef5;
 }
 
 .article-preview-dialog .preview-container {
@@ -305,13 +285,7 @@ export default {
 }
 
 .article-preview-dialog .preview-body {
-  /*padding-top: 30px;*/
   color: #303133;
-}
-
-/* 清除预览组件自身可能产生的多余外边距 */
-.article-preview-dialog .article-markdown-preview {
-  padding: 0;
 }
 
 /* VuePress 主题的 Markdown 内容样式 */
@@ -340,15 +314,6 @@ export default {
 
 .article-preview-dialog .vuepress-markdown-body iframe {
   max-width: 100%;
-}
-
-.article-preview-dialog .preview-footer {
-  margin-top: 60px;
-  padding-top: 20px;
-  border-top: 1px solid #ebeef5;
-  color: #c0c4cc;
-  font-size: 12px;
-  text-align: center;
 }
 
 @media screen and (max-width: 768px) {

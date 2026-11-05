@@ -29,7 +29,8 @@
 </template>
 
 <script>
-import CodeBlockEnhancer from '@/frame/muses/plugins/code-block-enhancer'
+import CodeBlockEnhancer from './code-block-enhancer.js'
+import { markdownToHtml } from './plugins/markdown-editor'
 export default {
   name: 'MusesMarkdownEditor',
   props: {
@@ -120,6 +121,7 @@ export default {
   data() {
     return {
       innerValue: this.value,
+      innerHtml: '',
       fullscreen: false, // 是否全屏
       fullscreenHeight: 0, // 全屏高度
       videoEditor: null, // 当前等待插入视频的编辑器实例
@@ -216,10 +218,11 @@ export default {
     // 向外同步 Markdown
     innerValue(value) {
       this.$emit('input', value)
-      this.$emit('change', value)
+      this.updateHtml(value)
     }
   },
   mounted() {
+    this.updateHtml(this.innerValue)
     this.bindFullscreenEvent()
     this.$nextTick(() => {
       this.codeBlockEnhancer = new CodeBlockEnhancer(
@@ -566,6 +569,18 @@ export default {
       }
     },
 
+    // 更新 HTML 内容
+    updateHtml(markdown) {
+      this.innerHtml = markdownToHtml(markdown)
+      this.$emit('change', markdown, this.innerHtml)
+    },
+    // 获取 HTML 内容
+    getHtml() {
+      // 主动重新生成，避免获取到尚未同步的内容
+      this.innerHtml = markdownToHtml(this.innerValue)
+      return this.innerHtml
+    },
+
     // 获取 Markdown 内容
     getValue() {
       return this.innerValue
@@ -574,6 +589,7 @@ export default {
     setValue(value) {
       this.innerValue = value || ''
     },
+
     // 获取编辑器实例
     getEditor() {
       return this.$refs.editor
