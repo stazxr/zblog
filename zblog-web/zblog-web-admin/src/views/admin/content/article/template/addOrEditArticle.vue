@@ -831,7 +831,7 @@ export default {
     },
     // 打开更多草稿列表
     openMoreDraftPage() {
-      this.$router.push({ name: 'Article', query: { _ts: '1' }})
+      this.$router.push({ name: 'MyArticle', query: { _ts: '1' }})
     },
     // 保存草稿
     saveDraft() {
@@ -1119,7 +1119,7 @@ export default {
 
         // 定时发布只是创建了定时任务，不应直接提示为已公开发布。
         this.$router.push({
-          name: 'Article',
+          name: 'MyArticle',
           query: {
             _ts: '3'
           }

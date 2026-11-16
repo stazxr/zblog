@@ -3,10 +3,7 @@ package com.github.stazxr.zblog.content.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
-import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
+import com.github.stazxr.zblog.content.domain.dto.*;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -186,4 +183,26 @@ public interface ArticleService extends IService<Article> {
      * @return UploadFileVo
      */
     UploadFileVo uploadFile(MultipartFile multipartFile, Long articleId, String type);
+
+    /**
+     * 分页查询待审核和已发布文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    IPage<ArticleVo> queryAuditAndPublishListByPage(ArticleQueryDto queryDto);
+
+    /**
+     * 查询文章管理页文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    ArticleCountVo queryAuditAndPublishCountInfo();
+
+    /**
+     * 审核文章
+     *
+     * @param reviewDto 审核信息
+     */
+    void reviewArticle(ArticleReviewDto reviewDto);
 }

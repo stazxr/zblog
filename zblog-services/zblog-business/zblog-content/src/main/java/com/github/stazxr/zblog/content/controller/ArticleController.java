@@ -5,10 +5,7 @@ import com.github.stazxr.zblog.bas.router.ApiVersion;
 import com.github.stazxr.zblog.bas.router.Router;
 import com.github.stazxr.zblog.bas.router.RouterLevel;
 import com.github.stazxr.zblog.base.domain.vo.UploadFileVo;
-import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
+import com.github.stazxr.zblog.content.domain.dto.*;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -362,5 +359,46 @@ public class ArticleController {
     @Router(name = "文章内容上传", code = "ARTIA004")
     public UploadFileVo uploadFile(@RequestPart(value = "file") MultipartFile multipartFile, @RequestParam Long articleId, @RequestParam String type) {
         return articleService.uploadFile(multipartFile, articleId, type);
+    }
+
+    /**
+     * 分页查询待审核和已发布文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    @GetMapping(value = "/pageAuditAndPublishList")
+    @ApiOperation(value = "分页查询待审核和已发布文章列表")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "分页查询待审核和已发布文章列表", code = "ARTIQ011")
+    public IPage<ArticleVo> queryAuditAndPublishListByPage(ArticleQueryDto queryDto) {
+        return articleService.queryAuditAndPublishListByPage(queryDto);
+    }
+
+    /**
+     * 查询文章管理页文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    @GetMapping(value = "/queryAuditAndPublishCountInfo")
+    @ApiOperation(value = "查询文章管理页文章数量统计信息")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "查询文章管理页文章数量统计信息", code = "ARTIQ012", level = RouterLevel.PUBLIC)
+    public ArticleCountVo queryAuditAndPublishCountInfo() {
+        return articleService.queryAuditAndPublishCountInfo();
+    }
+
+    /**
+     * 审核文章
+     *
+     * @param reviewDto 审核信息
+     */
+    @Log
+    @PostMapping(value = "/reviewArticle")
+    @ApiOperation(value = "审核文章")
+    @ApiVersion(value = BaseConst.ApiVersion.V_5_0_0)
+    @Router(name = "审核文章", code = "ARTIU005")
+    public void reviewArticle(@RequestBody ArticleReviewDto reviewDto) {
+        articleService.reviewArticle(reviewDto);
     }
 }

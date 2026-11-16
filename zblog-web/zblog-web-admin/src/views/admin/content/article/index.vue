@@ -274,7 +274,7 @@ import operationLogDialog from '@/views/admin/content/article/template/operation
 import versionDialog from '@/views/admin/content/article/template/versionDialog'
 import wechatPublishDialog from '@/views/admin/content/article/template/wechatPublishDialog'
 export default {
-  name: 'Article',
+  name: 'MyArticle',
   components: {
     previewDialog,
     operationLogDialog,

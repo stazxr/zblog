@@ -95,5 +95,9 @@ export default {
   // 文章内容上传
   uploadFile: params => {
     return api.httpRequest().post(`${articleApi}/uploadFile`, params)
+  },
+  // 分页查询待审核和已发布文章列表
+  pageAuditAndPublishList: params => {
+    return api.httpRequest().get(`${articleApi}/pageAuditAndPublishList`, params)
   }
 }

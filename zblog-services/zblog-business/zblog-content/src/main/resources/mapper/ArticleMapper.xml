@@ -132,6 +132,166 @@
         ORDER BY a.UPDATE_TIME DESC
     </select>
 
+    <select id="selectAuditAndPublishList" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleVo">
+        SELECT
+            a.ID,
+            <choose>
+                <!-- 已发布：使用正式发布版本的数据 -->
+                <when test='query.tagStatus == "1"'>
+                    av.TITLE,
+                    av.SUMMARY,
+                    av.ARTICLE_TYPE,
+                    av.ARTICLE_PERM,
+                    av.COMMENT_FLAG,
+                    av.WORDS_COUNT,
+                    av.COVER_IMAGE_TYPE,
+                    av.VERSION,
+                    av.PUBLISH_TIME,
+                </when>
+                <!-- 其他状态：使用文章主表数据 -->
+                <otherwise>
+                    a.TITLE,
+                    a.SUMMARY,
+                    a.ARTICLE_TYPE,
+                    a.ARTICLE_PERM,
+                    a.COMMENT_FLAG,
+                    a.WORDS_COUNT,
+                    a.COVER_IMAGE_TYPE,
+                    a.VERSION,
+                    NULL AS PUBLISH_TIME,
+                </otherwise>
+            </choose>
+            a.VIEW_COUNT,
+            a.LIKE_COUNT,
+            a.COMMENT_COUNT,
+            a.FAVORITE_COUNT,
+            a.AUTHOR_ID,
+            a.UPDATE_TIME,
+            a.DELETE_FLAG,
+            u.NICKNAME AS AUTHOR_NAME,
+            c.NAME AS CATEGORY_NAME
+        FROM article a
+        <choose>
+            <!-- 已发布：关联正式发布版本 -->
+            <when test='query.tagStatus == "1"'>
+                INNER JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
+                LEFT JOIN category c ON c.ID = av.CATEGORY_ID
+            </when>
+            <!-- 其他状态：关联文章当前分类 -->
+            <otherwise>
+                LEFT JOIN category c ON c.ID = a.CATEGORY_ID
+            </otherwise>
+        </choose>
+        LEFT JOIN user u ON u.ID = a.AUTHOR_ID
+        WHERE a.DELETE_FLAG = 0
+        <choose>
+            <!-- 1：已发布（不包含私密文章） -->
+            <when test='query.tagStatus == "1"'>
+                AND a.VERSION != 0 AND av.ARTICLE_PERM != 3
+            </when>
+            <!-- 2：待审核 -->
+            <when test='query.tagStatus == "2"'>
+                AND a.ARTICLE_STATUS = 2
+            </when>
+            <!-- 3：待处理 -->
+            <when test='query.tagStatus == "3"'>
+                AND a.ARTICLE_STATUS IN (4, 91)
+            </when>
+            <otherwise>
+                AND a.ARTICLE_STATUS = -1
+            </otherwise>
+        </choose>
+        <if test="query.authorId != null">
+            AND a.AUTHOR_ID = #{query.authorId}
+        </if>
+        <if test="query.title != null and query.title != ''">
+            <bind name="titleBind" value="'%' + query.title + '%'"/>
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND av.TITLE LIKE #{titleBind}
+                </when>
+                <otherwise>
+                    AND a.TITLE LIKE #{titleBind}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="query.slug != null and query.slug != ''">
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND av.SLUG = #{query.slug}
+                </when>
+                <otherwise>
+                    AND a.SLUG = #{query.slug}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="query.categoryId != null">
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND av.CATEGORY_ID = #{query.categoryId}
+                </when>
+                <otherwise>
+                    AND a.CATEGORY_ID = #{query.categoryId}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="query.tagId != null">
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND EXISTS (
+                        SELECT 1 FROM article_version_tag_relation avtr WHERE avtr.ARTICLE_VERSION_ID = av.ID AND avtr.TAG_ID = #{query.tagId}
+                    )
+                </when>
+                <otherwise>
+                    AND EXISTS (
+                        SELECT 1 FROM article_tag_relation atr WHERE atr.ARTICLE_ID = a.ID AND atr.TAG_ID = #{query.tagId}
+                    )
+                </otherwise>
+            </choose>
+        </if>
+        <if test="query.articleType != null">
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND av.ARTICLE_TYPE = #{query.articleType}
+                </when>
+                <otherwise>
+                    AND a.ARTICLE_TYPE = #{query.articleType}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="query.articleStatus != null">
+            AND a.ARTICLE_STATUS = #{query.articleStatus}
+        </if>
+        <if test="query.commentFlag != null">
+            <choose>
+                <when test='query.tagStatus == "1"'>
+                    AND av.COMMENT_FLAG = #{query.commentFlag}
+                </when>
+                <otherwise>
+                    AND a.COMMENT_FLAG = #{query.commentFlag}
+                </otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test='query.tagStatus == "1"'>
+                ORDER BY av.PUBLISH_TIME DESC
+            </when>
+            <otherwise>
+                ORDER BY a.UPDATE_TIME DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectAuditAndPublishCountInfo" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCountVo">
+        SELECT
+            SUM(a.VERSION != 0 AND av.ARTICLE_PERM != 3) AS publicCount,
+            SUM(a.ARTICLE_STATUS) AS pendingAuditCount,
+            SUM(a.ARTICLE_STATUS IN (4, 91)) AS pendingDealCount
+        FROM article a
+        INNER JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
+        WHERE a.DELETE_FLAG = 0
+    </select>
+
     <select id="selectArticleTagNamesByArticleIds" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleTagNameVo">
         SELECT
             atr.ARTICLE_ID AS articleId, t.NAME AS tagName

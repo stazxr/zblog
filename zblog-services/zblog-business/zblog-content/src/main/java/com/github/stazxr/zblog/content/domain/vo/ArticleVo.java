@@ -239,6 +239,12 @@ public class ArticleVo implements Serializable {
     private LocalDateTime deleteTime;
 
     /**
+     * 迭代版本id
+     */
+    @ApiModelProperty(value = "迭代版本id")
+    private Long versionId;
+
+    /**
      * 迭代版本
      */
     @ApiModelProperty(value = "迭代版本")

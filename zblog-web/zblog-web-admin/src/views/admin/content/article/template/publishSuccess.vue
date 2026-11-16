@@ -166,7 +166,7 @@ export default {
     // 返回文章管理页面
     goArticlePage() {
       this.$router.push({
-        name: 'Article',
+        name: 'MyArticle',
         query: {
           refresh: 't'
         }

@@ -122,4 +122,19 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return int 影响行数
      */
     int resetArticle(@Param("articleId") Long articleId);
+
+    /**
+     * 分页查询待审核和已发布文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    IPage<ArticleVo> selectAuditAndPublishList(@Param("page") Page<ArticleVo> page, @Param("query") ArticleQueryDto queryDto);
+
+    /**
+     * 查询文章管理页文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    ArticleCountVo selectAuditAndPublishCountInfo();
 }

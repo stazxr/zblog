@@ -30,10 +30,7 @@ import com.github.stazxr.zblog.base.mapper.UserWechatAccountMapper;
 import com.github.stazxr.zblog.base.service.FileService;
 import com.github.stazxr.zblog.content.autoconfigure.properties.ArticleUploadProperties;
 import com.github.stazxr.zblog.content.converter.ArticleWechatSyncConfigConverter;
-import com.github.stazxr.zblog.content.domain.dto.ArticleAutoSaveDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDraftDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleDto;
-import com.github.stazxr.zblog.content.domain.dto.ArticleWechatSyncConfigDto;
+import com.github.stazxr.zblog.content.domain.dto.*;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleAutoSaveQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleOperationLogQueryDto;
 import com.github.stazxr.zblog.content.domain.dto.query.ArticleQueryDto;
@@ -145,11 +142,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 分页查询
         Page<ArticleVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
         IPage<ArticleVo> articlePageList = baseMapper.selectMyArticleList(page, queryDto);
-
-        // 当前页文章 ID
         List<ArticleVo> records = articlePageList.getRecords();
-        List<Long> articleIds = records.stream().map(ArticleVo::getId).collect(Collectors.toList());
-        if (!articleIds.isEmpty()) {
+        if (records.size() > 0) {
+            // 当前页文章 ID
+            List<Long> articleIds = records.stream().map(ArticleVo::getId).collect(Collectors.toList());
+
             // 批量查询标签
             List<ArticleTagNameVo> tagRows = baseMapper.selectArticleTagNamesByArticleIds(articleIds);
             Map<Long, List<String>> tagMap = tagRows.stream().collect(Collectors.groupingBy(
@@ -159,7 +156,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             // 批量查询封面
             List<ArticleCoverImageVo> imageRows = baseMapper.selectArticleCoverImagesByArticleIds(articleIds);
             Map<Long, List<String>> imageMap = imageRows.stream().collect(Collectors.groupingBy(
-                ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
+                    ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
             ));
 
             // 回填文章标签和封面
@@ -832,6 +829,101 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             }
             throw new ServiceException(ArticleErrorCode.EARTIA017, e);
         }
+    }
+
+    /**
+     * 分页查询待审核和已发布文章列表
+     *
+     * @param queryDto 查询参数
+     * @return IPage<ArticleVo>
+     */
+    @Override
+    public IPage<ArticleVo> queryAuditAndPublishListByPage(ArticleQueryDto queryDto) {
+        // 参数检查
+        queryDto.checkPage();
+        ThrowUtils.throwIfBlank(queryDto.getTagStatus(), ArticleErrorCode.EARTIA001);
+        if (StringUtils.isNotBlank(queryDto.getTitle())) {
+            queryDto.setTitle(queryDto.getTitle().trim());
+        }
+        if (StringUtils.isNotBlank(queryDto.getSlug())) {
+            queryDto.setSlug(queryDto.getSlug().trim());
+        }
+
+        // 分页查询
+        Page<ArticleVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
+        IPage<ArticleVo> articlePageList = baseMapper.selectAuditAndPublishList(page, queryDto);
+        List<ArticleVo> records = articlePageList.getRecords();
+        if (records.size() > 0) {
+            if ("1".equals(queryDto.getTagStatus())) {
+                List<Long> articleVersionIds = records.stream().map(ArticleVo::getVersionId).collect(Collectors.toList());
+                if (!articleVersionIds.isEmpty()) {
+                    // 批量查询标签
+                    List<ArticleTagNameVo> tagRows = articleVersionMapper.selectArticleTagNamesByArticleVersionIds(articleVersionIds);
+                    Map<Long, List<String>> tagMap = tagRows.stream().collect(Collectors.groupingBy(
+                            ArticleTagNameVo::getArticleId, Collectors.mapping(ArticleTagNameVo::getTagName, Collectors.toList())
+                    ));
+
+                    // 批量查询封面
+                    List<ArticleCoverImageVo> imageRows = articleVersionMapper.selectArticleCoverImagesByArticleVersionIds(articleVersionIds);
+                    Map<Long, List<String>> imageMap = imageRows.stream().collect(Collectors.groupingBy(
+                            ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
+                    ));
+
+                    // 回填文章标签和封面
+                    for (ArticleVo article : records) {
+                        article.setTagNames(tagMap.getOrDefault(article.getVersionId(), Collections.emptyList()));
+                        article.setCoverImageList(imageMap.getOrDefault(article.getVersionId(), Collections.emptyList()));
+                    }
+                }
+            } else {
+                List<Long> articleIds = records.stream().map(ArticleVo::getId).collect(Collectors.toList());
+
+                // 批量查询标签
+                List<ArticleTagNameVo> tagRows = baseMapper.selectArticleTagNamesByArticleIds(articleIds);
+                Map<Long, List<String>> tagMap = tagRows.stream().collect(Collectors.groupingBy(
+                        ArticleTagNameVo::getArticleId, Collectors.mapping(ArticleTagNameVo::getTagName, Collectors.toList())
+                ));
+
+                // 批量查询封面
+                List<ArticleCoverImageVo> imageRows = baseMapper.selectArticleCoverImagesByArticleIds(articleIds);
+                Map<Long, List<String>> imageMap = imageRows.stream().collect(Collectors.groupingBy(
+                        ArticleCoverImageVo::getArticleId, Collectors.mapping(ArticleCoverImageVo::getCoverImage, Collectors.toList())
+                ));
+
+                // 回填文章标签和封面
+                for (ArticleVo article : records) {
+                    article.setTagNames(tagMap.getOrDefault(article.getId(), Collections.emptyList()));
+                    article.setCoverImageList(imageMap.getOrDefault(article.getId(), Collections.emptyList()));
+                }
+            }
+        }
+
+        return articlePageList;
+    }
+
+    /**
+     * 查询文章管理页文章数量统计信息
+     *
+     * @return ArticleCountVo
+     */
+    @Override
+    public ArticleCountVo queryAuditAndPublishCountInfo() {
+        ArticleCountVo articleCountVo = baseMapper.selectAuditAndPublishCountInfo();
+        if (articleCountVo == null) {
+            articleCountVo = new ArticleCountVo();
+        }
+        return articleCountVo;
+    }
+
+    /**
+     * 审核文章
+     *
+     * @param reviewDto 审核信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void reviewArticle(ArticleReviewDto reviewDto) {
+
     }
 
     private void checkUploadFileType(MultipartFile multipartFile, String type) {
