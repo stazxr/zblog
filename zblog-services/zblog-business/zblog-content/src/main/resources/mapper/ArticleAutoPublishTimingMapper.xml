@@ -25,7 +25,7 @@
 
     <update id="updateReviewToToDoStatus">
         UPDATE article_auto_publish_timing SET
-            STATUS = 0, ERROR_MSG = #{remark}, UPDATE_TIME = CURRENT_TIMESTAMP
+            STATUS = 0, UPDATE_TIME = CURRENT_TIMESTAMP
         WHERE ARTICLE_ID = #{articleId} AND STATUS = -1
     </update>
 

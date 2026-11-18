@@ -1216,8 +1216,6 @@ INSERT INTO `i18n_message` (`code`, `locale`, `message`, `type`) VALUES
 ('ARTICLE_WECHAT_TITLE_REQUIRED', 'en-US', 'TODO', 'common'),
 ('ARTICLE_AUDIT_STATUS_REQUIRED', 'zh-CN', '文章审核状态不能为空', 'common'),
 ('ARTICLE_AUDIT_STATUS_REQUIRED', 'en-US', 'Article audit status cannot be blank', 'common'),
-('BARRAGE_MESSAGE_STATUS_INVALID', 'zh-CN', '弹幕已被审核，请刷新页面重试', 'common'),
-('BARRAGE_MESSAGE_STATUS_INVALID', 'en-US', 'BarrageMessage audit status invalid', 'common'),
 -- 门户
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'zh-CN', '请填写弹幕信息', 'common'),
 ('PORTAL_BARRAGE_MESSAGE_CONTENT_REQUIRED', 'en-US', 'BarrageMessage content cannot be blank', 'common'),

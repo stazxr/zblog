@@ -248,7 +248,7 @@ export default {
 
       const now = new Date()
       const min = new Date(now.getTime() + 60 * 60 * 1000)
-      const max = new Date(now.getTime() + 72 * 60 * 60 * 1000)
+      const max = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
 
       return selected.getTime() >= min.getTime() &&
         selected.getTime() <= max.getTime() &&

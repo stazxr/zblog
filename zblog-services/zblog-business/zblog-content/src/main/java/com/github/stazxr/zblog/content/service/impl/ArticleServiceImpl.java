@@ -945,6 +945,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             if (publishTiming == null) {
                 articleStatus = ArticleStatus.PUBLISHED.getValue();
                 operationType = ArticleOperationType.PUBLISH;
+                // 发布文章
+                article.setVersion(article.getVersion() + 1);
+                publishArticleVersion(article);
             } else {
                 articleAutoPublishTimingMapper.updateReviewToToDoStatus(articleId);
                 articleStatus = ArticleStatus.SCHEDULED.getValue();
@@ -963,16 +966,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         // 更新文章状态
+        article.setArticleStatus(articleStatus);
         baseMapper.updateArticleStatus(articleId, articleStatus);
 
-        // 发布文章
-        if (ArticleStatus.PUBLISHED.getValue().equals(articleStatus)) {
-            article.setVersion(article.getVersion() + 1);
-            publishArticleVersion(article);
-        }
-
         // 记录文章操作日志
-        String remark = "【审批】";
+        String remark = "审批人|" + SecurityUtils.getUserName() + "|备注|";
         if (StringUtils.isNotBlank(auditReason)) {
             remark = remark + auditReason;
         }
