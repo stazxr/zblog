@@ -284,7 +284,7 @@ public class UserCenterServiceImpl implements UserCenterService {
     private void preDoUpdateUserPass(UserUpdatePassDto passDto) {
         // 空校验
         String username = passDto.getUsername();
-        ThrowUtils.when(StringUtils.isBlank(username)).system(BaseErrorCode.SCOREB003);
+        ThrowUtils.when(StringUtils.isBlank(username)).system(BaseErrorCode.SCOREB002);
         String oldPass = passDto.getOldPass();
         ThrowUtils.throwIfBlank(oldPass, UserCenterErrorCode.EUSERB000);
         String newPass = passDto.getNewPass();

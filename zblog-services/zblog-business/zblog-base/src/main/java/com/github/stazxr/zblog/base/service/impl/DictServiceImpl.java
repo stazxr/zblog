@@ -150,7 +150,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
 
     private void checkDict(Dict dict) {
         // 字典类型校验
-        ThrowUtils.when(DictType.of(dict.getDictType()) == null).system(BaseErrorCode.SCOREB002);
+        ThrowUtils.when(DictType.of(dict.getDictType()) == null).system(BaseErrorCode.SCOREB003);
 
         // 检查其他数据
         if (DictType.GROUP.getValue().equals(dict.getDictType())) {

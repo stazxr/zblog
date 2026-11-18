@@ -99,5 +99,13 @@ export default {
   // 分页查询待审核和已发布文章列表
   pageAuditAndPublishList: params => {
     return api.httpRequest().get(`${articleApi}/pageAuditAndPublishList`, params)
+  },
+  // 查询文章管理页文章数量统计信息
+  queryAuditAndPublishCountInfo: params => {
+    return api.httpRequest().get(`${articleApi}/queryAuditAndPublishCountInfo`, params)
+  },
+  // 文章审核
+  reviewArticle: params => {
+    return api.httpRequest().post(`${articleApi}/reviewArticle`, params)
   }
 }

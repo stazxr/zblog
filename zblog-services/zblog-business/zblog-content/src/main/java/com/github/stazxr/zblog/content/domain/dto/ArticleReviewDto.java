@@ -21,10 +21,22 @@ public class ArticleReviewDto implements Serializable {
     private static final long serialVersionUID = 8707837244254703075L;
 
     /**
-     * 文章ID
+     * 文章id
      */
     @NotNull(message = "{TECH_PARAM_MISS}")
-    @ApiModelProperty(value = "文章ID")
-    private Long id;
+    @ApiModelProperty(value = "文章id")
+    private Long articleId;
 
+    /**
+     * 审核结果
+     */
+    @NotNull(message = "{ARTICLE_AUDIT_STATUS_REQUIRED}")
+    @ApiModelProperty(value = "审核结果")
+    private Integer auditStatus;
+
+    /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    private String auditReason;
 }

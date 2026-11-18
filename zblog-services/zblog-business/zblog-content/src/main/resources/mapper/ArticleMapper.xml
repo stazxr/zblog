@@ -285,10 +285,10 @@
     <select id="selectAuditAndPublishCountInfo" resultType="com.github.stazxr.zblog.content.domain.vo.ArticleCountVo">
         SELECT
             SUM(a.VERSION != 0 AND av.ARTICLE_PERM != 3) AS publicCount,
-            SUM(a.ARTICLE_STATUS) AS pendingAuditCount,
+            SUM(a.ARTICLE_STATUS = 2) AS pendingAuditCount,
             SUM(a.ARTICLE_STATUS IN (4, 91)) AS pendingDealCount
         FROM article a
-        INNER JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
+        LEFT JOIN article_version av ON av.ARTICLE_ID = a.ID AND av.VERSION = a.VERSION
         WHERE a.DELETE_FLAG = 0
     </select>
 
@@ -394,6 +394,10 @@
 
     <update id="updateArticleStatus">
         UPDATE article SET ARTICLE_STATUS = #{status} WHERE ID = #{articleId}
+    </update>
+
+    <update id="updateArticleVersion">
+        UPDATE article SET VERSION = #{version} WHERE ID = #{articleId}
     </update>
 
     <update id="deleteArticle">

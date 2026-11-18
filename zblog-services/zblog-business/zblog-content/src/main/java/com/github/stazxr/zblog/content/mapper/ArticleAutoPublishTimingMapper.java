@@ -18,4 +18,35 @@ public interface ArticleAutoPublishTimingMapper extends BaseMapper<ArticleAutoPu
      * @param remark    原因
      */
     void invalidHistoryRecord(@Param("articleId") Long articleId, @Param("remark") String remark);
+
+    /**
+     * 查询文章审核中的发布记录
+     *
+     * @param articleId 文章id
+     * @return ArticleAutoPublishTiming
+     */
+    ArticleAutoPublishTiming selectReviewRecord(@Param("articleId") Long articleId);
+
+    /**
+     * 查询文章待发布的记录
+     *
+     * @param articleId 文章id
+     * @return ArticleAutoPublishTiming
+     */
+    ArticleAutoPublishTiming selectToPublishRecord(@Param("articleId") Long articleId);
+
+    /**
+     * 更新待审核态为待同步态
+     *
+     * @param articleId 文章id
+     */
+    void updateReviewToToDoStatus(@Param("articleId") Long articleId);
+
+    /**
+     * 更新待审核态为拒绝态
+     *
+     * @param articleId 文章id
+     * @param remark    备注
+     */
+    void updateReviewToRejectStatus(@Param("articleId") Long articleId, @Param("remark") String remark);
 }

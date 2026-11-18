@@ -66,18 +66,9 @@
             v-perm="['ARTIU005']"
             type="primary"
             :disabled="row === null"
-            @click="previewArticle"
+            @click="reviewArticle"
           >
             审核
-          </el-button>
-          <el-button
-            v-show="filters.tagStatus === '1'"
-            v-perm="['ARTID001']"
-            :disabled="row === null || row['deleteFlag'] !== 0"
-            type="danger"
-            @click="deleteArticle"
-          >
-            下线
           </el-button>
         </span>
       </div>
@@ -220,18 +211,11 @@
       @showOperationLogDone="showOperationLogDone"
     />
 
-    <!-- 版本记录 -->
-    <version-dialog
-      ref="versionDialog"
-      :dialog-visible="versionDialogVisible"
-      @showVersionDone="showVersionDone"
-    />
-
-    <!-- 发布公众号 -->
-    <wechat-publish-dialog
-      ref="wechatPublishDialog"
-      :dialog-visible="publishWechatDialogVisible"
-      @publishWechatDone="publishWechatDone"
+    <!-- 审核 -->
+    <auditDialog
+      ref="auditDialogRef"
+      :dialog-visible="auditDialogVisible"
+      @auditDone="auditDone"
     />
   </div>
 </template>
@@ -239,15 +223,13 @@
 <script>
 import previewDialog from '@/views/admin/content/article/template/previewDialog'
 import operationLogDialog from '@/views/admin/content/article/template/operationLogDialog'
-import versionDialog from '@/views/admin/content/article/template/versionDialog'
-import wechatPublishDialog from '@/views/admin/content/article/template/wechatPublishDialog'
+import auditDialog from '@/views/admin/audit/article/template/auditDialog'
 export default {
   name: 'Article',
   components: {
     previewDialog,
     operationLogDialog,
-    versionDialog,
-    wechatPublishDialog
+    auditDialog
   },
   data() {
     return {
@@ -288,11 +270,9 @@ export default {
       total: 0,
       page: 1,
       pageSize: 5,
-      wechatPublishLoading: false,
       previewDialogVisible: false,
       operationLogDialogVisible: false,
-      versionDialogVisible: false,
-      publishWechatDialogVisible: false
+      auditDialogVisible: false
     }
   },
   computed: {
@@ -421,11 +401,11 @@ export default {
         this.tableLoading = false
         this.row = null
         this.$refs.articleTable.setCurrentRow()
-        this.loadMyArticleCountInfo()
+        this.loadArticleCountInfo()
       })
     },
-    loadMyArticleCountInfo() {
-      this.$mapi.article.queryMyArticleCountInfo().then(res => {
+    loadArticleCountInfo() {
+      this.$mapi.article.queryAuditAndPublishCountInfo().then(res => {
         const { data } = res
         Object.keys(this.articleCountInfo).forEach(key => {
           this.articleCountInfo[key] = data[key] || 0
@@ -442,17 +422,6 @@ export default {
     previewDone() {
       this.previewDialogVisible = false
     },
-    // 新增与编辑
-    addArticle() {
-      this.$router.push({ name: 'AddOrEditArticle' })
-    },
-    editArticle() {
-      if (this.row === null) {
-        this.$message.error('请选择要编辑的文章')
-        return
-      }
-      this.$router.push({ name: 'AddOrEditArticle', query: { articleId: this.row.id }})
-    },
     // 查看操作日志
     showArticleLog() {
       if (this.row === null) {
@@ -466,88 +435,20 @@ export default {
     showOperationLogDone() {
       this.operationLogDialogVisible = false
     },
-    // 查看版本记录
-    showArticleVersion() {
+    // 审核文章
+    reviewArticle() {
       if (this.row === null) {
-        this.$message.error('请选择要查看的文章')
+        this.$message.error('请选择要审核的文章')
         return
       }
-
-      this.versionDialogVisible = true
-      this.$refs.versionDialog.initData(this.row.id)
+      this.auditDialogVisible = true
+      this.$refs.auditDialogRef.initData(this.row.id)
     },
-    showVersionDone() {
-      this.versionDialogVisible = false
-    },
-    // 发布微信公众号
-    publishWechat() {
-      if (this.row === null) {
-        this.$message.error('请选择要发布的文章')
-        return
-      }
-
-      if (this.row.articleStatus !== 5) {
-        this.$message.warning('只有已发布的文章才能同步到微信公众号')
-        return
-      }
-
-      this.publishWechatDialogVisible = true
-      this.$refs.wechatPublishDialog.initData(this.row.id)
-    },
-    publishWechatDone() {
-      this.publishWechatDialogVisible = false
-    },
-    // 删除
-    deleteArticle() {
-      if (this.row === null) {
-        this.$message.error('请选择要删除的文章')
-        return
-      }
-      this.$confirm('此操作将移动文章【' + this.row.title + '】到回收站, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$mapi.article.deleteArticle({ articleId: this.row.id }).then(res => {
-          this.$message.success(res.message)
-          this.listTableData()
-        })
-      })
-    },
-    deleteArticle2() {
-      if (this.row === null) {
-        this.$message.error('请选择要删除的文章')
-        return
-      }
-      this.$confirm('此操作将永久删除文章【' + this.row.title + '】, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$mapi.article.deleteArticle2({ articleId: this.row.id }).then(res => {
-          this.$message.success(res.message)
-          this.listTableData()
-        })
-      })
-    },
-    deleteArticle3() {
-      this.$confirm('此操作将彻底删除回收站的文章, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$mapi.article.deleteArticle3().then(res => {
-          this.$message.success(res.message)
-          this.listTableData()
-        })
-      })
-    },
-    // 还原文章
-    resetArticle() {
-      this.$mapi.article.resetArticle({ articleId: this.row.id }).then(res => {
-        this.$message.success(res.message)
+    auditDone(result = false) {
+      this.auditDialogVisible = false
+      if (result) {
         this.listTableData()
-      })
+      }
     }
   }
 }

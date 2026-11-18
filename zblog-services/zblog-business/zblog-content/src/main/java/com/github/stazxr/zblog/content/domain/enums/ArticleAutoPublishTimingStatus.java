@@ -8,6 +8,11 @@ package com.github.stazxr.zblog.content.domain.enums;
  */
 public enum ArticleAutoPublishTimingStatus {
     /**
+     * 待审核。
+     */
+    REVIEW(-1, "待审核"),
+
+    /**
      * 待发布。
      */
     TODO(0, "待发布"),

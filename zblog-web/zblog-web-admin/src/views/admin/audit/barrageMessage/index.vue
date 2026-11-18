@@ -202,6 +202,10 @@ export default {
     },
     // 审核
     auditBarrageMessage() {
+      if (this.row === null) {
+        this.$message.error('请选择要审核的留言')
+        return
+      }
       this.auditDialogVisible = true
       this.$refs.auditDialogRef.initData(this.row.id)
     },

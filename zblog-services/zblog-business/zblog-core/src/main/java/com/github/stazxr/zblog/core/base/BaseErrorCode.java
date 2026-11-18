@@ -33,11 +33,11 @@ public enum BaseErrorCode implements ErrorCode {
 
     /** 技术参数缺失 */
     SCOREB000("TECH_PARAM_MISS"),
-    /** 参数异常[PE001] */
+    /** 参数异常[PE001]: 业务参数异常 */
     SCOREB001("TECH_PARAM_INVALID1"),
-    /** 参数异常[PE002] */
+    /** 参数异常[PE002]: 业务参数缺失 */
     SCOREB002("TECH_PARAM_INVALID2"),
-    /** 参数异常[PE003] */
+    /** 参数异常[PE003]: 不在合理范围内 */
     SCOREB003("TECH_PARAM_INVALID3"),
 
     /** 数据加密失败 */

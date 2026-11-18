@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.stazxr.zblog.content.mapper.ArticleAutoPublishTimingMapper">
+    <select id="selectReviewRecord" resultType="com.github.stazxr.zblog.content.domain.entity.ArticleAutoPublishTiming">
+        SELECT
+            ID, ARTICLE_ID, VERSION, PUBLISH_TIME, STATUS, RETRY_COUNT, ERROR_MSG,
+            CREATE_TIME, UPDATE_TIME, EXECUTE_TIME, FINISH_TIME
+        FROM article_auto_publish_timing
+        WHERE ARTICLE_ID = #{articleId} AND STATUS = -1
+    </select>
+
+    <select id="selectToPublishRecord" resultType="com.github.stazxr.zblog.content.domain.entity.ArticleAutoPublishTiming">
+        SELECT
+            ID, ARTICLE_ID, VERSION, PUBLISH_TIME, STATUS, RETRY_COUNT, ERROR_MSG,
+            CREATE_TIME, UPDATE_TIME, EXECUTE_TIME, FINISH_TIME
+        FROM article_auto_publish_timing
+        WHERE ARTICLE_ID = #{articleId} AND STATUS = 0
+    </select>
+
     <update id="invalidHistoryRecord">
         UPDATE article_auto_publish_timing SET
             STATUS = 4, ERROR_MSG = #{remark}, UPDATE_TIME = CURRENT_TIMESTAMP
-        WHERE ARTICLE_ID = #{articleId} AND STATUS = 0
+        WHERE ARTICLE_ID = #{articleId} AND STATUS IN (-1, 0)
+    </update>
+
+    <update id="updateReviewToToDoStatus">
+        UPDATE article_auto_publish_timing SET
+            STATUS = 0, ERROR_MSG = #{remark}, UPDATE_TIME = CURRENT_TIMESTAMP
+        WHERE ARTICLE_ID = #{articleId} AND STATUS = -1
+    </update>
+
+    <update id="updateReviewToRejectStatus">
+        UPDATE article_auto_publish_timing SET
+            STATUS = 4, ERROR_MSG = #{remark}, UPDATE_TIME = CURRENT_TIMESTAMP
+        WHERE ARTICLE_ID = #{articleId} AND STATUS = -1
     </update>
 </mapper>

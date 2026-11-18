@@ -279,7 +279,7 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                     PermissionType.MENU.getType().equals(parentType);
             ThrowUtils.throwIf(!dirOrMenu, PermErrorCode.EPERMA014);
         } else {
-            ThrowUtils.system(BaseErrorCode.SCOREB002);
+            ThrowUtils.system(BaseErrorCode.SCOREB003);
         }
     }
 

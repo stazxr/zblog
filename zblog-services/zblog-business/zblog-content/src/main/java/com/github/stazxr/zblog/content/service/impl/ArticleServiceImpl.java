@@ -428,7 +428,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 填充文章信息
         fillArticle(article, articleDto);
-        article.setArticleStatus(ArticleStatus.SCHEDULED.getValue());
+        article.setArticleStatus(ArticleStatus.PENDING_REVIEW.getValue());
 
         // 保存文章内容
         baseMapper.updateArticleById(article);
@@ -573,7 +573,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public IPage<ArticleAutoSaveVo> queryAutoSaveArticleContentByPage(ArticleAutoSaveQueryDto queryDto) {
         // 参数检查
         queryDto.checkPage();
-        ThrowUtils.throwIfNull(queryDto.getArticleId(), BaseErrorCode.SCOREB001);
+        ThrowUtils.throwIfNull(queryDto.getArticleId(), BaseErrorCode.SCOREB002);
 
         // 分页查询
         Page<ArticleAutoSaveVo> page = new Page<>(queryDto.getPage(), queryDto.getPageSize());
@@ -588,7 +588,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public ArticleAutoSaveVo queryAutoSaveArticleContentById(Long recordId) {
-        ThrowUtils.throwIfNull(recordId, BaseErrorCode.SCOREB001);
+        ThrowUtils.throwIfNull(recordId, BaseErrorCode.SCOREB002);
         return articleContentDraftRecordMapper.selectAutoSaveArticleContentById(recordId);
     }
 
@@ -923,7 +923,60 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void reviewArticle(ArticleReviewDto reviewDto) {
+        // 查询文章信息
+        Long articleId = reviewDto.getArticleId();
+        Article article = baseMapper.selectById(articleId);
+        ThrowUtils.requireNonNull(article, BaseErrorCode.ECOREA001);
 
+        // 文章状态校验
+        ThrowUtils.throwIf(!ArticleStatus.PENDING_REVIEW.getValue().equals(article.getArticleStatus()), ArticleErrorCode.EARTIA009);
+
+        // 复制旧数据，用于日志记录
+        Article oldArticle = new Article();
+        BeanUtils.copyProperties(article, oldArticle);
+
+        // 解析文章状态
+        Integer articleStatus;
+        ArticleOperationType operationType;
+        Integer auditStatus = reviewDto.getAuditStatus();
+        String auditReason = reviewDto.getAuditReason();
+        if (ArticleAuditStatus.APPROVED.getStatus().equals(auditStatus)) {
+            ArticleAutoPublishTiming publishTiming = articleAutoPublishTimingMapper.selectReviewRecord(articleId);
+            if (publishTiming == null) {
+                articleStatus = ArticleStatus.PUBLISHED.getValue();
+                operationType = ArticleOperationType.PUBLISH;
+            } else {
+                articleAutoPublishTimingMapper.updateReviewToToDoStatus(articleId);
+                articleStatus = ArticleStatus.SCHEDULED.getValue();
+                operationType = ArticleOperationType.SCHEDULE;
+            }
+        } else if (ArticleAuditStatus.REJECTED.getStatus().equals(reviewDto.getAuditStatus())) {
+            String remark = "审批拒绝";
+            if (StringUtils.isNotBlank(auditReason)) {
+                remark = remark + ": " + auditReason;
+            }
+            articleAutoPublishTimingMapper.updateReviewToRejectStatus(articleId, remark);
+            articleStatus = ArticleStatus.REVIEW_REJECTED.getValue();
+            operationType = ArticleOperationType.REJECT;
+        } else {
+            throw new ServiceException(BaseErrorCode.SCOREB003);
+        }
+
+        // 更新文章状态
+        baseMapper.updateArticleStatus(articleId, articleStatus);
+
+        // 发布文章
+        if (ArticleStatus.PUBLISHED.getValue().equals(articleStatus)) {
+            article.setVersion(article.getVersion() + 1);
+            publishArticleVersion(article);
+        }
+
+        // 记录文章操作日志
+        String remark = "【审批】";
+        if (StringUtils.isNotBlank(auditReason)) {
+            remark = remark + auditReason;
+        }
+        recordArticleLog(article, oldArticle, operationType, remark);
     }
 
     private void checkUploadFileType(MultipartFile multipartFile, String type) {
@@ -1297,6 +1350,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 记录正式发布的文章封面
         articleVersionImageMapper.insertVersionImage(versionId, article.getId());
+
+        // 保存文章版本信息
+        baseMapper.updateArticleVersion(article.getId(), article.getVersion());
     }
 
     private void doAutoPublishArticle(Long articleId, Integer version, String publishTime) {
@@ -1309,7 +1365,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         timing.setArticleId(articleId);
         timing.setVersion(version);
         timing.setPublishTime(DateUtils.parseLocalDateTimeFormat(publishTime, "yyyy-MM-dd HH:mm"));
-        timing.setStatus(ArticleAutoPublishTimingStatus.TODO.getValue());
+        timing.setStatus(ArticleAutoPublishTimingStatus.REVIEW.getValue()); // 待审核
         timing.setRetryCount(0);
         timing.setCreateTime(LocalDateTime.now());
         articleAutoPublishTimingMapper.insert(timing);
